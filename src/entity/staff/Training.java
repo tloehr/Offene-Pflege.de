@@ -6,6 +6,7 @@ import entity.system.Users;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -117,6 +118,10 @@ public class Training {
 
     public void setCommontags(Collection<Commontags> commontags) {
         this.commontags = commontags;
+    }
+
+    public Training() {
+        commontags = new ArrayList<>();
     }
 
     @Override

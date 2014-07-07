@@ -4,6 +4,7 @@
 
 package op.settings;
 
+import javax.swing.event.*;
 import com.enterprisedt.net.ftp.FileTransferClient;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -1057,6 +1058,10 @@ public class PnlSystemSettings extends CleanablePanel {
 
     }
 
+    private void txtMailRecipientCaretUpdate(CaretEvent e) {
+        btnTestmail.setEnabled(SYSTools.isValidEMail(SYSTools.tidy(txtMailRecipient.getText())));
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabMain = new JTabbedPane();
@@ -1350,6 +1355,14 @@ public class PnlSystemSettings extends CleanablePanel {
                             //---- lblMailRecipient ----
                             lblMailRecipient.setText("error-recipient");
                             pnlMail.add(lblMailRecipient, CC.xy(1, 11));
+
+                            //---- txtMailRecipient ----
+                            txtMailRecipient.addCaretListener(new CaretListener() {
+                                @Override
+                                public void caretUpdate(CaretEvent e) {
+                                    txtMailRecipientCaretUpdate(e);
+                                }
+                            });
                             pnlMail.add(txtMailRecipient, CC.xy(3, 11));
 
                             //---- lblMailSenderPersonal ----

@@ -4,10 +4,12 @@
 
 package op.settings;
 
+import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.system.Users;
 import op.OPDE;
+import op.system.EMailSystem;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.CleanablePanel;
@@ -39,10 +41,15 @@ public class PnlUserSettings extends CleanablePanel {
         OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
         OPDE.getDisplayManager().clearAllIcons();
 
-        lblPWTitle.setText(SYSTools.xx(internalClassID + ".pwtitle"));
-        lblNew.setText(SYSTools.xx(internalClassID + ".newpw"));
-        lblOld.setText(SYSTools.xx(internalClassID + ".oldpw"));
-        btnChangePW.setToolTipText(SYSTools.xx(internalClassID + ".pwtitle"));
+        lblPWTitle.setText(SYSTools.xx("opde.usersettings.pwtitle"));
+        lblNew.setText(SYSTools.xx("opde.usersettings.newpw"));
+        lblOld.setText(SYSTools.xx("opde.usersettings.oldpw"));
+        btnChangePW.setToolTipText(SYSTools.xx("opde.usersettings.pwtitle"));
+
+        lblMailTitle.setText(SYSTools.xx("opde.usersettings.your.mailsettings"));
+        lblMailAddress.setText(SYSTools.xx("opde.usersettings.your.mailaddress"));
+        btnSendTestMail.setToolTipText(SYSTools.xx("opde.settings.global.mail.btnTestmail"));
+        tbNotify.setToolTipText(SYSTools.xx("opde.usersettings.enable.notification"));
 
         prepareSearchArea();
     }
@@ -66,11 +73,11 @@ public class PnlUserSettings extends CleanablePanel {
         EntityManager em = OPDE.createEM();
         Users user = em.merge(OPDE.getLogin().getUser());
         if (!user.getMd5pw().equals(SYSTools.hashword(txtOld.getText().trim()))) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".oldpwwrong")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.usersettings.oldpwwrong")));
             return;
         }
         if (txtNew.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".newpwempty")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.usersettings.newpwempty")));
             return;
         }
 
@@ -79,7 +86,7 @@ public class PnlUserSettings extends CleanablePanel {
             em.lock(user, LockModeType.OPTIMISTIC);
             user.setMd5pw(SYSTools.hashword(txtNew.getText().trim()));
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".pwchanged"));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.usersettings.pwchanged"));
 
             OPDE.getLogin().setUser(user);
             txtNew.setText("");
@@ -117,6 +124,18 @@ public class PnlUserSettings extends CleanablePanel {
         jspSearch.setViewportView(new JPanel());
     }
 
+    private void btnSendTestMailActionPerformed(ActionEvent e) {
+        EMailSystem.sendMail(OPDE.getLogin().getUser().getEMail(), SYSTools.xx(""+"\n"+"1234"), getMailProps());
+    }
+
+    private void textField1CaretUpdate(CaretEvent e) {
+        // TODO add your code here
+    }
+
+    private void txtMailAddressActionPerformed(ActionEvent e) {
+        btnSendTestMail.setEnabled(SYSTools.isValidEMail(txtMailAddress.getText()));
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -126,11 +145,16 @@ public class PnlUserSettings extends CleanablePanel {
         lblNew = new JLabel();
         txtNew = new JTextField();
         btnChangePW = new JButton();
+        lblMailTitle = new JLabel();
+        lblMailAddress = new JLabel();
+        txtMailAddress = new JTextField();
+        btnSendTestMail = new JButton();
+        tbNotify = new JToggleButton();
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, $lcgap, default",
-                "5*(default, $lgap), default"));
+            "2*(default, $lcgap), 178dlu, $lcgap, default:grow",
+            "5*(default, $lgap), 13dlu, 4*($lgap, default), $lgap, fill:default:grow"));
 
         //---- lblPWTitle ----
         lblPWTitle.setText("text");
@@ -158,9 +182,6 @@ public class PnlUserSettings extends CleanablePanel {
         //---- btnChangePW ----
         btnChangePW.setText(null);
         btnChangePW.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnChangePW.setBorderPainted(false);
-        btnChangePW.setBorder(null);
-        btnChangePW.setContentAreaFilled(false);
         btnChangePW.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnChangePW.addActionListener(new ActionListener() {
             @Override
@@ -169,6 +190,40 @@ public class PnlUserSettings extends CleanablePanel {
             }
         });
         add(btnChangePW, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
+
+        //---- lblMailTitle ----
+        lblMailTitle.setText("text");
+        lblMailTitle.setFont(new Font("Arial", Font.PLAIN, 18));
+        add(lblMailTitle, CC.xywh(3, 13, 3, 1));
+
+        //---- lblMailAddress ----
+        lblMailAddress.setText("text");
+        lblMailAddress.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(lblMailAddress, CC.xy(3, 15));
+
+        //---- txtMailAddress ----
+        txtMailAddress.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtMailAddress.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtMailAddressActionPerformed(e);
+            }
+        });
+        add(txtMailAddress, CC.xy(5, 15));
+
+        //---- btnSendTestMail ----
+        btnSendTestMail.setText("SendTestMail");
+        btnSendTestMail.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnSendTestMailActionPerformed(e);
+            }
+        });
+        add(btnSendTestMail, CC.xy(5, 17));
+
+        //---- tbNotify ----
+        tbNotify.setText("EnableNotifications");
+        add(tbNotify, CC.xy(5, 19));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -179,5 +234,10 @@ public class PnlUserSettings extends CleanablePanel {
     private JLabel lblNew;
     private JTextField txtNew;
     private JButton btnChangePW;
+    private JLabel lblMailTitle;
+    private JLabel lblMailAddress;
+    private JTextField txtMailAddress;
+    private JButton btnSendTestMail;
+    private JToggleButton tbNotify;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -1026,7 +1026,7 @@ public class ResInfoTools {
             query.setParameter("von", new DateTime().toDateMidnight().minusDays(7).toDate());
             query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
             query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
-            result += NReportTools.getReportsAsHTML(query.getResultList(), true, null, null);
+            result += NReportTools.getNReportsAsHTML(query.getResultList(), true, null, null);
             em.close();
 
         }

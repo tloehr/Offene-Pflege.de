@@ -11,7 +11,7 @@ new FormModel {
 				"border": new javax.swing.border.EmptyBorder( 12, 12, 12, 12 )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 					"$columnSpecs": "pref, unrelgap, default:grow"
-					"$rowSpecs": "default, relgap, default, linegap, default, relgap, default, relgap, default:grow, linegap, pref, linegap, default"
+					"$rowSpecs": "default, relgap, default, linegap, default, relgap, default, relgap, default:grow, linegap, fill:41dlu, linegap, default"
 				} ) {
 					name: "contentPanel"
 					add( new FormComponent( "javax.swing.JLabel" ) {

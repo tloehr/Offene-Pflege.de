@@ -64,6 +64,10 @@ public class Users implements Serializable, Comparable<Users> {
     private String md5pw;
     @Column(name = "EMail")
     private String eMail;
+    @Basic(optional = false)
+    @Column(name = "mailconfirmed")
+    private int mailconfirmed;
+
     @ManyToMany
     @JoinTable(name = "member", joinColumns =
     @JoinColumn(name = "UKennung"), inverseJoinColumns =
@@ -100,6 +104,15 @@ public class Users implements Serializable, Comparable<Users> {
         uid = null;
         groups = new ArrayList<Groups>();
         status = UsersTools.STATUS_ACTIVE;
+        mailconfirmed = UsersTools.MAIL_UNCONFIRMED;
+    }
+
+    public int getMailconfirmed() {
+        return mailconfirmed;
+    }
+
+    public void setMailconfirmed(int mailconfirmed) {
+        this.mailconfirmed = mailconfirmed;
     }
 
     public Collection<Training> getTrainings() {

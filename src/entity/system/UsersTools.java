@@ -22,6 +22,10 @@ public class UsersTools {
     public static final short STATUS_ACTIVE = 1;
     public static final short STATUS_ROOT = 2;
 
+    public static final int MAIL_UNCONFIRMED = 0;
+    public static final int MAIL_CONFIRMED = 1;
+    public static final int MAIL_NOTIFICATIONS_ENABLED = 2;
+
     public static ArrayList<Users> getUsers(boolean inactiveToo) {
         EntityManager em = OPDE.createEM();
 

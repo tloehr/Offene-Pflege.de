@@ -42,11 +42,12 @@ public class DlgReport extends MyJDialog {
     private PnlCommonTags pnlCommonTags;
 
     public DlgReport(NReport nReport, Closure actionBlock) {
-        super();
+        super(false);
         this.nReport = nReport;
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
+        pack();
         setVisible(true);
     }
 
@@ -166,8 +167,8 @@ public class DlgReport extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "13dlu, pref, $rgap, default:grow, 13dlu",
-            "2*(default), $nlgap, default, fill:143dlu, top:40dlu, default, 13dlu"));
+            "13dlu, pref, $rgap, 336dlu, 13dlu",
+            "13dlu, default, $nlgap, default, fill:143dlu, fill:46dlu, default, 13dlu"));
 
         //---- lblTime ----
         lblTime.setText("Dauer");
@@ -214,7 +215,7 @@ public class DlgReport extends MyJDialog {
             panel2.add(btnApply);
         }
         contentPane.add(panel2, CC.xy(4, 7, CC.RIGHT, CC.FILL));
-        setSize(770, 435);
+        pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

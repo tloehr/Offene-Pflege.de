@@ -59,10 +59,7 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.RollbackException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
@@ -246,7 +243,7 @@ public class PnlReport extends NursingRecordsPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (SYSTools.catchNull(txtSearch.getText()).trim().length() >= 3) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
+                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
                 }
             }
         });
@@ -277,10 +274,10 @@ public class PnlReport extends NursingRecordsPanel {
                 final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), false, null, null), false);
+                        SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), false, null, null), false);
                     }
                 });
-
+                btnTag.setForeground(GUITools.getColor(commontag.getColor()));
                 pnlTags.add(btnTag);
             }
             list.add(pnlTags);
@@ -347,11 +344,11 @@ public class PnlReport extends NursingRecordsPanel {
                                             }
                                         }
 
-                                        if (!minmax.isAfter(new DateTime(myReport.getPit()))) {
+                                        if (minmax.isAfter(new DateTime(myReport.getPit()))) {
                                             minmax.setStart(new DateTime(myReport.getPit()));
                                         }
 
-                                        if (!minmax.isBefore(new DateTime(myReport.getPit()))) {
+                                        if (minmax.isBefore(new DateTime(myReport.getPit()))) {
                                             minmax.setEnd(new DateTime(myReport.getPit()));
                                         }
 
@@ -637,7 +634,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintMonth.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Month(resident, month), false, null, null), true);
+                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month), false, null, null), true);
                 }
             });
             cptitle.getRight().add(btnPrintMonth);
@@ -743,7 +740,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintWeek.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, null, null), true);
+                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, null, null), true);
                 }
             });
             cptitle.getRight().add(btnPrintWeek);
@@ -838,7 +835,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintDay.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Day(resident, day), false, null, null), true);
+                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day), false, null, null), true);
                 }
             });
             titleCPDay.getRight().add(btnPrintDay);
@@ -906,7 +903,7 @@ public class PnlReport extends NursingRecordsPanel {
                                                     " " + SYSTools.xx("misc.msg.Time.short") +
                                                     ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                                                     ", " + nreport.getUser().getFullname() +
-                                                    (nreport.getCommontags().isEmpty() ? "" : " " + NReportTools.getTagsAsHTML(nreport, SYSConst.html_16x16_tagPurple_internal, 5)) + "</p></b></td>"
+                                                    (nreport.getCommontags().isEmpty() ? "" : " " + NReportTools.getTagsAsHTML(nreport, SYSConst.html_16x16_tagPurple_internal)) + "</p></b></td>"
                                     ) +
                                             SYSConst.html_table_tr(
                                                     "<td width=\"800\" align=\"left\">" + SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
@@ -1301,11 +1298,11 @@ public class PnlReport extends NursingRecordsPanel {
                                         }
                                     }
 
-                                    if (!minmax.isAfter(new DateTime(newReport.getPit()))) {
+                                    if (minmax.isAfter(new DateTime(newReport.getPit()))) {
                                         minmax.setStart(new DateTime(newReport.getPit()));
                                     }
 
-                                    if (!minmax.isBefore(new DateTime(newReport.getPit()))) {
+                                    if (minmax.isBefore(new DateTime(newReport.getPit()))) {
                                         minmax.setEnd(new DateTime(newReport.getPit()));
                                     }
 
@@ -1443,11 +1440,11 @@ public class PnlReport extends NursingRecordsPanel {
             btnTAGs.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    JidePopup popup = new JidePopup();
+                    final JidePopup popup = new JidePopup();
 
-                    JPanel pnl = new JPanel(new BorderLayout(5, 5));
-                    final PnlCommonTags pnlCommonTags = new PnlCommonTags(nreport.getCommontags(), true, 5);
-                    pnl.add(pnlCommonTags, BorderLayout.CENTER);
+                    final JPanel pnl = new JPanel(new BorderLayout(5, 5));
+                    final PnlCommonTags pnlCommonTags = new PnlCommonTags(nreport.getCommontags(), true, 4);
+                    pnl.add(new JScrollPane(pnlCommonTags), BorderLayout.CENTER);
                     JButton btnApply = new JButton(SYSConst.icon22apply);
                     pnl.add(btnApply, BorderLayout.SOUTH);
                     btnApply.addActionListener(new ActionListener() {
@@ -1532,6 +1529,7 @@ public class PnlReport extends NursingRecordsPanel {
                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                     popup.setOwner(btnTAGs);
                     popup.removeExcludedComponent(btnTAGs);
+                    pnl.setPreferredSize(new Dimension(350, 150));
                     popup.getContentPane().add(pnl);
                     popup.setDefaultFocusComponent(pnl);
 

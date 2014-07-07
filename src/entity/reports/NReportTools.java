@@ -179,11 +179,12 @@ public class NReportTools {
         return html;
     }
 
-    public static String getReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight) {
-        String html = "";
+    public static String getNReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight) {
+        String result = "";
 
         if (!nReports.isEmpty()) {
-            html += "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.reports") + (withlongheader ? " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h1>\n";
+
+            String html = "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.reports") + (withlongheader ? " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h1>\n";
             html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h2 id=\"fonth2\" >" + subtitle + "</h2>\n";
 
 
@@ -199,29 +200,32 @@ public class NReportTools {
 
 
                 html += SYSConst.html_bold(
-                                SYSConst.html_paragraph(
-                                        (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
-                                                (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
-                                                DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                                                " " + SYSTools.xx("misc.msg.Time.short") +
-                                                ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
-                                                ", " + nreport.getUser().getFullname() +
-                                                (nreport.getCommontags().isEmpty() ? "" : " " + NReportTools.getTagsAsHTML(nreport, SYSConst.html_16x16_tagPurple, 0))
-                                )
+
+                        (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
+                                (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
+                                DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                                " " + SYSTools.xx("misc.msg.Time.short") +
+                                ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
+                                ", " + nreport.getUser().getFullname() +
+                                (nreport.getCommontags().isEmpty() ? "" : " " + NReportTools.getTagsAsHTML(nreport, SYSConst.html_16x16_tagPurple))
+
                 );
 
                 html += "<br/>";
                 html += getAsHTML(nreport, highlight);
-                html += "<br/>";
+
+
+                result = SYSConst.html_paragraph(html);
+//                html += "<br/>";
 
             }
 
         } else {
-            html = SYSConst.html_italic("misc.msg.noentryyet");
+            result = SYSConst.html_italic("misc.msg.noentryyet");
         }
 
 
-        return html;
+        return result;
     }
 
     public static String getReportsAndHandoversAsHTML(List<QProcessElement> reports, String highlight, int year) {
@@ -273,25 +277,20 @@ public class NReportTools {
         return html;
     }
 
-    private static String getHTMLColor(NReport nReport) {
-        String color = "";
-        if (nReport.isReplaced() || nReport.isDeleted()) {
-            color = SYSConst.html_lightslategrey;
-        } else {
-            color = "color=\"black\"";// OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(nReport.getPit())] + "_FGBHP");
-        }
-        return color;
-    }
+//    private static String getHTMLColor(NReport nReport) {
+//        String color = "";
+//        if (nReport.isReplaced() || nReport.isDeleted()) {
+//            color = SYSConst.html_lightslategrey;
+//        } else {
+//            color = "color=\"black\"";// OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(nReport.getPit())] + "_FGBHP");
+//        }
+//        return color;
+//    }
 
-    public static String getTagsAsHTML(NReport nReport, String icon, int breakAfter) {
+    public static String getTagsAsHTML(NReport nReport, String icon) {
         String result = "";
-        int b = -1;
         for (Commontags ctag : nReport.getCommontags()) {
-            b++;
-            result += icon + " " + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font>" + (b > breakAfter ? "<br/>" : "");
-            if (b > breakAfter) {
-                b = 0;
-            }
+            result += icon + "&nbsp;" + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font> ";
         }
         return result;
     }

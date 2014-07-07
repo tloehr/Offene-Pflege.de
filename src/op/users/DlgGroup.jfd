@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "5.1.0.2.64" Java: "1.6.0_33" encoding: "UTF-8"
+JFDML JFormDesigner: "5.2.0.0.109" Java: "1.6.0_65" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -43,21 +43,12 @@ new FormModel {
 					name: "btnCancel"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/cancel.png" )
-					"contentAreaFilled": false
-					"borderPainted": false
-					"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCancelActionPerformed", true ) )
-				} )
-				add( new FormComponent( "com.jformdesigner.designer.wrapper.HSpacer" ) {
-					name: "hSpacer1"
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnOK"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/apply.png" )
-					"borderPainted": false
-					"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
-					"contentAreaFilled": false
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnOKActionPerformed", true ) )
 				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {

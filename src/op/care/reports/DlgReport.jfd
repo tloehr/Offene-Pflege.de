@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>13dlu, pref, relgap, default:grow, 13dlu</string> 
+        <string>13dlu, pref, relgap, 336dlu, 13dlu</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, default, narrowlinegap, default, fill:143dlu, top:40dlu, default, 13dlu</string> 
+        <string>13dlu, default, narrowlinegap, default, fill:143dlu, fill:46dlu, default, 13dlu</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -37,7 +37,7 @@
       </void> 
       <void method="setProperty"> 
        <string>$sizePolicy</string> 
-       <int>1</int> 
+       <int>0</int> 
       </void> 
       <void method="addEvent"> 
        <object class="com.jformdesigner.model.FormEvent"> 

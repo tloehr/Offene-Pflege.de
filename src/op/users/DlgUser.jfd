@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_65" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -27,11 +27,11 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>14dlu, labelcompgap, default, labelcompgap, default:grow, labelcompgap, 14dlu</string> 
+          <string>13dlu, labelcompgap, default, labelcompgap, 134dlu:grow, labelcompgap, 13dlu</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>14dlu, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, default, 9dlu, default, linegap, 14dlu</string> 
+          <string>13dlu, linegap, fill:18dlu, linegap, fill:18dlu, linegap, fill:18dlu, linegap, fill:18dlu, linegap, 18dlu, 9dlu, default, linegap, 13dlu</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -212,10 +212,6 @@
            <string>gridY</string> 
            <int>9</int> 
           </void> 
-          <void method="setProperty"> 
-           <string>gridWidth</string> 
-           <int>2</int> 
-          </void> 
          </object> 
         </void> 
         <void method="add"> 
@@ -373,6 +369,10 @@
            <string>gridWidth</string> 
            <int>2</int> 
           </void> 
+          <void method="setProperty"> 
+           <string>vAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+          </void> 
          </object> 
         </void> 
         <void method="add"> 
@@ -477,8 +477,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>400</int> 
-        <int>235</int> 
+        <int>510</int> 
+        <int>285</int> 
        </object> 
       </void> 
      </object> 

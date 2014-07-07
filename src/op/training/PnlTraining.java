@@ -865,7 +865,8 @@ public class PnlTraining extends CleanablePanel {
         ArrayList<Commontags> listTags = CommontagsTools.getAllUsedInTrainings();
         if (!listTags.isEmpty()) {
 
-            JPanel pnlTags = new JPanel(new RiverLayout(10, 5));
+            JPanel pnlTags = new JPanel();
+            pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.PAGE_AXIS));
             pnlTags.setOpaque(false);
 
             final JButton btnReset = GUITools.createHyperlinkButton("misc.commands.resetFilter", SYSConst.icon16tagPurpleDelete4, new ActionListener() {
@@ -877,10 +878,8 @@ public class PnlTraining extends CleanablePanel {
             });
             pnlTags.add(btnReset, RiverLayout.LEFT);
 
-            int counter = 1;
-            for (final Commontags commontag : listTags) {
-                counter++;
 
+            for (final Commontags commontag : listTags) {
                 final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -888,13 +887,7 @@ public class PnlTraining extends CleanablePanel {
                         reload();
                     }
                 });
-                if (counter > 3) {
-                    counter = 0;
-                    pnlTags.add(btnTag, RiverLayout.LINE_BREAK);
-                } else {
-                    pnlTags.add(btnTag, RiverLayout.LEFT);
-                }
-
+                pnlTags.add(btnTag);
 
             }
             list.add(pnlTags);

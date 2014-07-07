@@ -4,6 +4,8 @@
 
 package op.users;
 
+import java.awt.event.*;
+import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.system.Users;
@@ -35,7 +37,7 @@ public class DlgUser extends MyJDialog {
         this.callback = callback;
         initComponents();
         initPanel();
-//        pack();
+        pack();
         setVisible(true);
     }
 
@@ -88,7 +90,7 @@ public class DlgUser extends MyJDialog {
         }
 
         if (!txtEMail.getText().isEmpty() && !SYSTools.isValidEMail(txtEMail.getText().trim())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".wrongemail")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.users.dlgusers.wrongemail")));
             return;
         }
 
@@ -97,7 +99,7 @@ public class DlgUser extends MyJDialog {
             Users check4user = em.find(Users.class, txtUID.getText().trim());
             em.close();
             if (check4user != null) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".uidtaken")));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.users.dlgusers.uidtaken")));
                 return;
             }
         }
@@ -114,7 +116,6 @@ public class DlgUser extends MyJDialog {
 
         dispose();
     }
-
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -140,8 +141,8 @@ public class DlgUser extends MyJDialog {
         //======== jPanel4 ========
         {
             jPanel4.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, 14dlu",
-                    "14dlu, 4*($lgap, fill:default), $lgap, default, 9dlu, default, $lgap, 14dlu"));
+                "13dlu, $lcgap, default, $lcgap, 134dlu:grow, $lcgap, 13dlu",
+                "13dlu, 4*($lgap, fill:18dlu), $lgap, 18dlu, 9dlu, default, $lgap, 13dlu"));
 
             //---- lblUID ----
             lblUID.setText("UKennung");
@@ -172,7 +173,7 @@ public class DlgUser extends MyJDialog {
             //---- txtEMail ----
             txtEMail.setDragEnabled(false);
             txtEMail.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(txtEMail, CC.xywh(5, 9, 2, 1));
+            jPanel4.add(txtEMail, CC.xy(5, 9));
 
             //---- lblEmail ----
             lblEmail.setText("E-Mail");
@@ -202,7 +203,7 @@ public class DlgUser extends MyJDialog {
 
             //---- txtPW ----
             txtPW.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(txtPW, CC.xywh(5, 11, 2, 1));
+            jPanel4.add(txtPW, CC.xywh(5, 11, 2, 1, CC.DEFAULT, CC.FILL));
 
             //======== jPanel3 ========
             {
@@ -233,7 +234,7 @@ public class DlgUser extends MyJDialog {
             jPanel4.add(jPanel3, CC.xywh(5, 13, 2, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(jPanel4);
-        setSize(400, 235);
+        setSize(510, 285);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

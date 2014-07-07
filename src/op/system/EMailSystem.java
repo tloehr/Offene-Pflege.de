@@ -1,9 +1,7 @@
 package op.system;
 
-import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.settings.PnlSystemSettings;
 import op.threads.DisplayMessage;
 import op.tools.Pair;
 import op.tools.SYSTools;
@@ -39,7 +37,7 @@ public class EMailSystem {
     /**
      * Sends a standard error email to the predefined recipient, but only if the EMail System is activated.
      *
-     * @param throwable
+     *
      * @return false, if there was an mail exception. true otherwise.
      */
     public static boolean sendErrorMail(String message, File attachment) {
@@ -69,6 +67,14 @@ public class EMailSystem {
 
     }
 
+    /**
+     * sends an email message. but only if the EMail System is active and working.
+     * @param subject the text for the subject line
+     * @param bodyText the text for the mail body
+     * @param recipients this is an array of Pair of Strings. Each line of this array consists of the mail address and the personal name. hence the Pair<String, String>(ADDRESS, PERSONAL_NAME)
+     * @param attach array of files to attach
+     * @return true if sent successfully, false if not
+     */
     public static boolean sendMail(String subject, String bodyText, Pair<String, String>[] recipients, File[] attach) {
         if (!isMailsystemActive()) {
             return false;
@@ -77,8 +83,10 @@ public class EMailSystem {
     }
 
     public static boolean sendTestmail(Pair<String, String>[] recipients, File[] attach, Properties props) {
-            return send(SYSTools.xx("opde.settings.global.mail.testsubject"), SYSTools.xx("opde.settings.global.mail.testbody"), recipients, attach, props);
-        }
+        return send(SYSTools.xx("opde.settings.global.mail.testsubject"), SYSTools.xx("opde.settings.global.mail.testbody"), recipients, attach, props);
+    }
+
+
 
     private static boolean send(String subject, String bodyText, Pair<String, String>[] recipients, File[] attach, final Properties mailProps) {
 
@@ -109,8 +117,8 @@ public class EMailSystem {
 
 
             String sendText = bodyText;
-            if (mailProps.containsKey(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY)){
-                sendText += "\n--\n"+SYSTools.xx("opde.settings.global.mail.recipient.spamfilter")+": "+mailProps.getProperty(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY);
+            if (mailProps.containsKey(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY)) {
+                sendText += "\n--\n" + SYSTools.xx("opde.settings.global.mail.recipient.spamfilter") + ": " + mailProps.getProperty(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY);
             }
 
 

@@ -88,7 +88,6 @@ public class DlgGroup extends MyJDialog {
         txtText = new JTextField();
         panel1 = new JPanel();
         btnCancel = new JButton();
-        hSpacer1 = new JPanel(null);
         btnOK = new JButton();
 
         //======== this ========
@@ -114,9 +113,6 @@ public class DlgGroup extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.setContentAreaFilled(false);
-            btnCancel.setBorderPainted(false);
-            btnCancel.setBorder(null);
             btnCancel.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -124,14 +120,10 @@ public class DlgGroup extends MyJDialog {
                 }
             });
             panel1.add(btnCancel);
-            panel1.add(hSpacer1);
 
             //---- btnOK ----
             btnOK.setText(null);
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnOK.setBorderPainted(false);
-            btnOK.setBorder(null);
-            btnOK.setContentAreaFilled(false);
             btnOK.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -153,7 +145,6 @@ public class DlgGroup extends MyJDialog {
     private JTextField txtText;
     private JPanel panel1;
     private JButton btnCancel;
-    private JPanel hSpacer1;
     private JButton btnOK;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

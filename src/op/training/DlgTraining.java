@@ -35,13 +35,13 @@ public class DlgTraining extends MyJDialog {
     private final PnlCommonTags pnlCommonTags;
 
     public DlgTraining(Training training, Closure actionBlock) {
-        super();
+        super(false);
         this.training = training;
         this.actionBlock = actionBlock;
         initComponents();
         pnlCommonTags = new PnlCommonTags(training.getCommontags(), true, 3);
         initDialog();
-//        pack();
+        pack();
         setVisible(true);
     }
 
@@ -149,7 +149,7 @@ public class DlgTraining extends MyJDialog {
             {
                 contentPanel.setLayout(new FormLayout(
                     "pref, $ugap, default:grow",
-                    "default, $rgap, default, $lgap, 2*(default, $rgap), default:grow, $lgap, pref, $lgap, default"));
+                    "default, $rgap, default, $lgap, 2*(default, $rgap), default:grow, $lgap, fill:41dlu, $lgap, default"));
 
                 //---- lblDate ----
                 lblDate.setText("text");

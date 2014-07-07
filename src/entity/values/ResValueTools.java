@@ -90,27 +90,27 @@ public class ResValueTools {
         return result;
     }
 
-    public static ArrayList<Date> getDaysWithValues(Resident resident, ResValueTypes type, int year) {
-        DateTime from = new LocalDate(year, 1, 1).dayOfYear().withMinimumValue().toDateTimeAtStartOfDay();
-        DateTime to = new LocalDate(year, 1, 1).dayOfYear().withMaximumValue().toDateTimeAtStartOfDay().secondOfDay().withMaximumValue();
-
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNativeQuery(" " +
-                " SELECT DISTINCT DATE(r.pit) d" +
-                " FROM resvalue r " +
-                " INNER JOIN resvaluetypes t ON r.type = t.id " +
-                " WHERE DATE(r.pit) >= ? AND DATE(r.pit) <= ? AND r.bwkennung = ? AND t.valtype = ? " +
-                " GROUP BY DATE(r.pit)" +
-                " ORDER BY d DESC");
-
-        query.setParameter(1, from.toDate());
-        query.setParameter(2, to.toDate());
-        query.setParameter(3, resident.getRID());
-        query.setParameter(4, type.getValType());
-        ArrayList<Date> result = new ArrayList<Date>(query.getResultList());
-        em.close();
-        return result;
-    }
+//    public static ArrayList<Date> getDaysWithValues(Resident resident, ResValueTypes type, int year) {
+//        DateTime from = new LocalDate(year, 1, 1).dayOfYear().withMinimumValue().toDateTimeAtStartOfDay();
+//        DateTime to = new LocalDate(year, 1, 1).dayOfYear().withMaximumValue().toDateTimeAtStartOfDay().secondOfDay().withMaximumValue();
+//
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createNativeQuery(" " +
+//                " SELECT DISTINCT DATE(r.pit) d" +
+//                " FROM resvalue r " +
+//                " INNER JOIN resvaluetypes t ON r.type = t.id " +
+//                " WHERE DATE(r.pit) >= ? AND DATE(r.pit) <= ? AND r.bwkennung = ? AND t.valtype = ? " +
+//                " GROUP BY DATE(r.pit)" +
+//                " ORDER BY d DESC");
+//
+//        query.setParameter(1, from.toDate());
+//        query.setParameter(2, to.toDate());
+//        query.setParameter(3, resident.getRID());
+//        query.setParameter(4, type.getValType());
+//        ArrayList<Date> result = new ArrayList<Date>(query.getResultList());
+//        em.close();
+//        return result;
+//    }
 
     /**
      * Ermittelt den ersten bisher eingetragenen Wert für einen Bewohner.

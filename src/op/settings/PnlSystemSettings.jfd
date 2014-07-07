@@ -944,6 +944,14 @@
                   <void property="name"> 
                    <string>txtMailRecipient</string> 
                   </void> 
+                  <void method="addEvent"> 
+                   <object class="com.jformdesigner.model.FormEvent"> 
+                    <string>javax.swing.event.CaretListener</string> 
+                    <string>caretUpdate</string> 
+                    <string>txtMailRecipientCaretUpdate</string> 
+                    <boolean>true</boolean> 
+                   </object> 
+                  </void> 
                  </object> 
                  <object class="com.jformdesigner.model.FormLayoutConstraints"> 
                   <class>com.jgoodies.forms.layout.CellConstraints</class> 
