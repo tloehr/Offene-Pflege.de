@@ -24,10 +24,7 @@ import entity.info.ResInfoCategoryTools;
 import entity.prescription.MedStock;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.system.EMailSystem;
-import op.system.FileDrop;
-import op.system.LogicalPrinter;
-import op.system.PrinterForm;
+import op.system.*;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -983,7 +980,8 @@ public class PnlSystemSettings extends CleanablePanel {
 
         tbactive.setSelected(false);
         tbactive.setEnabled(false);
-        final Pair<String, String>[] testRecipient = new Pair[]{new Pair(getMailProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), getMailProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT))};
+//        final Pair<String, String>[] testRecipient = new Pair[]{new Pair(getMailProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), getMailProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT))};
+        final Recipient testRecipient = new Recipient(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL));
         btnTestmail.setEnabled(false);
         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.mail.testing", DisplayMessage.WAIT_TIL_NEXT_MESSAGE));
 
@@ -992,7 +990,7 @@ public class PnlSystemSettings extends CleanablePanel {
 
             @Override
             protected Object doInBackground() throws Exception {
-                success = EMailSystem.sendTestmail(testRecipient, null, getMailProps());
+                success = EMailSystem.sendMail(SYSTools.xx("opde.settings.global.mail.testsubject"), SYSTools.xx("opde.settings.global.mail.testbody"), testRecipient, null);
                 return null;
             }
 
@@ -1002,6 +1000,8 @@ public class PnlSystemSettings extends CleanablePanel {
                 tbactive.setEnabled(true);
                 if (success) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.mail.success"));
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.mail.fail", DisplayMessage.WARNING));
                 }
             }
         };
@@ -1059,7 +1059,7 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void txtMailRecipientCaretUpdate(CaretEvent e) {
-        btnTestmail.setEnabled(SYSTools.isValidEMail(SYSTools.tidy(txtMailRecipient.getText())));
+        btnTestmail.setEnabled(EMailSystem.isValidEmailAddress(SYSTools.tidy(txtMailRecipient.getText())));
     }
 
     private void initComponents() {

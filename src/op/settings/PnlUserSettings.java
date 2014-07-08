@@ -4,15 +4,19 @@
 
 package op.settings;
 
-import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.system.SYSPropsTools;
 import entity.system.Users;
+import entity.system.UsersTools;
 import op.OPDE;
 import op.system.EMailSystem;
+import op.system.Recipient;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.CleanablePanel;
+import op.tools.GUITools;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -23,6 +27,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Random;
 
 /**
  * @author Torsten Löhr
@@ -30,6 +37,8 @@ import java.awt.event.ActionListener;
 public class PnlUserSettings extends CleanablePanel {
     public static final String internalClassID = "opde.usersettings";
     private final JScrollPane jspSearch;
+    private JToggleButton tbNotify;
+    private boolean ignoreTBNotify;
 
     public PnlUserSettings(JScrollPane jspSearch) {
         this.jspSearch = jspSearch;
@@ -38,6 +47,8 @@ public class PnlUserSettings extends CleanablePanel {
     }
 
     private void initPanel() {
+        ignoreTBNotify = true;
+
         OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
         OPDE.getDisplayManager().clearAllIcons();
 
@@ -49,9 +60,74 @@ public class PnlUserSettings extends CleanablePanel {
         lblMailTitle.setText(SYSTools.xx("opde.usersettings.your.mailsettings"));
         lblMailAddress.setText(SYSTools.xx("opde.usersettings.your.mailaddress"));
         btnSendTestMail.setToolTipText(SYSTools.xx("opde.settings.global.mail.btnTestmail"));
-        tbNotify.setToolTipText(SYSTools.xx("opde.usersettings.enable.notification"));
+
+        tbNotify = GUITools.getNiceToggleButton("opde.usersettings.enable.notification");
+        panel1.add(tbNotify, CC.xy(5, 1));
+
+        tbNotify.setEnabled(OPDE.getLogin().getUser().getMailStatus() != UsersTools.MAIL_UNCONFIRMED);
+        txtMailKey.setEnabled(OPDE.getLogin().getUser().getMailStatus() == UsersTools.MAIL_UNCONFIRMED);
+
+        tbNotify.setSelected(OPDE.getLogin().getUser().getMailStatus() == UsersTools.MAIL_NOTIFICATIONS_ENABLED && OPDE.getProps().containsKey(SYSPropsTools.KEY_MAIL_TESTKEY));
+
+        tbNotify.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+
+                if (ignoreTBNotify) return;
+
+                txtMailKey.setEnabled(e.getStateChange() == ItemEvent.DESELECTED);
+
+                EntityManager em = OPDE.createEM();
+                Users user = em.merge(OPDE.getLogin().getUser());
+                try {
+                    em.getTransaction().begin();
+
+                    em.lock(user, LockModeType.OPTIMISTIC);
+                    user.setMailStatus(e.getStateChange() == ItemEvent.SELECTED ? UsersTools.MAIL_NOTIFICATIONS_ENABLED : UsersTools.MAIL_CONFIRMED);
+                    em.getTransaction().commit();
+
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.usersettings.notifications.enabled"));
+
+                    OPDE.getLogin().setUser(user);
+                    txtMailKey.setText("");
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (RollbackException ole) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
+                }
+
+            }
+
+        });
+
+        txtMailAddress.setText(SYSTools.catchNull(OPDE.getLogin().getUser().getEMail()));
+        lblMailStatus.setIcon(OPDE.getLogin().getUser().getMailStatus() != UsersTools.MAIL_UNCONFIRMED ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledGreenOff);
+        lblMailKey.setText(SYSTools.xx("opde.usersettings.mail.key"));
 
         prepareSearchArea();
+        ignoreTBNotify = false;
     }
 
     @Override
@@ -91,7 +167,8 @@ public class PnlUserSettings extends CleanablePanel {
             OPDE.getLogin().setUser(user);
             txtNew.setText("");
             txtOld.setText("");
-        } catch (OptimisticLockException ole) { OPDE.warn(ole);
+        } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -125,15 +202,129 @@ public class PnlUserSettings extends CleanablePanel {
     }
 
     private void btnSendTestMailActionPerformed(ActionEvent e) {
-        EMailSystem.sendMail(OPDE.getLogin().getUser().getEMail(), SYSTools.xx(""+"\n"+"1234"), getMailProps());
-    }
 
-    private void textField1CaretUpdate(CaretEvent e) {
-        // TODO add your code here
+        if (!EMailSystem.isValidEmailAddress(txtMailAddress.getText().trim())) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.users.dlgusers.wrongemail", DisplayMessage.WARNING));
+            return;
+        }
+
+        Random generator = new Random(System.currentTimeMillis());
+        String testkey = SYSTools.padL(Integer.toString(generator.nextInt(9999)), 4, "0");
+        EMailSystem.sendMail(SYSTools.xx("opde.settings.global.mail.testsubject"), SYSTools.xx("opde.usersettings.confirmmail.testbody") + "<br/>"+SYSConst.html_h2(SYSTools.xx("opde.usersettings.mail.key")+": " + testkey), new Recipient(txtMailAddress.getText().trim(), OPDE.getLogin().getUser().getFullname()), null);
+
+        EntityManager em = OPDE.createEM();
+
+        try {
+            em.getTransaction().begin();
+            Users user = em.merge(OPDE.getLogin().getUser());
+            em.lock(user, LockModeType.OPTIMISTIC);
+            SYSPropsTools.storeProp(em, SYSPropsTools.KEY_MAIL_TESTKEY, testkey, user);
+            user.setEMail(txtMailAddress.getText().trim());
+            user.setMailStatus(UsersTools.MAIL_UNCONFIRMED);
+            em.getTransaction().commit();
+
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.usersettings.notifications.enabled"));
+
+            OPDE.getLogin().setUser(user);
+
+        } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+        } catch (RollbackException ole) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
+
+        ignoreTBNotify = true;
+
+        lblMailStatus.setIcon(SYSConst.icon22ledGreenOff);
+        txtMailKey.setEnabled(true);
+        tbNotify.setSelected(false);
+        tbNotify.setEnabled(false);
+
+        ignoreTBNotify = false;
     }
 
     private void txtMailAddressActionPerformed(ActionEvent e) {
-        btnSendTestMail.setEnabled(SYSTools.isValidEMail(txtMailAddress.getText()));
+
+
+    }
+
+    private void txtMailKeyActionPerformed(ActionEvent e) {
+        String testkey = OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TESTKEY);
+
+        if (testkey.equals(txtMailKey.getText().trim())) {
+            tbNotify.setEnabled(true);
+
+            EntityManager em = OPDE.createEM();
+            Users user = em.merge(OPDE.getLogin().getUser());
+            try {
+                em.getTransaction().begin();
+
+                em.lock(user, LockModeType.OPTIMISTIC);
+                user.setMailStatus(UsersTools.MAIL_CONFIRMED);
+                SYSPropsTools.removeProp(em, SYSPropsTools.KEY_MAIL_TESTKEY, OPDE.getLogin().getUser());
+                em.getTransaction().commit();
+
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.usersettings.mail.confirmed"));
+
+                OPDE.getLogin().setUser(user);
+                txtMailKey.setText("");
+
+                lblMailStatus.setIcon(SYSConst.icon22ledGreenOn);
+
+            } catch (OptimisticLockException ole) {
+                OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (RollbackException ole) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(ex);
+            } finally {
+                em.close();
+            }
+
+        } else {
+            lblMailStatus.setIcon(SYSConst.icon22ledGreenOff);
+        }
+
     }
 
 
@@ -149,12 +340,15 @@ public class PnlUserSettings extends CleanablePanel {
         lblMailAddress = new JLabel();
         txtMailAddress = new JTextField();
         btnSendTestMail = new JButton();
-        tbNotify = new JToggleButton();
+        lblMailKey = new JLabel();
+        panel1 = new JPanel();
+        txtMailKey = new JTextField();
+        lblMailStatus = new JLabel();
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), 178dlu, $lcgap, default:grow",
-            "5*(default, $lgap), 13dlu, 4*($lgap, default), $lgap, fill:default:grow"));
+                "2*(default, $lcgap), 178dlu, $lcgap, default:grow",
+                "5*(default, $lgap), 13dlu, 5*($lgap, default), $lgap, fill:default:grow"));
 
         //---- lblPWTitle ----
         lblPWTitle.setText("text");
@@ -221,9 +415,34 @@ public class PnlUserSettings extends CleanablePanel {
         });
         add(btnSendTestMail, CC.xy(5, 17));
 
-        //---- tbNotify ----
-        tbNotify.setText("EnableNotifications");
-        add(tbNotify, CC.xy(5, 19));
+        //---- lblMailKey ----
+        lblMailKey.setText("text");
+        lblMailKey.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(lblMailKey, CC.xy(3, 19));
+
+        //======== panel1 ========
+        {
+            panel1.setLayout(new FormLayout(
+                    "default, $rgap, default, $ugap, default:grow",
+                    "default:grow"));
+
+            //---- txtMailKey ----
+            txtMailKey.setColumns(4);
+            txtMailKey.setFont(new Font("Arial", Font.PLAIN, 16));
+            txtMailKey.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtMailKeyActionPerformed(e);
+                }
+            });
+            panel1.add(txtMailKey, CC.xy(1, 1));
+
+            //---- lblMailStatus ----
+            lblMailStatus.setText(null);
+            lblMailStatus.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/leddarkgreen.png")));
+            panel1.add(lblMailStatus, CC.xy(3, 1));
+        }
+        add(panel1, CC.xy(5, 19, CC.FILL, CC.DEFAULT));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -238,6 +457,9 @@ public class PnlUserSettings extends CleanablePanel {
     private JLabel lblMailAddress;
     private JTextField txtMailAddress;
     private JButton btnSendTestMail;
-    private JToggleButton tbNotify;
+    private JLabel lblMailKey;
+    private JPanel panel1;
+    private JTextField txtMailKey;
+    private JLabel lblMailStatus;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

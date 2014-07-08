@@ -29,6 +29,7 @@ public class SYSPropsTools {
     public static final String KEY_COUNTRY = "country";
     public static final String KEY_MAIL_HOST = "mail.smtp.host";
     public static final String KEY_MAIL_SPAMFILTER_KEY = "mail.spamfilter.key";
+    public static final String KEY_MAIL_TESTKEY = "mail.testkey";
     public static final String KEY_MAIL_PORT = "mail.smtp.port";
     public static final String KEY_MAIL_PROTOCOL = "mail.transport.protocol";
     public static final String KEY_MAIL_AUTH = "mail.smtp.auth";
@@ -102,6 +103,20 @@ public class SYSPropsTools {
 
     public static void storeProp(String key, String value) {
         storeProp(key, value, null);
+    }
+
+    public static void removeProp(EntityManager em, String key, Users user) throws Exception {
+        if (!OPDE.getProps().containsKey(key) || user == null) {
+            return;
+        }
+
+        Query query = em.createQuery("SELECT sp FROM SYSProps sp WHERE sp.key = :key AND sp.user = :user");
+        query.setParameter("key", key);
+        query.setParameter("user", user);
+        SYSProps mySysprop = (SYSProps) query.getSingleResult();
+        em.remove(mySysprop);
+        OPDE.getProps().remove(key);
+
     }
 
     public static void storeProp(EntityManager em, String key, String value) throws Exception {

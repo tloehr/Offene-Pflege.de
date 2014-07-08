@@ -10,6 +10,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.system.Users;
 import op.OPDE;
+import op.system.EMailSystem;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import op.tools.SYSTools;
@@ -89,7 +90,7 @@ public class DlgUser extends MyJDialog {
             return;
         }
 
-        if (!txtEMail.getText().isEmpty() && !SYSTools.isValidEMail(txtEMail.getText().trim())) {
+        if (!txtEMail.getText().isEmpty() && !EMailSystem.isValidEmailAddress(txtEMail.getText().trim())) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.users.dlgusers.wrongemail")));
             return;
         }

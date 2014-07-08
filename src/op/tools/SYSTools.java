@@ -1824,16 +1824,16 @@ public class SYSTools {
         return 0;
     }
 
-    /**
-     * http://www.mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/
-     *
-     * @return
-     */
-    public static boolean isValidEMail(String mail) {
-        String EMAIL_PATTERN = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        return pattern.matcher(mail.trim()).matches();
-    }
+//    /**
+//     * http://www.mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/
+//     *
+//     * @return
+//     */
+//    public static boolean isValidEMail(String mail) {
+//        String EMAIL_PATTERN = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+//        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+//        return pattern.matcher(mail.trim()).matches();
+//    }
 
     public static String generatePassword(String firstname, String lastname) {
         Random generator = new Random(System.currentTimeMillis());

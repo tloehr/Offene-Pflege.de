@@ -1,9 +1,9 @@
 package op.system;
 
 import entity.system.SYSPropsTools;
+import entity.system.Users;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.Pair;
 import op.tools.SYSTools;
 
 import javax.activation.DataHandler;
@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
@@ -37,7 +38,6 @@ public class EMailSystem {
     /**
      * Sends a standard error email to the predefined recipient, but only if the EMail System is activated.
      *
-     *
      * @return false, if there was an mail exception. true otherwise.
      */
     public static boolean sendErrorMail(String message, File attachment) {
@@ -45,9 +45,10 @@ public class EMailSystem {
             return false;
         }
 
+        Recipient errorMailRecipient = new Recipient(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL));
 
-        Pair<String, String> pair = new Pair<String, String>(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL));
-        Pair<String, String>[] pairs = new Pair[]{pair};
+//        Pair<String, String> pair = new Pair<String, String>(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL));
+//        Pair<String, String>[] pairs = new Pair[]{pair};
 
         InetAddress localMachine = null;
         try {
@@ -63,32 +64,54 @@ public class EMailSystem {
                 SYSTools.xx("mail.errormail.line5") + ": " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
                 SYSTools.xx("mail.errormail.line6");
 
-        return send(SYSTools.xx("mail.errormail.subject") + ": " + message, bodyText, pairs, new File[]{attachment}, OPDE.getProps());
+        return sendMail(SYSTools.xx("mail.errormail.subject") + ": " + message, bodyText, new Recipient[]{errorMailRecipient}, new File[]{attachment}, OPDE.getProps());
 
     }
 
     /**
      * sends an email message. but only if the EMail System is active and working.
-     * @param subject the text for the subject line
-     * @param bodyText the text for the mail body
-     * @param recipients this is an array of Pair of Strings. Each line of this array consists of the mail address and the personal name. hence the Pair<String, String>(ADDRESS, PERSONAL_NAME)
-     * @param attach array of files to attach
+     *
+     * @param subject    the text for the subject line
+     * @param bodyText   the text for the mail body
+     * @param recipients this is an array of recipients.
+     * @param attach     array of files to attach
      * @return true if sent successfully, false if not
      */
-    public static boolean sendMail(String subject, String bodyText, Pair<String, String>[] recipients, File[] attach) {
-        if (!isMailsystemActive()) {
-            return false;
+//    public static boolean sendMail(String subject, String bodyText, Pair<String, String>[] recipients, File[] attach) {
+//        if (!isMailsystemActive()) {
+//            return false;
+//        }
+//        return send(subject, bodyText, recipients, attach, OPDE.getProps());
+//    }
+    public static boolean sendMail(String subject, String bodyText, Users user, File[] attach) {
+
+
+        return sendMail(subject, bodyText, new Recipient[]{new Recipient(user)}, attach, OPDE.getProps());
+    }
+
+    public static boolean sendMail(String subject, String bodyText, Recipient recipient, File[] attach) {
+//        if (!isMailsystemActive()) {
+//            return false;
+//        }
+
+        return sendMail(subject, bodyText, new Recipient[]{recipient}, attach, OPDE.getProps());
+    }
+
+    public static boolean sendMail(String subject, String bodyText, Users[] users, File[] attach) {
+//        if (!isMailsystemActive()) {
+//            return false;
+//        }
+
+        ArrayList<Recipient> recipients = new ArrayList<>();
+        for (Users user : users) {
+            recipients.add(new Recipient(user));
         }
-        return send(subject, bodyText, recipients, attach, OPDE.getProps());
-    }
 
-    public static boolean sendTestmail(Pair<String, String>[] recipients, File[] attach, Properties props) {
-        return send(SYSTools.xx("opde.settings.global.mail.testsubject"), SYSTools.xx("opde.settings.global.mail.testbody"), recipients, attach, props);
+        return sendMail(subject, bodyText, recipients.toArray(new Recipient[]{}), attach, OPDE.getProps());
     }
 
 
-
-    private static boolean send(String subject, String bodyText, Pair<String, String>[] recipients, File[] attach, final Properties mailProps) {
+    public static boolean sendMail(String subject, String bodyText, Recipient[] recipients, File[] attach, final Properties mailProps) {
 
         boolean success;
 
@@ -106,8 +129,9 @@ public class EMailSystem {
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(mailProps.getProperty(SYSPropsTools.KEY_MAIL_SENDER), mailProps.getProperty(SYSPropsTools.KEY_MAIL_SENDER_PERSONAL)));
 
-            for (Pair<String, String> recipient : recipients) {
-                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient.getFirst(), recipient.getSecond()));
+
+            for (Recipient recipient : recipients) {
+                msg.addRecipient(Message.RecipientType.TO, recipient.getInternetAddress());
             }
 
             msg.setSubject(subject);
@@ -117,12 +141,11 @@ public class EMailSystem {
 
 
             String sendText = bodyText;
-            if (mailProps.containsKey(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY)) {
-                sendText += "\n--\n" + SYSTools.xx("opde.settings.global.mail.recipient.spamfilter") + ": " + mailProps.getProperty(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY);
+            if (!SYSTools.catchNull(mailProps.getProperty(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY)).isEmpty()) {
+                sendText += "<br/>--<br/>" + SYSTools.xx("opde.settings.global.mail.recipient.spamfilter") + ": " + mailProps.getProperty(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY);
             }
 
-
-            messageBodyPart.setText(sendText);
+            messageBodyPart.setContent("<html>" + sendText + "</html>", "text/html; charset=utf-8");
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
@@ -136,6 +159,7 @@ public class EMailSystem {
                     multipart.addBodyPart(messageBodyPart);
                 }
             }
+
 
             msg.setContent(multipart);
             msg.saveChanges();
@@ -157,6 +181,18 @@ public class EMailSystem {
             success = false;
         }
         return success;
+    }
+
+
+    public static boolean isValidEmailAddress(String email) {
+        boolean result = true;
+        try {
+            InternetAddress emailAddr = new InternetAddress(email);
+            emailAddr.validate();
+        } catch (Exception ex) {
+            result = false;
+        }
+        return result;
     }
 
 }

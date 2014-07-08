@@ -5,7 +5,7 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 			"$columnSpecs": "default, labelcompgap, default, labelcompgap, 178dlu, labelcompgap, default:grow"
-			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, 13dlu, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:default:grow"
+			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, 13dlu, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:default:grow"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JLabel" ) {
@@ -91,12 +91,37 @@ new FormModel {
 				"gridX": 5
 				"gridY": 17
 			} )
-			add( new FormComponent( "javax.swing.JToggleButton" ) {
-				name: "tbNotify"
-				"text": "EnableNotifications"
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblMailKey"
+				"text": "text"
+				"font": #Font1
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 19
+				"gridX": 3
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+				"$columnSpecs": "default, relgap, default, unrelgap, default:grow"
+				"$rowSpecs": "default:grow"
+			} ) {
+				name: "panel1"
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtMailKey"
+					"columns": 4
+					"font": new java.awt.Font( "Arial", 0, 16 )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "txtMailKeyActionPerformed", true ) )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblMailStatus"
+					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkgreen.png" )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 1
+				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 5
 				"gridY": 19
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
