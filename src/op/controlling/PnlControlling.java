@@ -90,6 +90,7 @@ public class PnlControlling extends CleanablePanel {
 
     public static final String internalClassID = "opde.controlling";
     private JScrollPane jspSearch;
+    private Qmsplan showMeFirst;
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     private Closure progressClosure;
     private CollapsiblePanes searchPanes;
@@ -119,8 +120,9 @@ public class PnlControlling extends CleanablePanel {
     /**
      * Creates new form PnlControlling
      */
-    public PnlControlling(JScrollPane jspSearch) {
+    public PnlControlling(JScrollPane jspSearch, Qmsplan showMeFirst) {
         this.jspSearch = jspSearch;
+        this.showMeFirst = showMeFirst;
         progressClosure = new Closure() {
             @Override
             public void execute(Object o) {
@@ -139,7 +141,14 @@ public class PnlControlling extends CleanablePanel {
 //        tabMain.setTitleAt(TAB_QMS, SYSTools.xx("opde.controlling.tab.qms"));
         tabMain.setTitleAt(TAB_QMSPLAN, SYSTools.xx("opde.controlling.tab.qmsplan"));
         tabMain.setEnabledAt(TAB_QMSPLAN, OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlControlling.internalClassID));
-        reload();
+
+        if (showMeFirst != null){
+            tabMain.setSelectedIndex(TAB_QMSPLAN);
+        } else {
+            reload();
+        }
+
+
     }
 
 
@@ -746,8 +755,9 @@ public class PnlControlling extends CleanablePanel {
             }
             case TAB_QMSPLAN: {
                 if (pnlQMSPlan == null) {
-                    pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAllActive());
+                    pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAllActive(), showMeFirst);
                     tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
+                    showMeFirst = null;
                 }
                 break;
             }
@@ -981,38 +991,32 @@ public class PnlControlling extends CleanablePanel {
             ArrayList<Commontags> listTags = CommontagsTools.getAllUsedInQMSPlans(tbClosedOnes2.isSelected());
             if (!listTags.isEmpty()) {
 
-                JPanel pnlTags = new JPanel(new RiverLayout(10, 5));
+                JPanel pnlTags = new JPanel();
+                pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.PAGE_AXIS));
                 pnlTags.setOpaque(false);
 
                 final JButton btnReset = GUITools.createHyperlinkButton("misc.commands.resetFilter", SYSConst.icon16tagPurpleDelete4, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         pnlQMSPlan.cleanup();
-                        pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAllActive());
+                        pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAllActive(), null);
                         tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
                     }
                 });
                 pnlTags.add(btnReset, RiverLayout.LEFT);
 
-                int counter = 1;
                 for (final Commontags commontag : listTags) {
-                    counter++;
 
                     final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             pnlQMSPlan.cleanup();
-                            pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAll(commontag, QmsplanTools.STATE_ACTIVE));
+                            pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAll(commontag, QmsplanTools.STATE_ACTIVE), null);
                             tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
 
                         }
                     });
-                    if (counter > 3) {
-                        counter = 0;
-                        pnlTags.add(btnTag, RiverLayout.LINE_BREAK);
-                    } else {
-                        pnlTags.add(btnTag, RiverLayout.LEFT);
-                    }
+                    pnlTags.add(btnTag);
 
 
                 }

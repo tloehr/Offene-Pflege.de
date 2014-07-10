@@ -347,8 +347,8 @@ public class PnlUserSettings extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), 178dlu, $lcgap, default:grow",
-                "5*(default, $lgap), 13dlu, 5*($lgap, default), $lgap, fill:default:grow"));
+            "2*(default, $lcgap), 178dlu, $lcgap, default:grow",
+            "5*(default, $lgap), 13dlu, 5*($lgap, default), $lgap, fill:default:grow"));
 
         //---- lblPWTitle ----
         lblPWTitle.setText("text");
@@ -423,8 +423,8 @@ public class PnlUserSettings extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default, $rgap, default, $ugap, default:grow",
-                    "default:grow"));
+                "default, $rgap, default, $ugap, default:grow",
+                "default:grow"));
 
             //---- txtMailKey ----
             txtMailKey.setColumns(4);

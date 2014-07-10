@@ -260,6 +260,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnFiles.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    // checked for acls
                     Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
                         @Override
                         public void execute(Object o) {
@@ -389,6 +390,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
+            // checked for acls
             btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             cptitle.getRight().add(btnProcess);
         }
@@ -562,6 +564,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
+        // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton addRegular = GUITools.createHyperlinkButton("nursingrecords.prescription.btnNewRegular", SYSConst.icon22add, new ActionListener() {
                 @Override
@@ -626,6 +629,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             list.add(addRegular);
         }
 
+        // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton addNewOnDemand = GUITools.createHyperlinkButton("nursingrecords.prescription.btnNewOnDemand", SYSConst.icon22add, new ActionListener() {
                 @Override
@@ -691,6 +695,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             list.add(addNewOnDemand);
         }
 
+        // checked for acls
         if (resident.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.prescription.newstocks", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
@@ -706,6 +711,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             list.add(buchenButton);
         }
 
+        // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, new ActionListener() {
                 @Override
@@ -751,6 +757,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         final MedInventory inventory = prescription.shouldBeCalculated() ? TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm()) : null;
         final MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
+        // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *       ____ _
@@ -1051,6 +1058,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnEdit.setEnabled(!prescription.isClosed() && numBHPs == 0);
             pnlMenu.add(btnEdit);
         }
+        // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
             /***
              *      ____       _      _
@@ -1112,6 +1120,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnDelete.setEnabled(numBHPs == 0 && !prescription.isClosed());
             pnlMenu.add(btnDelete);
         }
+        // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             pnlMenu.add(new JSeparator());
 
@@ -1295,6 +1304,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     }, "nursingrecords.prescription.edit.sideeffects", prescription.getTradeForm().getMedProduct().getSideEffects());
                 }
             });
+            // checked for acls
             btnEditSideEffects.setEnabled(prescription.hasMed() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlMed.internalClassID));
             pnlMenu.add(btnEditSideEffects);
 

@@ -35,11 +35,11 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>default, labelcompgap, default:grow</string> 
+          <string>pref, labelcompgap, default:grow, labelcompgap, pref, labelcompgap, default:grow</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>fill:default, relgap, fill:default:grow, linegap, pref</string> 
+          <string>default, linegap, fill:default, relgap, fill:default:grow, linegap, 40dlu, relgap, default</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -53,12 +53,16 @@
            <object id="Font0" class="java.awt.Font"> 
             <string>Arial</string> 
             <int>0</int> 
-            <int>14</int> 
+            <int>18</int> 
            </object> 
           </void> 
           <void method="setProperty"> 
            <string>text</string> 
            <string>Stichwort</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>horizontalAlignment</string> 
+           <int>0</int> 
           </void> 
           <void property="name"> 
            <string>lblTitle</string> 
@@ -68,15 +72,7 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridX</string> 
-           <int>1</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>gridY</string> 
-           <int>1</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>vAlign</string> 
-           <object class="com.jgoodies.forms.layout.CellConstraints" field="TOP"/> 
+           <int>3</int> 
           </void> 
          </object> 
         </void> 
@@ -87,7 +83,7 @@
            <string>font</string> 
            <object class="java.awt.Font"> 
             <string>Arial</string> 
-            <int>1</int> 
+            <int>0</int> 
             <int>20</int> 
            </object> 
           </void> 
@@ -107,6 +103,84 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>3</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>com.jidesoft.swing.JideLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>text</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>orientation</string> 
+           <int>1</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object class="java.awt.Font"> 
+            <string>Arial</string> 
+            <int>0</int> 
+            <int>18</int> 
+           </object> 
+          </void> 
+          <void method="setProperty"> 
+           <string>horizontalAlignment</string> 
+           <int>0</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>clockwise</string> 
+           <boolean>false</boolean> 
+          </void> 
+          <void property="name"> 
+           <string>lblNotify</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>5</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridHeight</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>3</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JComboBox</string> 
+          <void property="name"> 
+           <string>cmbNotify</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.ItemListener</string> 
+            <string>itemStateChanged</string> 
+            <string>cmbNotifyItemStateChanged</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>7</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
            <int>3</int> 
           </void> 
          </object> 
@@ -141,7 +215,11 @@
             </void> 
             <void method="setProperty"> 
              <string>font</string> 
-             <object idref="Font0"/> 
+             <object class="java.awt.Font"> 
+              <string>Arial</string> 
+              <int>0</int> 
+              <int>14</int> 
+             </object> 
             </void> 
             <void property="name"> 
              <string>txtDescription</string> 
@@ -165,13 +243,13 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>3</int> 
+           <int>5</int> 
           </void> 
          </object> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
+          <string>com.jidesoft.swing.JideLabel</string> 
           <void method="setProperty"> 
            <string>font</string> 
            <object idref="Font0"/> 
@@ -179,6 +257,14 @@
           <void method="setProperty"> 
            <string>text</string> 
            <string>Situation</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>orientation</string> 
+           <int>1</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>clockwise</string> 
+           <boolean>false</boolean> 
           </void> 
           <void property="name"> 
            <string>lblDescription</string> 
@@ -192,11 +278,53 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>3</int> 
+           <int>5</int> 
           </void> 
           <void method="setProperty"> 
            <string>vAlign</string> 
-           <object class="com.jgoodies.forms.layout.CellConstraints" field="TOP"/> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="CENTER"/> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>javax.swing.JScrollPane</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>javax.swing.JScrollPane</class> 
+          </object> 
+          <void property="name"> 
+           <string>scrollPane1</string> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JList</string> 
+            <void method="setProperty"> 
+             <string>selectionMode</string> 
+             <int>0</int> 
+            </void> 
+            <void property="name"> 
+             <string>lstNotify</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>javax.swing.event.ListSelectionListener</string> 
+              <string>valueChanged</string> 
+              <string>lstNotifyValueChanged</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
+           </object> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>7</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>5</int> 
           </void> 
          </object> 
         </void> 
@@ -205,11 +333,19 @@
           <string>javax.swing.JLabel</string> 
           <void method="setProperty"> 
            <string>font</string> 
-           <object idref="Font0"/> 
+           <object class="java.awt.Font"> 
+            <string>Arial</string> 
+            <int>0</int> 
+            <int>18</int> 
+           </object> 
           </void> 
           <void method="setProperty"> 
            <string>text</string> 
            <string>Markierung</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>horizontalAlignment</string> 
+           <int>0</int> 
           </void> 
           <void property="name"> 
            <string>lblTags</string> 
@@ -219,6 +355,14 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridY</string> 
+           <int>9</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridWidth</string> 
            <int>5</int> 
           </void> 
          </object> 
@@ -233,10 +377,6 @@
         <void method="setProperty"> 
          <string>gridX</string> 
          <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>vAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
         </void> 
        </object> 
       </void> 

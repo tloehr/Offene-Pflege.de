@@ -1,9 +1,9 @@
 package entity.qms;
 
 import entity.files.Qms2File;
-import entity.files.Qmsplan2File;
 import entity.system.Users;
 import op.tools.SYSTools;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -159,6 +159,16 @@ public class Qms implements Comparable<Qms> {
     public boolean isOpen() {
         return state == QmsTools.STATE_OPEN;
     }
+
+    public boolean isDue() {
+        // if its closed its never due!
+        return isOpen() && new LocalDate(target).isAfter(new LocalDate().minusDays(qmssched.getDuedays()));
+    }
+
+    public boolean isPastDue() {
+            // if its closed its never due!
+            return isOpen() && new LocalDate(target).isAfter(new LocalDate());
+        }
 
     @Override
     public boolean equals(Object o) {

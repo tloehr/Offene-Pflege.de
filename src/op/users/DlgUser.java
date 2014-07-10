@@ -4,8 +4,6 @@
 
 package op.users;
 
-import java.awt.event.*;
-import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.system.Users;
@@ -43,7 +41,6 @@ public class DlgUser extends MyJDialog {
     }
 
     private void initPanel() {
-
         lblFirstname.setText(SYSTools.xx("misc.msg.firstname"));
         lblName.setText(SYSTools.xx("misc.msg.name"));
         lblPW.setText(SYSTools.xx("misc.msg.password"));
@@ -54,7 +51,6 @@ public class DlgUser extends MyJDialog {
         txtEMail.setText(user.getEMail());
         txtVorname.setText(user.getVorname());
         txtUID.setText(user.getUID());
-
 
         txtPW.setEnabled(user.getUID() == null);
         txtUID.setEnabled(user.getUID() == null);

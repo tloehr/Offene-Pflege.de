@@ -8,6 +8,7 @@ import op.system.InternalClass;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -30,7 +31,7 @@ public class PnlEditACL extends JPanel {
     public PnlEditACL(SYSGROUPS2ACL sysgroups2ACL) {
         super();
         this.sysgroups2ACL = sysgroups2ACL;
-        setLayout(new GridLayout(0, 8));
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         initPanel();
     }
 
@@ -40,8 +41,8 @@ public class PnlEditACL extends JPanel {
         for (final InternalClassACL possibleACL : ic.getPossibleACLs()) {
 
             JCheckBox cbACL = new JCheckBox(InternalClassACL.strACLS[possibleACL.getACLcode()]);
-            cbACL.setToolTipText(possibleACL.getDescription());
-            cbACL.setFont(SYSConst.ARIAL14);
+//            cbACL.setToolTipText();
+            cbACL.setFont(SYSConst.ARIAL14BOLD);
             // The CB should be selected if (and only if) the IntClass (with the fitting internalClassesID) is assigned to the group and
             // a ACL is assigned to the SYSGROUPS2ACL object with the same SHORT code for the acl.
             cbACL.setSelected(SYSGROUPS2ACLTools.findACLbyCODE(sysgroups2ACL, possibleACL.getACLcode()) != null);
@@ -82,6 +83,7 @@ public class PnlEditACL extends JPanel {
                 }
             });
             add(cbACL);
+            add(new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(possibleACL.getDescription()))));
 
         }
     }

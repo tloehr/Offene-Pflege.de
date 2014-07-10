@@ -18,6 +18,9 @@ import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
 import entity.process.QProcess;
 import entity.process.QProcessTools;
+import entity.qms.Qms;
+import entity.qms.QmsTools;
+import entity.system.CommontagsTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import op.OPDE;
@@ -25,6 +28,7 @@ import op.care.PnlCare;
 import op.care.info.PnlInformation;
 import op.care.nursingprocess.PnlNursingProcess;
 import op.care.values.PnlValues;
+import op.controlling.PnlControlling;
 import op.dev.PnlDev;
 import op.misc.DlgIntervention;
 import op.process.PnlProcess;
@@ -35,7 +39,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
@@ -65,6 +69,7 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<Object[]> birthdayList;
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
+    private ArrayList<Qms> dueQMSes;
     private final int BIRTHDAY = 4;
 
     public PnlWelcome(JScrollPane jspSearch) {
@@ -83,6 +88,7 @@ public class PnlWelcome extends CleanablePanel {
         SYSTools.clear(birthdayList);
         SYSTools.clear(noStoolList);
         SYSTools.clear(violatingLiquidValues);
+        SYSTools.clear(dueQMSes);
     }
 
     @Override
@@ -167,8 +173,9 @@ public class PnlWelcome extends CleanablePanel {
                 expiryList = MedStockTools.getExpiryList(7);
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
+                dueQMSes = QmsTools.getDueList();
                 Collections.sort(processList);
-                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size();
+                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size();
 
                 if (!processList.isEmpty()) {
                     String title = "<html><font size=+1>" +
@@ -255,6 +262,21 @@ public class PnlWelcome extends CleanablePanel {
                     cpsWelcome.add(cp);
                 }
 
+                if (!dueQMSes.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            SYSTools.xx("opde.controlling.qms.due.or.overdue") + "</font></html>";
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    for (Qms due : dueQMSes) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4DueQms(due).getMain());
+                    }
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
+                }
+
+
                 if (max == 0) {
                     JPanel pnlContent = new JPanel(new VerticalLayout());
                     JLabel lbl = new JLabel(SYSTools.xx("misc.msg.noEntries"));
@@ -313,9 +335,25 @@ public class PnlWelcome extends CleanablePanel {
         return cptitle;
     }
 
+    private DefaultCPTitle createCP4DueQms(final Qms due) {
+
+           String title = SYSTools.toHTMLForScreen(QmsTools.toHTML(due) + " "+ CommontagsTools.getAsHTML(due.getQmsplan().getCommontags(), SYSConst.html_16x16_tagPurple_internal));
+
+           DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+               @Override
+               public void actionPerformed(ActionEvent e) {
+                   OPDE.getMainframe().clearPreviousProgbutton();
+                   OPDE.getMainframe().setCurrentResident(null);
+                   OPDE.getMainframe().setPanelTo(new PnlControlling(jspSearch, due.getQmsplan()));
+               }
+           });
+
+           return cptitle;
+       }
+
     private DefaultCPTitle createCP4HighLowIn(Object[] ns) {
         final Resident resident = (Resident) ns[0];
-        ArrayList<Pair<DateMidnight, BigDecimal>> violatingValues = (ArrayList<Pair<DateMidnight, BigDecimal>>) ns[1];
+        ArrayList<Pair<LocalDate, BigDecimal>> violatingValues = (ArrayList<Pair<LocalDate, BigDecimal>>) ns[1];
         Properties controlling = resident.getControlling();
 
         BigDecimal lowin = null;
@@ -337,7 +375,7 @@ public class PnlWelcome extends CleanablePanel {
         title += "<tr><td>";
         title += "<table border=\"0\">";
 
-        for (Pair<DateMidnight, BigDecimal> val : violatingValues) {
+        for (Pair<LocalDate, BigDecimal> val : violatingValues) {
             title += "<tr valign=\"top\">" +
                     "<td width=\"100\" align=\"left\">" +
                     DateFormat.getDateInstance().format(val.getFirst().toDate()) + "</td>" +

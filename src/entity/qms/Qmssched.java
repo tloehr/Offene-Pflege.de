@@ -182,6 +182,19 @@ public class Qmssched {
         this.state = state;
     }
 
+
+    @Basic
+    @Column(name = "dueDays", nullable = true, insertable = true, updatable = true)
+    private int duedays;
+
+    public int getDuedays() {
+        return duedays;
+    }
+
+    public void setDuedays(int duedays) {
+        this.duedays = duedays;
+    }
+
     @JoinColumn(name = "station", referencedColumnName = "StatID")
     @ManyToOne
     private Station station;
@@ -249,6 +262,8 @@ public class Qmssched {
         this.qmsList = new ArrayList<>();
         this.user = OPDE.getLogin().getUser();
         this.state = QmsschedTools.STATE_ACTIVE;
+
+        this.duedays = 3;
 
     }
 

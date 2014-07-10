@@ -26,6 +26,7 @@
 package entity.system;
 
 import entity.files.*;
+import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
 import op.tools.SYSTools;
@@ -73,6 +74,7 @@ public class Users implements Serializable, Comparable<Users> {
     @JoinColumn(name = "UKennung"), inverseJoinColumns =
     @JoinColumn(name = "GKennung"))
     private Collection<Groups> groups;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSFiles> sysfilesCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
@@ -87,11 +89,15 @@ public class Users implements Serializable, Comparable<Users> {
     private Collection<NReport> korrigierteNReport;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSLogin> logins;
+
     @ManyToMany
     @JoinTable(name = "training2users", joinColumns =
     @JoinColumn(name = "UID"), inverseJoinColumns =
     @JoinColumn(name = "TRID"))
     private Collection<Training> trainings;
+
+    @ManyToMany(mappedBy = "notification")
+    private Collection<Qmsplan> notifiedAboutQmsplan;
 
     public Collection<User2File> getAttachedFilesConnections() {
         return attachedFilesConnections;

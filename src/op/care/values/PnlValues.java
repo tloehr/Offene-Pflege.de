@@ -1146,7 +1146,7 @@ public class PnlValues extends NursingRecordsPanel {
 
 //                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day";
                         final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-                        final LocalDate week = SYSCalendar.max(SYSCalendar.bow(dt.toLocalDate()), new LocalDate(dt.getYear(), 1, 1));
+//                        final LocalDate week = SYSCalendar.max(SYSCalendar.bow(dt.toLocalDate()), new LocalDate(dt.getYear(), 1, 1));
 //                        final String keyWeek = vtype.getID() + ".xtypes." + week + ".week";
 
                         synchronized (mapType2Values) {

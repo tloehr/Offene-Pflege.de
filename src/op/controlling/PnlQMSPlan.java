@@ -49,12 +49,14 @@ public class PnlQMSPlan extends CleanablePanel {
     private HashMap<String, CollapsiblePane> cpMap;
     //    private ArrayList<Qmsplan> listQMSPlans;
     private ArrayList<Qmsplan> listQMSPlans;
+    private final Qmsplan expandMe;
 
-//    private final int MAX_TEXT_LENGTH = 65;
+    //    private final int MAX_TEXT_LENGTH = 65;
     private final int MAX_MONTHS_IN_ADVANCE_TO_CONFIRM_QMS = 6;
 
-    public PnlQMSPlan(ArrayList<Qmsplan> listQMSPlans) {
+    public PnlQMSPlan(ArrayList<Qmsplan> listQMSPlans, Qmsplan expandMe) {
         this.listQMSPlans = listQMSPlans;
+        this.expandMe = expandMe;
         cpMap = new HashMap<>();
         mapQms2Panel = new HashMap<>();
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -112,7 +114,7 @@ public class PnlQMSPlan extends CleanablePanel {
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
             try {
-                cpMap.get(key).setCollapsed(true);
+                cpMap.get(key).setCollapsed( expandMe == null || !qmsplan.equals(expandMe) );
             } catch (PropertyVetoException e) {
                 // Bah!
             }
@@ -199,7 +201,7 @@ public class PnlQMSPlan extends CleanablePanel {
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
             try {
-                cpMap.get(key).setCollapsed(true);
+                cpMap.get(key).setCollapsed(expandMe == null || !qmssched.getQmsplan().equals(expandMe));
             } catch (PropertyVetoException e) {
                 // Bah!
             }

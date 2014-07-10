@@ -834,7 +834,7 @@ public class ResValueTools {
 
     public static ArrayList<Object[]> getHighLowIn() {
 
-        ArrayList<Object[]> result = new ArrayList<Object[]>();
+        ArrayList<Object[]> result = new ArrayList();
         Station currentStation = StationTools.getStationForThisHost();
         ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 

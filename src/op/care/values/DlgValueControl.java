@@ -144,13 +144,13 @@ public class DlgValueControl extends MyJDialog {
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
-        if (saveOK()) {
+        if (isSaveOK()) {
             save();
             dispose();
         }
     }
 
-    private boolean saveOK() {
+    private boolean isSaveOK() {
         boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
 
         BigDecimal stooldays = SYSTools.parseDecimal(txtStoolDays.getText());

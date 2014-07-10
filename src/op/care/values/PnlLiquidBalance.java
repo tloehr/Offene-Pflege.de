@@ -14,6 +14,7 @@ import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
 import entity.files.SYSVAL2FILE;
 import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.process.SYSVAL2PROCESS;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
@@ -26,6 +27,7 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
+import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -37,10 +39,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -63,6 +64,8 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
     private NumberFormat nf;
     private final ResValueTypes LIQUIDBALANCE;
     private ArrayList<LocalDate> listOfStartDays;
+    private BigDecimal targetIn, highIn, lowIn;
+    private Properties controlProps;
 
     public PnlLiquidBalance(Resident resident, JScrollPane jspSearch) {
         this.resident = resident;
@@ -79,6 +82,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         startDay = new LocalDate();
         lblLeft.setText(SYSTools.xx("nursingrecords.liquidbalances.summary"));
         lblRight.setText(SYSTools.xx("nursingrecords.liquidbalances.details"));
+        lblLimits.setText(null);
 
         df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
         nf = DecimalFormat.getNumberInstance();
@@ -118,6 +122,24 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(listValues, LIQUIDBALANCE)), true);
     }
 
+    private void scrlLeftComponentResized(ComponentEvent e) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                tblLeft.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+                if (highIn != null || lowIn != null) {
+                    TableUtils.autoResizeAllColumns(tblLeft, null, new int[]{100, 100, 100, 100}, true, false);
+                } else {
+                    TableUtils.autoResizeAllColumns(tblLeft, null, new int[]{100, 100, 100, 100, 100}, true, false);
+                }
+
+                TableUtils.autoResizeAllRows(tblLeft);
+
+            }
+        });
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         lblLeft = new JLabel();
@@ -126,6 +148,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         tblLeft = new JTable();
         scrlRight = new JScrollPane();
         tblRight = new JTable();
+        lblLimits = new JLabel();
         panel1 = new JPanel();
         btnToday = new JButton();
         btnBack = new JButton();
@@ -135,8 +158,8 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "pref, $lcgap, pref:grow",
-            "default, default:grow, $lgap, default"));
+                "pref, $lcgap, pref:grow",
+                "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //---- lblLeft ----
         lblLeft.setText("text");
@@ -150,13 +173,19 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
         //======== scrlLeft ========
         {
+            scrlLeft.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    scrlLeftComponentResized(e);
+                }
+            });
 
             //---- tblLeft ----
             tblLeft.setFont(new Font("Arial", Font.PLAIN, 16));
             tblLeft.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
             scrlLeft.setViewportView(tblLeft);
         }
-        add(scrlLeft, CC.xy(1, 2, CC.FILL, CC.FILL));
+        add(scrlLeft, CC.xywh(1, 3, 1, 3, CC.FILL, CC.FILL));
 
         //======== scrlRight ========
         {
@@ -165,7 +194,11 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             tblRight.setFont(new Font("Arial", Font.PLAIN, 16));
             scrlRight.setViewportView(tblRight);
         }
-        add(scrlRight, CC.xy(3, 2, CC.FILL, CC.FILL));
+        add(scrlRight, CC.xy(3, 3, CC.FILL, CC.FILL));
+
+        //---- lblLimits ----
+        lblLimits.setText("text");
+        add(lblLimits, CC.xy(3, 5));
 
         //======== panel1 ========
         {
@@ -204,7 +237,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             });
             panel1.add(btnForward);
         }
-        add(panel1, CC.xy(1, 4, CC.CENTER, CC.DEFAULT));
+        add(panel1, CC.xy(1, 7, CC.CENTER, CC.DEFAULT));
 
         //======== panel2 ========
         {
@@ -221,7 +254,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             });
             panel2.add(btnPrint);
         }
-        add(panel2, CC.xy(3, 4, CC.RIGHT, CC.DEFAULT));
+        add(panel2, CC.xy(3, 7, CC.RIGHT, CC.DEFAULT));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -231,19 +264,23 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         this.resident = resident;
         GUITools.setResidentDisplay(resident);
         cleanup();
+        parseControlling();
         reload();
+    }
+
+    private void parseControlling() {
+        controlProps = resident.getControlling();
+        lowIn = SYSTools.parseBigDecimal(controlProps.getProperty(ResidentTools.KEY_LOWIN));
+        targetIn = SYSTools.parseBigDecimal(controlProps.getProperty(ResidentTools.KEY_TARGETIN));
+        highIn = SYSTools.parseBigDecimal(controlProps.getProperty(ResidentTools.KEY_HIGHIN));
+
     }
 
     @Override
     public void cleanup() {
-        if (listValues != null) {
-            listValues.clear();
-        }
-        listValues = null;
-        if (listSummaries != null) {
-            listSummaries.clear();
-        }
-        listSummaries = null;
+        SYSTools.clear(listValues);
+        SYSTools.clear(listSummaries);
+        SYSTools.clear(controlProps);
     }
 
     @Override
@@ -260,12 +297,32 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
     void loadLeftTable() {
         Vector<Vector> dataLeft = new Vector<>();
         listSummaries = ResValueTools.getLiquidBalances(resident, startDay, 20);
+
         for (Object[] obj : listSummaries) {
             Vector line = new Vector();
             line.add(new LocalDate(((java.sql.Date) obj[0]).getTime()));
-            line.add(obj[1]);
+            BigDecimal liquidin = (BigDecimal) obj[1];
+            line.add(liquidin);
+
             line.add(obj[2]);
-            line.add(obj[3]);
+
+
+            BigDecimal liquidresult = (BigDecimal) obj[3];
+            line.add(liquidresult);
+
+            if (highIn != null || lowIn != null) {
+                String evaluation = "";
+                if (lowIn != null && liquidin.compareTo(lowIn) < 0) {
+                    evaluation = SYSConst.html_color(Color.blue, SYSConst.html_bold("&darr;"));
+                } else if (highIn != null && liquidin.compareTo(targetIn) > 0) {
+                    evaluation = SYSConst.html_color(Color.red, SYSConst.html_bold("&uarr;"));
+                } else {
+                    evaluation = SYSConst.html_color(Color.green, SYSConst.html_bold("ok"));
+                }
+                line.add(evaluation);
+            }
+
+
             dataLeft.add(line);
         }
 
@@ -274,7 +331,9 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         headerLeft.add(SYSTools.xx("misc.msg.ingestion"));
         headerLeft.add(SYSTools.xx("misc.msg.egestion"));
         headerLeft.add(SYSTools.xx("misc.msg.liquid.result"));
-
+        if (highIn != null || lowIn != null) {
+            headerLeft.add(SYSTools.xx("misc.msg.evaluation"));
+        }
         DefaultTableModel tmLeft = new DefaultTableModel(dataLeft, headerLeft) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -292,9 +351,6 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                 int minIndex = lsm.getMinSelectionIndex();
                 int maxIndex = lsm.getMaxSelectionIndex();
 
-//                OPDE.debug(minIndex);
-//                OPDE.debug(maxIndex);
-
                 if (minIndex < 0 || maxIndex < 0) return;
 
                 cleanup();
@@ -309,7 +365,6 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                 if (o == null) {
                     text = SYSTools.xx("misc.commands.>>noselection<<");
                 } else if (o instanceof LocalDate) {
-                    //                    text = ((GP) o).getName() + ", " + ((GP) o).getFirstname() + ", " + ((GP) o).getCity();
                     text = ((LocalDate) o).toString("dd.MM.yyyy");
                 } else {
                     text = o.toString();
@@ -317,11 +372,21 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                 return new DefaultTableCellRenderer().getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
             }
         });
+
+
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
         tblLeft.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
         tblLeft.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
         tblLeft.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+
+        if (highIn != null || lowIn != null) {
+            tblLeft.getColumnModel().getColumn(4).setCellRenderer(new RNDHTML());
+        }
+
+        scrlLeftComponentResized(null);
+
+
     }
 
     void loadRightTable(final LocalDate from, final LocalDate to) {
@@ -520,6 +585,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                             startDay = new LocalDate(myValue.getPit());
                             loadLeftTable();
                             loadRightTable(startDay, startDay);
+
                         }
 
                     }
@@ -548,7 +614,6 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                                 em.lock(myResident, LockModeType.OPTIMISTIC);
                                 myResident.setControlling((Properties) o);
                                 em.getTransaction().commit();
-
                                 resident = myResident;
                             } catch (OptimisticLockException ole) {
                                 OPDE.warn(ole);
@@ -568,6 +633,8 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                             } finally {
                                 em.close();
                             }
+                            parseControlling();
+                            loadLeftTable();
 
                         }
                     }
@@ -587,6 +654,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
     private JTable tblLeft;
     private JScrollPane scrlRight;
     private JTable tblRight;
+    private JLabel lblLimits;
     private JPanel panel1;
     private JButton btnToday;
     private JButton btnBack;

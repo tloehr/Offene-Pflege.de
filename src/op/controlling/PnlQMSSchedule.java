@@ -47,6 +47,8 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -55,6 +57,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -112,6 +115,11 @@ public class PnlQMSSchedule extends JPanel {
 
 
     private void initPanel() {
+
+        NumberFormat nf = NumberFormat.getIntegerInstance();
+        nf.setMaximumIntegerDigits(2);
+        txtDueDays.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(nf)));
+        txtDueDays.setValue(qmssched.getDuedays());
 
         tabWdh.setTitleAt(TAB_DAILY, SYSTools.xx("misc.msg.daily"));
         tabWdh.setTitleAt(TAB_WEEKLY, SYSTools.xx("misc.msg.weekly"));
@@ -222,6 +230,8 @@ public class PnlQMSSchedule extends JPanel {
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
         btnSave = new JButton();
+        lblDueDays = new JLabel();
+        txtDueDays = new JFormattedTextField();
 
         //======== this ========
         setLayout(new BorderLayout());
@@ -237,21 +247,24 @@ public class PnlQMSSchedule extends JPanel {
             });
             panelMain.setLayout(new FormLayout(
                 "$rgap, $lcgap, 35dlu:grow, $ugap, 105dlu:grow, $lcgap, $rgap",
-                "default, $nlgap, default, $lgap, default, $nlgap, 2*(default, $lgap), pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
+                "default, $nlgap, 18dlu, $lgap, default, $nlgap, 2*(default, $lgap), pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
 
             //---- lblMeasure ----
             lblMeasure.setText("text");
             lblMeasure.setFont(new Font("Arial", Font.PLAIN, 10));
             lblMeasure.setHorizontalAlignment(SwingConstants.TRAILING);
             panelMain.add(lblMeasure, CC.xy(5, 1));
-            panelMain.add(txtQMS, CC.xywh(3, 3, 3, 1));
+
+            //---- txtQMS ----
+            txtQMS.setFont(new Font("Arial", Font.BOLD, 14));
+            panelMain.add(txtQMS, CC.xywh(3, 3, 3, 1, CC.DEFAULT, CC.FILL));
 
             //---- lblLocation ----
             lblLocation.setText("text");
             lblLocation.setFont(new Font("Arial", Font.PLAIN, 10));
             lblLocation.setHorizontalAlignment(SwingConstants.TRAILING);
             panelMain.add(lblLocation, CC.xy(5, 5));
-            panelMain.add(cmbLocation, CC.xywh(3, 7, 3, 1));
+            panelMain.add(cmbLocation, CC.xy(5, 7));
 
             //======== tabWdh ========
             {
@@ -556,6 +569,7 @@ public class PnlQMSSchedule extends JPanel {
                 //---- txtBemerkung ----
                 txtBemerkung.setColumns(20);
                 txtBemerkung.setRows(5);
+                txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
                 jScrollPane1.setViewportView(txtBemerkung);
             }
             panelMain.add(jScrollPane1, CC.xywh(3, 17, 3, 1, CC.DEFAULT, CC.FILL));
@@ -569,6 +583,16 @@ public class PnlQMSSchedule extends JPanel {
                 }
             });
             panelMain.add(btnSave, CC.xy(5, 19, CC.RIGHT, CC.DEFAULT));
+
+            //---- lblDueDays ----
+            lblDueDays.setText("text");
+            lblDueDays.setFont(new Font("Arial", Font.PLAIN, 10));
+            lblDueDays.setHorizontalAlignment(SwingConstants.TRAILING);
+            panelMain.add(lblDueDays, CC.xy(3, 5));
+
+            //---- txtDueDays ----
+            txtDueDays.setFont(new Font("Arial", Font.PLAIN, 14));
+            panelMain.add(txtDueDays, CC.xy(3, 7, CC.DEFAULT, CC.FILL));
         }
         add(panelMain, BorderLayout.CENTER);
 
@@ -671,6 +695,7 @@ public class PnlQMSSchedule extends JPanel {
 
         qmssched.setMeasure(SYSTools.tidy(txtQMS.getText()));
         qmssched.setText(SYSTools.tidy(txtBemerkung.getText()));
+        qmssched.setDuedays((Integer) txtDueDays.getValue());
 
         if (cmbLocation.getSelectedItem() == null) {
             qmssched.setHome(null);
@@ -760,5 +785,7 @@ public class PnlQMSSchedule extends JPanel {
     private JScrollPane jScrollPane1;
     private JTextArea txtBemerkung;
     private JButton btnSave;
+    private JLabel lblDueDays;
+    private JFormattedTextField txtDueDays;
     // End of variables declaration//GEN-END:variables
 }

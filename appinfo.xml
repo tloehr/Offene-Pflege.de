@@ -42,12 +42,12 @@
         <class name="admin.residents.cash" short="Barbeträge"
                long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true"
                javaclass="op.allowance.PnlAllowance" icon="coins.png">
-            <manager langbundle="appinfo.default.acl.manager"/>
-            <update langbundle="appinfo.default.acl.update"/>
-            <delete langbundle="appinfo.default.acl.delete"/>
-            <print langbundle="appinfo.default.acl.print"/>
-            <execute langbundle="appinfo.default.acl.execute"/>
-            <archive langbundle="appinfo.default.acl.archive"/>
+            <manager langbundle="admin.residents.cash.acl.manager"/>
+            <update langbundle="admin.residents.cash.acl.update"/>
+            <delete langbundle="admin.residents.cash.acl.delete"/>
+            <print langbundle="admin.residents.cash.acl.print"/>
+            <execute langbundle="admin.residents.cash.acl.execute"/>
+            <archive langbundle="admin.residents.cash.acl.archive"/>
         </class>
         <class name="opde.usersettings" short="Deine Einstellungen"
                long="Hiermit kann man die eigene Konfiguration ändern." main="true"
@@ -64,11 +64,11 @@
                javaclass="op.dev.PnlDev" icon="developer1.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
-        <class name="nursingrecords.prescription" short="Pflegeakte/Verordnungen"
+        <class name="nursingrecords.prescription" short="Pflegeakte/Ärztliche Verordnungen"
                long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von ärztlichen Verordnungen.">
-            <print langbundle="appinfo.default.acl.print"/>
-            <delete langbundle="appinfo.default.acl.delete"/>
-            <update langbundle="appinfo.default.acl.update"/>
+            <print langbundle="nursingrecords.prescription.acl.print"/>
+            <delete langbundle="nursingrecords.prescription.acl.delete"/>
+            <update langbundle="nursingrecords.prescription.acl.update"/>
         </class>
         <class name="nursingrecords.nursingprocess" short="Pflegeakte/Pflegeplanung"
                long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von Pflegeplanungen.">
@@ -96,10 +96,10 @@
                long="Das Modul zur Bearbeitung der täglichen Trinkmengen.">
         </class>
         <class name="nursingrecords.bhp" short="Pflegeakte/Behandlungspflege" long="">
-            <update langbundle="appinfo.default.acl.update"/>
+            <update langbundle="nursingrecords.bhp.acl.update"/>
         </class>
         <class name="nursingrecords.dfn" short="Pflegeakte/Durchführungsnachweis" long="">
-            <update langbundle="appinfo.default.acl.update"/>
+            <update langbundle="nursingrecords.dfn.acl.update"/>
         </class>
         <class name="nursingrecords.qprocesses" short="Vorgänge"
                long="Das Modul zur Bearbeitung und Anzeige von Vorgängen."
@@ -140,12 +140,12 @@
                long="nursingrecords.info.appinfo.long"
                javaclass="op.care.info.PnlInformation">
             <update langbundle="appinfo.default.acl.update"/>
-            <manager langbundle="nursingrecords.info.appinfo.acl.manager"/>
+            <manager langbundle="nursingrecords.info.acl.manager"/>
             <delete langbundle="appinfo.default.acl.delete"/>
             <print langbundle="appinfo.default.acl.print"/>
             <archive langbundle="appinfo.default.acl.archive"/>
-            <user1 langbundle="nursingrecords.info.appinfo.acl.user1"/>
-            <user2 langbundle="nursingrecords.info.appinfo.acl.user2"/>
+            <user1 langbundle="nursingrecords.info.acl.user1"/>
+            <user2 langbundle="nursingrecords.info.acl.user2"/>
         </class>
     </classes>
 

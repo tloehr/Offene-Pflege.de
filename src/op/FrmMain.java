@@ -669,7 +669,7 @@ public class FrmMain extends JFrame {
         } else if (classname.equals("op.welcome.PnlWelcome")) {
             panel = new PnlWelcome(jspSearch);
         } else if (classname.equals("op.controlling.PnlControlling")) {
-            panel = new PnlControlling(jspSearch);
+            panel = new PnlControlling(jspSearch, null);
         } else if (classname.equals("op.settings.PnlSystemSettings")) {
             panel = new PnlSystemSettings(jspSearch);
         } else if (classname.equals("op.settings.PnlUserSettings")) {

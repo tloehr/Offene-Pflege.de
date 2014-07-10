@@ -2,11 +2,14 @@ package entity.qms;
 
 import io.lamma.Date;
 import io.lamma.Lamma4j;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -43,42 +46,65 @@ public class QmsTools {
         }
     }
 
+    /**
+     * retrieves a list of all due and overdue QMSs.
+     *
+     * @return
+     */
+    public static ArrayList<Qms> getDueList() {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Qms> result = new ArrayList<>();
 
-//    public static ArrayList<Qms> get(Qmssched qmssched, LocalDate year) {
-//        EntityManager em = OPDE.createEM();
-//        ArrayList<Qms> list = null;
-//
-//        try {
-//
-//            String jpql = " SELECT qms " +
-//                    " FROM Qms qms " +
-//                    " WHERE qms.qmssched = :qmssched " +
-//                    " AND qms.target >= :from AND qms.target <= :to " +
-//                    " ORDER BY qms.target DESC ";
-//
-//            Query query = em.createQuery(jpql);
-//
-//            query.setParameter("qmssched", qmssched);
-//            query.setParameter("from", SYSCalendar.boy(year).toDateTimeAtStartOfDay().toDate());
-//            query.setParameter("to", SYSCalendar.eod(SYSCalendar.eoy(year)).toDate());
-//
-//            list = new ArrayList<Qms>(query.getResultList());
-//
-//        } catch (Exception se) {
-//            OPDE.fatal(se);
-//        } finally {
-//            em.close();
-//        }
-//        return list;
-//    }
+        try {
+
+
+            String jpql = " SELECT qms " +
+                    " FROM Qms qms " +
+                    " WHERE qms.qmssched.state = :schedstate AND qms.qmsplan.state = :planstate AND qms.state = :qmsstate " +
+                    " ORDER BY qms.target DESC ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("schedstate", QmsschedTools.STATE_ACTIVE);
+            query.setParameter("planstate", QmsplanTools.STATE_ACTIVE);
+            query.setParameter("qmsstate", QmsTools.STATE_OPEN);
+
+
+            ArrayList<Qms> listPre = new ArrayList<Qms>(query.getResultList());
+
+            for (Qms qms : listPre) {
+                if (qms.isDue()) {
+                    result.add(qms);
+                }
+            }
+
+            listPre.clear();
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return result;
+    }
 
     public static Icon getIcon(Qms qms) {
         if (qms.getState() == STATE_DONE) {
             return SYSConst.icon22apply;
         }
-        if (qms.getState() == STATE_OPEN) {
+
+        if (qms.isPastDue()) {
+            return SYSConst.icon22ledRedOn;
+        }
+
+        if (qms.isDue()) {
+            return SYSConst.icon22ledYellowOn;
+        }
+
+        if (qms.isOpen()) {
             return null;
         }
+
         if (qms.getState() == STATE_REFUSED) {
             return SYSConst.icon22cancel;
         }
@@ -87,16 +113,17 @@ public class QmsTools {
     }
 
 
-
-
     public static String toHTML(Qms qms) {
 
         String result = SYSConst.html_bold(DateFormat.getDateInstance().format(qms.getTarget()));
 
+        if (qms.isDue()) {
+            result += " // (" + SYSTools.xx(qms.isPastDue() ? "misc.msg.pastdue" : "misc.msg.due") + ")";
+        }
+
         if (!qms.isOpen()) {
             result += " // " + DateFormat.getDateInstance().format(qms.getActual()) + "; " + qms.getUser().getUID();
         }
-
 
 
         return result;

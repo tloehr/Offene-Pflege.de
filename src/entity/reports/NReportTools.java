@@ -207,7 +207,7 @@ public class NReportTools {
                                 " " + SYSTools.xx("misc.msg.Time.short") +
                                 ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                                 ", " + nreport.getUser().getFullname() +
-                                (nreport.getCommontags().isEmpty() ? "" : " " + NReportTools.getTagsAsHTML(nreport, SYSConst.html_16x16_tagPurple))
+                                (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
 
                 );
 
@@ -286,14 +286,6 @@ public class NReportTools {
 //        }
 //        return color;
 //    }
-
-    public static String getTagsAsHTML(NReport nReport, String icon) {
-        String result = "";
-        for (Commontags ctag : nReport.getCommontags()) {
-            result += icon + "&nbsp;" + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font> ";
-        }
-        return result;
-    }
 
     public static String getDateAndUser(NReport nReport, boolean showIDs, boolean showMinutes) {
         String result = "";

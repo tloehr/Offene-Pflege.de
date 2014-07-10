@@ -903,7 +903,7 @@ public class PnlReport extends NursingRecordsPanel {
                                                     " " + SYSTools.xx("misc.msg.Time.short") +
                                                     ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                                                     ", " + nreport.getUser().getFullname() +
-                                                    (nreport.getCommontags().isEmpty() ? "" : " " + NReportTools.getTagsAsHTML(nreport, SYSConst.html_16x16_tagPurple_internal)) + "</p></b></td>"
+                                                    (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple_internal)) + "</p></b></td>"
                                     ) +
                                             SYSConst.html_table_tr(
                                                     "<td width=\"800\" align=\"left\">" + SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +

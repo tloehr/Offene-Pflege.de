@@ -32,6 +32,7 @@ public class ResValueTypesTools {
     public static ResValueTypes getType(short type) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT v FROM ResValueTypes v WHERE v.valType = :type");
+
         query.setParameter("type", type);
         ResValueTypes result = (ResValueTypes) query.getSingleResult();
         return result;

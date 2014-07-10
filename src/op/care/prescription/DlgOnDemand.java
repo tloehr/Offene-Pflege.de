@@ -158,9 +158,6 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void btnSituationActionPerformed(ActionEvent e) {
-//        if (cmbSit.getModel().getSize() != 0) {
-//            return;
-//        }
 
         final JidePopup popup = new JidePopup();
         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));

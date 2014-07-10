@@ -6,6 +6,7 @@ import op.OPDE;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by tloehr on 30.05.14.
@@ -120,6 +121,14 @@ public class CommontagsTools {
             em.close();
         }
         return list;
+    }
+
+    public static String getAsHTML(Collection<Commontags> commontags, String icon) {
+        String result = "";
+        for (Commontags ctag : commontags) {
+            result += icon + "&nbsp;" + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font> ";
+        }
+        return result;
     }
 
 }
