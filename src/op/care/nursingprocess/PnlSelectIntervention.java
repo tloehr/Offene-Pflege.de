@@ -39,7 +39,7 @@ import java.util.Arrays;
  */
 public class PnlSelectIntervention extends JPanel {
     private Intervention intervention2Edit = null;
-    public static final String internalClassID = PnlNursingProcess.internalClassID + ".pnlselectinterventions";
+    public static final String internalClassID = "nursingrecords.nursingprocess.pnlselectinterventions";
     private Closure actionBlock;
     private JToggleButton tbAktiv;
     Number dauer = BigDecimal.TEN;
@@ -54,13 +54,13 @@ public class PnlSelectIntervention extends JPanel {
     }
 
     private void initPanel() {
-        lblText.setText(SYSTools.xx(internalClassID + ".lbltext"));
-        lblLength.setText(SYSTools.xx(internalClassID + ".lbllength"));
-        lblCat.setText(SYSTools.xx(internalClassID + ".lblcat"));
-        lblType.setText(SYSTools.xx(internalClassID + ".lbltype"));
+        lblText.setText(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.lbltext"));
+        lblLength.setText(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.lbllength"));
+        lblCat.setText(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.lblcat"));
+        lblType.setText(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.lbltype"));
 
         lstInterventions.setModel(new DefaultListModel());
-        tbAktiv = GUITools.getNiceToggleButton(internalClassID + ".activeIntervention");
+        tbAktiv = GUITools.getNiceToggleButton("nursingrecords.nursingprocess.pnlselectinterventions.activeIntervention");
         pnlRight.add(tbAktiv, CC.xy(1, 9));
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -138,7 +138,7 @@ public class PnlSelectIntervention extends JPanel {
 
     private boolean saveok() {
         if (txtText.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".textempty"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.textempty"), DisplayMessage.WARNING));
             return false;
         }
         return true;
@@ -205,7 +205,7 @@ public class PnlSelectIntervention extends JPanel {
                     myIntervention.setInterventionType(cmbType.getSelectedIndex() + 1);
                     myIntervention.setActive(tbAktiv.isSelected());
                     em.getTransaction().commit();
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".interventionedited"));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.nursingprocess.pnlselectinterventions.interventionedited"));
                     actionBlock.execute(null);
                 } catch (OptimisticLockException ole) { OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {

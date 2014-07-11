@@ -44,7 +44,13 @@ import java.util.*;
 
 
 /**
- * @author Torsten Löhr
+ * ACL
+ * ============
+ * EXECUTE
+ * UPDATE
+ * DELETE
+ *
+ * @author tloehr
  */
 public class PnlTraining extends CleanablePanel {
     public static final String internalClassID = "opde.training";

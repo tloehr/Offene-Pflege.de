@@ -74,21 +74,13 @@ public class GUITools {
     }
 
     public static JideButton createHyperlinkButton(String titleORlangbundle, Icon icon, ActionListener actionListener) {
-//        String title = SYSTools.catchNull(titleORlangbundle);
-//        try {
-//            title = SYSTools.xx(titleORlangbundle);
-//        } catch (Exception e) {
-//            // ok, its not a langbundle key
-//        }
+
         final JideButton button = new JideButton(SYSTools.xx(titleORlangbundle), icon);
         button.setButtonStyle(JideButton.HYPERLINK_STYLE);
         button.setFont(SYSConst.ARIAL14);
 
         button.setOpaque(false);
         button.setHorizontalAlignment(SwingConstants.LEADING);
-//        button.setVerticalAlignment(SwingConstants.TOP);
-//        button.setVerticalTextPosition(SwingConstants.TOP);
-//        button.setHorizontalTextPosition(SwingConstants.RIGHT);
 
         button.setRequestFocusEnabled(true);
         button.setFocusable(true);

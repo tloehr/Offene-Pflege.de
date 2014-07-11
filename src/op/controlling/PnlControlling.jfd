@@ -37,6 +37,18 @@
          <string>boldActiveTab</string> 
          <boolean>true</boolean> 
         </void> 
+        <void method="setProperty"> 
+         <string>font</string> 
+         <object class="java.awt.Font"> 
+          <string>Arial</string> 
+          <int>0</int> 
+          <int>16</int> 
+         </object> 
+        </void> 
+        <void method="setProperty"> 
+         <string>showTabButtons</string> 
+         <boolean>true</boolean> 
+        </void> 
         <void method="addEvent"> 
          <object class="com.jformdesigner.model.FormEvent"> 
           <string>javax.swing.event.ChangeListener</string> 

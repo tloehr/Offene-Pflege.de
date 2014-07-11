@@ -1,5 +1,6 @@
 package op.users;
 
+import com.jidesoft.swing.JideButton;
 import entity.system.Acl;
 import entity.system.SYSGROUPS2ACL;
 import entity.system.SYSGROUPS2ACLTools;
@@ -7,6 +8,9 @@ import op.OPDE;
 import op.system.InternalClass;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
+import op.tools.GUITools;
+import op.tools.RiverLayout;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -15,8 +19,11 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.net.URI;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,12 +38,32 @@ public class PnlEditACL extends JPanel {
     public PnlEditACL(SYSGROUPS2ACL sysgroups2ACL) {
         super();
         this.sysgroups2ACL = sysgroups2ACL;
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new RiverLayout(5, 0));
+//        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         initPanel();
     }
 
     private void initPanel() {
-        InternalClass ic = OPDE.getAppInfo().getInternalClasses().get(sysgroups2ACL.getInternalClassID());
+        final InternalClass ic = OPDE.getAppInfo().getInternalClasses().get(sysgroups2ACL.getInternalClassID());
+
+        add(RiverLayout.PARAGRAPH_BREAK + " " + RiverLayout.HFILL, new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(SYSConst.html_italic(ic.getLongDescription())))));
+
+        if (!SYSTools.catchNull(ic.getHelpurl()).isEmpty()) {
+            JideButton helpButton = GUITools.createHyperlinkButton("misc.msg.explain.this.to.me", SYSConst.icon22helpMe, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        URI uri = new URI(SYSTools.xx(ic.getHelpurl()));
+                        Desktop.getDesktop().browse(uri);
+                    } catch (Exception ex) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
+                    }
+                }
+            });
+            helpButton.setFont(SYSConst.ARIAL14ITALIC);
+            add(RiverLayout.LEFT, helpButton);
+        }
+
 
         for (final InternalClassACL possibleACL : ic.getPossibleACLs()) {
 
@@ -67,7 +94,8 @@ public class PnlEditACL extends JPanel {
 
                         sysgroups2ACL = mySYSGROUPS2ACL;
 
-                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -82,9 +110,9 @@ public class PnlEditACL extends JPanel {
                     }
                 }
             });
-            add(cbACL);
-            add(new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(possibleACL.getDescription()))));
-
+            add(RiverLayout.PARAGRAPH_BREAK+ " "+ RiverLayout.VTOP, cbACL);
+            add(RiverLayout.LEFT + " "+ RiverLayout.HFILL, new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(possibleACL.getDescription()))));
         }
+
     }
 }

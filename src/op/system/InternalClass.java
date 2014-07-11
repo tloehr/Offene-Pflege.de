@@ -23,6 +23,7 @@ public class InternalClass implements Comparable<InternalClass> {
     private String shortDescription;
     private String longDescription;
     private String javaclass;
+    private String helpurl;
     private boolean mainClass;
     private String iconname;
 
@@ -32,12 +33,13 @@ public class InternalClass implements Comparable<InternalClass> {
 
     private SYSGROUPS2ACL intClass;
 
-    public InternalClass(String internalClassID, String shortDescription, String longDescription, boolean mainClass, String javaclass, String iconname) {
+    public InternalClass(String internalClassID, String shortDescription, String longDescription, boolean mainClass, String javaclass, String iconname, String helpurl) {
         this.internalClassID = internalClassID;
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
         this.mainClass = mainClass;
         this.javaclass = javaclass;
+        this.helpurl = helpurl;
         acls = new ArrayList();
         this.intClass = null;
         this.iconname = iconname;
@@ -89,6 +91,10 @@ public class InternalClass implements Comparable<InternalClass> {
      */
     public String getShortDescription() {
         return shortDescription;
+    }
+
+    public String getHelpurl() {
+        return helpurl;
     }
 
     public String getInternalClassID() {

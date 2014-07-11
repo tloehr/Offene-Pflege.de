@@ -47,7 +47,8 @@ public class SYSConst {
     public static final Font ARIAL12BOLD = new Font("Arial", Font.BOLD, 12);
     public static final Font ARIAL12 = new Font("Arial", Font.PLAIN, 12);
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
-    public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 16);
+    public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 14);
+    public static final Font ARIAL14ITALIC = new Font("Arial", Font.ITALIC, 14);
     public static final Font ARIAL16 = new Font("Arial", Font.PLAIN, 16);
     public static final Font ARIAL16BOLD = new Font("Arial", Font.BOLD, 14);
     public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
@@ -598,6 +599,7 @@ public class SYSConst {
     public static final Icon icon163ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/3ledlightgreen.png"));
     public static final Icon icon16ledGreenOff = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/leddarkgreen.png"));
     public static final Icon icon22ledOrangeOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledorange.png"));
+    public static final Icon icon22helpMe = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/helpme.png"));
     public static final Icon icon22ledOrangeOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkorange.png"));
     public static final Icon icon22ledPurpleOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledpurple.png"));
     public static final Icon icon22ledPurpleOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkpurple.png"));

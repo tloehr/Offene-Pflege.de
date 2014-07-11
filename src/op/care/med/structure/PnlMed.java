@@ -468,7 +468,7 @@ public class PnlMed extends CleanablePanel {
 //        }
 
         if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton buchenButton = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".newstocks", SYSConst.icon22addrow, new ActionListener() {
+            JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.inventory.newstocks", SYSConst.icon22addrow, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgNewStocks(null);

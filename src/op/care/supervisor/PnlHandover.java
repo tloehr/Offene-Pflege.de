@@ -112,8 +112,8 @@ public class PnlHandover extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(SYSTools.xx("misc.msg.key")));
-        list.add(new JLabel(SYSTools.xx(internalClassID + ".keydescription1"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-        list.add(new JLabel(SYSTools.xx(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.handover.keydescription1"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.handover.keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
         return list;
     }
 
@@ -522,7 +522,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
         final JButton btnAcknowledge = new JButton(SYSConst.icon163ledGreenOn);
         btnAcknowledge.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnAcknowledge.setToolTipText(SYSTools.xx(internalClassID + ".tooltips.btnAcknowledge"));
+        btnAcknowledge.setToolTipText(SYSTools.xx("nursingrecords.handover.tooltips.btnAcknowledge"));
         btnAcknowledge.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -917,7 +917,7 @@ public class PnlHandover extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".tooltips.btnadd"), SYSConst.icon22add, new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnadd"), SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgHOReport(new Handovers((Homes) cmbHomes.getSelectedItem()), new Closure() {
@@ -970,7 +970,7 @@ public class PnlHandover extends NursingRecordsPanel {
             list.add(addButton);
         }
 
-        final JideButton btnControllingToday = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
+        final JideButton btnControllingToday = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
         btnControllingToday.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -985,7 +985,7 @@ public class PnlHandover extends NursingRecordsPanel {
         });
         list.add(btnControllingToday);
 
-        final JideButton btnControllingYesterday = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".tooltips.btnControllingYesterday"), SYSConst.icon22magnify1, null);
+        final JideButton btnControllingYesterday = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnControllingYesterday"), SYSConst.icon22magnify1, null);
         btnControllingYesterday.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -1029,7 +1029,7 @@ public class PnlHandover extends NursingRecordsPanel {
                 }
             });
             innerPanel.add(txtSearch);
-            JButton btnSearchGeneralReports = GUITools.createHyperlinkButton(internalClassID + ".searchHandovers", null, null);
+            JButton btnSearchGeneralReports = GUITools.createHyperlinkButton("nursingrecords.handover.searchHandovers", null, null);
             btnSearchGeneralReports.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -1066,12 +1066,12 @@ public class PnlHandover extends NursingRecordsPanel {
         });
         list.add(cmbHomes);
 
-        tbResidentFirst = GUITools.getNiceToggleButton(internalClassID + ".residentFirst");
-        SYSPropsTools.restoreState(internalClassID + ".tbResidentFirst", tbResidentFirst);
+        tbResidentFirst = GUITools.getNiceToggleButton("nursingrecords.handover.residentFirst");
+        SYSPropsTools.restoreState("nursingrecords.handover.tbResidentFirst", tbResidentFirst);
         tbResidentFirst.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ".tbResidentFirst", tbResidentFirst);
+                SYSPropsTools.storeState("nursingrecords.handover.tbResidentFirst", tbResidentFirst);
                 reload();
             }
         });
