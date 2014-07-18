@@ -96,7 +96,7 @@
                helpurl="nursingrecords.bhp.appinfo.helpurl">
             <update langbundle="nursingrecords.bhp.acl.update"/>
         </class>
-        <class name="nursingrecords.dfn" short="nursingrecords.bhp.appinfo.short Pflegeakte/Durchführungsnachweis" long="nursingrecords.bhp.appinfo.short"
+        <class name="nursingrecords.dfn" short="nursingrecords.dfn.appinfo.short" long="nursingrecords.dfn.appinfo.long"
                helpurl="nursingrecords.dfn.appinfo.helpurl">
             <update langbundle="nursingrecords.dfn.acl.update"/>
         </class>

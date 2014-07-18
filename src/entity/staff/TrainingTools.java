@@ -15,6 +15,10 @@ import java.util.ArrayList;
  */
 public class TrainingTools {
 
+    public static final byte STATE_INTERNAL = 0;
+    public static final byte STATE_WORK_PLACE_RELATED = 1;
+    public static final byte STATE_EXTERNAL = 2;
+
     /**
      * retrieves the PITs of the first and the last entry in the training table.
      *
@@ -24,10 +28,10 @@ public class TrainingTools {
         Pair<LocalDate, LocalDate> result = null;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT t FROM Training t ORDER BY t.date ASC ");
+        Query queryMin = em.createQuery("SELECT t FROM Training t ORDER BY t.starting ASC ");
         queryMin.setMaxResults(1);
 
-        Query queryMax = em.createQuery("SELECT t FROM Training t ORDER BY t.date DESC ");
+        Query queryMax = em.createQuery("SELECT t FROM Training t ORDER BY t.starting DESC ");
         queryMax.setMaxResults(1);
 
         try {
@@ -36,7 +40,7 @@ public class TrainingTools {
             if (min.isEmpty()) {
                 result = null;
             } else {
-                result = new Pair<LocalDate, LocalDate>(new LocalDate(min.get(0).getDate()), new LocalDate(max.get(0).getDate()));
+                result = new Pair<LocalDate, LocalDate>(new LocalDate(min.get(0).getStarting()), new LocalDate(max.get(0).getStarting()));
             }
 
         } catch (Exception e) {
@@ -57,11 +61,11 @@ public class TrainingTools {
         Pair<LocalDate, LocalDate> result = null;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT t FROM Training t WHERE :commontag MEMBER OF t.commontags ORDER BY t.date ASC ");
+        Query queryMin = em.createQuery("SELECT t FROM Training t WHERE :commontag MEMBER OF t.commontags ORDER BY t.starting ASC ");
         queryMin.setParameter("commontag", commontag);
         queryMin.setMaxResults(1);
 
-        Query queryMax = em.createQuery("SELECT t FROM Training t WHERE :commontag MEMBER OF t.commontags ORDER BY t.date DESC ");
+        Query queryMax = em.createQuery("SELECT t FROM Training t WHERE :commontag MEMBER OF t.commontags ORDER BY t.starting DESC ");
         queryMax.setParameter("commontag", commontag);
         queryMax.setMaxResults(1);
 
@@ -71,7 +75,7 @@ public class TrainingTools {
             if (min.isEmpty()) {
                 result = null;
             } else {
-                result = new Pair<LocalDate, LocalDate>(new LocalDate(min.get(0).getDate()), new LocalDate(max.get(0).getDate()));
+                result = new Pair<LocalDate, LocalDate>(new LocalDate(min.get(0).getStarting()), new LocalDate(max.get(0).getStarting()));
             }
 
         } catch (Exception e) {
@@ -87,7 +91,7 @@ public class TrainingTools {
         ArrayList<Training> list = new ArrayList<>();
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT t FROM Training t WHERE t.date >= :from AND t.date <= :to ORDER BY t.date DESC ");
+        Query queryMin = em.createQuery("SELECT t FROM Training t WHERE t.starting >= :from AND t.starting <= :to ORDER BY t.starting DESC ");
         queryMin.setParameter("from", SYSCalendar.boy(iYear).toDate());
         queryMin.setParameter("to", SYSCalendar.eoy(iYear).toDate());
 
@@ -106,7 +110,7 @@ public class TrainingTools {
         ArrayList<Training> list = new ArrayList<>();
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT t FROM Training t WHERE :commontag MEMBER OF t.commontags AND t.date >= :from AND t.date <= :to ORDER BY t.date DESC ");
+        Query queryMin = em.createQuery("SELECT t FROM Training t WHERE :commontag MEMBER OF t.commontags AND t.starting >= :from AND t.starting <= :to ORDER BY t.starting DESC ");
         queryMin.setParameter("commontag", commontag);
         queryMin.setParameter("from", SYSCalendar.boy(iYear).toDate());
         queryMin.setParameter("to", SYSCalendar.eoy(iYear).toDate());

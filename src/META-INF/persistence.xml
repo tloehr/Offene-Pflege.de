@@ -19,7 +19,6 @@
         <class>entity.nursingprocess.InterventionSchedule</class>
         <class>entity.nursingprocess.Intervention</class>
         <class>entity.reports.NR2User</class>
-        <class>entity.reports.NReportTAGS</class>
         <class>entity.reports.NReport</class>
         <class>entity.nursingprocess.NPControl</class>
         <class>entity.nursingprocess.NursingProcess</class>
@@ -73,5 +72,6 @@
         <class>entity.qms.Qmsplan</class>
         <class>entity.qms.Qmssched</class>
         <class>entity.system.Commontags</class>
+        <class>entity.staff.Training2Users</class>
     </persistence-unit>
 </persistence>

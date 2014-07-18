@@ -29,6 +29,7 @@ import entity.files.*;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
+import entity.staff.Training2Users;
 import op.tools.SYSTools;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
@@ -90,10 +91,7 @@ public class Users implements Serializable, Comparable<Users> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSLogin> logins;
 
-    @ManyToMany
-    @JoinTable(name = "training2users", joinColumns =
-    @JoinColumn(name = "UID"), inverseJoinColumns =
-    @JoinColumn(name = "TRID"))
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "")
     private Collection<Training> trainings;
 
     @ManyToMany(mappedBy = "notification")
@@ -105,6 +103,9 @@ public class Users implements Serializable, Comparable<Users> {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<User2File> attachedFilesConnections;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "attendee")
+    private Collection<Training2Users> attendedTrainings;
 
     public Users() {
         uid = null;

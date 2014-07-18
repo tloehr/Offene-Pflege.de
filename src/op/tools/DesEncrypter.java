@@ -1,5 +1,8 @@
 package op.tools;
 
+import entity.system.SYSProps;
+import entity.system.SYSPropsTools;
+import op.OPDE;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.crypto.Cipher;
@@ -22,12 +25,20 @@ public class DesEncrypter {
     // Iteration count
     int iterationCount = 19;
 
+
+
     public DesEncrypter(String passPhrase) {
         try {
 
-            NetworkInterface ni = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-            if (ni == null) { // Das ist nötig, weil ein Linux in einer VMWare hier ein NULL liefert.
-                ni = NetworkInterface.getNetworkInterfaces().nextElement();
+            // i am doing this to reproduce same keys on the same machine. especially a mac tends to shuffle the nic list from time to time
+            NetworkInterface ni = NetworkInterface.getByName(OPDE.getLocalProps().getProperty(SYSPropsTools.LOCAL_KEY_CIPHER_NIC, ""));
+            if (ni == null) {
+                ni = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+                if (ni == null) { // Das ist nötig, weil ein Linux in einer VMWare hier ein NULL liefert.
+                    ni = NetworkInterface.getNetworkInterfaces().nextElement();
+                }
+                OPDE.getLocalProps().setProperty(SYSPropsTools.LOCAL_KEY_CIPHER_NIC, ni.getName());
+                OPDE.saveLocalProps();
             }
 
             // Die 6-Bytes MAC Adresse muss noch um zwei weitere, beliebige Bytes aufgefüllt werden. Das verlangt der Algorithmus

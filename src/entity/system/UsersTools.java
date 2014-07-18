@@ -4,6 +4,7 @@
  */
 package entity.system;
 
+import entity.EntityTools;
 import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSTools;
@@ -45,6 +46,28 @@ public class UsersTools {
         return list;
 
     }
+
+
+    public static ArrayList<Users> getUsers(String searchPattern, boolean inactiveToo) {
+            EntityManager em = OPDE.createEM();
+
+            Query query;
+            if (inactiveToo) {
+                query = em.createQuery("SELECT u FROM Users u WHERE u.status <> :status ORDER BY u.nachname, u.vorname ");
+                query.setParameter("status", STATUS_ROOT);
+            } else {
+                query = em.createQuery("SELECT u FROM Users u WHERE (u.uid LIKE :pattern OR u.nachname LIKE :pattern OR u.vorname LIKE :pattern) AND u.status = :status ORDER BY u.nachname, u.vorname ");
+                query.setParameter("status", STATUS_ACTIVE);
+                query.setParameter("pattern", EntityTools.getMySQLsearchPattern(searchPattern));
+            }
+
+            ArrayList<Users> list = new ArrayList<Users>(query.getResultList());
+
+            em.close();
+
+            return list;
+
+        }
 
     public static ListCellRenderer getRenderer() {
         return new ListCellRenderer() {

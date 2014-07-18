@@ -53,6 +53,8 @@ public class SYSPropsTools {
     public static final String KEY_CALC_MEDI_OTHER = "calc.medi.other"; // yet unused
     public static final String KEY_MAINTENANCE_MODE = "system.maintenance.mode";
 
+    public static final String LOCAL_KEY_CIPHER_NIC = "cipher.nic.id";
+
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
 

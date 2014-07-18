@@ -130,6 +130,7 @@ public class PnlControlling extends CleanablePanel {
             }
         };
         initComponents();
+        tabMain.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
         initPanel();
     }
 
@@ -786,10 +787,11 @@ private void initComponents() {
 
     //======== tabMain ========
     {
-        tabMain.setTabPlacement(SwingConstants.LEFT);
         tabMain.setBoldActiveTab(true);
         tabMain.setFont(new Font("Arial", Font.PLAIN, 16));
         tabMain.setShowTabButtons(true);
+        tabMain.setTabPlacement(SwingConstants.LEFT);
+        tabMain.setHideOneTab(true);
         tabMain.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -950,6 +952,7 @@ private void initComponents() {
                                         em.getTransaction().commit();
                                         pnlQMSPlan.getListQMSPlans().add(myQMSPlan);
                                         pnlQMSPlan.reload();
+                                        prepareSearchArea();
                                     } catch (OptimisticLockException ole) {
                                         OPDE.warn(ole);
                                         if (em.getTransaction().isActive()) {
@@ -1014,7 +1017,7 @@ private void initComponents() {
                             pnlQMSPlan.cleanup();
                             pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAll(commontag, QmsplanTools.STATE_ACTIVE), null);
                             tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
-
+                            //TODO: mark the filter when it is used. maybe a yellow background
                         }
                     });
                     pnlTags.add(btnTag);

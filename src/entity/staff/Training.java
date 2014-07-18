@@ -1,5 +1,6 @@
 package entity.staff;
 
+import entity.files.Qms2File;
 import entity.files.Training2File;
 import entity.system.Commontags;
 import entity.system.Users;
@@ -27,16 +28,29 @@ public class Training {
     }
 
     @Basic
-    @Column(name = "date", nullable = false, insertable = true, updatable = true)
+    @Column(name = "startingon", nullable = false, insertable = true, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private Date starting;
 
-    public Date getDate() {
-        return date;
+    public Date getStarting() {
+        return starting;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setStarting(Date date) {
+        this.starting = date;
+    }
+
+    @Basic
+    @Column(name = "endingat", nullable = true, insertable = true, updatable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date ending;
+
+    public Date getEnding() {
+        return ending;
+    }
+
+    public void setEnding(Date ending) {
+        this.ending = ending;
     }
 
     @Basic
@@ -76,23 +90,26 @@ public class Training {
     }
 
     @Basic
-    @Column(name = "internal", nullable = false, insertable = true, updatable = true)
-    private boolean internal;
+    @Column(name = "state", nullable = false, insertable = true, updatable = true)
+    private byte state;
 
-    public boolean getInternal() {
-        return internal;
+    public byte getState() {
+        return state;
     }
 
-    public void setInternal(boolean internal) {
-        this.internal = internal;
+    public void setState(byte state) {
+        this.state = state;
     }
-
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "training")
     private Collection<Training2File> attachedFilesConnections;
 
-    @ManyToMany(mappedBy = "trainings")
-    private Collection<Users> attendees;
+    @OneToMany(mappedBy = "training")
+    private Collection<Training2Users> attendees;
+
+    public Collection<Training2Users> getAttendees() {
+        return attendees;
+    }
 
     @ManyToMany
     @JoinTable(name = "training2tags", joinColumns =
@@ -108,9 +125,6 @@ public class Training {
     @Column(name = "version")
     private Long version;
 
-    public Collection<Users> getAttendees() {
-        return attendees;
-    }
 
     public Collection<Commontags> getCommontags() {
         return commontags;
@@ -122,6 +136,7 @@ public class Training {
 
     public Training() {
         commontags = new ArrayList<>();
+        state = TrainingTools.STATE_INTERNAL;
     }
 
     @Override
@@ -132,9 +147,14 @@ public class Training {
         Training training = (Training) o;
 
         if (id != training.id) return false;
-        if (internal != training.internal) return false;
-        if (date != null ? !date.equals(training.date) : training.date != null) return false;
+        if (state != training.state) return false;
+        if (attachedFilesConnections != null ? !attachedFilesConnections.equals(training.attachedFilesConnections) : training.attachedFilesConnections != null)
+            return false;
+        if (attendees != null ? !attendees.equals(training.attendees) : training.attendees != null) return false;
+        if (commontags != null ? !commontags.equals(training.commontags) : training.commontags != null) return false;
         if (docent != null ? !docent.equals(training.docent) : training.docent != null) return false;
+        if (ending != null ? !ending.equals(training.ending) : training.ending != null) return false;
+        if (starting != null ? !starting.equals(training.starting) : training.starting != null) return false;
         if (text != null ? !text.equals(training.text) : training.text != null) return false;
         if (title != null ? !title.equals(training.title) : training.title != null) return false;
         if (version != null ? !version.equals(training.version) : training.version != null) return false;
@@ -145,11 +165,15 @@ public class Training {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (starting != null ? starting.hashCode() : 0);
+        result = 31 * result + (ending != null ? ending.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (docent != null ? docent.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (internal ? 1 : 0);
+        result = 31 * result + (int) state;
+        result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
+        result = 31 * result + (attendees != null ? attendees.hashCode() : 0);
+        result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         return result;
     }

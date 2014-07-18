@@ -30,10 +30,6 @@
          <class>javax.swing.JTabbedPane</class> 
         </object> 
         <void method="setProperty"> 
-         <string>tabPlacement</string> 
-         <int>2</int> 
-        </void> 
-        <void method="setProperty"> 
          <string>boldActiveTab</string> 
          <boolean>true</boolean> 
         </void> 
@@ -47,6 +43,14 @@
         </void> 
         <void method="setProperty"> 
          <string>showTabButtons</string> 
+         <boolean>true</boolean> 
+        </void> 
+        <void method="setProperty"> 
+         <string>tabPlacement</string> 
+         <int>2</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>hideOneTab</string> 
          <boolean>true</boolean> 
         </void> 
         <void method="addEvent"> 
