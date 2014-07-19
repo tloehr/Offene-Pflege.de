@@ -8,17 +8,20 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.staff.Training;
+import entity.staff.TrainingTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.PnlCommonTags;
-import op.tools.PnlUserlistEditor;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
+import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -36,30 +39,29 @@ public class PnlTrainingEditor extends JPanel {
 
     private void initPanel() {
         lblDate.setText(SYSTools.xx("misc.msg.Date"));
-
         lblTitle.setText(SYSTools.xx("misc.msg.title"));
         lblDocent.setText(SYSTools.xx("opde.training.docent"));
         lblText.setText(SYSTools.xx("misc.msg.details"));
         lblTags.setText(SYSTools.xx("misc.msg.tags"));
 
         jdcStarting.setDate(training.getStarting());
-        txtTimeStarting.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(training.getStarting()));
 
-        if (training.getEnding() != null) {
-            jdcEnding.setDate(training.getEnding());
-            txtTimeEnding.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(training.getEnding()));
+        if (new LocalDate(training.getStarting()).toDateTimeAtStartOfDay().toDate().equals(training.getStarting())) {
+            txtTimeStarting.setText(null);
+            cbTime.setSelected(false);
+        } else {
+            txtTimeStarting.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(training.getStarting()));
+            cbTime.setSelected(true);
         }
 
-        jdcEnding.setEnabled(training.getEnding() != null);
-        txtTimeEnding.setEnabled(training.getEnding() != null);
+        cmbState.setModel(new DefaultComboBoxModel(SYSTools.translate(TrainingTools.STATES)));
 
         txtTitle.setText(training.getTitle());
         txtDocent.setText(training.getDocent());
         txtText.setText(training.getText());
 
-        add(new PnlCommonTags(training.getCommontags()), CC.xywh(3, 13, 5, 1));
-        add(new PnlUserlistEditor(training.getAttendees()), CC.xywh(3, 15, 5, 1));
-
+        add(new PnlCommonTags(training.getCommontags(), true), CC.xywh(3, 13, 5, 1));
+        add(new PnlUserlistEditor(training, true), CC.xywh(3, 15, 5, 1));
     }
 
     private void txtTimeFocusLost(FocusEvent e) {
@@ -71,16 +73,18 @@ public class PnlTrainingEditor extends JPanel {
         }
     }
 
+    private void cbTimeItemStateChanged(ItemEvent e) {
+        txtTimeStarting.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         lblTitle = new JLabel();
         txtTitle = new JTextField();
         lblDate = new JLabel();
         jdcStarting = new JDateChooser();
-        lblDate2 = new JLabel();
-        jdcEnding = new JDateChooser();
+        cbTime = new JCheckBox();
         txtTimeStarting = new JTextField();
-        txtTimeEnding = new JTextField();
         lblDocent = new JLabel();
         txtDocent = new JTextField();
         lblText = new JLabel();
@@ -88,9 +92,7 @@ public class PnlTrainingEditor extends JPanel {
         txtText = new JTextArea();
         cmbState = new JComboBox();
         lblTags = new JLabel();
-        panel1 = new JPanel();
         lblAttendees = new JLabel();
-        panel2 = new JPanel();
 
         //======== this ========
         setLayout(new FormLayout(
@@ -115,11 +117,15 @@ public class PnlTrainingEditor extends JPanel {
         jdcStarting.setFont(new Font("Arial", Font.PLAIN, 14));
         add(jdcStarting, CC.xy(3, 3));
 
-        //---- lblDate2 ----
-        lblDate2.setText("text");
-        lblDate2.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblDate2, CC.xy(5, 3));
-        add(jdcEnding, CC.xy(7, 3));
+        //---- cbTime ----
+        cbTime.setText(null);
+        cbTime.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cbTimeItemStateChanged(e);
+            }
+        });
+        add(cbTime, CC.xy(5, 3));
 
         //---- txtTimeStarting ----
         txtTimeStarting.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -129,17 +135,7 @@ public class PnlTrainingEditor extends JPanel {
                 txtTimeFocusLost(e);
             }
         });
-        add(txtTimeStarting, CC.xy(3, 5));
-
-        //---- txtTimeEnding ----
-        txtTimeEnding.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtTimeEnding.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                txtTimeFocusLost(e);
-            }
-        });
-        add(txtTimeEnding, CC.xy(7, 5));
+        add(txtTimeStarting, CC.xy(7, 3));
 
         //---- lblDocent ----
         lblDocent.setText("text");
@@ -171,24 +167,10 @@ public class PnlTrainingEditor extends JPanel {
         lblTags.setFont(new Font("Arial", Font.PLAIN, 14));
         add(lblTags, CC.xy(1, 13, CC.DEFAULT, CC.TOP));
 
-        //======== panel1 ========
-        {
-            panel1.setLayout(new FormLayout(
-                    "default, $lcgap, default",
-                    "2*(default, $lgap), default"));
-        }
-        add(panel1, CC.xywh(3, 13, 5, 1));
-
         //---- lblAttendees ----
         lblAttendees.setText("text");
         lblAttendees.setFont(new Font("Arial", Font.PLAIN, 14));
         add(lblAttendees, CC.xy(1, 15, CC.DEFAULT, CC.TOP));
-
-        //======== panel2 ========
-        {
-            panel2.setLayout(new FlowLayout());
-        }
-        add(panel2, CC.xywh(3, 15, 5, 1));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -197,10 +179,8 @@ public class PnlTrainingEditor extends JPanel {
     private JTextField txtTitle;
     private JLabel lblDate;
     private JDateChooser jdcStarting;
-    private JLabel lblDate2;
-    private JDateChooser jdcEnding;
+    private JCheckBox cbTime;
     private JTextField txtTimeStarting;
-    private JTextField txtTimeEnding;
     private JLabel lblDocent;
     private JTextField txtDocent;
     private JLabel lblText;
@@ -208,8 +188,6 @@ public class PnlTrainingEditor extends JPanel {
     private JTextArea txtText;
     private JComboBox cmbState;
     private JLabel lblTags;
-    private JPanel panel1;
     private JLabel lblAttendees;
-    private JPanel panel2;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

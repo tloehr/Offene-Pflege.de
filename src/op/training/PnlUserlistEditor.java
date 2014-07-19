@@ -2,33 +2,40 @@
  * Created by JFormDesigner on Fri May 30 15:30:55 CEST 2014
  */
 
-package op.tools;
+package op.training;
 
 import com.jidesoft.swing.AutoCompletion;
 import com.jidesoft.swing.SelectAllUtils;
+import entity.staff.Training;
 import entity.staff.Training2Users;
+import entity.staff.Training2UsersTools;
 import entity.system.Commontags;
 import entity.system.Users;
 import entity.system.UsersTools;
+import op.OPDE;
+import op.tools.RiverLayout;
+import op.tools.RoundedBorder;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlUserlistEditor extends JPanel {
 
+    private final Training training;
     private final boolean editmode;
     //    HashMap<String, Commontags> mapAllTags = new HashMap<>();
     HashSet<Training2Users> listSelectedUsers;
@@ -41,20 +48,21 @@ public class PnlUserlistEditor extends JPanel {
 
     int MAXLINE = 8;
 
-    public PnlUserlistEditor(Collection<Training2Users> listSelectedUsers) {
-        this(listSelectedUsers, false);
-    }
+//    public PnlUserlistEditor(Collection<Training2Users> listSelectedUsers) {
+//        this(listSelectedUsers, false);
+//    }
+//
+//    public PnlUserlistEditor(Collection<Training2Users> listSelectedUsers, boolean editmode, int maxline) {
+//        this(listSelectedUsers, editmode);
+//        MAXLINE = maxline;
+//    }
 
-    public PnlUserlistEditor(Collection<Training2Users> listSelectedUsers, boolean editmode, int maxline) {
-        this(listSelectedUsers, editmode);
-        MAXLINE = maxline;
-    }
-
-    public PnlUserlistEditor(Collection<Training2Users> listSelectedUsers, boolean editmode) {
+    public PnlUserlistEditor(Training training, boolean editmode) {
+        this.training = training;
         this.editmode = editmode;
         setLayout(new BorderLayout(5, 5));
 
-        this.listSelectedUsers = new HashSet<>(listSelectedUsers);
+        this.listSelectedUsers = new HashSet<>(training.getAttendees());
         this.completionList = new ArrayList<>();
 
         initPanel();
@@ -66,7 +74,7 @@ public class PnlUserlistEditor extends JPanel {
 
     private void initPanel() {
 
-        pnlSelectedUsers = new JPanel(new RiverLayout(10, 5));
+        pnlSelectedUsers = new JPanel(new RiverLayout(5, 5));
         add(pnlSelectedUsers, BorderLayout.CENTER);
 
         mapButtons = new HashMap<>();
@@ -78,10 +86,42 @@ public class PnlUserlistEditor extends JPanel {
             pnlSelectedUsers.add(createButton(training2Users));
         }
 
+
         if (editmode) {
             pnlUsersearch = new JPanel();
             pnlUsersearch.setLayout(new BoxLayout(pnlUsersearch, BoxLayout.PAGE_AXIS));
             add(pnlUsersearch, BorderLayout.WEST);
+            lstUsersFound = new JList(new DefaultListModel());
+            lstUsersFound.addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    if (e.getValueIsAdjusting()) return;
+
+                    final Users thisUser = (Users) lstUsersFound.getModel().getElementAt(e.getFirstIndex());
+
+                    if (!Training2UsersTools.contains(training.getAttendees(), thisUser)) {
+
+
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        if (training.getAttendees().size() % MAXLINE == 0) {
+                                            pnlSelectedUsers.add(createButton(new Training2Users(new Date(), thisUser, training)), RiverLayout.PARAGRAPH_BREAK);
+                                        } else {
+                                            pnlSelectedUsers.add(createButton(new Training2Users(new Date(), thisUser, training)), RiverLayout.LEFT);
+                                        }
+
+                                        txtUsers.setText("");
+                                        revalidate();
+                                        repaint();
+                                    }
+                                });
+                            }
+
+
+                }
+            });
 
             txtUsers = new JTextField(30);
             txtUsers.addCaretListener(new CaretListener() {
@@ -123,7 +163,7 @@ public class PnlUserlistEditor extends JPanel {
             });
 
             pnlUsersearch.add(txtUsers);
-            lstUsersFound = new JList(new DefaultListModel());
+
             pnlUsersearch.add(new JScrollPane(lstUsersFound));
         }
     }

@@ -41,19 +41,6 @@ public class Training {
     }
 
     @Basic
-    @Column(name = "endingat", nullable = true, insertable = true, updatable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date ending;
-
-    public Date getEnding() {
-        return ending;
-    }
-
-    public void setEnding(Date ending) {
-        this.ending = ending;
-    }
-
-    @Basic
     @Column(name = "title", nullable = false, insertable = true, updatable = true, length = 200)
     private String title;
 
@@ -153,7 +140,6 @@ public class Training {
         if (attendees != null ? !attendees.equals(training.attendees) : training.attendees != null) return false;
         if (commontags != null ? !commontags.equals(training.commontags) : training.commontags != null) return false;
         if (docent != null ? !docent.equals(training.docent) : training.docent != null) return false;
-        if (ending != null ? !ending.equals(training.ending) : training.ending != null) return false;
         if (starting != null ? !starting.equals(training.starting) : training.starting != null) return false;
         if (text != null ? !text.equals(training.text) : training.text != null) return false;
         if (title != null ? !title.equals(training.title) : training.title != null) return false;
@@ -166,7 +152,6 @@ public class Training {
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (starting != null ? starting.hashCode() : 0);
-        result = 31 * result + (ending != null ? ending.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (docent != null ? docent.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);

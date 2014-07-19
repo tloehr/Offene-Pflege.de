@@ -31,6 +31,7 @@ public class DisplayManager extends Thread {
     private JLabel lblMain;
     private FadingLabel lblSub;
     private MessageQ messageQ;
+    // a pair for the text and the value for the progressbar.
     private Pair<String, Integer> progressBarMessage;
     private final Color defaultColor = new Color(105, 80, 69);
     private Icon icondead, iconaway, icongone, iconbiohazard;
@@ -41,6 +42,7 @@ public class DisplayManager extends Thread {
     private long step = 0;
     private int lastMinute;
     private long lastoperation; // used for the timeout function to automatically log out idle users
+    private boolean pbIsInUse; // for optimization. the jp.setString() was called a trillion times without any need.
 //    private int TIMEOUTMINS;
 
 //    private DateFormat df;
@@ -293,17 +295,16 @@ public class DisplayManager extends Thread {
                         jp.setIndeterminate(true);
                     }
                 } else {
-
                     if (jp.isIndeterminate()) {
                         jp.setIndeterminate(false);
                     }
                     jp.setValue(progressBarMessage.getSecond());
                 }
                 jp.setString(progressBarMessage.getFirst());
+                pbIsInUse = true;
             } else {
 
-
-                if (progressBarMessage.getSecond() < 0) {
+                if (progressBarMessage.getSecond() < 0 && pbIsInUse) {
                     jp.setIndeterminate(false);
                     jp.setValue(0);
                     jp.setString(null);
@@ -316,8 +317,7 @@ public class DisplayManager extends Thread {
                     jp.setValue(0);
                     jp.setString(null);
                 }
-
-
+                pbIsInUse = false;
             }
         }
 
@@ -346,8 +346,8 @@ public class DisplayManager extends Thread {
             try {
                 step++;
 
-                lblMain.repaint();
-                lblSub.repaint();
+//                lblMain.repaint();
+//                lblSub.repaint();
 
                 processProgressBar();
                 processSubMessage();

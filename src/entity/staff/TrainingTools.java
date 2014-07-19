@@ -19,6 +19,8 @@ public class TrainingTools {
     public static final byte STATE_WORK_PLACE_RELATED = 1;
     public static final byte STATE_EXTERNAL = 2;
 
+    public static final String[] STATES = new String[]{"opde.training.state.internal","opde.training.state.workplace","opde.training.state.external"};
+
     /**
      * retrieves the PITs of the first and the last entry in the training table.
      *

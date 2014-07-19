@@ -44,7 +44,7 @@ public class MyJDialog extends JDialog {
         isDisposed = false;
         setResizable(false);
         setUndecorated(!decorated);
-        initAnimator();
+//        initAnimator();
     }
 
     public MyJDialog(JFrame owner, boolean decorated) {
@@ -53,7 +53,7 @@ public class MyJDialog extends JDialog {
         isDisposed = false;
         setResizable(false);
         setUndecorated(!decorated);
-        initAnimator();
+//        initAnimator();
     }
 
     public MyJDialog(Dialog owner) {
@@ -119,50 +119,50 @@ public class MyJDialog extends JDialog {
         }).build();
     }
 
-    @Override
-    public void setVisible(boolean visible) {
-        if (isDisposed) {
-            return;
-        }
-
-        if (!OPDE.isAnimation()) {
-            super.setVisible(visible);
-            return;
-        }
-
-        setLocation(OPDE.getMainframe().getLocationForDialog(getSize()));
-        if (visible) {
-            if (fadeIn != null && !fadeIn.isRunning()) {
-                if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
-                    try {
-                        Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-                        Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
-                        mSetWindowOpacity.invoke(null, thisDialog, 0.0f);
-                        repaint();
-                    } catch (Exception ex) {
-                    }
-                }
-                fadeIn.start();
-                super.setVisible(true);
-            }
-        } else {
-            if (fadeIn != null && fadeIn.isRunning()) {
-                fadeIn.cancel();
-            }
-            if (fadeOut != null && !fadeOut.isRunning()) {
-                if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
-                    try {
-                        Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-                        Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
-                        mSetWindowOpacity.invoke(null, thisDialog, 1.0f);
-                        repaint();
-                    } catch (Exception ex) {
-                    }
-                }
-                fadeOut.start();
-            }
-        }
-    }
+//    @Override
+//    public void setVisible(boolean visible) {
+//        if (isDisposed) {
+//            return;
+//        }
+//
+//        if (!OPDE.isAnimation()) {
+//            super.setVisible(visible);
+//            return;
+//        }
+//
+//        setLocation(OPDE.getMainframe().getLocationForDialog(getSize()));
+//        if (visible) {
+//            if (fadeIn != null && !fadeIn.isRunning()) {
+//                if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
+//                    try {
+//                        Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
+//                        Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
+//                        mSetWindowOpacity.invoke(null, thisDialog, 0.0f);
+//                        repaint();
+//                    } catch (Exception ex) {
+//                    }
+//                }
+//                fadeIn.start();
+//                super.setVisible(true);
+//            }
+//        } else {
+//            if (fadeIn != null && fadeIn.isRunning()) {
+//                fadeIn.cancel();
+//            }
+//            if (fadeOut != null && !fadeOut.isRunning()) {
+//                if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
+//                    try {
+//                        Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
+//                        Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
+//                        mSetWindowOpacity.invoke(null, thisDialog, 1.0f);
+//                        repaint();
+//                    } catch (Exception ex) {
+//                    }
+//                }
+//                fadeOut.start();
+//            }
+//        }
+//    }
 
     private void superdispose() {
         super.dispose();
