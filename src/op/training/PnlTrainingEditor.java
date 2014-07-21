@@ -96,8 +96,8 @@ public class PnlTrainingEditor extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow",
-                "6*(default, $lgap), fill:30dlu, $lgap, fill:default:grow"));
+            "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow",
+            "6*(default, $lgap), fill:30dlu, $lgap, fill:default:grow"));
 
         //---- lblTitle ----
         lblTitle.setText("text");
