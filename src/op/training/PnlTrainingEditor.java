@@ -10,10 +10,12 @@ import com.toedter.calendar.JDateChooser;
 import entity.staff.Training;
 import entity.staff.TrainingTools;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
 import op.tools.PnlCommonTags;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.joda.time.LocalDate;
 
 import javax.swing.*;
@@ -30,6 +32,7 @@ import java.util.Date;
  */
 public class PnlTrainingEditor extends JPanel {
     private Training training;
+    private PnlUserlistEditor pnlUserlistEditor;
 
     public PnlTrainingEditor(Training training) {
         this.training = training;
@@ -61,7 +64,19 @@ public class PnlTrainingEditor extends JPanel {
         txtText.setText(training.getText());
 
         add(new PnlCommonTags(training.getCommontags(), true), CC.xywh(3, 13, 5, 1));
-        add(new PnlUserlistEditor(training, true), CC.xywh(3, 15, 5, 1));
+
+
+        Closure afterUserlistEdited = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlTraining.internalClassID) ? new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o == null) return;
+                training = (Training) o;
+                add(pnlUserlistEditor, CC.xywh(3, 15, 5, 1));
+            }
+        } : null;
+        pnlUserlistEditor = new PnlUserlistEditor(training, afterUserlistEdited);
+        add(pnlUserlistEditor, CC.xywh(3, 15, 5, 1));
+
     }
 
     private void txtTimeFocusLost(FocusEvent e) {
@@ -96,8 +111,8 @@ public class PnlTrainingEditor extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow",
-            "6*(default, $lgap), fill:30dlu, $lgap, fill:default:grow"));
+                "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow",
+                "6*(default, $lgap), fill:30dlu, $lgap, fill:default:grow"));
 
         //---- lblTitle ----
         lblTitle.setText("text");

@@ -478,6 +478,8 @@ public class SYSConst {
     public static final Icon icon22ambulance = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2.png"));
     public static final Icon icon22ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2_pressed.png"));
     public static final Icon icon22apply = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply.png"));
+    public static final Icon icon16cancel = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/cancel.png"));
+    public static final Icon icon16empty = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/empty.png"));
     public static final Icon icon16apply = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/apply.png"));
     public static final Icon icon16info = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/info.png"));
     public static final Icon icon16infoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/info-pressed.png"));
@@ -504,6 +506,7 @@ public class SYSConst {
     public static final Icon icon32menu = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/menu.png"));
     public static final Icon icon32Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/pressed.png"));
     public static final Icon icon22Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/pressed.png"));
+    public static final Icon icon16Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/pressed.png"));
     public static final Icon icon22edit3Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_invert.png"));
     //    public static final Icon icon22edit1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1.png"));
 //    public static final Icon icon22edit1Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1_pressed.png"));
@@ -652,5 +655,8 @@ public class SYSConst {
     public static final Icon icon16tagPurpleDelete2 = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/tag_purple_delete2.png"));
     public static final Icon icon16tagPurpleDelete4 = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/tag_purple_delete4.png"));
     public static final Icon icon16tagPurple = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/tag_purple.png"));
+
+    public static final Icon icon16user = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/user_active.png"));
+    public static final Icon icon16userDel = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/delete_user.png"));
 
 }

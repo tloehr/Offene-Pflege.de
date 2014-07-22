@@ -134,7 +134,7 @@ public class PnlWelcome extends CleanablePanel {
                     }
                 });
                 progButton.setFont(SYSConst.ARIAL20);
-                progButton.setToolTipText(longDescription);
+                progButton.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:150px;\">"+longDescription+"</p>"));
 
                 pnlApps.add(progButton);
             }

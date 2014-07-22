@@ -9,16 +9,16 @@ import com.jidesoft.swing.SelectAllUtils;
 import entity.staff.Training;
 import entity.staff.Training2Users;
 import entity.staff.Training2UsersTools;
-import entity.system.Commontags;
 import entity.system.Users;
 import entity.system.UsersTools;
-import op.OPDE;
 import op.tools.RiverLayout;
-import op.tools.RoundedBorder;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
@@ -28,7 +28,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @author Torsten Löhr
@@ -36,41 +39,30 @@ import java.util.*;
 public class PnlUserlistEditor extends JPanel {
 
     private final Training training;
+    private final Closure editAction;
     private final boolean editmode;
-    //    HashMap<String, Commontags> mapAllTags = new HashMap<>();
-    HashSet<Training2Users> listSelectedUsers;
-    HashMap<Training2Users, JButton> mapButtons;
+    //    HashSet<Training2Users> listSelectedUsers;
+    HashMap<Training2Users, JPanel> mapButtons;
     ArrayList<String> completionList;
     JTextField txtUsers;
     AutoCompletion ac;
     JPanel pnlUsersearch, pnlSelectedUsers;
     JList lstUsersFound;
 
-    int MAXLINE = 8;
+    int MAXLINE = 6;
 
-//    public PnlUserlistEditor(Collection<Training2Users> listSelectedUsers) {
-//        this(listSelectedUsers, false);
-//    }
-//
-//    public PnlUserlistEditor(Collection<Training2Users> listSelectedUsers, boolean editmode, int maxline) {
-//        this(listSelectedUsers, editmode);
-//        MAXLINE = maxline;
-//    }
-
-    public PnlUserlistEditor(Training training, boolean editmode) {
+    public PnlUserlistEditor(Training training, Closure editAction) {
         this.training = training;
-        this.editmode = editmode;
+        this.editAction = editAction;
+        this.editmode = editAction != null;
         setLayout(new BorderLayout(5, 5));
 
-        this.listSelectedUsers = new HashSet<>(training.getAttendees());
+//        this.listSelectedUsers = new HashSet<>(training.getAttendees());
         this.completionList = new ArrayList<>();
 
         initPanel();
     }
 
-    public HashSet<Training2Users> getListSelectedUsers() {
-        return listSelectedUsers;
-    }
 
     private void initPanel() {
 
@@ -79,11 +71,8 @@ public class PnlUserlistEditor extends JPanel {
 
         mapButtons = new HashMap<>();
 
-//        for (Commontags commontags : CommontagsTools.getAll()) {
-//            mapAllTags.put(commontags.getText(), commontags);
-//        }
-        for (Training2Users training2Users : listSelectedUsers) {
-            pnlSelectedUsers.add(createButton(training2Users));
+        for (Training2Users training2Users : training.getAttendees()) {
+            pnlSelectedUsers.add(createUserPanel(training2Users));
         }
 
 
@@ -96,34 +85,45 @@ public class PnlUserlistEditor extends JPanel {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
                     if (e.getValueIsAdjusting()) return;
+                    if (lstUsersFound.getSelectedValue() == null) return;
 
-                    final Users thisUser = (Users) lstUsersFound.getModel().getElementAt(e.getFirstIndex());
+                    final Users thisUser = (Users) lstUsersFound.getSelectedValue();
 
                     if (!Training2UsersTools.contains(training.getAttendees(), thisUser)) {
 
+//                        SwingUtilities.invokeLater(new Runnable() {
+//                            @Override
+//                            public void run() {
+//
+//
+//
+//
+//
+//
+////                                txtUsers.setText("");
+//                                revalidate();
+//                                repaint();
+//                            }
+//                        });
 
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
+                        Training2Users training2Users = new Training2Users(new Date(), thisUser, training);
 
-                                        if (training.getAttendees().size() % MAXLINE == 0) {
-                                            pnlSelectedUsers.add(createButton(new Training2Users(new Date(), thisUser, training)), RiverLayout.PARAGRAPH_BREAK);
-                                        } else {
-                                            pnlSelectedUsers.add(createButton(new Training2Users(new Date(), thisUser, training)), RiverLayout.LEFT);
-                                        }
+                        if (training.getAttendees().size() % MAXLINE == 0) {
+                            pnlSelectedUsers.add(createUserPanel(training2Users), RiverLayout.PARAGRAPH_BREAK);
+                        } else {
+                            pnlSelectedUsers.add(createUserPanel(training2Users), RiverLayout.LEFT);
+                        }
 
-                                        txtUsers.setText("");
-                                        revalidate();
-                                        repaint();
-                                    }
-                                });
-                            }
+                        training.getAttendees().add(training2Users);
+
+                        editAction.execute(training);
+                    }
 
 
                 }
             });
 
-            txtUsers = new JTextField(30);
+            txtUsers = new JTextField(15);
             txtUsers.addCaretListener(new CaretListener() {
                 @Override
                 public void caretUpdate(CaretEvent e) {
@@ -168,6 +168,10 @@ public class PnlUserlistEditor extends JPanel {
         }
     }
 
+    private void notifyCaller() {
+
+    }
+
 //    private void cmbTagsActionPerformed(ActionEvent e) {
 //
 //        if (!editmode) return;
@@ -194,9 +198,9 @@ public class PnlUserlistEditor extends JPanel {
 //                public void run() {
 //
 //                    if (listSelectedTags.size() % MAXLINE == 0) {
-//                        add(createButton(mapAllTags.get(enteredText)), RiverLayout.LINE_BREAK);
+//                        add(createUserPanel(mapAllTags.get(enteredText)), RiverLayout.LINE_BREAK);
 //                    } else {
-//                        add(createButton(mapAllTags.get(enteredText)), RiverLayout.LEFT);
+//                        add(createUserPanel(mapAllTags.get(enteredText)), RiverLayout.LEFT);
 //                    }
 //
 //                    txtUsers.setText("");
@@ -208,54 +212,76 @@ public class PnlUserlistEditor extends JPanel {
 //    }
 
 
-    private JButton createButton(final Training2Users training2Users) {
+    private JPanel createUserPanel(final Training2Users training2Users) {
 
         if (mapButtons.containsKey(training2Users)) {
             return mapButtons.get(training2Users);
         }
 
-        final JButton jButton = new JButton(training2Users.getAttendee().getUID(), editmode ? SYSConst.icon16tagPurpleDelete2 : SYSConst.icon16tagPurple);
-        jButton.setFont(SYSConst.ARIAL12);
-        jButton.setBorder(new RoundedBorder(10));
-        jButton.setHorizontalTextPosition(SwingConstants.LEADING);
-//        jButton.setMargin(new Insets(2, 2, 2, 2));
-        jButton.setForeground(SYSConst.purple1[SYSConst.dark1]);
+        final JPanel pnlButton = new JPanel();
+        pnlButton.setBorder(new SoftBevelBorder(BevelBorder.RAISED));
+        pnlButton.setToolTipText(training2Users.getAttendee().getFullname() + "; " + DateFormat.getDateInstance(DateFormat.SHORT).format(training2Users.getPit()));
+        pnlButton.add(new JLabel(training2Users.getAttendee().getUID()));
 
         if (editmode) {
+            JButton btnDelUser = new JButton(null, SYSConst.icon16userDel);
 
-            jButton.addActionListener(new ActionListener() {
+            btnDelUser.setFont(SYSConst.ARIAL12);
+            btnDelUser.setHorizontalTextPosition(SwingConstants.LEADING);
+//            btnDelUser.setForeground(SYSConst.green2[SYSConst.dark4]);
+
+
+//            btnDelUser.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    listSelectedUsers.remove(training2Users);
+//                    mapButtons.remove(training2Users);
+//                    training.getAttendees().remove(training2Users);
+//
+//                    SwingUtilities.invokeLater(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            removeAll();
+//
+//                            add(txtUsers);
+//                            int tagnum = 1;
+//
+//                            for (JPanel btn : mapButtons.values()) {
+//                                if (tagnum % MAXLINE == 0) {
+//                                    pnlSelectedUsers.add(btn, RiverLayout.LINE_BREAK);
+//                                } else {
+//                                    pnlSelectedUsers.add(btn, RiverLayout.LEFT);
+//                                }
+//                                tagnum++;
+//                            }
+//
+//                            pnlButton.remove(pnlButton);
+//                            pnlButton.revalidate();
+//                            pnlButton.repaint();
+//                        }
+//                    });
+//                }
+//            });
+
+            pnlButton.add(btnDelUser);
+        }
+
+        JButton btnState = new JButton(Training2UsersTools.getIcon(training2Users));
+        if (editmode) {
+            btnState.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    listSelectedUsers.remove(training2Users);
-                    mapButtons.remove(training2Users);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            removeAll();
 
-                            add(txtUsers);
-                            int tagnum = 1;
-
-                            for (JButton btn : mapButtons.values()) {
-                                if (tagnum % MAXLINE == 0) {
-                                    add(btn, RiverLayout.LINE_BREAK);
-                                } else {
-                                    add(btn, RiverLayout.LEFT);
-                                }
-                                tagnum++;
-                            }
-
-                            remove(jButton);
-                            revalidate();
-                            repaint();
-                        }
-                    });
                 }
             });
         }
-        mapButtons.put(training2Users, jButton);
 
-        return jButton;
+
+        pnlButton.add(new JToggleButton("OK"));
+        pnlButton.add(new JButton("Time"));
+
+
+        return pnlButton;
     }
 
 

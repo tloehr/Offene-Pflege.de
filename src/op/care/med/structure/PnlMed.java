@@ -118,9 +118,11 @@ public class PnlMed extends CleanablePanel {
     private void initComponents() {
         jScrollPane1 = new JScrollPane();
         treeMed = new JTree();
+        panel1 = new JPanel();
+        label1 = new JLabel();
 
         //======== this ========
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        setLayout(new CardLayout());
 
         //======== jScrollPane1 ========
         {
@@ -135,7 +137,18 @@ public class PnlMed extends CleanablePanel {
             });
             jScrollPane1.setViewportView(treeMed);
         }
-        add(jScrollPane1);
+        add(jScrollPane1, "card1");
+
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+
+            //---- label1 ----
+            label1.setText("text");
+            label1.setIcon(null);
+            panel1.add(label1);
+        }
+        add(panel1, "card2");
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -303,6 +316,8 @@ public class PnlMed extends CleanablePanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jScrollPane1;
     private JTree treeMed;
+    private JPanel panel1;
+    private JLabel label1;
     // End of variables declaration//GEN-END:variables
 
     private class TreeRenderer extends DefaultTreeCellRenderer {

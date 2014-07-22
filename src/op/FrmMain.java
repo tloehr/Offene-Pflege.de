@@ -843,9 +843,9 @@ public class FrmMain extends JFrame {
         this.currentResident = currentResident;
     }
 
-    public boolean isBlocked() {
-        return lblWait.isVisible();
-    }
+//    public boolean isBlocked() {
+//        return lblWait.isVisible();
+//    }
 
     public void setBlocked(boolean blocked) {
         if (blocked) {
@@ -868,11 +868,11 @@ public class FrmMain extends JFrame {
         }
     }
 
-    public Point getLocationForDialog(Dimension dimOfDialog) {
-        Point point = new Point((getSize().width - dimOfDialog.width) / 2, pnlMainMessage.getHeight() + 10);
-        SwingUtilities.convertPointToScreen(point, this);
-        return point;
-    }
+//    public Point getLocationForDialog(Dimension dimOfDialog) {
+//        Point point = new Point((getSize().width - dimOfDialog.width) / 2, pnlMainMessage.getHeight() + 10);
+//        SwingUtilities.convertPointToScreen(point, this);
+//        return point;
+//    }
 
     public void setPanelTo(CleanablePanel pnl) {
         if (currentVisiblePanel != null) {

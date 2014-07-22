@@ -290,14 +290,17 @@ public class DisplayManager extends Thread {
     private void processProgressBar() {
         synchronized (progressBarMessage) {
             if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
-                if (progressBarMessage.getSecond() < 0) {
-                    if (!jp.isIndeterminate()) {
-                        jp.setIndeterminate(true);
-                    }
-                } else {
-                    if (jp.isIndeterminate()) {
-                        jp.setIndeterminate(false);
-                    }
+//                if (progressBarMessage.getSecond() < 0) {
+//                    if (!jp.isIndeterminate()) {
+//                        jp.setIndeterminate(true);
+//                    }
+//                } else {
+//                    if (jp.isIndeterminate()) {
+//                        jp.setIndeterminate(false);
+//                    }
+//                    jp.setValue(progressBarMessage.getSecond());
+//                }
+                if (progressBarMessage.getSecond() >= 0){
                     jp.setValue(progressBarMessage.getSecond());
                 }
                 jp.setString(progressBarMessage.getFirst());
@@ -305,15 +308,15 @@ public class DisplayManager extends Thread {
             } else {
 
                 if (progressBarMessage.getSecond() < 0 && pbIsInUse) {
-                    jp.setIndeterminate(false);
+//                    jp.setIndeterminate(false);
                     jp.setValue(0);
                     jp.setString(null);
                 }
 
                 if (jp.getValue() > 0) {
-                    if (jp.isIndeterminate()) {
-                        jp.setIndeterminate(false);
-                    }
+//                    if (jp.isIndeterminate()) {
+//                        jp.setIndeterminate(false);
+//                    }
                     jp.setValue(0);
                     jp.setString(null);
                 }
