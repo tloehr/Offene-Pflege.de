@@ -92,6 +92,10 @@ public class SYSFiles implements Serializable, Comparable {
     private Collection<Qmsplan2File> qmsplanAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<Qms2File> qmsAssignCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
+    private Collection<Training2File> trainingAssignCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
+    private Collection<TrainingAttendee2File> trainAttendeeAssignCollection;
 
     public SYSFiles() {
     }
@@ -151,6 +155,14 @@ public class SYSFiles implements Serializable, Comparable {
 
     public Collection<Qms2File> getQmsAssignCollection() {
         return qmsAssignCollection;
+    }
+
+    public Collection<Training2File> getTrainingAssignCollection() {
+        return trainingAssignCollection;
+    }
+
+    public Collection<TrainingAttendee2File> getTrainAttendeeAssignCollection() {
+        return trainAttendeeAssignCollection;
     }
 
     public Long getOcfid() {

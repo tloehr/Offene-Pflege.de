@@ -43,6 +43,8 @@ public class DisplayManager extends Thread {
     private int lastMinute;
     private long lastoperation; // used for the timeout function to automatically log out idle users
     private boolean pbIsInUse; // for optimization. the jp.setString() was called a trillion times without any need.
+    private Icon[] reloading;
+    private int currentAnimationFrameForReload = -1; // -1 means, no animation
 //    private int TIMEOUTMINS;
 
 //    private DateFormat df;
@@ -52,6 +54,9 @@ public class DisplayManager extends Thread {
      */
     public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS, JPanel pnlIcons, JProgressBar pbTimeout, Closure timeoutAction) {
         super();
+
+        reloading = new Icon[]{SYSConst.icon32reload0, SYSConst.icon32reload1, SYSConst.icon32reload2, SYSConst.icon32reload3, SYSConst.icon32reload4, SYSConst.icon32reload5, SYSConst.icon32reload6, SYSConst.icon32reload7};
+
         this.pbTimeout = pbTimeout;
         progressBarMessage = new Pair<String, Integer>("", -1);
         this.timeoutAction = timeoutAction;
@@ -291,16 +296,11 @@ public class DisplayManager extends Thread {
         synchronized (progressBarMessage) {
             if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
 //                if (progressBarMessage.getSecond() < 0) {
-//                    if (!jp.isIndeterminate()) {
-//                        jp.setIndeterminate(true);
-//                    }
+//                    if (currentAnimationFrameForReload == -1) currentAnimationFrameForReload = 0;
 //                } else {
-//                    if (jp.isIndeterminate()) {
-//                        jp.setIndeterminate(false);
-//                    }
-//                    jp.setValue(progressBarMessage.getSecond());
+//                    currentAnimationFrameForReload = -1;
 //                }
-                if (progressBarMessage.getSecond() >= 0){
+                if (progressBarMessage.getSecond() >= 0) {
                     jp.setValue(progressBarMessage.getSecond());
                 }
                 jp.setString(progressBarMessage.getFirst());
@@ -343,6 +343,7 @@ public class DisplayManager extends Thread {
         return new DisplayMessage("&raquo;" + text + " " + "&laquo; " + SYSTools.xx("misc.msg.successfully") + " " + SYSTools.xx("misc.msg." + operation), DisplayMessage.NORMAL);
     }
 
+
     @Override
     public void run() {
         while (!interrupted) {
@@ -378,6 +379,18 @@ public class DisplayManager extends Thread {
                         timeoutAction.execute(null);
                     }
                 }
+
+                // not yet
+//                if (step % 4 == 0 && currentAnimationFrameForReload >= 0) {
+//
+//                    if (currentAnimationFrameForReload > 7) {
+//                        currentAnimationFrameForReload = 0;
+//                    }
+//
+//                    OPDE.getMainframe().getBtnReload().setIcon(reloading[currentAnimationFrameForReload]);
+//                    currentAnimationFrameForReload++;
+//                }
+
                 Thread.sleep(50);
             } catch (InterruptedException ie) {
                 interrupted = true;

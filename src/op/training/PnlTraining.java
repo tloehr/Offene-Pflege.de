@@ -10,18 +10,14 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
-import com.jidesoft.swing.JideButton;
 import entity.staff.Training;
 import entity.staff.Training2Users;
 import entity.staff.TrainingTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
-import entity.system.Users;
-import entity.system.UsersTools;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.system.InternalClassACL;
-import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -30,15 +26,11 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.RollbackException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.util.*;
@@ -58,7 +50,7 @@ public class PnlTraining extends CleanablePanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private Map<String, CollapsiblePane> cpMap;
-    private Map<String, ArrayList<Training2Users>> userMap;
+    //    private Map<String, ArrayList<Training2Users>> userMap;
     private Map<String, Training> trainingMap;
     private Commontags filterTag;
     private JScrollPane jspMain;
@@ -78,7 +70,7 @@ public class PnlTraining extends CleanablePanel {
         jspMain.setViewportView(cpsMain);
 
         add(jspMain);
-        userMap = Collections.synchronizedMap(new HashMap<String, ArrayList<Training2Users>>());
+//        userMap = Collections.synchronizedMap(new HashMap<String, ArrayList<Training2Users>>());
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
         trainingMap = Collections.synchronizedMap(new HashMap<String, Training>());
         prepareSearchArea();
@@ -87,9 +79,9 @@ public class PnlTraining extends CleanablePanel {
 
     @Override
     public void cleanup() {
-        synchronized (userMap) {
-            SYSTools.clear(userMap);
-        }
+//        synchronized (userMap) {
+//            SYSTools.clear(userMap);
+//        }
         synchronized (cpMap) {
             SYSTools.clear(cpMap);
         }
@@ -229,9 +221,13 @@ public class PnlTraining extends CleanablePanel {
             trainingMap.put(key, training);
         }
 
+        DateTime starting = new DateTime(training.getStarting());
+        boolean withTime = !new LocalDate(training.getStarting()).toDateTimeAtStartOfDay().toDate().equals(training.getStarting());
+
         String title = "<font size=+1><b>" +
-                training.getTitle() + ", " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(training.getStarting()) +
-                "</b></font><p>";
+                training.getTitle() + ", [" +
+                (withTime ? starting.toString("EEE, dd.MM.yy  HH:mm") : starting.toString("EEE, dd.MM.yy") ) +
+                "]</b></font><p>";
 
         for (Commontags ctag : training.getCommontags()) {
             title += SYSConst.html_16x16_tagPurple_internal + "&nbsp;" + ctag.getText() + "&nbsp;";
@@ -356,123 +352,6 @@ public class PnlTraining extends CleanablePanel {
         return cpTraining;
     }
 
-
-    private void fillUserPanel(final JPanel userPanel, final String key) {
-        userPanel.removeAll();
-
-
-        if (userMap.get(key).isEmpty()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    userPanel.setLayout(new FlowLayout());
-                    userPanel.revalidate();
-                }
-            });
-            return;
-        }
-
-//        SwingUtilities.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                userPanel.setLayout(new GridLayout(userMap.get(key).size() / 3, 3, 5, 5));
-//
-//                for (Users usertmp : userMap.get(key)) {
-//                    JCheckBox cb = new JCheckBox(usertmp.getFullname());
-//                    final Users user;
-//
-//                    synchronized (trainingMap) {
-//                        EntityManager em = OPDE.createEM();
-//                        usertmp = em.merge(usertmp);
-//                        em.refresh(usertmp);
-//                        cb.setSelected(usertmp.getTrainings().contains(trainingMap.get(key)));
-//                        em.close();
-//                        user = usertmp;
-//                    }
-//
-//                    cb.addItemListener(new ItemListener() {
-//                        @Override
-//                        public void itemStateChanged(ItemEvent e) {
-//                            EntityManager em = OPDE.createEM();
-//
-//                            try {
-//                                em.getTransaction().begin();
-//
-//
-//                                Users myUser = em.merge(user);
-//                                em.lock(myUser, LockModeType.OPTIMISTIC);
-//                                Training myTraining = null;
-//                                synchronized (trainingMap) {
-//                                    myTraining = em.merge(trainingMap.get(key));
-//                                }
-//                                em.lock(myTraining, LockModeType.OPTIMISTIC);
-//
-//                                if (e.getStateChange() == ItemEvent.SELECTED) {
-//                                    myUser.getTrainings().add(myTraining);
-//                                    myTraining.getAttendees().add(user);
-//                                } else {
-//                                    myUser.getTrainings().remove(myTraining);
-//                                    myTraining.getAttendees().remove(user);
-//                                }
-//
-//                                em.getTransaction().commit();
-//                                synchronized (trainingMap) {
-//                                    trainingMap.put(key, myTraining);
-//                                    ArrayList<Training2Users> listUsers = new ArrayList<>(trainingMap.get(key).getAttendees());
-//                                    Collections.sort(listUsers, new Comparator<Training2Users>() {
-//                                        @Override
-//                                        public int compare(Training2Users o1, Training2Users o2) {
-//                                            return o1.getAttendee().compareTo(o2.getAttendee());
-//                                        }
-//                                    });
-//                                    synchronized (userMap) {
-//                                        userMap.put(key, listUsers);
-//                                    }
-//                                }
-//
-//                                if (myUser.equals(OPDE.getLogin().getUser())) {
-//                                    OPDE.getLogin().setUser(myUser);
-//                                }
-//                            } catch (OptimisticLockException ole) {
-//                                OPDE.warn(ole);
-//                                if (em.getTransaction().isActive()) {
-//                                    em.getTransaction().rollback();
-//                                }
-//                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-//                                    OPDE.getMainframe().emptyFrame();
-//                                    OPDE.getMainframe().afterLogin();
-//                                } else {
-//                                    reload();
-//                                }
-//                            } catch (RollbackException ole) {
-//                                if (em.getTransaction().isActive()) {
-//                                    em.getTransaction().rollback();
-//                                }
-//                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-//                                    OPDE.getMainframe().emptyFrame();
-//                                    OPDE.getMainframe().afterLogin();
-//                                }
-//                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-//                            } catch (Exception exc) {
-//                                if (em.getTransaction().isActive()) {
-//                                    em.getTransaction().rollback();
-//                                }
-//                                OPDE.fatal(exc);
-//                            } finally {
-//                                em.close();
-//                            }
-//                        }
-//                    });
-//
-//                    userPanel.add(cb);
-//                }
-//                userPanel.revalidate();
-//            }
-//        });
-
-    }
-
-
     private JPanel createContentPanel4(final Training training) {
 
 
@@ -480,9 +359,22 @@ public class PnlTraining extends CleanablePanel {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
         contentPanel.setOpaque(false);
 
-        contentPanel.add(new PnlTrainingEditor(training));
 
+        Closure afterEdited = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o == null) {
+                    reload();
+                } else {
+                    Training editedTraining = (Training) o;
+                    final String key = editedTraining.getId() + ".trainid";
+                    trainingMap.put(key, editedTraining);
+                    createCP4(editedTraining);
+                }
+            }
+        } : null;
 
+        contentPanel.add(new PnlTrainingEditor(training, afterEdited));
 
         return contentPanel;
     }

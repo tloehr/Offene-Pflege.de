@@ -15,6 +15,7 @@ import entity.qms.Qms;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
+import entity.staff.Training2Users;
 import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
@@ -180,9 +181,17 @@ public class DlgFiles extends MyJDialog {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.qmsplanAssignCollection ac WHERE ac.qmsplan = :qmsplan ");
             query.setParameter("qmsplan", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
+        } else if (attachable instanceof Training) {
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.trainingAssignCollection tac WHERE tac.training = :training ");
+            query.setParameter("training", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof Qms) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.qmsAssignCollection ac WHERE ac.qms = :qms ");
             query.setParameter("qms", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+        } else if (attachable instanceof Training2Users) {
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.trainAttendeeAssignCollection tac WHERE tac.training2Users = :training2users ");
+            query.setParameter("training2users", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         }
         Collections.sort(files);

@@ -1,8 +1,10 @@
 package entity.staff;
 
+import entity.files.TrainingAttendee2File;
 import entity.system.Users;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -10,7 +12,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "training2users")
-public class Training2Users {
+public class Training2Users implements Comparable<Training2Users> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,6 +76,12 @@ public class Training2Users {
     @ManyToOne
     private Users attendee;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "training2Users")
+    private Collection<TrainingAttendee2File> attachedFilesConnections;
+
+    public Collection<TrainingAttendee2File> getAttachedFilesConnections() {
+        return attachedFilesConnections;
+    }
 
     public Users getAttendee() {
         return attendee;
@@ -98,5 +106,10 @@ public class Training2Users {
         this.pit = pit;
         this.attendee = attendee;
         this.training = training;
+    }
+
+    @Override
+    public int compareTo(Training2Users o) {
+        return attendee.getUID().compareTo(o.getAttendee().getUID());
     }
 }

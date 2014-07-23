@@ -4,21 +4,29 @@
 
 package op.training;
 
-import com.jidesoft.swing.AutoCompletion;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.SelectAllUtils;
+import com.toedter.calendar.JCalendar;
 import entity.staff.Training;
 import entity.staff.Training2Users;
 import entity.staff.Training2UsersTools;
+import entity.staff.TrainingTools;
 import entity.system.Users;
 import entity.system.UsersTools;
+import op.OPDE;
+import op.care.sysfiles.DlgFiles;
+import op.threads.DisplayManager;
+import op.tools.GUITools;
 import op.tools.RiverLayout;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ListSelectionEvent;
@@ -28,10 +36,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.GregorianCalendar;
 
 /**
  * @author Torsten Löhr
@@ -41,24 +52,17 @@ public class PnlUserlistEditor extends JPanel {
     private final Training training;
     private final Closure editAction;
     private final boolean editmode;
-    //    HashSet<Training2Users> listSelectedUsers;
-    HashMap<Training2Users, JPanel> mapButtons;
-    ArrayList<String> completionList;
     JTextField txtUsers;
-    AutoCompletion ac;
     JPanel pnlUsersearch, pnlSelectedUsers;
     JList lstUsersFound;
 
-    int MAXLINE = 6;
+    int MAXLINE = 4;
 
     public PnlUserlistEditor(Training training, Closure editAction) {
         this.training = training;
         this.editAction = editAction;
         this.editmode = editAction != null;
         setLayout(new BorderLayout(5, 5));
-
-//        this.listSelectedUsers = new HashSet<>(training.getAttendees());
-        this.completionList = new ArrayList<>();
 
         initPanel();
     }
@@ -69,10 +73,17 @@ public class PnlUserlistEditor extends JPanel {
         pnlSelectedUsers = new JPanel(new RiverLayout(5, 5));
         add(pnlSelectedUsers, BorderLayout.CENTER);
 
-        mapButtons = new HashMap<>();
+        ArrayList<Training2Users> training2UsersArrayList = new ArrayList<>(training.getAttendees());
+        Collections.sort(training2UsersArrayList);
 
-        for (Training2Users training2Users : training.getAttendees()) {
-            pnlSelectedUsers.add(createUserPanel(training2Users));
+        int i = 0;
+        for (Training2Users training2Users : training2UsersArrayList) {
+            if (i % MAXLINE == 0) {
+                pnlSelectedUsers.add(createUserPanel(training2Users), RiverLayout.PARAGRAPH_BREAK);
+            } else {
+                pnlSelectedUsers.add(createUserPanel(training2Users), RiverLayout.LEFT);
+            }
+            i++;
         }
 
 
@@ -91,32 +102,46 @@ public class PnlUserlistEditor extends JPanel {
 
                     if (!Training2UsersTools.contains(training.getAttendees(), thisUser)) {
 
-//                        SwingUtilities.invokeLater(new Runnable() {
-//                            @Override
-//                            public void run() {
-//
-//
-//
-//
-//
-//
-////                                txtUsers.setText("");
-//                                revalidate();
-//                                repaint();
-//                            }
-//                        });
+                        Training2Users training2Users = new Training2Users(training.getStarting(), thisUser, training);
 
-                        Training2Users training2Users = new Training2Users(new Date(), thisUser, training);
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            Training2Users myT2U = em.merge(training2Users);
 
-                        if (training.getAttendees().size() % MAXLINE == 0) {
-                            pnlSelectedUsers.add(createUserPanel(training2Users), RiverLayout.PARAGRAPH_BREAK);
-                        } else {
-                            pnlSelectedUsers.add(createUserPanel(training2Users), RiverLayout.LEFT);
+                            Training myTraining = em.merge(training);
+                            em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                            myTraining.getAttendees().add(myT2U);
+
+                            em.getTransaction().commit();
+
+                            editAction.execute(myTraining);
+
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            editAction.execute(null);
+                        } catch (Exception ex) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(ex);
+                        } finally {
+                            em.close();
                         }
 
-                        training.getAttendees().add(training2Users);
-
-                        editAction.execute(training);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                revalidate();
+                                repaint();
+                            }
+                        });
                     }
 
 
@@ -140,16 +165,6 @@ public class PnlUserlistEditor extends JPanel {
 
             SelectAllUtils.install(txtUsers);
 
-//            ac.setStrict(false);
-//            ac.setStrictCompletion(false);
-//            txtUsers.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    cmbTagsActionPerformed(e);
-//                }
-//            });
-//
-
             txtUsers.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyTyped(KeyEvent e) {
@@ -166,135 +181,204 @@ public class PnlUserlistEditor extends JPanel {
 
             pnlUsersearch.add(new JScrollPane(lstUsersFound));
         }
-    }
-
-    private void notifyCaller() {
 
     }
-
-//    private void cmbTagsActionPerformed(ActionEvent e) {
-//
-//        if (!editmode) return;
-//
-//        if (txtUsers.getText().isEmpty()) return;
-//        if (txtUsers.getText().length() > 100) return;
-//
-//        final String enteredText = SYSTools.tidy(txtUsers.getText());
-//
-//        if (!mapAllTags.containsKey(enteredText)) {
-//            Commontags myNewCommontag = new Commontags(SYSTools.tidy(enteredText));
-//            mapAllTags.put(enteredText, myNewCommontag);
-//            ac.uninstallListeners();
-//            ac = new AutoCompletion(txtUsers, mapAllTags.keySet().toArray(new String[]{}));
-//            ac.setStrict(false);
-//            ac.setStrictCompletion(false);
-//        }
-//
-//        if (!listSelectedTags.contains(mapAllTags.get(enteredText))) {
-//            listSelectedTags.add(mapAllTags.get(enteredText));
-//
-//            SwingUtilities.invokeLater(new Runnable() {
-//                @Override
-//                public void run() {
-//
-//                    if (listSelectedTags.size() % MAXLINE == 0) {
-//                        add(createUserPanel(mapAllTags.get(enteredText)), RiverLayout.LINE_BREAK);
-//                    } else {
-//                        add(createUserPanel(mapAllTags.get(enteredText)), RiverLayout.LEFT);
-//                    }
-//
-//                    txtUsers.setText("");
-//                    revalidate();
-//                    repaint();
-//                }
-//            });
-//        }
-//    }
-
 
     private JPanel createUserPanel(final Training2Users training2Users) {
 
-        if (mapButtons.containsKey(training2Users)) {
-            return mapButtons.get(training2Users);
-        }
-
         final JPanel pnlButton = new JPanel();
-        pnlButton.setBorder(new SoftBevelBorder(BevelBorder.RAISED));
+        pnlButton.setBorder(new EmptyBorder(0, 0, 0, 10));
         pnlButton.setToolTipText(training2Users.getAttendee().getFullname() + "; " + DateFormat.getDateInstance(DateFormat.SHORT).format(training2Users.getPit()));
         pnlButton.add(new JLabel(training2Users.getAttendee().getUID()));
 
         if (editmode) {
-            JButton btnDelUser = new JButton(null, SYSConst.icon16userDel);
-
+            JButton btnDelUser = GUITools.getTinyButton("misc.msg.delete", SYSConst.icon16userDel);
+            btnDelUser.setPressedIcon(SYSConst.icon16Pressed);
             btnDelUser.setFont(SYSConst.ARIAL12);
             btnDelUser.setHorizontalTextPosition(SwingConstants.LEADING);
 //            btnDelUser.setForeground(SYSConst.green2[SYSConst.dark4]);
 
 
-//            btnDelUser.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    listSelectedUsers.remove(training2Users);
-//                    mapButtons.remove(training2Users);
-//                    training.getAttendees().remove(training2Users);
-//
-//                    SwingUtilities.invokeLater(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            removeAll();
-//
-//                            add(txtUsers);
-//                            int tagnum = 1;
-//
-//                            for (JPanel btn : mapButtons.values()) {
-//                                if (tagnum % MAXLINE == 0) {
-//                                    pnlSelectedUsers.add(btn, RiverLayout.LINE_BREAK);
-//                                } else {
-//                                    pnlSelectedUsers.add(btn, RiverLayout.LEFT);
-//                                }
-//                                tagnum++;
-//                            }
-//
-//                            pnlButton.remove(pnlButton);
-//                            pnlButton.revalidate();
-//                            pnlButton.repaint();
-//                        }
-//                    });
-//                }
-//            });
+            btnDelUser.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Training myTraining = em.merge(training);
+                        em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        Training2Users myT2U = em.merge(training2Users);
+                        myTraining.getAttendees().remove(myT2U);
+                        em.remove(myT2U);
+                        em.getTransaction().commit();
+                        editAction.execute(myTraining);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        editAction.execute(null);
+                    } catch (Exception ex) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(ex);
+                    } finally {
+                        em.close();
+                    }
+
+                }
+            });
 
             pnlButton.add(btnDelUser);
         }
 
-        JButton btnState = new JButton(Training2UsersTools.getIcon(training2Users));
+        JButton btnState = GUITools.getTinyButton(Training2UsersTools.getTooltip(training2Users), Training2UsersTools.getIcon(training2Users));
+        btnState.setPressedIcon(SYSConst.icon16Pressed);
         if (editmode) {
             btnState.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Training myTraining = em.merge(training);
+                        em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        Training2Users myT2U = em.merge(training2Users);
+                        myTraining.getAttendees().remove(myT2U);
+
+                        byte state = myT2U.getState();
+                        state++;
+                        if (state > Training2UsersTools.STATE_REFUSED) state = Training2UsersTools.STATE_OPEN;
+                        myT2U.setState(state);
+                        myTraining.getAttendees().add(myT2U);
+
+                        em.getTransaction().commit();
+                        editAction.execute(myTraining);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        editAction.execute(null);
+                    } catch (Exception ex) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(ex);
+                    } finally {
+                        em.close();
+                    }
 
                 }
             });
         }
+        pnlButton.add(btnState);
 
 
-        pnlButton.add(new JToggleButton("OK"));
-        pnlButton.add(new JButton("Time"));
+        if (training.getState() == TrainingTools.STATE_WORK_PLACE_RELATED) {
 
+            final JButton btnDate = GUITools.getTinyButton("misc.msg.date", SYSConst.icon16date);
+            btnDate.setPressedIcon(SYSConst.icon16Pressed);
+            if (editmode) {
+                btnDate.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        JCalendar jdc = new JCalendar(training2Users.getPit());
+                        jdc.addPropertyChangeListener("calendar", new PropertyChangeListener() {
+                            @Override
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                if (evt.getNewValue() == null) return;
+                                Date date = ((GregorianCalendar) evt.getNewValue()).getTime();
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    Training myTraining = em.merge(training);
+                                    em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    Training2Users myT2U = em.merge(training2Users);
+                                    myTraining.getAttendees().remove(myT2U);
+                                    myT2U.setPit(date);
+                                    myTraining.getAttendees().add(myT2U);
+
+                                    em.getTransaction().commit();
+                                    editAction.execute(myTraining);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    editAction.execute(null);
+                                } catch (Exception ex) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(ex);
+                                } finally {
+                                    em.close();
+                                }
+
+                            }
+                        });
+
+                        final JidePopup popupInfo = new JidePopup();
+                        popupInfo.setMovable(false);
+                        popupInfo.setContentPane(jdc);
+                        popupInfo.removeExcludedComponent(jdc);
+                        popupInfo.setDefaultFocusComponent(jdc);
+                        popupInfo.setOwner(btnDate);
+
+                        GUITools.showPopup(popupInfo, SwingConstants.CENTER);
+
+
+                    }
+                });
+            }
+            pnlButton.add(btnDate);
+        }
+
+        final JButton btnFiles = GUITools.getTinyButton(null, training2Users.getAttachedFilesConnections().isEmpty() ? SYSConst.icon16attach : SYSConst.icon16greenStar);
+
+        if (!training2Users.getAttachedFilesConnections().isEmpty()){
+            btnFiles.setText(Integer.toString(training2Users.getAttachedFilesConnections().size()));
+        }
+        btnFiles.setToolTipText(SYSTools.xx("misc.btnfiles.tooltip"));
+        btnFiles.setForeground(Color.BLUE);
+        btnFiles.setFont(SYSConst.ARIAL12BOLD);
+        btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
+        btnFiles.setPressedIcon(SYSConst.icon16Pressed);
+        btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
+        btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        btnFiles.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Closure fileHandleClosure = !editmode ? null : new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        EntityManager em = OPDE.createEM();
+                        final Training myTraining = em.find(Training.class, training2Users.getId());
+                        em.close();
+                        editAction.execute(myTraining);
+                    }
+                };
+                new DlgFiles(training2Users, fileHandleClosure);
+            }
+        });
+        btnFiles.setEnabled(OPDE.isFTPworking());
+        pnlButton.add(btnFiles);
 
         return pnlButton;
     }
-
-
-//    public static JButton createFilterButton(final Commontags commontag, ActionListener al) {
-//
-//
-//        jButton.setFont(SYSConst.ARIAL12);
-//        jButton.setBorder(new RoundedBorder(10));
-//        jButton.setHorizontalTextPosition(SwingConstants.LEADING);
-//        jButton.setForeground(SYSConst.purple1[SYSConst.medium4]);
-//
-//        return jButton;
-//    }
 
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

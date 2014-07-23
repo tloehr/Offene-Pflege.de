@@ -485,6 +485,7 @@ public class SYSConst {
     public static final Icon icon16infoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/info-pressed.png"));
     public static final Icon icon22applyPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply_pressed.png"));
     public static final Icon icon22attach = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/attach.png"));
+    public static final Icon icon16attach = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/attach.png"));
     public static final Icon icon22attachPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/attach_pressed.png"));
     public static final Icon icon22calendar = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/calenders.png"));
     public static final Icon icon22calendarPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/calenders_pressed.png"));
@@ -537,7 +538,7 @@ public class SYSConst {
     public static final Icon icon22playerStartPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_start_pressed.png"));
     public static final Icon icon22playerStop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
     public static final Icon icon22playerStopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
-    //    public static final Icon icon22print = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1.png"));
+    public static final Icon icon16date = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/date.png"));
 //    public static final Icon icon22printPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1_pressed.png"));
     public static final Icon icon22print2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2.png"));
     public static final Icon icon22print2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2_pressed.png"));
@@ -659,4 +660,13 @@ public class SYSConst {
     public static final Icon icon16user = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/user_active.png"));
     public static final Icon icon16userDel = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/delete_user.png"));
 
+    public static final Icon icon32reload0 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0.png"));
+    public static final Icon icon32reload1 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload1.png"));
+    public static final Icon icon32reload2 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload2.png"));
+    public static final Icon icon32reload3 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload3.png"));
+    public static final Icon icon32reload4 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload4.png"));
+    public static final Icon icon32reload5 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload5.png"));
+    public static final Icon icon32reload6 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload6.png"));
+    public static final Icon icon32reload7 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload7.png"));
+    
 }

@@ -410,16 +410,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, 3dlu, $nlgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, 3dlu, $nlgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -507,7 +507,7 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.add(pbMsg, CC.xy(5, 7, CC.FILL, CC.FILL));
 
                 //---- btnReload ----
-                btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload.png")));
+                btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload0.png")));
                 btnReload.setBorder(null);
                 btnReload.setBorderPainted(false);
                 btnReload.setOpaque(false);
@@ -572,6 +572,10 @@ public class FrmMain extends JFrame {
         }
     }
 
+    public JButton getBtnReload() {
+        return btnReload;
+    }
+
     public JScrollPane prepareSearchArea() {
         // fixes #1
         if (panesApps != null) {
@@ -616,6 +620,8 @@ public class FrmMain extends JFrame {
         for (Station station : stationen) {
             panesApps.add(addNursingRecords(station));
         }
+
+
 
         // May see the archive
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInformation.internalClassID)) {

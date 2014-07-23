@@ -21,6 +21,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.ByteArrayOutputStream;
@@ -169,6 +171,7 @@ public class GUITools {
         jButton.setBorder(null);
         jButton.setBorderPainted(false);
         jButton.setToolTipText(tooltip);
+        jButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return jButton;
     }
 
@@ -989,4 +992,52 @@ public class GUITools {
                 Math.max((int) (color.getGreen() * FACTOR), 0),
                 Math.max((int) (color.getBlue() * FACTOR), 0));
     }
+
+
+    static Image iconToImage(Icon icon) {
+       if (icon instanceof ImageIcon) {
+          return ((ImageIcon)icon).getImage();
+       }
+       else {
+          int w = icon.getIconWidth();
+          int h = icon.getIconHeight();
+          GraphicsEnvironment ge =
+            GraphicsEnvironment.getLocalGraphicsEnvironment();
+          GraphicsDevice gd = ge.getDefaultScreenDevice();
+          GraphicsConfiguration gc = gd.getDefaultConfiguration();
+          BufferedImage image = gc.createCompatibleImage(w, h);
+          Graphics2D g = image.createGraphics();
+          icon.paintIcon(null, g, 0, 0);
+          g.dispose();
+          return image;
+       }
+     }
+
+
+//    public static Icon paint(Icon in) {
+//       Image myImage = iconToImage(in);
+//       BufferedImage bufferedImage = new BufferedImage(myImage.getWidth(null), myImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+//
+//        GraphicsEnvironment ge =
+//                GraphicsEnvironment.getLocalGraphicsEnvironment();
+//              GraphicsDevice gd = ge.getDefaultScreenDevice();
+//              GraphicsConfiguration gc = gd.getDefaultConfiguration();
+//              BufferedImage image = gc.createCompatibleImage(in.getIconWidth(), in.getIconHeight());
+//              Graphics2D g = image.createGraphics();
+//
+//
+//       Graphics gb = bufferedImage.getGraphics();
+//       gb.drawImage(myImage, 0, 0, null);
+//       gb.dispose();
+//
+//       AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+//       tx.translate(-myImage.getWidth(null), 0);
+//       AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+//       bufferedImage = op.filter(bufferedImage, null);
+//
+//
+//
+//       g2d.drawImage(myImage, 10, 10, null);
+//       g2d.drawImage(bufferedImage, null, 300, 10);
+//     }
 }

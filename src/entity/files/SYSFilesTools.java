@@ -37,6 +37,7 @@ import entity.qms.Qms;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
+import entity.staff.Training2Users;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.values.ResValue;
@@ -198,6 +199,14 @@ public class SYSFilesTools {
                                 Qms2File link = em.merge(new Qms2File(sysfile, (Qms) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getQmsAssignCollection().add(link);
                                 ((Qms) attachable).getAttachedFilesConnections().add(link);
+                            } else if (attachable instanceof Training) {
+                                Training2File link = em.merge(new Training2File(sysfile, (Training) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getTrainingAssignCollection().add(link);
+                                ((Training) attachable).getAttachedFilesConnections().add(link);
+                            } else if (attachable instanceof Training2Users) {
+                                TrainingAttendee2File link = em.merge(new TrainingAttendee2File(sysfile, (Training2Users) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getTrainAttendeeAssignCollection().add(link);
+                                ((Training2Users) attachable).getAttachedFilesConnections().add(link);
                             }
                         }
                         successful.add(sysfile);

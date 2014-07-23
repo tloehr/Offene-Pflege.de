@@ -472,7 +472,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/32x32/reload.png</string> 
+              <string>/artwork/32x32/reload0.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 

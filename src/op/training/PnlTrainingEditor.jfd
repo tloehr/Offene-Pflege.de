@@ -4,74 +4,50 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "default, labelcompgap, default:grow, labelcompgap, default, labelcompgap, default:grow"
-			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:30dlu, linegap, fill:default:grow"
+			"$columnSpecs": "pref, labelcompgap, default, labelcompgap, pref, labelcompgap, pref, labelcompgap, default:grow"
+			"$rowSpecs": "labelcompgap, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:30dlu, linegap, default, linegap, fill:default:grow"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblTitle"
 				"text": "text"
-				"font": &Font0 new java.awt.Font( "Arial", 0, 14 )
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
-			add( new FormComponent( "javax.swing.JTextField" ) {
-				name: "txtTitle"
-				"font": #Font0
+				"font": new java.awt.Font( "Arial", 0, 10 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
+				"gridY": 3
 				"gridWidth": 5
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblDate"
-				"text": "text"
-				"font": #Font0
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 3
-			} )
-			add( new FormComponent( "com.toedter.calendar.JDateChooser" ) {
-				name: "jdcStarting"
-				"font": #Font0
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
-				"gridY": 3
-			} )
-			add( new FormComponent( "javax.swing.JCheckBox" ) {
-				name: "cbTime"
-				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-				addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "cbTimeItemStateChanged", true ) )
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 5
-				"gridY": 3
-			} )
-			add( new FormComponent( "javax.swing.JTextField" ) {
-				name: "txtTimeStarting"
-				"font": #Font0
-				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTimeFocusLost", true ) )
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 7
-				"gridY": 3
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblDocent"
 				"text": "text"
-				"font": #Font0
+				"font": new java.awt.Font( "Arial", 0, 10 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 7
-			} )
-			add( new FormComponent( "javax.swing.JTextField" ) {
-				name: "txtDocent"
-				"font": #Font0
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
-				"gridY": 7
-				"gridWidth": 5
+				"gridY": 3
+				"gridX": 7
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblText"
 				"text": "text"
-				"font": #Font0
+				"font": new java.awt.Font( "Arial", 0, 10 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 9
+				"gridY": 3
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
+				"gridX": 9
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtTitle"
+				"font": &Font0 new java.awt.Font( "Arial", 0, 14 )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTitleFocusLost", true ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridWidth": 5
+				"gridY": 5
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtDocent"
+				"font": #Font0
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtDocentFocusLost", true ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 7
+				"gridY": 5
 			} )
 			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 				name: "scrollPane1"
@@ -79,38 +55,77 @@ new FormModel {
 					name: "txtText"
 					"lineWrap": true
 					"wrapStyleWord": true
+					addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTextFocusLost", true ) )
 				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 5
+				"gridX": 9
+				"gridHeight": 5
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblDate"
+				"text": "text"
+				"font": new java.awt.Font( "Arial", 0, 10 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 7
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTime"
+				"text": "text"
+				"font": new java.awt.Font( "Arial", 0, 10 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 7
+			} )
+			add( new FormComponent( "com.toedter.calendar.JDateChooser" ) {
+				name: "jdcStarting"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 9
+			} )
+			add( new FormComponent( "javax.swing.JCheckBox" ) {
+				name: "cbTime"
+				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+				addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "cbTimeItemStateChanged", true ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
 				"gridY": 9
-				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-				"gridWidth": 5
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtTimeStarting"
+				"font": #Font0
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTimeFocusLost", true ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 9
 			} )
 			add( new FormComponent( "javax.swing.JComboBox" ) {
 				name: "cmbState"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
-				"gridY": 11
+				"gridX": 7
+				"gridY": 9
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblTags"
 				"text": "text"
-				"font": #Font0
+				"font": new java.awt.Font( "Arial", 0, 10 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridY": 13
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
+				"gridWidth": 7
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblAttendees"
 				"text": "text"
-				"font": #Font0
+				"font": new java.awt.Font( "Arial", 0, 10 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 15
+				"gridY": 17
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
+				"gridWidth": 7
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 400, 300 )
+			"size": new java.awt.Dimension( 560, 300 )
 		} )
 	}
 }

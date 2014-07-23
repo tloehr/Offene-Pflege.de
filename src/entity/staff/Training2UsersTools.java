@@ -42,4 +42,17 @@ public class Training2UsersTools {
            return null;
        }
 
+    public static String getTooltip(Training2Users training2Users) {
+               if (training2Users.getState() == STATE_DONE) {
+                   return "opde.t2u.state.done";
+               }
+               if (training2Users.getState() == STATE_OPEN) {
+                   return "opde.t2u.state.open";
+               }
+               if (training2Users.getState() == STATE_REFUSED) {
+                   return "opde.t2u.state.refused";
+               }
+               return null;
+           }
+
 }

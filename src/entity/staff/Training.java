@@ -135,8 +135,8 @@ public class Training {
 
         if (id != training.id) return false;
         if (state != training.state) return false;
-        if (attachedFilesConnections != null ? !attachedFilesConnections.equals(training.attachedFilesConnections) : training.attachedFilesConnections != null)
-            return false;
+//        if (attachedFilesConnections != null ? !attachedFilesConnections.equals(training.attachedFilesConnections) : training.attachedFilesConnections != null)
+//            return false;
         if (attendees != null ? !attendees.equals(training.attendees) : training.attendees != null) return false;
         if (commontags != null ? !commontags.equals(training.commontags) : training.commontags != null) return false;
         if (docent != null ? !docent.equals(training.docent) : training.docent != null) return false;
@@ -156,7 +156,7 @@ public class Training {
         result = 31 * result + (docent != null ? docent.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (int) state;
-        result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
+//        result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
         result = 31 * result + (attendees != null ? attendees.hashCode() : 0);
         result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);

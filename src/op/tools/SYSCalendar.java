@@ -27,10 +27,6 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
-import entity.info.ResInfo;
-import entity.info.ResInfoTools;
-import entity.info.ResInfoTypeTools;
-import entity.info.Resident;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import io.lamma.LammaConst;
@@ -52,12 +48,10 @@ import java.awt.event.FocusEvent;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.Format;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SYSCalendar {
-
 
 
     // the beginning null makes it compatible with the joda int constants.
@@ -67,7 +61,6 @@ public class SYSCalendar {
 
     public final static Weekday[] weeksdays = new Weekday[]{null, LammaConst.MONDAY, LammaConst.TUESDAY, LammaConst.WEDNESDAY, LammaConst.THURSDAY,
             LammaConst.FRIDAY, LammaConst.SATURDAY, LammaConst.SUNDAY};
-
 
 
     public static boolean isInFuture(long time) {
@@ -345,15 +338,24 @@ public class SYSCalendar {
         if (input == null || input.equals("")) {
             throw new NumberFormatException("leere Eingabe");
         }
+
         StringTokenizer st = new StringTokenizer(input, ":,.");
-        if (st.countTokens() < 2 || st.countTokens() > 3) {
+        if (st.countTokens() > 3) {
             throw new NumberFormatException("falsches Format");
         }
-        String sStunde = st.nextToken();
-        String sMinute = st.nextToken();
+
+        String sStunde = "00";
+        String sMinute = "00";
         String sSekunde = "00";
 
-        if (st.countTokens() == 1) { // Noch genau einer übrig, kann nur Sekunde sein.
+        if (st.countTokens() == 1) { // maybe a simple hour
+            sStunde = st.nextToken();
+        } else if (st.countTokens() == 2) { // maybe a simple hour
+            sStunde = st.nextToken();
+            sMinute = st.nextToken();
+        } else {
+            sStunde = st.nextToken();
+            sMinute = st.nextToken();
             sSekunde = st.nextToken();
         }
 
