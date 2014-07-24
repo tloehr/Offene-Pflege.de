@@ -264,10 +264,10 @@ public class DlgRegular extends MyJDialog {
     private void initComponents() {
         jPanel1 = new JPanel();
         txtMed = new JXSearchField();
-        cmbMed = new JComboBox();
+        cmbMed = new JComboBox<>();
         panel4 = new JPanel();
         btnMed = new JButton();
-        cmbIntervention = new JComboBox();
+        cmbIntervention = new JComboBox<>();
         txtIntervention = new JXSearchField();
         jPanel8 = new JPanel();
         jspDosis = new JScrollPane();
@@ -284,9 +284,9 @@ public class DlgRegular extends MyJDialog {
         txtBemerkung = new JTextPane();
         lblText = new JLabel();
         pnlON = new JPanel();
-        cmbDocON = new JComboBox();
+        cmbDocON = new JComboBox<>();
         btnAddGP = new JButton();
-        cmbHospitalON = new JComboBox();
+        cmbHospitalON = new JComboBox<>();
         btnAddHospital = new JButton();
         panel1 = new JPanel();
         btnClose = new JButton();
@@ -328,7 +328,7 @@ public class DlgRegular extends MyJDialog {
             jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
+            cmbMed.setModel(new DefaultComboBoxModel<>(new String[] {
                 "Item 1",
                 "Item 2",
                 "Item 3",
@@ -366,7 +366,7 @@ public class DlgRegular extends MyJDialog {
             jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbIntervention ----
-            cmbIntervention.setModel(new DefaultComboBoxModel(new String[] {
+            cmbIntervention.setModel(new DefaultComboBoxModel<>(new String[] {
                 "Item 1",
                 "Item 2",
                 "Item 3",
@@ -531,7 +531,7 @@ public class DlgRegular extends MyJDialog {
                     "default, $lgap, default"));
 
                 //---- cmbDocON ----
-                cmbDocON.setModel(new DefaultComboBoxModel(new String[] {
+                cmbDocON.setModel(new DefaultComboBoxModel<>(new String[] {
                     "Item 1",
                     "Item 2",
                     "Item 3",
@@ -562,7 +562,7 @@ public class DlgRegular extends MyJDialog {
                 pnlON.add(btnAddGP, CC.xy(3, 1));
 
                 //---- cmbHospitalON ----
-                cmbHospitalON.setModel(new DefaultComboBoxModel(new String[] {
+                cmbHospitalON.setModel(new DefaultComboBoxModel<>(new String[] {
                     "Item 1",
                     "Item 2",
                     "Item 3",
@@ -902,10 +902,10 @@ public class DlgRegular extends MyJDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
     private JXSearchField txtMed;
-    private JComboBox cmbMed;
+    private JComboBox<String> cmbMed;
     private JPanel panel4;
     private JButton btnMed;
-    private JComboBox cmbIntervention;
+    private JComboBox<String> cmbIntervention;
     private JXSearchField txtIntervention;
     private JPanel jPanel8;
     private JScrollPane jspDosis;
@@ -922,9 +922,9 @@ public class DlgRegular extends MyJDialog {
     private JTextPane txtBemerkung;
     private JLabel lblText;
     private JPanel pnlON;
-    private JComboBox cmbDocON;
+    private JComboBox<String> cmbDocON;
     private JButton btnAddGP;
-    private JComboBox cmbHospitalON;
+    private JComboBox<String> cmbHospitalON;
     private JButton btnAddHospital;
     private JPanel panel1;
     private JButton btnClose;

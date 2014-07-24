@@ -638,10 +638,10 @@ public class PnlBHP extends NursingRecordsPanel {
                         // add outcome check BHP if necessary
                         if (!myBHP.isOutcomeText() && myBHP.getPrescriptionSchedule().getCheckAfterHours() != null) {
                             outcomeBHP = em.merge(new BHP(myBHP));
+                            mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).add(outcomeBHP);
                         }
 
                         em.getTransaction().commit();
-
 
                         if (myBHP.shouldBeCalculated() && involvedPresciption.isClosed()) { // &&
                             reload();
@@ -1058,7 +1058,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         BHP outcomeBHP = BHPTools.getComment(bhp);
 
                         if (outcomeBHP != null && !outcomeBHP.isOpen()) {
-                            // already commented upon
+                            // already commented
                             return;
                         }
 
@@ -1417,7 +1417,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     html += "<h1 id=\"fonth1\" >" + ResidentTools.getFullName(resident) + "</h1>";
                     html += SYSConst.html_h2(SYSTools.xx("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDatum.getDate())));
 
-                    for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+                    for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_OUTCOMES, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
                         if (mapShift2BHP.containsKey(shift)) {
                             html += BHPTools.getBHPsAsHTMLtable(mapShift2BHP.get(shift));
                         }

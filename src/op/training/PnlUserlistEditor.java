@@ -135,13 +135,13 @@ public class PnlUserlistEditor extends JPanel {
                             em.close();
                         }
 
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                revalidate();
-                                repaint();
-                            }
-                        });
+//                        SwingUtilities.invokeLater(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                revalidate();
+//                                repaint();
+//                            }
+//                        });
                     }
 
 

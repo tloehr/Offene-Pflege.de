@@ -566,7 +566,7 @@ public class DFNTools {
         if (!list.isEmpty()) {
 
             DFN d1 = list.get(0);
-            result += SYSConst.html_h3(d1.isOnDemand() ? SYSTools.xx("nursingrecords.dfn.ondemand") : SYSTools.xx(SHIFT_TEXT[d1.getShift()]));
+            result += SYSConst.html_h2(d1.isOnDemand() ? "nursingrecords.dfn.ondemand" : SHIFT_TEXT[d1.getShift()]);
 
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +

@@ -28,6 +28,8 @@ package op.care.info;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.popup.JidePopup;
+import entity.EntityTools;
 import entity.info.ICD;
 import entity.info.ResInfo;
 import entity.info.ResInfoTools;
@@ -36,7 +38,10 @@ import entity.prescription.GPTools;
 import entity.prescription.Hospital;
 import entity.prescription.HospitalTools;
 import op.OPDE;
+import op.residents.PnlEditGP;
+import op.residents.PnlEditHospital;
 import op.threads.DisplayMessage;
+import op.tools.GUITools;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -97,6 +102,34 @@ public class DlgDiag extends MyJDialog {
         reloadTable();
     }
 
+    private void btnAddGPActionPerformed(ActionEvent e) {
+        final PnlEditGP pnlGP = new PnlEditGP(new GP());
+        JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    GP gp = EntityTools.merge((GP) o);
+                    cmbArzt.setModel(new DefaultComboBoxModel(new GP[]{gp}));
+                }
+            }
+        }, btnAddGP);
+        GUITools.showPopup(popup, SwingConstants.EAST);
+    }
+
+    private void btnAddHospitalActionPerformed(ActionEvent e) {
+        final PnlEditHospital pnlHospital = new PnlEditHospital(new Hospital());
+        JidePopup popup = GUITools.createPanelPopup(pnlHospital, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    Hospital hospital = EntityTools.merge((Hospital) o);
+                    cmbKH.setModel(new DefaultComboBoxModel(new Hospital[]{hospital}));
+                }
+            }
+        }, btnAddHospital);
+        GUITools.showPopup(popup, SwingConstants.EAST);
+    }
+
 
     private void fillCMBs() {
         EntityManager em = OPDE.createEM();
@@ -148,13 +181,14 @@ public class DlgDiag extends MyJDialog {
         jspDiagnosen = new JScrollPane();
         lstDiag = new JList();
         lblDiagBy = new JLabel();
-        panel2 = new JPanel();
-        cmbArzt = new JComboBox();
-        cmbKH = new JComboBox();
+        cmbArzt = new JComboBox<>();
+        btnAddGP = new JButton();
+        cmbKH = new JComboBox<>();
+        btnAddHospital = new JButton();
         lblSecurity = new JLabel();
         lblSide = new JLabel();
-        cmbKoerper = new JComboBox();
-        cmbSicherheit = new JComboBox();
+        cmbKoerper = new JComboBox<>();
+        cmbSicherheit = new JComboBox<>();
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
         lblInterval = new JLabel();
@@ -202,33 +236,56 @@ public class DlgDiag extends MyJDialog {
             lblDiagBy.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(lblDiagBy, CC.xy(3, 7, CC.RIGHT, CC.DEFAULT));
 
-            //======== panel2 ========
-            {
-                panel2.setLayout(new FormLayout(
-                    "default:grow, $rgap, default:grow",
-                    "default:grow"));
+            //---- cmbArzt ----
+            cmbArzt.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
+            }));
+            cmbArzt.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(cmbArzt, CC.xywh(5, 7, 5, 1));
 
-                //---- cmbArzt ----
-                cmbArzt.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
-                }));
-                cmbArzt.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(cmbArzt, CC.xywh(1, 1, 3, 1));
-            }
-            jPanel1.add(panel2, CC.xywh(5, 7, 7, 1));
+            //---- btnAddGP ----
+            btnAddGP.setText(null);
+            btnAddGP.setBorder(null);
+            btnAddGP.setContentAreaFilled(false);
+            btnAddGP.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+            btnAddGP.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnAddGP.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+            btnAddGP.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnAddGPActionPerformed(e);
+                }
+            });
+            jPanel1.add(btnAddGP, CC.xy(11, 7));
 
             //---- cmbKH ----
-            cmbKH.setModel(new DefaultComboBoxModel(new String[] {
+            cmbKH.setModel(new DefaultComboBoxModel<>(new String[] {
                 "Item 1",
                 "Item 2",
                 "Item 3",
                 "Item 4"
             }));
             cmbKH.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(cmbKH, CC.xywh(5, 9, 7, 1));
+            jPanel1.add(cmbKH, CC.xywh(5, 9, 5, 1));
+
+            //---- btnAddHospital ----
+            btnAddHospital.setText(null);
+            btnAddHospital.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+            btnAddHospital.setBorder(null);
+            btnAddHospital.setContentAreaFilled(false);
+            btnAddHospital.setBorderPainted(false);
+            btnAddHospital.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnAddHospital.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+            btnAddHospital.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnAddHospitalActionPerformed(e);
+                }
+            });
+            jPanel1.add(btnAddHospital, CC.xy(11, 9));
 
             //---- lblSecurity ----
             lblSecurity.setText("Diagnosesicherheit:");
@@ -241,7 +298,7 @@ public class DlgDiag extends MyJDialog {
             jPanel1.add(lblSide, CC.xy(3, 11, CC.RIGHT, CC.DEFAULT));
 
             //---- cmbKoerper ----
-            cmbKoerper.setModel(new DefaultComboBoxModel(new String[] {
+            cmbKoerper.setModel(new DefaultComboBoxModel<>(new String[] {
                 "Nicht festgelegt",
                 "links",
                 "rechts",
@@ -251,7 +308,7 @@ public class DlgDiag extends MyJDialog {
             jPanel1.add(cmbKoerper, CC.xy(5, 11));
 
             //---- cmbSicherheit ----
-            cmbSicherheit.setModel(new DefaultComboBoxModel(new String[] {
+            cmbSicherheit.setModel(new DefaultComboBoxModel<>(new String[] {
                 "Nicht festgelegt",
                 "gesichert",
                 "Verdacht auf",
@@ -406,13 +463,14 @@ public class DlgDiag extends MyJDialog {
     private JScrollPane jspDiagnosen;
     private JList lstDiag;
     private JLabel lblDiagBy;
-    private JPanel panel2;
-    private JComboBox cmbArzt;
-    private JComboBox cmbKH;
+    private JComboBox<String> cmbArzt;
+    private JButton btnAddGP;
+    private JComboBox<String> cmbKH;
+    private JButton btnAddHospital;
     private JLabel lblSecurity;
     private JLabel lblSide;
-    private JComboBox cmbKoerper;
-    private JComboBox cmbSicherheit;
+    private JComboBox<String> cmbKoerper;
+    private JComboBox<String> cmbSicherheit;
     private JScrollPane jScrollPane1;
     private JTextArea txtBemerkung;
     private JLabel lblInterval;

@@ -539,7 +539,7 @@ public class SYSConst {
     public static final Icon icon22playerStop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
     public static final Icon icon22playerStopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
     public static final Icon icon16date = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/date.png"));
-//    public static final Icon icon22printPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1_pressed.png"));
+    //    public static final Icon icon22printPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1_pressed.png"));
     public static final Icon icon22print2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2.png"));
     public static final Icon icon22print2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2_pressed.png"));
     public static final Icon icon22redo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo.png"));
@@ -660,13 +660,21 @@ public class SYSConst {
     public static final Icon icon16user = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/user_active.png"));
     public static final Icon icon16userDel = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/delete_user.png"));
 
-    public static final Icon icon32reload0 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0.png"));
-    public static final Icon icon32reload1 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload1.png"));
-    public static final Icon icon32reload2 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload2.png"));
-    public static final Icon icon32reload3 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload3.png"));
-    public static final Icon icon32reload4 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload4.png"));
-    public static final Icon icon32reload5 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload5.png"));
-    public static final Icon icon32reload6 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload6.png"));
-    public static final Icon icon32reload7 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload7.png"));
-    
+    public static final Icon icon32reload0 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0000.png"));
+    public static final Icon icon32reload1 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0225.png"));
+    public static final Icon icon32reload2 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0450.png"));
+    public static final Icon icon32reload3 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0675.png"));
+    public static final Icon icon32reload4 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0900.png"));
+    public static final Icon icon32reload5 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload1125.png"));
+    public static final Icon icon32reload6 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload1350.png"));
+    public static final Icon icon32reload7 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload1575.png"));
+    public static final Icon icon32reload8 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload1800.png"));
+    public static final Icon icon32reload9 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload2025.png"));
+    public static final Icon icon32reload10 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload2250.png"));
+    public static final Icon icon32reload11 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload2475.png"));
+    public static final Icon icon32reload12 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload2700.png"));
+    public static final Icon icon32reload13 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload2925.png"));
+    public static final Icon icon32reload14 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload3150.png"));
+    public static final Icon icon32reload15 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload3375.png"));
+
 }

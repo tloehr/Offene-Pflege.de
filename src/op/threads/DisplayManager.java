@@ -4,7 +4,6 @@ import entity.files.SYSFilesTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.tools.FadingLabel;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -29,7 +28,7 @@ public class DisplayManager extends Thread {
     private boolean interrupted;
     private JProgressBar jp;
     private JLabel lblMain;
-    private FadingLabel lblSub;
+    private JLabel lblSub;
     private MessageQ messageQ;
     // a pair for the text and the value for the progressbar.
     private Pair<String, Integer> progressBarMessage;
@@ -42,9 +41,10 @@ public class DisplayManager extends Thread {
     private long step = 0;
     private int lastMinute;
     private long lastoperation; // used for the timeout function to automatically log out idle users
-    private boolean pbIsInUse; // for optimization. the jp.setString() was called a trillion times without any need.
+    private boolean pbIsInUse, pbTOIsInUse, sublabelIsInUse; // for optimization. the jp.setString() was called a trillion times without any need.
     private Icon[] reloading;
     private int currentAnimationFrameForReload = -1; // -1 means, no animation
+    final int timeoutmins;
 //    private int TIMEOUTMINS;
 
 //    private DateFormat df;
@@ -52,12 +52,26 @@ public class DisplayManager extends Thread {
     /**
      * Creates a new instance of HeapStat
      */
-    public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS, JPanel pnlIcons, JProgressBar pbTimeout, Closure timeoutAction) {
+    public DisplayManager(JProgressBar p, JLabel lblM, JLabel lblS, JPanel pnlIcons, JProgressBar pbTimeout, Closure timeoutAction) {
         super();
 
-        reloading = new Icon[]{SYSConst.icon32reload0, SYSConst.icon32reload1, SYSConst.icon32reload2, SYSConst.icon32reload3, SYSConst.icon32reload4, SYSConst.icon32reload5, SYSConst.icon32reload6, SYSConst.icon32reload7};
+        reloading = new Icon[]{SYSConst.icon32reload0, SYSConst.icon32reload1, SYSConst.icon32reload2, SYSConst.icon32reload3, SYSConst.icon32reload4,
+                SYSConst.icon32reload5, SYSConst.icon32reload6, SYSConst.icon32reload7,
+                SYSConst.icon32reload8, SYSConst.icon32reload9, SYSConst.icon32reload10,
+                SYSConst.icon32reload11, SYSConst.icon32reload12, SYSConst.icon32reload13,
+                SYSConst.icon32reload14, SYSConst.icon32reload15};
 
+        timeoutmins = OPDE.getTimeout();
         this.pbTimeout = pbTimeout;
+        if (timeoutmins == 0) {
+            pbTimeout.setValue(0);
+            pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.turned.off"));
+        }
+
+        sublabelIsInUse = false;
+        pbIsInUse = false;
+        pbTOIsInUse = false;
+
         progressBarMessage = new Pair<String, Integer>("", -1);
         this.timeoutAction = timeoutAction;
         setName("DisplayManager");
@@ -214,13 +228,13 @@ public class DisplayManager extends Thread {
         }
     }
 
-    public void setProgressBarMessage(String message, int percentage) {
-        synchronized (progressBarMessage) {
-            progressBarMessage.setFirst(message == null ? "" : message);
-            progressBarMessage.setSecond(percentage);
-            jp.setStringPainted(true);
-        }
-    }
+//    public void setProgressBarMessage(String message, int percentage) {
+//        synchronized (progressBarMessage) {
+//            progressBarMessage.setFirst(message == null ? "" : message);
+//            progressBarMessage.setSecond(percentage);
+//            jp.setStringPainted(true);
+//        }
+//    }
 //
 //    public synchronized void clearProgressBarMessage() {
 //        synchronized (progressBarMessage) {
@@ -253,26 +267,30 @@ public class DisplayManager extends Thread {
                 } else if (!messageQ.getHead().isProcessed()) {
                     messageQ.getHead().setProcessed();
                     lblSub.setText(SYSTools.toHTMLForScreen(messageQ.getHead().getMessage()));
+                    sublabelIsInUse = true;
                 } else if (messageQ.hasNextMessage() && messageQ.getNextMessage().isUrgent()) {
                     messageQ.next();
                 } else if (messageQ.getHead().isShowingTillReplacement() && messageQ.hasNextMessage()) {
                     messageQ.next();
                 }
-            } else {
+            } else if (sublabelIsInUse) {
                 lblSub.setText(null);
+                sublabelIsInUse = false;
             }
 
 
-            // Coloring
-            if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
-                jp.setForeground(Color.RED);
-                lblSub.setForeground(Color.RED);
-            } else if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.WARNING) {
-                jp.setForeground(SYSConst.darkorange);
-                lblSub.setForeground(SYSConst.darkorange);
-            } else {
-                lblSub.setForeground(defaultColor);
-                jp.setForeground(defaultColor);
+            if (sublabelIsInUse) {
+                // Coloring
+                if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
+                    jp.setForeground(Color.RED);
+                    lblSub.setForeground(Color.RED);
+                } else if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.WARNING) {
+                    jp.setForeground(SYSConst.darkorange);
+                    lblSub.setForeground(SYSConst.darkorange);
+                } else {
+                    lblSub.setForeground(defaultColor);
+                    jp.setForeground(defaultColor);
+                }
             }
         }
     }
@@ -295,11 +313,11 @@ public class DisplayManager extends Thread {
     private void processProgressBar() {
         synchronized (progressBarMessage) {
             if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
-//                if (progressBarMessage.getSecond() < 0) {
-//                    if (currentAnimationFrameForReload == -1) currentAnimationFrameForReload = 0;
-//                } else {
-//                    currentAnimationFrameForReload = -1;
-//                }
+                if (progressBarMessage.getSecond() < 0) {
+                    if (currentAnimationFrameForReload == -1) currentAnimationFrameForReload = 0;
+                } else {
+                    currentAnimationFrameForReload = -1;
+                }
                 if (progressBarMessage.getSecond() >= 0) {
                     jp.setValue(progressBarMessage.getSecond());
                 }
@@ -309,17 +327,21 @@ public class DisplayManager extends Thread {
 
                 if (progressBarMessage.getSecond() < 0 && pbIsInUse) {
 //                    jp.setIndeterminate(false);
+//                    currentAnimationFrameForReload = -1;
+                    OPDE.getMainframe().getBtnReload().setIcon(SYSConst.icon32reload0);
                     jp.setValue(0);
                     jp.setString(null);
                 }
 
                 if (jp.getValue() > 0) {
+
 //                    if (jp.isIndeterminate()) {
 //                        jp.setIndeterminate(false);
 //                    }
                     jp.setValue(0);
                     jp.setString(null);
                 }
+                currentAnimationFrameForReload = -1;
                 pbIsInUse = false;
             }
         }
@@ -350,20 +372,13 @@ public class DisplayManager extends Thread {
             try {
                 step++;
 
-//                lblMain.repaint();
-//                lblSub.repaint();
-
                 processProgressBar();
                 processSubMessage();
                 check4MaintenanceMode();
 
-                int timeoutmins = OPDE.getTimeout();
-                if (timeoutmins == 0) {
-                    pbTimeout.setValue(0);
-                    pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.turned.off"));
-                }
-                if (timeoutmins > 0) {
-                    pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.in") + " " + timeoutmins + " " + SYSTools.xx("misc.msg.Minute(s)"));
+
+                if (timeoutmins > 0 && step % 120 == 0) {
+//                    pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.in") + " " + timeoutmins + " " + SYSTools.xx("misc.msg.Minute(s)"));
                     // Timeout functions
                     if (OPDE.getLogin() != null) {
                         long timeoutPeriodInMillis = timeoutmins * 60 * 1000;
@@ -371,8 +386,12 @@ public class DisplayManager extends Thread {
                         long millisToGo = millisOfTimeout - System.currentTimeMillis();
                         pbTimeout.setMaximum(new BigDecimal(timeoutmins * 60).intValue());
                         pbTimeout.setValue(new BigDecimal(millisToGo / 1000).intValue());
+                        pbTOIsInUse = true;
                     } else {
-                        pbTimeout.setValue(0);
+                        if (pbTOIsInUse){
+                            pbTimeout.setValue(0);
+                            pbTOIsInUse = false;
+                        }
                     }
 
                     if (OPDE.getLogin() != null && System.currentTimeMillis() > lastoperation + (timeoutmins * 60 * 1000)) {
@@ -380,16 +399,15 @@ public class DisplayManager extends Thread {
                     }
                 }
 
-                // not yet
-//                if (step % 4 == 0 && currentAnimationFrameForReload >= 0) {
-//
-//                    if (currentAnimationFrameForReload > 7) {
-//                        currentAnimationFrameForReload = 0;
-//                    }
-//
-//                    OPDE.getMainframe().getBtnReload().setIcon(reloading[currentAnimationFrameForReload]);
-//                    currentAnimationFrameForReload++;
-//                }
+                if (currentAnimationFrameForReload >= 0 && step % 4 == 0) {
+
+                    if (currentAnimationFrameForReload > reloading.length - 1) {
+                        currentAnimationFrameForReload = 0;
+                    }
+
+                    OPDE.getMainframe().getBtnReload().setIcon(reloading[currentAnimationFrameForReload]);
+                    currentAnimationFrameForReload++;
+                }
 
                 Thread.sleep(50);
             } catch (InterruptedException ie) {

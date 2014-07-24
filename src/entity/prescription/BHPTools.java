@@ -583,8 +583,6 @@ public class BHPTools {
     }
 
 
-
-
     /**
      * @param date
      * @return
@@ -729,7 +727,15 @@ public class BHPTools {
         if (!list.isEmpty()) {
 
             BHP b1 = list.get(0);
-            result += SYSConst.html_h3((b1.isOnDemand() ? SYSTools.xx("nursingrecords.bhp.ondemand") : SYSTools.xx(SHIFT_TEXT[b1.getShift()])));
+
+
+            if (b1.isOnDemand()) {
+                result += SYSConst.html_h2("nursingrecords.bhp.ondemand");
+            } else if (b1.isOutcomeText()) {
+                result += SYSConst.html_h2("nursingrecords.bhp.outcome");
+            } else {
+                result += SYSConst.html_h2(SHIFT_TEXT[b1.getShift()]);
+            }
 
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
@@ -744,6 +750,10 @@ public class BHPTools {
                                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                                 BHPTools.getScheduleText(bhp, ", ", "") +
                                 (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "");
+
+                if (bhp.isOutcomeText() && bhp.getState() == BHPTools.STATE_DONE) {
+                    text += "\n" + SYSConst.html_paragraph(bhp.getText());
+                }
 
 
                 result += "<tr>";

@@ -8,7 +8,9 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.staff.Training;
+import entity.staff.Training2Users;
 import entity.staff.TrainingTools;
+import entity.system.Commontags;
 import op.OPDE;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -87,7 +89,47 @@ public class PnlTrainingEditor extends JPanel {
         txtDocent.setText(training.getDocent());
         txtText.setText(training.getText());
 
-        add(new PnlCommonTags(training.getCommontags(), true), CC.xywh(1, 15,9, 1));
+        add(new PnlCommonTags(training.getCommontags(), new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o == null) return;
+                EntityManager em = OPDE.createEM();
+
+                try {
+                    em.getTransaction().begin();
+
+                    Commontags commontag = em.merge((Commontags) o);
+                    Training myTraining = em.merge(training);
+                    em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                    if(myTraining.getCommontags().contains(commontag)){
+                        myTraining.getCommontags().remove(commontag);
+                    } else {
+                        myTraining.getCommontags().add(commontag);
+                    }
+
+                    em.getTransaction().commit();
+
+                    editAction.execute(myTraining);
+
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    editAction.execute(null);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
+                }
+            }
+        }), CC.xywh(1, 13, 9, 1));
 
 
         Closure afterUserlistEdited = editAction != null ? new Closure() {
@@ -102,7 +144,7 @@ public class PnlTrainingEditor extends JPanel {
             }
         } : null;
         pnlUserlistEditor = new PnlUserlistEditor(training, afterUserlistEdited);
-        add(pnlUserlistEditor, CC.xywh(1, 19, 9, 1));
+        add(pnlUserlistEditor, CC.xywh(1, 17, 9, 1));
 
         jdcStarting.addPropertyChangeListener("date", new PropertyChangeListener() {
             @Override
@@ -162,37 +204,37 @@ public class PnlTrainingEditor extends JPanel {
 //        txtTimeStarting.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 
 //        if (e.getStateChange() != ItemEvent.SELECTED) {
-            EntityManager em = OPDE.createEM();
+        EntityManager em = OPDE.createEM();
 
-            try {
+        try {
 
-                LocalDate localDate = new LocalDate(training.getStarting());
-                DateTime newPit = e.getStateChange() == ItemEvent.SELECTED ? localDate.toDateTimeAtCurrentTime() : localDate.toDateTimeAtStartOfDay();
+            LocalDate localDate = new LocalDate(training.getStarting());
+            DateTime newPit = e.getStateChange() == ItemEvent.SELECTED ? localDate.toDateTimeAtCurrentTime() : localDate.toDateTimeAtStartOfDay();
 
-                em.getTransaction().begin();
-                Training myTraining = em.merge(training);
-                em.lock(myTraining, LockModeType.OPTIMISTIC);
-                myTraining.setStarting(newPit.toDate());
-                em.getTransaction().commit();
+            em.getTransaction().begin();
+            Training myTraining = em.merge(training);
+            em.lock(myTraining, LockModeType.OPTIMISTIC);
+            myTraining.setStarting(newPit.toDate());
+            em.getTransaction().commit();
 
-                editAction.execute(myTraining);
+            editAction.execute(myTraining);
 
-            } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
-                OPDE.warn(ole);
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                editAction.execute(null);
-            } catch (Exception ex) {
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                OPDE.fatal(ex);
-            } finally {
-                em.close();
+        } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
+            OPDE.warn(ole);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
             }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            editAction.execute(null);
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
 //        }
 
     }
@@ -388,8 +430,8 @@ public class PnlTrainingEditor extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "pref, $lcgap, default, 2*($lcgap, pref), $lcgap, default:grow",
-            "$lcgap, 6*($lgap, default), $lgap, fill:30dlu, $lgap, default, $lgap, fill:default:grow"));
+                "pref, $lcgap, default, 2*($lcgap, pref), $lcgap, default:grow",
+                "$lcgap, 5*($lgap, default), $lgap, fill:30dlu, $lgap, default, $lgap, fill:default:grow"));
 
         //---- lblTitle ----
         lblTitle.setText("text");
@@ -480,12 +522,12 @@ public class PnlTrainingEditor extends JPanel {
         //---- lblTags ----
         lblTags.setText("text");
         lblTags.setFont(new Font("Arial", Font.PLAIN, 10));
-        add(lblTags, CC.xywh(1, 13, 7, 1, CC.DEFAULT, CC.TOP));
+        add(lblTags, CC.xywh(1, 11, 7, 1, CC.DEFAULT, CC.TOP));
 
         //---- lblAttendees ----
         lblAttendees.setText("text");
         lblAttendees.setFont(new Font("Arial", Font.PLAIN, 10));
-        add(lblAttendees, CC.xywh(1, 17, 7, 1, CC.DEFAULT, CC.TOP));
+        add(lblAttendees, CC.xywh(1, 15, 7, 1, CC.DEFAULT, CC.TOP));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 

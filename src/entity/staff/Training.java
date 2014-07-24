@@ -124,6 +124,9 @@ public class Training {
     public Training() {
         commontags = new ArrayList<>();
         state = TrainingTools.STATE_INTERNAL;
+        title = SYSTools.xx("opde.training.standard.title");
+        docent = SYSTools.xx("opde.training.standard.docent");
+        starting = new Date();
     }
 
     @Override

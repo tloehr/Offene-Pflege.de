@@ -120,7 +120,7 @@
         <class name="opde.users" short="opde.users.appinfo.short"
                long="opde.users.appinfo.long" main="true"
                javaclass="op.users.PnlUser" icon="usergroup.png">
-            <execute langbundle="opde.medication.acl.execute"/>
+            <execute langbundle="opde.users.acl.execute"/>
         </class>
         <class name="nursingrecords.handover" short="nursingrecords.handover.appinfo.short"
                long="nursingrecords.handover.appinfo.long" main="true"

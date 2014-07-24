@@ -9,6 +9,7 @@ import com.jidesoft.swing.SelectAllUtils;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import op.OPDE;
+import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -33,6 +34,7 @@ public class PnlCommonTags extends JPanel {
     JTextField txtTags;
     AutoCompletion ac;
 
+    private Closure editAction;
     int MAXLINE = 8;
 
     public PnlCommonTags(Collection<Commontags> listSelectedTags) {
@@ -44,8 +46,16 @@ public class PnlCommonTags extends JPanel {
         MAXLINE = maxline;
     }
 
+    public PnlCommonTags(Collection<Commontags> listSelectedTags, Closure editAction) {
+        this(listSelectedTags, editAction != null);
+        this.editAction = editAction;
+
+    }
+
     public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode) {
+        editAction = null;
         this.editmode = editmode;
+
         setLayout(new RiverLayout(10, 5));
 
         this.listSelectedTags = new HashSet<>(listSelectedTags);
@@ -109,7 +119,7 @@ public class PnlCommonTags extends JPanel {
         if (txtTags.getText().isEmpty()) return;
         if (txtTags.getText().length() > 100) return;
 
-        final String enteredText = SYSTools.tidy(txtTags.getText());
+        final String enteredText = SYSTools.tidy(txtTags.getText()).toLowerCase();
 
         if (!mapAllTags.containsKey(enteredText)) {
             Commontags myNewCommontag = new Commontags(SYSTools.tidy(enteredText));
@@ -120,25 +130,32 @@ public class PnlCommonTags extends JPanel {
             ac.setStrictCompletion(false);
         }
 
+
         if (!listSelectedTags.contains(mapAllTags.get(enteredText))) {
-            listSelectedTags.add(mapAllTags.get(enteredText));
+            if (editAction != null) {
+                ac.uninstallListeners();
+                editAction.execute(mapAllTags.get(enteredText));
+            } else {
+                listSelectedTags.add(mapAllTags.get(enteredText));
 
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
 
-                    if (listSelectedTags.size() % MAXLINE == 0) {
-                        add(createButton(mapAllTags.get(enteredText)), RiverLayout.LINE_BREAK);
-                    } else {
-                        add(createButton(mapAllTags.get(enteredText)), RiverLayout.LEFT);
+                        if (listSelectedTags.size() % MAXLINE == 0) {
+                            add(createButton(mapAllTags.get(enteredText)), RiverLayout.LINE_BREAK);
+                        } else {
+                            add(createButton(mapAllTags.get(enteredText)), RiverLayout.LEFT);
+                        }
+
+                        txtTags.setText("");
+                        revalidate();
+                        repaint();
                     }
-
-                    txtTags.setText("");
-                    revalidate();
-                    repaint();
-                }
-            });
+                });
+            }
         }
+
     }
 
 
@@ -153,38 +170,44 @@ public class PnlCommonTags extends JPanel {
         jButton.setFont(SYSConst.ARIAL12);
         jButton.setBorder(new RoundedBorder(10));
         jButton.setHorizontalTextPosition(SwingConstants.LEADING);
-//        jButton.setMargin(new Insets(2, 2, 2, 2));
-        jButton.setForeground(SYSConst.purple1[SYSConst.dark1]);
+        jButton.setForeground(SYSConst.purple1[SYSConst.dark3]);
 
         if (editmode) {
 
             jButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    listSelectedTags.remove(commontag);
-                    mapButtons.remove(commontag);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            removeAll();
 
-                            add(txtTags);
-                            int tagnum = 1;
+                    if (editAction != null) {
+                        ac.uninstallListeners();
+                        editAction.execute(commontag);
+                    } else {
 
-                            for (JButton btn : mapButtons.values()) {
-                                if (tagnum % MAXLINE == 0) {
-                                    add(btn, RiverLayout.LINE_BREAK);
-                                } else {
-                                    add(btn, RiverLayout.LEFT);
+                        listSelectedTags.remove(commontag);
+                        mapButtons.remove(commontag);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                removeAll();
+
+                                add(txtTags);
+                                int tagnum = 1;
+
+                                for (JButton btn : mapButtons.values()) {
+                                    if (tagnum % MAXLINE == 0) {
+                                        add(btn, RiverLayout.LINE_BREAK);
+                                    } else {
+                                        add(btn, RiverLayout.LEFT);
+                                    }
+                                    tagnum++;
                                 }
-                                tagnum++;
-                            }
 
-                            remove(jButton);
-                            revalidate();
-                            repaint();
-                        }
-                    });
+                                remove(jButton);
+                                revalidate();
+                                repaint();
+                            }
+                        });
+                    }
                 }
             });
         }
@@ -192,18 +215,6 @@ public class PnlCommonTags extends JPanel {
 
         return jButton;
     }
-
-
-//    public static JButton createFilterButton(final Commontags commontag, ActionListener al) {
-//
-//
-//        jButton.setFont(SYSConst.ARIAL12);
-//        jButton.setBorder(new RoundedBorder(10));
-//        jButton.setHorizontalTextPosition(SwingConstants.LEADING);
-//        jButton.setForeground(SYSConst.purple1[SYSConst.medium4]);
-//
-//        return jButton;
-//    }
 
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

@@ -10,6 +10,7 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
 import entity.staff.Training;
 import entity.staff.Training2Users;
 import entity.staff.TrainingTools;
@@ -226,7 +227,7 @@ public class PnlTraining extends CleanablePanel {
 
         String title = "<font size=+1><b>" +
                 training.getTitle() + ", [" +
-                (withTime ? starting.toString("EEE, dd.MM.yy  HH:mm") : starting.toString("EEE, dd.MM.yy") ) +
+                (withTime ? starting.toString("EEE, dd.MM.yy  HH:mm") : starting.toString("EEE, dd.MM.yy")) +
                 "]</b></font><p>";
 
         for (Commontags ctag : training.getCommontags()) {
@@ -606,63 +607,59 @@ public class PnlTraining extends CleanablePanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-//        /***
-//         *      _   _
-//         *     | \ | | _____      __
-//         *     |  \| |/ _ \ \ /\ / /
-//         *     | |\  |  __/\ V  V /
-//         *     |_| \_|\___| \_/\_/
-//         *
-//         */
-//        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-//            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    new DlgTraining(new Training(), new Closure() {
-//                        @Override
-//                        public void execute(Object training) {
-//                            if (training != null) {
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//                                    final Training myTraining = (Training) em.merge(training);
-//                                    em.getTransaction().commit();
-//
-//                                    final String keyYear = Integer.toString(new DateTime(myTraining.getStarting()).getYear()) + ".year";
-//
-//                                    if (!cpMap.containsKey(keyYear)) {
-//                                        reload();
-//                                    } else {
-//                                        filterTag = null;
-//                                        createCP4(TrainingTools.getTrainings4(new LocalDate(myTraining.getStarting()).getYear(), filterTag));
-//                                        buildPanel();
-//                                    }
-//                                } catch (OptimisticLockException ole) {
-//                                    OPDE.warn(ole);
-//                                    if (em.getTransaction().isActive()) {
-//                                        em.getTransaction().rollback();
-//                                    }
-//                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-//                                        OPDE.getMainframe().emptyFrame();
-//                                        OPDE.getMainframe().afterLogin();
-//                                    } else {
-//                                        reload();
-//                                    }
-//                                } catch (Exception e) {
-//                                    if (em.getTransaction().isActive()) {
-//                                        em.getTransaction().rollback();
-//                                    }
-//                                    OPDE.fatal(e);
-//                                } finally {
-//                                    em.close();
-//                                }
-//                            }
+        /***
+         *      _   _
+         *     | \ | | _____      __
+         *     |  \| |/ _ \ \ /\ / /
+         *     | |\  |  __/\ V  V /
+         *     |_| \_|\___| \_/\_/
+         *
+         */
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        final Training myTraining = em.merge(new Training());
+                        em.getTransaction().commit();
+
+                        final String keyYear = Integer.toString(new DateTime(myTraining.getStarting()).getYear()) + ".year";
+
+                        reload();
+
+//                        if (!cpMap.containsKey(keyYear)) {
+//                            reload();
+//                        } else {
+//                            filterTag = null;
+//                            createCP4(TrainingTools.getTrainings4(new LocalDate(myTraining.getStarting()).getYear(), filterTag));
+//                            buildPanel();
 //                        }
-//                    });
-//                }
-//            });
-//            list.add(addButton);
-//        }
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        } else {
+                            reload();
+                        }
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                }
+            });
+            list.add(addButton);
+        }
         return list;
     }
 

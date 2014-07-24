@@ -5,7 +5,7 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 			"$columnSpecs": "pref, labelcompgap, default, labelcompgap, pref, labelcompgap, pref, labelcompgap, default:grow"
-			"$rowSpecs": "labelcompgap, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:30dlu, linegap, default, linegap, fill:default:grow"
+			"$rowSpecs": "labelcompgap, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:30dlu, linegap, default, linegap, fill:default:grow"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JLabel" ) {
@@ -110,7 +110,7 @@ new FormModel {
 				"text": "text"
 				"font": new java.awt.Font( "Arial", 0, 10 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 13
+				"gridY": 11
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
 				"gridWidth": 7
 			} )
@@ -119,7 +119,7 @@ new FormModel {
 				"text": "text"
 				"font": new java.awt.Font( "Arial", 0, 10 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 17
+				"gridY": 15
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
 				"gridWidth": 7
 			} )

@@ -35,6 +35,7 @@ import com.jidesoft.status.LabelStatusBarItem;
 import com.jidesoft.status.MemoryStatusBarItem;
 import com.jidesoft.status.StatusBar;
 import com.jidesoft.status.TimeStatusBarItem;
+import com.jidesoft.swing.*;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
@@ -384,7 +385,7 @@ public class FrmMain extends JFrame {
         pnlIcons = new JPanel();
         lblMainMsg = new JLabel();
         btnExit = new JButton();
-        lblSubMsg = new FadingLabel();
+        lblSubMsg = new JideLabel();
         btnHelp = new JButton();
         pbMsg = new JProgressBar();
         btnReload = new JButton();
@@ -507,7 +508,7 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.add(pbMsg, CC.xy(5, 7, CC.FILL, CC.FILL));
 
                 //---- btnReload ----
-                btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload0.png")));
+                btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload0000.png")));
                 btnReload.setBorder(null);
                 btnReload.setBorderPainted(false);
                 btnReload.setOpaque(false);
@@ -968,7 +969,7 @@ public class FrmMain extends JFrame {
     private JPanel pnlIcons;
     private JLabel lblMainMsg;
     private JButton btnExit;
-    private FadingLabel lblSubMsg;
+    private JideLabel lblSubMsg;
     private JButton btnHelp;
     private JProgressBar pbMsg;
     private JButton btnReload;

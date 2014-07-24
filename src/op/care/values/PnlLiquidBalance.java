@@ -313,11 +313,11 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             if (highIn != null || lowIn != null) {
                 String evaluation = "";
                 if (lowIn != null && liquidin.compareTo(lowIn) < 0) {
-                    evaluation = SYSConst.html_color(Color.blue, SYSConst.html_bold("&darr;"));
-                } else if (highIn != null && liquidin.compareTo(targetIn) > 0) {
-                    evaluation = SYSConst.html_color(Color.red, SYSConst.html_bold("&uarr;"));
+                    evaluation = SYSConst.html_color(Color.blue, SYSConst.html_bold("misc.msg.too.less"));
+                } else if (highIn != null && liquidin.compareTo(highIn) > 0) {
+                    evaluation = SYSConst.html_color(Color.red, SYSConst.html_bold("misc.msg.too.much"));
                 } else {
-                    evaluation = SYSConst.html_color(Color.green, SYSConst.html_bold("ok"));
+                    evaluation = SYSConst.html_color(Color.green.darker(), SYSConst.html_bold("misc.msg.ok"));
                 }
                 line.add(evaluation);
             }
