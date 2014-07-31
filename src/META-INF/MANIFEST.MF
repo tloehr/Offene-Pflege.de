@@ -1,19 +1,20 @@
 Manifest-Version: 1.0
-Class-Path: commons-lang3-3.1.jar jgoodies-common-1.6.0.jar commons-io
- -2.4.jar jgoodies-looks-2.5.3.jar jgoodies-validation-2.5.0.jar jgood
- ies-binding-2.9.1.jar eclipselink.jar javax.persistence_2.0.4.v201112
- 200901.jar commons-digester3-3.2.jar swingx-beaninfo-1.6.2.jar swingx
- -core-1.6.2.jar jgoodies-forms-1.7.1.jar itext-pdfa-5.4.3.jar itext-x
- tra-5.4.3.jar itextpdf-5.4.3.jar mail.jar dsn.jar gimap.jar mailapi.j
- ar imap.jar pop3.jar smtp.jar joda-time-2.3.jar resolver.jar xml-apis
- .jar serializer.jar xercesImpl.jar jgoodies-animation-1.4.3.jar jide-
- common.jar jide-components.jar jide-dialogs.jar jide-grids.jar jide-p
- laf-jdk7.jar jide-plaf.jar mysql-connector-java-5.1.26-bin.jar looks-
- 2.0.1.jar jcalendar-1.3.3.jar commons-collections-3.2.1.jar commons-c
- ollections-3.2.1-javadoc.jar commons-collections-3.2.1-sources.jar co
- mmons-collections-testframework-3.2.1.jar commons-cli-1.2.jar commons
- -beanutils-core-1.8.3.jar commons-beanutils-1.8.3.jar commons-beanuti
- ls-bean-collections-1.8.3.jar log4j-1.2.17.jar edtftpj.jar timingfram
- ework-swing-4.1.jar
+Class-Path: commons-cli-1.2.jar jgoodies-binding-2.9.1.jar joda-time-2
+ .3.jar commons-collections-3.2.1.jar commons-collections-3.2.1-javado
+ c.jar commons-collections-3.2.1-sources.jar commons-collections-testf
+ ramework-3.2.1.jar scala-library.jar scala-reflect.jar jgoodies-forms
+ -1.7.1.jar timingframework-swing-4.1.jar eclipselink.jar javax.persis
+ tence_2.1.0.v201304241213.jar log4j-1.2.17.jar poi-3.9-20121203.jar c
+ ommons-beanutils-core-1.8.3.jar commons-beanutils-1.8.3.jar commons-b
+ eanutils-bean-collections-1.8.3.jar jgoodies-common-1.6.0.jar mail.ja
+ r dsn.jar gimap.jar mailapi.jar imap.jar pop3.jar smtp.jar commons-io
+ -2.4.jar swingx-beaninfo-1.6.2.jar swingx-core-1.6.2.jar edtftpj.jar 
+ jide-common.jar jide-components.jar jide-dialogs.jar jide-grids.jar j
+ ide-plaf-jdk7.jar jide-plaf.jar itext-pdfa-5.4.3.jar itext-xtra-5.4.3
+ .jar itextpdf-5.4.3.jar commons-lang3-3.1.jar mysql-connector-java-5.
+ 1.31-bin.jar jgoodies-animation-1.4.3.jar jgoodies-looks-2.5.3.jar co
+ mmons-digester3-3.2.jar lamma_2.11-1.1.3.jar jgoodies-validation-2.5.
+ 0.jar resolver.jar xml-apis.jar serializer.jar xercesImpl.jar looks-2
+ .0.1.jar jcalendar-1.3.3.jar
 Main-Class: op.OPDE
 

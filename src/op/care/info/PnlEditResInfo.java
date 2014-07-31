@@ -2,6 +2,7 @@ package op.care.info;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextArea;
 import entity.EntityTools;
@@ -118,21 +119,68 @@ public class PnlEditResInfo {
     public void addInfoButtons(JPanel pnl, String tooltip, String tx) {
         if (tooltip == null && tx == null) return;
 
-        if (tooltip != null) {
-            JLabel ttip = new JLabel(SYSConst.icon16info);
-            ttip.setBorder(null);
+        final JTextPane txt = new JTextPane();
+        txt.setContentType("text/html");
+        txt.setEditable(false);
 
+        final JidePopup popupInfo = new JidePopup();
+        popupInfo.setMovable(false);
+
+        JScrollPane scrl = new JScrollPane(txt);
+        scrl.setMaximumSize(new Dimension(550, 300));
+
+        popupInfo.setContentPane(scrl);
+        popupInfo.removeExcludedComponent(txt);
+        popupInfo.setDefaultFocusComponent(txt);
+
+
+        if (tooltip != null) {
             tooltip = tooltip.replace('[', '<').replace(']', '>');
-            ttip.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
+
+            if (tooltip.indexOf("<p>") < 0 && tooltip.indexOf("<li>") < 0) {
+                tooltip = "<p>" + tooltip + "</p>";
+            }
+
+            tooltip = tooltip.replace("<p>", "<p style=\"width:300px;\">");
+            tooltip = tooltip.replace("<li>", "<li style=\"width:300px;\">");
+
+
+            final JButton ttip = GUITools.getTinyButton(SYSTools.toHTMLForScreen(tooltip), SYSConst.icon16info);
+            txt.setText(SYSTools.toHTMLForScreen(tooltip));
+
+            ttip.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    popupInfo.setOwner(ttip);
+                    GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+                }
+            });
             pnl.add("left", ttip);
         }
 
         if (tx != null) {
-            JLabel btntx = new JLabel(SYSConst.icon16ambulance);
-            btntx.setBorder(null);
 
             tx = tx.replace('[', '<').replace(']', '>');
-            btntx.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tx + "</p>"));
+
+            if (tx.indexOf("<p>") < 0 && tx.indexOf("<li>") < 0) {
+                tx = "<p>" + tx + "</p>";
+            }
+
+            tx = tx.replace("<p>", "<p style=\"width:300px;\">");
+            tx = tx.replace("<li>", "<li style=\"width:300px;\">");
+
+            final JButton btntx = GUITools.getTinyButton(SYSTools.toHTMLForScreen(tx), SYSConst.icon16ambulance);
+            txt.setText(SYSTools.toHTMLForScreen(tx));
+
+            btntx.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    popupInfo.setOwner(btntx);
+                    GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+                }
+            });
+
+
             pnl.add("left", btntx);
         }
 
@@ -208,7 +256,7 @@ public class PnlEditResInfo {
             lblComment.setForeground(Color.LIGHT_GRAY);
             lblComment.setFont(SYSConst.ARIAL18BOLD);
             ovrComment.addOverlayComponent(lblComment, DefaultOverlayable.SOUTH_EAST);
-            if (resInfo.getResValue() != null) {
+            if (resInfo != null && resInfo.getResValue() != null) {
                 pnlContent.add(new JLabel(SYSTools.xx("nursingrecords.info.dlg.will.create.value")), BorderLayout.NORTH);
             }
             pnlContent.add(h.getPanel(), BorderLayout.CENTER);

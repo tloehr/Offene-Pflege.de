@@ -981,6 +981,8 @@ public class PnlInformation extends NursingRecordsPanel {
 //                                    mapInfo2Editor.get(resInfo).getResInfo()
                                         em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                         // so that no conflicts can occur if another user enters a new info at the same time
+                                        // todo: leave it for now. BUT this must be changed. You will also conflict with ANY other info for any other resident. You will need an auxiliary locking table like (id, rid, BWINFTYP, VERSION) and lock the records there.
+                                        //
                                         em.lock(em.merge(resInfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                         em.lock(oldinfo, LockModeType.OPTIMISTIC);
 
