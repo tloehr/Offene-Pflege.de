@@ -39,6 +39,7 @@ public class DlgValue extends MyJDialog {
         this.afterAction = afterAction;
         initComponents();
         initPanel();
+        setTitle(resValue.getType().getText());
         setVisible(true);
 
     }
@@ -49,8 +50,6 @@ public class DlgValue extends MyJDialog {
             pnlPIT = new PnlPIT(resValue.getPit(), editMode == MODE_NEW);
             panel2.add(pnlPIT);
         }
-
-
 
         lblWert1.setVisible(resValue.getVal1() != null);
         txtWert1.setVisible(resValue.getVal1() != null);

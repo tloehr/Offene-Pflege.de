@@ -80,17 +80,17 @@
             <delete langbundle="nursingrecords.files.acl.delete"/>
         </class>
         <class name="nursingrecords.reports" short="nursingrecords.reports.appinfo.short"
-               long="nursingrecords.reports.appinfo.long" helpurl="nursingrecords.nursingprocess.appinfo.helpurl">
+               long="nursingrecords.reports.appinfo.long" helpurl="nursingrecords.reports.appinfo.helpurl">
             <print langbundle="nursingrecords.reports.acl.print"/>
             <update langbundle="nursingrecords.reports.acl.update"/>
         </class>
         <class name="nursingrecords.vitalparameters" short="nursingrecords.vitalparameters.appinfo.short"
-               long="nursingrecords.vitalparameters.appinfo.long">
+               long="nursingrecords.vitalparameters.appinfo.long" helpurl="nursingrecords.vitalparameters.appinfo.helpurl">
             <print langbundle="nursingrecords.vitalparameters.acl.print"/>
             <update langbundle="nursingrecords.vitalparameters.acl.update"/>
         </class>
         <class name="nursingrecords.liquidbalances" short="nursingrecords.liquidbalances.appinfo.short"
-               long="nursingrecords.liquidbalances.appinfo.long">
+               long="nursingrecords.liquidbalances.appinfo.long" helpurl="nursingrecords.liquidbalances.appinfo.helpurl">
         </class>
         <class name="nursingrecords.bhp" short="nursingrecords.bhp.appinfo.short" long="nursingrecords.bhp.appinfo.long"
                helpurl="nursingrecords.bhp.appinfo.helpurl">

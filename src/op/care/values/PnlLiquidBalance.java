@@ -16,10 +16,12 @@ import entity.files.SYSVAL2FILE;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.SYSVAL2PROCESS;
+import entity.system.UsersTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypes;
 import entity.values.ResValueTypesTools;
+import netscape.security.UserTarget;
 import op.OPDE;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -402,7 +404,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             data[row][0] = df.format(val.getPit());
             data[row][1] = nf.format(val.getVal1());
             data[row][2] = val.getText();
-            data[row][3] = val.getUser().getUID();
+            data[row][3] = SYSTools.anonymizeUser(val.getUser().getUID());
             data[row][4] = SYSConst.icon22delete;
             row++;
         }
