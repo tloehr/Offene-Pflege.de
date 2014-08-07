@@ -120,6 +120,8 @@ public class FrmMain extends JFrame {
         initPhase = true;
         initComponents();
 
+        pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
+
 //        pbTimeout.setToolTipText(SYSTools.xx("opde.mainframe.pbTimeout.tooltip"));
         // for the timeout function
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
@@ -211,7 +213,6 @@ public class FrmMain extends JFrame {
         displayManager.clearAllMessages();
 
         emptySearchArea();
-
     }
 
     public void emptySearchArea() {
@@ -417,16 +418,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, 3dlu, $nlgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, 3dlu, $nlgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -941,7 +942,6 @@ public class FrmMain extends JFrame {
         System.gc();
         cleanup();
         SYSTools.checkForSoftwareupdates();
-
     }
 
     /**

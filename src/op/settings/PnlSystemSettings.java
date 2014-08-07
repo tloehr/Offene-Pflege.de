@@ -1015,13 +1015,13 @@ public class PnlSystemSettings extends CleanablePanel {
         Properties ftpprops = getFTPProps();
         try {
             FileTransferClient ftp = SYSFilesTools.getFTPClient(ftpprops);
-            File file = new File(System.getProperty("user.home") + File.separator + "opdestart.jar");
+            File file = new File(OPDE.getOPWD() + File.separator + "opdestart.jar");
             String md5a = SYSTools.getMD5Checksum(file);
             ftp.uploadFile(file.getPath(), "ftptest.file");
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.ftp.msg.upload", 1));
-            ftp.downloadFile(System.getProperty("user.home") + File.separator + "ftptest.file", "ftptest.file");
+            ftp.downloadFile(OPDE.getOPWD() + File.separator + "ftptest.file", "ftptest.file");
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.ftp.msg.download", 1));
-            File file2 = new File(System.getProperty("user.home") + File.separator + "ftptest.file");
+            File file2 = new File(OPDE.getOPWD() + File.separator + "ftptest.file");
             String md5b = SYSTools.getMD5Checksum(file2);
             if (md5b.equalsIgnoreCase(md5a)) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.ftp.msg.files.equal", 1));

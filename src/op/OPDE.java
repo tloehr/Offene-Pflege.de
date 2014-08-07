@@ -264,6 +264,7 @@ public class OPDE {
     /**
      * returns the minutes until the system timeouts the current login automatically when no user action is detected.
      * if the timeout value is 0, no timeout is performed.
+     *
      * @return
      */
     public static int getTimeout() {
@@ -278,7 +279,7 @@ public class OPDE {
         return timeout;
     }
 
-    public static void setTimeout(int timeout){
+    public static void setTimeout(int timeout) {
         localProps.setProperty("timeout", Integer.toString(timeout));
         saveLocalProps();
     }
@@ -411,6 +412,7 @@ public class OPDE {
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
         opts.addOption("x", "experimental", false, "Schaltet experimentelle Programm-Module für User frei, die Admin Rechte haben. VORSICHT !!!!");
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
+        opts.addOption("w", "workingdir", true, "Damit kannst Du ein anderes Arbeitsverzeichnis setzen. Wenn Du diese Option weglässt, dann ist das Dein Benutzerverzeichnis: " + System.getProperty("user.home"));
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
         Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(lang.getString("cmdline.ftpserver")).create("f");
         opts.addOption(optFTPserver);
@@ -466,7 +468,16 @@ public class OPDE {
             System.exit(0);
         }
 
-        opwd = System.getProperty("user.home") + sep + AppInfo.dirBase;
+
+        String homedir = System.getProperty("user.home");
+        // alternatice working dir
+        if (cl.hasOption("w")) {
+            File dir = new File(cl.getOptionValue("w"));
+            if (dir.exists() && dir.isDirectory()) {
+                homedir = dir.getAbsolutePath();
+            }
+        }
+        opwd = homedir + sep + AppInfo.dirBase;
 
         /***
          *                                                                ___

@@ -60,7 +60,7 @@
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>0dlu, linegap, pref, linegap, fill:11dlu, linegap, pref, linegap, 0dlu</string> 
+            <string>0dlu, linegap, 15dlu, linegap, fill:11dlu, linegap, pref, linegap, 0dlu</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -769,3 +769,4 @@
   </void> 
  </object> 
 </java> 
+

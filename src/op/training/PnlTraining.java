@@ -371,6 +371,7 @@ public class PnlTraining extends CleanablePanel {
                     final String key = editedTraining.getId() + ".trainid";
                     trainingMap.put(key, editedTraining);
                     createCP4(editedTraining);
+                    prepareSearchArea();
                 }
             }
         } : null;
@@ -403,8 +404,14 @@ public class PnlTraining extends CleanablePanel {
 
     private void prepareSearchArea() {
 
-        searchPanes = new CollapsiblePanes();
-        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        if (searchPanes != null) {
+            searchPanes.removeAll();
+        } else {
+            searchPanes = new CollapsiblePanes();
+            searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        }
+
+
         jspSearch.setViewportView(searchPanes);
 
         JPanel mypanel = new JPanel();
