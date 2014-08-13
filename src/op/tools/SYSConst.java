@@ -86,6 +86,11 @@ public class SYSConst {
     public static String html_16x16_Eraser = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/eraser.png\" border=\"0\">";
     public static String html_16x16_Edited = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/edited.png\" border=\"0\">";
     public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
+
+    public static String html_16x16_apply = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/apply.png\" border=\"0\">";
+    public static String html_16x16_cancel = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/cancel.png\" border=\"0\">";
+    public static String html_16x16_empty = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/empty.png\" border=\"0\">";
+
     public static String html_16x16_tagPurple_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/tag_purple.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Eraser_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/eraser.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Edited_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/edited.png").toString() + "\" border=\"0\">";
@@ -337,6 +342,11 @@ public class SYSConst {
     public static String html_h3(String content) {
         return "<h3 id=\"fonth3\" >" + SYSTools.xx(content) + "</h3>\n";
     }
+
+
+    public static String html_h4(String content) {
+            return "<h4 id=\"fontsmall\">" + SYSTools.xx(content) + "</h4>\n";
+        }
 
     public static String html_table(String content, String border) {
         return "<table id=\"fonttext\" border=\"" + border + "\">" + SYSTools.xx(content) + "</table>\n";

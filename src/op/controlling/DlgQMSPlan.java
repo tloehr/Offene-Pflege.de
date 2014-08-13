@@ -80,7 +80,7 @@ public class DlgQMSPlan extends MyJDialog {
 
         lblTitle.setText(SYSTools.xx("misc.msg.title"));
         lblDescription.setText(SYSTools.xx("misc.msg.description"));
-        lblTags.setText(SYSTools.xx("misc.msg.tags"));
+        lblTags.setText(SYSTools.xx("misc.msg.commontags"));
         lblNotify.setText(SYSTools.xx("misc.msg.notification.list"));
 
         txtTitle.setText(qmsplan.getTitle());

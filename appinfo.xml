@@ -23,6 +23,7 @@
             <execute langbundle="opde.controlling.acl.execute"/>
             <update langbundle="opde.controlling.acl.update"/>
             <delete langbundle="opde.controlling.acl.delete"/>
+            <manager langbundle="opde.controlling.acl.manager"/>
         </class>
         <class name="opde.training" short="opde.training.appinfo.short"
                long="opde.training.appinfo.long"
@@ -31,6 +32,7 @@
             <execute langbundle="appinfo.default.acl.execute"/>
             <update langbundle="opde.training.acl.update"/>
             <delete langbundle="opde.training.acl.delete"/>
+            <print langbundle="opde.training.acl.print"/>
         </class>
         <class name="opde.systemsettings" short="opde.systemsettings.appinfo.short"
                long="opde.systemsettings.appinfo.long" main="true"

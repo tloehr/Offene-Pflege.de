@@ -188,8 +188,8 @@ public class PnlUserlistEditor extends JPanel {
 
         final JPanel pnlButton = new JPanel();
         pnlButton.setBorder(new EmptyBorder(0, 0, 0, 10));
-        pnlButton.setToolTipText(training2Users.getAttendee().getFullname() + "; " + DateFormat.getDateInstance(DateFormat.SHORT).format(training2Users.getPit()));
-        pnlButton.add(new JLabel(training2Users.getAttendee().getUID()));
+        pnlButton.setToolTipText(training2Users.getAttendee().getUID() + "; " + DateFormat.getDateInstance(DateFormat.SHORT).format(training2Users.getPit()));
+        pnlButton.add(new JLabel(training2Users.getAttendee().getFullname()));
 
         if (editmode) {
             JButton btnDelUser = GUITools.getTinyButton("misc.msg.delete", SYSConst.icon16userDel);

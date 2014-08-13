@@ -46,6 +46,7 @@ import entity.process.QProcessTools;
 import entity.qms.Qmsplan;
 import entity.qms.QmsplanTools;
 import entity.reports.NReportTools;
+import entity.staff.TrainingTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import entity.system.SYSPropsTools;
@@ -142,7 +143,7 @@ public class PnlControlling extends CleanablePanel {
         tabMain.setTitleAt(TAB_QMSPLAN, SYSTools.xx("opde.controlling.tab.qmsplan"));
         tabMain.setEnabledAt(TAB_QMSPLAN, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID));
 
-        if (showMeFirst != null){
+        if (showMeFirst != null) {
             tabMain.setSelectedIndex(TAB_QMSPLAN);
         } else {
             reload();
@@ -187,6 +188,43 @@ public class PnlControlling extends CleanablePanel {
 //        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
 
         return cpOrga;
+    }
+
+    private CollapsiblePane createCP4Staff() {
+        final CollapsiblePane cpStaff = new CollapsiblePane();
+
+        String title = "<html><font size=+1>" +
+                SYSTools.xx("opde.controlling.staff") +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpStaff.setCollapsed(!cpStaff.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+        cpStaff.setTitleLabelComponent(cptitle.getMain());
+        cpStaff.setSlidingDirection(SwingConstants.SOUTH);
+        cpStaff.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cpStaff.setContentPane(createContentPanel4Orga());
+            }
+        });
+
+        if (!cpStaff.isCollapsed()) {
+            cpStaff.setContentPane(createContentPanel4Staff());
+        }
+
+        cpStaff.setHorizontalAlignment(SwingConstants.LEADING);
+        //        cpOrga.setOpaque(false);
+        //        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
+
+        return cpStaff;
     }
 
     private CollapsiblePane createCP4Nutrition() {
@@ -396,6 +434,67 @@ public class PnlControlling extends CleanablePanel {
         pnlComplaints.add(btnComplaints, BorderLayout.WEST);
         pnlComplaints.add(txtComplaintsMonthsBack, BorderLayout.EAST);
         pnlContent.add(pnlComplaints);
+
+        return pnlContent;
+    }
+
+
+    private JPanel createContentPanel4Staff() {
+        JPanel pnlContent = new JPanel(new VerticalLayout());
+
+        /***
+         *      ____  _         __  __
+         *     / ___|| |_ __ _ / _|/ _|
+         *     \___ \| __/ _` | |_| |_
+         *      ___) | || (_| |  _|  _|
+         *     |____/ \__\__,_|_| |_|
+         *
+         */
+        JPanel pnlTraining = new JPanel(new BorderLayout());
+        final JButton btnTrainings = GUITools.createHyperlinkButton("opde.controlling.staff.training", null, null);
+        Pair<LocalDate, LocalDate> minmax = TrainingTools.getMinMax();
+        btnTrainings.setEnabled(minmax != null);
+
+        final JComboBox cmbYears = new JComboBox();
+
+        if (minmax == null) {
+            cmbYears.setModel(new DefaultComboBoxModel());
+        } else {
+            ArrayList<Integer> years = new ArrayList<>();
+
+            for (int year = minmax.getSecond().getYear(); year >= minmax.getFirst().getYear(); year--) {
+                years.add(year);
+            }
+
+            cmbYears.setModel(SYSTools.list2cmb(years));
+            cmbYears.setSelectedIndex(0);
+        }
+
+        btnTrainings.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSFilesTools.print(TrainingTools.getTraining2Attendees((Integer) cmbYears.getSelectedItem()), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlTraining.add(btnTrainings, BorderLayout.WEST);
+        pnlTraining.add(cmbYears, BorderLayout.EAST);
+        pnlContent.add(pnlTraining);
+
 
         return pnlContent;
     }
@@ -745,6 +844,11 @@ public class PnlControlling extends CleanablePanel {
                 cpsControlling.removeAll();
                 cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
                 cpsControlling.add(createCP4Orga());
+
+                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
+                    cpsControlling.add(createCP4Staff());
+                }
+
                 cpsControlling.add(createCP4Nursing());
                 cpsControlling.add(createCP4Nutrition());
                 if (OPDE.isCalcMediUPR1()) {
@@ -776,47 +880,47 @@ public class PnlControlling extends CleanablePanel {
 //     * always regenerated by the PrinterForm Editor.
 //     */
 //    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-private void initComponents() {
-    tabMain = new JideTabbedPane();
-    scrollPane1 = new JScrollPane();
-    cpsControlling = new CollapsiblePanes();
-    panel2 = new JPanel();
+    private void initComponents() {
+        tabMain = new JideTabbedPane();
+        scrollPane1 = new JScrollPane();
+        cpsControlling = new CollapsiblePanes();
+        panel2 = new JPanel();
 
-    //======== this ========
-    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        //======== this ========
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-    //======== tabMain ========
-    {
-        tabMain.setBoldActiveTab(true);
-        tabMain.setFont(new Font("Arial", Font.PLAIN, 16));
-        tabMain.setShowTabButtons(true);
-        tabMain.setTabPlacement(SwingConstants.LEFT);
-        tabMain.setHideOneTab(true);
-        tabMain.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                tabMainStateChanged(e);
-            }
-        });
-
-        //======== scrollPane1 ========
+        //======== tabMain ========
         {
+            tabMain.setBoldActiveTab(true);
+            tabMain.setFont(new Font("Arial", Font.PLAIN, 16));
+            tabMain.setShowTabButtons(true);
+            tabMain.setTabPlacement(SwingConstants.LEFT);
+            tabMain.setHideOneTab(true);
+            tabMain.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    tabMainStateChanged(e);
+                }
+            });
 
-            //======== cpsControlling ========
+            //======== scrollPane1 ========
             {
-                cpsControlling.setLayout(new BoxLayout(cpsControlling, BoxLayout.X_AXIS));
-            }
-            scrollPane1.setViewportView(cpsControlling);
-        }
-        tabMain.addTab("controlling", scrollPane1);
 
-        //======== panel2 ========
-        {
-            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+                //======== cpsControlling ========
+                {
+                    cpsControlling.setLayout(new BoxLayout(cpsControlling, BoxLayout.X_AXIS));
+                }
+                scrollPane1.setViewportView(cpsControlling);
+            }
+            tabMain.addTab("controlling", scrollPane1);
+
+            //======== panel2 ========
+            {
+                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+            }
+            tabMain.addTab("text", panel2);
         }
-        tabMain.addTab("text", panel2);
-    }
-    add(tabMain);
+        add(tabMain);
     }// </editor-fold>//GEN-END:initComponents
 
 

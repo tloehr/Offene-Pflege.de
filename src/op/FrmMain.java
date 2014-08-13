@@ -120,7 +120,9 @@ public class FrmMain extends JFrame {
         initPhase = true;
         initComponents();
 
-        pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
+//        pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
+
+
 
 //        pbTimeout.setToolTipText(SYSTools.xx("opde.mainframe.pbTimeout.tooltip"));
         // for the timeout function

@@ -170,7 +170,7 @@ public class GUITools {
         jButton.setContentAreaFilled(false);
         jButton.setBorder(null);
         jButton.setBorderPainted(false);
-        jButton.setToolTipText(tooltip);
+        jButton.setToolTipText(SYSTools.xx(tooltip));
         jButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return jButton;
     }

@@ -8,7 +8,6 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.staff.Training;
-import entity.staff.Training2Users;
 import entity.staff.TrainingTools;
 import entity.system.Commontags;
 import op.OPDE;
@@ -57,7 +56,7 @@ public class PnlTrainingEditor extends JPanel {
         lblTitle.setText(SYSTools.xx("misc.msg.title"));
         lblDocent.setText(SYSTools.xx("opde.training.docent"));
         lblText.setText(SYSTools.xx("misc.msg.details"));
-        lblTags.setText(SYSTools.xx("misc.msg.tags"));
+        lblTags.setText(SYSTools.xx("misc.msg.commontags"));
         lblTime.setText(SYSTools.xx("misc.msg.Time"));
         lblAttendees.setText(SYSTools.xx("misc.msg.attendees"));
 

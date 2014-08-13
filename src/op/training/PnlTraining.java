@@ -11,6 +11,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import entity.files.SYSFilesTools;
 import entity.staff.Training;
 import entity.staff.Training2Users;
 import entity.staff.TrainingTools;
@@ -43,6 +44,7 @@ import java.util.*;
  * EXECUTE
  * UPDATE
  * DELETE
+ * PRINT
  *
  * @author tloehr
  */
@@ -91,7 +93,7 @@ public class PnlTraining extends CleanablePanel {
     @Override
     public void reload() {
 
-        cleanup();
+//        cleanup();
 
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
@@ -142,7 +144,6 @@ public class PnlTraining extends CleanablePanel {
                 } catch (PropertyVetoException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
-
             }
         }
 
@@ -162,6 +163,23 @@ public class PnlTraining extends CleanablePanel {
                 }
             }
         });
+
+
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+            final JButton btnPrintYear = new JButton(SYSConst.icon22print2);
+            btnPrintYear.setPressedIcon(SYSConst.icon22print2Pressed);
+            btnPrintYear.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnPrintYear.setContentAreaFilled(false);
+            btnPrintYear.setBorder(null);
+            btnPrintYear.setToolTipText(SYSTools.xx("misc.tooltips.btnprintyear"));
+            btnPrintYear.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    SYSFilesTools.print(TrainingTools.getAsHTML(TrainingTools.getTrainings4(year, filterTag)), true);
+                }
+            });
+            cptitle.getRight().add(btnPrintYear);
+        }
 
 
         cpYear.setTitleLabelComponent(cptitle.getMain());
@@ -614,14 +632,6 @@ public class PnlTraining extends CleanablePanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        /***
-         *      _   _
-         *     | \ | | _____      __
-         *     |  \| |/ _ \ \ /\ / /
-         *     | |\  |  __/\ V  V /
-         *     |_| \_|\___| \_/\_/
-         *
-         */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
@@ -637,13 +647,6 @@ public class PnlTraining extends CleanablePanel {
 
                         reload();
 
-//                        if (!cpMap.containsKey(keyYear)) {
-//                            reload();
-//                        } else {
-//                            filterTag = null;
-//                            createCP4(TrainingTools.getTrainings4(new LocalDate(myTraining.getStarting()).getYear(), filterTag));
-//                            buildPanel();
-//                        }
                     } catch (OptimisticLockException ole) {
                         OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
@@ -681,22 +684,21 @@ public class PnlTraining extends CleanablePanel {
             pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.PAGE_AXIS));
             pnlTags.setOpaque(false);
 
-            final JButton btnReset = GUITools.createHyperlinkButton("misc.commands.resetFilter", SYSConst.icon16tagPurpleDelete4, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    filterTag = null;
-                    reload();
-                }
-            });
-            pnlTags.add(btnReset, RiverLayout.LEFT);
+//            final JButton btnReset = GUITools.createHyperlinkButton("misc.commands.resetFilter", SYSConst.icon16tagPurpleDelete4, new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    filterTag = null;
+//                    reload();
+//                }
+//            });
+//            pnlTags.add(btnReset, RiverLayout.LEFT);
 
 
             for (final Commontags commontag : listTags) {
                 final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        filterTag = commontag;
-                        reload();
+                        SYSFilesTools.print(TrainingTools.getAsHTML(TrainingTools.getTrainings4(0, filterTag)), true);
                     }
                 });
                 pnlTags.add(btnTag);
