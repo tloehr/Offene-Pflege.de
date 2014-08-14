@@ -113,6 +113,10 @@ public class PnlQMSSchedule extends JPanel {
         }
     }
 
+    private void btnEveryYearActionPerformed(ActionEvent e) {
+        // TODO add your code here
+    }
+
 
     private void initPanel() {
 
@@ -172,6 +176,7 @@ public class PnlQMSSchedule extends JPanel {
         lblMeasure.setText(SYSTools.xx("misc.msg.measure"));
         lblLDate.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.startingon"));
         lblLocation.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.location"));
+        lblDueDays.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.duedays"));
 
         cmbLocation.setTreeModel(new DefaultTreeModel(StationTools.getCompleteStructure()));
 
@@ -225,6 +230,10 @@ public class PnlQMSSchedule extends JPanel {
         spinDayInMonth = new JSpinner();
         cmbTag = new JComboBox<>();
         pnlYearly = new JPanel();
+        label7 = new JLabel();
+        spinMonat2 = new JSpinner();
+        label8 = new JLabel();
+        btnEveryYear = new JButton();
         lblLDate = new JLabel();
         jdcStartingOn = new JDateChooser();
         jScrollPane1 = new JScrollPane();
@@ -549,8 +558,34 @@ public class PnlQMSSchedule extends JPanel {
                 //======== pnlYearly ========
                 {
                     pnlYearly.setLayout(new FormLayout(
-                        "default, $lcgap, default",
+                        "30dlu, $lcgap, 26dlu, $lcgap, 56dlu",
                         "2*(default, $lgap), default"));
+
+                    //---- label7 ----
+                    label7.setText("alle");
+                    label7.setFont(new Font("Arial", Font.PLAIN, 14));
+                    label7.setHorizontalAlignment(SwingConstants.TRAILING);
+                    pnlYearly.add(label7, CC.xy(1, 1));
+
+                    //---- spinMonat2 ----
+                    spinMonat2.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlYearly.add(spinMonat2, CC.xy(3, 1));
+
+                    //---- label8 ----
+                    label8.setText("Jahre");
+                    label8.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlYearly.add(label8, CC.xy(5, 1));
+
+                    //---- btnEveryYear ----
+                    btnEveryYear.setText("jedes Jahr");
+                    btnEveryYear.setFont(new Font("Arial", Font.PLAIN, 14));
+                    btnEveryYear.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnEveryYearActionPerformed(e);
+                        }
+                    });
+                    pnlYearly.add(btnEveryYear, CC.xywh(1, 3, 5, 1));
                 }
                 tabWdh.addTab("text", pnlYearly);
             }
@@ -780,6 +815,10 @@ public class PnlQMSSchedule extends JPanel {
     private JSpinner spinDayInMonth;
     private JComboBox<String> cmbTag;
     private JPanel pnlYearly;
+    private JLabel label7;
+    private JSpinner spinMonat2;
+    private JLabel label8;
+    private JButton btnEveryYear;
     private JLabel lblLDate;
     private JDateChooser jdcStartingOn;
     private JScrollPane jScrollPane1;

@@ -164,7 +164,7 @@ public class TrainingTools {
                             "]"
             );
 
-            html += (training.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(training.getCommontags(), SYSConst.html_16x16_tagPurple));
+            html += (training.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(training.getCommontags(), SYSConst.html_16x16_tagPurple) + "<br/>");
 
             html += SYSTools.xx(STATES[training.getState()]) + "<br/>";
 
@@ -173,7 +173,7 @@ public class TrainingTools {
             }
 
             if (!SYSTools.catchNull(training.getText()).isEmpty()) {
-                html += SYSConst.html_paragraph(SYSTools.xx("misc.msg.details") + ": " + training.getDocent());
+                html += SYSConst.html_paragraph(SYSTools.xx("misc.msg.details") + ": " + training.getText());
             }
 
             ArrayList<Training2Users> listDone = getDone(training);
@@ -203,7 +203,7 @@ public class TrainingTools {
 
     public static String getTraining2Attendees(int year) {
 
-        String html = SYSConst.html_h1("opde.controlling.staff.training" + " " + year);
+        String html = SYSConst.html_h1(SYSTools.xx("opde.controlling.staff.training") + " " + year);
 
         ArrayList<Users> listUsers = UsersTools.getUsers(false);
         ArrayList<Training> listTraining = getTrainings4(year);
@@ -231,15 +231,14 @@ public class TrainingTools {
                 }
             }
 
-            if (list.isEmpty()){
-                html += SYSTools.xx("empty.list");
+            if (list.isEmpty()) {
+                html += SYSTools.xx("opde.controlling.staff.nothing.yet");
             } else {
                 html += SYSConst.html_ul(list);
             }
 
 
         }
-
 
 
         return SYSConst.html_div(html);

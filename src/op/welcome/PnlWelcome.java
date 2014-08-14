@@ -134,7 +134,7 @@ public class PnlWelcome extends CleanablePanel {
                     }
                 });
                 progButton.setFont(SYSConst.ARIAL20);
-                progButton.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:150px;\">"+longDescription+"</p>"));
+                progButton.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:150px;\">" + longDescription + "</p>"));
 
                 pnlApps.add(progButton);
             }
@@ -337,19 +337,19 @@ public class PnlWelcome extends CleanablePanel {
 
     private DefaultCPTitle createCP4DueQms(final Qms due) {
 
-           String title = SYSTools.toHTMLForScreen(QmsTools.toHTML(due) + " "+ CommontagsTools.getAsHTML(due.getQmsplan().getCommontags(), SYSConst.html_16x16_tagPurple_internal));
+        String title = SYSTools.toHTMLForScreen(QmsTools.toHTML(due) + " " + CommontagsTools.getAsHTML(due.getQmsplan().getCommontags(), SYSConst.html_16x16_tagPurple_internal));
 
-           DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-               @Override
-               public void actionPerformed(ActionEvent e) {
-                   OPDE.getMainframe().clearPreviousProgbutton();
-                   OPDE.getMainframe().setCurrentResident(null);
-                   OPDE.getMainframe().setPanelTo(new PnlControlling(jspSearch, due.getQmsplan()));
-               }
-           });
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().clearPreviousProgbutton();
+                OPDE.getMainframe().setCurrentResident(null);
+                OPDE.getMainframe().setPanelTo(new PnlControlling(jspSearch, due.getQmsplan()));
+            }
+        });
 
-           return cptitle;
-       }
+        return cptitle;
+    }
 
     private DefaultCPTitle createCP4HighLowIn(Object[] ns) {
         final Resident resident = (Resident) ns[0];
@@ -585,8 +585,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow, $lcgap, pref",
-                "default, default:grow"));
+                    "default:grow, $lcgap, pref",
+                    "default, default:grow"));
 
             //---- btnAbout ----
             btnAbout.setText(null);
