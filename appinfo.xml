@@ -26,7 +26,7 @@
             <manager langbundle="opde.controlling.acl.manager"/>
         </class>
         <class name="opde.training" short="opde.training.appinfo.short"
-               long="opde.training.appinfo.long"
+               long="opde.training.appinfo.long" helpurl="opde.training.appinfo.helpurl"
                main="true"
                javaclass="op.training.PnlTraining" icon="teacher_blackboard.png">
             <execute langbundle="appinfo.default.acl.execute"/>

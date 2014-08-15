@@ -37,7 +37,14 @@ public class QmsTools {
         Collections.sort(qmssched.getQmsList());
         int maxSequence = qmssched.getQmsList().isEmpty() ? -1 : qmssched.getQmsList().get(qmssched.getQmsList().size() - 1).getSequence();
 
-        ArrayList<Date> listSequence = new ArrayList<>(Lamma4j.sequence(SYSCalendar.toLammaDate(qmssched.getStartingOn()), SYSCalendar.toLammaDate(new LocalDate().plusYears(Math.max(qmssched.getYearly(), 2)).toDate()), QmsschedTools.getRecurrence(qmssched)));
+
+        ArrayList<Date> listSequence = new ArrayList<>();
+        if (qmssched.isYearly()){
+            listSequence.addAll(Lamma4j.sequence(SYSCalendar.toLammaDate(qmssched.getStartingOn()), SYSCalendar.toLammaDate(new LocalDate().plusYears(20).toDate()), QmsschedTools.getRecurrence(qmssched)));
+        } else {
+            listSequence.addAll(Lamma4j.sequence(SYSCalendar.toLammaDate(qmssched.getStartingOn()), SYSCalendar.toLammaDate(new LocalDate().plusYears(Math.max(qmssched.getYearly(), 2)).toDate()), QmsschedTools.getRecurrence(qmssched)));
+        }
+         new ArrayList<>();
 
         if (listSequence.size() >= maxSequence) {
             for (int element = maxSequence + 1; element < maxSequence + numOccurences + 1; element++) {

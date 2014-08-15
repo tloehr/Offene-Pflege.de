@@ -85,14 +85,11 @@ public class QmsschedTools {
                 result += SYSTools.xx("misc.msg.every") + " " + qmssched.getYearly() + " " + SYSTools.xx("misc.msg.Years") + ", ";
             }
 
-            if (qmssched.getMonthinyear() > 0) {
-                MutableDateTime mdt = new MutableDateTime();
-                mdt.setDayOfWeek(qmssched.getWeekday());
 
-                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText() + " " + SYSTools.xx("in");
-            } else {
-                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
-            }
+            MutableDateTime mdt = new MutableDateTime();
+            mdt.setDayOfMonth(qmssched.getDayinmonth());
+            mdt.setMonthOfYear(qmssched.getMonthinyear());
+            result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + mdt.monthOfYear().getAsText();
 
 
         } else {
@@ -137,19 +134,10 @@ public class QmsschedTools {
                         LammaConversion.nthDayOfMonth(qmssched.getDayinmonth()));
             }
         } else if (qmssched.isYearly()) {
-
-            if (qmssched.getWeekday() > 0) { // month with a nth weekday in that month
-                recurrence = LammaConversion.years(
-                        qmssched.getYearly(),
-                        LammaConversion.nthMonthOfYear(SYSCalendar.months[qmssched.getMonthinyear()],
-                                LammaConversion.nthWeekdayOfMonth(qmssched.getDayinmonth(), SYSCalendar.weeksdays[qmssched.getWeekday()])));
-            } else { // month with a specific day in that month
-                recurrence = LammaConversion.years(
-                        qmssched.getYearly(),
-                        LammaConversion.nthMonthOfYear(SYSCalendar.months[qmssched.getMonthinyear()],
-                                LammaConversion.nthDayOfMonth(qmssched.getDayinmonth())));
-            }
-
+            recurrence = LammaConversion.years(
+                    qmssched.getYearly(),
+                    LammaConversion.nthMonthOfYear(SYSCalendar.months[qmssched.getMonthinyear()],
+                            LammaConversion.nthDayOfMonth(qmssched.getDayinmonth())));
         }
         return recurrence;
     }

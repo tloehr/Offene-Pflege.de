@@ -952,6 +952,15 @@ public class GUITools {
         return color;
     }
 
+    /**
+     * creates a blend between two colors. The float specifies where the balance is.
+     * the more towards 1.0 emphasizes the <b>first</b> color.
+     * the more towards 0.0 emphasizes the <b>second</b> color.
+     * @param clOne
+     * @param clTwo
+     * @param fAmount
+     * @return
+     */
     public static Color blend(Color clOne, Color clTwo, float fAmount) {
         float fInverse = 1.0f - fAmount;
 
@@ -969,49 +978,49 @@ public class GUITools {
         return new Color(afResult[0], afResult[1], afResult[2]);
     }
 
-    public static Color brighter(Color originalColour, float FACTOR) {
-
-
-        float hsbVals[] = Color.RGBtoHSB(originalColour.getRed(),
-                originalColour.getGreen(),
-                originalColour.getBlue(), null);
-
-        Color highlight = Color.getHSBColor(hsbVals[0], hsbVals[1], FACTOR * (1f + hsbVals[2]));
-//            Color shadow = Color.getHSBColor( hsbVals[0], hsbVals[1], 0.5f * hsbVals[2] );
-
-        return highlight;
-
-
-//        return new Color(Math.min((int) (color.getRed() * (1 / FACTOR)), 255),
-//                Math.min((int) (color.getGreen() * (1 / FACTOR)), 255),
-//                Math.min((int) (color.getBlue() * (1 / FACTOR)), 255));
-    }
-
-    public static Color darker(Color color, float FACTOR) {
-        return new Color(Math.max((int) (color.getRed() * FACTOR), 0),
-                Math.max((int) (color.getGreen() * FACTOR), 0),
-                Math.max((int) (color.getBlue() * FACTOR), 0));
-    }
-
-
-    static Image iconToImage(Icon icon) {
-       if (icon instanceof ImageIcon) {
-          return ((ImageIcon)icon).getImage();
-       }
-       else {
-          int w = icon.getIconWidth();
-          int h = icon.getIconHeight();
-          GraphicsEnvironment ge =
-            GraphicsEnvironment.getLocalGraphicsEnvironment();
-          GraphicsDevice gd = ge.getDefaultScreenDevice();
-          GraphicsConfiguration gc = gd.getDefaultConfiguration();
-          BufferedImage image = gc.createCompatibleImage(w, h);
-          Graphics2D g = image.createGraphics();
-          icon.paintIcon(null, g, 0, 0);
-          g.dispose();
-          return image;
-       }
-     }
+//    public static Color brighter(Color originalColour, float FACTOR) {
+//
+//
+//        float hsbVals[] = Color.RGBtoHSB(originalColour.getRed(),
+//                originalColour.getGreen(),
+//                originalColour.getBlue(), null);
+//
+//        Color highlight = Color.getHSBColor(hsbVals[0], hsbVals[1], FACTOR * (1f + hsbVals[2]));
+////            Color shadow = Color.getHSBColor( hsbVals[0], hsbVals[1], 0.5f * hsbVals[2] );
+//
+//        return highlight;
+//
+//
+////        return new Color(Math.min((int) (color.getRed() * (1 / FACTOR)), 255),
+////                Math.min((int) (color.getGreen() * (1 / FACTOR)), 255),
+////                Math.min((int) (color.getBlue() * (1 / FACTOR)), 255));
+//    }
+//
+//    public static Color darker(Color color, float FACTOR) {
+//        return new Color(Math.max((int) (color.getRed() * FACTOR), 0),
+//                Math.max((int) (color.getGreen() * FACTOR), 0),
+//                Math.max((int) (color.getBlue() * FACTOR), 0));
+//    }
+//
+//
+//    static Image iconToImage(Icon icon) {
+//       if (icon instanceof ImageIcon) {
+//          return ((ImageIcon)icon).getImage();
+//       }
+//       else {
+//          int w = icon.getIconWidth();
+//          int h = icon.getIconHeight();
+//          GraphicsEnvironment ge =
+//            GraphicsEnvironment.getLocalGraphicsEnvironment();
+//          GraphicsDevice gd = ge.getDefaultScreenDevice();
+//          GraphicsConfiguration gc = gd.getDefaultConfiguration();
+//          BufferedImage image = gc.createCompatibleImage(w, h);
+//          Graphics2D g = image.createGraphics();
+//          icon.paintIcon(null, g, 0, 0);
+//          g.dispose();
+//          return image;
+//       }
+//     }
 
 
 //    public static Icon paint(Icon in) {

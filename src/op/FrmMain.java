@@ -198,6 +198,25 @@ public class FrmMain extends JFrame {
         gc.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
         initPhase = false;
+
+
+
+//        JDialog dlg = new JDialog(this, false);
+//
+//        JPanel pnl = new JPanel();
+//        pnl.setLayout(new VerticalLayout());
+//
+//        for (float f = 0.0f; f <= 1.0; f = f + 0.01f){
+//            JLabel lbl = new JLabel(Float.toString(f));
+//            lbl.setForeground(GUITools.blend(Color.red, Color.WHITE, f));
+//            pnl.add(lbl);
+//        }
+//
+//        dlg.setContentPane(new JScrollPane(pnl));
+//
+//        dlg.pack();
+//        dlg.setVisible(true);
+
     }
 
     public void completeRefresh() {

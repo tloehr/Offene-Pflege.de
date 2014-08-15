@@ -26,7 +26,6 @@
  */
 package op.controlling;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.combobox.TreeComboBox;
@@ -53,10 +52,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,6 +71,7 @@ public class PnlQMSSchedule extends JPanel {
     private final int TAB_WEEKLY = 1;
     private final int TAB_MONTHLY = 2;
     private final int TAB_YEARLY = 3;
+    private final int[] maxdays = new int[]{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     public PnlQMSSchedule(Qmssched qmssched, Closure actionBlock) {
         this.qmssched = qmssched;
@@ -105,7 +102,7 @@ public class PnlQMSSchedule extends JPanel {
 
     private void cmbTagItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            if (cmbTag.getSelectedIndex() == 0){
+            if (cmbTag.getSelectedIndex() == 0) {
                 spinDayInMonth.setModel(new SpinnerNumberModel(1, 1, 31, 1));
             } else {
                 spinDayInMonth.setModel(new SpinnerNumberModel(1, 1, 5, 1));
@@ -117,30 +114,104 @@ public class PnlQMSSchedule extends JPanel {
         // TODO add your code here
     }
 
+    private void i18n() {
+        tabWdh.setTitleAt(TAB_DAILY, SYSTools.xx("misc.msg.daily"));
+        tabWdh.setTitleAt(TAB_WEEKLY, SYSTools.xx("misc.msg.weekly"));
+        tabWdh.setTitleAt(TAB_MONTHLY, SYSTools.xx("misc.msg.monthly"));
+        tabWdh.setTitleAt(TAB_YEARLY, SYSTools.xx("misc.msg.yearly"));
+
+        lblEveryDay.setText(SYSTools.xx("misc.msg.every"));
+        lblDays.setText(SYSTools.xx("misc.msg.Days2"));
+        btnJedenTag.setText(SYSTools.xx("misc.msg.everyDay"));
+
+        lblEveryWeek.setText(SYSTools.xx("misc.msg.every"));
+        lblWeeks.setText(SYSTools.xx("misc.msg.weeks"));
+        btnJedeWoche.setText(SYSTools.xx("misc.msg.everyWeek"));
+
+        cbMon.setText(SYSTools.xx("misc.msg.monday"));
+        cbDie.setText(SYSTools.xx("misc.msg.tuesday"));
+        cbMit.setText(SYSTools.xx("misc.msg.wednesday"));
+        cbDon.setText(SYSTools.xx("misc.msg.thursday"));
+        cbFre.setText(SYSTools.xx("misc.msg.friday"));
+        cbSam.setText(SYSTools.xx("misc.msg.saturday"));
+        cbSon.setText(SYSTools.xx("misc.msg.sunday"));
+
+        lblEveryMonth.setText(SYSTools.xx("misc.msg.every3"));
+        lblMonth.setText(SYSTools.xx("misc.msg.month"));
+        btnJedenMonat.setText(SYSTools.xx("misc.msg.everyMonth"));
+        cmbTag.setModel(new DefaultComboBoxModel<>(new String[]{
+                SYSTools.xx("misc.msg.dayOfMonth"),
+                SYSTools.xx("misc.msg.monday"),
+                SYSTools.xx("misc.msg.tuesday"),
+                SYSTools.xx("misc.msg.wednesday"),
+                SYSTools.xx("misc.msg.thursday"),
+                SYSTools.xx("misc.msg.friday"),
+                SYSTools.xx("misc.msg.saturday"),
+                SYSTools.xx("misc.msg.sunday")
+        }));
+
+        lblEveryYear.setText(SYSTools.xx("misc.msg.every"));
+        lblYear.setText(SYSTools.xx("misc.msg.Years"));
+        btnEveryYear.setText(SYSTools.xx("misc.msg.everyYear"));
+        lblOnDay.setText(SYSTools.xx("misc.msg.atchrono"));
+
+        lblMeasure.setText(SYSTools.xx("misc.msg.measure"));
+        lblLDate.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.startingon"));
+        lblLocation.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.location"));
+        lblDueDays.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.duedays"));
+
+        cmbMonth.setModel(new DefaultComboBoxModel<>(new String[]{
+                SYSTools.xx("misc.msg.january"),
+                SYSTools.xx("misc.msg.february"),
+                SYSTools.xx("misc.msg.march"),
+                SYSTools.xx("misc.msg.april"),
+                SYSTools.xx("misc.msg.may"),
+                SYSTools.xx("misc.msg.june"),
+                SYSTools.xx("misc.msg.july"),
+                SYSTools.xx("misc.msg.august"),
+                SYSTools.xx("misc.msg.september"),
+                SYSTools.xx("misc.msg.october"),
+                SYSTools.xx("misc.msg.november"),
+                SYSTools.xx("misc.msg.december"),
+        }));
+
+
+    }
 
     private void initPanel() {
+
+
+        i18n();
 
         NumberFormat nf = NumberFormat.getIntegerInstance();
         nf.setMaximumIntegerDigits(2);
         txtDueDays.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(nf)));
         txtDueDays.setValue(qmssched.getDuedays());
 
-        tabWdh.setTitleAt(TAB_DAILY, SYSTools.xx("misc.msg.daily"));
-        tabWdh.setTitleAt(TAB_WEEKLY, SYSTools.xx("misc.msg.weekly"));
-        tabWdh.setTitleAt(TAB_MONTHLY, SYSTools.xx("misc.msg.monthly"));
-        tabWdh.setTitleAt(TAB_YEARLY, SYSTools.xx("misc.msg.yearly"));
-
         spinTaeglich.setModel(new SpinnerNumberModel(1, 1, 365, 1));
         spinWoche.setModel(new SpinnerNumberModel(1, 1, 52, 1));
         spinMonat.setModel(new SpinnerNumberModel(1, 1, 12, 1));
+        spinYearly.setModel(new SpinnerNumberModel(1, 1, 10, 1));
         spinDayInMonth.setModel(new SpinnerNumberModel(1, 1, 31, 1));
 
         spinTaeglich.setValue(Math.max(qmssched.getDaily(), 1));
         spinWoche.setValue(Math.max(qmssched.getWeekly(), 1));
         spinMonat.setValue(Math.max(qmssched.getMonthly(), 1));
         spinDayInMonth.setValue(Math.max(qmssched.getDayinmonth(), 1));
+        spinYearly.setValue(Math.max(qmssched.getYearly(), 1));
 
         cbMon.setSelected(true);
+
+        cmbMonth.setSelectedIndex(qmssched.isYearly() ? qmssched.getMonthinyear() - 1 : 0);
+        spinDayInMonthInYear.setModel(new SpinnerNumberModel(qmssched.isYearly() ? qmssched.getDayinmonth() : 1, 1, maxdays[cmbMonth.getSelectedIndex()], 1));
+        cmbMonth.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    spinDayInMonthInYear.setModel(new SpinnerNumberModel(1, 1, maxdays[cmbMonth.getSelectedIndex()], 1));
+                }
+            }
+        });
 
         if (qmssched.isDaily()) {
             tabWdh.setSelectedIndex(TAB_DAILY);
@@ -173,11 +244,6 @@ public class PnlQMSSchedule extends JPanel {
         txtBemerkung.setText(qmssched.getText());
         txtQMS.setText(qmssched.getMeasure());
 
-        lblMeasure.setText(SYSTools.xx("misc.msg.measure"));
-        lblLDate.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.startingon"));
-        lblLocation.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.location"));
-        lblDueDays.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.duedays"));
-
         cmbLocation.setTreeModel(new DefaultTreeModel(StationTools.getCompleteStructure()));
 
     }
@@ -197,16 +263,16 @@ public class PnlQMSSchedule extends JPanel {
         cmbLocation = new TreeComboBox();
         tabWdh = new JideTabbedPane();
         pnlDaily = new JPanel();
-        label3 = new JLabel();
+        lblEveryDay = new JLabel();
         spinTaeglich = new JSpinner();
-        jLabel7 = new JLabel();
+        lblDays = new JLabel();
         btnJedenTag = new JButton();
         pnlWeekly = new JPanel();
         panel3 = new JPanel();
         btnJedeWoche = new JButton();
-        label2 = new JLabel();
+        lblEveryWeek = new JLabel();
         spinWoche = new JSpinner();
-        jLabel8 = new JLabel();
+        lblWeeks = new JLabel();
         lblUhrzeit2 = new JideLabel();
         lblUhrzeit3 = new JideLabel();
         lblUhrzeit4 = new JideLabel();
@@ -222,18 +288,21 @@ public class PnlQMSSchedule extends JPanel {
         cbSam = new JRadioButton();
         cbSon = new JRadioButton();
         pnlMonthly = new JPanel();
-        label4 = new JLabel();
+        lblEveryMonth = new JLabel();
         spinMonat = new JSpinner();
-        label6 = new JLabel();
+        lblMonth = new JLabel();
         btnJedenMonat = new JButton();
-        label5 = new JLabel();
+        llblOnDayOfMonth = new JLabel();
         spinDayInMonth = new JSpinner();
         cmbTag = new JComboBox<>();
         pnlYearly = new JPanel();
-        label7 = new JLabel();
-        spinMonat2 = new JSpinner();
-        label8 = new JLabel();
+        lblEveryYear = new JLabel();
+        spinYearly = new JSpinner();
+        lblYear = new JLabel();
         btnEveryYear = new JButton();
+        lblOnDay = new JLabel();
+        spinDayInMonthInYear = new JSpinner();
+        cmbMonth = new JComboBox();
         lblLDate = new JLabel();
         jdcStartingOn = new JDateChooser();
         jScrollPane1 = new JScrollPane();
@@ -255,8 +324,8 @@ public class PnlQMSSchedule extends JPanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                "$rgap, $lcgap, 35dlu:grow, $ugap, 105dlu:grow, $lcgap, $rgap",
-                "default, $nlgap, 18dlu, $lgap, default, $nlgap, 2*(default, $lgap), pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
+                    "$rgap, $lcgap, 35dlu:grow, $ugap, 105dlu:grow, $lcgap, $rgap",
+                    "default, $nlgap, 18dlu, $lgap, default, $nlgap, 2*(default, $lgap), pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
 
             //---- lblMeasure ----
             lblMeasure.setText("text");
@@ -282,23 +351,23 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlDaily.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlDaily.setLayout(new FormLayout(
-                        "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
-                        "default, $lgap, pref, $lgap, default"));
+                            "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
+                            "default, $lgap, pref, $lgap, default"));
 
-                    //---- label3 ----
-                    label3.setText("alle");
-                    label3.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlDaily.add(label3, CC.xy(2, 3));
+                    //---- lblEveryDay ----
+                    lblEveryDay.setText("alle");
+                    lblEveryDay.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlDaily.add(lblEveryDay, CC.xy(2, 3));
 
                     //---- spinTaeglich ----
                     spinTaeglich.setFont(new Font("Arial", Font.PLAIN, 14));
                     spinTaeglich.setModel(new SpinnerNumberModel(1, null, null, 1));
                     pnlDaily.add(spinTaeglich, CC.xy(5, 3));
 
-                    //---- jLabel7 ----
-                    jLabel7.setText("Tage");
-                    jLabel7.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlDaily.add(jLabel7, CC.xy(7, 3));
+                    //---- lblDays ----
+                    lblDays.setText("Tage");
+                    lblDays.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlDaily.add(lblDays, CC.xy(7, 3));
 
                     //---- btnJedenTag ----
                     btnJedenTag.setText("Jeden Tag");
@@ -316,14 +385,14 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlWeekly.setLayout(new FormLayout(
-                        "default, 7*(13dlu), $lcgap, default:grow",
-                        "$ugap, $lgap, default, $lgap, pref, $nlgap, default:grow, $lgap, $rgap"));
+                            "default, 7*(13dlu), $lcgap, default:grow",
+                            "$ugap, $lgap, default, $lgap, fill:53dlu:grow, $nlgap, default:grow, $lgap, $rgap"));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                            "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
-                            "default:grow, $lgap, default"));
+                                "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
+                                "default:grow, $lgap, default"));
 
                         //---- btnJedeWoche ----
                         btnJedeWoche.setText("Jede Woche");
@@ -336,16 +405,16 @@ public class PnlQMSSchedule extends JPanel {
                         });
                         panel3.add(btnJedeWoche, CC.xywh(3, 3, 3, 1));
 
-                        //---- label2 ----
-                        label2.setText("alle");
-                        label2.setFont(new Font("Arial", Font.PLAIN, 14));
-                        panel3.add(label2, CC.xy(1, 1));
+                        //---- lblEveryWeek ----
+                        lblEveryWeek.setText("alle");
+                        lblEveryWeek.setFont(new Font("Arial", Font.PLAIN, 14));
+                        panel3.add(lblEveryWeek, CC.xy(1, 1));
                         panel3.add(spinWoche, CC.xy(3, 1));
 
-                        //---- jLabel8 ----
-                        jLabel8.setText("Wochen am");
-                        jLabel8.setFont(new Font("Arial", Font.PLAIN, 14));
-                        panel3.add(jLabel8, CC.xy(5, 1));
+                        //---- lblWeeks ----
+                        lblWeeks.setText("Wochen am");
+                        lblWeeks.setFont(new Font("Arial", Font.PLAIN, 14));
+                        panel3.add(lblWeeks, CC.xy(5, 1));
                     }
                     pnlWeekly.add(panel3, CC.xywh(2, 3, 9, 1));
 
@@ -488,23 +557,23 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.setLayout(new FormLayout(
-                        "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
-                        "3*(default, $lgap), default"));
+                            "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
+                            "3*(default, $lgap), default"));
 
-                    //---- label4 ----
-                    label4.setText("jeden");
-                    label4.setFont(new Font("Arial", Font.PLAIN, 14));
-                    label4.setHorizontalAlignment(SwingConstants.TRAILING);
-                    pnlMonthly.add(label4, CC.xy(3, 3));
+                    //---- lblEveryMonth ----
+                    lblEveryMonth.setText("jeden");
+                    lblEveryMonth.setFont(new Font("Arial", Font.PLAIN, 14));
+                    lblEveryMonth.setHorizontalAlignment(SwingConstants.TRAILING);
+                    pnlMonthly.add(lblEveryMonth, CC.xy(3, 3));
 
                     //---- spinMonat ----
                     spinMonat.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.add(spinMonat, CC.xy(5, 3));
 
-                    //---- label6 ----
-                    label6.setText("Monat");
-                    label6.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlMonthly.add(label6, CC.xy(7, 3));
+                    //---- lblMonth ----
+                    lblMonth.setText("Monat");
+                    lblMonth.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlMonthly.add(lblMonth, CC.xy(7, 3));
 
                     //---- btnJedenMonat ----
                     btnJedenMonat.setText("Jeden Monat");
@@ -517,11 +586,11 @@ public class PnlQMSSchedule extends JPanel {
                     });
                     pnlMonthly.add(btnJedenMonat, CC.xywh(3, 5, 5, 1));
 
-                    //---- label5 ----
-                    label5.setText("jeweils am");
-                    label5.setFont(new Font("Arial", Font.PLAIN, 14));
-                    label5.setHorizontalAlignment(SwingConstants.TRAILING);
-                    pnlMonthly.add(label5, CC.xy(3, 7));
+                    //---- llblOnDayOfMonth ----
+                    llblOnDayOfMonth.setText("jeweils am");
+                    llblOnDayOfMonth.setFont(new Font("Arial", Font.PLAIN, 14));
+                    llblOnDayOfMonth.setHorizontalAlignment(SwingConstants.TRAILING);
+                    pnlMonthly.add(llblOnDayOfMonth, CC.xy(3, 7));
 
                     //---- spinDayInMonth ----
                     spinDayInMonth.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -534,15 +603,15 @@ public class PnlQMSSchedule extends JPanel {
                     pnlMonthly.add(spinDayInMonth, CC.xy(5, 7));
 
                     //---- cmbTag ----
-                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[] {
-                        "Tag des Monats",
-                        "Montag",
-                        "Dienstag",
-                        "Mittwoch",
-                        "Donnerstag",
-                        "Freitag",
-                        "Samstag",
-                        "Sonntag"
+                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[]{
+                            "Tag des Monats",
+                            "Montag",
+                            "Dienstag",
+                            "Mittwoch",
+                            "Donnerstag",
+                            "Freitag",
+                            "Samstag",
+                            "Sonntag"
                     }));
                     cmbTag.setFont(new Font("Arial", Font.PLAIN, 14));
                     cmbTag.addItemListener(new ItemListener() {
@@ -558,23 +627,23 @@ public class PnlQMSSchedule extends JPanel {
                 //======== pnlYearly ========
                 {
                     pnlYearly.setLayout(new FormLayout(
-                        "30dlu, $lcgap, 26dlu, $lcgap, 56dlu",
-                        "2*(default, $lgap), default"));
+                            "30dlu, $rgap, 26dlu, $rgap, pref, $ugap, default",
+                            "default, 15dlu, default"));
 
-                    //---- label7 ----
-                    label7.setText("alle");
-                    label7.setFont(new Font("Arial", Font.PLAIN, 14));
-                    label7.setHorizontalAlignment(SwingConstants.TRAILING);
-                    pnlYearly.add(label7, CC.xy(1, 1));
+                    //---- lblEveryYear ----
+                    lblEveryYear.setText("alle");
+                    lblEveryYear.setFont(new Font("Arial", Font.PLAIN, 14));
+                    lblEveryYear.setHorizontalAlignment(SwingConstants.TRAILING);
+                    pnlYearly.add(lblEveryYear, CC.xy(1, 1));
 
-                    //---- spinMonat2 ----
-                    spinMonat2.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlYearly.add(spinMonat2, CC.xy(3, 1));
+                    //---- spinYearly ----
+                    spinYearly.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlYearly.add(spinYearly, CC.xy(3, 1));
 
-                    //---- label8 ----
-                    label8.setText("Jahre");
-                    label8.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlYearly.add(label8, CC.xy(5, 1));
+                    //---- lblYear ----
+                    lblYear.setText("Jahre");
+                    lblYear.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlYearly.add(lblYear, CC.xy(5, 1));
 
                     //---- btnEveryYear ----
                     btnEveryYear.setText("jedes Jahr");
@@ -585,7 +654,18 @@ public class PnlQMSSchedule extends JPanel {
                             btnEveryYearActionPerformed(e);
                         }
                     });
-                    pnlYearly.add(btnEveryYear, CC.xywh(1, 3, 5, 1));
+                    pnlYearly.add(btnEveryYear, CC.xy(7, 1));
+
+                    //---- lblOnDay ----
+                    lblOnDay.setText("alle");
+                    lblOnDay.setFont(new Font("Arial", Font.PLAIN, 14));
+                    lblOnDay.setHorizontalAlignment(SwingConstants.TRAILING);
+                    pnlYearly.add(lblOnDay, CC.xy(1, 3));
+
+                    //---- spinDayInMonthInYear ----
+                    spinDayInMonthInYear.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlYearly.add(spinDayInMonthInYear, CC.xy(3, 3));
+                    pnlYearly.add(cmbMonth, CC.xywh(5, 3, 3, 1));
                 }
                 tabWdh.addTab("text", pnlYearly);
             }
@@ -713,10 +793,10 @@ public class PnlQMSSchedule extends JPanel {
 
     public void save() throws NumberFormatException {
 
-        qmssched.setDaily(tabWdh.getSelectedIndex() == TAB_DAILY ? Byte.parseByte(spinTaeglich.getValue().toString()) :  0);
-        qmssched.setWeekly(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Byte.parseByte(spinWoche.getValue().toString()) :  0);
-        qmssched.setMonthly(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Byte.parseByte(spinMonat.getValue().toString()) :  0);
-        qmssched.setYearly(tabWdh.getSelectedIndex() == TAB_YEARLY ? Byte.parseByte(spinMonat.getValue().toString()) : 0);
+        qmssched.setDaily(tabWdh.getSelectedIndex() == TAB_DAILY ? Byte.parseByte(spinTaeglich.getValue().toString()) : 0);
+        qmssched.setWeekly(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Byte.parseByte(spinWoche.getValue().toString()) : 0);
+        qmssched.setMonthly(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Byte.parseByte(spinMonat.getValue().toString()) : 0);
+        qmssched.setYearly(tabWdh.getSelectedIndex() == TAB_YEARLY ? Byte.parseByte(spinYearly.getValue().toString()) : 0);
         qmssched.setStartingOn(jdcStartingOn.getDate());
 
         if (tabWdh.getSelectedIndex() == TAB_DAILY) {
@@ -726,6 +806,11 @@ public class PnlQMSSchedule extends JPanel {
         if (tabWdh.getSelectedIndex() == TAB_MONTHLY) {
             qmssched.setDayinmonth(Integer.parseInt(spinDayInMonth.getValue().toString()));
             qmssched.setWeekday(cmbTag.getSelectedIndex());
+        }
+
+        if (tabWdh.getSelectedIndex() == TAB_YEARLY) {
+            qmssched.setDayinmonth(Integer.parseInt(spinDayInMonthInYear.getValue().toString()));
+            qmssched.setMonthinyear(cmbMonth.getSelectedIndex() + 1);
         }
 
         qmssched.setMeasure(SYSTools.tidy(txtQMS.getText()));
@@ -782,16 +867,16 @@ public class PnlQMSSchedule extends JPanel {
     private TreeComboBox cmbLocation;
     private JideTabbedPane tabWdh;
     private JPanel pnlDaily;
-    private JLabel label3;
+    private JLabel lblEveryDay;
     private JSpinner spinTaeglich;
-    private JLabel jLabel7;
+    private JLabel lblDays;
     private JButton btnJedenTag;
     private JPanel pnlWeekly;
     private JPanel panel3;
     private JButton btnJedeWoche;
-    private JLabel label2;
+    private JLabel lblEveryWeek;
     private JSpinner spinWoche;
-    private JLabel jLabel8;
+    private JLabel lblWeeks;
     private JideLabel lblUhrzeit2;
     private JideLabel lblUhrzeit3;
     private JideLabel lblUhrzeit4;
@@ -807,18 +892,21 @@ public class PnlQMSSchedule extends JPanel {
     private JRadioButton cbSam;
     private JRadioButton cbSon;
     private JPanel pnlMonthly;
-    private JLabel label4;
+    private JLabel lblEveryMonth;
     private JSpinner spinMonat;
-    private JLabel label6;
+    private JLabel lblMonth;
     private JButton btnJedenMonat;
-    private JLabel label5;
+    private JLabel llblOnDayOfMonth;
     private JSpinner spinDayInMonth;
     private JComboBox<String> cmbTag;
     private JPanel pnlYearly;
-    private JLabel label7;
-    private JSpinner spinMonat2;
-    private JLabel label8;
+    private JLabel lblEveryYear;
+    private JSpinner spinYearly;
+    private JLabel lblYear;
     private JButton btnEveryYear;
+    private JLabel lblOnDay;
+    private JSpinner spinDayInMonthInYear;
+    private JComboBox cmbMonth;
     private JLabel lblLDate;
     private JDateChooser jdcStartingOn;
     private JScrollPane jScrollPane1;

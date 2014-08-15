@@ -1,6 +1,7 @@
 package entity.qms;
 
 import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -106,7 +107,10 @@ public class QmsplanTools {
 //        }
 
         html += !SYSTools.catchNull(qmsplan.getDescription()).isEmpty() ? SYSConst.html_h3("misc.msg.description") +
-                SYSTools.replace(qmsplan.getDescription(), "\n", "<br/>", false) : "";
+                 SYSConst.html_paragraph(SYSTools.replace(qmsplan.getDescription(), "\n", "<br/>", false)) : "";
+
+        html +=  qmsplan.getCommontags().isEmpty() ? "" : CommontagsTools.getAsHTML(qmsplan.getCommontags(), SYSConst.html_16x16_tagPurple_internal);
+
 
 //        html += SYSConst.html_h3("misc.msg.measures");
 //
@@ -129,8 +133,8 @@ public class QmsplanTools {
         //        }
 
 
-        html += "</div>";
-        return html;
+//        html += "</div>";
+        return SYSConst.html_color(qmsplan.getColor(), html);
     }
 
 }

@@ -162,12 +162,12 @@ public class Qms implements Comparable<Qms> {
 
     public boolean isDue() {
         // if its closed its never due!
-        return isOpen() && new LocalDate(target).isAfter(new LocalDate().minusDays(qmssched.getDuedays()));
+        return isOpen() && new LocalDate(target).minusDays(qmssched.getDuedays()).isBefore(new LocalDate());
     }
 
     public boolean isPastDue() {
             // if its closed its never due!
-            return isOpen() && new LocalDate(target).isAfter(new LocalDate());
+            return isOpen() && new LocalDate(target).isBefore(new LocalDate());
         }
 
     @Override

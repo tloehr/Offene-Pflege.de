@@ -222,7 +222,7 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>label3</string> 
+               <string>lblEveryDay</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -284,7 +284,7 @@
                <object idref="Font3"/> 
               </void> 
               <void property="name"> 
-               <string>jLabel7</string> 
+               <string>lblDays</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -354,7 +354,7 @@
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>unrelgap, linegap, default, linegap, pref, narrowlinegap, default:grow, linegap, relgap</string> 
+              <string>unrelgap, linegap, default, linegap, fill:53dlu:grow, narrowlinegap, default:grow, linegap, relgap</string> 
              </void> 
             </object> 
             <void method="setProperty"> 
@@ -436,7 +436,7 @@
                  <object idref="Font2"/> 
                 </void> 
                 <void property="name"> 
-                 <string>label2</string> 
+                 <string>lblEveryWeek</string> 
                 </void> 
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -482,7 +482,7 @@
                  <object idref="Font4"/> 
                 </void> 
                 <void property="name"> 
-                 <string>jLabel8</string> 
+                 <string>lblWeeks</string> 
                 </void> 
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1278,7 +1278,7 @@
                <int>11</int> 
               </void> 
               <void property="name"> 
-               <string>label4</string> 
+               <string>lblEveryMonth</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1332,7 +1332,7 @@
                <object idref="Font2"/> 
               </void> 
               <void property="name"> 
-               <string>label6</string> 
+               <string>lblMonth</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1402,7 +1402,7 @@
                <int>11</int> 
               </void> 
               <void property="name"> 
-               <string>label5</string> 
+               <string>llblOnDayOfMonth</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1531,11 +1531,11 @@
              <class>com.jgoodies.forms.layout.FormLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>30dlu, labelcompgap, 26dlu, labelcompgap, 56dlu</string> 
+              <string>30dlu, relgap, 26dlu, relgap, pref, unrelgap, default</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>default, linegap, default, linegap, default</string> 
+              <string>default, 15dlu, default</string> 
              </void> 
             </object> 
             <void property="name"> 
@@ -1557,7 +1557,7 @@
                <int>11</int> 
               </void> 
               <void property="name"> 
-               <string>label7</string> 
+               <string>lblEveryYear</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1572,7 +1572,7 @@
                <object idref="Font6"/> 
               </void> 
               <void property="name"> 
-               <string>spinMonat2</string> 
+               <string>spinYearly</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1595,7 +1595,7 @@
                <object idref="Font2"/> 
               </void> 
               <void property="name"> 
-               <string>label8</string> 
+               <string>lblYear</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1632,12 +1632,81 @@
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
+               <string>gridX</string> 
+               <int>7</int> 
+              </void> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JLabel</string> 
+              <void method="setProperty"> 
+               <string>text</string> 
+               <string>alle</string> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object idref="Font2"/> 
+              </void> 
+              <void method="setProperty"> 
+               <string>horizontalAlignment</string> 
+               <int>11</int> 
+              </void> 
+              <void property="name"> 
+               <string>lblOnDay</string> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jgoodies.forms.layout.CellConstraints</class> 
+              <void method="setProperty"> 
+               <string>gridY</string> 
+               <int>3</int> 
+              </void> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JSpinner</string> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object idref="Font6"/> 
+              </void> 
+              <void property="name"> 
+               <string>spinDayInMonthInYear</string> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jgoodies.forms.layout.CellConstraints</class> 
+              <void method="setProperty"> 
+               <string>gridY</string> 
+               <int>3</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>gridX</string> 
+               <int>3</int> 
+              </void> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JComboBox</string> 
+              <void property="name"> 
+               <string>cmbMonth</string> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jgoodies.forms.layout.CellConstraints</class> 
+              <void method="setProperty"> 
+               <string>gridX</string> 
+               <int>5</int> 
+              </void> 
+              <void method="setProperty"> 
                <string>gridY</string> 
                <int>3</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
              </object> 
             </void> 
