@@ -1,5 +1,6 @@
 package entity.qms;
 
+import entity.system.Users;
 import io.lamma.Date;
 import io.lamma.Lamma4j;
 import op.OPDE;
@@ -25,7 +26,8 @@ public class QmsTools {
 
 
     /**
-     * this method generates QMS objects. It uses the lamma.io date sequence generator and checks which occurence is next. This one will be the new one to generate. Every QMS object knows its
+     * this method generates QMS objects. It uses the lamma.io date sequence generator and checks which occurence is next.
+     * This one will be the new one to generate. Every QMS object knows its
      * position in the recurrence list.
      *
      * @param qmssched      the schedule which contains the recurrence pattern
@@ -36,7 +38,6 @@ public class QmsTools {
 
         Collections.sort(qmssched.getQmsList());
         int maxSequence = qmssched.getQmsList().isEmpty() ? -1 : qmssched.getQmsList().get(qmssched.getQmsList().size() - 1).getSequence();
-
 
         ArrayList<Date> listSequence = new ArrayList<>();
         if (qmssched.isYearly()){
@@ -55,10 +56,11 @@ public class QmsTools {
 
     /**
      * retrieves a list of all due and overdue QMSs.
+     * @param user the list is created only for those users which are supposed to be notified
      *
      * @return
      */
-    public static ArrayList<Qms> getDueList() {
+    public static ArrayList<Qms> getDueList(Users user) {
         EntityManager em = OPDE.createEM();
         ArrayList<Qms> result = new ArrayList<>();
 
@@ -68,6 +70,7 @@ public class QmsTools {
             String jpql = " SELECT qms " +
                     " FROM Qms qms " +
                     " WHERE qms.qmssched.state = :schedstate AND qms.qmsplan.state = :planstate AND qms.state = :qmsstate " +
+                    " AND :user MEMBER OF qms.qmsplan.notification " +
                     " ORDER BY qms.target DESC ";
 
             Query query = em.createQuery(jpql);
@@ -75,7 +78,7 @@ public class QmsTools {
             query.setParameter("schedstate", QmsschedTools.STATE_ACTIVE);
             query.setParameter("planstate", QmsplanTools.STATE_ACTIVE);
             query.setParameter("qmsstate", QmsTools.STATE_OPEN);
-
+            query.setParameter("user", user);
 
             ArrayList<Qms> listPre = new ArrayList<Qms>(query.getResultList());
 

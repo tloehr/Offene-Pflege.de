@@ -77,8 +77,6 @@ public class PnlQMSSchedule extends JPanel {
         this.qmssched = qmssched;
         this.actionBlock = actionBlock;
 
-        this.qmssched.getQmsList().clear();
-
         initComponents();
         initPanel();
     }
@@ -111,7 +109,7 @@ public class PnlQMSSchedule extends JPanel {
     }
 
     private void btnEveryYearActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        spinYearly.setValue(1);
     }
 
     private void i18n() {
@@ -838,6 +836,7 @@ public class PnlQMSSchedule extends JPanel {
             qmssched.setStation(null);
         }
 
+        qmssched.getQmsList().clear();
         QmsTools.generate(qmssched, 2);
 
     }

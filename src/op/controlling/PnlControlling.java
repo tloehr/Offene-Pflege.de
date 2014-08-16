@@ -79,7 +79,8 @@ import java.util.*;
  * ============
  * EXECUTE      Start this sub program and use the controlling queries
  * UPDATE       Enter and edit new / existing Qmsplans and Qmsschedules. Access the QMS tab in general.
- * DELETE       Delete Qmsplan with everything connected to it
+ * DELETE       Delete Qmsplan with everything connected to it. But only when unused.
+ * MANAGER      show staff controlling tab and allow to delete even USED Qmsplans.
  *
  * @author tloehr
  */
@@ -859,9 +860,11 @@ public class PnlControlling extends CleanablePanel {
             }
             case TAB_QMSPLAN: {
                 if (pnlQMSPlan == null) {
-                    pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAllActive(), showMeFirst);
+                    pnlQMSPlan = new PnlQMSPlan(showMeFirst);
                     tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
                     showMeFirst = null;
+                } else {
+                    pnlQMSPlan.reload();
                 }
                 break;
             }
@@ -1054,7 +1057,7 @@ public class PnlControlling extends CleanablePanel {
                                         em.getTransaction().begin();
                                         final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
                                         em.getTransaction().commit();
-                                        pnlQMSPlan.getListQMSPlans().add(myQMSPlan);
+//                                        pnlQMSPlan.getListQMSPlans().add(myQMSPlan);
                                         pnlQMSPlan.reload();
                                         prepareSearchArea();
                                     } catch (OptimisticLockException ole) {
@@ -1107,7 +1110,7 @@ public class PnlControlling extends CleanablePanel {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         pnlQMSPlan.cleanup();
-                        pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAllActive(), null);
+                        pnlQMSPlan = new PnlQMSPlan(null);
                         tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
                     }
                 });
@@ -1119,7 +1122,7 @@ public class PnlControlling extends CleanablePanel {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             pnlQMSPlan.cleanup();
-                            pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAll(commontag, QmsplanTools.STATE_ACTIVE), null);
+                            pnlQMSPlan = new PnlQMSPlan(null);
                             tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
                             //TODO: mark the filter when it is used. maybe a yellow background
                         }

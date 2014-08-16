@@ -2,13 +2,17 @@ package entity.qms;
 
 import io.lamma.LammaConversion;
 import io.lamma.Recurrence;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 import org.joda.time.MutableDateTime;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.text.DateFormat;
+import java.util.ArrayList;
 
 /**
  * Created by tloehr on 17.06.14.
@@ -149,6 +153,39 @@ public class QmsschedTools {
             if (!unused) break;
         }
         return unused;
+    }
+
+    public static long getNumOpen(Qmssched qmssched) {
+        long open = 0;
+
+        EntityManager em = OPDE.createEM();
+
+        try {
+
+            String jpql = " SELECT count(q) " +
+                    " FROM Qms q" +
+                    " WHERE q.qmssched = :qmssched AND q.state = :state ";
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("state", QmsTools.STATE_OPEN);
+            query.setParameter("qmssched", qmssched);
+
+            open = (long) query.getSingleResult();
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+
+//
+//        for (Qms qms : qmssched.getQmsList()) {
+//            if (qms.isOpen()) {
+//                open++;
+//            }
+//
+//        }
+        return open;
     }
 
 }

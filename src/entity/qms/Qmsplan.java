@@ -61,6 +61,15 @@ public class Qmsplan {
     @Column(name = "state", nullable = false, insertable = true, updatable = true)
     private byte state;
 
+    public byte getState() {
+        return state;
+    }
+
+    public void setState(byte state) {
+        this.state = state;
+    }
+
+
     @JoinColumn(name = "uid", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;

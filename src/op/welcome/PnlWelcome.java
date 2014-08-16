@@ -173,7 +173,7 @@ public class PnlWelcome extends CleanablePanel {
                 expiryList = MedStockTools.getExpiryList(7);
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
-                dueQMSes = QmsTools.getDueList();
+                dueQMSes = QmsTools.getDueList(OPDE.getLogin().getUser());
                 Collections.sort(processList);
                 int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size();
 
@@ -337,7 +337,12 @@ public class PnlWelcome extends CleanablePanel {
 
     private DefaultCPTitle createCP4DueQms(final Qms due) {
 
-        String title = SYSTools.toHTMLForScreen(QmsTools.toHTML(due) + " " + CommontagsTools.getAsHTML(due.getQmsplan().getCommontags(), SYSConst.html_16x16_tagPurple_internal));
+        String title = SYSTools.toHTMLForScreen(QmsTools.toHTML(due)
+                        + " " + SYSConst.html_bold(due.getQmssched().getMeasure())
+                        + " [" + SYSConst.html_italic(due.getQmsplan().getTitle())
+                        + " " + CommontagsTools.getAsHTML(due.getQmsplan().getCommontags(), SYSConst.html_16x16_tagPurple_internal)
+                        + "]"
+        );
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
