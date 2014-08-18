@@ -44,7 +44,6 @@ import entity.prescription.MedStockTools;
 import entity.process.QProcessElement;
 import entity.process.QProcessTools;
 import entity.qms.Qmsplan;
-import entity.qms.QmsplanTools;
 import entity.reports.NReportTools;
 import entity.staff.TrainingTools;
 import entity.system.Commontags;
@@ -68,6 +67,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
@@ -96,6 +97,8 @@ public class PnlControlling extends CleanablePanel {
     private Closure progressClosure;
     private CollapsiblePanes searchPanes;
     private PnlQMSPlan pnlQMSPlan;
+    private boolean init = false;
+    private Commontags filterTag = null;
 
     // Variables declaration - do not modify
     //GEN-BEGIN:variables
@@ -1096,10 +1099,9 @@ public class PnlControlling extends CleanablePanel {
         if (tabMain.getSelectedIndex() == TAB_QMSPLAN) {
 
 
-            final JToggleButton tbClosedOnes2 = new JToggleButton();
-            tbClosedOnes2.setSelected(true);
+            final JToggleButton tbClosedOnes2 = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showclosed"));
 
-            ArrayList<Commontags> listTags = CommontagsTools.getAllUsedInQMSPlans(tbClosedOnes2.isSelected());
+            ArrayList<Commontags> listTags = CommontagsTools.getAllUsedInQMSPlans(true);
             if (!listTags.isEmpty()) {
 
                 JPanel pnlTags = new JPanel();
@@ -1109,9 +1111,20 @@ public class PnlControlling extends CleanablePanel {
                 final JButton btnReset = GUITools.createHyperlinkButton("misc.commands.resetFilter", SYSConst.icon16tagPurpleDelete4, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        pnlQMSPlan.cleanup();
-                        pnlQMSPlan = new PnlQMSPlan(null);
-                        tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
+
+//                        init = true;
+//                        tbClosedOnes2.setSelected(false);
+//                        init = false;
+
+//                        pnlQMSPlan.reload();
+//
+//                        pnlQMSPlan.cleanup();
+//                        pnlQMSPlan = new PnlQMSPlan(null);
+//                        tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
+
+                        filterTag = null;
+                        tbClosedOnes2.setSelected(false);
+
                     }
                 });
                 pnlTags.add(btnReset, RiverLayout.LEFT);
@@ -1121,10 +1134,17 @@ public class PnlControlling extends CleanablePanel {
                     final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            pnlQMSPlan.cleanup();
-                            pnlQMSPlan = new PnlQMSPlan(null);
-                            tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
-                            //TODO: mark the filter when it is used. maybe a yellow background
+//                            init = true;
+//                            tbClosedOnes2.setSelected(true);
+//                            init = false;
+//
+//                            pnlQMSPlan.cleanup();
+//                            pnlQMSPlan = new PnlQMSPlan(null);
+//                            tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
+//                            //TODO: mark the filter when it is used. maybe a yellow background
+
+                            filterTag = commontag;
+                            tbClosedOnes2.setSelected(true);
                         }
                     });
                     pnlTags.add(btnTag);
@@ -1133,6 +1153,19 @@ public class PnlControlling extends CleanablePanel {
                 }
                 list.add(pnlTags);
             }
+
+
+            tbClosedOnes2.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent itemEvent) {
+//                    if (init) return;
+                    pnlQMSPlan.reload(filterTag, itemEvent.getStateChange() == ItemEvent.SELECTED);
+                }
+            });
+            list.add(tbClosedOnes2);
+            tbClosedOnes2.setHorizontalAlignment(SwingConstants.LEFT);
+
+
         }
 
         return list;

@@ -82,6 +82,7 @@ public class OPDE {
 
     protected static boolean animation = false;
     protected static boolean debug;
+    protected static boolean training;
     protected static boolean experimental;
     protected static String opwd = "";
     protected static String css = "";
@@ -311,6 +312,10 @@ public class OPDE {
         return experimental;
     }
 
+    public static boolean isTraining() {
+        return training;
+    }
+
     /**
      * Hier ist die main Methode von OPDE. In dieser Methode wird auch festgestellt, wie OPDE gestartet wurde.
      * <ul>
@@ -414,6 +419,7 @@ public class OPDE {
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
         opts.addOption("w", "workingdir", true, "Damit kannst Du ein anderes Arbeitsverzeichnis setzen. Wenn Du diese Option weglässt, dann ist das Dein Benutzerverzeichnis: " + System.getProperty("user.home"));
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
+        opts.addOption("t", "training", false, "Wird für Einarbeitungsversionen benötigt. Färbt die Oberfläche anders ein und zeigt eine Warnmeldung nach jeder Anmeldung.");
         Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(lang.getString("cmdline.ftpserver")).create("f");
         opts.addOption(optFTPserver);
 //        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
@@ -548,6 +554,12 @@ public class OPDE {
 
             } else {
                 experimental = false;
+            }
+
+            if (cl.hasOption("t") || SYSTools.catchNull(localProps.getProperty("training")).equalsIgnoreCase("true")) {
+                training = true;
+            } else {
+                training = false;
             }
 
 

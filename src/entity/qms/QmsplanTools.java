@@ -48,35 +48,42 @@ public class QmsplanTools {
     }
 
 
-    public static ArrayList<Qmsplan> getAll(Commontags commontag, int state) {
+    public static ArrayList<Qmsplan> getAll(Commontags commontag) {
         EntityManager em = OPDE.createEM();
         ArrayList<Qmsplan> list = null;
 
         try {
+            String jpql = " SELECT q " +
+                    " FROM Qmsplan q " +
+                    " WHERE q.state = :state " +
+                    " AND :commontag MEMBER OF q.commontags " +
+                    " ORDER BY q.title DESC ";
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("commontag", commontag);
+
+            list = new ArrayList<Qmsplan>(query.getResultList());
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
 
 
-            if (commontag == null) {
-                String jpql = " SELECT q " +
-                        " FROM Qmsplan q" +
-                        " WHERE q.state = :state " +
-                        " ORDER BY q.title DESC ";
+    public static ArrayList<Qmsplan> getAll() {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Qmsplan> list = null;
+        try {
 
-                Query query = em.createQuery(jpql);
-                query.setParameter("state", state);
-                list = new ArrayList<Qmsplan>(query.getResultList());
-            } else {
-                String jpql = " SELECT q " +
-                        " FROM Qmsplan q " +
-                        " WHERE q.state = :state " +
-                        " AND :commontag MEMBER OF q.commontags " +
-                        " ORDER BY q.title DESC ";
+            String jpql = " SELECT q " +
+                    " FROM Qmsplan q" +
+                    " ORDER BY q.title DESC ";
 
-                Query query = em.createQuery(jpql);
-                query.setParameter("commontag", commontag);
-                query.setParameter("state", state);
+            Query query = em.createQuery(jpql);
+            list = new ArrayList<Qmsplan>(query.getResultList());
 
-                list = new ArrayList<Qmsplan>(query.getResultList());
-            }
         } catch (Exception se) {
             OPDE.fatal(se);
         } finally {
@@ -107,9 +114,9 @@ public class QmsplanTools {
 //        }
 
         html += !SYSTools.catchNull(qmsplan.getDescription()).isEmpty() ? SYSConst.html_h3("misc.msg.description") +
-                 SYSConst.html_paragraph(SYSTools.replace(qmsplan.getDescription(), "\n", "<br/>", false)) : "";
+                SYSConst.html_paragraph(SYSTools.replace(qmsplan.getDescription(), "\n", "<br/>", false)) : "";
 
-        html +=  qmsplan.getCommontags().isEmpty() ? "" : CommontagsTools.getAsHTML(qmsplan.getCommontags(), SYSConst.html_16x16_tagPurple_internal);
+        html += qmsplan.getCommontags().isEmpty() ? "" : CommontagsTools.getAsHTML(qmsplan.getCommontags(), SYSConst.html_16x16_tagPurple_internal);
 
 
 //        html += SYSConst.html_h3("misc.msg.measures");

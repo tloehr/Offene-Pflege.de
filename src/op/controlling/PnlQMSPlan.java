@@ -7,6 +7,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.qms.*;
+import entity.system.Commontags;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.system.InternalClassACL;
@@ -46,15 +47,17 @@ public class PnlQMSPlan extends CleanablePanel {
 
     private HashMap<Qms, CollapsiblePane> mapQms2Panel;
     private HashMap<String, CollapsiblePane> cpMap;
+    private ArrayList<Qmsplan> listQMSPlans;
     //    private ArrayList<Qmsplan> listQMSPlans;
-//    private ArrayList<Qmsplan> listQMSPlans;
     private final Qmsplan expandMe;
 
     //    private final int MAX_TEXT_LENGTH = 65;
     private final int MAX_MONTHS_IN_ADVANCE_TO_CONFIRM_QMS = 6;
+    private Commontags commontag;
+    private boolean closedOnes2;
 
     public PnlQMSPlan(Qmsplan expandMe) {
-
+        listQMSPlans = new ArrayList<>();
         this.expandMe = expandMe;
         cpMap = new HashMap<>();
         mapQms2Panel = new HashMap<>();
@@ -73,13 +76,33 @@ public class PnlQMSPlan extends CleanablePanel {
         cpMap.clear();
         mapQms2Panel.clear();
         cpsMain.removeAll();
+        listQMSPlans.clear();
+    }
+
+
+    public void reload(Commontags commontag, boolean closedOnes2) {
+        this.commontag = commontag;
+        this.closedOnes2 = closedOnes2;
+        reload();
+    }
+
+    private void reloadData() {
+        listQMSPlans.clear();
+        if (commontag != null) {
+            listQMSPlans.addAll(QmsplanTools.getAll(commontag));
+        } else if (closedOnes2) {
+            listQMSPlans.addAll(QmsplanTools.getAll());
+        } else {
+            listQMSPlans.addAll(QmsplanTools.getAllActive());
+        }
     }
 
     @Override
     public void reload() {
         cpMap.clear();
         mapQms2Panel.clear();
-        for (Qmsplan qmsplan : QmsplanTools.getAllActive()) {
+        reloadData();
+        for (Qmsplan qmsplan : listQMSPlans) {
             createCP4(qmsplan);
         }
         buildPanel();
@@ -93,7 +116,8 @@ public class PnlQMSPlan extends CleanablePanel {
     private void buildPanel() {
         cpsMain.removeAll();
         cpsMain.setLayout(new JideBoxLayout(cpsMain, JideBoxLayout.Y_AXIS));
-        for (Qmsplan qmsplan : QmsplanTools.getAllActive()) {
+
+        for (Qmsplan qmsplan : listQMSPlans) {
             cpsMain.add(cpMap.get(qmsplan.getId() + ".qmsplan"));
         }
         cpsMain.addExpansion();
@@ -300,10 +324,6 @@ public class PnlQMSPlan extends CleanablePanel {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.already.used.cant.edit"));
                         return;
                     }
-//                    if (!qmssched.isActive()) {
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.inactive"));
-//                        return;
-//                    }
 
                     final JidePopup popup = new JidePopup();
                     PnlQMSSchedule pnlQMSSchedule = new PnlQMSSchedule(qmssched, new Closure() {
@@ -322,6 +342,7 @@ public class PnlQMSPlan extends CleanablePanel {
                                     em.getTransaction().commit();
 //                                    listQMSPlans.set(listQMSPlans.indexOf(qmssched.getQmsplan()), myQMSPlan);
                                     createCP4(myQMSPlan);
+                                    reloadData();
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
                                     OPDE.warn(ole);
@@ -402,6 +423,7 @@ public class PnlQMSPlan extends CleanablePanel {
                                     // Refresh Display
 //                                    listQMSPlans.set(listQMSPlans.indexOf(qmssched.getQmsplan()), myQMSPlan);
                                     createCP4(myQMSPlan);
+                                    reloadData();
                                     buildPanel();
 
                                 } catch (OptimisticLockException ole) {
@@ -463,6 +485,7 @@ public class PnlQMSPlan extends CleanablePanel {
 //                        listQMSPlans.set(listQMSPlans.indexOf(qmssched.getQmsplan()), myQMSPlan);
 
                         createCP4(myQMSPlan);
+                        reloadData();
                         buildPanel();
                     } catch (OptimisticLockException ole) {
                         OPDE.warn(ole);
@@ -533,6 +556,7 @@ public class PnlQMSPlan extends CleanablePanel {
 //                                listQMSPlans.remove(qmsplan);
 //                                listQMSPlans.add(myQMSPlan);
                                 createCP4(myQMSPlan);
+                                reloadData();
                                 buildPanel();
                             } catch (OptimisticLockException ole) {
                                 OPDE.warn(ole);
@@ -646,6 +670,7 @@ public class PnlQMSPlan extends CleanablePanel {
 //                    listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
                     mapQms2Panel.remove(qms);
                     createCP4(myQmsplan);
+                    reloadData();
                     buildPanel();
 
                 } catch (OptimisticLockException ole) {
@@ -772,6 +797,7 @@ public class PnlQMSPlan extends CleanablePanel {
 //                            listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
                             mapQms2Panel.remove(qms);
                             createCP4(myQmsplan);
+                            reloadData();
                             buildPanel();
                         } catch (OptimisticLockException ole) {
                             OPDE.warn(ole);
@@ -842,6 +868,7 @@ public class PnlQMSPlan extends CleanablePanel {
 //                            listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
                             mapQms2Panel.remove(qms);
                             createCP4(myQmsplan);
+                            reloadData();
                             buildPanel();
 
                         } catch (OptimisticLockException ole) {
@@ -909,6 +936,7 @@ public class PnlQMSPlan extends CleanablePanel {
 //                                listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
                                 mapQms2Panel.remove(qms);
                                 createCP4(myQmsplan);
+                                reloadData();
                                 buildPanel();
 
                             } catch (OptimisticLockException ole) {
@@ -1056,7 +1084,8 @@ public class PnlQMSPlan extends CleanablePanel {
                                     em.getTransaction().commit();
 //                                    listQMSPlans.remove(qmsplan);
 //                                    listQMSPlans.add(myQMSPlan);
-                                    reload();
+                                    reloadData();
+                                    buildPanel();
                                 } catch (OptimisticLockException ole) {
                                     OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
@@ -1109,9 +1138,9 @@ public class PnlQMSPlan extends CleanablePanel {
 
 
                                     // Refresh Display
-//                                    listQMSPlans.remove(qmsplan);
-                                    reload();
-
+                                    listQMSPlans.remove(qmsplan);
+//                                    reload();
+                                    buildPanel();
                                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(qmsplan.getTitle(), "deleted"));
 
                                 } catch (OptimisticLockException ole) {

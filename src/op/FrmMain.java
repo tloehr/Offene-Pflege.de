@@ -120,8 +120,10 @@ public class FrmMain extends JFrame {
         initPhase = true;
         initComponents();
 
-//        pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
 
+        if (OPDE.isTraining()) {
+            pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
+        }
 
 
 //        pbTimeout.setToolTipText(SYSTools.xx("opde.mainframe.pbTimeout.tooltip"));
@@ -198,7 +200,6 @@ public class FrmMain extends JFrame {
         gc.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
         initPhase = false;
-
 
 
 //        JDialog dlg = new JDialog(this, false);
@@ -357,6 +358,17 @@ public class FrmMain extends JFrame {
         OPDE.getDisplayManager().touch();
         dlgLogin = null;
 
+
+        if (OPDE.isTraining()) {
+            JTextPane txtMessage = new JTextPane();
+            txtMessage.setFont(new Font("Arial", Font.PLAIN, 18));
+            txtMessage.setEditable(false);
+            txtMessage.setContentType("text/html");
+            txtMessage.setText(SYSTools.toHTMLForScreen(SYSTools.xx("opde.general.training.version.message")));
+
+            JOptionPane.showConfirmDialog(this, txtMessage, SYSTools.xx("opde.general.training.version.title"), JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        }
+
         if (specialities != null) {
             synchronized (specialities) {
                 SYSTools.clear(specialities);
@@ -439,16 +451,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, 3dlu, $nlgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, 3dlu, $nlgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
