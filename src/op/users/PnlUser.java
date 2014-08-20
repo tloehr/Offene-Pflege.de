@@ -517,7 +517,7 @@ public class PnlUser extends CleanablePanel {
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
-                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                         OPDE.getMainframe().emptyFrame();
                         OPDE.getMainframe().afterLogin();
                     }
@@ -578,7 +578,7 @@ public class PnlUser extends CleanablePanel {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
                                 }
@@ -712,7 +712,7 @@ public class PnlUser extends CleanablePanel {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
                                 }
@@ -797,7 +797,7 @@ public class PnlUser extends CleanablePanel {
         Collections.sort(listClasses);
         for (final InternalClass ic : listClasses) {
             CollapsiblePane cpClass = new CollapsiblePane(ic.getShortDescription());
-            cpClass.setToolTipText(ic.getLongDescription());
+//            cpClass.setToolTipText(ic.getLongDescription());
             SYSGROUPS2ACL mySYSGROUPS2ACL = lookup.containsKey(ic.getInternalClassID()) ? lookup.get(ic.getInternalClassID()) : new SYSGROUPS2ACL(ic.getInternalClassID(), group);
             cpClass.setContentPane(new PnlEditACL(mySYSGROUPS2ACL));
             cpClass.setStyle(CollapsiblePane.TREE_STYLE);

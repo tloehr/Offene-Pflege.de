@@ -368,7 +368,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     } else {
@@ -1074,7 +1074,7 @@ public class PnlReport extends NursingRecordsPanel {
                                             if (em.getTransaction().isActive()) {
                                                 em.getTransaction().rollback();
                                             }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                                 OPDE.getMainframe().emptyFrame();
                                                 OPDE.getMainframe().afterLogin();
                                             } else {
@@ -1084,7 +1084,7 @@ public class PnlReport extends NursingRecordsPanel {
                                             if (em.getTransaction().isActive()) {
                                                 em.getTransaction().rollback();
                                             }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                                 OPDE.getMainframe().emptyFrame();
                                                 OPDE.getMainframe().afterLogin();
                                             }
@@ -1321,7 +1321,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     } else {
@@ -1403,7 +1403,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
                                     } else {
@@ -1443,7 +1443,7 @@ public class PnlReport extends NursingRecordsPanel {
                     final JidePopup popup = new JidePopup();
 
                     final JPanel pnl = new JPanel(new BorderLayout(5, 5));
-                    final PnlCommonTags pnlCommonTags = new PnlCommonTags(nreport.getCommontags(), true, 4);
+                    final PnlCommonTags pnlCommonTags = new PnlCommonTags(nreport.getCommontags(), true, 3);
                     pnl.add(new JScrollPane(pnlCommonTags), BorderLayout.CENTER);
                     JButton btnApply = new JButton(SYSConst.icon22apply);
                     pnl.add(btnApply, BorderLayout.SOUTH);
@@ -1458,7 +1458,9 @@ public class PnlReport extends NursingRecordsPanel {
                                 em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
                                 myReport.getCommontags().clear();
-                                myReport.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
+                                for (Commontags commontag : pnlCommonTags.getListSelectedTags()){
+                                    myReport.getCommontags().add(em.merge(commontag));
+                                }
 
                                 em.getTransaction().commit();
 
@@ -1496,24 +1498,16 @@ public class PnlReport extends NursingRecordsPanel {
                                 GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
                             } catch (OptimisticLockException ole) {
                                 OPDE.warn(ole);
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
                                 } else {
                                     reloadDisplay(true);
                                 }
-                            } catch (RollbackException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                             } catch (Exception e) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
@@ -1596,7 +1590,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
                                 } else {
@@ -1752,7 +1746,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
                                 } else {
@@ -1762,7 +1756,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
                                 }

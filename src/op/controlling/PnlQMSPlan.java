@@ -679,7 +679,7 @@ public class PnlQMSPlan extends CleanablePanel {
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
-                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                         OPDE.getMainframe().emptyFrame();
                         OPDE.getMainframe().afterLogin();
                     }
@@ -688,7 +688,7 @@ public class PnlQMSPlan extends CleanablePanel {
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
-                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
                         OPDE.getMainframe().emptyFrame();
                         OPDE.getMainframe().afterLogin();
                     }

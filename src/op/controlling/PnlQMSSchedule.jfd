@@ -1826,6 +1826,14 @@
               <int>14</int> 
              </object> 
             </void> 
+            <void method="setProperty"> 
+             <string>lineWrap</string> 
+             <boolean>true</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>wrapStyleWord</string> 
+             <boolean>true</boolean> 
+            </void> 
             <void property="name"> 
              <string>txtBemerkung</string> 
             </void> 
@@ -1923,7 +1931,7 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JFormattedTextField</string> 
+          <string>javax.swing.JTextField</string> 
           <void method="setProperty"> 
            <string>font</string> 
            <object class="java.awt.Font"> 
@@ -1934,6 +1942,12 @@
           </void> 
           <void property="name"> 
            <string>txtDueDays</string> 
+          </void> 
+          <void method="auxiliary"> 
+           <void method="setProperty"> 
+            <string>JavaCodeGenerator.customCreateCode</string> 
+            <string>GUITools.createIntegerTextField(1, 31, 1);</string> 
+           </void> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 

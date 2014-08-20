@@ -60,7 +60,7 @@ public class QmsschedTools {
             MutableDateTime mdt = new MutableDateTime();
             mdt.setDayOfWeek(qmssched.getWeekday());
 
-            result += ", " + SYSTools.xx("misc.msg.each") + " " + SYSTools.xx("misc.msg.atchrono") + " " + mdt.dayOfWeek().getAsText();
+            result += ", " + SYSTools.xx("misc.msg.every4") + " " + mdt.dayOfWeek().getAsText();
 
         } else if (qmssched.isMonthly()) {
 
@@ -75,9 +75,9 @@ public class QmsschedTools {
                 MutableDateTime mdt = new MutableDateTime();
                 mdt.setDayOfWeek(qmssched.getWeekday());
 
-                result += SYSTools.xx("misc.msg.each") + " " + SYSTools.xx("misc.msg.atchrono") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText();
+                result += SYSTools.xx("misc.msg.every4") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText();
             } else {
-                result += SYSTools.xx("misc.msg.each") + " " + SYSTools.xx("misc.msg.atchrono") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
+                result +=SYSTools.xx("misc.msg.every4") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
             }
 
 
@@ -93,7 +93,7 @@ public class QmsschedTools {
             MutableDateTime mdt = new MutableDateTime();
             mdt.setDayOfMonth(qmssched.getDayinmonth());
             mdt.setMonthOfYear(qmssched.getMonthinyear());
-            result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + mdt.monthOfYear().getAsText();
+            result += SYSTools.xx("misc.msg.every4") + " " + qmssched.getDayinmonth() + ". " + mdt.monthOfYear().getAsText();
 
 
         } else {

@@ -84,7 +84,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
 
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "nreports2tags", joinColumns =
     @JoinColumn(name = "pbid"), inverseJoinColumns =
     @JoinColumn(name = "ctagid"))
