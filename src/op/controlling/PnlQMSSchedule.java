@@ -269,8 +269,6 @@ public class PnlQMSSchedule extends JPanel {
                 row++;
             }
         }
-
-
     }
 
     /**

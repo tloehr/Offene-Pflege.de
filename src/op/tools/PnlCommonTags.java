@@ -4,6 +4,7 @@
 
 package op.tools;
 
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.AutoCompletion;
 import com.jidesoft.swing.SelectAllUtils;
 import entity.system.Commontags;
@@ -12,6 +13,9 @@ import op.OPDE;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +33,7 @@ public class PnlCommonTags extends JPanel {
     HashMap<Commontags, JButton> mapButtons;
     ArrayList<String> completionList;
     JTextField txtTags;
+    JButton btnPickTags;
     AutoCompletion ac;
 
     private Closure editAction;
@@ -112,6 +117,81 @@ public class PnlCommonTags extends JPanel {
             });
 
             add(txtTags);
+
+
+            if (editAction == null) {
+
+                btnPickTags = new JButton(SYSConst.icon22checkbox);
+                btnPickTags.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        final JidePopup popup = new JidePopup();
+                        JPanel pnl = new JPanel(new BorderLayout());
+                        pnl.add(new JScrollPane(getClickableTagsPanel()), BorderLayout.CENTER);
+//                        JButton btnApply = new JButton(SYSConst.icon22apply);
+//                        pnl.add(btnApply, BorderLayout.SOUTH);
+//
+//                        btnApply.addActionListener(new ActionListener() {
+//                            @Override
+//                            public void actionPerformed(ActionEvent ae) {
+//                                popup.hidePopup();
+//                            }
+//                        });
+
+                        popup.setMovable(false);
+                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                        popup.setOwner(btnPickTags);
+                        popup.removeExcludedComponent(btnPickTags);
+                        pnl.setPreferredSize(new Dimension(400, 200));
+                        popup.getContentPane().add(pnl);
+                        popup.setDefaultFocusComponent(pnl);
+
+                        popup.addPopupMenuListener(new PopupMenuListener() {
+                            @Override
+                            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                                OPDE.debug("popupMenuWillBecomeVisible");
+                            }
+
+                            @Override
+                            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        removeAll();
+
+                                        add(txtTags);
+                                        if (btnPickTags != null) {
+                                            add(btnPickTags);
+                                        }
+                                        int tagnum = 1;
+
+                                        for (JButton btn : mapButtons.values()) {
+                                            if (tagnum % MAXLINE == 0) {
+                                                add(btn, RiverLayout.LINE_BREAK);
+                                            } else {
+                                                add(btn, RiverLayout.LEFT);
+                                            }
+                                            tagnum++;
+                                        }
+
+                                        revalidate();
+                                        repaint();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void popupMenuCanceled(PopupMenuEvent e) {
+                                OPDE.debug("popupMenuCanceled");
+                            }
+                        });
+
+                        GUITools.showPopup(popup, SwingConstants.WEST);
+                    }
+                });
+
+                add(btnPickTags);
+            }
         }
     }
 
@@ -194,6 +274,9 @@ public class PnlCommonTags extends JPanel {
                                 removeAll();
 
                                 add(txtTags);
+                                if (btnPickTags != null) {
+                                    add(btnPickTags);
+                                }
                                 int tagnum = 1;
 
                                 for (JButton btn : mapButtons.values()) {
@@ -217,6 +300,34 @@ public class PnlCommonTags extends JPanel {
         mapButtons.put(commontag, jButton);
 
         return jButton;
+    }
+
+
+    private JPanel getClickableTagsPanel() {
+        JPanel pnl = new JPanel();
+
+        pnl.setLayout(new GridLayout(0, 3));
+        for (final Commontags ctag : mapAllTags.values()) {
+            JCheckBox cb = new JCheckBox(ctag.getText());
+
+            cb.setSelected(listSelectedTags.contains(ctag));
+
+            cb.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        listSelectedTags.add(ctag);
+                        add(createButton(ctag));
+                    } else {
+                        listSelectedTags.remove(ctag);
+                        mapButtons.remove(ctag);
+                    }
+                }
+            });
+
+            pnl.add(cb);
+        }
+        return pnl;
     }
 
 
