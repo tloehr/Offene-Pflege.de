@@ -7,7 +7,6 @@ package op.care.reports;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.DefaultOverlayable;
-import com.jidesoft.swing.OverlayTextField;
 import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
 import entity.info.ResInfo;

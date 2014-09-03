@@ -11,8 +11,8 @@ import org.joda.time.MutableDateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.swing.*;
 import java.text.DateFormat;
-import java.util.ArrayList;
 
 /**
  * Created by tloehr on 17.06.14.
@@ -77,7 +77,7 @@ public class QmsschedTools {
 
                 result += SYSTools.xx("misc.msg.every4") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText();
             } else {
-                result +=SYSTools.xx("misc.msg.every4") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
+                result += SYSTools.xx("misc.msg.every4") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
             }
 
 
@@ -186,6 +186,38 @@ public class QmsschedTools {
 //
 //        }
         return open;
+    }
+
+
+    public static Icon getIcon(Qmssched qmssched) {
+
+        Icon icon = null;
+
+        int pastdue = 2;
+        int due = 1;
+
+        int worstCase = 0;
+
+        for (Qms qms : qmssched.getQmsList()) {
+            if (qms.isOpen()) {
+                int thisCase = 0;
+                if (qms.isPastDue()) {
+                    thisCase = pastdue;
+                }
+                if (qms.isDue()) {
+                    thisCase = due;
+                }
+                worstCase = Math.max(worstCase, thisCase);
+            }
+        }
+
+        if (worstCase == pastdue) {
+            icon = SYSConst.icon22ledRedOn;
+        } else if (worstCase == due) {
+            icon = SYSConst.icon22ledYellowOn;
+        }
+
+        return icon;
     }
 
 }

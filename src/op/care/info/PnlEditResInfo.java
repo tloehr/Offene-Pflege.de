@@ -4,6 +4,7 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
+import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.OverlayTextArea;
 import entity.EntityTools;
 import entity.files.SYSFilesTools;
@@ -46,6 +47,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -966,7 +969,7 @@ public class PnlEditResInfo {
         }
 
         @Override
-        public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
+        public void startElement(String nsURI, String strippedName, String tagName, final Attributes attributes) throws SAXException {
             /***
              *               _   _
              *      ___ _ __| |_(_)___ _ _  __ _ _ _ ___ _  _ _ __
@@ -987,7 +990,7 @@ public class PnlEditResInfo {
                 innerpanel.setName(groupname);
                 innerpanel.setOpaque(false);
                 if (attributes.getValue("label") != null) {
-                    JLabel jl = new JLabel(attributes.getValue("label"));
+                    JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")));
 
                     int fontstyle = Font.PLAIN;
                     if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
@@ -1016,7 +1019,7 @@ public class PnlEditResInfo {
             }
             if (tagName.equalsIgnoreCase("scale")) {
                 scalemode = true;
-                scalesumlabeltext = attributes.getValue("label");
+                scalesumlabeltext = SYSTools.xx(attributes.getValue("label"));
                 scaleButtonGroups = new ArrayList();
                 scaleriskmodel = new ArrayList();
                 try {
@@ -1038,7 +1041,7 @@ public class PnlEditResInfo {
              *                    |___/             |_|
              */
             if (tagName.equalsIgnoreCase("tabgroup")) {
-                JLabel jl = new JLabel(attributes.getValue("label"));
+                JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")));
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
                     jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
@@ -1077,7 +1080,7 @@ public class PnlEditResInfo {
                 if (scalemode) {
                     score = SYSTools.parseBigDecimal(attributes.getValue("score"));
                 }
-                JRadioButton j = new JRadioButton(attributes.getValue("label"));
+                JRadioButton j = new JRadioButton(SYSTools.xx(attributes.getValue("label")));
                 j.setOpaque(false);
                 focusTraversal.add(j);
 
@@ -1114,7 +1117,7 @@ public class PnlEditResInfo {
              */
             if (tagName.equalsIgnoreCase("checkbox")) {
                 groupname = attributes.getValue("name");
-                JCheckBox j = new JCheckBox(attributes.getValue("label"));
+                JCheckBox j = new JCheckBox(SYSTools.xx(attributes.getValue("label")));
                 j.setOpaque(false);
                 focusTraversal.add(j);
                 j.setName(groupname);
@@ -1127,6 +1130,22 @@ public class PnlEditResInfo {
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), tabgroup ? "tab" : "br left");
                 outerpanel.add(layout, j);
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+
+                int fontstyle = Font.PLAIN;
+                if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                        fontstyle = Font.BOLD;
+                    }
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                        fontstyle = Font.ITALIC;
+                    }
+                }
+                if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
+                    int size = Integer.parseInt(attributes.getValue("size"));
+                    j.setFont(new Font("Arial", fontstyle, size));
+                } else {
+                    j.setFont(new Font("Arial", fontstyle, 12));
+                }
 
                 if (attributes.getValue("default") != null && attributes.getValue("default").equals("true")) {
                     j.setSelected(true);
@@ -1193,7 +1212,7 @@ public class PnlEditResInfo {
                     length = Integer.parseInt(attributes.getValue("length"));
                     hfill = "";
                 }
-                JLabel jl = new JLabel(attributes.getValue("label") + ":");
+                JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")) + ":");
                 JTextField j = new JTextField(length);
                 j.setOpaque(false);
                 j.setDisabledTextColor(Color.DARK_GRAY);
@@ -1259,7 +1278,7 @@ public class PnlEditResInfo {
                 }, neurologist, dermatology);
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 if (attributes.getValue("label") != null) {
-                    JLabel jl = new JLabel(attributes.getValue("label") + ":");
+                    JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")) + ":");
                     outerpanel.add(layout, jl);
                     layout = "left";
                 }
@@ -1340,6 +1359,33 @@ public class PnlEditResInfo {
                 outerpanel.add(jl);
             }
             /***
+             *                 _
+             *      _   _ _ __| |
+             *     | | | | '__| |
+             *     | |_| | |  | |
+             *      \__,_|_|  |_|
+             *
+             */
+            if (tagName.equalsIgnoreCase("url")) {
+                JideButton link = GUITools.createHyperlinkButton(attributes.getValue("label"), SYSConst.icon16internet, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Desktop desktop = Desktop.getDesktop();
+                        try {
+                            desktop.browse(new URI(attributes.getValue("link")));
+                        } catch (IOException ioe) {
+                            ioe.printStackTrace();
+                        } catch (URISyntaxException use) {
+                            use.printStackTrace();
+
+                        }
+                    }
+                });
+                link.setToolTipText(attributes.getValue("link"));
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                outerpanel.add(layout, link);
+            }
+            /***
              *      _                     _      _         _
              *     (_)_ __  __ _ __ _ ___| |__ _| |__  ___| |
              *     | | '  \/ _` / _` / -_) / _` | '_ \/ -_) |
@@ -1363,10 +1409,16 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("label")) {
                 //groupname = attributes.getValue("name");
                 groupname = null;
-                JLabel jl = new JLabel(attributes.getValue("label"));
+                JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")));
+
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
                     jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
+                if (!SYSTools.catchNull(attributes.getValue("bgcolor")).isEmpty()) {
+                    jl.setBackground(GUITools.getColor(attributes.getValue("bgcolor")));
+                    jl.setOpaque(true);
+                }
+
                 int fontstyle = Font.PLAIN;
                 if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
                     if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
@@ -1382,6 +1434,8 @@ public class PnlEditResInfo {
                 } else {
                     jl.setFont(new Font("Arial", fontstyle, 12));
                 }
+
+
 //                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
 //                jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
@@ -1405,7 +1459,7 @@ public class PnlEditResInfo {
 //                jcb.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 components.put(groupname, jcb);
                 jcb.addItemListener(new ComboBoxItemStateListener());
-                JLabel jl = new JLabel(attributes.getValue("label") + ":");
+                JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")) + ":");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
                 outerpanel.add("left", jcb);
@@ -1425,7 +1479,7 @@ public class PnlEditResInfo {
              *
              */
             if (tagName.equalsIgnoreCase("item")) {
-                boxModel.addElement(new ComboBoxBean(attributes.getValue("label"), attributes.getValue("name"), attributes.getValue("tooltip")));
+                boxModel.addElement(new ComboBoxBean(SYSTools.xx(attributes.getValue("label")), attributes.getValue("name"), attributes.getValue("tooltip")));
                 if (SYSTools.catchNull(attributes.getValue("default")).equals("true")) {
                     content.put(groupname, attributes.getValue("name"));
                 }

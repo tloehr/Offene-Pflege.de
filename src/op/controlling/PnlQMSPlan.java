@@ -150,9 +150,6 @@ public class PnlQMSPlan extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    //                    if (cpCat.isCollapsed() && !tbInactive.isSelected()  && !isEmpty(cat) && containsOnlyClosedNPs(cat)) {
-                    //                        tbInactive.setSelected(true);
-                    //                    }
                     cpPlan.setCollapsed(!cpPlan.isCollapsed());
                 } catch (PropertyVetoException pve) {
                     // BAH!
@@ -288,15 +285,14 @@ public class PnlQMSPlan extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    //                    if (cpCat.isCollapsed() && !tbInactive.isSelected()  && !isEmpty(cat) && containsOnlyClosedNPs(cat)) {
-                    //                        tbInactive.setSelected(true);
-                    //                    }
                     cpSched.setCollapsed(!cpSched.isCollapsed());
                 } catch (PropertyVetoException pve) {
                     // BAH!
                 }
             }
         });
+
+        cptitle.getAdditionalIconPanel().add(new JLabel(QmsschedTools.getIcon(qmssched)));
 
 
         cpSched.setBackground(GUITools.blend(qmssched.getQmsplan().getColor(), Color.WHITE, 0.1f));
@@ -553,8 +549,6 @@ public class PnlQMSPlan extends CleanablePanel {
                                 myQMSPlan.getQmsschedules().add(em.merge((Qmssched) o));
                                 em.lock(myQMSPlan, LockModeType.OPTIMISTIC);
                                 em.getTransaction().commit();
-//                                listQMSPlans.remove(qmsplan);
-//                                listQMSPlans.add(myQMSPlan);
                                 createCP4(myQMSPlan);
                                 reloadData();
                                 buildPanel();
@@ -1082,9 +1076,9 @@ public class PnlQMSPlan extends CleanablePanel {
                                     Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
                                     em.lock(myQMSPlan, LockModeType.OPTIMISTIC);
                                     em.getTransaction().commit();
-//                                    listQMSPlans.remove(qmsplan);
-//                                    listQMSPlans.add(myQMSPlan);
+
                                     reloadData();
+                                    createCP4(myQMSPlan);
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
                                     OPDE.warn(ole);

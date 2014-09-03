@@ -1435,7 +1435,7 @@ public class PnlReport extends NursingRecordsPanel {
              *     |_.__/ \__|_| |_|_/_/   \_\____|___/
              *
              */
-            final JButton btnTAGs = GUITools.createHyperlinkButton("nursingrecords.reports.btntags.tooltip", SYSConst.icon22tagPurple, null);
+            final JButton btnTAGs = GUITools.createHyperlinkButton("misc.msg.editTags", SYSConst.icon22tagPurple, null);
             btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnTAGs.addActionListener(new ActionListener() {
                 @Override

@@ -82,6 +82,7 @@ public class DlgOnDemand extends MyJDialog {
     private Pair<Prescription, PrescriptionSchedule> returnPackage = null;
     private List<GP> listAerzte;
     private List<Hospital> listKH;
+    private PnlCommonTags pnlCommonTags;
 
     /**
      * Creates new form DlgRegular
@@ -362,7 +363,7 @@ public class DlgOnDemand extends MyJDialog {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
                 "68dlu, $lcgap, pref:grow, $lcgap, pref",
-                "3*(16dlu, $lgap), default, $lgap, fill:default:grow"));
+                "3*(16dlu, $lgap), default, $lgap, fill:113dlu:grow, $lgap, 60dlu"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -573,7 +574,7 @@ public class DlgOnDemand extends MyJDialog {
                 }));
                 jPanel2.add(cmbCheckAfter, CC.xywh(3, 4, 5, 1));
             }
-            jPanel1.add(jPanel2, CC.xywh(1, 7, 5, 3, CC.CENTER, CC.CENTER));
+            jPanel1.add(jPanel2, CC.xywh(1, 9, 5, 1, CC.CENTER, CC.TOP));
         }
         contentPane.add(jPanel1, CC.xy(5, 3));
 
@@ -719,7 +720,7 @@ public class DlgOnDemand extends MyJDialog {
 
         ignoreEvent = true;
 
-        lblCheckResultAfter.setText(SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck")+":");
+        lblCheckResultAfter.setText(SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ":");
 
         rbActive.setText(SYSTools.xx("nursingrecords.prescription.dlgOnDemand.rbActive"));
 
@@ -751,10 +752,12 @@ public class DlgOnDemand extends MyJDialog {
         txtMaxTimes.setText(NumberFormat.getNumberInstance().format(schedule.getMaxAnzahl()));
         txtEDosis.setText(schedule.getMaxEDosis().setScale(2, RoundingMode.HALF_UP).toString());
 
+        pnlCommonTags = new PnlCommonTags(prescription.getCommontags(), true, 3);
+        jPanel1.add(new JScrollPane(pnlCommonTags), CC.xyw(1, 11, 5));
+
+
         ignoreEvent = false;
-
         txtMed.requestFocus();
-
 
     }
 
@@ -917,6 +920,9 @@ public class DlgOnDemand extends MyJDialog {
 
         prescription.getPrescriptionSchedule().clear();
         prescription.getPrescriptionSchedule().add(schedule);
+
+        prescription.getCommontags().clear();
+        prescription.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
 
         return true;
     }

@@ -44,13 +44,28 @@ public class PnlCommonTags extends JPanel {
     }
 
     public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode, int maxline) {
-        this(listSelectedTags, editmode);
         MAXLINE = maxline;
+        editAction = null;
+        this.editmode = editmode;
+
+        setLayout(new RiverLayout(10, 5));
+
+        this.listSelectedTags = new HashSet<>(listSelectedTags);
+        this.completionList = new ArrayList<>();
+
+        initPanel();
     }
 
     public PnlCommonTags(Collection<Commontags> listSelectedTags, Closure editAction) {
-        this(listSelectedTags, editAction != null);
         this.editAction = editAction;
+        this.editmode = editAction != null;
+
+        setLayout(new RiverLayout(10, 5));
+
+        this.listSelectedTags = new HashSet<>(listSelectedTags);
+        this.completionList = new ArrayList<>();
+
+        initPanel();
 
     }
 
@@ -78,8 +93,14 @@ public class PnlCommonTags extends JPanel {
             mapAllTags.put(commontags.getText(), commontags);
         }
 
+        int tagnum = 1;
         for (Commontags selectedTags : listSelectedTags) {
-            add(createButton(selectedTags));
+            if (tagnum % MAXLINE == 0) {
+                add(createButton(selectedTags), RiverLayout.LINE_BREAK);
+            } else {
+                add(createButton(selectedTags), RiverLayout.LEFT);
+            }
+            tagnum++;
         }
 
         if (editmode) {
@@ -121,7 +142,8 @@ public class PnlCommonTags extends JPanel {
 
             if (editAction == null) {
 
-                btnPickTags = new JButton(SYSConst.icon22checkbox);
+                btnPickTags = GUITools.getTinyButton("opde.tags.pnlcommontags.allTags", SYSConst.icon22checkbox);
+                btnPickTags.setPressedIcon(SYSConst.icon22Pressed);
                 btnPickTags.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

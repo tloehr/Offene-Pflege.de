@@ -590,8 +590,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow, $lcgap, pref",
-                    "default, default:grow"));
+                "default:grow, $lcgap, pref",
+                "default, default:grow"));
 
             //---- btnAbout ----
             btnAbout.setText(null);

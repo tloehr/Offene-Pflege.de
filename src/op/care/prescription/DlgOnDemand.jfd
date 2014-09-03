@@ -50,7 +50,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>16dlu, linegap, 16dlu, linegap, 16dlu, linegap, default, linegap, fill:default:grow</string> 
+          <string>16dlu, linegap, 16dlu, linegap, 16dlu, linegap, default, linegap, fill:113dlu:grow, linegap, 60dlu</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -759,19 +759,15 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>7</int> 
+           <int>9</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridWidth</string> 
            <int>5</int> 
           </void> 
           <void method="setProperty"> 
-           <string>gridHeight</string> 
-           <int>3</int> 
-          </void> 
-          <void method="setProperty"> 
            <string>vAlign</string> 
-           <object class="com.jgoodies.forms.layout.CellConstraints" field="CENTER"/> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="TOP"/> 
           </void> 
           <void method="setProperty"> 
            <string>hAlign</string> 

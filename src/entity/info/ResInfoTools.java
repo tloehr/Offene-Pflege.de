@@ -11,10 +11,10 @@ import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypesTools;
 import op.OPDE;
-import op.controlling.PnlControlling;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -47,6 +47,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ResInfoTools {
+
 
     public static ResInfo getLastResinfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
@@ -109,6 +110,30 @@ public class ResInfoTools {
         em.close();
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
+
+
+    public static ArrayList<ResInfo> getAll(Resident resident, ResInfoType type, LocalDate start, LocalDate end) {
+        DateTime from = start.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(end);
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(
+                " SELECT rinfo FROM ResInfo rinfo " +
+                        " WHERE rinfo.resident = :bewohner " +
+                        " AND rinfo.bwinfotyp = :bwinfotyp " +
+                        " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
+                        " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
+                        " (rinfo.from > :from AND rinfo.to < :to)) " +
+                        " ORDER BY rinfo.from DESC"
+        );
+        query.setParameter("bewohner", resident);
+        query.setParameter("bwinfotyp", type);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
+
 
     public static ArrayList<ResInfo> getAll(Resident resident, ResInfoType type) {
         EntityManager em = OPDE.createEM();
@@ -622,7 +647,7 @@ public class ResInfoTools {
         public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
             // Baut eine Liste mit names und labels auf.
             String name = attributes.getValue("name");
-            String label = attributes.getValue("label");
+            String label = SYSTools.xx(attributes.getValue("label"));
 
             if (!tagName.equalsIgnoreCase("java")) {
                 if (tagName.equalsIgnoreCase("list")) {
@@ -1338,15 +1363,17 @@ public class ResInfoTools {
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
+        ResInfoType fallType = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALL);
+
         String jpql = " " +
                 " SELECT ri " +
                 " FROM ResInfo ri " +
-                " WHERE ri.bwinfotyp.type = :type " +
+                " WHERE ri.bwinfotyp.equiv = :equiv " +
                 " AND ri.resident.adminonly <> 2 " +
                 " AND ri.from >= :from ";
 
         Query query = em.createQuery(jpql);
-        query.setParameter("type", ResInfoTypeTools.TYPE_FALL);
+        query.setParameter("equiv", fallType.getEquiv());
         query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<ResInfo> listData = new ArrayList<ResInfo>(query.getResultList());
 
@@ -1356,7 +1383,7 @@ public class ResInfoTools {
         em.close();
 
         // virtual station. is never persisted
-        Station exResident = new Station(SYSTools.xx(PnlControlling.internalClassID + ".nursing.falls.exResidents"), null);
+        Station exResident = new Station(SYSTools.xx("opde.controlling.nursing.falls.exResidents"), null);
 
         // Init Maps
         HashMap<LocalDate, HashMap<Station, Integer>> statMap = new HashMap<LocalDate, HashMap<Station, Integer>>();
@@ -1382,14 +1409,14 @@ public class ResInfoTools {
         ArrayList<LocalDate> listMonths = new ArrayList<LocalDate>(statMap.keySet());
         Collections.sort(listMonths);
 
-        html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".nursing.falls.anonymous"));
+        html.append(SYSConst.html_h1("opde.controlling.nursing.falls.anonymous"));
         html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
         StringBuffer table = new StringBuffer(1000);
         table.append(SYSConst.html_table_tr(
                 SYSConst.html_table_th("misc.msg.month") +
                         SYSConst.html_table_th("misc.msg.subdivision") +
-                        SYSConst.html_table_th(PnlControlling.internalClassID + ".nursing.falls.fallCount")
+                        SYSConst.html_table_th("opde.controlling.nursing.falls.fallCount")
         ));
 
         listStation.add(exResident);
@@ -1426,15 +1453,17 @@ public class ResInfoTools {
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
+        ResInfoType fallType = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALL);
+
         String jpql1 = " " +
                 " SELECT ri " +
                 " FROM ResInfo ri " +
-                " WHERE ri.bwinfotyp.type = :type " +
+                " WHERE ri.bwinfotyp.equiv = :equiv " +
                 " AND ri.resident.adminonly <> 2 " +
                 " AND ri.from >= :from ";
 
         Query query1 = em.createQuery(jpql1);
-        query1.setParameter("type", ResInfoTypeTools.TYPE_FALL);
+        query1.setParameter("equiv", fallType.getEquiv());
         query1.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<QProcessElement> listData = new ArrayList<QProcessElement>(query1.getResultList());
 
@@ -1454,7 +1483,7 @@ public class ResInfoTools {
 
         em.close();
 
-        html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".nursing.falls.byResident"));
+        html.append(SYSConst.html_h1("opde.controlling.nursing.falls.byResident"));
         html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
         p = 0;
@@ -1492,7 +1521,7 @@ public class ResInfoTools {
             }
 
             table.append(SYSConst.html_table_tr(
-                    SYSConst.html_table_th(PnlControlling.internalClassID + ".nursing.falls.fallCount") +
+                    SYSConst.html_table_th("opde.controlling.nursing.falls.fallCount") +
                             SYSConst.html_table_th(new Integer(fallCount).toString())
             ));
 
@@ -1504,6 +1533,36 @@ public class ResInfoTools {
         listData.clear();
         listResident.clear();
 
+        return html.toString();
+    }
+
+    public static String getFallsIndicatorsByMonth(int monthsback, Closure progress) {
+        StringBuilder html = new StringBuilder(1000);
+        LocalDate from = SYSCalendar.bom(new LocalDate().minusMonths(monthsback));
+        Interval interval = new Interval(from.toDateTimeAtStartOfDay(), SYSCalendar.eom(new LocalDate()).toDateTimeAtCurrentTime());
+        DateFormat df = DateFormat.getDateInstance();
+
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+        html.append(SYSConst.html_h1("opde.controlling.nursing.fallsindicators.byMonth"));
+        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+        String tableContent = SYSConst.html_table_tr(SYSConst.html_table_th("Monat") + SYSConst.html_table_th("Sturzindikator"));
+
+        p = 0;
+        for (LocalDate month = from; !month.isAfter(SYSCalendar.bom(new LocalDate())); month = month.plusMonths(1)) {
+            p++;
+            progress.execute(new Pair<Integer, Integer>(p, new Long(interval.toDuration().getStandardDays() / 30l).intValue()));
+            BigDecimal occupantDays = new BigDecimal(getOccupantDays(SYSCalendar.bom(month), SYSCalendar.min(SYSCalendar.eom(month), new LocalDate())));
+            BigDecimal sumFalls = new BigDecimal(getFalls(SYSCalendar.bom(month), SYSCalendar.eom(month)).size());
+            BigDecimal fallsIndicator = sumFalls.divide(occupantDays, 6, RoundingMode.HALF_UP).multiply(new BigDecimal(1000));
+
+            tableContent += SYSConst.html_table_tr(
+                    SYSConst.html_table_td(month.toString("MMMM YYYY")) +
+                            SYSConst.html_table_td(sumFalls.toString() + " / " + occupantDays + " * 1000 = " + fallsIndicator.setScale(2, BigDecimal.ROUND_HALF_UP), "right")
+            );
+        }
+
+        html.append(SYSConst.html_table(tableContent, "1"));
         return html.toString();
     }
 
@@ -1653,6 +1712,85 @@ public class ResInfoTools {
         }
         return result.isEmpty() ? "" : result.substring(0, result.length() - 2);
 
+    }
+
+    public static int getOccupantDays(Resident resident, LocalDate from, LocalDate to) {
+        ResInfoType stayType = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY);
+        ArrayList<ResInfo> listStays = getAll(resident, stayType, from, to);
+        if (listStays.isEmpty()) return 0;
+
+        Interval interval0 = new Interval(from.toDateTimeAtStartOfDay(), SYSCalendar.eod(to));
+
+        ResInfoType absenceType = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE);
+        ArrayList<ResInfo> listAbsences = getAll(resident, absenceType, from, to);
+
+        int daysPresent = 0;
+        for (ResInfo resInfo : listStays) {
+            Interval interval1 = new Interval(new LocalDate(resInfo.getFrom()).toDateTimeAtStartOfDay(), SYSCalendar.eod(new LocalDate(resInfo.getTo())));
+            Interval overlap = interval0.overlap(interval1);
+
+            if (overlap != null) {
+                daysPresent += overlap.toDuration().getStandardDays() + 1;
+//                OPDE.debug(daysPresent);
+            }
+        }
+
+        int daysAbsent = 0;
+        for (ResInfo resInfo : listAbsences) {
+            Interval interval1 = new Interval(new LocalDate(resInfo.getFrom()).toDateTimeAtStartOfDay(), SYSCalendar.eod(new LocalDate(resInfo.getTo())));
+            Interval overlap = interval0.overlap(interval1);
+
+            if (overlap != null) {
+                daysAbsent += overlap.toDuration().getStandardDays() + 1;
+            }
+        }
+
+        return daysPresent - daysAbsent;
+    }
+
+
+    public static int getOccupantDays(LocalDate from, LocalDate to) {
+        int daysPresent = 0;
+        for (Resident resident : ResidentTools.getAllActive(from, to)) {
+            daysPresent += getOccupantDays(resident, from, to);
+        }
+        return daysPresent;
+    }
+
+//    public static BigDecimal getFallIndicator(LocalDate from, LocalDate to) {
+//        BigDecimal occupantDays = new BigDecimal(getOccupantDays(from, to));
+//        BigDecimal sumFalls = new BigDecimal(getFalls(from, to).size());
+//
+//        return sumFalls.divide(occupantDays, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(1000));
+//    }
+
+
+    public static ArrayList<ResInfo> getFalls(LocalDate start, LocalDate end) {
+        DateTime from = start.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(end);
+
+        EntityManager em = OPDE.createEM();
+        DateFormat df = DateFormat.getDateInstance();
+
+        ResInfoType fallType = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALL);
+
+        String jpql = " " +
+                " SELECT ri " +
+                " FROM ResInfo ri " +
+                " WHERE ri.bwinfotyp.equiv = :equiv " +
+                " AND ri.resident.adminonly <> 2 " +
+                " AND ((ri.from <= :from AND ri.to >= :from) OR " +
+                " (ri.from <= :to AND ri.to >= :to) OR " +
+                " (ri.from > :from AND ri.to < :to)) " +
+                " AND ri.from >= :from ";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("equiv", fallType.getEquiv());
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResInfo> listData = new ArrayList<ResInfo>(query.getResultList());
+
+        return listData;
     }
 
 }

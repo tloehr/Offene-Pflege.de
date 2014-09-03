@@ -13,6 +13,7 @@ import entity.Station;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.system.Commontags;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.prescription.PnlPrescription;
@@ -653,7 +654,7 @@ public class PrescriptionTools {
     public static String getRemark(Prescription prescription) {
         String result = "<div id=\"fonttext\">";
 
-        if (prescription.hasMed() && prescription.getTradeForm().getMedProduct().hasSideEffects()){
+        if (prescription.hasMed() && prescription.getTradeForm().getMedProduct().hasSideEffects()) {
             result += "<b><u>" + SYSTools.xx("misc.msg.sideeffects") + ":</u> <font color=\"orange\">" + prescription.getTradeForm().getMedProduct().getSideEffects() + "</font></b>";
 
         }
@@ -1040,5 +1041,34 @@ public class PrescriptionTools {
 //            BHPTools.cleanup(em, myp);
         }
     }
+
+    public static ArrayList<Prescription> getPrescriptions4Tags(Resident resident, Commontags tag) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Prescription> list = null;
+
+        try {
+
+            String jpql = " SELECT p " +
+                    " FROM Prescription p" +
+                    " JOIN p.commontags t " +
+                    " WHERE p.resident = :resident " +
+                    " AND t = :tag " +
+                    " ORDER BY p.from DESC ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("resident", resident);
+            query.setParameter("tag", tag);
+
+            list = new ArrayList<Prescription>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
 
 }

@@ -1,12 +1,11 @@
 package entity.system;
 
+import entity.prescription.Prescription;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
-import op.tools.GUITools;
 
 import javax.persistence.*;
-import java.awt.*;
 import java.util.Collection;
 
 /**
@@ -73,6 +72,9 @@ public class Commontags {
 
     @ManyToMany(mappedBy = "commontags")
     private Collection<NReport> nReports;
+
+    @ManyToMany(mappedBy = "commontags")
+    private Collection<Prescription> prescriptions;
 
     public Commontags() {
     }

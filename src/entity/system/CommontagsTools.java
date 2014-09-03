@@ -98,12 +98,6 @@ public class CommontagsTools {
 
         try {
 
-//             String mysql = " SELECT DISTINCT ctagid FROM nreports2tags ";
-//             Query query = em.createNativeQuery(mysql);
-//
-//             for ()
-
-
             String jpql = " SELECT DISTINCT c " +
                     " FROM Commontags c " +
                     " JOIN c.nReports nr " +
@@ -122,6 +116,31 @@ public class CommontagsTools {
         }
         return list;
     }
+
+    public static ArrayList<Commontags> getAllUsedInPrescription(Resident resident) {
+           EntityManager em = OPDE.createEM();
+           ArrayList<Commontags> list = null;
+
+           try {
+
+               String jpql = " SELECT DISTINCT c " +
+                       " FROM Commontags c " +
+                       " JOIN c.prescriptions p " +
+                       " WHERE p.resident = :resident " +
+                       " ORDER BY c.text ASC ";
+
+
+               Query query = em.createQuery(jpql);
+               query.setParameter("resident", resident);
+               list = new ArrayList<Commontags>(query.getResultList());
+
+           } catch (Exception se) {
+               OPDE.fatal(se);
+           } finally {
+               em.close();
+           }
+           return list;
+       }
 
     public static String getAsHTML(Collection<Commontags> commontags, String icon) {
         String result = "";

@@ -45,7 +45,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.prompt.PromptSupport;
-import org.joda.time.DateMidnight;
+
+import org.joda.time.LocalDate;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
@@ -89,6 +90,7 @@ public class DlgRegular extends MyJDialog {
     private Pair<Prescription, List<PrescriptionSchedule>> returnPackage = null;
 
     private JToggleButton tbDailyPlan;
+    private PnlCommonTags pnlCommonTags;
 
     /**
      * Creates new form DlgRegular
@@ -208,7 +210,7 @@ public class DlgRegular extends MyJDialog {
     }
 
     private void txtToFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusYears(1));
+        SYSCalendar.handleDateFocusLost(evt, new LocalDate(), new LocalDate().plusYears(1));
     }
 
     private void cmbDocONKeyPressed(KeyEvent e) {
@@ -454,7 +456,7 @@ public class DlgRegular extends MyJDialog {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
                 "149dlu",
-                "3*(fill:default, $lgap), fill:default:grow"));
+                "3*(fill:default, $lgap), fill:108dlu:grow, $lgap, 60dlu"));
 
             //======== pnlOFF ========
             {
@@ -686,6 +688,9 @@ public class DlgRegular extends MyJDialog {
         setFocusTraversalPolicy(GUITools.createTraversalPolicy(new ArrayList<Component>(Arrays.asList(new Component[]{cmbDocON, cmbHospitalON, txtMed, rbActive, txtBemerkung}))));
 
         reloadTable();
+
+        pnlCommonTags = new PnlCommonTags(prescription.getCommontags(), true, 3);
+        jPanel3.add(new JScrollPane(pnlCommonTags), CC.xy(1, 9, CC.DEFAULT, CC.FILL));
     }
 
     private void txtMedFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMedFocusGained
@@ -737,9 +742,9 @@ public class DlgRegular extends MyJDialog {
     private boolean saveOK() {
         if (ignoreEvent) return false;
 
-        DateMidnight day;
+        LocalDate day;
         try {
-            day = new DateMidnight(SYSCalendar.parseDate(txtTo.getText()));
+            day = new LocalDate(SYSCalendar.parseDate(txtTo.getText()));
         } catch (NumberFormatException ex) {
             day = null;
         }
@@ -798,14 +803,14 @@ public class DlgRegular extends MyJDialog {
         prescription.setFrom(new Date());
         if (rbDate.isSelected()) {
 
-            DateMidnight day = null;
+            LocalDate day = null;
             try {
-                day = new DateMidnight(SYSCalendar.parseDate(txtTo.getText()));
+                day = new LocalDate(SYSCalendar.parseDate(txtTo.getText()));
             } catch (NumberFormatException ex) {
                 OPDE.fatal(ex);
             }
 
-            prescription.setTo(day.plusDays(1).toDateTime().minusSeconds(1).toDate());
+            prescription.setTo(SYSCalendar.eod(day).toDate());
             prescription.setUserOFF(OPDE.getLogin().getUser());
             prescription.setHospitalOFF(prescription.getHospitalON());
             prescription.setDocOFF(prescription.getDocON());
@@ -815,6 +820,10 @@ public class DlgRegular extends MyJDialog {
             prescription.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         }
         prescription.setUntilEndOfPackage(rbEndOfPackage.isSelected());
+
+        prescription.getCommontags().clear();
+        prescription.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
+
 
         return true;
     }

@@ -67,6 +67,7 @@ import op.welcome.PnlWelcome;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;

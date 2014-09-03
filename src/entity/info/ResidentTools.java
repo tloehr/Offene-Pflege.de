@@ -14,7 +14,6 @@ import entity.process.QProcessTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
@@ -214,6 +213,43 @@ public class ResidentTools {
         query.setParameter("station", station);
         ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
         em.close();
+        return list;
+    }
+
+
+    /**
+     * retrieves a list of all residents who were staying in the home during that specified
+     * interval.
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    public static ArrayList<Resident> getAllActive(LocalDate start, LocalDate end) {
+        DateTime from = start.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(end);
+        ArrayList<Resident> list = null;
+        EntityManager em = OPDE.createEM();
+        try {
+
+            Query query = em.createQuery(" " +
+                    " SELECT b FROM Resident b " +
+                    " JOIN b.resInfoCollection rinfo " +
+                    " WHERE rinfo.bwinfotyp.type = :type " +
+                    " AND b.adminonly <> 2 " +
+                    " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
+                    " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
+                    " (rinfo.from > :from AND rinfo.to < :to)) " +
+                    " ORDER BY b.name, b.firstname");
+            query.setParameter("type", ResInfoTypeTools.TYPE_STAY);
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
+            list = new ArrayList<Resident>(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
         return list;
     }
 

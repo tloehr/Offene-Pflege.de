@@ -36,6 +36,9 @@ import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.prescription.*;
 import entity.process.*;
+import entity.reports.NReportTools;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import entity.system.UniqueTools;
 import op.OPDE;
 import op.care.med.inventory.DlgCloseStock;
@@ -84,6 +87,8 @@ public class PnlPrescription extends NursingRecordsPanel {
 
     private Color[] color1, color2;
 
+    private List<Commontags> listUsedCommontags;
+
     /**
      * Creates new form PnlPrescription
      */
@@ -101,13 +106,17 @@ public class PnlPrescription extends NursingRecordsPanel {
         cpMap = new HashMap<String, CollapsiblePane>();
         lstPrescriptions = new ArrayList<Prescription>();
         lstVisiblePrescriptions = new ArrayList<Prescription>();
+        listUsedCommontags = new ArrayList<Commontags>();
         prepareSearchArea();
     }
 
     @Override
     public void switchResident(Resident res) {
         this.resident = EntityTools.find(Resident.class, res.getRID());
+        listUsedCommontags.clear();
+        listUsedCommontags.addAll(CommontagsTools.getAllUsedInNReports(resident));
         GUITools.setResidentDisplay(resident);
+        prepareSearchArea();
         reloadDisplay();
     }
 
@@ -222,11 +231,15 @@ public class PnlPrescription extends NursingRecordsPanel {
                 "<td width=\"200\" align=\"left\">" +
                 PrescriptionTools.getOriginalPrescription(prescription) +
                 PrescriptionTools.getRemark(prescription) +
-                "</td>" +
-                "</table>" +
-                "</html>";
+                "</td>";
 
-//        String title2 = "";
+        if (!prescription.getCommontags().isEmpty()) {
+            title += "<tr>" +
+                    "    <td colspan=\"3\">" + CommontagsTools.getAsHTML(prescription.getCommontags(), SYSConst.html_16x16_tagPurple_internal) + "</td>" +
+                    "  </tr>";
+        }
+
+        title += "</table>" + "</html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
         cpPres.setCollapsible(false);
@@ -500,6 +513,9 @@ public class PnlPrescription extends NursingRecordsPanel {
         cpsPrescription.removeAll();
         SYSTools.clear(lstPrescriptions);
         SYSTools.clear(lstVisiblePrescriptions);
+
+        SYSTools.clear(listUsedCommontags);
+
     }
 
     private void prepareSearchArea() {
@@ -557,6 +573,26 @@ public class PnlPrescription extends NursingRecordsPanel {
         });
         tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbClosed);
+
+
+        if (!listUsedCommontags.isEmpty()) {
+
+            JPanel pnlTags = new JPanel();
+            pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.Y_AXIS));
+            pnlTags.setOpaque(false);
+
+            for (final Commontags commontag : listUsedCommontags) {
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag)), true), false);
+                    }
+                });
+                btnTag.setForeground(GUITools.getColor(commontag.getColor()));
+                pnlTags.add(btnTag);
+            }
+            list.add(pnlTags);
+        }
 
         return list;
     }
@@ -1058,6 +1094,103 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnEdit.setEnabled(!prescription.isClosed() && numBHPs == 0);
             pnlMenu.add(btnEdit);
         }
+
+
+        /***
+         *      _     _       _____  _    ____
+         *     | |__ | |_ _ _|_   _|/ \  / ___|___
+         *     | '_ \| __| '_ \| | / _ \| |  _/ __|
+         *     | |_) | |_| | | | |/ ___ \ |_| \__ \
+         *     |_.__/ \__|_| |_|_/_/   \_\____|___/
+         *
+         */
+        final JButton btnTAGs = GUITools.createHyperlinkButton("misc.msg.editTags", SYSConst.icon22tagPurple, null);
+        btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnTAGs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                final JidePopup popup = new JidePopup();
+
+                final JPanel pnl = new JPanel(new BorderLayout(5, 5));
+                final PnlCommonTags pnlCommonTags = new PnlCommonTags(prescription.getCommontags(), true, 3);
+                pnl.add(new JScrollPane(pnlCommonTags), BorderLayout.CENTER);
+                JButton btnApply = new JButton(SYSConst.icon22apply);
+                pnl.add(btnApply, BorderLayout.SOUTH);
+                btnApply.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+
+                            em.getTransaction().begin();
+                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                            Prescription myPrescription = em.merge(prescription);
+                            em.lock(myPrescription, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                            myPrescription.getCommontags().clear();
+                            for (Commontags commontag : pnlCommonTags.getListSelectedTags()) {
+                                myPrescription.getCommontags().add(em.merge(commontag));
+                            }
+
+
+                            em.getTransaction().commit();
+
+                            lstPrescriptions.remove(prescription);
+                            lstPrescriptions.add(myPrescription);
+                            Collections.sort(lstPrescriptions);
+                            final CollapsiblePane myCP = createCP4(myPrescription);
+                            buildPanel();
+
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
+                                        @Override
+                                        public void execute(Object o) {
+                                            GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                        }
+                                    });
+                                }
+                            });
+
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            } else {
+                                reloadDisplay();
+                            }
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+                    }
+                });
+
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(btnTAGs);
+                popup.removeExcludedComponent(btnTAGs);
+                pnl.setPreferredSize(new Dimension(350, 150));
+                popup.getContentPane().add(pnl);
+                popup.setDefaultFocusComponent(pnl);
+
+                GUITools.showPopup(popup, SwingConstants.WEST);
+
+            }
+        });
+        btnTAGs.setEnabled(!prescription.isClosed());
+        pnlMenu.add(btnTAGs);
+
         // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
             /***

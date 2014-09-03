@@ -11,6 +11,7 @@ import entity.nursingprocess.Intervention;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSPRE2PROCESS;
+import entity.system.Commontags;
 import entity.system.Users;
 import op.OPDE;
 import op.care.prescription.PnlPrescription;
@@ -26,6 +27,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -158,6 +160,13 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     private GP docOFF;
 
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+        @JoinTable(name = "prescription2tags", joinColumns =
+        @JoinColumn(name = "prescid"), inverseJoinColumns =
+        @JoinColumn(name = "ctagid"))
+        private Collection<Commontags> commontags;
+
+
     public Prescription() {
     }
 
@@ -169,6 +178,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.from = new Date();
         this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.userON = OPDE.getLogin().getUser();
+        this.commontags = new ArrayList<Commontags>();
     }
 
     public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
@@ -191,6 +201,12 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.docON = docON;
         this.docOFF = docOFF;
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
+        this.commontags = new ArrayList<Commontags>();
+    }
+
+
+    public Collection<Commontags> getCommontags() {
+        return commontags;
     }
 
     public Date getFrom() {

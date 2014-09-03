@@ -36,10 +36,7 @@ import com.jidesoft.swing.JideTabbedPane;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
-import entity.info.ResInfoTools;
-import entity.info.ResInfoTypeTools;
-import entity.info.Resident;
-import entity.info.ResidentTools;
+import entity.info.*;
 import entity.prescription.MedStockTools;
 import entity.process.QProcessElement;
 import entity.process.QProcessTools;
@@ -683,6 +680,51 @@ public class PnlControlling extends CleanablePanel {
         pnlFallsRes.add(txtResFallsMonthsBack, BorderLayout.EAST);
         pnlContent.add(pnlFallsRes);
 
+
+        /***
+         *      _____     _ _     ___           _ _           _
+         *     |  ___|_ _| | |___|_ _|_ __   __| (_) ___ __ _| |_ ___  _ __
+         *     | |_ / _` | | / __|| || '_ \ / _` | |/ __/ _` | __/ _ \| '__|
+         *     |  _| (_| | | \__ \| || | | | (_| | | (_| (_| | || (_) | |
+         *     |_|  \__,_|_|_|___/___|_| |_|\__,_|_|\___\__,_|\__\___/|_|
+         *
+         */
+        JPanel pnlFallsIndicator = new JPanel(new BorderLayout());
+        final JButton btnFallsIndicator = GUITools.createHyperlinkButton("opde.controlling.nursing.fallsindicators.byMonth", null, null);
+        int fallsIndicatorBack;
+        try {
+            fallsIndicatorBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsIndicatorMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            fallsIndicatorBack = 7;
+        }
+        final JTextField txtFallsIndicatorsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsResMonthsBack);
+        txtFallsIndicatorsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
+
+        btnFallsIndicator.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp("opde.controlling::fallsIndicatorMonthsBack", txtFallsIndicatorsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure), false);
+//                        ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlFallsIndicator.add(btnFallsIndicator, BorderLayout.WEST);
+        pnlFallsIndicator.add(txtFallsIndicatorsMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlFallsIndicator);
 
         return pnlContent;
     }
