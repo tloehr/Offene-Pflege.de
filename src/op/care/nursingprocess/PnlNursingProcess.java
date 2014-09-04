@@ -39,7 +39,10 @@ import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.info.Resident;
 import entity.nursingprocess.*;
+import entity.prescription.PrescriptionTools;
 import entity.process.*;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
 import op.OPDE;
@@ -60,6 +63,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.util.*;
@@ -82,6 +87,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private ArrayList<NursingProcess> listNP;
 
     private Color[] color1, color2;
+    private List<Commontags> listUsedCommontags;
 
     /**
      * Creates new form PnlNursingProcess
@@ -101,6 +107,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         valuecache = new HashMap<ResInfoCategory, ArrayList<NursingProcess>>();
         categories = ResInfoCategoryTools.getAll4NP();
         contenPanelMap = new HashMap<NursingProcess, JPanel>();
+        listUsedCommontags = new ArrayList<>();
         prepareSearchArea();
         color1 = SYSConst.red2;
         color2 = SYSConst.greyscale;
@@ -112,6 +119,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         SYSTools.clear(valuecache);
         SYSTools.clear(contenPanelMap);
         SYSTools.clear(listNP);
+        SYSTools.clear(listUsedCommontags);
     }
 
     @Override
@@ -320,15 +328,22 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *
          */
         if (!contenPanelMap.containsKey(np)) {
-            String title = "<html><table border=\"0\">" +
-                    "<tr valign=\"top\">" +
+            String title = "<html><table border=\"0\">";
+
+            if (!np.getCommontags().isEmpty()) {
+                title += "<tr>" +
+                        "    <td colspan=\"2\">" + CommontagsTools.getAsHTML(np.getCommontags(), SYSConst.html_16x16_tagPurple_internal) + "</td>" +
+                        "  </tr>";
+            }
+
+            title += "<tr valign=\"top\">" +
                     "<td width=\"280\" align=\"left\">" + np.getPITAsHTML() + "</td>" +
                     "<td width=\"500\" align=\"left\">" +
                     (np.isClosed() ? "<s>" : "") +
                     np.getContentAsHTML() +
                     (np.isClosed() ? "</s>" : "") +
-                    "</td>" +
-                    "</table>" +
+                    "</td></tr>";
+            title += "</table>" +
                     "</html>";
 
             DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
@@ -616,8 +631,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addFilters());
         GUITools.addAllComponents(mypanel, addKey());
-//        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
 
@@ -636,6 +651,32 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
         return SYSTools.toHTMLForScreen(result);
     }
+
+
+    private java.util.List<Component> addFilters() {
+           java.util.List<Component> list = new ArrayList<Component>();
+
+//           if (!listUsedCommontags.isEmpty()) {
+//
+//               JPanel pnlTags = new JPanel();
+//               pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.Y_AXIS));
+//               pnlTags.setOpaque(false);
+//
+//               for (final Commontags commontag : listUsedCommontags) {
+//                   final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
+//                       @Override
+//                       public void actionPerformed(ActionEvent e) {
+//                           SYSFilesTools.print(NursingProcessTools.getAsHTML().getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag), true, true, false, tbClosed.isSelected(), true), true);
+//                       }
+//                   });
+//                   btnTag.setForeground(GUITools.getColor(commontag.getColor()));
+//                   pnlTags.add(btnTag);
+//               }
+//               list.add(pnlTags);
+//           }
+//
+           return list;
+       }
 
 
     private List<Component> addCommands() {
@@ -678,6 +719,19 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     valuecache.get(newNP.getCategory()).add(newNP);
                                     Collections.sort(valuecache.get(newNP.getCategory()));
                                     createCP4(newNP.getCategory());
+
+                                    boolean reloadSearch = false;
+                                    for (Commontags ctag : newNP.getCommontags()) {
+                                        if (!listUsedCommontags.contains(ctag)) {
+                                            listUsedCommontags.add(ctag);
+                                            reloadSearch = true;
+                                        }
+                                    }
+                                    if (reloadSearch) {
+                                        prepareSearchArea();
+                                    }
+
+
                                     buildPanel();
 
                                     SwingUtilities.invokeLater(new Runnable() {
@@ -765,6 +819,19 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                                 newNP.setNPSeries(unique.getUid());
                                                 DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
                                                 em.getTransaction().commit();
+
+
+                                                boolean reloadSearch = false;
+                                                for (Commontags ctag : newNP.getCommontags()) {
+                                                    if (!listUsedCommontags.contains(ctag)) {
+                                                        listUsedCommontags.add(ctag);
+                                                        reloadSearch = true;
+                                                    }
+                                                }
+                                                if (reloadSearch) {
+                                                    prepareSearchArea();
+                                                }
+
 
                                                 // Refresh Display
                                                 if (!valuecache.containsKey(newNP.getCategory())) {
@@ -927,6 +994,19 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     valuecache.get(myNewNP.getCategory()).add(myNewNP);
                                     Collections.sort(valuecache.get(myNewNP.getCategory()));
                                     createCP4(myNewNP.getCategory());
+
+                                    boolean reloadSearch = false;
+                                    for (Commontags ctag : myNewNP.getCommontags()) {
+                                        if (!listUsedCommontags.contains(ctag)) {
+                                            listUsedCommontags.add(ctag);
+                                            reloadSearch = true;
+                                        }
+                                    }
+                                    if (reloadSearch) {
+                                        prepareSearchArea();
+                                    }
+
+
                                     buildPanel();
                                     GUITools.flashBackground(contenPanelMap.get(myNewNP), Color.YELLOW, 2);
                                 } catch (OptimisticLockException ole) {
@@ -1081,6 +1161,17 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     // Create new DFNs according to plan
                                     DFNTools.generate(em, mynp.getInterventionSchedule(), new LocalDate(), true);
                                     em.getTransaction().commit();
+
+                                    boolean reloadSearch = false;
+                                    for (Commontags ctag : mynp.getCommontags()) {
+                                        if (!listUsedCommontags.contains(ctag)) {
+                                            listUsedCommontags.add(ctag);
+                                            reloadSearch = true;
+                                        }
+                                    }
+                                    if (reloadSearch) {
+                                        prepareSearchArea();
+                                    }
 
                                     // Refresh Display
                                     valuecache.get(np.getCategory()).remove(np);
@@ -1278,6 +1369,104 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             btnEval.setEnabled(!np.isClosed());
             pnlMenu.add(btnEval);
 
+
+            /***
+             *      _     _       _____  _    ____
+             *     | |__ | |_ _ _|_   _|/ \  / ___|___
+             *     | '_ \| __| '_ \| | / _ \| |  _/ __|
+             *     | |_) | |_| | | | |/ ___ \ |_| \__ \
+             *     |_.__/ \__|_| |_|_/_/   \_\____|___/
+             *
+             */
+            final JButton btnTAGs = GUITools.createHyperlinkButton("misc.msg.editTags", SYSConst.icon22tagPurple, null);
+            btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnTAGs.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
+
+                    final JPanel pnl = new JPanel(new BorderLayout(5, 5));
+                    final PnlCommonTags pnlCommonTags = new PnlCommonTags(np.getCommontags(), true, 3);
+                    pnl.add(new JScrollPane(pnlCommonTags), BorderLayout.CENTER);
+                    JButton btnApply = new JButton(SYSConst.icon22apply);
+                    pnl.add(btnApply, BorderLayout.SOUTH);
+                    btnApply.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+
+                                em.getTransaction().begin();
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                NursingProcess myNP = em.merge(np);
+                                em.lock(myNP, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                myNP.getCommontags().clear();
+                                for (Commontags commontag : pnlCommonTags.getListSelectedTags()) {
+                                    myNP.getCommontags().add(em.merge(commontag));
+                                }
+
+                                em.getTransaction().commit();
+
+                                // Refresh Display
+                                valuecache.get(np.getCategory()).remove(np);
+                                contenPanelMap.remove(np);
+                                valuecache.get(myNP.getCategory()).add(myNP);
+                                Collections.sort(valuecache.get(myNP.getCategory()));
+
+                                boolean reloadSearch = false;
+                                for (Commontags ctag : myNP.getCommontags()) {
+                                    if (!listUsedCommontags.contains(ctag)) {
+                                        listUsedCommontags.add(ctag);
+                                        reloadSearch = true;
+                                    }
+                                }
+                                if (reloadSearch) {
+                                    prepareSearchArea();
+                                }
+
+                                createCP4(myNP.getCategory());
+                                buildPanel();
+                                GUITools.flashBackground(contenPanelMap.get(myNP), Color.YELLOW, 2);
+
+
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                } else {
+                                    reloadDisplay();
+                                }
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    });
+
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.setOwner(btnTAGs);
+                    popup.removeExcludedComponent(btnTAGs);
+                    pnl.setPreferredSize(new Dimension(350, 150));
+                    popup.getContentPane().add(pnl);
+                    popup.setDefaultFocusComponent(pnl);
+
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+
+                }
+            });
+            btnTAGs.setEnabled(!np.isClosed());
+            pnlMenu.add(btnTAGs);
 
             pnlMenu.add(new JSeparator());
 

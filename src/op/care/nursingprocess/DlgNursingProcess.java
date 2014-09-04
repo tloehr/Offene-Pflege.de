@@ -29,15 +29,12 @@ package op.care.nursingprocess;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import com.jidesoft.swing.AutoCompletion;
-import com.jidesoft.swing.SelectAllUtils;
 import com.toedter.calendar.JDateChooser;
 import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionSchedule;
 import entity.nursingprocess.NursingProcess;
-import entity.nursingprocess.NursingProcessTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -64,6 +61,7 @@ public class DlgNursingProcess extends MyJDialog {
     private NursingProcess nursingProcess;
     private JPopupMenu menu;
     private ArrayList<InterventionSchedule> listInterventionSchedule2Remove = new ArrayList();
+    private PnlCommonTags pnlCommonTags;
 
     /**
      * Creates new form DlgNursingProcess
@@ -85,7 +83,7 @@ public class DlgNursingProcess extends MyJDialog {
         lblCat.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblCat"));
         lblSituation.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblSituation"));
         lblGoal.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblGoal"));
-        lblFlag.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFlag"));
+//        lblFlag.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFlag"));
         lblFirstRevision.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFirstRevision"));
 
         txtStichwort.setText(nursingProcess.getTopic());
@@ -96,9 +94,8 @@ public class DlgNursingProcess extends MyJDialog {
         cmbKategorie.setSelectedItem(nursingProcess.getCategory());
         reloadInterventions();
 
-//        cmbFlags.setModel(new DefaultComboBoxModel(NursingProcessTools.FLAGS));
-//        cmbFlags.setSelectedIndex(nursingProcess.getFlag());
-
+        pnlCommonTags = new PnlCommonTags(nursingProcess.getCommontags(), true, 3);
+        jPanel5.add(new JScrollPane(pnlCommonTags), CC.xyw(1, 9, 3, CC.DEFAULT, CC.FILL));
 
         String mode = "new";
         if (nursingProcess.getID() != 0) {
@@ -236,8 +233,6 @@ public class DlgNursingProcess extends MyJDialog {
         lblGoal = new JLabel();
         jScrollPane1 = new JScrollPane();
         txtZiele = new JTextArea();
-        lblFlag = new JLabel();
-        cmbFlags = new JComboBox();
         lblFirstRevision = new JLabel();
         jdcKontrolle = new JDateChooser();
         panel2 = new JPanel();
@@ -254,13 +249,13 @@ public class DlgNursingProcess extends MyJDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
-            "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
+            "fill:14dlu, $lgap, fill:default:grow, $rgap, pref, $lgap, 14dlu"));
 
         //======== jPanel5 ========
         {
             jPanel5.setLayout(new FormLayout(
                 "default, $lcgap, default:grow",
-                "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, default, $lgap, pref"));
+                "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, 70dlu, $lgap, pref"));
 
             //---- lblTopic ----
             lblTopic.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -339,15 +334,6 @@ public class DlgNursingProcess extends MyJDialog {
                 jScrollPane1.setViewportView(txtZiele);
             }
             jPanel5.add(jScrollPane1, CC.xy(3, 7));
-
-            //---- lblFlag ----
-            lblFlag.setFont(new Font("Arial", Font.PLAIN, 14));
-            lblFlag.setText("Markierung");
-            jPanel5.add(lblFlag, CC.xy(1, 9));
-
-            //---- cmbFlags ----
-            cmbFlags.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel5.add(cmbFlags, CC.xy(3, 9));
 
             //---- lblFirstRevision ----
             lblFirstRevision.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -448,7 +434,7 @@ public class DlgNursingProcess extends MyJDialog {
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(1145, 570);
+        setSize(1145, 695);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -579,7 +565,8 @@ public class DlgNursingProcess extends MyJDialog {
         nursingProcess.setGoal(txtZiele.getText().trim());
         nursingProcess.setNextEval(jdcKontrolle.getDate());
         nursingProcess.setCategory((ResInfoCategory) cmbKategorie.getSelectedItem());
-//        nursingProcess.setFlag(cmbFlags.getSelectedIndex());
+        nursingProcess.getCommontags().clear();
+        nursingProcess.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
     }
 
 
@@ -595,8 +582,6 @@ public class DlgNursingProcess extends MyJDialog {
     private JLabel lblGoal;
     private JScrollPane jScrollPane1;
     private JTextArea txtZiele;
-    private JLabel lblFlag;
-    private JComboBox cmbFlags;
     private JLabel lblFirstRevision;
     private JDateChooser jdcKontrolle;
     private JPanel panel2;

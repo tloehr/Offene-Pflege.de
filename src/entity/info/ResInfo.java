@@ -29,6 +29,7 @@ import entity.files.SYSINF2FILE;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
+import entity.system.Commontags;
 import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
@@ -43,6 +44,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 /**
  * @author tloehr
@@ -93,9 +95,20 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     @JoinColumn(name = "resvalueid", referencedColumnName = "BWID")
     @ManyToOne
     private ResValue resValue;
+
+    public Collection<Commontags> getCommontags() {
+        return commontags;
+    }
+
     // ==
     // M:N Relationen
     // ==
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "resinfo2tags", joinColumns =
+    @JoinColumn(name = "resinfoid"), inverseJoinColumns =
+    @JoinColumn(name = "ctagid"))
+    private Collection<Commontags> commontags;
+
     // ==
     // 1:N Relationen
     // ==
@@ -135,6 +148,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
         this.resValue = null;
+        this.commontags = new HashSet<>();
     }
 
     public ResInfo(Date from, Date to, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident, Users userON, Users userOFF) {
@@ -150,6 +164,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.resValue = null;
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
+        this.commontags = new HashSet<>();
     }
 
     @Override

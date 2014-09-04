@@ -16,6 +16,7 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.process.*;
+import entity.system.Commontags;
 import entity.system.SYSPropsTools;
 import entity.values.ResValue;
 import op.OPDE;
@@ -76,6 +77,7 @@ public class PnlInformation extends NursingRecordsPanel {
     private Map<String, CollapsiblePane> mapKey2CP;
     private Map<Integer, ResInfoType> mapEquiv2Type;
     private Map<String, CollapsiblePaneAdapter> cpListener;
+    private List<Commontags> listUsedCommontags;
 
 
     public PnlInformation(Resident resident, JScrollPane jspSearch, PnlCare pnlCare) {
@@ -97,6 +99,7 @@ public class PnlInformation extends NursingRecordsPanel {
         mapInfo2Editor = Collections.synchronizedMap(new HashMap<ResInfo, PnlEditResInfo>());
         mapKey2CP = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
         mapEquiv2Type = Collections.synchronizedMap(new HashMap<Integer, ResInfoType>());
+        listUsedCommontags = Collections.synchronizedList(new ArrayList<Commontags>());
         prepareSearchArea();
         reload();
     }
@@ -1119,7 +1122,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                         editinfo.setHtml(ResInfoTools.getContentAsHTML(tmpInfo));
                                         editinfo.setProperties(tmpInfo.getProperties());
                                         editinfo.setText(tmpInfo.getText());
-                                        if (editinfo.getResValue() != null){
+                                        if (editinfo.getResValue() != null) {
                                             ResValue oldValue = editinfo.getResValue();
                                             editinfo.setResValue(em.merge(tmpInfo.getResValue()));
                                             em.remove(oldValue);
@@ -1277,6 +1280,9 @@ public class PnlInformation extends NursingRecordsPanel {
         synchronized (listAllInfos) {
             listAllInfos.clear();
         }
+        synchronized (listUsedCommontags) {
+            listUsedCommontags.clear();
+        }
         synchronized (mapInfo2Editor) {
             mapInfo2Editor.clear();
         }
@@ -1286,7 +1292,6 @@ public class PnlInformation extends NursingRecordsPanel {
         synchronized (mapEquiv2Type) {
             mapEquiv2Type.clear();
         }
-
         synchronized (cpListener) {
             cpListener.clear();
         }

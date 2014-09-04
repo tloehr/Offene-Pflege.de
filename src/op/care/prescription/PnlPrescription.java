@@ -36,7 +36,6 @@ import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.prescription.*;
 import entity.process.*;
-import entity.reports.NReportTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import entity.system.UniqueTools;
@@ -114,7 +113,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     public void switchResident(Resident res) {
         this.resident = EntityTools.find(Resident.class, res.getRID());
         listUsedCommontags.clear();
-        listUsedCommontags.addAll(CommontagsTools.getAllUsedInNReports(resident));
+        listUsedCommontags.addAll(CommontagsTools.getAllUsedInPrescription(resident));
         GUITools.setResidentDisplay(resident);
         prepareSearchArea();
         reloadDisplay();
@@ -574,7 +573,6 @@ public class PnlPrescription extends NursingRecordsPanel {
         tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbClosed);
 
-
         if (!listUsedCommontags.isEmpty()) {
 
             JPanel pnlTags = new JPanel();
@@ -585,7 +583,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag)), true), false);
+                        SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag), true, true, false, tbClosed.isSelected(), true), true);
                     }
                 });
                 btnTag.setForeground(GUITools.getColor(commontag.getColor()));
@@ -985,6 +983,18 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         final CollapsiblePane myCP = createCP4(myPrescription);
                                         buildPanel();
 
+                                        synchronized (listUsedCommontags) {
+                                            boolean reloadSearch = false;
+                                            for (Commontags ctag : myPrescription.getCommontags()) {
+                                                if (!listUsedCommontags.contains(ctag)) {
+                                                    listUsedCommontags.add(ctag);
+                                                    reloadSearch = true;
+                                                }
+                                            }
+                                            if (reloadSearch) {
+                                                prepareSearchArea();
+                                            }
+                                        }
                                         SwingUtilities.invokeLater(new Runnable() {
                                             @Override
                                             public void run() {
@@ -1052,6 +1062,19 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         Collections.sort(lstPrescriptions);
                                         final CollapsiblePane myCP = createCP4(myPrescription);
                                         buildPanel();
+
+                                        synchronized (listUsedCommontags) {
+                                            boolean reloadSearch = false;
+                                            for (Commontags ctag : myPrescription.getCommontags()) {
+                                                if (!listUsedCommontags.contains(ctag)) {
+                                                    listUsedCommontags.add(ctag);
+                                                    reloadSearch = true;
+                                                }
+                                            }
+                                            if (reloadSearch) {
+                                                prepareSearchArea();
+                                            }
+                                        }
 
                                         SwingUtilities.invokeLater(new Runnable() {
                                             @Override
@@ -1132,7 +1155,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 myPrescription.getCommontags().add(em.merge(commontag));
                             }
 
-
                             em.getTransaction().commit();
 
                             lstPrescriptions.remove(prescription);
@@ -1140,6 +1162,19 @@ public class PnlPrescription extends NursingRecordsPanel {
                             Collections.sort(lstPrescriptions);
                             final CollapsiblePane myCP = createCP4(myPrescription);
                             buildPanel();
+
+                            synchronized (listUsedCommontags) {
+                                boolean reloadSearch = false;
+                                for (Commontags ctag : myPrescription.getCommontags()) {
+                                    if (!listUsedCommontags.contains(ctag)) {
+                                        listUsedCommontags.add(ctag);
+                                        reloadSearch = true;
+                                    }
+                                }
+                                if (reloadSearch) {
+                                    prepareSearchArea();
+                                }
+                            }
 
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override

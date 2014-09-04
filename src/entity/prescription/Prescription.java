@@ -161,10 +161,10 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-        @JoinTable(name = "prescription2tags", joinColumns =
-        @JoinColumn(name = "prescid"), inverseJoinColumns =
-        @JoinColumn(name = "ctagid"))
-        private Collection<Commontags> commontags;
+    @JoinTable(name = "prescription2tags", joinColumns =
+    @JoinColumn(name = "prescid"), inverseJoinColumns =
+    @JoinColumn(name = "ctagid"))
+    private Collection<Commontags> commontags;
 
 
     public Prescription() {
@@ -535,6 +535,11 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
                 copy.getPrescriptionSchedule().add(scheduleCopy);
             }
         });
+
+        for (Commontags ctag : commontags) {
+            copy.getCommontags().add(ctag);
+        }
+
         return copy;
     }
 

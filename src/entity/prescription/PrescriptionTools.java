@@ -14,6 +14,7 @@ import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.prescription.PnlPrescription;
@@ -972,7 +973,9 @@ public class PrescriptionTools {
                 if (withDiscontinued || !myprescription.isClosed()) {
 
                     result += "<tr>";
-                    result += "<td valign=\"top\">" + (withIcon && myprescription.isClosed() ? SYSConst.html_22x22_StopSign : "") + getLongDescription(myprescription) + "</td>";
+                    result += "<td valign=\"top\">" + (withIcon && myprescription.isClosed() ? SYSConst.html_22x22_StopSign : "") + getLongDescription(myprescription);
+                    result += (myprescription.getCommontags().isEmpty() ? "" : "<br/>"+CommontagsTools.getAsHTML(myprescription.getCommontags(), SYSConst.html_16x16_tagPurple));
+                    result += "</td>";
                     result += "<td valign=\"top\">" + getDoseAsHTML(myprescription, withmed) + "<br/>";
                     result += getRemark(myprescription) + "</td>";
                     result += "<td valign=\"top\">" + myprescription.getPITAsHTML();

@@ -10,6 +10,7 @@ import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSNP2PROCESS;
+import entity.system.Commontags;
 import entity.system.Users;
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
@@ -20,10 +21,7 @@ import org.joda.time.DateTime;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -94,7 +92,18 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private List<InterventionSchedule> interventionSchedules;
 
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "np2tags", joinColumns =
+    @JoinColumn(name = "npid"), inverseJoinColumns =
+    @JoinColumn(name = "ctagid"))
+    private Collection<Commontags> commontags;
+
     public NursingProcess() {
+    }
+
+    public Collection<Commontags> getCommontags() {
+        return commontags;
     }
 
     public NursingProcess(Resident resident) {
@@ -107,6 +116,8 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         from = new Date();
 //        flag = NursingProcessTools.FLAG_NONE;
         to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
+        this.commontags = new ArrayList<Commontags>();
+
         this.npseries = -1l;
     }
 
@@ -406,6 +417,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         this.attachedQProcessConnections = attachedQProcessConnections;
         this.npControls = npControls;
         this.interventionSchedules = interventionSchedules;
+        this.commontags = new ArrayList<>();
     }
 
     @Override
@@ -415,6 +427,9 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
             InterventionSchedule myIS = is.clone();
             myIS.setNursingProcess(myNewNP);
             myNewNP.getInterventionSchedule().add(myIS);
+        }
+        for (Commontags ctag : commontags){
+            myNewNP.getCommontags().add(ctag);
         }
         return myNewNP;
     }

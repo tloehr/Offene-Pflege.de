@@ -118,29 +118,79 @@ public class CommontagsTools {
     }
 
     public static ArrayList<Commontags> getAllUsedInPrescription(Resident resident) {
-           EntityManager em = OPDE.createEM();
-           ArrayList<Commontags> list = null;
+        EntityManager em = OPDE.createEM();
+        ArrayList<Commontags> list = null;
 
-           try {
+        try {
 
-               String jpql = " SELECT DISTINCT c " +
-                       " FROM Commontags c " +
-                       " JOIN c.prescriptions p " +
-                       " WHERE p.resident = :resident " +
-                       " ORDER BY c.text ASC ";
+            String jpql = " SELECT DISTINCT c " +
+                    " FROM Commontags c " +
+                    " JOIN c.prescriptions p " +
+                    " WHERE p.resident = :resident " +
+                    " ORDER BY c.text ASC ";
 
 
-               Query query = em.createQuery(jpql);
-               query.setParameter("resident", resident);
-               list = new ArrayList<Commontags>(query.getResultList());
+            Query query = em.createQuery(jpql);
+            query.setParameter("resident", resident);
+            list = new ArrayList<Commontags>(query.getResultList());
 
-           } catch (Exception se) {
-               OPDE.fatal(se);
-           } finally {
-               em.close();
-           }
-           return list;
-       }
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+    public static ArrayList<Commontags> getAllUsedInNursingProcess(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Commontags> list = null;
+
+        try {
+
+            String jpql = " SELECT DISTINCT c " +
+                    " FROM Commontags c " +
+                    " JOIN c.nursingProcesses p " +
+                    " WHERE p.resident = :resident " +
+                    " ORDER BY c.text ASC ";
+
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("resident", resident);
+            list = new ArrayList<Commontags>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+    public static ArrayList<Commontags> getAllUsedInResInfos(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Commontags> list = null;
+
+        try {
+
+            String jpql = " SELECT DISTINCT c " +
+                    " FROM Commontags c " +
+                    " JOIN c.resinfos p " +
+                    " WHERE p.resident = :resident " +
+                    " ORDER BY c.text ASC ";
+
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("resident", resident);
+            list = new ArrayList<Commontags>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
 
     public static String getAsHTML(Collection<Commontags> commontags, String icon) {
         String result = "";

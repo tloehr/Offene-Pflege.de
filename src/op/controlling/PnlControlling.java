@@ -36,7 +36,10 @@ import com.jidesoft.swing.JideTabbedPane;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
-import entity.info.*;
+import entity.info.ResInfoTools;
+import entity.info.ResInfoTypeTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.prescription.MedStockTools;
 import entity.process.QProcessElement;
 import entity.process.QProcessTools;
@@ -151,6 +154,44 @@ public class PnlControlling extends CleanablePanel {
         }
 
 
+    }
+
+
+    private CollapsiblePane createCP4Pain() {
+        final CollapsiblePane cpPain = new CollapsiblePane();
+
+        String title = "<html><font size=+1>" +
+                SYSTools.xx("opde.controlling.pain") +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpPain.setCollapsed(!cpPain.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+        cpPain.setTitleLabelComponent(cptitle.getMain());
+        cpPain.setSlidingDirection(SwingConstants.SOUTH);
+        cpPain.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cpPain.setContentPane(createContentPanel4Pain());
+            }
+        });
+
+        if (!cpPain.isCollapsed()) {
+            cpPain.setContentPane(createContentPanel4Orga());
+        }
+
+        cpPain.setHorizontalAlignment(SwingConstants.LEADING);
+        //        cpOrga.setOpaque(false);
+        //        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
+
+        return cpPain;
     }
 
 
@@ -337,6 +378,51 @@ public class PnlControlling extends CleanablePanel {
 
         return cpOrga;
     }
+
+    private JPanel createContentPanel4Pain() {
+            JPanel pnlContent = new JPanel(new VerticalLayout());
+
+            JPanel pnlPainDossier = new JPanel(new BorderLayout());
+            final JButton btnBVActivities = GUITools.createHyperlinkButton("opde.controlling.orga.paindossier", null, null);
+            int monthsBack;
+            try {
+                monthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::paindossiermonthsback"));
+            } catch (NumberFormatException nfe) {
+                monthsBack = 1;
+            }
+            final JTextField txtPainMonthsBack = GUITools.createIntegerTextField(1, 52, monthsBack);
+            txtPainMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
+            btnBVActivities.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    OPDE.getMainframe().setBlocked(true);
+                    SwingWorker worker = new SwingWorker() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            SYSPropsTools.storeProp("opde.controlling::paindossiermonthsback", txtPainMonthsBack.getText(), OPDE.getLogin().getUser());
+                            SYSFilesTools.print(NReportTools.getBVActivites(new LocalDate().minusWeeks(Integer.parseInt(txtPainMonthsBack.getText())), progressClosure), false);
+                            return null;
+                        }
+
+                        @Override
+                        protected void done() {
+                            OPDE.getDisplayManager().setProgressBarMessage(null);
+                            OPDE.getMainframe().setBlocked(false);
+                        }
+                    };
+                    worker.execute();
+                }
+            });
+            pnlPainDossier.add(btnBVActivities, BorderLayout.WEST);
+            pnlPainDossier.add(txtPainMonthsBack, BorderLayout.EAST);
+            pnlContent.add(pnlPainDossier);
+
+
+
+
+            return pnlContent;
+        }
 
     private JPanel createContentPanel4Orga() {
         JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -897,6 +983,7 @@ public class PnlControlling extends CleanablePanel {
 
                 cpsControlling.add(createCP4Nursing());
                 cpsControlling.add(createCP4Nutrition());
+                cpsControlling.add(createCP4Pain());
                 if (OPDE.isCalcMediUPR1()) {
                     cpsControlling.add(createCP4Drugs());
                 }

@@ -1,5 +1,7 @@
 package entity.system;
 
+import entity.info.ResInfo;
+import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
@@ -75,6 +77,12 @@ public class Commontags {
 
     @ManyToMany(mappedBy = "commontags")
     private Collection<Prescription> prescriptions;
+
+    @ManyToMany(mappedBy = "commontags")
+        private Collection<ResInfo> resinfos;
+
+    @ManyToMany(mappedBy = "commontags")
+        private Collection<NursingProcess> nursingProcesses;
 
     public Commontags() {
     }
