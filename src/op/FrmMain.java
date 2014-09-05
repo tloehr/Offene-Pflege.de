@@ -317,6 +317,7 @@ public class FrmMain extends JFrame {
         }
     }
 
+
     public void removeSpeciality(ResInfoType type, final Resident resident) {
         if (!type.isAlertType() && type.getType() != ResInfoTypeTools.TYPE_ABSENCE) {
             return;

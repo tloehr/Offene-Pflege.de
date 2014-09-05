@@ -17,6 +17,7 @@ import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.process.*;
 import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import entity.system.SYSPropsTools;
 import entity.values.ResValue;
 import op.OPDE;
@@ -676,7 +677,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
         final boolean normalInfoType = resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY;
 
-        String title = "";
+        String title = "<html><body>";
 
         if (resInfo.isSingleIncident()) {
             title += DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ")";
@@ -688,6 +689,12 @@ public class PnlInformation extends NursingRecordsPanel {
         if (resInfo.getResInfoType().isObsolete() && mapEquiv2Type.containsKey(resInfo.getResInfoType().getEquiv())) {
             title += " -" + resInfo.getResInfoType().getShortDescription() + "-";
         }
+
+        if (!resInfo.getCommontags().isEmpty()) {
+            title += "<br/>" + CommontagsTools.getAsHTML(resInfo.getCommontags(), SYSConst.html_16x16_tagPurple_internal, 4);
+        }
+
+        title += "</body></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
@@ -1752,6 +1759,105 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
             }
         }
+
+
+        /***
+         *      _     _       _____  _    ____
+         *     | |__ | |_ _ _|_   _|/ \  / ___|___
+         *     | '_ \| __| '_ \| | / _ \| |  _/ __|
+         *     | |_) | |_| | | | |/ ___ \ |_| \__ \
+         *     |_.__/ \__|_| |_|_/_/   \_\____|___/
+         *
+         */
+        final JButton btnTAGs = GUITools.createHyperlinkButton("misc.msg.editTags", SYSConst.icon22tagPurple, null);
+        btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnTAGs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                final JidePopup popup = new JidePopup();
+
+                final JPanel pnl = new JPanel(new BorderLayout(5, 5));
+                final PnlCommonTags pnlCommonTags = new PnlCommonTags(resInfo.getCommontags(), true, 3);
+                pnl.add(new JScrollPane(pnlCommonTags), BorderLayout.CENTER);
+                JButton btnApply = new JButton(SYSConst.icon22apply);
+                pnl.add(btnApply, BorderLayout.SOUTH);
+                btnApply.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+
+                            em.getTransaction().begin();
+                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                            ResInfo myInfo = em.merge(resInfo);
+                            em.lock(myInfo, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                            myInfo.getCommontags().clear();
+                            for (Commontags commontag : pnlCommonTags.getListSelectedTags()) {
+                                myInfo.getCommontags().add(em.merge(commontag));
+                            }
+
+                            em.getTransaction().commit();
+
+                            synchronized (mapType2ResInfos) {
+                                ResInfoType referenceType = mapType2ResInfos.containsKey(resInfo.getResInfoType()) ? resInfo.getResInfoType() : mapEquiv2Type.get(resInfo.getResInfoType().getEquiv());
+                                // refresh data
+                                int oldIndex = mapType2ResInfos.get(referenceType).indexOf(resInfo);
+                                mapType2ResInfos.get(referenceType).remove(resInfo);
+                                mapType2ResInfos.get(referenceType).add(oldIndex, myInfo);
+                            }
+                            synchronized (listAllInfos) {
+                                listAllInfos.remove(resInfo);
+                                listAllInfos.add(myInfo);
+                            }
+                            synchronized (mapKey2CP) {
+                                mapKey2CP.remove(keyResInfo);
+                            }
+
+                            sortData();
+                            reloadDisplay();
+
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            } else {
+                                reloadDisplay();
+                            }
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+                    }
+                });
+
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(btnTAGs);
+                popup.removeExcludedComponent(btnTAGs);
+                pnl.setPreferredSize(new Dimension(350, 150));
+                popup.getContentPane().add(pnl);
+                popup.setDefaultFocusComponent(pnl);
+
+                GUITools.showPopup(popup, SwingConstants.WEST);
+
+            }
+        });
+        btnTAGs.setEnabled(!resInfo.isClosed());
+        pnlMenu.add(btnTAGs);
+
+
+        pnlMenu.add(new JSeparator());
+
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *      _     _         _____ _ _

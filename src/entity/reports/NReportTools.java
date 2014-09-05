@@ -834,8 +834,8 @@ public class NReportTools {
     }
 
     public static ArrayList<NReport> getNReports4Tags(Resident resident, Commontags tag) {
-//        DateTime from = day.toDateTime();
-//        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
+
+
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
 
@@ -864,5 +864,36 @@ public class NReportTools {
         return list;
     }
 
+
+    public static ArrayList<NReport> getNReports4Tags(Commontags tag, LocalDate start, LocalDate end) {
+
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
+
+        try {
+
+            String jpql = " SELECT nr " +
+                    " FROM NReport nr " +
+                    " JOIN nr.commontags t " +
+                    " WHERE nr.resident.adminonly <> 2 " +
+                    " AND t = :tag " +
+                    " AND nr.pit >= :from AND nr.pit <= :to  " +
+                    " ORDER BY nr.pit DESC ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("tag", tag);
+            query.setParameter("from", start.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("to", SYSCalendar.eod(end).toDate());
+
+            list = new ArrayList<NReport>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
 
 }

@@ -1173,6 +1173,13 @@ public class PnlReport extends NursingRecordsPanel {
                 for (int year = end.getYear(); year >= start.getYear(); year--) {
                     final String keyYear = Integer.toString(year) + ".year";
 
+
+                    // todo: to track down the NPEs.
+                    if (cpMap.get(keyYear) == null){
+                        reload();
+                        break;
+                    }
+
                     cpsReports.add(cpMap.get(keyYear));
                 }
             }

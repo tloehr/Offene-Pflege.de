@@ -246,6 +246,13 @@ public class PnlDFN extends NursingRecordsPanel {
 
             boolean isEmpty = true;
             synchronized (mapShift2DFN) {
+
+                // todo: to track down the NPEs.
+                if (mapShift2DFN.get(shift) == null) {
+                    reload();
+                    break;
+                }
+
                 isEmpty = mapShift2DFN.get(shift).isEmpty();
             }
             synchronized (mapShift2Pane) {

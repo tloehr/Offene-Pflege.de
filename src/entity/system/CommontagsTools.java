@@ -25,6 +25,7 @@ public class CommontagsTools {
     public static final int TYPE_SYS_SOCIAL = 8;
     public static final int TYPE_SYS_SOCIAL2 = 10;
     public static final int TYPE_SYS_COMPLAINT = 9;
+    public static final int TYPE_SYS_PAINMGR = 11;
 
     public static ArrayList<Commontags> getAll() {
         EntityManager em = OPDE.createEM();
@@ -47,6 +48,28 @@ public class CommontagsTools {
         return list;
     }
 
+    public static Commontags getType(int type) {
+            EntityManager em = OPDE.createEM();
+            ArrayList<Commontags> list = null;
+
+            try {
+
+                String jpql = " SELECT c " +
+                        " FROM Commontags c " +
+                        " WHERE c.type = :type ";
+
+                Query query = em.createQuery(jpql);
+                query.setParameter("type", type);
+
+                list = new ArrayList<Commontags>(query.getResultList());
+
+            } catch (Exception se) {
+                OPDE.fatal(se);
+            } finally {
+                em.close();
+            }
+            return list.isEmpty() ? null : list.get(0);
+        }
 
     public static ArrayList<Commontags> getAllUsedInQMSPlans(boolean inactiveOnes2) {
         EntityManager em = OPDE.createEM();
@@ -193,9 +216,18 @@ public class CommontagsTools {
     }
 
     public static String getAsHTML(Collection<Commontags> commontags, String icon) {
+        return getAsHTML(commontags, icon, 0);
+    }
+
+    public static String getAsHTML(Collection<Commontags> commontags, String icon, int maxline) {
         String result = "";
+        int i = 0;
         for (Commontags ctag : commontags) {
+            i++;
             result += icon + "&nbsp;" + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font> ";
+            if (maxline > 0 && i % maxline == 0){
+                result += "<br/>";
+            }
         }
         return result;
     }
