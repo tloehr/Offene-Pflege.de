@@ -43,6 +43,7 @@ import entity.info.ResidentTools;
 import entity.prescription.MedStockTools;
 import entity.process.QProcessElement;
 import entity.process.QProcessTools;
+import entity.qms.ControllingTools;
 import entity.qms.Qmsplan;
 import entity.reports.NReportTools;
 import entity.staff.TrainingTools;
@@ -157,6 +158,44 @@ public class PnlControlling extends CleanablePanel {
     }
 
 
+    private CollapsiblePane createCP4Fall() {
+        final CollapsiblePane cpPain = new CollapsiblePane();
+
+        String title = "<html><font size=+1>" +
+                SYSTools.xx("opde.controlling.fall") +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpPain.setCollapsed(!cpPain.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+        cpPain.setTitleLabelComponent(cptitle.getMain());
+        cpPain.setSlidingDirection(SwingConstants.SOUTH);
+        cpPain.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cpPain.setContentPane(createContentPanel4Pain());
+            }
+        });
+
+        if (!cpPain.isCollapsed()) {
+            cpPain.setContentPane(createContentPanel4Pain());
+        }
+
+        cpPain.setHorizontalAlignment(SwingConstants.LEADING);
+        //        cpOrga.setOpaque(false);
+        //        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
+
+        return cpPain;
+    }
+
+
     private CollapsiblePane createCP4Pain() {
         final CollapsiblePane cpPain = new CollapsiblePane();
 
@@ -184,7 +223,7 @@ public class PnlControlling extends CleanablePanel {
         });
 
         if (!cpPain.isCollapsed()) {
-            cpPain.setContentPane(createContentPanel4Orga());
+            cpPain.setContentPane(createContentPanel4Pain());
         }
 
         cpPain.setHorizontalAlignment(SwingConstants.LEADING);
@@ -380,49 +419,189 @@ public class PnlControlling extends CleanablePanel {
     }
 
     private JPanel createContentPanel4Pain() {
-            JPanel pnlContent = new JPanel(new VerticalLayout());
+        JPanel pnlContent = new JPanel(new VerticalLayout());
 
-            JPanel pnlPainDossier = new JPanel(new BorderLayout());
-            final JButton btnBVActivities = GUITools.createHyperlinkButton("opde.controlling.orga.paindossier", null, null);
-            int monthsBack;
-            try {
-                monthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::paindossiermonthsback"));
-            } catch (NumberFormatException nfe) {
-                monthsBack = 1;
-            }
-            final JTextField txtPainMonthsBack = GUITools.createIntegerTextField(1, 52, monthsBack);
-            txtPainMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
-            btnBVActivities.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-
-                    OPDE.getMainframe().setBlocked(true);
-                    SwingWorker worker = new SwingWorker() {
-                        @Override
-                        protected Object doInBackground() throws Exception {
-                            SYSPropsTools.storeProp("opde.controlling::paindossiermonthsback", txtPainMonthsBack.getText(), OPDE.getLogin().getUser());
-                            SYSFilesTools.print(NReportTools.getBVActivites(new LocalDate().minusWeeks(Integer.parseInt(txtPainMonthsBack.getText())), progressClosure), false);
-                            return null;
-                        }
-
-                        @Override
-                        protected void done() {
-                            OPDE.getDisplayManager().setProgressBarMessage(null);
-                            OPDE.getMainframe().setBlocked(false);
-                        }
-                    };
-                    worker.execute();
-                }
-            });
-            pnlPainDossier.add(btnBVActivities, BorderLayout.WEST);
-            pnlPainDossier.add(txtPainMonthsBack, BorderLayout.EAST);
-            pnlContent.add(pnlPainDossier);
-
-
-
-
-            return pnlContent;
+        JPanel pnlPainDossier = new JPanel(new BorderLayout());
+        final JButton btnBVActivities = GUITools.createHyperlinkButton("opde.controlling.orga.paindossier", null, null);
+        int monthsBack;
+        try {
+            monthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::paindossiermonthsback"));
+        } catch (NumberFormatException nfe) {
+            monthsBack = 1;
         }
+        final JTextField txtPainMonthsBack = GUITools.createIntegerTextField(1, 52, monthsBack);
+        txtPainMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
+        btnBVActivities.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp("opde.controlling::paindossiermonthsback", txtPainMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ControllingTools.getPainDossierAsHTML(new LocalDate().minusMonths(Integer.parseInt(txtPainMonthsBack.getText())), new LocalDate(), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlPainDossier.add(btnBVActivities, BorderLayout.WEST);
+        pnlPainDossier.add(txtPainMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlPainDossier);
+
+
+        return pnlContent;
+    }
+
+    private JPanel createContentPanel4Fall() {
+        JPanel pnlContent = new JPanel(new VerticalLayout());
+
+        /***
+         *      _____     _ _          _
+         *     |  ___|_ _| | |___     / \   _ __   ___  _ __  _   _ _ __ ___   ___  _   _ ___
+         *     | |_ / _` | | / __|   / _ \ | '_ \ / _ \| '_ \| | | | '_ ` _ \ / _ \| | | / __|
+         *     |  _| (_| | | \__ \  / ___ \| | | | (_) | | | | |_| | | | | | | (_) | |_| \__ \
+         *     |_|  \__,_|_|_|___/ /_/   \_\_| |_|\___/|_| |_|\__, |_| |_| |_|\___/ \__,_|___/
+         *                                                    |___/
+         */
+        JPanel pnlFallsAnon = new JPanel(new BorderLayout());
+        final JButton btnFallsAnon = GUITools.createHyperlinkButton("opde.controlling.nursing.falls.anonymous", null, null);
+        int fallsMonthsBack;
+        try {
+            fallsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            fallsMonthsBack = 7;
+        }
+        final JTextField txtFallsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsMonthsBack);
+        txtFallsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
+
+        btnFallsAnon.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp("opde.controlling::fallsMonthsBack", txtFallsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ResInfoTools.getFallsAnonymous(Integer.parseInt(txtFallsMonthsBack.getText()), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlFallsAnon.add(btnFallsAnon, BorderLayout.WEST);
+        pnlFallsAnon.add(txtFallsMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlFallsAnon);
+
+        /***
+         *      _____     _ _       _           ____           _     _            _
+         *     |  ___|_ _| | |___  | |__  _   _|  _ \ ___  ___(_) __| | ___ _ __ | |_
+         *     | |_ / _` | | / __| | '_ \| | | | |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|
+         *     |  _| (_| | | \__ \ | |_) | |_| |  _ <  __/\__ \ | (_| |  __/ | | | |_
+         *     |_|  \__,_|_|_|___/ |_.__/ \__, |_| \_\___||___/_|\__,_|\___|_| |_|\__|
+         *                                |___/
+         */
+        JPanel pnlFallsRes = new JPanel(new BorderLayout());
+        final JButton btnFallsRes = GUITools.createHyperlinkButton("opde.controlling.nursing.falls.byResident", null, null);
+        int fallsResMonthsBack;
+        try {
+            fallsResMonthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsResMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            fallsResMonthsBack = 7;
+        }
+        final JTextField txtResFallsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsResMonthsBack);
+        txtResFallsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
+
+        btnFallsRes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp("opde.controlling::fallsResMonthsBack", txtResFallsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ResInfoTools.getFallsByResidents(Integer.parseInt(txtResFallsMonthsBack.getText()), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlFallsRes.add(btnFallsRes, BorderLayout.WEST);
+        pnlFallsRes.add(txtResFallsMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlFallsRes);
+
+
+        /***
+         *      _____     _ _     ___           _ _           _
+         *     |  ___|_ _| | |___|_ _|_ __   __| (_) ___ __ _| |_ ___  _ __
+         *     | |_ / _` | | / __|| || '_ \ / _` | |/ __/ _` | __/ _ \| '__|
+         *     |  _| (_| | | \__ \| || | | | (_| | | (_| (_| | || (_) | |
+         *     |_|  \__,_|_|_|___/___|_| |_|\__,_|_|\___\__,_|\__\___/|_|
+         *
+         */
+        JPanel pnlFallsIndicator = new JPanel(new BorderLayout());
+        final JButton btnFallsIndicator = GUITools.createHyperlinkButton("opde.controlling.nursing.fallsindicators.byMonth", null, null);
+        int fallsIndicatorBack;
+        try {
+            fallsIndicatorBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsIndicatorMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            fallsIndicatorBack = 7;
+        }
+        final JTextField txtFallsIndicatorsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsResMonthsBack);
+        txtFallsIndicatorsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
+
+        btnFallsIndicator.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp("opde.controlling::fallsIndicatorMonthsBack", txtFallsIndicatorsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure), false);
+                        //                        ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlFallsIndicator.add(btnFallsIndicator, BorderLayout.WEST);
+        pnlFallsIndicator.add(txtFallsIndicatorsMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlFallsIndicator);
+
+
+        return pnlContent;
+    }
+
 
     private JPanel createContentPanel4Orga() {
         JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -678,139 +857,6 @@ public class PnlControlling extends CleanablePanel {
         pblSocialTimes.add(cmbSocialTimes, BorderLayout.EAST);
         pnlContent.add(pblSocialTimes);
 
-        /***
-         *      _____     _ _          _
-         *     |  ___|_ _| | |___     / \   _ __   ___  _ __  _   _ _ __ ___   ___  _   _ ___
-         *     | |_ / _` | | / __|   / _ \ | '_ \ / _ \| '_ \| | | | '_ ` _ \ / _ \| | | / __|
-         *     |  _| (_| | | \__ \  / ___ \| | | | (_) | | | | |_| | | | | | | (_) | |_| \__ \
-         *     |_|  \__,_|_|_|___/ /_/   \_\_| |_|\___/|_| |_|\__, |_| |_| |_|\___/ \__,_|___/
-         *                                                    |___/
-         */
-        JPanel pnlFallsAnon = new JPanel(new BorderLayout());
-        final JButton btnFallsAnon = GUITools.createHyperlinkButton("opde.controlling.nursing.falls.anonymous", null, null);
-        int fallsMonthsBack;
-        try {
-            fallsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsMonthsBack"));
-        } catch (NumberFormatException nfe) {
-            fallsMonthsBack = 7;
-        }
-        final JTextField txtFallsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsMonthsBack);
-        txtFallsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
-
-        btnFallsAnon.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().setBlocked(true);
-                SwingWorker worker = new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp("opde.controlling::fallsMonthsBack", txtFallsMonthsBack.getText(), OPDE.getLogin().getUser());
-                        SYSFilesTools.print(ResInfoTools.getFallsAnonymous(Integer.parseInt(txtFallsMonthsBack.getText()), progressClosure), false);
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
-                        OPDE.getDisplayManager().setProgressBarMessage(null);
-                        OPDE.getMainframe().setBlocked(false);
-                    }
-                };
-                worker.execute();
-            }
-        });
-        pnlFallsAnon.add(btnFallsAnon, BorderLayout.WEST);
-        pnlFallsAnon.add(txtFallsMonthsBack, BorderLayout.EAST);
-        pnlContent.add(pnlFallsAnon);
-
-        /***
-         *      _____     _ _       _           ____           _     _            _
-         *     |  ___|_ _| | |___  | |__  _   _|  _ \ ___  ___(_) __| | ___ _ __ | |_
-         *     | |_ / _` | | / __| | '_ \| | | | |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|
-         *     |  _| (_| | | \__ \ | |_) | |_| |  _ <  __/\__ \ | (_| |  __/ | | | |_
-         *     |_|  \__,_|_|_|___/ |_.__/ \__, |_| \_\___||___/_|\__,_|\___|_| |_|\__|
-         *                                |___/
-         */
-        JPanel pnlFallsRes = new JPanel(new BorderLayout());
-        final JButton btnFallsRes = GUITools.createHyperlinkButton("opde.controlling.nursing.falls.byResident", null, null);
-        int fallsResMonthsBack;
-        try {
-            fallsResMonthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsResMonthsBack"));
-        } catch (NumberFormatException nfe) {
-            fallsResMonthsBack = 7;
-        }
-        final JTextField txtResFallsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsResMonthsBack);
-        txtResFallsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
-
-        btnFallsRes.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().setBlocked(true);
-                SwingWorker worker = new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp("opde.controlling::fallsResMonthsBack", txtResFallsMonthsBack.getText(), OPDE.getLogin().getUser());
-                        SYSFilesTools.print(ResInfoTools.getFallsByResidents(Integer.parseInt(txtResFallsMonthsBack.getText()), progressClosure), false);
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
-                        OPDE.getDisplayManager().setProgressBarMessage(null);
-                        OPDE.getMainframe().setBlocked(false);
-                    }
-                };
-                worker.execute();
-            }
-        });
-        pnlFallsRes.add(btnFallsRes, BorderLayout.WEST);
-        pnlFallsRes.add(txtResFallsMonthsBack, BorderLayout.EAST);
-        pnlContent.add(pnlFallsRes);
-
-
-        /***
-         *      _____     _ _     ___           _ _           _
-         *     |  ___|_ _| | |___|_ _|_ __   __| (_) ___ __ _| |_ ___  _ __
-         *     | |_ / _` | | / __|| || '_ \ / _` | |/ __/ _` | __/ _ \| '__|
-         *     |  _| (_| | | \__ \| || | | | (_| | | (_| (_| | || (_) | |
-         *     |_|  \__,_|_|_|___/___|_| |_|\__,_|_|\___\__,_|\__\___/|_|
-         *
-         */
-        JPanel pnlFallsIndicator = new JPanel(new BorderLayout());
-        final JButton btnFallsIndicator = GUITools.createHyperlinkButton("opde.controlling.nursing.fallsindicators.byMonth", null, null);
-        int fallsIndicatorBack;
-        try {
-            fallsIndicatorBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsIndicatorMonthsBack"));
-        } catch (NumberFormatException nfe) {
-            fallsIndicatorBack = 7;
-        }
-        final JTextField txtFallsIndicatorsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsResMonthsBack);
-        txtFallsIndicatorsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
-
-        btnFallsIndicator.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().setBlocked(true);
-                SwingWorker worker = new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp("opde.controlling::fallsIndicatorMonthsBack", txtFallsIndicatorsMonthsBack.getText(), OPDE.getLogin().getUser());
-                        SYSFilesTools.print(ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure), false);
-//                        ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure);
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
-                        OPDE.getDisplayManager().setProgressBarMessage(null);
-                        OPDE.getMainframe().setBlocked(false);
-                    }
-                };
-                worker.execute();
-            }
-        });
-        pnlFallsIndicator.add(btnFallsIndicator, BorderLayout.WEST);
-        pnlFallsIndicator.add(txtFallsIndicatorsMonthsBack, BorderLayout.EAST);
-        pnlContent.add(pnlFallsIndicator);
 
         return pnlContent;
     }
@@ -984,6 +1030,8 @@ public class PnlControlling extends CleanablePanel {
                 cpsControlling.add(createCP4Nursing());
                 cpsControlling.add(createCP4Nutrition());
                 cpsControlling.add(createCP4Pain());
+                cpsControlling.add(createCP4Fall());
+
                 if (OPDE.isCalcMediUPR1()) {
                     cpsControlling.add(createCP4Drugs());
                 }

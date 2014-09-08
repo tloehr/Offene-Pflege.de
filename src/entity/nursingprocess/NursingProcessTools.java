@@ -4,10 +4,13 @@ import entity.EntityTools;
 import entity.info.ResInfoCategory;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.system.Commontags;
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
+import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -35,6 +38,23 @@ public class NursingProcessTools {
         Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :resident AND p.category = :cat ORDER BY p.topic, p.from");
         query.setParameter("cat", cat);
         query.setParameter("resident", resident);
+        ArrayList<NursingProcess> planungen = new ArrayList<NursingProcess>(query.getResultList());
+        em.close();
+        return planungen;
+    }
+
+    public static ArrayList<NursingProcess> getAll(int type, LocalDate from, LocalDate to) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT DISTINCT p FROM NursingProcess p " +
+                " JOIN p.commontags ct " +
+                " WHERE ((p.from <= :from AND p.to >= :from) OR " +
+                " (p.from <= :to AND p.to >= :to) OR " +
+                " (p.from > :from AND p.to < :to)) " +
+                " AND ct.type = :type ");
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(to).toDate());
+        query.setParameter("type", type);
         ArrayList<NursingProcess> planungen = new ArrayList<NursingProcess>(query.getResultList());
         em.close();
         return planungen;

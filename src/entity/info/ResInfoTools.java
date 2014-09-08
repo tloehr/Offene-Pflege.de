@@ -2,6 +2,7 @@ package entity.info;
 
 import entity.HomesTools;
 import entity.Station;
+import entity.nursingprocess.NursingProcess;
 import entity.prescription.GPTools;
 import entity.prescription.PrescriptionTools;
 import entity.process.QProcessElement;
@@ -164,6 +165,23 @@ public class ResInfoTools {
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
         return resInfos;
+    }
+
+    public static ArrayList<ResInfo> getAll(int ctype, LocalDate from, LocalDate to) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT DISTINCT p FROM ResInfo p " +
+                " JOIN p.commontags ct " +
+                " WHERE ((p.from <= :from AND p.to >= :from) OR " +
+                " (p.from <= :to AND p.to >= :to) OR " +
+                " (p.from > :from AND p.to < :to)) " +
+                " AND ct.type = :type ");
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(to).toDate());
+        query.setParameter("type", ctype);
+        ArrayList<ResInfo> planungen = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return planungen;
     }
 
     public static ArrayList<ResInfo> getAllActive(Resident resident) {

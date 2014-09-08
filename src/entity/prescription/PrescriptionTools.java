@@ -881,6 +881,23 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static ArrayList<Prescription> getAll(int type, LocalDate from, LocalDate to) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT DISTINCT p FROM Prescription p " +
+                " JOIN p.commontags ct " +
+                " WHERE ((p.from <= :from AND p.to >= :from) OR " +
+                " (p.from <= :to AND p.to >= :to) OR " +
+                " (p.from > :from AND p.to < :to)) " +
+                " AND ct.type = :type ");
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(to).toDate());
+        query.setParameter("type", type);
+        ArrayList<Prescription> prescriptions = new ArrayList<Prescription>(query.getResultList());
+        em.close();
+        return prescriptions;
+    }
+
     public static ArrayList<Prescription> getAll(Resident resident) {
         EntityManager em = OPDE.createEM();
 
@@ -974,7 +991,7 @@ public class PrescriptionTools {
 
                     result += "<tr>";
                     result += "<td valign=\"top\">" + (withIcon && myprescription.isClosed() ? SYSConst.html_22x22_StopSign : "") + getLongDescription(myprescription);
-                    result += (myprescription.getCommontags().isEmpty() ? "" : "<br/>"+CommontagsTools.getAsHTML(myprescription.getCommontags(), SYSConst.html_16x16_tagPurple));
+                    result += (myprescription.getCommontags().isEmpty() ? "" : "<br/>" + CommontagsTools.getAsHTML(myprescription.getCommontags(), SYSConst.html_16x16_tagPurple));
                     result += "</td>";
                     result += "<td valign=\"top\">" + getDoseAsHTML(myprescription, withmed) + "<br/>";
                     result += getRemark(myprescription) + "</td>";

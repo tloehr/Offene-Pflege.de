@@ -180,6 +180,10 @@ public class NReportTools {
     }
 
     public static String getNReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight) {
+        return getNReportsAsHTML(nReports, withlongheader, subtitle, highlight, true);
+    }
+
+    public static String getNReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight, boolean withObsoletes) {
         String result = "";
 
         if (!nReports.isEmpty()) {
@@ -191,32 +195,34 @@ public class NReportTools {
             LocalDate prevDate = null;
             for (NReport nreport : nReports) {
 
-                LocalDate currentDate = new LocalDate(nreport.getPit());
+                if (withObsoletes || !nreport.isObsolete()) {
 
-                if (prevDate == null || !prevDate.equals(currentDate)) {
-                    prevDate = currentDate;
-                    html += SYSTools.catchNull(subtitle).isEmpty() ? "<h2 id=\"fonth2\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h2>\n" : "<h3 id=\"fonth3\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h3>\n";
+                    LocalDate currentDate = new LocalDate(nreport.getPit());
+
+                    if (prevDate == null || !prevDate.equals(currentDate)) {
+                        prevDate = currentDate;
+                        html += SYSTools.catchNull(subtitle).isEmpty() ? "<h2 id=\"fonth2\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h2>\n" : "<h3 id=\"fonth3\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h3>\n";
+                    }
+
+
+                    html += SYSConst.html_bold(
+
+                            (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
+                                    (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
+                                    DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                                    " " + SYSTools.xx("misc.msg.Time.short") +
+                                    ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
+                                    ", " + nreport.getUser().getFullname() +
+                                    (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
+
+                    );
+
+                    html += "<br/>";
+                    html += getAsHTML(nreport, highlight);
+
+
+                    result = SYSConst.html_paragraph(html);
                 }
-
-
-                html += SYSConst.html_bold(
-
-                        (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
-                                (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
-                                DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                                " " + SYSTools.xx("misc.msg.Time.short") +
-                                ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
-                                ", " + nreport.getUser().getFullname() +
-                                (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
-
-                );
-
-                html += "<br/>";
-                html += getAsHTML(nreport, highlight);
-
-
-                result = SYSConst.html_paragraph(html);
-//                html += "<br/>";
 
             }
 

@@ -1,45 +1,46 @@
 package entity.qms;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.draw.VerticalPositionMark;
-import entity.Station;
-import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.NursingProcess;
-import entity.prescription.*;
+import entity.nursingprocess.NursingProcessTools;
+import entity.prescription.Prescription;
+import entity.prescription.PrescriptionTools;
 import entity.reports.NReport;
 import entity.reports.NReportTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
-import op.OPDE;
-import op.system.PDF;
-import op.threads.DisplayMessage;
+import entity.values.ResValue;
+import entity.values.ResValueTools;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.joda.time.DateTime;
+import org.apache.commons.collections.Closure;
 import org.joda.time.LocalDate;
 
-import javax.persistence.EntityManager;
-import javax.swing.*;
-import java.awt.*;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by tloehr on 05.09.14.
  */
 public class ControllingTools {
 
-    public static HashMap<Resident, DB> getPainDossierData(LocalDate from) {
+    /**
+     * gathers all the necessary data and puts them into one data structure organised as a HashMap<Resident, DB>.
+     * where DB is simply a helper class for gathering a couple of lists. nothing fancy.
+     *
+     * @param from
+     * @param to
+     * @return
+     */
+    public static HashMap<Resident, DB> getPainDossierData(LocalDate from, LocalDate to, Closure progress) {
 
         Commontags painTag = CommontagsTools.getType(CommontagsTools.TYPE_SYS_PAIN);
         Commontags painMgrTag = CommontagsTools.getType(CommontagsTools.TYPE_SYS_PAINMGR);
@@ -49,33 +50,120 @@ public class ControllingTools {
 
         HashMap<Resident, DB> mapResidents = new HashMap<>();
 
-        ArrayList<NReport> painReports = NReportTools.getNReports4Tags(painTag, from, new LocalDate());
-        painReports.addAll(NReportTools.getNReports4Tags(painMgrTag, from, new LocalDate()));
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        HashSet<NReport> painReports = new HashSet<>(NReportTools.getNReports4Tags(painTag, from, to));
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        painReports.addAll(NReportTools.getNReports4Tags(painMgrTag, from, to));
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
 
         for (NReport nReport : painReports) {
             if (!mapResidents.containsKey(nReport.getResident())) {
                 mapResidents.put(nReport.getResident(), new DB());
             }
-
             mapResidents.get(nReport.getResident()).getNreports().add(nReport);
-
         }
 
+        ArrayList<ResValue> painValues = ResValueTools.getPainvalues(from, to);
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        for (ResValue val : painValues) {
+            if (!mapResidents.containsKey(val.getResident())) {
+                mapResidents.put(val.getResident(), new DB());
+            }
+            mapResidents.get(val.getResident()).getResValues().add(val);
+        }
+
+        HashSet<NursingProcess> painNP = new HashSet(NursingProcessTools.getAll(CommontagsTools.TYPE_SYS_PAIN, from, to));
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        painNP.addAll(NursingProcessTools.getAll(CommontagsTools.TYPE_SYS_PAINMGR, from, to));
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        for (NursingProcess np : painNP) {
+            if (!mapResidents.containsKey(np.getResident())) {
+                mapResidents.put(np.getResident(), new DB());
+            }
+            mapResidents.get(np.getResident()).getNursingProcesses().add(np);
+        }
+
+        HashSet<ResInfo> painInfo = new HashSet(ResInfoTools.getAll(CommontagsTools.TYPE_SYS_PAIN, from, to));
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        painInfo.addAll(ResInfoTools.getAll(CommontagsTools.TYPE_SYS_PAINMGR, from, to));
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        for (ResInfo info : painInfo) {
+            if (!mapResidents.containsKey(info.getResident())) {
+                mapResidents.put(info.getResident(), new DB());
+            }
+            mapResidents.get(info.getResident()).getResInfos().add(info);
+        }
+
+        HashSet<Prescription> painPresc = new HashSet(PrescriptionTools.getAll(CommontagsTools.TYPE_SYS_PAIN, from, to));
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        painPresc.addAll(PrescriptionTools.getAll(CommontagsTools.TYPE_SYS_PAINMGR, from, to));
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        for (Prescription prescription : painPresc) {
+            if (!mapResidents.containsKey(prescription.getResident())) {
+                mapResidents.put(prescription.getResident(), new DB());
+            }
+            mapResidents.get(prescription.getResident()).getPrescriptions().add(prescription);
+        }
+
+        progress.execute(new Pair<Integer, Integer>(50, 100));
         return mapResidents;
 
     }
 
 
-    public static String getPainDossierAsHTML(LocalDate from){
-        HashMap<Resident, DB> mapResidents = getPainDossierData(from);
+    public static String getPainDossierAsHTML(LocalDate from, LocalDate to, Closure progress) {
+        HashMap<Resident, DB> mapResidents = getPainDossierData(from, to, progress);
 
-        for (Resident resident : mapResidents.keySet()){
+        DateFormat df = DateFormat.getDateInstance();
 
+        String html = "";
 
+        BigDecimal step = new BigDecimal(50).divide(new BigDecimal(mapResidents.keySet().size()), 2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal p = new BigDecimal(50);
 
+        for (Resident resident : mapResidents.keySet()) {
+            p = p.add(step);
 
+            progress.execute(new Pair<Integer, Integer>(p.intValue(), 100));
+
+            String resTXT = SYSConst.html_h1(SYSTools.xx("opde.controlling.orga.paindossier") + ": " + ResidentTools.getLabelText(resident));
+            resTXT += SYSConst.html_bold("controlling.misc.controlPeriod" + " " + df.format(from.toDate()) + " &rarr; " + df.format(to.toDate()));
+
+            resTXT += SYSConst.html_h2("nursingrecords.reports");
+
+            if (mapResidents.get(resident).getNreports().isEmpty()) {
+                resTXT += SYSTools.xx("misc.msg.currentlynoentry = zur Zeit kein Eintrag vorhanden");
+            } else {
+                ArrayList<NReport> listReports = new ArrayList<>(mapResidents.get(resident).getNreports());
+                Collections.sort(listReports);
+                resTXT += NReportTools.getNReportsAsHTML(listReports, false, null, null, false);
+                listReports.clear();
+            }
+
+            html += resTXT;
         }
+        mapResidents.clear();
 
+        return html;
     }
 
 //    private static void printPainDossierAsPDF(final Station station, final List data) throws Exception {
@@ -292,12 +380,14 @@ public class ControllingTools {
         HashSet<Prescription> prescriptions;
         HashSet<ResInfo> resInfos;
         HashSet<NursingProcess> nursingProcesses;
+        HashSet<ResValue> resValues;
 
         private DB() {
             nreports = new HashSet<>();
             prescriptions = new HashSet<>();
             resInfos = new HashSet<>();
             nursingProcesses = new HashSet<>();
+            resValues = new HashSet<>();
         }
 
         public HashSet<NReport> getNreports() {
@@ -314,6 +404,10 @@ public class ControllingTools {
 
         public HashSet<NursingProcess> getNursingProcesses() {
             return nursingProcesses;
+        }
+
+        public HashSet<ResValue> getResValues() {
+            return resValues;
         }
     }
 

@@ -359,6 +359,29 @@ public class ResValueTools {
         return list;
     }
 
+    public static ArrayList<ResValue> getPainvalues(LocalDate f, LocalDate t) {
+
+        //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+        DateTime from = f.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(t);
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.pit >= :from" +
+                " AND rv.pit <= :to" +
+                " AND rv.vtype.valType = :type" +
+                " AND rv.editedBy IS NULL " +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("type", ResValueTypesTools.PAIN);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
+
+        return list;
+    }
+
     public static ArrayList<ResValue> getResValuesNoEdits(Resident resident, short type, LocalDate f, LocalDate t) {
 
         //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);

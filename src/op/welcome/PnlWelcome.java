@@ -311,7 +311,7 @@ public class PnlWelcome extends CleanablePanel {
                 "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
                 "<td width=\"200\" align=\"left\">" + SYSTools.xx("opde.welcome.lastStool") + ": " +
                 (lastStool == null ? SYSTools.xx("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.getPit())) + "</td>" +
-                "<td width=\"200\" align=\"left\">" + SYSTools.xx("opde.welcome.controlPeriod") + ": " +
+                "<td width=\"200\" align=\"left\">" + SYSTools.xx("controlling.misc.controlPeriod") + ": " +
                 daysControl + " " + SYSTools.xx("misc.msg.Days2") + "</td>" +
                 "</tr>" +
                 "</table>" +
