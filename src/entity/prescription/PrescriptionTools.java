@@ -980,10 +980,10 @@ public class PrescriptionTools {
 
         if (!list.isEmpty()) {
             Prescription prescription = list.get(0);
-            result += withheader ? "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
+            result += withheader ? "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.prescription") + (withlongheader ? ": " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th>Medikament/Massnahme</th><th>Dosierung / Hinweise</th><th>Angesetzt</th></tr>";
+                    "<th>" + SYSTools.xx("misc.msg.medication") + "/" + SYSTools.xx("misc.msg.measures") + "</th><th>" + SYSTools.xx("misc.msg.dosage") + "</th><th>" + SYSTools.xx("misc.msg.valid.from") + "</th></tr>";
 
             for (Prescription myprescription : list) {
 

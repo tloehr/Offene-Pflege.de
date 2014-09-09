@@ -121,7 +121,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
     private void btnPrintActionPerformed(ActionEvent e) {
         if (listValues == null || listValues.isEmpty()) return;
-        SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(listValues, LIQUIDBALANCE)), true);
+        SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(listValues)), true);
     }
 
     private void scrlLeftComponentResized(ComponentEvent e) {

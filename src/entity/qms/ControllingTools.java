@@ -51,9 +51,11 @@ public class ControllingTools {
         HashMap<Resident, DB> mapResidents = new HashMap<>();
 
         int p = -1;
-        progress.execute(new Pair<Integer, Integer>(p, 100));
 
+        p += 5;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
         HashSet<NReport> painReports = new HashSet<>(NReportTools.getNReports4Tags(painTag, from, to));
+
         p += 5;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
@@ -140,28 +142,81 @@ public class ControllingTools {
         BigDecimal step = new BigDecimal(50).divide(new BigDecimal(mapResidents.keySet().size()), 2, BigDecimal.ROUND_HALF_UP);
         BigDecimal p = new BigDecimal(50);
 
-        for (Resident resident : mapResidents.keySet()) {
+
+        ArrayList<Resident> listResident = new ArrayList<>(mapResidents.keySet());
+        Collections.sort(listResident);
+
+        for (Resident resident : listResident) {
             p = p.add(step);
 
             progress.execute(new Pair<Integer, Integer>(p.intValue(), 100));
 
             String resTXT = SYSConst.html_h1(SYSTools.xx("opde.controlling.orga.paindossier") + ": " + ResidentTools.getLabelText(resident));
-            resTXT += SYSConst.html_bold("controlling.misc.controlPeriod" + " " + df.format(from.toDate()) + " &rarr; " + df.format(to.toDate()));
+            resTXT += SYSConst.html_bold(SYSTools.xx("controlling.misc.controlPeriod") + " " + df.format(from.toDate()) + " &rarr; " + df.format(to.toDate()));
+
 
             resTXT += SYSConst.html_h2("nursingrecords.reports");
-
             if (mapResidents.get(resident).getNreports().isEmpty()) {
-                resTXT += SYSTools.xx("misc.msg.currentlynoentry = zur Zeit kein Eintrag vorhanden");
+                resTXT += SYSTools.xx("misc.msg.currentlynoentry");
             } else {
                 ArrayList<NReport> listReports = new ArrayList<>(mapResidents.get(resident).getNreports());
                 Collections.sort(listReports);
-                resTXT += NReportTools.getNReportsAsHTML(listReports, false, null, null, false);
+                resTXT += NReportTools.getNReportsAsHTML(listReports, false, false, null, null, false);
                 listReports.clear();
             }
+
+
+            resTXT += SYSConst.html_h2("misc.msg.pain.intensity");
+            if (mapResidents.get(resident).getResValues().isEmpty()) {
+                resTXT += SYSTools.xx("misc.msg.currentlynoentry");
+            } else {
+                ArrayList<ResValue> listValues = new ArrayList<>(mapResidents.get(resident).getResValues());
+                Collections.sort(listValues);
+                resTXT += ResValueTools.getAsHTML(listValues);
+                listValues.clear();
+            }
+
+
+            resTXT += SYSConst.html_h2("nursingrecords.info");
+            if (mapResidents.get(resident).getResInfos().isEmpty()) {
+                resTXT += SYSTools.xx("misc.msg.currentlynoentry");
+            } else {
+                ArrayList<ResInfo> listInfos = new ArrayList<>(mapResidents.get(resident).getResInfos());
+                Collections.sort(listInfos);
+                resTXT += ResInfoTools.getResInfosAsHTML(listInfos, true, null);
+                listInfos.clear();
+            }
+
+
+            resTXT += SYSConst.html_h2("nursingrecords.prescription");
+            if (mapResidents.get(resident).getPrescriptions().isEmpty()) {
+                resTXT += SYSTools.xx("misc.msg.currentlynoentry");
+            } else {
+                ArrayList<Prescription> listPrescriptions = new ArrayList<>(mapResidents.get(resident).getPrescriptions());
+                Collections.sort(listPrescriptions);
+                resTXT += PrescriptionTools.getPrescriptionsAsHTML(listPrescriptions, false, false, false, true, false);
+                listPrescriptions.clear();
+            }
+
+
+            resTXT += SYSConst.html_h2("nursingrecords.nursingprocess");
+            if (mapResidents.get(resident).getNursingProcesses().isEmpty()) {
+                resTXT += SYSTools.xx("misc.msg.currentlynoentry");
+            } else {
+                ArrayList<NursingProcess> listNP = new ArrayList<>(mapResidents.get(resident).getNursingProcesses());
+                Collections.sort(listNP);
+                for (NursingProcess np : listNP) {
+                    resTXT += NursingProcessTools.getAsHTML(np, false, true, false, false);
+                }
+                listNP.clear();
+            }
+
+            resTXT += "<hr/>";
 
             html += resTXT;
         }
         mapResidents.clear();
+        listResident.clear();
 
         return html;
     }

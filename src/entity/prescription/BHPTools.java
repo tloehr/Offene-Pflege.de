@@ -437,6 +437,38 @@ public class BHPTools {
         return listBHP;
     }
 
+
+    public static ArrayList<BHP> getBHPs(Prescription prescription,  LocalDate from, LocalDate to) {
+            long begin = System.currentTimeMillis();
+            EntityManager em = OPDE.createEM();
+            ArrayList<BHP> listBHP = null;
+
+            try {
+                Date now = new Date();
+
+                String jpql = " SELECT bhp " +
+                        " FROM BHP bhp " +
+                        " WHERE bhp.prescription = :prescription " +
+                        " AND bhp.soll >= :from AND bhp.soll <= :to " +
+                        " ORDER BY bhp.soll ";
+                Query queryOnDemand = em.createQuery(jpql);
+
+                    queryOnDemand.setParameter("prescription", prescription);
+                    queryOnDemand.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+                    queryOnDemand.setParameter("to", SYSCalendar.eod(to).toDate());
+
+                listBHP = new ArrayList<BHP>(queryOnDemand.getResultList());
+
+            } catch (Exception se) {
+                OPDE.fatal(se);
+            } finally {
+                em.close();
+            }
+
+            SYSTools.showTimeDifference(begin);
+            return listBHP;
+        }
+
     /**
      * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand).
      * Outcome BHPs included, even if they originate from onDemand Prescriptions.
@@ -478,7 +510,7 @@ public class BHPTools {
 
 
     /**
-     * tells us, if the BHP is commented upon.
+     * tells us, if the BHP is commented
      *
      * @param bhp
      * @return

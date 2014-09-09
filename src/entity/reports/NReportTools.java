@@ -180,15 +180,19 @@ public class NReportTools {
     }
 
     public static String getNReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight) {
-        return getNReportsAsHTML(nReports, withlongheader, subtitle, highlight, true);
+        return getNReportsAsHTML(nReports, true, withlongheader, subtitle, highlight, true);
     }
 
-    public static String getNReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight, boolean withObsoletes) {
+    public static String getNReportsAsHTML(List<NReport> nReports, boolean withHeader, boolean withlongheader, String subtitle, String highlight, boolean withObsoletes) {
         String result = "";
 
         if (!nReports.isEmpty()) {
 
-            String html = "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.reports") + (withlongheader ? " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h1>\n";
+            String html = "";
+
+            if (withHeader) {
+                html += "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.reports") + (withlongheader ? " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h1>\n";
+            }
             html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h2 id=\"fonth2\" >" + subtitle + "</h2>\n";
 
 

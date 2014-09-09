@@ -33,7 +33,6 @@ import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
 import entity.prescription.MedStockTransactionTools;
 import op.OPDE;
-import op.care.prescription.PnlPrescription;
 import op.threads.DisplayManager;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
@@ -55,7 +54,7 @@ public class DlgCloseStock extends MyJDialog {
 
     private MedStock medStock;
     private Closure actionBlock;
-    public static final String internalClassID = PnlPrescription.internalClassID + ".dlgCloseStock";
+    public static final String internalClassID = "nursingrecords.prescription.dlgCloseStock";
 
     /**
      * Creates new form DlgBestandAnbruch
@@ -105,8 +104,8 @@ public class DlgCloseStock extends MyJDialog {
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
-                "14dlu, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
+                    "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
+                    "14dlu, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
 
             //======== jScrollPane1 ========
             {
@@ -192,11 +191,11 @@ public class DlgCloseStock extends MyJDialog {
             jPanel1.add(rbGefallen, CC.xywh(3, 11, 5, 1));
 
             //---- cmbBestID ----
-            cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbBestID.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbBestID.addItemListener(new ItemListener() {
@@ -264,9 +263,9 @@ public class DlgCloseStock extends MyJDialog {
     }
 
     private void initDialog() {
-        String text = SYSTools.xx(internalClassID + ".youWantToClose1a") + medStock.getID() + SYSTools.xx(internalClassID + ".youWantToClose1b");
+        String text = SYSTools.xx("nursingrecords.prescription.dlgCloseStock.youWantToClose1a") + medStock.getID() + SYSTools.xx("nursingrecords.prescription.dlgCloseStock.youWantToClose1b");
         text += "<br/>" + MedStockTools.getTextASHTML(medStock) + "</br>";
-        text += "<br/>" + SYSTools.xx(internalClassID + ".chooseAReason") + ":";
+        text += "<br/>" + SYSTools.xx("nursingrecords.prescription.dlgCloseStock.chooseAReason") + ":";
         txtInfo.setContentType("text/html");
         txtInfo.setText(SYSTools.toHTML(SYSConst.html_div(text)));
 
@@ -354,26 +353,26 @@ public class DlgCloseStock extends MyJDialog {
             MedStock nextBest = null;
             if (cmbBestID.getSelectedIndex() > 0) {
                 nextBest = em.merge((MedStock) cmbBestID.getSelectedItem());
-                OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + nextBest.getID());
+                OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_SOON1") + ": " + nextBest.getID());
                 em.lock(nextBest, LockModeType.OPTIMISTIC);
                 myStock.setNextStock(nextBest);
             }
 
             if (rbStellen.isSelected()) {
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
-                MedStockTools.setStockTo(em, myStock, inhalt, SYSTools.xx(internalClassID + ".TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
+                MedStockTools.setStockTo(em, myStock, inhalt, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
                 myStock.setState(MedStockTools.STATE_WILL_BE_CLOSED_SOON);
-                OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
+                OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
             } else {
                 if (rbGefallen.isSelected()) {
-                    MedStockTools.close(em, myStock, SYSTools.xx(internalClassID + ".TX.STATE_EDIT_EMPTY_BROKEN_OR_LOST"), MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
-                    OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_BROKEN_OR_LOST"));
+                    MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_BROKEN_OR_LOST"), MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
+                    OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_BROKEN_OR_LOST"));
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedStockTools.close(em, myStock, SYSTools.xx(internalClassID + ".TX.STATE_EDIT_EMPTY_PAST_EXPIRY"), MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
-                    OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_PAST_EXPIRY"));
+                    MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_PAST_EXPIRY"), MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
+                    OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_PAST_EXPIRY"));
                 } else {
-                    MedStockTools.close(em, myStock, SYSTools.xx(internalClassID + ".TX.STATE_EDIT_EMPTY_NOW"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
-                    OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_NOW"));
+                    MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_NOW"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                    OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_NOW"));
                 }
             }
 

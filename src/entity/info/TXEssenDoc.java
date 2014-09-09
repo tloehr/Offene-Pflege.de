@@ -43,18 +43,16 @@ public class TXEssenDoc {
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private Resident resident;
     private HashMap<String, String> content;
-    //    private ArrayList<ResInfo> listAllInfos;
     private ArrayList<ResInfo> listICD;
     private HashMap<Integer, ResInfo> mapID2Info;
 
     private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 8);
-    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
-    private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
-    private PdfContentByte over = null;
-    private PdfWriter writer = null;
-    //     = null;
+//    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
+//    private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
+//    private PdfContentByte over = null;
+//    private PdfWriter writer = null;
+//
     ByteArrayOutputStream medListStream = null, icdListStream = null;
-    //    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     boolean mre, psych = false;
     int progress, max;
 

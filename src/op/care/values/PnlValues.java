@@ -52,7 +52,6 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -413,7 +412,7 @@ public class PnlValues extends NursingRecordsPanel {
                     if (!mapType2Values.containsKey(keyYears)) {
                         mapType2Values.put(keyYears, ResValueTools.getResValues(resident, vtype, year));
                     }
-                    SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(mapType2Values.get(keyYears), vtype)), true);
+                    SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(mapType2Values.get(keyYears))), true);
                 }
             });
             cptitle.getRight().add(btnPrintYear);

@@ -185,7 +185,7 @@ public class PnlControlling extends CleanablePanel {
         });
 
         if (!cpPain.isCollapsed()) {
-            cpPain.setContentPane(createContentPanel4Pain());
+            cpPain.setContentPane(createContentPanel4Fall());
         }
 
         cpPain.setHorizontalAlignment(SwingConstants.LEADING);
@@ -700,6 +700,46 @@ public class PnlControlling extends CleanablePanel {
         pnlComplaints.add(btnComplaints, BorderLayout.WEST);
         pnlComplaints.add(txtComplaintsMonthsBack, BorderLayout.EAST);
         pnlContent.add(pnlComplaints);
+
+
+
+        // ResInfoTypeTools.TYPE_NURSING_INSURANCE
+        JPanel pnlInsuranceGrade = new JPanel(new BorderLayout());
+                final JButton btnIG = GUITools.createHyperlinkButton("misc.msg.InsuranceGrades", null, null);
+
+        asd
+
+                btnIG.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        OPDE.getMainframe().setBlocked(true);
+                        SwingWorker worker = new SwingWorker() {
+                            @Override
+                            protected Object doInBackground() throws Exception {
+                                SYSPropsTools.storeProp("opde.controlling::complaintsMonthBack", txtComplaintsMonthsBack.getText(), OPDE.getLogin().getUser());
+
+                                int monthsback = Integer.parseInt(txtComplaintsMonthsBack.getText());
+
+                                String content = QProcessTools.getComplaintsAnalysis(monthsback, progressClosure);
+                                content += NReportTools.getComplaints(new LocalDate().minusMonths(monthsback).dayOfMonth().withMinimumValue(), progressClosure);
+
+                                SYSFilesTools.print(content, false);
+                                return null;
+                            }
+
+                            @Override
+                            protected void done() {
+                                OPDE.getDisplayManager().setProgressBarMessage(null);
+                                OPDE.getMainframe().setBlocked(false);
+                            }
+                        };
+                        worker.execute();
+                    }
+                });
+                pnlInsuranceGrade.add(btnIG, BorderLayout.WEST);
+                pnlInsuranceGrade.add(txtComplaintsMonthsBack, BorderLayout.EAST);
+                pnlContent.add(pnlInsuranceGrade);
+
 
         return pnlContent;
     }

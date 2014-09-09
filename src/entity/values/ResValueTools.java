@@ -210,21 +210,23 @@ public class ResValueTools {
     }
 
 
-    public static String getAsHTML(List<ResValue> resValues, ResValueTypes vtype) {
+    public static String getAsHTML(List<ResValue> resValues) {
 
         if (resValues.isEmpty()) {
             return SYSConst.html_italic("misc.msg.noentryyet");
         }
 
+
+
         String html = "";
 
-        html += SYSConst.html_h1(vtype.getText());
+        html += SYSConst.html_h1(resValues.get(0).getType().getText());
         html += SYSConst.html_h2(ResidentTools.getLabelText(resValues.get(0).getResident()));
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                "<th style=\"width:20%\">" + SYSTools.xx(PnlValues.internalClassID + ".tabheader1") +
-                "</th><th style=\"width:40%\">" + SYSTools.xx(PnlValues.internalClassID + ".tabheader2") + "</th>" +
-                "</th><th style=\"width:40%\">" + SYSTools.xx(PnlValues.internalClassID + ".tabheader3") + "</th></tr>\n";
+                "<th style=\"width:20%\">" + SYSTools.xx("nursingrecords.vitalparameters.tabheader1") +
+                "</th><th style=\"width:40%\">" + SYSTools.xx("nursingrecords.vitalparameters.tabheader2") + "</th>" +
+                "</th><th style=\"width:40%\">" + SYSTools.xx("nursingrecords.vitalparameters.tabheader3") + "</th></tr>\n";
 
         for (ResValue resValue : resValues) {
             html += "<tr>";
