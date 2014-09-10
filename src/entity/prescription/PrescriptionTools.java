@@ -1009,6 +1009,60 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static String getPITAsHTML(Prescription prescription) {
+//        String result = "";
+        DateFormat df = DateFormat.getDateInstance();
+
+        String td = SYSConst.html_bold(df.format(prescription.getFrom())) + "; " +
+                prescription.getUserON().getFullname() +
+                (prescription.getDocON() != null ? "; " + GPTools.getFullName(prescription.getDocON()) : "") +
+                (prescription.getHospitalON() != null ? "; " + HospitalTools.getFullName(prescription.getHospitalON()) : "");
+
+        td += "&nbsp;&rarr;&nbsp;";
+
+        if (prescription.isClosed()) {
+            td += SYSConst.html_bold(df.format(prescription.getTo())) + "; " +
+                    prescription.getUserOFF().getFullname() +
+                    (prescription.getDocOFF() != null ? "; " + GPTools.getFullName(prescription.getDocOFF()) : "") +
+                    (prescription.getHospitalOFF() != null ? "; " + HospitalTools.getFullName(prescription.getHospitalOFF()) : "");
+
+        }
+
+        td += "<br/>[" + prescription.getID() + "]";
+
+        return td;
+    }
+
+    public static String getPrescriptionsAsHTML4PainList(List<Prescription> list, LocalDate from, LocalDate to) {
+        String result = "";
+
+        if (!list.isEmpty()) {
+            for (Prescription myprescription : list) {
+                String paragraph = "";
+
+                paragraph += (myprescription.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(myprescription.getCommontags(), SYSConst.html_16x16_tagPurple));
+                paragraph += "<br/>" + getDoseAsHTML(myprescription, false);
+                paragraph += "<br/>" + getRemark(myprescription);
+                paragraph += "<br/>" + getPITAsHTML(myprescription);
+
+
+                result += "<font size=+1>" + getLongDescription(myprescription) + "</font>";
+                result += SYSConst.html_paragraph(paragraph);
+
+                if (myprescription.isOnDemand()) {
+                    ArrayList<BHP> listBHP = BHPTools.getBHPs(myprescription, from, to);
+                    if (!listBHP.isEmpty()) {
+                        result += SYSConst.html_h4("BHPs");
+                        result += SYSConst.html_paragraph(BHPTools.getBHPsAsHTMLtable(listBHP, false));
+                    }
+                }
+            }
+        } else {
+            result += SYSConst.html_h2("nursingrecords.prescription") + SYSConst.html_italic("misc.msg.currentlynoentry");
+        }
+        return result;
+    }
+
 //    /**
 //     * Ermittelt die Anzahl der Verordnungen, die zu dieser Verordnung gemäß der VerordnungKennung gehören.
 //     * Verordnung, die über die Zeit mehrfach geändert werden, hängen über die VerordnungsKennung aneinander.

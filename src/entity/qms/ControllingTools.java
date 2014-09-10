@@ -18,7 +18,9 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import org.joda.time.Period;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -194,7 +196,7 @@ public class ControllingTools {
             } else {
                 ArrayList<Prescription> listPrescriptions = new ArrayList<>(mapResidents.get(resident).getPrescriptions());
                 Collections.sort(listPrescriptions);
-                resTXT += PrescriptionTools.getPrescriptionsAsHTML(listPrescriptions, false, false, false, true, false);
+                resTXT += PrescriptionTools.getPrescriptionsAsHTML4PainList(listPrescriptions, from, to);
                 listPrescriptions.clear();
             }
 

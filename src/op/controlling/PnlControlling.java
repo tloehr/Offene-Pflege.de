@@ -36,10 +36,7 @@ import com.jidesoft.swing.JideTabbedPane;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
-import entity.info.ResInfoTools;
-import entity.info.ResInfoTypeTools;
-import entity.info.Resident;
-import entity.info.ResidentTools;
+import entity.info.*;
 import entity.prescription.MedStockTools;
 import entity.process.QProcessElement;
 import entity.process.QProcessTools;
@@ -71,6 +68,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -83,6 +82,7 @@ import java.util.*;
  * UPDATE       Enter and edit new / existing Qmsplans and Qmsschedules. Access the QMS tab in general.
  * DELETE       Delete Qmsplan with everything connected to it. But only when unused.
  * MANAGER      show staff controlling tab and allow to delete even USED Qmsplans.
+ * USER1        Can access the organisational request tab.
  *
  * @author tloehr
  */
@@ -702,48 +702,77 @@ public class PnlControlling extends CleanablePanel {
         pnlContent.add(pnlComplaints);
 
 
-
         // ResInfoTypeTools.TYPE_NURSING_INSURANCE
         JPanel pnlInsuranceGrade = new JPanel(new BorderLayout());
-                final JButton btnIG = GUITools.createHyperlinkButton("misc.msg.InsuranceGrades", null, null);
+        final JButton btnIG = GUITools.createHyperlinkButton("misc.msg.InsuranceGrades", null, null);
 
-        asd
 
-                btnIG.addActionListener(new ActionListener() {
+        btnIG.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
                     @Override
-                    public void actionPerformed(ActionEvent e) {
-                        OPDE.getMainframe().setBlocked(true);
-                        SwingWorker worker = new SwingWorker() {
-                            @Override
-                            protected Object doInBackground() throws Exception {
-                                SYSPropsTools.storeProp("opde.controlling::complaintsMonthBack", txtComplaintsMonthsBack.getText(), OPDE.getLogin().getUser());
+                    protected Object doInBackground() throws Exception {
+                        String content = SYSConst.html_h1("misc.msg.InsuranceGrades");
 
-                                int monthsback = Integer.parseInt(txtComplaintsMonthsBack.getText());
 
-                                String content = QProcessTools.getComplaintsAnalysis(monthsback, progressClosure);
-                                content += NReportTools.getComplaints(new LocalDate().minusMonths(monthsback).dayOfMonth().withMinimumValue(), progressClosure);
+                        String ul = "";
+                        for (Resident resident : ResidentTools.getAllActive()) {
+                            if (resident.getAdminonly() == ResidentTools.NORMAL) {
 
-                                SYSFilesTools.print(content, false);
-                                return null;
+                                ul += SYSConst.html_li(SYSConst.html_bold(ResidentTools.getLabelText(resident)));
+
+                                ResInfo insurance = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.TYPE_NURSING_INSURANCE);
+
+                                String ins = "";
+                                if (insurance == null) {
+                                    ins = SYSTools.xx("misc.msg.noentryyet");
+                                } else {
+                                    Properties props = load(insurance.getProperties());
+                                    String grade = SYSTools.xx("ninsurance.grade." + props.getProperty("grade"));
+                                    ins = grade + (props.getProperty("grade").equals("assigned") ? ": " + props.getProperty("result") : "");
+                                }
+
+
+                                ul += SYSConst.html_ul(SYSConst.html_li(ins));
                             }
+                        }
 
-                            @Override
-                            protected void done() {
-                                OPDE.getDisplayManager().setProgressBarMessage(null);
-                                OPDE.getMainframe().setBlocked(false);
-                            }
-                        };
-                        worker.execute();
+                        content += SYSConst.html_ul(ul);
+
+                        SYSFilesTools.print(content, false);
+                        return null;
                     }
-                });
-                pnlInsuranceGrade.add(btnIG, BorderLayout.WEST);
-                pnlInsuranceGrade.add(txtComplaintsMonthsBack, BorderLayout.EAST);
-                pnlContent.add(pnlInsuranceGrade);
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlInsuranceGrade.add(btnIG, BorderLayout.WEST);
+        pnlContent.add(pnlInsuranceGrade);
 
 
         return pnlContent;
     }
 
+
+    private Properties load(String text) {
+        Properties props = new Properties();
+        try {
+            StringReader reader = new StringReader(text);
+            props.load(reader);
+            reader.close();
+        } catch (IOException ex) {
+            OPDE.fatal(ex);
+        }
+        return props;
+    }
 
     private JPanel createContentPanel4Staff() {
         JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -1061,7 +1090,10 @@ public class PnlControlling extends CleanablePanel {
             case TAB_CONTROLLING: {
                 cpsControlling.removeAll();
                 cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
-                cpsControlling.add(createCP4Orga());
+
+                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
+                    cpsControlling.add(createCP4Orga());
+                }
 
                 if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
                     cpsControlling.add(createCP4Staff());

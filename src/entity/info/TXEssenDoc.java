@@ -299,7 +299,7 @@ public class TXEssenDoc {
      * @throws Exception
      */
     private File concatPDFFiles(File file1, File filemre, File filepsych) throws Exception {
-        File outfileMain = File.createTempFile("TXE", ".pdf");//new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        File outfileMain = File.createTempFile("TXE", ".pdf");
         outfileMain.deleteOnExit();
 //        file1.deleteOnExit();
 
@@ -1299,7 +1299,7 @@ public class TXEssenDoc {
             document.close();
 
         } catch (DocumentException d) {
-
+            OPDE.error(d);
         }
 
     }

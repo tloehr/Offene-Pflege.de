@@ -1,5 +1,6 @@
 package entity.system;
 
+import com.itextpdf.text.Chunk;
 import entity.info.Resident;
 import op.OPDE;
 
@@ -231,5 +232,20 @@ public class CommontagsTools {
         }
         return result;
     }
+
+//    public static Chunk getAsChunk(Collection<Commontags> commontags) {
+//            Chunk chunk = new Chunk();
+//            int i = 0;
+//            for (Commontags ctag : commontags) {
+//                i++;
+//                Paragrap
+//                chunk.append("");
+//                result += SYSCons + "&nbsp;" + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font> ";
+//                if (maxline > 0 && i % maxline == 0){
+//                    result += "<br/>";
+//                }
+//            }
+//            return result;
+//        }
 
 }

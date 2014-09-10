@@ -4,6 +4,7 @@
 */
 package entity.reports;
 
+import com.itextpdf.text.*;
 import entity.EntityTools;
 import entity.Homes;
 import entity.info.Resident;
@@ -12,6 +13,7 @@ import entity.process.QProcessElement;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import op.OPDE;
+import op.system.PDF;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -23,11 +25,13 @@ import org.joda.time.MutableInterval;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -225,10 +229,13 @@ public class NReportTools {
                     html += getAsHTML(nreport, highlight);
 
 
-                    result = SYSConst.html_paragraph(html);
-                }
+//                    result = SYSConst.html_paragraph(html);
 
+
+                }
             }
+
+            result += html;
 
         } else {
             result = SYSConst.html_italic("misc.msg.noentryyet");
@@ -237,6 +244,78 @@ public class NReportTools {
 
         return result;
     }
+
+
+//    public static ArrayList<Element> getNReportsAsPDF(List<NReport> nReports, boolean withObsoletes) throws DocumentException, IOException {
+//        String result = "";
+//
+//        ArrayList<Element> listElements = new ArrayList<>();
+//
+//        String header = SYSTools.xx("nursingrecords.reports") + " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident());
+//
+//        Paragraph h1 = new Paragraph(new Phrase(header, PDF.plain(PDF.sizeH1())));
+//        h1.setAlignment(Element.ALIGN_CENTER);
+//        listElements.add(h1);
+//
+//
+//        Paragraph p = new Paragraph(SYSTools.xx("nursingrecords.prescription.dailyplan.warning"));
+//        p.setAlignment(Element.ALIGN_CENTER);
+//        listElements.add(p);
+//        listElements.add(Chunk.NEWLINE);
+//
+//        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+//
+//        if (!nReports.isEmpty()) {
+//
+//
+//            LocalDate prevDate = null;
+//            for (NReport nreport : nReports) {
+//
+//                if (withObsoletes || !nreport.isObsolete()) {
+//
+//                    LocalDate currentDate = new LocalDate(nreport.getPit());
+//
+//                    if (prevDate == null || !prevDate.equals(currentDate)) {
+//                        prevDate = currentDate;
+//
+//                        Paragraph h2 = new Paragraph(new Phrase(currentDate.toString("EEEE, dd.MM.yyyy"), PDF.plain(PDF.sizeH2())));
+//                        h2.setAlignment(Element.ALIGN_CENTER);
+//                        listElements.add(h2);
+//                    }
+//
+//                    listElements.add(SYSConst.getPDF_16x16_tagPurple());
+//
+//                    html += SYSConst.html_bold(
+//
+//                            (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
+//                                    (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
+//                                    DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+//                                    " " + SYSTools.xx("misc.msg.Time.short") +
+//                                    ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
+//                                    ", " + nreport.getUser().getFullname() +
+//                                    (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
+//
+//                    );
+//
+//                    html += "<br/>";
+//                    html += getAsHTML(nreport, highlight);
+//
+//
+//                    //                    result = SYSConst.html_paragraph(html);
+//
+//
+//                }
+//            }
+//
+//            result += html;
+//
+//        } else {
+//            result = SYSConst.html_italic("misc.msg.noentryyet");
+//        }
+//
+//
+//        return listElements;
+//    }
 
     public static String getReportsAndHandoversAsHTML(List<QProcessElement> reports, String highlight, int year) {
         String html = "";
@@ -347,7 +426,7 @@ public class NReportTools {
             tmp = SYSTools.replace(tmp, highlight, "<font style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</font>", true);
         }
 
-        result += "<p>" + tmp + "<p/>";
+        result += "<p>" + tmp + "</p>";
 
         result += "<div/>";
         return result;

@@ -1419,7 +1419,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                     for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_OUTCOMES, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
                         if (mapShift2BHP.containsKey(shift)) {
-                            html += BHPTools.getBHPsAsHTMLtable(mapShift2BHP.get(shift));
+                            html += BHPTools.getBHPsAsHTMLtable(mapShift2BHP.get(shift), true);
                         }
                     }
                 }

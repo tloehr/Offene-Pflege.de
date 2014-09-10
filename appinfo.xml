@@ -24,6 +24,7 @@
             <update langbundle="opde.controlling.acl.update"/>
             <delete langbundle="opde.controlling.acl.delete"/>
             <manager langbundle="opde.controlling.acl.manager"/>
+            <user1 langbundle="opde.controlling.acl.user1"/>
         </class>
         <class name="opde.training" short="opde.training.appinfo.short"
                long="opde.training.appinfo.long" helpurl="opde.training.appinfo.helpurl"

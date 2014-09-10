@@ -438,36 +438,36 @@ public class BHPTools {
     }
 
 
-    public static ArrayList<BHP> getBHPs(Prescription prescription,  LocalDate from, LocalDate to) {
-            long begin = System.currentTimeMillis();
-            EntityManager em = OPDE.createEM();
-            ArrayList<BHP> listBHP = null;
+    public static ArrayList<BHP> getBHPs(Prescription prescription, LocalDate from, LocalDate to) {
+        long begin = System.currentTimeMillis();
+        EntityManager em = OPDE.createEM();
+        ArrayList<BHP> listBHP = null;
 
-            try {
-                Date now = new Date();
+        try {
+            Date now = new Date();
 
-                String jpql = " SELECT bhp " +
-                        " FROM BHP bhp " +
-                        " WHERE bhp.prescription = :prescription " +
-                        " AND bhp.soll >= :from AND bhp.soll <= :to " +
-                        " ORDER BY bhp.soll ";
-                Query queryOnDemand = em.createQuery(jpql);
+            String jpql = " SELECT bhp " +
+                    " FROM BHP bhp " +
+                    " WHERE bhp.prescription = :prescription " +
+                    " AND bhp.soll >= :from AND bhp.soll <= :to " +
+                    " ORDER BY bhp.soll ";
+            Query queryOnDemand = em.createQuery(jpql);
 
-                    queryOnDemand.setParameter("prescription", prescription);
-                    queryOnDemand.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
-                    queryOnDemand.setParameter("to", SYSCalendar.eod(to).toDate());
+            queryOnDemand.setParameter("prescription", prescription);
+            queryOnDemand.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+            queryOnDemand.setParameter("to", SYSCalendar.eod(to).toDate());
 
-                listBHP = new ArrayList<BHP>(queryOnDemand.getResultList());
+            listBHP = new ArrayList<BHP>(queryOnDemand.getResultList());
 
-            } catch (Exception se) {
-                OPDE.fatal(se);
-            } finally {
-                em.close();
-            }
-
-            SYSTools.showTimeDifference(begin);
-            return listBHP;
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
         }
+
+        SYSTools.showTimeDifference(begin);
+        return listBHP;
+    }
 
     /**
      * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand).
@@ -753,25 +753,25 @@ public class BHPTools {
     }
 
 
-    public static String getBHPsAsHTMLtable(List<BHP> list) {
+    public static String getBHPsAsHTMLtable(List<BHP> list, boolean withHeader) {
         String result = "";
 
         if (!list.isEmpty()) {
 
             BHP b1 = list.get(0);
 
-
-            if (b1.isOnDemand()) {
-                result += SYSConst.html_h2("nursingrecords.bhp.ondemand");
-            } else if (b1.isOutcomeText()) {
-                result += SYSConst.html_h2("nursingrecords.bhp.outcome");
-            } else {
-                result += SYSConst.html_h2(SHIFT_TEXT[b1.getShift()]);
+            if (withHeader) {
+                if (b1.isOnDemand()) {
+                    result += SYSConst.html_h2("nursingrecords.bhp.ondemand");
+                } else if (b1.isOutcomeText()) {
+                    result += SYSConst.html_h2("nursingrecords.bhp.outcome");
+                } else {
+                    result += SYSConst.html_h2(SHIFT_TEXT[b1.getShift()]);
+                }
             }
 
-
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th>" + SYSTools.xx("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
+                    "<th>" + SYSTools.xx("nursingrecords.nursingprocess.interventions") + "</th><th>" + SYSTools.xx("misc.msg.state") + "</th><th>" + SYSTools.xx("misc.msg.Users") + " / " + SYSTools.xx("misc.msg.time") + "</th></tr>";
 
             for (BHP bhp : list) {
 
