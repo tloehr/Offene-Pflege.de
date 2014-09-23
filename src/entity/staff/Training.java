@@ -98,7 +98,7 @@ public class Training {
         return attendees;
     }
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "training2tags", joinColumns =
     @JoinColumn(name = "trainid"), inverseJoinColumns =
     @JoinColumn(name = "ctagid"))

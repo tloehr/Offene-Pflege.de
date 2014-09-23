@@ -1110,38 +1110,14 @@ public class PnlInventory extends NursingRecordsPanel {
 
                                 final MedStockTransaction myTX = (MedStockTransaction) em.merge(o);
                                 MedStock myStock = em.merge(stock);
-//                                myStock.getStockTransaction().add(myTX);
                                 em.lock(myStock, LockModeType.OPTIMISTIC);
                                 em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
                                 em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
                                 em.getTransaction().commit();
 
-//                                synchronized (lstInventories) {
-//                                    int indexInventory = lstInventories.indexOf(stock.getInventory());
-//                                    int indexStock = lstInventories.get(indexInventory).getMedStocks().indexOf(stock);
-////                                    lstInventories.get(indexInventory).getMedStocks().remove(stock);
-//                                    lstInventories.get(indexInventory).getMedStocks().set(indexStock, myStock);
-//                                }
                                 createCP4(myStock.getInventory());
 
                                 buildPanel();
-
-//                                SwingUtilities.invokeLater(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        synchronized (linemap) {
-//                                            if (linemap.containsKey(myTX)) {
-//                                                GUITools.scroll2show(jspInventory, linemap.get(myTX).getLocation().y, new Closure() {
-//                                                    @Override
-//                                                    public void execute(Object o) {
-//                                                        GUITools.flashBackground(linemap.get(myTX), Color.YELLOW, 2);
-//                                                    }
-//                                                });
-//                                            }
-//                                        }
-//                                    }
-//                                });
-
                             } catch (OptimisticLockException ole) {
                                 OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {

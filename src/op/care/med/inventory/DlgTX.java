@@ -64,18 +64,16 @@ public class DlgTX extends MyJDialog {
         this.actionBlock = actionBlock;
 
         initDialog();
-        setVisible(true);
     }
 
     private void txtMengeFocusGained(FocusEvent e) {
         SYSTools.markAllTxt(txtValue);
     }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-        actionBlock.execute(tx);
-    }
+//    @Override
+//    public void dispose() {
+//        super.dispose();
+//    }
 
     private void txtTextActionPerformed(ActionEvent e) {
         txtValue.requestFocus();
@@ -212,6 +210,7 @@ public class DlgTX extends MyJDialog {
         tx.setAmount(amount);
         tx.setState(MedStockTransactionTools.STATE_EDIT_MANUAL);
         tx.setText(txtText.getText().trim());
+        actionBlock.execute(tx);
         dispose();
     }//GEN-LAST:event_btnBuchungActionPerformed
 

@@ -33,7 +33,9 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 
 /**
  * @author Torsten Löhr
@@ -88,7 +90,11 @@ public class PnlTrainingEditor extends JPanel {
         txtDocent.setText(training.getDocent());
         txtText.setText(training.getText());
 
-        add(new PnlCommonTags(training.getCommontags(), new Closure() {
+        final PnlCommonTags pnlCommonTags = new PnlCommonTags(training.getCommontags(), true, 3);
+        add(pnlCommonTags, CC.xywh(1, 13, 9, 1));
+
+
+        pnlCommonTags.addNotifyListeners(new Closure() {
             @Override
             public void execute(Object o) {
                 if (o == null) return;
@@ -97,14 +103,16 @@ public class PnlTrainingEditor extends JPanel {
                 try {
                     em.getTransaction().begin();
 
-                    Commontags commontag = em.merge((Commontags) o);
+                    Commontags changedTag = (Commontags) o;
+
                     Training myTraining = em.merge(training);
                     em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                    if(myTraining.getCommontags().contains(commontag)){
-                        myTraining.getCommontags().remove(commontag);
+
+                    if (myTraining.getCommontags().contains(changedTag)){
+                        myTraining.getCommontags().remove(changedTag);
                     } else {
-                        myTraining.getCommontags().add(commontag);
+                        myTraining.getCommontags().add(changedTag);
                     }
 
                     em.getTransaction().commit();
@@ -128,7 +136,7 @@ public class PnlTrainingEditor extends JPanel {
                     em.close();
                 }
             }
-        }), CC.xywh(1, 13, 9, 1));
+        });
 
 
         Closure afterUserlistEdited = editAction != null ? new Closure() {

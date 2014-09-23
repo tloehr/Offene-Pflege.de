@@ -359,12 +359,12 @@ public class PnlTraining extends CleanablePanel {
         cpTraining.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpTraining.setContentPane(createContentPanel4(training));
+                cpTraining.setContentPane(createContentPanel4(trainingMap.get(key)));
             }
         });
 
         if (!cpTraining.isCollapsed()) {
-            cpTraining.setContentPane(createContentPanel4(training));
+            cpTraining.setContentPane(createContentPanel4(trainingMap.get(key)));
         }
 
 
@@ -373,11 +373,9 @@ public class PnlTraining extends CleanablePanel {
 
     private JPanel createContentPanel4(final Training training) {
 
-
         final JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
         contentPanel.setOpaque(false);
-
 
         Closure afterEdited = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? new Closure() {
             @Override

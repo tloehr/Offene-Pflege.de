@@ -79,7 +79,7 @@ public class PnlHomes extends PopupPanel {
 
             home.setName(txtName.getText().trim());
             home.setStreet(txtStrasse.getText().trim());
-            home.setZip(txtPLZ.getText().trim());
+            home.setZip(SYSTools.left(txtPLZ.getText().trim(), 5, ""));
             home.setCity(txtOrt.getText().trim());
             home.setTel(txtTel.getText().trim());
             home.setFax(txtFax.getText().trim());

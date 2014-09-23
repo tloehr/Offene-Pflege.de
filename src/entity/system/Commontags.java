@@ -79,10 +79,10 @@ public class Commontags {
     private Collection<Prescription> prescriptions;
 
     @ManyToMany(mappedBy = "commontags")
-        private Collection<ResInfo> resinfos;
+    private Collection<ResInfo> resinfos;
 
     @ManyToMany(mappedBy = "commontags")
-        private Collection<NursingProcess> nursingProcesses;
+    private Collection<NursingProcess> nursingProcesses;
 
     public Commontags() {
     }
