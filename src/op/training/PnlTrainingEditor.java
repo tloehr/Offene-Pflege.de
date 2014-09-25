@@ -33,9 +33,7 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 
 /**
  * @author Torsten Löhr
@@ -43,12 +41,14 @@ import java.util.HashSet;
 public class PnlTrainingEditor extends JPanel {
     private Training training;
     private final Closure editAction;
+    private boolean editMode;
     private PnlUserlistEditor pnlUserlistEditor;
     boolean initPhase = true;
 
     public PnlTrainingEditor(Training training, Closure editAction) {
         this.training = training;
         this.editAction = editAction;
+        this.editMode = editAction != null;
         initComponents();
         initPanel();
     }
@@ -71,7 +71,7 @@ public class PnlTrainingEditor extends JPanel {
         } else {
             txtTimeStarting.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(training.getStarting()));
             cbTime.setSelected(true);
-            txtTimeStarting.setEnabled(true);
+            txtTimeStarting.setEnabled(editMode);
         }
 
         cmbState.setModel(new DefaultComboBoxModel(SYSTools.translate(TrainingTools.STATES)));
@@ -84,15 +84,12 @@ public class PnlTrainingEditor extends JPanel {
             }
         });
 
-//        txtTimeStarting.setEnabled();
-
         txtTitle.setText(training.getTitle());
         txtDocent.setText(training.getDocent());
         txtText.setText(training.getText());
 
-        final PnlCommonTags pnlCommonTags = new PnlCommonTags(training.getCommontags(), true, 3);
+        final PnlCommonTags pnlCommonTags = new PnlCommonTags(training.getCommontags(), editMode, 3);
         add(pnlCommonTags, CC.xywh(1, 13, 9, 1));
-
 
         pnlCommonTags.addNotifyListeners(new Closure() {
             @Override
@@ -109,7 +106,7 @@ public class PnlTrainingEditor extends JPanel {
                     em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
 
-                    if (myTraining.getCommontags().contains(changedTag)){
+                    if (myTraining.getCommontags().contains(changedTag)) {
                         myTraining.getCommontags().remove(changedTag);
                     } else {
                         myTraining.getCommontags().add(changedTag);
@@ -159,12 +156,20 @@ public class PnlTrainingEditor extends JPanel {
                 jdcStartingPropertyChange(evt);
             }
         });
+
+        cbTime.setEnabled(editMode);
+        txtTitle.setEditable(editMode);
+        txtText.setEditable(editMode);
+        txtDocent.setEditable(editMode);
+        jdcStarting.setEnabled(editMode);
+        cmbState.setEnabled(editMode);
+
         initPhase = false;
     }
 
     private void txtTimeFocusLost(FocusEvent e) {
 
-        OPDE.debug("txtTimeFocusLost");
+        if (!editMode) return;
 
         EntityManager em = OPDE.createEM();
 
@@ -207,10 +212,8 @@ public class PnlTrainingEditor extends JPanel {
 
     private void cbTimeItemStateChanged(ItemEvent e) {
         if (initPhase) return;
-        OPDE.debug("cbTimeItemStateChanged");
-//        txtTimeStarting.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        if (!editMode) return;
 
-//        if (e.getStateChange() != ItemEvent.SELECTED) {
         EntityManager em = OPDE.createEM();
 
         try {
@@ -247,10 +250,10 @@ public class PnlTrainingEditor extends JPanel {
     }
 
     private void txtTitleFocusLost(FocusEvent e) {
-        OPDE.debug("txtTitleFocusLost");
-        if (txtTitle.getText().trim().isEmpty()) {
-            return;
-        }
+
+        if (!editMode) return;
+        if (txtTitle.getText().trim().isEmpty()) return;
+
         EntityManager em = OPDE.createEM();
 
         try {
@@ -282,7 +285,7 @@ public class PnlTrainingEditor extends JPanel {
     }
 
     private void txtDocentFocusLost(FocusEvent e) {
-        OPDE.debug("txtDocentFocusLost");
+        if (!editMode) return;
         EntityManager em = OPDE.createEM();
 
         try {
@@ -314,7 +317,7 @@ public class PnlTrainingEditor extends JPanel {
     }
 
     private void jdcStartingPropertyChange(PropertyChangeEvent e) {
-        OPDE.debug("jdcStartingPropertyChange");
+        if (!editMode) return;
         EntityManager em = OPDE.createEM();
         LocalTime localTime = new LocalTime(training.getStarting());
         LocalDate localDate = new LocalDate(jdcStarting.getDate());
@@ -349,7 +352,7 @@ public class PnlTrainingEditor extends JPanel {
     }
 
     private void txtTextFocusLost(FocusEvent e) {
-        OPDE.debug("txtTextFocusLost");
+        if (!editMode) return;
         EntityManager em = OPDE.createEM();
 
         try {
@@ -381,7 +384,7 @@ public class PnlTrainingEditor extends JPanel {
     }
 
     private void cmbStateItemStateChanged(ItemEvent e) {
-        OPDE.debug("cmbStateItemStateChanged");
+        if (!editMode) return;
         EntityManager em = OPDE.createEM();
 
         try {
