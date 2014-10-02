@@ -137,14 +137,14 @@ public class PnlDosageForm extends PopupPanel {
 
     private void initPanel() {
 
-        lblPreparation.setText(SYSTools.xx(internalClassID + ".preparation"));
-        lblUsage.setText(SYSTools.xx(internalClassID + ".usagetext"));
-        lblUsageUnit.setText(SYSTools.xx(internalClassID + ".usageUnit"));
-        lblPackUnit.setText(SYSTools.xx(internalClassID + ".packUnit"));
-        lblIntervention.setText(SYSTools.xx(internalClassID + ".intervention"));
-        lblDailyPlan.setText(SYSTools.xx(internalClassID + ".dailyPlan"));
-        lblEquiv.setText(SYSTools.xx(internalClassID + ".sameas"));
-        lblUPRState.setText(SYSTools.xx(internalClassID + ".uprstate"));
+        lblPreparation.setText(SYSTools.xx("opde.medication.pnlDosageForm.preparation"));
+        lblUsage.setText(SYSTools.xx("opde.medication.pnlDosageForm.usagetext"));
+        lblUsageUnit.setText(SYSTools.xx("opde.medication.pnlDosageForm.usageUnit"));
+        lblPackUnit.setText(SYSTools.xx("opde.medication.pnlDosageForm.packUnit"));
+        lblIntervention.setText(SYSTools.xx("opde.medication.pnlDosageForm.intervention"));
+        lblDailyPlan.setText(SYSTools.xx("opde.medication.pnlDosageForm.dailyPlan"));
+        lblEquiv.setText(SYSTools.xx("opde.medication.pnlDosageForm.sameas"));
+        lblUPRState.setText(SYSTools.xx("opde.medication.pnlDosageForm.uprstate"));
 
         cmbUPR.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("state_upr1"), SYSTools.xx("state_uprn"), SYSTools.xx("state_dont_calc")}));
         cmbUPR.setSelectedIndex(form.getUPRState());
@@ -191,7 +191,7 @@ public class PnlDosageForm extends PopupPanel {
     public boolean isSaveOK() {
 
         if (SYSTools.catchNull(txtPreparation.getText()).trim().isEmpty() && SYSTools.catchNull(txtUsageText.getText()).trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".notbothmustbeempty", DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.medication.pnlDosageForm.notbothmustbeempty", DisplayMessage.WARNING));
             return false;
         }
         if (SYSTools.catchNull(txtSameAs.getText()).trim().isEmpty()) {

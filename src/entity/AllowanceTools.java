@@ -15,6 +15,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -138,13 +139,12 @@ public class AllowanceTools {
     }
 
 
-    public static BigDecimal getSUM(Resident resident, DateTime to) {
-//        OPDE.debug("getSUM to: " + DateFormat.getDateInstance().format(to.toDate()));
+    public static BigDecimal getSUM(Resident resident, LocalDate to) {
+        long time = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.resident = :resident AND al.pit <= :to ");
         query.setParameter("resident", resident);
-//        query.setParameter("from", from.toDate());
-        query.setParameter("to", to.toDate());
+        query.setParameter("to", SYSCalendar.eod(to).toDate());
         BigDecimal sum = BigDecimal.ZERO;
         try {
             sum = (BigDecimal) query.getSingleResult();
@@ -156,11 +156,12 @@ public class AllowanceTools {
         if (sum == null) {
             sum = BigDecimal.ZERO;
         }
-//        OPDE.debug("getSUM sum: " + sum.toPlainString());
+        OPDE.debug("getSUM(Resident " + resident.getRID() + ", DateTime " + DateFormat.getDateTimeInstance().format(to.toDate()) + ") " + (System.currentTimeMillis() - time) + " ms");
         return sum;
     }
 
     public static BigDecimal getSUM(Resident resident) {
+        long time = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.resident = :resident ");
         query.setParameter("resident", resident);
@@ -175,6 +176,7 @@ public class AllowanceTools {
         if (sum == null) {
             sum = BigDecimal.ZERO;
         }
+        OPDE.debug("getSUM(Resident resident) " + (System.currentTimeMillis() - time) + " ms");
         return sum;
     }
 
@@ -195,6 +197,7 @@ public class AllowanceTools {
     }
 
     public static ArrayList<Allowance> getYear(Resident resident, Date year) {
+        long time = System.currentTimeMillis();
         DateTime from = new DateTime(year).dayOfYear().withMinimumValue();
         DateTime to = new DateTime(year).dayOfYear().withMaximumValue();
 
@@ -211,11 +214,12 @@ public class AllowanceTools {
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-
+        OPDE.debug("getYear(Resident " + resident.getRID() + ", Date " + year + ") " + (System.currentTimeMillis() - time) + " ms");
         return result;
     }
 
     public static ArrayList<Allowance> getMonth(Resident resident, Date month) {
+        long time = System.currentTimeMillis();
         DateTime from = new DateTime(month).dayOfMonth().withMinimumValue();
         DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
 
@@ -232,7 +236,7 @@ public class AllowanceTools {
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-
+        OPDE.debug("getMonth(Resident resident, Date month) " + (System.currentTimeMillis() - time) + " ms");
         return result;
     }
 
@@ -242,8 +246,9 @@ public class AllowanceTools {
      * @param resident
      * @return
      */
-    public static Pair<Date, Date> getMinMax(Resident resident) {
-        Pair<Date, Date> result = null;
+    public static Pair<LocalDate, LocalDate> getMinMax(Resident resident) {
+        long time = System.currentTimeMillis();
+        Pair<LocalDate, LocalDate> result = null;
 
         EntityManager em = OPDE.createEM();
         Query queryMin = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.pit ASC ");
@@ -255,18 +260,19 @@ public class AllowanceTools {
         queryMax.setMaxResults(1);
 
         if (queryMax.getResultList().isEmpty()) { // if queryMax is empty, then queryMin must also be empty, too
-            result = new Pair<Date, Date>(new Date(), new Date());
+            result = new Pair<LocalDate, LocalDate>(new LocalDate(), new LocalDate());
         } else {
 
             try {
                 ArrayList<Allowance> min = new ArrayList<Allowance>(queryMin.getResultList());
                 ArrayList<Allowance> max = new ArrayList<Allowance>(queryMax.getResultList());
-                result = new Pair<Date, Date>(min.get(0).getPit(), max.get(0).getPit());
+                result = new Pair<LocalDate, LocalDate>(new LocalDate(min.get(0).getPit()), new LocalDate(max.get(0).getPit()));
             } catch (Exception e) {
                 OPDE.fatal(e);
             }
         }
         em.close();
+        OPDE.debug("getMinMax(Resident resident) " + (System.currentTimeMillis() - time) + " ms");
         return result;
     }
 

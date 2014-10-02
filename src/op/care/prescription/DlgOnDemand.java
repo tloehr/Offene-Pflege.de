@@ -355,7 +355,7 @@ public class DlgOnDemand extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "14dlu, $lcgap, default, 6dlu, default:grow, $lcgap, 14dlu",
+            "14dlu, $lcgap, default, 6dlu, 355dlu, $lcgap, 14dlu",
             "14dlu, $lgap, fill:default:grow, $lgap, fill:default, $lgap, 14dlu"));
 
         //======== jPanel1 ========

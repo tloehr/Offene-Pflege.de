@@ -34,6 +34,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
@@ -285,13 +286,29 @@ public class PnlEditResInfo {
         main.setBorder(new EmptyBorder(10, 10, 10, 10));
         main.add(pnlContent, BorderLayout.CENTER);
 
+        pnlContent.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                OPDE.debug("moved");
+            }
+        });
 
-        JPanel enlosingButtonPanel = new JPanel(new BorderLayout());
-        enlosingButtonPanel.setOpaque(false);
 
-        JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.LINE_AXIS));
-        btnPanel.setOpaque(false);
+
+//        JPanel enlosingUpperButtonPanel = new JPanel(new BorderLayout());
+//        enlosingUpperButtonPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+//        enlosingUpperButtonPanel.setOpaque(false);
+
+//        JPanel enlosingLowerButtonPanel = new JPanel(new BorderLayout());
+//        enlosingLowerButtonPanel.setOpaque(false);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
+        buttonPanel.setOpaque(false);
+
+//        JPanel lowerButtonBanel = new JPanel();
+//        lowerButtonBanel.setLayout(new BoxLayout(lowerButtonBanel, BoxLayout.LINE_AXIS));
+//        lowerButtonBanel.setOpaque(false);
 
         // export 2 png function for development
         if (OPDE.isDebug()) {
@@ -306,15 +323,25 @@ public class PnlEditResInfo {
                     GUITools.exportToPNG(pnlContent, resInfo.getResInfoType().getID());
                 }
             });
-            btnPanel.add(png, BorderLayout.LINE_END);
+            buttonPanel.add(png);
         }
 
-        JButton apply = new JButton(SYSConst.icon22apply);
-        apply.setBorder(null);
-        apply.setContentAreaFilled(false);
-        apply.setPressedIcon(SYSConst.icon22Pressed);
-        apply.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        apply.addActionListener(new ActionListener() {
+//        JButton apply1 = GUITools.getTinyButton(null, SYSConst.icon22apply);
+//        apply1.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                if (resInfo != null) {
+//                    closure.execute(getResInfo());
+//                } else {
+//                    closure.execute(content);
+//                }
+//                cleanup();
+//            }
+//        });
+//        lowerButtonBanel.add(apply1);
+
+        JButton apply2 = GUITools.getTinyButton(null, SYSConst.icon22apply);
+        apply2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (resInfo != null) {
@@ -325,25 +352,46 @@ public class PnlEditResInfo {
                 cleanup();
             }
         });
-        btnPanel.add(apply, BorderLayout.LINE_END);
+        buttonPanel.add(apply2);
 
-        JButton cancel = new JButton(SYSConst.icon22cancel);
-        cancel.setBorder(null);
-        cancel.setContentAreaFilled(false);
-        cancel.setPressedIcon(SYSConst.icon22Pressed);
-        cancel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        cancel.addActionListener(new ActionListener() {
+
+//        JButton cancel1 = GUITools.getTinyButton(null, SYSConst.icon22cancel);
+//        cancel1.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                closure.execute(null);
+//                cleanup();
+//            }
+//        });
+//        lowerButtonBanel.add(cancel1);
+
+
+        JButton cancel2 = GUITools.getTinyButton(null, SYSConst.icon22cancel);
+        cancel2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 closure.execute(null);
                 cleanup();
             }
         });
-        btnPanel.add(cancel, BorderLayout.LINE_END);
+        buttonPanel.add(cancel2);
 
 
-        enlosingButtonPanel.add(btnPanel, BorderLayout.LINE_END);
-        main.add(enlosingButtonPanel, BorderLayout.SOUTH);
+
+
+        JScrollPane scrollPanel = new JScrollPane(buttonPanel);
+
+        scrollPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                OPDE.debug("moved me");
+            }
+        });
+//        scrollPanel.add(buttonPanel, BorderLayout.CENTER);
+        main.add(scrollPanel, BorderLayout.WEST);
+
+//        enlosingLowerButtonPanel.add(lowerButtonBanel, BorderLayout.CENTER);
+//        main.add(enlosingLowerButtonPanel, BorderLayout.SOUTH);
 
 
         JPanel hdrPanel = new JPanel(new BorderLayout());

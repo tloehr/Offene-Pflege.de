@@ -13,14 +13,11 @@ import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -34,7 +31,7 @@ public class PnlTX extends JPanel {
     private Allowance tx;
     private Closure afterChange;
     DecimalFormat cf = new DecimalFormat("######.00");
-    DateMidnight min;
+    LocalDate min;
     Component focusOwner = null;
 
     public PnlTX(Allowance tx, Closure afterChange) {
@@ -46,7 +43,7 @@ public class PnlTX extends JPanel {
     }
 
     private void txtDateFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, min, new DateMidnight());
+        SYSCalendar.handleDateFocusLost(evt, min, new LocalDate());
     }
 
     private void txtDateFocusGained(FocusEvent e) {
@@ -97,8 +94,12 @@ public class PnlTX extends JPanel {
         txtCash.setText(NumberFormat.getCurrencyInstance().format(checkCash(txtCash.getText(), BigDecimal.ONE)));
     }
 
-    private void cmbResidentActionPerformed(ActionEvent e) {
-        txtDate.requestFocus();
+
+    private void cmbResidentItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            ResInfo firstStay = ResInfoTools.getFirstResinfo((Resident) e.getItem(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+            min = firstStay == null ? new LocalDate().dayOfMonth().withMinimumValue() : new LocalDate(firstStay.getFrom());
+        }
     }
 
     private void initComponents() {
@@ -114,8 +115,8 @@ public class PnlTX extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
-            "default, $lgap, pref, 4*($lgap, default)"));
+                "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
+                "default, $lgap, pref, 4*($lgap, default)"));
 
         //---- lblResident ----
         lblResident.setText("text");
@@ -125,10 +126,10 @@ public class PnlTX extends JPanel {
         //---- cmbResident ----
         cmbResident.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbResident.setFocusable(false);
-        cmbResident.addActionListener(new ActionListener() {
+        cmbResident.addItemListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                cmbResidentActionPerformed(e);
+            public void itemStateChanged(ItemEvent e) {
+                cmbResidentItemStateChanged(e);
             }
         });
         add(cmbResident, CC.xy(5, 3));
@@ -142,12 +143,13 @@ public class PnlTX extends JPanel {
         txtDate.setFont(new Font("Arial", Font.PLAIN, 14));
         txtDate.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusLost(FocusEvent e) {
-                txtDateFocusLost(e);
-            }
-            @Override
             public void focusGained(FocusEvent e) {
                 txtDateFocusGained(e);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtDateFocusLost(e);
             }
         });
         txtDate.addActionListener(new ActionListener() {
@@ -167,12 +169,13 @@ public class PnlTX extends JPanel {
         txtText.setFont(new Font("Arial", Font.PLAIN, 14));
         txtText.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusLost(FocusEvent e) {
-                txtTextFocusLost(e);
-            }
-            @Override
             public void focusGained(FocusEvent e) {
                 txtTextFocusGained(e);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtTextFocusLost(e);
             }
         });
         txtText.addActionListener(new ActionListener() {
@@ -192,12 +195,13 @@ public class PnlTX extends JPanel {
         txtCash.setFont(new Font("Arial", Font.PLAIN, 14));
         txtCash.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusLost(FocusEvent e) {
-                txtCashFocusLost(e);
-            }
-            @Override
             public void focusGained(FocusEvent e) {
                 txtCashFocusGained(e);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtCashFocusLost(e);
             }
         });
         txtCash.addActionListener(new ActionListener() {
@@ -224,18 +228,15 @@ public class PnlTX extends JPanel {
         }
 
         if (tx.getResident() != null) {
-            cmbResident.setModel(new DefaultComboBoxModel(new Resident[]{tx.getResident()}));
+            cmbResident.setModel(new DefaultComboBoxModel<Resident>(new Resident[]{tx.getResident()}));
             //cmbResident.setEditable(false);
         } else {
             cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getAllActive()));
             //cmbResident.setEditable(true);
         }
 
-        // TODO: change min, when combobox changes
-        ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
-        min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
-
-        OPDE.debug(min);
+        ResInfo firstStay = (cmbResident.getSelectedItem() == null ? null : ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY)));
+        min = (firstStay == null ? new LocalDate().dayOfMonth().withMinimumValue() : new LocalDate(firstStay.getFrom()));
 
         setFocusCycleRoot(true);
         setFocusTraversalPolicy(new FocusTraversalPolicy() {

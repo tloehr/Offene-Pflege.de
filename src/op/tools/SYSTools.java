@@ -468,11 +468,11 @@ public class SYSTools {
         return dlm;
     }
 
-    public static DefaultComboBoxModel list2cmb(List list) {
-        DefaultComboBoxModel cmb = new DefaultComboBoxModel();
+    public static <T> DefaultComboBoxModel<T>  list2cmb(List<T> list) {
+        DefaultComboBoxModel cmb = new DefaultComboBoxModel<T>();
         if (list != null) {
-            for (Object o : list) {
-                cmb.addElement(o);
+            for (T t : list) {
+                cmb.addElement(t);
             }
         }
         return cmb;

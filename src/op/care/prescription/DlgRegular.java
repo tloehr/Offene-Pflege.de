@@ -301,7 +301,7 @@ public class DlgRegular extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
+            "$rgap, $lcgap, default, $lcgap, pref, $lcgap, $rgap",
             "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jPanel1 ========
@@ -394,7 +394,7 @@ public class DlgRegular extends MyJDialog {
                     new Font("Arial", Font.PLAIN, 14)));
                 jPanel8.setFont(new Font("Arial", Font.PLAIN, 14));
                 jPanel8.setLayout(new FormLayout(
-                    "default:grow",
+                    "370dlu",
                     "fill:default:grow, $lgap, pref"));
 
                 //======== jspDosis ========
@@ -624,7 +624,7 @@ public class DlgRegular extends MyJDialog {
         lblTX.setText(null);
         lblTX.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2.png")));
         contentPane.add(lblTX, CC.xy(3, 5));
-        setSize(1070, 640);
+        setSize(1015, 640);
         setLocationRelativeTo(getOwner());
 
         //---- bgMedikament ----

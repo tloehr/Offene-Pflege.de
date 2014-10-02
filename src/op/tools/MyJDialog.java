@@ -21,9 +21,6 @@ import java.util.concurrent.TimeUnit;
  * To change this template use File | Settings | File Templates.
  */
 public class MyJDialog extends JDialog {
-    private Animator fadeIn, fadeOut;
-    private MyJDialog thisDialog;
-    private boolean isDisposed;
     private JPanel content;
 
     public MyJDialog(boolean decorated) {
@@ -40,20 +37,18 @@ public class MyJDialog extends JDialog {
 
     public MyJDialog(Dialog owner, boolean decorated) {
         super(owner, true);
+        setLocationRelativeTo(getParent());
         initContent();
-        isDisposed = false;
         setResizable(false);
         setUndecorated(!decorated);
-//        initAnimator();
     }
 
     public MyJDialog(JFrame owner, boolean decorated) {
         super(owner, true);
+        setLocationRelativeTo(getParent());
         initContent();
-        isDisposed = false;
         setResizable(false);
         setUndecorated(!decorated);
-//        initAnimator();
     }
 
     public MyJDialog(Dialog owner) {
@@ -71,100 +66,4 @@ public class MyJDialog extends JDialog {
         setVisible(false);
     }
 
-    protected void initAnimator() {
-        if (!OPDE.isAnimation()) {
-            return;
-        }
-
-        final TimingSource ts = new SwingTimerTimingSource();
-        thisDialog = this;
-        Animator.setDefaultTimingSource(ts);
-        ts.init();
-        fadeIn = new Animator.Builder().setDuration(250, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
-
-            @Override
-            public void timingEvent(Animator animator, double fraction) {
-                if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
-                    try {
-                        Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-                        Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
-                        mSetWindowOpacity.invoke(null, thisDialog, new Float(fraction));
-                        repaint();
-                    } catch (Exception ex) {
-                    }
-                }
-            }
-        }).build();
-
-        fadeOut = new Animator.Builder().setDuration(250, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.BACKWARD).addTarget(new TimingTargetAdapter() {
-
-            @Override
-            public void timingEvent(Animator animator, double fraction) {
-                if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
-                    try {
-                        Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-                        Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
-                        mSetWindowOpacity.invoke(null, thisDialog, new Float(fraction));
-                        repaint();
-                    } catch (Exception ex) {
-                    }
-                }
-            }
-
-            @Override
-            public void end(Animator source) {
-                isDisposed = true;
-                superdispose();
-            }
-        }).build();
-    }
-
-//    @Override
-//    public void setVisible(boolean visible) {
-//        if (isDisposed) {
-//            return;
-//        }
-//
-//        if (!OPDE.isAnimation()) {
-//            super.setVisible(visible);
-//            return;
-//        }
-//
-//        setLocation(OPDE.getMainframe().getLocationForDialog(getSize()));
-//        if (visible) {
-//            if (fadeIn != null && !fadeIn.isRunning()) {
-//                if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
-//                    try {
-//                        Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-//                        Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
-//                        mSetWindowOpacity.invoke(null, thisDialog, 0.0f);
-//                        repaint();
-//                    } catch (Exception ex) {
-//                    }
-//                }
-//                fadeIn.start();
-//                super.setVisible(true);
-//            }
-//        } else {
-//            if (fadeIn != null && fadeIn.isRunning()) {
-//                fadeIn.cancel();
-//            }
-//            if (fadeOut != null && !fadeOut.isRunning()) {
-//                if (AWTUtilities.isTranslucencySupported(AWTUtilities.Translucency.TRANSLUCENT)) {
-//                    try {
-//                        Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-//                        Method mSetWindowOpacity = awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
-//                        mSetWindowOpacity.invoke(null, thisDialog, 1.0f);
-//                        repaint();
-//                    } catch (Exception ex) {
-//                    }
-//                }
-//                fadeOut.start();
-//            }
-//        }
-//    }
-
-    private void superdispose() {
-        super.dispose();
-    }
 }
