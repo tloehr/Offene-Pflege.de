@@ -34,7 +34,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
@@ -86,7 +85,11 @@ public class PnlEditResInfo {
     private JTextArea sumlabel;
     private Component focusOwner = null;
 
-    boolean enabled;
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    private boolean enabled;
 
     private ArrayList<RiskBean> scaleriskmodel;
     private String scalesumlabeltext;
@@ -263,6 +266,7 @@ public class PnlEditResInfo {
             if (resInfo != null && resInfo.getResValue() != null) {
                 pnlContent.add(new JLabel(SYSTools.xx("nursingrecords.info.dlg.will.create.value")), BorderLayout.NORTH);
             }
+
             pnlContent.add(h.getPanel(), BorderLayout.CENTER);
             pnlContent.add(new JScrollPane(ovrComment), BorderLayout.SOUTH);
 
@@ -286,29 +290,20 @@ public class PnlEditResInfo {
         main.setBorder(new EmptyBorder(10, 10, 10, 10));
         main.add(pnlContent, BorderLayout.CENTER);
 
-        pnlContent.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                OPDE.debug("moved");
-            }
-        });
 
+        JPanel enclosingUpperButtonPanel = new JPanel(new BorderLayout());
+        enclosingUpperButtonPanel.setOpaque(false);
 
+        JPanel enclosingLowerButtonPanel = new JPanel(new BorderLayout());
+        enclosingLowerButtonPanel.setOpaque(false);
 
-//        JPanel enlosingUpperButtonPanel = new JPanel(new BorderLayout());
-//        enlosingUpperButtonPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-//        enlosingUpperButtonPanel.setOpaque(false);
+        JPanel upperButtonBanel = new JPanel();
+        upperButtonBanel.setLayout(new BoxLayout(upperButtonBanel, BoxLayout.LINE_AXIS));
+        upperButtonBanel.setOpaque(false);
 
-//        JPanel enlosingLowerButtonPanel = new JPanel(new BorderLayout());
-//        enlosingLowerButtonPanel.setOpaque(false);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
-        buttonPanel.setOpaque(false);
-
-//        JPanel lowerButtonBanel = new JPanel();
-//        lowerButtonBanel.setLayout(new BoxLayout(lowerButtonBanel, BoxLayout.LINE_AXIS));
-//        lowerButtonBanel.setOpaque(false);
+        JPanel lowerButtonBanel = new JPanel();
+        lowerButtonBanel.setLayout(new BoxLayout(lowerButtonBanel, BoxLayout.LINE_AXIS));
+        lowerButtonBanel.setOpaque(false);
 
         // export 2 png function for development
         if (OPDE.isDebug()) {
@@ -323,22 +318,22 @@ public class PnlEditResInfo {
                     GUITools.exportToPNG(pnlContent, resInfo.getResInfoType().getID());
                 }
             });
-            buttonPanel.add(png);
+            upperButtonBanel.add(png);
         }
 
-//        JButton apply1 = GUITools.getTinyButton(null, SYSConst.icon22apply);
-//        apply1.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (resInfo != null) {
-//                    closure.execute(getResInfo());
-//                } else {
-//                    closure.execute(content);
-//                }
-//                cleanup();
-//            }
-//        });
-//        lowerButtonBanel.add(apply1);
+        JButton apply1 = GUITools.getTinyButton(null, SYSConst.icon22apply);
+        apply1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (resInfo != null) {
+                    closure.execute(getResInfo());
+                } else {
+                    closure.execute(content);
+                }
+                cleanup();
+            }
+        });
+        upperButtonBanel.add(apply1);
 
         JButton apply2 = GUITools.getTinyButton(null, SYSConst.icon22apply);
         apply2.addActionListener(new ActionListener() {
@@ -352,54 +347,42 @@ public class PnlEditResInfo {
                 cleanup();
             }
         });
-        buttonPanel.add(apply2);
+        lowerButtonBanel.add(apply2);
 
 
-//        JButton cancel1 = GUITools.getTinyButton(null, SYSConst.icon22cancel);
-//        cancel1.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                closure.execute(null);
-//                cleanup();
-//            }
-//        });
-//        lowerButtonBanel.add(cancel1);
+        JButton cancel1 = GUITools.getTinyButton(null, SYSConst.icon22cancel);
+        cancel1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancel();
+            }
+        });
+        upperButtonBanel.add(cancel1);
 
 
         JButton cancel2 = GUITools.getTinyButton(null, SYSConst.icon22cancel);
         cancel2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                closure.execute(null);
-                cleanup();
+                cancel();
             }
         });
-        buttonPanel.add(cancel2);
+        lowerButtonBanel.add(cancel2);
 
 
+        enclosingUpperButtonPanel.add(upperButtonBanel, BorderLayout.LINE_START);
+        main.add(enclosingUpperButtonPanel, BorderLayout.NORTH);
+
+        enclosingLowerButtonPanel.add(lowerButtonBanel, BorderLayout.LINE_END);
+        main.add(enclosingLowerButtonPanel, BorderLayout.SOUTH);
 
 
-        JScrollPane scrollPanel = new JScrollPane(buttonPanel);
-
-        scrollPanel.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                OPDE.debug("moved me");
-            }
-        });
-//        scrollPanel.add(buttonPanel, BorderLayout.CENTER);
-        main.add(scrollPanel, BorderLayout.WEST);
-
-//        enlosingLowerButtonPanel.add(lowerButtonBanel, BorderLayout.CENTER);
-//        main.add(enlosingLowerButtonPanel, BorderLayout.SOUTH);
-
-
-        JPanel hdrPanel = new JPanel(new BorderLayout());
-        JLabel jl = new JLabel(resInfo != null ? resInfo.getResInfoType().getShortDescription() : "dev");
-        jl.setFont(SYSConst.ARIAL24BOLD);
-        hdrPanel.add(jl, BorderLayout.CENTER);
-        hdrPanel.add(new JSeparator(), BorderLayout.SOUTH);
-        main.add(jl, BorderLayout.NORTH);
+//        JPanel hdrPanel = new JPanel(new BorderLayout());
+//        JLabel jl = new JLabel(resInfo != null ? resInfo.getResInfoType().getShortDescription() : "dev");
+//        jl.setFont(SYSConst.ARIAL24BOLD);
+//        hdrPanel.add(jl, BorderLayout.CENTER);
+//        hdrPanel.add(new JSeparator(), BorderLayout.SOUTH);
+//        main.add(jl, BorderLayout.NORTH);
 
         if (!focusTraversal.isEmpty()) {
             main.setFocusCycleRoot(true);
@@ -456,6 +439,11 @@ public class PnlEditResInfo {
             });
         }
         setXEnabled(main, false);
+    }
+
+    public void cancel() {
+        closure.execute(null);
+        cleanup();
     }
 
     public Exception getLastParsingException() {
@@ -1008,12 +996,18 @@ public class PnlEditResInfo {
         private String groupname;
         private DefaultComboBoxModel boxModel;
 
+
         @Override
         public void startDocument() throws SAXException {
             components = new HashMap();
             boxModel = null;
             outerpanel = new JPanel(new RiverLayout());
             tabgroup = false;
+
+            // set a title
+            JLabel jl = new JLabel(resInfo != null ? resInfo.getResInfoType().getShortDescription() : "dev");
+            jl.setFont(SYSConst.ARIAL24BOLD);
+            outerpanel.add(jl, RiverLayout.LEFT);
         }
 
         @Override

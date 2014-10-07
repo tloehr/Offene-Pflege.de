@@ -43,7 +43,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>relgap, default, relgap, default:grow, linegap, 3dlu, narrowlinegap, pref, linegap, 0dlu</string> 
+          <string>relgap, default, relgap, default:grow, 3dlu, narrowlinegap, bottom:pref, linegap, 0dlu</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -689,7 +689,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>6</int> 
+           <int>5</int> 
           </void> 
           <void method="setProperty"> 
            <string>hAlign</string> 
@@ -702,19 +702,65 @@
          </object> 
         </void> 
         <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>com.jidesoft.status.StatusBar</string> 
-          <void method="setProperty"> 
-           <string>background</string> 
-           <object class="java.awt.Color"> 
-            <int>238</int> 
-            <int>238</int> 
-            <int>238</int> 
-            <int>255</int> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>javax.swing.JPanel</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>javax.swing.BoxLayout</class> 
+          </object> 
+          <void property="name"> 
+           <string>panel2</string> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JButton</string> 
+            <void method="setProperty"> 
+             <string>text</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/22x22/view_top_bottom.png</string> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>alignmentY</string> 
+             <float>1.0</float> 
+            </void> 
+            <void property="name"> 
+             <string>btnResetSplitpane</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>btnResetSplitpaneActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
            </object> 
           </void> 
-          <void property="name"> 
-           <string>statusBar</string> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>com.jidesoft.status.StatusBar</string> 
+            <void method="setProperty"> 
+             <string>background</string> 
+             <object class="java.awt.Color"> 
+              <int>238</int> 
+              <int>238</int> 
+              <int>238</int> 
+              <int>255</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>alignmentY</string> 
+             <float>1.0</float> 
+            </void> 
+            <void property="name"> 
+             <string>statusBar</string> 
+            </void> 
+           </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -725,19 +771,19 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>8</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>hAlign</string> 
-           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>vAlign</string> 
-           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+           <int>7</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridWidth</string> 
            <int>4</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>vAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="BOTTOM"/> 
+          </void> 
+          <void method="setProperty"> 
+           <string>hAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
           </void> 
          </object> 
         </void> 
@@ -769,4 +815,3 @@
   </void> 
  </object> 
 </java> 
-

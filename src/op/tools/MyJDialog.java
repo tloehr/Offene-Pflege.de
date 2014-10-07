@@ -1,17 +1,10 @@
 package op.tools;
 
-import com.sun.awt.AWTUtilities;
 import op.OPDE;
-import org.jdesktop.core.animation.timing.Animator;
-import org.jdesktop.core.animation.timing.TimingSource;
-import org.jdesktop.core.animation.timing.TimingTargetAdapter;
-import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,6 +42,16 @@ public class MyJDialog extends JDialog {
         initContent();
         setResizable(false);
         setUndecorated(!decorated);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        // makes sure, that the dialog is never larger than the screen in use.
+        Rectangle maximumsize = GUITools.getScreenSize(GUITools.getCurrentScreen(OPDE.getMainframe()));
+        Dimension dim = super.getPreferredSize();
+        if (dim.width > maximumsize.width) dim.width = maximumsize.width;
+        if (dim.height > maximumsize.height) dim.height = maximumsize.height;
+        return dim;
     }
 
     public MyJDialog(Dialog owner) {

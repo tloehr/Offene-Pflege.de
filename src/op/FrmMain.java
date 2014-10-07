@@ -200,6 +200,9 @@ public class FrmMain extends JFrame {
         final MemoryStatusBarItem gc = new MemoryStatusBarItem();
         gc.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
+
+        btnResetSplitpane.setToolTipText(SYSTools.xx("opde.mainframe.btnSplitReset.tooltip"));
+
         initPhase = false;
 
 
@@ -355,6 +358,10 @@ public class FrmMain extends JFrame {
 
     }
 
+    private void btnResetSplitpaneActionPerformed(ActionEvent e) {
+        splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, 0.5d));
+    }
+
 
     public void afterLogin() {
         OPDE.getDisplayManager().touch();
@@ -436,6 +443,8 @@ public class FrmMain extends JFrame {
         pnlWait = new JPanel();
         lblWait = new JLabel();
         pbTimeout = new JProgressBar();
+        panel2 = new JPanel();
+        btnResetSplitpane = new JButton();
         statusBar = new StatusBar();
 
         //======== this ========
@@ -453,16 +462,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, 3dlu, $nlgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -597,11 +606,30 @@ public class FrmMain extends JFrame {
                 pnlCard.add(pnlWait, "cardWait");
             }
             pnlMain.add(pnlCard, CC.xy(5, 4, CC.FILL, CC.FILL));
-            pnlMain.add(pbTimeout, CC.xywh(3, 6, 4, 1, CC.FILL, CC.DEFAULT));
+            pnlMain.add(pbTimeout, CC.xywh(3, 5, 4, 1, CC.FILL, CC.DEFAULT));
 
-            //---- statusBar ----
-            statusBar.setBackground(new Color(238, 238, 238));
-            pnlMain.add(statusBar, CC.xywh(3, 8, 4, 1, CC.FILL, CC.FILL));
+            //======== panel2 ========
+            {
+                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+
+                //---- btnResetSplitpane ----
+                btnResetSplitpane.setText(null);
+                btnResetSplitpane.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/view_top_bottom.png")));
+                btnResetSplitpane.setAlignmentY(1.0F);
+                btnResetSplitpane.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnResetSplitpaneActionPerformed(e);
+                    }
+                });
+                panel2.add(btnResetSplitpane);
+
+                //---- statusBar ----
+                statusBar.setBackground(new Color(238, 238, 238));
+                statusBar.setAlignmentY(1.0F);
+                panel2.add(statusBar);
+            }
+            pnlMain.add(panel2, CC.xywh(3, 7, 4, 1, CC.FILL, CC.BOTTOM));
         }
         contentPane.add(pnlMain);
         setSize(945, 695);
@@ -1018,6 +1046,8 @@ public class FrmMain extends JFrame {
     private JPanel pnlWait;
     private JLabel lblWait;
     private JProgressBar pbTimeout;
+    private JPanel panel2;
+    private JButton btnResetSplitpane;
     private StatusBar statusBar;
     // End of variables declaration//GEN-END:variables
 

@@ -55,7 +55,7 @@ public class AllowanceTools {
         int elementNumber = 1;
         boolean pagebreak = false;
 
-        String header = SYSTools.xx(PnlAllowance.internalClassID + ".printheader") + " " + ResidentTools.getLabelText(resident);
+        String header = SYSTools.xx("admin.residents.cash.printheader") + " " + ResidentTools.getLabelText(resident);
 
         String html = "";
 
@@ -280,7 +280,7 @@ public class AllowanceTools {
     public static String getOverallSumAsHTML(int monthsback) {
         DecimalFormat cf = new DecimalFormat("######.00");
         Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
-        String html = "<h1  align=\"center\" id=\"fonth1\">" + SYSTools.xx(PnlAllowance.internalClassID + ".overallsum") + "</h1>";
+        String html = "<h1  align=\"center\" id=\"fonth1\">" + SYSTools.xx("admin.residents.cash.overallsum") + "</h1>";
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.pit <= :end");

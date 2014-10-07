@@ -229,7 +229,7 @@ public class GUITools {
     }
 
     private static Point centerOnScreen(JidePopup popup) {
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        GraphicsDevice gd = getCurrentScreen(OPDE.getMainframe());
         int width = gd.getDisplayMode().getWidth();
         int height = gd.getDisplayMode().getHeight();
 
@@ -247,6 +247,8 @@ public class GUITools {
         Container content = popup.getContentPane();
 
         final Point screenposition = new Point(popup.getOwner().getLocationOnScreen().x, popup.getOwner().getLocationOnScreen().y);
+//        Point screenposition = new Point(popup.getOwner().getLocation());
+//        SwingUtilities.convertPointToScreen(screenposition, OPDE.getMainframe());
 
         int x = screenposition.x;
         int y = screenposition.y;
@@ -300,7 +302,10 @@ public class GUITools {
     }
 
     public static boolean isFullyVisibleOnScreen(JidePopup popup, Point point) {
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+//        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+        GraphicsDevice gd = getCurrentScreen(OPDE.getMainframe());
+
         int width = gd.getDisplayMode().getWidth();
         int height = gd.getDisplayMode().getHeight();
 
@@ -1049,4 +1054,58 @@ public class GUITools {
 //       g2d.drawImage(myImage, 10, 10, null);
 //       g2d.drawImage(bufferedImage, null, 300, 10);
 //     }
+
+    /**
+     *
+     *
+     * http://stackoverflow.com/questions/2234476/how-to-detect-the-current-display-with-java
+     * @param myWindow
+     * @return
+     */
+    public static GraphicsDevice getCurrentScreen(JFrame myWindow){
+
+        GraphicsConfiguration config = myWindow.getGraphicsConfiguration();
+        return config.getDevice();
+//        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//        // AFAIK - there are no guarantees that screen devices are in order...
+//        // but they have been on every system I've used.
+//        GraphicsDevice[] allScreens = env.getScreenDevices();
+//        int myScreenIndex = -1;
+//        for (int i = 0; i < allScreens.length; i++) {
+//            if (allScreens[i].equals(myScreen))
+//            {
+//                myScreenIndex = i;
+//                break;
+//            }
+//        }
+////        System.out.println("window is on screen" + myScreenIndex);
+//        return myScreenIndex;
+    }
+
+    public static Rectangle getScreenSize(GraphicsDevice myScreen){
+        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        // AFAIK - there are no guarantees that screen devices are in order...
+        // but they have been on every system I've used.
+        GraphicsDevice[] allScreens = env.getScreenDevices();
+        int myScreenIndex = -1;
+        for (int i = 0; i < allScreens.length; i++) {
+            if (allScreens[i].equals(myScreen))
+            {
+                myScreenIndex = i;
+                break;
+            }
+        }
+//        System.out.println("window is on screen" + myScreenIndex);
+
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[myScreenIndex].getDefaultConfiguration().getBounds();
+
+
+    }
+
+
+
+
 }
+
+

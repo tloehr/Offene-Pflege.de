@@ -31,6 +31,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
@@ -531,11 +532,11 @@ public class PnlInformation extends NursingRecordsPanel {
                                         btnAdd.addActionListener(new ActionListener() {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
-                                                final JidePopup popup = new JidePopup();
+//                                                final JidePopup popup = new JidePopup();
                                                 PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(new ResInfo(resInfoType, resident), new Closure() {
                                                     @Override
                                                     public void execute(Object o) {
-                                                        popup.hidePopup();
+//                                                        popup.hidePopup();
                                                         if (o != null) {
 
                                                             EntityManager em = OPDE.createEM();
@@ -609,17 +610,22 @@ public class PnlInformation extends NursingRecordsPanel {
                                                 }, resInfoType.getResInfoCat().getColor());
                                                 pnlEditResInfo.setEnabled(true, PnlEditResInfo.NEW);
 
-                                                popup.setMovable(false);
-                                                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                                                JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());
-                                                //scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight()) - 100));
-                                                scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight())));
-
-                                                popup.setOwner(btnAdd);
-                                                popup.removeExcludedComponent(btnAdd);
-                                                popup.getContentPane().add(scrl);
-                                                popup.setDefaultFocusComponent(scrl);
-                                                GUITools.showPopup(popup, SwingConstants.CENTER);
+                                                MyJDialog dlgPopup = new MyJDialog(true);
+                                                dlgPopup.getContentPane().setLayout(new BoxLayout(dlgPopup.getContentPane(), BoxLayout.X_AXIS));
+                                                dlgPopup.getContentPane().add(new JScrollPane(pnlEditResInfo.getPanel()));
+                                                dlgPopup.pack();
+                                                dlgPopup.setVisible(true);
+//                                                popup.setMovable(false);
+//                                                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+//                                                JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());
+//                                                //scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight()) - 100));
+//                                                scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight())));
+//
+//                                                popup.setOwner(btnAdd);
+//                                                popup.removeExcludedComponent(btnAdd);
+//                                                popup.getContentPane().add(scrl);
+//                                                popup.setDefaultFocusComponent(scrl);
+//                                                GUITools.showPopup(popup, SwingConstants.CENTER);
                                             }
                                         });
                                         cpsType.add(btnAdd);
@@ -959,7 +965,21 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
                 btnPrint.setEnabled(false);
                 btnMenu.setEnabled(false);
-                mapInfo2Editor.get(resInfo).setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints(), PnlEditResInfo.CHANGE);
+                boolean canBeEnabled = resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints();
+
+                if (canBeEnabled) {
+                    CollectionUtils.forAllDo(mapInfo2Editor.entrySet(), new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            PnlEditResInfo pnlEditResInfo = (PnlEditResInfo) o;
+                            if (pnlEditResInfo.isEnabled()){
+                                pnlEditResInfo.cancel();
+                            }
+                        }
+                    });
+                }
+
+                mapInfo2Editor.get(resInfo).setEnabled(canBeEnabled, PnlEditResInfo.CHANGE);
                 final boolean wasChangeable = btnChange.isEnabled();
                 btnChange.setEnabled(false);
                 final boolean wasEditable = btnEdit.isEnabled();
@@ -991,7 +1011,7 @@ public class PnlInformation extends NursingRecordsPanel {
 //                                    mapInfo2Editor.get(resInfo).getResInfo()
                                         em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                         // so that no conflicts can occur if another user enters a new info at the same time
-                                        // todo: leave it for now. BUT this must be changed. You will also conflict with ANY other info for any other resident. You will need an auxiliary locking table like (id, rid, BWINFTYP, VERSION) and lock the records there.
+                                        // todo: leave it for now. BUT this must be changed. You will also conflict with ANY other info for any other resident. You will need an auxiliary locking table like (id, rid, BWINFTYP, VERSION) and lock the records there. The same goes for the allowances.
                                         //
                                         em.lock(em.merge(resInfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                         em.lock(oldinfo, LockModeType.OPTIMISTIC);

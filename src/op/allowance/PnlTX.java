@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
 /**
  * @author Torsten Löhr
@@ -99,6 +100,7 @@ public class PnlTX extends JPanel {
         if (e.getStateChange() == ItemEvent.SELECTED) {
             ResInfo firstStay = ResInfoTools.getFirstResinfo((Resident) e.getItem(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
             min = firstStay == null ? new LocalDate().dayOfMonth().withMinimumValue() : new LocalDate(firstStay.getFrom());
+            txtDate.setText(new LocalDate().toString("dd.MM.yyyy"));
         }
     }
 
@@ -227,15 +229,19 @@ public class PnlTX extends JPanel {
             txtText.setText(tx.getText());
         }
 
+
+        ResInfo firstStay = null;
         if (tx.getResident() != null) {
             cmbResident.setModel(new DefaultComboBoxModel<Resident>(new Resident[]{tx.getResident()}));
-            //cmbResident.setEditable(false);
+            firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         } else {
-            cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getAllActive()));
-            //cmbResident.setEditable(true);
+            ArrayList<Resident> list = ResidentTools.getAllActive();
+            cmbResident.setModel(SYSTools.list2cmb(list));
+            if (!list.isEmpty()) {
+                firstStay = ResInfoTools.getFirstResinfo(list.get(0), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+            }
         }
 
-        ResInfo firstStay = (cmbResident.getSelectedItem() == null ? null : ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY)));
         min = (firstStay == null ? new LocalDate().dayOfMonth().withMinimumValue() : new LocalDate(firstStay.getFrom()));
 
         setFocusCycleRoot(true);

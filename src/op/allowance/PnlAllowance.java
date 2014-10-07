@@ -47,7 +47,9 @@ import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import org.joda.time.Period;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -76,7 +78,6 @@ public class PnlAllowance extends CleanablePanel {
     NumberFormat cf = NumberFormat.getCurrencyInstance();
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
 
-    private Resident currentResident;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JXSearchField txtSearch;
@@ -119,13 +120,12 @@ public class PnlAllowance extends CleanablePanel {
         minmax = new HashMap<>();
 
         lstResidents = ResidentTools.getAllActive();
-        currentResident = null;
-        OPDE.getMainframe().setCurrentResident(currentResident);
     }
 
     @Override
     public void reload() {
-        cleanup();
+        lstResidents.clear();
+        lstResidents = ResidentTools.getAllActive();
         reloadDisplay();
     }
 
@@ -138,6 +138,7 @@ public class PnlAllowance extends CleanablePanel {
         cpMap.clear();
         contentmap.clear();
         carrySums.clear();
+        minmax.clear();
     }
 
     private void initComponents() {
@@ -182,6 +183,8 @@ public class PnlAllowance extends CleanablePanel {
         cashmap.clear();
         cpMap.clear();
         contentmap.clear();
+        carrySums.clear();
+        minmax.clear();
 
         if (withworker) {
 
@@ -205,11 +208,7 @@ public class PnlAllowance extends CleanablePanel {
 
                 @Override
                 protected void done() {
-                    if (currentResident != null) {
-                        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(currentResident));
-                    } else {
-                        OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
-                    }
+                    OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
                     buildPanel();
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
@@ -222,11 +221,14 @@ public class PnlAllowance extends CleanablePanel {
             for (Resident resident : lstResidents) {
                 createCP4(resident);
             }
-            if (currentResident != null) {
-                OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(currentResident));
-            } else {
-                OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
-            }
+
+            OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
+
+//            if (currentResident != null) {
+//                OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(currentResident));
+//            } else {
+//                OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
+//            }
             buildPanel();
         }
 
@@ -303,7 +305,7 @@ public class PnlAllowance extends CleanablePanel {
             btnPrintResident.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, currentResident), true);
+                    SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, resident), true);
                 }
 
 
@@ -375,12 +377,6 @@ public class PnlAllowance extends CleanablePanel {
 
             LocalDate start = SYSCalendar.bom(minmax.get(resident).getFirst());
             LocalDate end = resident.isActive() ? new LocalDate() : SYSCalendar.eom(minmax.get(resident).getSecond());
-
-            if (!resident.equals(currentResident)) {
-                OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
-                currentResident = resident;
-                OPDE.getMainframe().setCurrentResident(currentResident);
-            }
 
             CollapsiblePane cpArchive = new CollapsiblePane(SYSTools.xx("admin.residents.cash.archive"));
             try {
@@ -478,7 +474,7 @@ public class PnlAllowance extends CleanablePanel {
                 if (!carrySums.containsKey(carry4printKey)) {
                     carrySums.put(carry4printKey, AllowanceTools.getSUM(resident, SYSCalendar.eoy(start.minusYears(1))));
                 }
-                SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carrySums.get(carry4printKey), currentResident), true);
+                SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carrySums.get(carry4printKey), resident), true);
             }
 
 
@@ -503,11 +499,6 @@ public class PnlAllowance extends CleanablePanel {
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
 
-                if (!resident.equals(currentResident)) {
-                    OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
-                    currentResident = resident;
-                    OPDE.getMainframe().setCurrentResident(currentResident);
-                }
 
                 // somebody clicked on the year
                 // monthly informations will be generated. even if there
@@ -602,7 +593,7 @@ public class PnlAllowance extends CleanablePanel {
                 }
 
                 final BigDecimal carry4print = AllowanceTools.getSUM(resident, SYSCalendar.eom(month.minusMonths(1)));
-                SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry4print, currentResident), true);
+                SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry4print, resident), true);
             }
         });
 
@@ -625,11 +616,6 @@ public class PnlAllowance extends CleanablePanel {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
 
-                if (!resident.equals(currentResident)) {
-                    OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
-                    currentResident = resident;
-                    OPDE.getMainframe().setCurrentResident(currentResident);
-                }
 
                 cpMonth.setContentPane(createContentPanel4(resident, month));
                 cpMonth.setOpaque(false);
@@ -689,8 +675,6 @@ public class PnlAllowance extends CleanablePanel {
                     cmbResident.setModel(SYSTools.list2cmb(listSearchResidents));
                     lstResidents = new ArrayList<Resident>();
                     lstResidents.add((Resident) cmbResident.getSelectedItem());
-                    currentResident = (Resident) cmbResident.getSelectedItem();
-                    OPDE.getMainframe().setCurrentResident(currentResident);
                     reloadDisplay();
                 } else {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.nodata"));
@@ -708,8 +692,6 @@ public class PnlAllowance extends CleanablePanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     lstResidents = new ArrayList<Resident>();
                     lstResidents.add((Resident) e.getItem());
-                    currentResident = (Resident) e.getItem();
-                    OPDE.getMainframe().setCurrentResident(currentResident);
                     reloadDisplay();
                 }
             }
@@ -721,8 +703,6 @@ public class PnlAllowance extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 lstResidents = ResidentTools.getAllActive();
-                currentResident = null;
-                OPDE.getMainframe().setCurrentResident(currentResident);
                 reloadDisplay();
             }
         });
@@ -734,8 +714,6 @@ public class PnlAllowance extends CleanablePanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     lstResidents = ResidentTools.getAllInactive();
-                    currentResident = null;
-                    OPDE.getMainframe().setCurrentResident(currentResident);
                     reloadDisplay();
                 }
             });
@@ -748,8 +726,6 @@ public class PnlAllowance extends CleanablePanel {
                     lstResidents = ResidentTools.getAllInactive();
                     lstResidents.addAll(ResidentTools.getAllActive());
                     Collections.sort(lstResidents);
-                    currentResident = null;
-                    OPDE.getMainframe().setCurrentResident(currentResident);
                     reloadDisplay();
                 }
             });
@@ -1161,10 +1137,10 @@ public class PnlAllowance extends CleanablePanel {
 
 
     private PnlTX getPnlTX(Resident resident, final Allowance allowance) {
+        final BigDecimal editAmount = allowance != null ? allowance.getAmount() : null;
+        final Allowance allow = (allowance == null ? new Allowance(resident) : allowance);
 
-        Allowance all = (allowance == null ? new Allowance(resident) : allowance);
-
-        return new PnlTX(all, new Closure() {
+        return new PnlTX(allow, new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
@@ -1199,6 +1175,11 @@ public class PnlAllowance extends CleanablePanel {
                             Collections.sort(cashmap.get(keyMonth));
                         }
 
+                        // little trick to fix the carries
+                        if (editAmount != null) {
+                            updateCarrySums(myAllowance.getResident(), new LocalDate(myAllowance.getPit()), editAmount.negate());
+                        }
+                        // add the new / edited amount
                         updateCarrySums(myAllowance);
 
                         createCP4(myAllowance.getResident());
@@ -1248,25 +1229,56 @@ public class PnlAllowance extends CleanablePanel {
     }
 
     private void updateCarrySums(Allowance myAllowance) {
-        String prevKey = getKey(myAllowance.getResident(), SYSCalendar.eom(new LocalDate(myAllowance.getPit()).minusMonths(1)));
+//        String prevKey = getKey(myAllowance.getResident(), SYSCalendar.eom(new LocalDate(myAllowance.getPit()).minusMonths(1)));
+//        if (!carrySums.containsKey(prevKey)) {
+//            carrySums.put(prevKey, AllowanceTools.getSUM(myAllowance.getResident(), SYSCalendar.eom(new LocalDate(myAllowance.getPit()).minusMonths(1))));
+//        }
+//
+//        // update carrysums
+//        for (LocalDate month = SYSCalendar.eom(new LocalDate(myAllowance.getPit())); month.compareTo(SYSCalendar.eoy(new LocalDate())) <= 0; month = SYSCalendar.eom(month.plusMonths(1))) {
+//            OPDE.debug(month.toString("yyyy-MM-dd"));
+//            final String key = getKey(myAllowance.getResident(), month);
+//
+//            if (!carrySums.containsKey(key)) {
+//                prevKey = getKey(myAllowance.getResident(), SYSCalendar.eom(month.minusMonths(1)));
+//                carrySums.put(key, carrySums.get(prevKey).add(myAllowance.getAmount()));
+//            } else {
+//                carrySums.put(key, carrySums.get(key).add(myAllowance.getAmount()));
+//            }
+//
+//            contentmap.remove(key);
+//        }
+        updateCarrySums(myAllowance.getResident(), new LocalDate(myAllowance.getPit()), myAllowance.getAmount());
+    }
+
+    private void updateCarrySums(Resident resident, LocalDate pit, BigDecimal amount) {
+        String prevKey = getKey(resident, SYSCalendar.eom(pit.minusMonths(1)));
         if (!carrySums.containsKey(prevKey)) {
-            carrySums.put(prevKey, AllowanceTools.getSUM(myAllowance.getResident(), SYSCalendar.eom(new LocalDate(myAllowance.getPit()).minusMonths(1))));
+            carrySums.put(prevKey, AllowanceTools.getSUM(resident, SYSCalendar.eom(pit).minusMonths(1)));
         }
 
         // update carrysums
-        for (LocalDate month = SYSCalendar.eom(new LocalDate(myAllowance.getPit())); month.compareTo(SYSCalendar.eoy(new LocalDate())) <= 0; month = SYSCalendar.eom(month.plusMonths(1))) {
+        for (LocalDate month = SYSCalendar.eom(pit); month.compareTo(SYSCalendar.eoy(new LocalDate())) <= 0; month = SYSCalendar.eom(month.plusMonths(1))) {
             OPDE.debug(month.toString("yyyy-MM-dd"));
-            final String key = getKey(myAllowance.getResident(), month);
+            final String key = getKey(resident, month);
 
             if (!carrySums.containsKey(key)) {
-                prevKey = getKey(myAllowance.getResident(), SYSCalendar.eom(month.minusMonths(1)));
-                carrySums.put(key, carrySums.get(prevKey).add(myAllowance.getAmount()));
+                prevKey = getKey(resident, SYSCalendar.eom(month.minusMonths(1)));
+                carrySums.put(key, carrySums.get(prevKey).add(amount));
             } else {
-                carrySums.put(key, carrySums.get(key).add(myAllowance.getAmount()));
+                carrySums.put(key, carrySums.get(key).add(amount));
             }
 
             contentmap.remove(key);
         }
-    }
 
+        // fix minmax interval
+        Interval myMinMax = new Interval(minmax.get(resident).getFirst().toDateTimeAtStartOfDay(), SYSCalendar.eod(minmax.get(resident).getSecond()));
+        if (myMinMax.isBefore(pit.toDateTimeAtCurrentTime())){
+            minmax.put(resident, new Pair(minmax.get(resident).getFirst(), SYSCalendar.eom(pit)));
+        } else if (myMinMax.isAfter(pit.toDateTimeAtCurrentTime())){
+            minmax.put(resident, new Pair(SYSCalendar.bom(pit), minmax.get(resident).getSecond()));
+        }
+
+    }
 }
