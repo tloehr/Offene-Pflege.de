@@ -4,7 +4,6 @@
 
 package op.settings;
 
-import javax.swing.event.*;
 import com.enterprisedt.net.ftp.FileTransferClient;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -22,6 +21,8 @@ import entity.info.ICD;
 import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.prescription.MedStock;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.system.*;
@@ -32,19 +33,19 @@ import org.apache.commons.collections.Closure;
 import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.Query;
-import javax.persistence.RollbackException;
+import javax.persistence.*;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -65,14 +66,141 @@ public class PnlSystemSettings extends CleanablePanel {
     private JToggleButton tbauth, tbtls, tbstarttls, tbactive, tbCalcMed;
     private DefaultListModel<File> dlmICDFiles;
     private ArrayList<ICD> listICDs;
+    private JScrollPane jspSearch;
+    private CollapsiblePanes searchPanes;
 
     public PnlSystemSettings(JScrollPane jspSearch) {
-        jspSearch.setViewportView(new JPanel());
+        this.jspSearch = jspSearch;
         cpMap = new HashMap<String, CollapsiblePane>();
         cpPanel = new HashMap<String, JPanel>();
         listICDs = new ArrayList<>();
         initComponents();
         initPanel();
+    }
+
+
+    private void prepareSearchArea() {
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+        GUITools.addAllComponents(mypanel, addCommands());
+
+        searchPane.setContentPane(mypanel);
+
+        searchPanes.add(searchPane);
+        searchPanes.addExpansion();
+
+    }
+
+
+    private java.util.List<Component> addCommands() {
+
+        java.util.List<Component> list = new ArrayList<Component>();
+
+
+        final JideButton btnCommontags = GUITools.createHyperlinkButton(SYSTools.xx("opde.settings.global.btnCommontags"), SYSConst.icon22add, null);
+        btnCommontags.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+//                ArrayList list = new ArrayList();
+                final JPanel selPanel = new JPanel();
+                selPanel.setLayout(new BoxLayout(selPanel, BoxLayout.PAGE_AXIS));
+
+                for (final Commontags tags : CommontagsTools.getAll()) {
+                    if (tags.getType() == CommontagsTools.TYPE_SYS_USER) {
+                        final JPanel pnl = new JPanel(new BorderLayout());
+                        pnl.add(new JLabel(tags.getText()), BorderLayout.CENTER);
+                        JButton btn = new JButton(SYSConst.icon16delete);
+                        btn.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent ae) {
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+
+
+                                    Commontags myTag = em.merge(tags);
+
+                                    em.remove(myTag);
+
+                                    em.getTransaction().commit();
+
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            selPanel.remove(pnl);
+                                            selPanel.revalidate();
+                                            selPanel.repaint();
+                                        }
+                                    });
+
+
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
+
+                            }
+                        });
+                        pnl.add(btn, BorderLayout.EAST);
+
+                        selPanel.add(pnl);
+                    }
+                }
+
+                final MyJDialog dlg = new MyJDialog(false);
+
+                JButton btnClose = new JButton(SYSConst.icon16cancel);
+                btnClose.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dlg.dispose();
+                    }
+                });
+
+                selPanel.add(btnClose, BorderLayout.SOUTH);
+
+                dlg.setContentPane(new JScrollPane(selPanel));
+                dlg.pack();
+                dlg.setSize(new Dimension(selPanel.getPreferredSize().width, 450));
+                dlg.setVisible(true);
+            }
+        });
+        list.add(btnCommontags);
+
+
+        return list;
     }
 
     private void btnTestLabelActionPerformed(ActionEvent e) {
@@ -129,6 +257,7 @@ public class PnlSystemSettings extends CleanablePanel {
             initGlobal();
         } else {
             initLocal();
+
         }
     }
 
@@ -138,6 +267,8 @@ public class PnlSystemSettings extends CleanablePanel {
         cmbPhysicalPrinters.setModel(new DefaultComboBoxModel());
         cmbForm.setModel(new DefaultComboBoxModel());
         cmbLogicalPrinters.setModel(new DefaultComboBoxModel());
+
+        jspSearch.setViewportView(new JPanel());
 
         PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null);
 
@@ -278,7 +409,7 @@ public class PnlSystemSettings extends CleanablePanel {
         spinTimeout.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                OPDE.setTimeout( (Integer) spinTimeout.getValue());
+                OPDE.setTimeout((Integer) spinTimeout.getValue());
             }
         });
         pnlLocal.add(spinTimeout, CC.xy(7, 9));
@@ -296,6 +427,9 @@ public class PnlSystemSettings extends CleanablePanel {
         createMailSystem();
         createFTPSystem();
         createCalcMed();
+
+        prepareSearchArea();
+
     }
 
     private void createCatList() {
@@ -1154,8 +1288,8 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlLocal ========
             {
                 pnlLocal.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
+                        "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+                        "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
 
                 //---- lblPrinters ----
                 lblPrinters.setText("labelPrinter");
@@ -1240,8 +1374,8 @@ public class PnlSystemSettings extends CleanablePanel {
                 //======== pnlGlobal ========
                 {
                     pnlGlobal.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
-                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
+                            "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
+                            "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
 
                     //======== panel5 ========
                     {
@@ -1286,8 +1420,8 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlICD ========
                     {
                         pnlICD.setLayout(new FormLayout(
-                            "default:grow, default",
-                            "fill:default:grow, $lgap, 60dlu, $lgap, default"));
+                                "default:grow, default",
+                                "fill:default:grow, $lgap, 60dlu, $lgap, default"));
 
                         //======== scrollPane1 ========
                         {
@@ -1324,8 +1458,8 @@ public class PnlSystemSettings extends CleanablePanel {
                         //======== pnlMail ========
                         {
                             pnlMail.setLayout(new FormLayout(
-                                "default, $lcgap, default:grow",
-                                "13*(default, $lgap), default"));
+                                    "default, $lcgap, default:grow",
+                                    "13*(default, $lgap), default"));
 
                             //---- lblMailHost ----
                             lblMailHost.setText("host");
@@ -1452,16 +1586,16 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlCalcMed ========
                     {
                         pnlCalcMed.setLayout(new FormLayout(
-                            "default:grow",
-                            "2*(default, $lgap), default"));
+                                "default:grow",
+                                "2*(default, $lgap), default"));
                     }
                     pnlGlobal.add(pnlCalcMed, CC.xy(7, 14));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                            "default, $lcgap, default:grow",
-                            "5*(default, $lgap), default"));
+                                "default, $lcgap, default:grow",
+                                "5*(default, $lgap), default"));
 
                         //---- lblFTPServer ----
                         lblFTPServer.setText("host");
@@ -1571,7 +1705,6 @@ public class PnlSystemSettings extends CleanablePanel {
         lblHomes.setText(SYSTools.xx("opde.settings.global.homes"));
         lblCat.setText(SYSTools.xx("opde.settings.global.categories"));
         tabMainStateChanged(null);
-
 
     }
 

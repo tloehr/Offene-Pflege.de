@@ -971,7 +971,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     CollectionUtils.forAllDo(mapInfo2Editor.entrySet(), new Closure() {
                         @Override
                         public void execute(Object o) {
-                            PnlEditResInfo pnlEditResInfo = (PnlEditResInfo) o;
+                            PnlEditResInfo pnlEditResInfo = ((Map.Entry<ResInfo, PnlEditResInfo>) o).getValue();
                             if (pnlEditResInfo.isEnabled()){
                                 pnlEditResInfo.cancel();
                             }

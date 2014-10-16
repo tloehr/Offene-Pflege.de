@@ -644,7 +644,6 @@ public class PnlWelcome extends CleanablePanel {
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlInformation.internalClassID)) { // => ACLMATRIX
             JideButton addbw = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome.addbw"), SYSConst.icon22addbw, null);
-//            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
 
             addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -671,7 +670,6 @@ public class PnlWelcome extends CleanablePanel {
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID)) {
             JideButton editInterventions = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome.editInterventions"), SYSConst.icon22work, null);
-            //            final MyJDialog dlg = new MyJDialog();
             editInterventions.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editInterventions.setAlignmentX(Component.LEFT_ALIGNMENT);
             editInterventions.addActionListener(new ActionListener() {

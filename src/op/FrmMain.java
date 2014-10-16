@@ -1029,6 +1029,13 @@ public class FrmMain extends JFrame {
     }
 
 
+    public Point getLocationForDialog(Dimension dimOfDialog) {
+        Point point = new Point((getSize().width - dimOfDialog.width) / 2, pnlMainMessage.getHeight() + 10);
+        SwingUtilities.convertPointToScreen(point, this);
+        return point;
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlMain;
     private JPanel pnlMainMessage;

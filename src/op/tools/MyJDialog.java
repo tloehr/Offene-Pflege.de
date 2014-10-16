@@ -69,4 +69,9 @@ public class MyJDialog extends JDialog {
         setVisible(false);
     }
 
+    @Override
+    public void setVisible(boolean b) {
+        setLocation(OPDE.getMainframe().getLocationForDialog(getSize()));
+        super.setVisible(b);
+    }
 }
