@@ -21,8 +21,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.ByteArrayOutputStream;
@@ -165,7 +163,7 @@ public class GUITools {
     }
 
 
-    public static JButton getTinyButton(String tooltip, Icon icon){
+    public static JButton getTinyButton(String tooltip, Icon icon) {
         JButton jButton = new JButton(icon);
         jButton.setContentAreaFilled(false);
         jButton.setBorder(null);
@@ -259,9 +257,14 @@ public class GUITools {
                 y = screenposition.y;
                 break;
             }
+            case SwingConstants.SOUTH: {
+                x = screenposition.x;
+                y = screenposition.y + popup.getOwner().getPreferredSize().height;
+                break;
+            }
             case SwingConstants.SOUTH_EAST: {
                 x = screenposition.x + popup.getOwner().getPreferredSize().width;
-                y = screenposition.y;
+                y = screenposition.y + popup.getOwner().getPreferredSize().height;
                 break;
             }
             case SwingConstants.NORTH_EAST: {
@@ -961,6 +964,7 @@ public class GUITools {
      * creates a blend between two colors. The float specifies where the balance is.
      * the more towards 1.0 emphasizes the <b>first</b> color.
      * the more towards 0.0 emphasizes the <b>second</b> color.
+     *
      * @param clOne
      * @param clTwo
      * @param fAmount
@@ -1056,13 +1060,12 @@ public class GUITools {
 //     }
 
     /**
-     *
-     *
      * http://stackoverflow.com/questions/2234476/how-to-detect-the-current-display-with-java
+     *
      * @param myWindow
      * @return
      */
-    public static GraphicsDevice getCurrentScreen(JFrame myWindow){
+    public static GraphicsDevice getCurrentScreen(JFrame myWindow) {
 
         GraphicsConfiguration config = myWindow.getGraphicsConfiguration();
         return config.getDevice();
@@ -1082,7 +1085,7 @@ public class GUITools {
 //        return myScreenIndex;
     }
 
-    public static Rectangle getScreenSize(GraphicsDevice myScreen){
+    public static Rectangle getScreenSize(GraphicsDevice myScreen) {
         GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
         // AFAIK - there are no guarantees that screen devices are in order...
@@ -1090,8 +1093,7 @@ public class GUITools {
         GraphicsDevice[] allScreens = env.getScreenDevices();
         int myScreenIndex = -1;
         for (int i = 0; i < allScreens.length; i++) {
-            if (allScreens[i].equals(myScreen))
-            {
+            if (allScreens[i].equals(myScreen)) {
                 myScreenIndex = i;
                 break;
             }
@@ -1102,8 +1104,6 @@ public class GUITools {
 
 
     }
-
-
 
 
 }

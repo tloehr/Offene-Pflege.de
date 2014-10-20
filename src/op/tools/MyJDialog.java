@@ -49,8 +49,8 @@ public class MyJDialog extends JDialog {
         // makes sure, that the dialog is never larger than the screen in use.
         Rectangle maximumsize = GUITools.getScreenSize(GUITools.getCurrentScreen(OPDE.getMainframe()));
         Dimension dim = super.getPreferredSize();
-        if (dim.width > maximumsize.width) dim.width = maximumsize.width;
-        if (dim.height > maximumsize.height) dim.height = maximumsize.height;
+        if (dim.getWidth() > maximumsize.getWidth() * 0.9) dim.setSize(maximumsize.getWidth() * 0.9, dim.getHeight());
+        if (dim.getHeight() > maximumsize.getHeight() * 0.9) dim.setSize(dim.getWidth(), maximumsize.getHeight() * 0.9);
         return dim;
     }
 

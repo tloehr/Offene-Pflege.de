@@ -528,15 +528,15 @@ public class PnlInformation extends NursingRecordsPanel {
                                             }
                                         }
 
+                                        final MyJDialog dlgPopup = new MyJDialog(true);
                                         final JideButton btnAdd = GUITools.createHyperlinkButton(buttonText, SYSConst.icon22add, null);
                                         btnAdd.addActionListener(new ActionListener() {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
-//                                                final JidePopup popup = new JidePopup();
                                                 PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(new ResInfo(resInfoType, resident), new Closure() {
                                                     @Override
                                                     public void execute(Object o) {
-//                                                        popup.hidePopup();
+                                                        dlgPopup.dispose();
                                                         if (o != null) {
 
                                                             EntityManager em = OPDE.createEM();
@@ -610,22 +610,10 @@ public class PnlInformation extends NursingRecordsPanel {
                                                 }, resInfoType.getResInfoCat().getColor());
                                                 pnlEditResInfo.setEnabled(true, PnlEditResInfo.NEW);
 
-                                                MyJDialog dlgPopup = new MyJDialog(true);
                                                 dlgPopup.getContentPane().setLayout(new BoxLayout(dlgPopup.getContentPane(), BoxLayout.X_AXIS));
                                                 dlgPopup.getContentPane().add(new JScrollPane(pnlEditResInfo.getPanel()));
                                                 dlgPopup.pack();
                                                 dlgPopup.setVisible(true);
-//                                                popup.setMovable(false);
-//                                                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-//                                                JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());
-//                                                //scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight()) - 100));
-//                                                scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight())));
-//
-//                                                popup.setOwner(btnAdd);
-//                                                popup.removeExcludedComponent(btnAdd);
-//                                                popup.getContentPane().add(scrl);
-//                                                popup.setDefaultFocusComponent(scrl);
-//                                                GUITools.showPopup(popup, SwingConstants.CENTER);
                                             }
                                         });
                                         cpsType.add(btnAdd);
@@ -972,7 +960,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             PnlEditResInfo pnlEditResInfo = ((Map.Entry<ResInfo, PnlEditResInfo>) o).getValue();
-                            if (pnlEditResInfo.isEnabled()){
+                            if (pnlEditResInfo.isEnabled()) {
                                 pnlEditResInfo.cancel();
                             }
                         }

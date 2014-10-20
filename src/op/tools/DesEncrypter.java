@@ -61,22 +61,22 @@ public class DesEncrypter {
         }
     }
 
-    public String encrypt(String str) {
-        try {
-
-            // Encode the string into bytes using utf-8
-            byte[] utf8 = str.getBytes("UTF8");
-
-            // Encrypt
-            byte[] enc = ecipher.doFinal(utf8);
-
-            // Encode bytes to base64 to get a string
-            return new sun.misc.BASE64Encoder().encode(enc);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    public String encrypt(String str) {
+//        try {
+//
+//            // Encode the string into bytes using utf-8
+//            byte[] utf8 = str.getBytes("UTF8");
+//
+//            // Encrypt
+//            byte[] enc = ecipher.doFinal(utf8);
+//
+//            // Encode bytes to base64 to get a string
+//            return new sun.misc.BASE64Encoder().encode(enc);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     public String decrypt(String str) throws Exception {
 
