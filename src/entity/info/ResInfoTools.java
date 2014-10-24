@@ -2,7 +2,6 @@ package entity.info;
 
 import entity.HomesTools;
 import entity.Station;
-import entity.nursingprocess.NursingProcess;
 import entity.prescription.GPTools;
 import entity.prescription.PrescriptionTools;
 import entity.process.QProcessElement;
@@ -1554,8 +1553,10 @@ public class ResInfoTools {
         return html.toString();
     }
 
-    public static String getFallsIndicatorsByMonth(int monthsback, Closure progress) {
+    public static String getFallsIndicatorsByMonth(int monthsback, Closure progress) throws Exception {
         StringBuilder html = new StringBuilder(1000);
+
+
         LocalDate from = SYSCalendar.bom(new LocalDate().minusMonths(monthsback));
         Interval interval = new Interval(from.toDateTimeAtStartOfDay(), SYSCalendar.eom(new LocalDate()).toDateTimeAtCurrentTime());
         DateFormat df = DateFormat.getDateInstance();
@@ -1581,6 +1582,7 @@ public class ResInfoTools {
         }
 
         html.append(SYSConst.html_table(tableContent, "1"));
+
         return html.toString();
     }
 

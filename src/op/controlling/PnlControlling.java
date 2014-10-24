@@ -74,6 +74,7 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * ACL
@@ -412,8 +413,7 @@ public class PnlControlling extends CleanablePanel {
         }
 
         cpOrga.setHorizontalAlignment(SwingConstants.LEADING);
-//        cpOrga.setOpaque(false);
-//        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
+
 
         return cpOrga;
     }
@@ -569,7 +569,7 @@ public class PnlControlling extends CleanablePanel {
         } catch (NumberFormatException nfe) {
             fallsIndicatorBack = 7;
         }
-        final JTextField txtFallsIndicatorsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsResMonthsBack);
+        final JTextField txtFallsIndicatorsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsIndicatorBack);
         txtFallsIndicatorsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
 
         btnFallsIndicator.addActionListener(new ActionListener() {
@@ -580,18 +580,28 @@ public class PnlControlling extends CleanablePanel {
                     @Override
                     protected Object doInBackground() throws Exception {
                         SYSPropsTools.storeProp("opde.controlling::fallsIndicatorMonthsBack", txtFallsIndicatorsMonthsBack.getText(), OPDE.getLogin().getUser());
-                        SYSFilesTools.print(ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure), false);
-                        //                        ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure);
-                        return null;
+                        return ResInfoTools.getFallsIndicatorsByMonth(Integer.parseInt(txtFallsIndicatorsMonthsBack.getText()), progressClosure);
                     }
 
                     @Override
                     protected void done() {
+                        try {
+                            SYSFilesTools.print(get().toString(), true);
+                        } catch (ExecutionException ee) {
+                            OPDE.fatal(ee);
+                        } catch (InterruptedException ie) {
+                            // nop
+                        }
+
+
                         OPDE.getDisplayManager().setProgressBarMessage(null);
                         OPDE.getMainframe().setBlocked(false);
                     }
                 };
+
                 worker.execute();
+
+
             }
         });
         pnlFallsIndicator.add(btnFallsIndicator, BorderLayout.WEST);
