@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 @Entity
 @Table(name = "commontags")
-public class Commontags {
+public class Commontags implements Comparable<Commontags> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,6 +66,8 @@ public class Commontags {
         this.color = color;
     }
 
+    //TODO: add a sorter row
+
     @ManyToMany(mappedBy = "commontags")
     private Collection<Training> trainings;
 
@@ -115,6 +117,16 @@ public class Commontags {
         result = 31 * result + type;
         result = 31 * result + (color != null ? color.hashCode() : 0);
         return result;
+    }
+
+
+    @Override
+    public int compareTo(Commontags o) {
+        int compare = o.getColor().compareTo(getColor());
+        compare = compare == 0 ? Boolean.compare(o.getType() > 0, getType() > 0) : compare;
+        compare = compare == 0 ? o.getText().compareTo(getText()) * -1 : compare;
+
+        return compare;
     }
 
     @Override

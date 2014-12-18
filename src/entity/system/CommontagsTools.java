@@ -36,7 +36,7 @@ public class CommontagsTools {
 
             String jpql = " SELECT c " +
                     " FROM Commontags c " +
-                    " ORDER BY c.text ASC ";
+                    " ORDER BY c.color, c.type, c.text ASC ";
 
             Query query = em.createQuery(jpql);
             list = new ArrayList<Commontags>(query.getResultList());

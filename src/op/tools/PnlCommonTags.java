@@ -17,10 +17,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
@@ -28,6 +25,7 @@ import java.util.HashSet;
 public class PnlCommonTags extends JPanel {
 
     private final boolean editmode;
+    private final boolean addNewTags;
     HashMap<String, Commontags> mapAllTags = new HashMap<>();
     HashSet<Commontags> listSelectedTags;
     HashMap<Commontags, JButton> mapButtons;
@@ -45,6 +43,11 @@ public class PnlCommonTags extends JPanel {
     }
 
     public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode, int maxline) {
+        this(listSelectedTags, editmode, false, maxline);
+    }
+
+    public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode, boolean addNewTags, int maxline) {
+        this.addNewTags = addNewTags;
         listeners = new ArrayList<>();
 
         MAXLINE = maxline;
@@ -76,6 +79,7 @@ public class PnlCommonTags extends JPanel {
         listeners = new ArrayList<>();
 //        editAction = null;
         this.editmode = editmode;
+        this.addNewTags = false;
 
         setLayout(new RiverLayout(10, 5));
 
@@ -240,6 +244,9 @@ public class PnlCommonTags extends JPanel {
 
         final String enteredText = SYSTools.tidy(txtTags.getText()).toLowerCase();
 
+        if (!addNewTags && !mapAllTags.containsKey(enteredText)) return;
+
+
         if (!mapAllTags.containsKey(enteredText)) {
             Commontags myNewCommontag = new Commontags(SYSTools.tidy(enteredText));
             mapAllTags.put(enteredText, myNewCommontag);
@@ -337,8 +344,16 @@ public class PnlCommonTags extends JPanel {
         JPanel pnl = new JPanel();
 
         pnl.setLayout(new GridLayout(0, 3));
-        for (final Commontags ctag : mapAllTags.values()) {
+
+
+        ArrayList<Commontags> listTags = new ArrayList<>(mapAllTags.values());
+        Collections.sort(listTags);
+
+        for (final Commontags ctag : listTags) {
             JCheckBox cb = new JCheckBox(ctag.getText());
+
+            cb.setForeground(GUITools.getColor(ctag.getColor()));
+            cb.setFont(ctag.getType() == 0 ? SYSConst.ARIAL12 : SYSConst.ARIAL12BOLD);
 
             cb.setSelected(listSelectedTags.contains(ctag));
 

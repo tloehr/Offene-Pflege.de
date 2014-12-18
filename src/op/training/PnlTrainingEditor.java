@@ -100,7 +100,7 @@ public class PnlTrainingEditor extends JPanel {
                 try {
                     em.getTransaction().begin();
 
-                    Commontags changedTag = (Commontags) o;
+                    Commontags changedTag = em.merge((Commontags) o);
 
                     Training myTraining = em.merge(training);
                     em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
