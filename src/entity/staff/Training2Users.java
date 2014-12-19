@@ -1,18 +1,23 @@
 package entity.staff;
 
+import entity.files.SYSFiles;
+import entity.files.SYSFilesContainer;
+import entity.files.SYSFilesLink;
 import entity.files.TrainingAttendee2File;
 import entity.system.Users;
+import op.OPDE;
 
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 /**
  * Created by tloehr on 17.07.14.
  */
 @Entity
 @Table(name = "training2users")
-public class Training2Users implements Comparable<Training2Users> {
+public class Training2Users implements Comparable<Training2Users>, SYSFilesContainer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,6 +86,29 @@ public class Training2Users implements Comparable<Training2Users> {
 
     public Collection<TrainingAttendee2File> getAttachedFilesConnections() {
         return attachedFilesConnections;
+    }
+
+    @Override
+    public SYSFilesLink attachFile(SYSFiles sysFiles) {
+        TrainingAttendee2File link = new TrainingAttendee2File(sysFiles, this, OPDE.getLogin().getUser(), new Date());
+        sysFiles.getTrainAttendeeAssignCollection().add(link);
+        attachedFilesConnections.add(link);
+        return link;
+    }
+
+    @Override
+    public SYSFilesLink detachFile(SYSFiles sysFiles) {
+        SYSFilesLink link2remove = null;
+        for (SYSFilesLink link : attachedFilesConnections){
+            if (link.getSysfile().equals(sysFiles)){
+                link2remove = link;
+                break;
+            }
+        }
+        sysFiles.getTrainAttendeeAssignCollection().remove(link2remove);
+        attachedFilesConnections.remove(link2remove);
+
+        return link2remove;
     }
 
     public Users getAttendee() {

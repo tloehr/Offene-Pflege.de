@@ -76,7 +76,7 @@ public class DlgFiles extends MyJDialog {
     private JPanel getFileDropPanel() {
         JPanel dropPanel = new JPanel();
         dropPanel.setLayout(new BorderLayout());
-        JLabel dropLabel = new JLabel(SYSTools.xx(PnlFiles.internalClassID + ".drophere"), SYSConst.icon48kgetdock, SwingConstants.CENTER);
+        JLabel dropLabel = new JLabel(SYSTools.xx("nursingrecords.files.drophere"), SYSConst.icon48kgetdock, SwingConstants.CENTER);
         dropLabel.setFont(SYSConst.ARIAL20);
         dropLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         dropLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -108,7 +108,7 @@ public class DlgFiles extends MyJDialog {
 
     private JPanel getFileListPanel() {
         list = new JList();
-        JPanel pnlFilesList = new JPanel();
+        final JPanel pnlFilesList = new JPanel();
         pnlFilesList.setLayout(new BoxLayout(pnlFilesList, BoxLayout.LINE_AXIS));
 
         ArrayList<SYSFiles> files = getAttachedFilesList(attachable);
@@ -125,9 +125,37 @@ public class DlgFiles extends MyJDialog {
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 2) {
+                if (SwingUtilities.isLeftMouseButton(mouseEvent) && mouseEvent.getClickCount() == 2) {
                     SYSFilesTools.handleFile((SYSFiles) list.getSelectedValue(), Desktop.Action.OPEN);
                 }
+
+                //todo: this is much more complicated than it looks. maybe i need some sort of interface attachable
+//                else if (SwingUtilities.isRightMouseButton(mouseEvent)) {
+//                    JidePopupMenu jMenu = new JidePopupMenu();
+//
+//                    JMenuItem miDetachFile = new JMenuItem(SYSTools.xx("nursingrecords.files.detach"));
+//
+//                    jMenu.add(miDetachFile);
+//
+//                    miDetachFile.addActionListener(new ActionListener() {
+//                        @Override
+//                        public void actionPerformed(ActionEvent e) {
+//
+//                            EntityManager em = OPDE.getEMF().createEntityManager();
+//                            SYSFiles attachedFile = em.merge((SYSFiles) list.getSelectedValue());
+//
+//
+//
+//                            //todo: handle some sort of orphan deletes when detaching files
+//
+//                            em.close();
+//
+//
+//                        }
+//                    });
+//
+//                    jMenu.show(pnlFilesList, 0, pnlFilesList.getPreferredSize().height);
+//                }
             }
         });
 
@@ -224,8 +252,8 @@ public class DlgFiles extends MyJDialog {
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                        "default:grow, $lcgap, default:grow",
-                        "fill:default:grow, $lgap, default"));
+                    "default:grow, $lcgap, default:grow",
+                    "fill:default:grow, $lgap, default"));
 
                 //---- btnCancel ----
                 btnCancel.setText(null);

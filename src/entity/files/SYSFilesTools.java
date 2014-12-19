@@ -146,7 +146,6 @@ public class SYSFilesTools {
 
 
     public static List<SYSFiles> putFiles(File[] files, Object attachable) {
-
         ArrayList<SYSFiles> successful = new ArrayList<SYSFiles>(files.length);
         FileTransferClient ftp = getFTPClient();
 
@@ -204,9 +203,8 @@ public class SYSFilesTools {
                                 sysfile.getTrainingAssignCollection().add(link);
                                 ((Training) attachable).getAttachedFilesConnections().add(link);
                             } else if (attachable instanceof Training2Users) {
-                                TrainingAttendee2File link = em.merge(new TrainingAttendee2File(sysfile, (Training2Users) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getTrainAttendeeAssignCollection().add(link);
-                                ((Training2Users) attachable).getAttachedFilesConnections().add(link);
+                                em.merge(((SYSFilesContainer) attachable).attachFile(sysfile));
+                                grmpf;
                             }
                         }
                         successful.add(sysfile);
@@ -257,6 +255,47 @@ public class SYSFilesTools {
             }
         }
         return successful;
+    }
+
+    public static void detachFiles(SYSFiles[] files, SYSFilesContainer sysFilesContainer) {
+
+        FileTransferClient ftp = getFTPClient();
+
+        if (ftp != null) {
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+
+                for (SYSFiles sysfile : files) {
+                    SYSFilesLink link = em.merge(sysFilesContainer.detachFile(sysfile));
+                    em.remove(link);
+                }
+
+                em.getTransaction().commit();
+            } catch (OptimisticLockException ole) {
+                OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(ex);
+            } finally {
+                em.close();
+                try {
+                    ftp.disconnect();
+                } catch (Exception e) {
+                    OPDE.error(e);
+                }
+            }
+        }
     }
 
 

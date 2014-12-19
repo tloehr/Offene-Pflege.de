@@ -1,6 +1,5 @@
 package entity.files;
 
-import entity.staff.Training;
 import entity.staff.Training2Users;
 import entity.system.Users;
 
@@ -12,7 +11,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "trainatt2file")
-public class TrainingAttendee2File {
+public class TrainingAttendee2File implements SYSFilesLink {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,9 +47,19 @@ public class TrainingAttendee2File {
     @ManyToOne
     private Training2Users training2Users;
 
+    @Override
+    public SYSFilesContainer getSYSFilesContainer() {
+        return training2Users;
+    }
+
     @JoinColumn(name = "fid", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
+
+    @Override
+    public SYSFiles getSysfile() {
+        return sysfile;
+    }
 
     public TrainingAttendee2File() {
     }
@@ -73,7 +82,8 @@ public class TrainingAttendee2File {
         if (editor != null ? !editor.equals(that.editor) : that.editor != null) return false;
         if (pit != null ? !pit.equals(that.pit) : that.pit != null) return false;
         if (sysfile != null ? !sysfile.equals(that.sysfile) : that.sysfile != null) return false;
-        if (training2Users != null ? !training2Users.equals(that.training2Users) : that.training2Users != null) return false;
+        if (training2Users != null ? !training2Users.equals(that.training2Users) : that.training2Users != null)
+            return false;
 
         return true;
     }

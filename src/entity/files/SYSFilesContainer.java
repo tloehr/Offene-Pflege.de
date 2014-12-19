@@ -7,8 +7,7 @@ package entity.files;
  * Time: 15:11
  * To change this template use File | Settings | File Templates.
  */
-public interface FileAttachable {
-
-
-
+public interface SYSFilesContainer {
+    public SYSFilesLink attachFile(SYSFiles sysFiles);
+    public SYSFilesLink detachFile(SYSFiles sysFiles);
 }
