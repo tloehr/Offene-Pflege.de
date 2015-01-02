@@ -46,12 +46,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 
 /**
@@ -63,6 +67,9 @@ public class PnlFiles extends NursingRecordsPanel {
     private Resident resident;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
+    //    private RowFilter<TMSYSFiles, Integer> textFilter;
+    private TableRowSorter<TMSYSFiles> sorter;
+    private TMSYSFiles tmSYSFiles;
 
     /**
      * Creates new form PnlFiles
@@ -70,7 +77,6 @@ public class PnlFiles extends NursingRecordsPanel {
     public PnlFiles(Resident resident, JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
-
         initPanel();
         switchResident(resident);
     }
@@ -78,7 +84,6 @@ public class PnlFiles extends NursingRecordsPanel {
 
     private void initPanel() {
         prepareSearchArea();
-
     }
 
     @Override
@@ -105,7 +110,6 @@ public class PnlFiles extends NursingRecordsPanel {
     }
 
     void reloadTable() {
-
         HashSet<SYSFiles> filesSet = new HashSet<>();
 
         EntityManager em = OPDE.createEM();
@@ -113,7 +117,6 @@ public class PnlFiles extends NursingRecordsPanel {
         Query query0 = em.createQuery("SELECT s FROM SYSFiles s JOIN s.residentAssignCollection res WHERE res.resident = :resident");
         query0.setParameter("resident", resident);
         filesSet.addAll(query0.getResultList());
-
 
         Query query1 = em.createQuery("SELECT s FROM SYSFiles s JOIN s.nrAssignCollection nr WHERE nr.nReport.resident = :resident");
         query1.setParameter("resident", resident);
@@ -141,18 +144,81 @@ public class PnlFiles extends NursingRecordsPanel {
 
         Collections.sort(listFiles);
 
-        tblFiles.setModel(new TMSYSFiles(listFiles));
-        tblFiles.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
+//        createFilters();
+        tmSYSFiles = new TMSYSFiles(listFiles);
+        tblFiles.setModel(tmSYSFiles);
+
+        sorter = new TableRowSorter(tmSYSFiles);
+        sorter.setSortsOnUpdates(true);
+        tblFiles.setRowSorter(sorter);
+
+//        sorter.setComparator(TMSYSFiles.COL_PIT, new Comparator<Date>() {
+//            @Override
+//            public int compare(Date o1, Date o2) {
+//                return o1.compareTo(o2);
+//            }
+//        });
+
+//        sorter.setRowFilter(textFilter);
+
+        tblFiles.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
+                return super.getTableCellRendererComponent(table, sdf.format((Date) value), isSelected, hasFocus, row, column);
+            }
+        });
         tblFiles.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
         tblFiles.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+        tblFiles.getColumnModel().getColumn(3).setCellRenderer(new RNDHTML());
 
-        tblFiles.getColumnModel().getColumn(0).setHeaderValue(SYSTools.xx(internalClassID + ".tabheader1"));
-        tblFiles.getColumnModel().getColumn(1).setHeaderValue(SYSTools.xx(internalClassID + ".tabheader2"));
-        tblFiles.getColumnModel().getColumn(2).setHeaderValue(SYSTools.xx(internalClassID + ".tabheader3"));
-
+        tblFiles.getColumnModel().getColumn(0).setHeaderValue(SYSTools.xx("nursingrecords.files.tabheader1"));
+        tblFiles.getColumnModel().getColumn(1).setHeaderValue(SYSTools.xx("nursingrecords.files.tabheader2"));
+        tblFiles.getColumnModel().getColumn(2).setHeaderValue(SYSTools.xx("nursingrecords.files.tabheader3"));
+        tblFiles.getColumnModel().getColumn(3).setHeaderValue(SYSTools.xx("nursingrecords.files.tabheader4"));
 
         jspFiles.dispatchEvent(new ComponentEvent(jspFiles, ComponentEvent.COMPONENT_RESIZED));
-//        tblFiles.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
+    }
+
+
+    private void createFilters() {
+
+//        textFilter = new RowFilter<TMSYSFiles, Integer>() {
+//            @Override
+//            public boolean include(Entry<? extends TMSYSFiles, ? extends Integer> entry) {
+//                int row = entry.getIdentifier();
+//                SYSFiles sysFile = entry.getModel().getRow(row);
+//
+//                if (!tbOldStocks.isSelected() && stock.isAusgebucht()) return false;
+//
+//                if (!treeIngredients.getSelectionModel().isSelectionEmpty() && !treeIngredients.getSelectionModel().getLeadSelectionPath().getLastPathComponent().equals(treeIngredients.getModel().getRoot())) {
+//                    for (TreePath path : treeIngredients.getSelectionModel().getSelectionPaths()) {
+//                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+//                        if (node.getUserObject() instanceof Recipes) {
+//                            if (!RecipeTools.contains((Recipes) node.getUserObject(), stock.getProdukt().getIngTypes())) {
+//                                return false;
+//                            }
+//                        } else if (node.getUserObject() instanceof Ingtypes2Recipes) {
+//                            if (!stock.getProdukt().getIngTypes().equals(((Ingtypes2Recipes) node.getUserObject()).getIngType())) {
+//                                return false;
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                String textKriterium = searchUnAss.getText().trim().toLowerCase();
+//                if (textKriterium.isEmpty()) return true;
+//
+//                return (stock.getProdukt().getBezeichnung().toLowerCase().indexOf(textKriterium) >= 0 ||
+//                        Long.toString(stock.getId()).equals(textKriterium) ||
+//                        Tools.catchNull(stock.getProdukt().getGtin()).indexOf(textKriterium) >= 0 ||
+//                        stock.getProdukt().getIngTypes().getBezeichnung().toLowerCase().indexOf(textKriterium) >= 0 ||
+//                        stock.getProdukt().getIngTypes().getWarengruppe().getBezeichnung().toLowerCase().indexOf(textKriterium) >= 0);
+//
+//
+//            }
+//        };
+
     }
 
     /**
@@ -197,6 +263,7 @@ public class PnlFiles extends NursingRecordsPanel {
                         }
                 ));
                 tblFiles.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                tblFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 tblFiles.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
@@ -222,12 +289,13 @@ public class PnlFiles extends NursingRecordsPanel {
 
         final int row = tblFiles.rowAtPoint(p);
         final int col = tblFiles.columnAtPoint(p);
+
         if (singleRowSelected) {
             lsm.setSelectionInterval(row, row);
         }
 
         final TMSYSFiles tm = (TMSYSFiles) tblFiles.getModel();
-        final SYSFiles sysfile = tm.getRow(row);
+        final SYSFiles sysfile = tm.getRow(tblFiles.convertRowIndexToModel(row));
 
         if (SwingUtilities.isRightMouseButton(evt)) {
 
@@ -272,7 +340,7 @@ public class PnlFiles extends NursingRecordsPanel {
                                     SYSFiles mySysfile = em.merge(sysfile);
                                     mySysfile.setBeschreibung(((JTextArea) editor).getText().trim());
                                     em.getTransaction().commit();
-                                    tm.setSYSFile(row, mySysfile);
+                                    tm.setSYSFile(tblFiles.convertRowIndexToModel(row), mySysfile);
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
                                     OPDE.fatal(e);
@@ -342,11 +410,15 @@ public class PnlFiles extends NursingRecordsPanel {
         Dimension dim = jsp.getSize();
         // Größe der Text Spalte im TB ändern.
         // Summe der fixen Spalten  = 210 + ein bisschen
-        int textWidth = dim.width - 200;
-        tblFiles.getColumnModel().getColumn(0).setPreferredWidth(200);
-        tblFiles.getColumnModel().getColumn(1).setPreferredWidth(textWidth / 3 * 2);
-        tblFiles.getColumnModel().getColumn(2).setPreferredWidth(textWidth / 3);
+        int textWidth = dim.width - 250;
+        tblFiles.getColumnModel().getColumn(0).setPreferredWidth(170);
+        tblFiles.getColumnModel().getColumn(1).setPreferredWidth(80);
+        tblFiles.getColumnModel().getColumn(2).setPreferredWidth(textWidth / 3 * 2);
+        tblFiles.getColumnModel().getColumn(3).setPreferredWidth(textWidth / 3);
 //        tblFiles.getColumnModel().getColumn(2).setPreferredWidth(100);
+
+//        SYSTools.packTable(tblFiles, 0);
+
     }//GEN-LAST:event_jspFilesComponentResized
 
     private void prepareSearchArea() {
@@ -357,10 +429,7 @@ public class PnlFiles extends NursingRecordsPanel {
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             searchPanes.add(addCommands());
         }
-//        searchPanes.add(addFilters());
-
         searchPanes.addExpansion();
-
     }
 
     private CollapsiblePane addCommands() {

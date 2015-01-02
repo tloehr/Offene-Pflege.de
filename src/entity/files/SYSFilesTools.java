@@ -204,7 +204,6 @@ public class SYSFilesTools {
                                 ((Training) attachable).getAttachedFilesConnections().add(link);
                             } else if (attachable instanceof Training2Users) {
                                 em.merge(((SYSFilesContainer) attachable).attachFile(sysfile));
-                                grmpf;
                             }
                         }
                         successful.add(sysfile);

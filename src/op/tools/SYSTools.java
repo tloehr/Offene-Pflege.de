@@ -1925,6 +1925,45 @@ public class SYSTools {
     }
 
 
+    public static void packTable(JTable table, int margin) {
+           for (int colindex = 0; colindex < table.getColumnCount(); colindex++) {
+               packColumn(table, colindex, margin);
+           }
+       }
+
+    /*
+         * http://exampledepot.com/egs/javax.swing.table/PackCol.html
+         */
+        public static void packColumn(JTable table, int vColIndex, int margin) {
+            TableModel model = table.getModel();
+            DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
+            TableColumn col = colModel.getColumn(vColIndex);
+            int width = 0;
+
+            // Get width of column header
+            TableCellRenderer renderer = col.getHeaderRenderer();
+            if (renderer == null) {
+                renderer = table.getTableHeader().getDefaultRenderer();
+            }
+            Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
+            width = comp.getPreferredSize().width;
+
+            // Get maximum width of column data
+            for (int r = 0; r < table.getRowCount(); r++) {
+                renderer = table.getCellRenderer(r, vColIndex);
+                comp = renderer.getTableCellRendererComponent(
+                        table, table.getValueAt(r, vColIndex), false, false, r, vColIndex);
+                width = Math.max(width, comp.getPreferredSize().width);
+            }
+
+            // Add margin
+            width += 2 * margin;
+            // Set the width
+            col.setPreferredWidth(width);
+
+            OPDE.debug("packColumn/3: col="+vColIndex+"  width="+width);
+        }
+
     public static void checkForSoftwareupdates() {
 //        final String FTPServer = "ftp.offene-pflege.de";
         final int FTPPort = 21;

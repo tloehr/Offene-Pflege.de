@@ -26,22 +26,22 @@
 package op.care.sysfiles;
 
 import entity.files.SYSFiles;
-import entity.files.SYSFilesTools;
-import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author tloehr
  */
 public class TMSYSFiles extends AbstractTableModel {
     public static final int COL_PIT = 0;
-    public static final int COL_FILE = 1;
-    public static final int COL_DESCRIPTION = 2;
+    public static final int COL_USER = 1;
+    public static final int COL_FILE = 2;
+    public static final int COL_DESCRIPTION = 3;
 
     ArrayList<SYSFiles> mymodel;
 
@@ -51,14 +51,41 @@ public class TMSYSFiles extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
 
     @Override
     public Class getColumnClass(int column) {
-        return String.class;
+
+
+        Class thisclass;
+               switch (column) {
+                   case COL_PIT: {
+                       thisclass = Date.class;
+                       break;
+                   }
+                   case COL_USER: {
+                       thisclass = String.class;
+                       break;
+                   }
+                   case COL_FILE: {
+                       thisclass = String.class;
+                       break;
+                   }
+                   case COL_DESCRIPTION: {
+                       thisclass = String.class;
+                       break;
+                   }
+                   default: {
+                       thisclass = String.class;
+                   }
+               }
+
+
+        return thisclass;
     }
-    public void setSYSFile(int row, SYSFiles sysfile){
+
+    public void setSYSFile(int row, SYSFiles sysfile) {
         mymodel.set(row, sysfile);
         fireTableRowsUpdated(row, row);
     }
@@ -82,44 +109,54 @@ public class TMSYSFiles extends AbstractTableModel {
         return rowcount;
     }
 
-    private String getAttachmentsAsHTML(int row) {
-        SYSFiles sysfile = mymodel.get(row);
-        String result = "";
+//    private String getAttachmentsAsHTML(int row) {
+//        SYSFiles sysfile = mymodel.get(row);
+//        String result = "";
+//
+//        result += sysfile.getNrAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.reports") + " " + sysfile.getNrAssignCollection().size() + ", ";
+//        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.info") + " " + sysfile.getBwiAssignCollection().size() + ", ";
+//        result += sysfile.getPreAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.prescription") + " " + sysfile.getPreAssignCollection().size() + ", ";
+//
+//        String html = SYSTools.xx(PnlFiles.internalClassID+".Attachments")+": ";
+//        if (result.isEmpty()) {
+//            html += html = SYSTools.xx("misc.msg.none");
+//        } else {
+//            html += result; //result.substring(0, result.length() - 3);
+//        }
+//
+//        return html;
+//    }
 
-        result += sysfile.getNrAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.reports") + " " + sysfile.getNrAssignCollection().size() + ", ";
-        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.info") + " " + sysfile.getBwiAssignCollection().size() + ", ";
-        result += sysfile.getPreAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.prescription") + " " + sysfile.getPreAssignCollection().size() + ", ";
 
-        String html = SYSTools.xx(PnlFiles.internalClassID+".Attachments")+": ";
-        if (result.isEmpty()) {
-            html += html = SYSTools.xx("misc.msg.none");
-        } else {
-            html += result; //result.substring(0, result.length() - 3);
-        }
-
-        return html;
-    }
 
     @Override
     public Object getValueAt(int row, int column) {
-        String value = "";
+        Object value;
         switch (column) {
-            case 0: {
-                value += SYSFilesTools.getDatumUndUser(mymodel.get(row));
+            case COL_PIT: {
+                value = mymodel.get(row).getPit();
                 break;
             }
-            case 1: {
-                value += SYSConst.html_fontface;
-                value += mymodel.get(row).getFilename() + ", ";
-                value += SYSTools.xx("misc.msg.Size") + ": " + BigDecimal.valueOf(mymodel.get(row).getFilesize()).divide(new BigDecimal(1048576), 2, BigDecimal.ROUND_HALF_UP) + " mb";
+            case COL_USER: {
+                value = SYSTools.anonymizeUser(mymodel.get(row).getUser().getUID());
+                break;
+            }
+            case COL_FILE: {
+                String html = "";
+                html += SYSConst.html_fontface;
+                html += mymodel.get(row).getFilename() + ", ";
+                html += SYSTools.xx("misc.msg.Size") + ": " + BigDecimal.valueOf(mymodel.get(row).getFilesize()).divide(new BigDecimal(1048576), 2, BigDecimal.ROUND_HALF_UP) + " mb";
 //                value += ", " + getAttachmentsAsHTML(row);
-                value += "</font>";
+                html += "</font>";
+                value = html;
                 break;
             }
-            case 2: {
-                value += SYSConst.html_fontface;
-                value += "<p>"+SYSTools.catchNull(mymodel.get(row).getBeschreibung())+"</p>";
-                value += "</font>";
+            case COL_DESCRIPTION: {
+                String html = "";
+                html += SYSConst.html_fontface;
+                html += "<p>" + SYSTools.catchNull(mymodel.get(row).getBeschreibung()) + "</p>";
+                html += "</font>";
+                value = html;
                 break;
             }
             default: {
