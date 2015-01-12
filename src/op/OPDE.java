@@ -424,8 +424,9 @@ public class OPDE {
         opts.addOption(optFTPserver);
 //        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
 
-//        Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .opde Verzeichnis befindet.").create("k");
-//        opts.addOption(konfigdir);
+        Option notification = OptionBuilder.withLongOpt("notification").hasOptionalArg().withDescription("Schickt allen festgelegten Empfängern die jeweilige Benachrichtungs-Mail.").create("n");
+        notification.setArgName("Liste der Empfänger (durch Komma getrennt, ohne Leerzeichen. UID verwenden). Damit kannst Du die Benachrichtigungen einschränken. Fehlt diese Liste, erhalten ALLE Empfänger eine Mail.");
+        opts.addOption(notification);
 
         opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(lang.getString("cmdline.jdbc")).create("j"));
 
@@ -699,6 +700,40 @@ public class OPDE {
                 System.exit(0);
             }
 
+
+            /***
+             *      _   _       _   _  __ _           _   _
+             *     | \ | | ___ | |_(_)/ _(_) ___ __ _| |_(_) ___  _ __
+             *     |  \| |/ _ \| __| | |_| |/ __/ _` | __| |/ _ \| '_ \
+             *     | |\  | (_) | |_| |  _| | (_| (_| | |_| | (_) | | | |
+             *     |_| \_|\___/ \__|_|_| |_|\___\__,_|\__|_|\___/|_| |_|
+             *
+             */
+            if (cl.hasOption("n")) {
+
+                EntityManager em = OPDE.createEM();
+
+                try {
+                    em.getTransaction().begin();
+                    Users rootUser = em.find(Users.class, "admin");
+
+                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
+                    OPDE.setLogin(rootLogin);
+                    initProps();
+
+                    EMailSystem.notify(cl.getOptionValue("n"));
+
+                    em.getTransaction().commit();
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    fatal(ex);
+                } finally {
+                    em.close();
+                }
+                System.exit(0);
+            }
 
             // to speed things later. The first connection loads the while JPA system.
             EntityManager em1 = createEM();

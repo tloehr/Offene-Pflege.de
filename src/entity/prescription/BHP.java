@@ -6,21 +6,23 @@ import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
-import org.eclipse.persistence.annotations.OptimisticLocking;
-import org.eclipse.persistence.annotations.OptimisticLockingType;
+//import org.eclipse.persistence.annotations.OptimisticLocking;
+//import org.eclipse.persistence.annotations.OptimisticLockingType;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
+
 import java.awt.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "bhp")
-@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
+//@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
 public class BHP implements Serializable, Comparable<BHP> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -126,7 +128,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bhp")
-    private Collection<MedStockTransaction> stockTransaction;
+    private List<MedStockTransaction> stockTransaction;
 
     @JoinColumn(name = "BHPPID", referencedColumnName = "BHPPID")
     @ManyToOne
@@ -362,7 +364,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
 
-    public Collection<MedStockTransaction> getStockTransaction() {
+    public List<MedStockTransaction> getStockTransaction() {
         return stockTransaction;
     }
 

@@ -68,7 +68,7 @@ public class Users implements Serializable, Comparable<Users> {
     private String eMail;
     @Basic(optional = false)
     @Column(name = "mailconfirmed")
-    private int mailstatus;
+    private int mailConfirmed;
 
     @ManyToMany
     @JoinTable(name = "member", joinColumns =
@@ -111,15 +111,15 @@ public class Users implements Serializable, Comparable<Users> {
         uid = null;
         groups = new ArrayList<Groups>();
         status = UsersTools.STATUS_ACTIVE;
-        mailstatus = UsersTools.MAIL_UNCONFIRMED;
+        mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
     }
 
-    public int getMailStatus() {
-        return mailstatus;
+    public int getMailConfirmed() {
+        return mailConfirmed;
     }
 
-    public void setMailStatus(int mailconfirmed) {
-        this.mailstatus = mailconfirmed;
+    public void setMailConfirmed(int mailConfirmed) {
+        this.mailConfirmed = mailConfirmed;
     }
 
     public Collection<Training> getTrainings() {

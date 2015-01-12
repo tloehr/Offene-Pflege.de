@@ -50,7 +50,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>16dlu, linegap, 16dlu, linegap, default, linegap, fill:default:grow</string> 
+          <string>16dlu, linegap, 16dlu, linegap, default, linegap, default, linegap, fill:default:grow</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -607,7 +607,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>7</int> 
+           <int>9</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridWidth</string> 

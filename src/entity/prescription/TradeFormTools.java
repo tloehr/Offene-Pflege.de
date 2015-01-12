@@ -153,6 +153,14 @@ public class TradeFormTools {
         return list;
     }
 
+
+
+    public static MedInventory getInventory4Prescription(Prescription prescription) {
+        return getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
+
+    }
+
+
     /**
      * Die genaue Erläuterung zu dieser Methode befindet sich in der Methode <code>getSuitableInventoriesForThisTradeForm</code>.
      * Sie implementiert Punkt 1 der dort beschriebenen 2 Antworten.

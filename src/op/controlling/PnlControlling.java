@@ -601,7 +601,6 @@ public class PnlControlling extends CleanablePanel {
 
                 worker.execute();
 
-
             }
         });
         pnlFallsIndicator.add(btnFallsIndicator, BorderLayout.WEST);

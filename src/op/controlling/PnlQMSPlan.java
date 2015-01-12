@@ -950,7 +950,7 @@ public class PnlQMSPlan extends CleanablePanel {
                                 em.close();
                             }
                         }
-                    }, "misc.msg.comment", qms.getText());
+                    }, "misc.msg.comment", qms.getText(), null);
                 }
             });
             btnText.setEnabled(!qms.isOpen() && qms.getQmssched().isActive());

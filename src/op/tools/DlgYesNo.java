@@ -6,6 +6,7 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import op.system.Validator;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -18,12 +19,16 @@ import java.awt.event.ActionListener;
  * @author Torsten Löhr
  */
 public class DlgYesNo extends MyJDialog {
+
+
+    private Validator validator;
     private Closure actionBlock;
     //    private int result;
     private boolean editorMode;
 
     public DlgYesNo(String message, Icon icon, Closure actionBlock) {
         super(false);
+        validator = null;
         editorMode = false;
         initComponents();
         this.actionBlock = actionBlock;
@@ -41,10 +46,14 @@ public class DlgYesNo extends MyJDialog {
      * @param icon
      * @param actionBlock
      */
-    public DlgYesNo(Icon icon, Closure actionBlock, String title, String preset) {
+    public DlgYesNo(Icon icon, Closure actionBlock, String title, String preset, Validator validator) {
         super(false);
+        this.validator = validator;
+
+
         editorMode = true;
         initComponents();
+
         this.actionBlock = actionBlock;
         lblTitle.setText(SYSTools.xx(title));
         txtMessage.setEditable(true);
@@ -66,7 +75,11 @@ public class DlgYesNo extends MyJDialog {
 
     private void okButtonActionPerformed(ActionEvent e) {
         if (editorMode) {
-            actionBlock.execute(txtMessage.getText() == null ? null : txtMessage.getText().trim());
+            if (validator != null) {
+                actionBlock.execute(validator.isValid(txtMessage.getText()) ? validator.parse(txtMessage.getText()) : null);
+            } else {
+                actionBlock.execute(txtMessage.getText() == null ? null : txtMessage.getText().trim());
+            }
         } else {
             actionBlock.execute(JOptionPane.YES_OPTION);
         }
@@ -97,8 +110,8 @@ public class DlgYesNo extends MyJDialog {
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                    "default, $lcgap, 171dlu",
-                    "pref, $lgap, 124dlu, $lgap, pref"));
+                        "default, $lcgap, 171dlu",
+                        "pref, $lgap, 124dlu, $lgap, pref"));
 
                 //---- lblTitle ----
                 lblTitle.setText("text");

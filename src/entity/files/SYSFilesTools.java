@@ -586,4 +586,33 @@ public class SYSFilesTools {
         return temp;
     }
 
+
+    public static File getHtmlFile(String html, String ext){
+            File temp = null;
+            try {
+                // Create temp file.
+                temp = File.createTempFile("opde", ext);
+
+                String text = "<html><head>";
+
+                text += OPDE.getCSS();
+                text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
+                        + "<hr/>" +
+                        "<div id=\"fonttext\">" +
+                        "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
+                        + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
+                        + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum() + "</div></body></html>";
+
+
+                // Write to temp file
+                BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+                out.write(text);
+
+                out.close();
+            } catch (IOException e) {
+                OPDE.error(e);
+            }
+            return temp;
+        }
+
 }

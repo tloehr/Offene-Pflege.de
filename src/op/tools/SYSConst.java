@@ -96,6 +96,7 @@ public class SYSConst {
     public static String html_16x16_tagPurple_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/tag_purple.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Eraser_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/eraser.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Edited_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/edited.png").toString() + "\" border=\"0\">";
+    public static String html_16x16_scales_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/scales_of_balance_16.png").toString() + "\" border=\"0\">";
 
     public static Image getPDF_16x16_tagPurple() throws BadElementException, IOException {
         return Image.getInstance(OPDE.getOPWD() + sep + AppInfo.dirArtwork + sep + AppInfo.dirArtwork16 + sep + "tag_purple.png");
@@ -635,6 +636,7 @@ public class SYSConst {
     public static final Icon icon22stopSign = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/stop.png"));
     public static final Icon icon22comment = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/comment.png"));
     public static final Icon icon48comment = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/comment.png"));
+    public static final Icon icon48scales = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/scales_of_balance_48.png"));
     public static final Icon icon22magnify1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/magnify1.png"));
     public static final Icon icon22home = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/home.png"));
     public static final Icon icon22wizard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/wizard.png"));

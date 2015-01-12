@@ -64,10 +64,10 @@ public class PnlUserSettings extends CleanablePanel {
         tbNotify = GUITools.getNiceToggleButton("opde.usersettings.enable.notification");
         panel1.add(tbNotify, CC.xy(5, 1));
 
-        tbNotify.setEnabled(OPDE.getLogin().getUser().getMailStatus() != UsersTools.MAIL_UNCONFIRMED);
-        txtMailKey.setEnabled(OPDE.getLogin().getUser().getMailStatus() == UsersTools.MAIL_UNCONFIRMED);
+        tbNotify.setEnabled(OPDE.getLogin().getUser().getMailConfirmed() != UsersTools.MAIL_UNCONFIRMED);
+        txtMailKey.setEnabled(OPDE.getLogin().getUser().getMailConfirmed() == UsersTools.MAIL_UNCONFIRMED);
 
-        tbNotify.setSelected(OPDE.getLogin().getUser().getMailStatus() == UsersTools.MAIL_NOTIFICATIONS_ENABLED && OPDE.getProps().containsKey(SYSPropsTools.KEY_MAIL_TESTKEY));
+        tbNotify.setSelected(OPDE.getLogin().getUser().getMailConfirmed() == UsersTools.MAIL_NOTIFICATIONS_ENABLED && OPDE.getProps().containsKey(SYSPropsTools.KEY_MAIL_TESTKEY));
 
         tbNotify.addItemListener(new ItemListener() {
             @Override
@@ -83,7 +83,7 @@ public class PnlUserSettings extends CleanablePanel {
                     em.getTransaction().begin();
 
                     em.lock(user, LockModeType.OPTIMISTIC);
-                    user.setMailStatus(e.getStateChange() == ItemEvent.SELECTED ? UsersTools.MAIL_NOTIFICATIONS_ENABLED : UsersTools.MAIL_CONFIRMED);
+                    user.setMailConfirmed(e.getStateChange() == ItemEvent.SELECTED ? UsersTools.MAIL_NOTIFICATIONS_ENABLED : UsersTools.MAIL_CONFIRMED);
                     em.getTransaction().commit();
 
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.usersettings.notifications.enabled"));
@@ -123,7 +123,7 @@ public class PnlUserSettings extends CleanablePanel {
         });
 
         txtMailAddress.setText(SYSTools.catchNull(OPDE.getLogin().getUser().getEMail()));
-        lblMailStatus.setIcon(OPDE.getLogin().getUser().getMailStatus() != UsersTools.MAIL_UNCONFIRMED ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledGreenOff);
+        lblMailStatus.setIcon(OPDE.getLogin().getUser().getMailConfirmed() != UsersTools.MAIL_UNCONFIRMED ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledGreenOff);
         lblMailKey.setText(SYSTools.xx("opde.usersettings.mail.key"));
 
         prepareSearchArea();
@@ -220,7 +220,7 @@ public class PnlUserSettings extends CleanablePanel {
             em.lock(user, LockModeType.OPTIMISTIC);
             SYSPropsTools.storeProp(em, SYSPropsTools.KEY_MAIL_TESTKEY, testkey, user);
             user.setEMail(txtMailAddress.getText().trim());
-            user.setMailStatus(UsersTools.MAIL_UNCONFIRMED);
+            user.setMailConfirmed(UsersTools.MAIL_UNCONFIRMED);
             em.getTransaction().commit();
 
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.usersettings.notifications.enabled"));
@@ -282,7 +282,7 @@ public class PnlUserSettings extends CleanablePanel {
                 em.getTransaction().begin();
 
                 em.lock(user, LockModeType.OPTIMISTIC);
-                user.setMailStatus(UsersTools.MAIL_CONFIRMED);
+                user.setMailConfirmed(UsersTools.MAIL_CONFIRMED);
                 SYSPropsTools.removeProp(em, SYSPropsTools.KEY_MAIL_TESTKEY, OPDE.getLogin().getUser());
                 em.getTransaction().commit();
 

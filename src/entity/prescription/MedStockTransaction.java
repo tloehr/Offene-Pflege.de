@@ -23,6 +23,9 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     @Basic(optional = false)
     @Column(name = "Menge")
     private BigDecimal amount;
+    @Basic(optional = true)
+    @Column(name = "weight")
+    private BigDecimal weight;
     @Column(name = "Text", length = 100)
     private String text;
     @Basic(optional = false)
@@ -41,15 +44,17 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         this.stock = stock;
         this.amount = amount;
         this.bhp = null;
+        this.weight = null;
         this.state = MedStockTransactionTools.STATE_CREDIT;
         this.user = OPDE.getLogin().getUser();
     }
 
-    public MedStockTransaction(MedStock stock, BigDecimal amount, BHP bhp) {
+    public MedStockTransaction(MedStock stock, BigDecimal amount, BigDecimal weight,  BHP bhp) {
         this.stock = stock;
         this.amount = amount;
         this.pit = new Date();
         this.bhp = bhp;
+        this.weight = weight;
         this.state = MedStockTransactionTools.STATE_DEBIT;
         this.user = OPDE.getLogin().getUser();
     }
@@ -59,8 +64,18 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         this.amount = amount;
         this.pit = new Date();
         this.bhp = null;
+        this.weight = null;
         this.state = state;
         this.user = OPDE.getLogin().getUser();
+    }
+
+
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
     }
 
     public Long getID() {
@@ -135,7 +150,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     //OWNER
     private Users user;
 
-//    @Override
+    //    @Override
 //    public boolean equals(Object o) {
 //        if (this == o) return true;
 //        if (o == null || getClass() != o.getClass()) return false;
@@ -160,6 +175,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (amount != null ? amount.hashCode() : 0);
+        result = 31 * result + (weight != null ? weight.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (int) state;
         result = 31 * result + (pit != null ? pit.hashCode() : 0);

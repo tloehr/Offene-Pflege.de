@@ -105,13 +105,13 @@ public class MedInventoryTools {
      * @param quantity die gewünschte Entnahmemenge
      * @param bhp      BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      */
-    public static void withdraw(EntityManager em, MedInventory inventory, BigDecimal quantity, BHP bhp) throws Exception {
+    public static void withdraw(EntityManager em, MedInventory inventory, BigDecimal quantity, BigDecimal weight, BHP bhp) throws Exception {
         OPDE.debug("withdraw/5: inventory: " + inventory);
         if (inventory == null) {
             throw new Exception("No MedStock is currently in use");
         }
         MedStock stock = MedStockTools.getStockInUse(inventory);
-        if (stock.getTradeForm().getDosageForm().isDontCALC()){
+        if (stock.getTradeForm().getDosageForm().isDontCALC()) {
             OPDE.debug("withdraw/5: no calculation necessary. is ointment or something like that");
             return;
         }
@@ -122,7 +122,7 @@ public class MedInventoryTools {
         }
 
         OPDE.debug("withdraw/5: amount: " + quantity);
-        withdraw(em, stock, quantity, bhp);
+        withdraw(em, stock, quantity, weight, bhp);
     }
 
 
@@ -187,7 +187,7 @@ public class MedInventoryTools {
      * @param bhp
      * @throws Exception
      */
-    private static void withdraw(EntityManager em, MedStock activeStock, BigDecimal quantity, BHP bhp) throws Exception {
+    private static void withdraw(EntityManager em, MedStock activeStock, BigDecimal quantity, BigDecimal weight, BHP bhp) throws Exception {
         if (quantity.compareTo(BigDecimal.ZERO) < 0) {
             OPDE.fatal(new NumberFormatException("withdraw/4: negative quantity"));
         }
@@ -205,7 +205,7 @@ public class MedInventoryTools {
         }
 
         // The TX for this turn
-        MedStockTransaction tx = em.merge(new MedStockTransaction(stock, withdrawal.negate(), bhp));
+        MedStockTransaction tx = em.merge(new MedStockTransaction(stock, withdrawal.negate(), weight, bhp));
         stock.getStockTransaction().add(tx);
         bhp.getStockTransaction().add(tx);
         OPDE.debug("withdraw/4: tx: " + tx);
@@ -219,7 +219,7 @@ public class MedInventoryTools {
                 MedStockTools.close(em, stock, SYSTools.xx(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
             } else if (stock.hasNext2Open()) {
                 MedStock nextStock = MedStockTools.close(em, stock, SYSTools.xx(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
-                withdraw(em, nextStock, quantity.subtract(stockSum), bhp);
+                withdraw(em, nextStock, quantity.subtract(stockSum), weight, bhp);
             }
         }
     }

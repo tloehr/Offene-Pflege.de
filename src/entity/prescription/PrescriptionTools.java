@@ -20,10 +20,8 @@ import op.OPDE;
 import op.care.prescription.PnlPrescription;
 import op.system.PDF;
 import op.threads.DisplayMessage;
-import op.tools.HTMLTools;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -35,6 +33,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -51,12 +50,12 @@ public class PrescriptionTools {
      * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
      * Aufgrund der ungleichen HTML Standards (insbesonders der Druckdarstellung im CSS2.0 und später auch CSS2.1)
      * muss ich hier einen Trick anwenden, damit das auf verschiedenen Browsern halbwegs gleich aussieht.
-     * <p/>
+     * <p>
      * Daher addiere ich jedes größere Element auf einer Seite (also Header, Tabellen Zeilen) mit dem Wert 1.
      * Nach einer bestimmten Anzahl von Elementen erzwinge ich einen Pagebreak.
-     * <p/>
+     * <p>
      * Nach einem Pagebreak wird der Name des aktuellen Bewohner nocheinmal wiederholt.
-     * <p/>
+     * <p>
      * Ein Mac OS Safari druckt mit diesen Werten sehr gut.
      * Beim Firefox (about:settings) sollten die Ränder wie folgt eingestellt werden:
      * <ul>
@@ -667,6 +666,13 @@ public class PrescriptionTools {
             result += result.isEmpty() ? "" : "<br/>";
             result += "<b><u>" + SYSTools.xx("misc.msg.comment") + ":</u> </b>" + prescription.getText();
         }
+        if (prescription.isOnDailyPlan()) {
+            result += "<br/>" + SYSConst.html_italic(SYSTools.xx("nursingrecords.prescription.addedToDailyPlan"));
+        }
+        if (prescription.isWeightControl()) {
+            result += "<br/>" + SYSConst.html_bold(SYSTools.xx("nursingrecords.prescription.weightControlled"));
+        }
+
         return result + "</div>";
     }
 
@@ -924,6 +930,20 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static ArrayList<Prescription> getAllActiveWithWeightControll() {
+        EntityManager em = OPDE.createEM();
+
+        ArrayList<Prescription> result = null;
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.weightControl = :weightControl AND p.to >= :now");
+        query.setParameter("weightControl", true);
+        query.setParameter("now", new Date());
+
+        result = new ArrayList(query.getResultList());
+
+        em.close();
+        return result;
+    }
+
     public static ArrayList<Prescription> getAllActiveRegularMedsOnly(Resident resident) {
         EntityManager em = OPDE.createEM();
 
@@ -994,7 +1014,16 @@ public class PrescriptionTools {
                     result += (myprescription.getCommontags().isEmpty() ? "" : "<br/>" + CommontagsTools.getAsHTML(myprescription.getCommontags(), SYSConst.html_16x16_tagPurple));
                     result += "</td>";
                     result += "<td valign=\"top\">" + getDoseAsHTML(myprescription, withmed) + "<br/>";
-                    result += getRemark(myprescription) + "</td>";
+                    result += getRemark(myprescription);
+
+//                    if (prescription.isOnDailyPlan()) {
+//                        result += "<br/>" + SYSConst.html_italic(SYSTools.xx("nursingrecords.prescription.addedToDailyPlan"));
+//                    }
+//                    if (prescription.isWeightControl()) {
+//                        result += "<br/>" + SYSConst.html_italic(SYSTools.xx("nursingrecords.prescription.weightControlled"));
+//                    }
+
+                    result += "</td>";
                     result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
 
                     result += "</td>";
@@ -1142,6 +1171,93 @@ public class PrescriptionTools {
             em.close();
         }
         return list;
+    }
+
+
+    public static String getNarcoticsWeightList(Closure progress) throws Exception {
+        StringBuilder html = new StringBuilder(1000);
+
+        ArrayList<Prescription> listWeightControlled = getAllActiveWithWeightControll();
+
+        DateFormat df = DateFormat.getDateTimeInstance();
+
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+        html.append(SYSConst.html_h1("opde.controlling.prescription.narcotics.weightcontrol"));
+
+        if (listWeightControlled.isEmpty()) {
+            html.append(SYSConst.html_italic("opde.controlling.prescription.narcotics.no.weightcontrols"));
+        } else {
+
+
+            listWeightControlled.forEach(prescription -> {
+                html.append(SYSConst.html_h2("[" + prescription.getID() + "] " + getShortDescription(prescription)));
+                MedInventory inventory = TradeFormTools.getInventory4Prescription(prescription);
+                MedStock stock = MedInventoryTools.getCurrentOpened(inventory);
+
+                final StringBuffer tableContent = new StringBuffer(SYSConst.html_table_tr(SYSConst.html_table_th("Zeit") + SYSConst.html_table_th("Gewicht") + SYSConst.html_table_th("Diff-Gewicht") + SYSConst.html_table_th("Menge") + SYSConst.html_table_th("Diff-Menge") + SYSConst.html_table_th("Verhältnis")));
+
+                Collections.sort(stock.getStockTransaction(), new Comparator<MedStockTransaction>() {
+                    @Override
+                    public int compare(MedStockTransaction o1, MedStockTransaction o2) {
+                        return o1.getPit().compareTo(o2.getPit());
+                    }
+                });
+
+                boolean iamthefirstone = true;
+                BigDecimal previousWeight = BigDecimal.ZERO;
+                BigDecimal previousQuantity = BigDecimal.ZERO;
+                for (MedStockTransaction tx : stock.getStockTransaction()) {
+
+                    BigDecimal weight = tx.getWeight();
+                    BigDecimal quantity = previousQuantity.add(tx.getAmount());
+
+                    BigDecimal diffWeight = previousWeight.subtract(weight);
+                    BigDecimal diffQuantity = previousQuantity.subtract(quantity);
+                    BigDecimal quota = iamthefirstone ? BigDecimal.ZERO : diffQuantity.divide(diffWeight, 2, RoundingMode.HALF_UP);
+
+                    tableContent.append(SYSConst.html_table_tr(
+                                    SYSConst.html_table_td(df.format(tx.getPit())) +
+                                            SYSConst.html_table_td(weight.toString()) +
+                                            SYSConst.html_table_td(iamthefirstone ? "--" : diffWeight.toString()) +
+                                            SYSConst.html_table_td(quantity.toString()) +
+                                            SYSConst.html_table_td(iamthefirstone ? "--" : diffQuantity.toString()) +
+                                            SYSConst.html_table_td(iamthefirstone ? "--" : quota.toString())
+                            )
+                    );
+
+                    previousWeight = weight;
+                    previousQuantity = quantity;
+                    iamthefirstone = false;
+                }
+
+
+            });
+
+
+        }
+//        progress.execute(new Pair<Integer, Integer>(p, new Long(interval.toDuration().getStandardDays() / 30l).intValue()));_
+
+        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+        String tableContent = SYSConst.html_table_tr(SYSConst.html_table_th("Monat") + SYSConst.html_table_th("Sturzindikator"));
+
+        p = 0;
+        for (LocalDate month = from; !month.isAfter(SYSCalendar.bom(new LocalDate())); month = month.plusMonths(1)) {
+            p++;
+
+            BigDecimal occupantDays = new BigDecimal(getOccupantDays(SYSCalendar.bom(month), SYSCalendar.min(SYSCalendar.eom(month), new LocalDate())));
+            BigDecimal sumFalls = new BigDecimal(getFalls(SYSCalendar.bom(month), SYSCalendar.eom(month)).size());
+            BigDecimal fallsIndicator = sumFalls.divide(occupantDays, 6, RoundingMode.HALF_UP).multiply(new BigDecimal(1000));
+
+            tableContent += SYSConst.html_table_tr(
+                    SYSConst.html_table_td(month.toString("MMMM YYYY")) +
+                            SYSConst.html_table_td(sumFalls.toString() + " / " + occupantDays + " * 1000 = " + fallsIndicator.setScale(2, BigDecimal.ROUND_HALF_UP), "right")
+            );
+        }
+
+        html.append(SYSConst.html_table(tableContent, "1"));
+
+        return html.toString();
     }
 
 

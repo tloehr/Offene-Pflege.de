@@ -1469,7 +1469,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 }
                             }
                         }
-                    }, "nursingrecords.prescription.edit.sideeffects", prescription.getTradeForm().getMedProduct().getSideEffects());
+                    }, "nursingrecords.prescription.edit.sideeffects", prescription.getTradeForm().getMedProduct().getSideEffects(), null);
                 }
             });
             // checked for acls

@@ -71,7 +71,7 @@ import java.util.List;
  * <li><code><b>Verordnung</b>{verid=4658, anDatum=Thu Dec 22 15:54:14 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3580, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=entity.rest.Situations[sitID=10], anKH=entity.rest.Hospital[khid=16], abKH=null, anArzt=entity.rest.GP[arztID=21], abArzt=null}</code></li>
  * <li><code><b>VerordnungPlanung</b>{bhppid=7403, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=1, maxEDosis=2, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 15:55:05 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4658, ...}}</code></li>
  * </ul>
- * <p/>
+ * <p>
  * <h3>Regelverordnung mit sehr unterschiedlichen Dosierungen</h3>
  * <ul>
  * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel123.png" /><p/><code><b>Verordnung</b>{verid=4659, anDatum=Thu Dec 22 16:09:09 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3581, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=null, anKH=null, abKH=null, anArzt=entity.rest.GP[arztID=1], abArzt=null}</code></li>
@@ -113,6 +113,10 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     @Basic(optional = false)
     @Column(name = "Stellplan")
     private boolean showOnDailyPlan;
+    @Basic(optional = false)
+    @Column(name = "weightcontrol")
+    private boolean weightControl;
+
 
     // ==
     // 1:N Relationen
@@ -179,6 +183,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.userON = OPDE.getLogin().getUser();
         this.commontags = new ArrayList<Commontags>();
+        this.weightControl = false;
     }
 
     public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
@@ -202,8 +207,17 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.docOFF = docOFF;
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.commontags = new ArrayList<Commontags>();
+        this.weightControl = false;
     }
 
+
+    public boolean isWeightControl() {
+        return weightControl;
+    }
+
+    public void setWeightControl(boolean weightControl) {
+        this.weightControl = weightControl;
+    }
 
     public Collection<Commontags> getCommontags() {
         return commontags;

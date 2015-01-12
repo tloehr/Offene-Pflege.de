@@ -14,7 +14,8 @@ import java.util.Collection;
  */
 public class CommontagsTools {
 
-
+    // type settings in the "commontags" table. every type which is not 0 is considered a system type, which can not be edited or deleted.
+    // those tags are used in queries for controlling purposes. so the system relies on their presence.
     public static final int TYPE_SYS_USER = 0;
     public static final int TYPE_SYS_HANDOVER = 1;
     public static final int TYPE_SYS_EMERGENCY = 2;
@@ -27,6 +28,8 @@ public class CommontagsTools {
     public static final int TYPE_SYS_SOCIAL2 = 10;
     public static final int TYPE_SYS_COMPLAINT = 9;
     public static final int TYPE_SYS_PAINMGR = 11;
+    public static final int TYPE_SYS_METHADONE = 12; // methadon maintenance (Substitutionspräparate)
+    public static final int TYPE_SYS_NARCOTICS = 13; // methadon maintenance (Substitutionspräparate)
 
     public static ArrayList<Commontags> getAll() {
         EntityManager em = OPDE.createEM();
