@@ -39,10 +39,8 @@ import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
@@ -52,7 +50,7 @@ import java.text.NumberFormat;
  *
  */
 public class DlgTX extends MyJDialog {
-    private BigDecimal amount;
+    private BigDecimal amount, weight;
     private Closure actionBlock;
     private BigDecimal bestandsumme;
     private BigDecimal packgroesse;
@@ -62,12 +60,11 @@ public class DlgTX extends MyJDialog {
         super(false);
         this.tx = tx;
         this.actionBlock = actionBlock;
-
         initDialog();
     }
 
     private void txtMengeFocusGained(FocusEvent e) {
-        SYSTools.markAllTxt(txtValue);
+        txtValue.selectAll();
     }
 
 //    @Override
@@ -83,9 +80,45 @@ public class DlgTX extends MyJDialog {
         txtText.requestFocus();
     }
 
+    boolean isAmountOk() {
+        boolean amountOK = false;
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            amountOK = amount.negate().compareTo(bestandsumme) <= 0;
+        } else if (amount.compareTo(BigDecimal.ZERO) > 0) {
+            amountOK = amount.compareTo(packgroesse.subtract(bestandsumme)) <= 0;
+        }
+        return amountOK;
+    }
+
+
+    boolean isWeightOk() {
+        if (!tx.getStock().getTradeForm().isWeightControlled()) return true;
+        boolean weightOK = weight.compareTo(BigDecimal.ZERO) > 0;
+        return weightOK;
+    }
+
+    private void txtWeightControlledFocusGained(FocusEvent e) {
+        txtWeightControlled.selectAll();
+    }
+
+    private void txtWeightControlledCaretUpdate(CaretEvent evt) {
+        weight = SYSTools.checkBigDecimal(evt, false);
+        btnBuchung.setEnabled(isAmountOk() && isWeightOk());
+    }
+
     private void initDialog() {
         initComponents();
+        lblText.setText(SYSTools.xx("opde.medication.tx.text"));
+        lblValue.setText(SYSTools.xx("misc.msg.amount"));
+        lblWeightControl.setText(SYSTools.xx("opde.medication.tx.controlWeight"));
+        lblUnit2.setText("g");
         bestandsumme = MedStockTools.getSum(tx.getStock());
+        weight = null;
+        txtWeightControlled.setEnabled(tx.getStock().getTradeForm().isWeightControlled());
+
+        if (txtWeightControlled.isEnabled()){
+            txtWeightControlled.setToolTipText(SYSTools.xx("opde.medication.controlWeight.only.after.change"));
+        }
 
         lblUnit.setText(TradeFormTools.getPackUnit(tx.getStock().getTradeForm()));
 
@@ -112,6 +145,9 @@ public class DlgTX extends MyJDialog {
         txtValue = new JTextField();
         lblValue = new JLabel();
         lblUnit = new JLabel();
+        lblWeightControl = new JLabel();
+        txtWeightControlled = new JTextField();
+        lblUnit2 = new JLabel();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnBuchung = new JButton();
@@ -120,7 +156,7 @@ public class DlgTX extends MyJDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
-            "2*(default, $lgap), fill:default, $lgap, fill:default"));
+            "2*(default, $lgap), fill:default, $lgap, default, $lgap, fill:default"));
 
         //---- lblText ----
         lblText.setText("Buchungstext");
@@ -129,36 +165,21 @@ public class DlgTX extends MyJDialog {
 
         //---- txtText ----
         txtText.setColumns(100);
-        txtText.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtTextActionPerformed(e);
-            }
-        });
+        txtText.addActionListener(e -> txtTextActionPerformed(e));
         contentPane.add(txtText, CC.xywh(5, 3, 3, 1));
 
         //---- txtValue ----
         txtValue.setHorizontalAlignment(SwingConstants.RIGHT);
         txtValue.setText("jTextField1");
         txtValue.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtValue.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                txtMengeCaretUpdate(e);
-            }
-        });
+        txtValue.addCaretListener(e -> txtMengeCaretUpdate(e));
         txtValue.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 txtMengeFocusGained(e);
             }
         });
-        txtValue.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtValueActionPerformed(e);
-            }
-        });
+        txtValue.addActionListener(e -> txtValueActionPerformed(e));
         contentPane.add(txtValue, CC.xy(5, 5));
 
         //---- lblValue ----
@@ -172,32 +193,46 @@ public class DlgTX extends MyJDialog {
         lblUnit.setFont(new Font("Arial", Font.PLAIN, 14));
         contentPane.add(lblUnit, CC.xy(7, 5));
 
+        //---- lblWeightControl ----
+        lblWeightControl.setText("Menge");
+        lblWeightControl.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblWeightControl, CC.xy(3, 7));
+
+        //---- txtWeightControlled ----
+        txtWeightControlled.setHorizontalAlignment(SwingConstants.RIGHT);
+        txtWeightControlled.setText("jTextField1");
+        txtWeightControlled.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtWeightControlled.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtWeightControlledFocusGained(e);
+            }
+        });
+        txtWeightControlled.addCaretListener(e -> txtWeightControlledCaretUpdate(e));
+        contentPane.add(txtWeightControlled, CC.xy(5, 7));
+
+        //---- lblUnit2 ----
+        lblUnit2.setHorizontalAlignment(SwingConstants.TRAILING);
+        lblUnit2.setText("g");
+        lblUnit2.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblUnit2, CC.xy(7, 7, CC.LEFT, CC.DEFAULT));
+
         //======== panel1 ========
         {
             panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnBuchung ----
             btnBuchung.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnBuchung.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBuchungActionPerformed(e);
-                }
-            });
+            btnBuchung.addActionListener(e -> btnBuchungActionPerformed(e));
             panel1.add(btnBuchung);
         }
-        contentPane.add(panel1, CC.xywh(5, 7, 3, 1, CC.RIGHT, CC.DEFAULT));
-        setSize(600, 140);
+        contentPane.add(panel1, CC.xywh(5, 9, 3, 1, CC.RIGHT, CC.DEFAULT));
+        setSize(600, 165);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -219,14 +254,15 @@ public class DlgTX extends MyJDialog {
     }
 
     private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
-        amount = SYSTools.checkBigDecimal(evt, false);
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            btnBuchung.setEnabled(amount.negate().compareTo(bestandsumme) <= 0);
-        } else if (amount.compareTo(BigDecimal.ZERO) > 0) {
-            btnBuchung.setEnabled(amount.compareTo(packgroesse.subtract(bestandsumme)) <= 0);
-        } else {
-            btnBuchung.setEnabled(false);
-        }
+        amount = SYSTools.checkBigDecimal(evt, true);
+        btnBuchung.setEnabled(isAmountOk() && isWeightOk());
+//        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+//            btnBuchung.setEnabled(amount.negate().compareTo(bestandsumme) <= 0);
+//        } else if (amount.compareTo(BigDecimal.ZERO) > 0) {
+//            btnBuchung.setEnabled(amount.compareTo(packgroesse.subtract(bestandsumme)) <= 0);
+//        } else {
+//            btnBuchung.setEnabled(false);
+//        }
     }//GEN-LAST:event_txtMengeCaretUpdate
 
 
@@ -236,6 +272,9 @@ public class DlgTX extends MyJDialog {
     private JTextField txtValue;
     private JLabel lblValue;
     private JLabel lblUnit;
+    private JLabel lblWeightControl;
+    private JTextField txtWeightControlled;
+    private JLabel lblUnit2;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnBuchung;

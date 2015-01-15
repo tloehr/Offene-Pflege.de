@@ -38,6 +38,7 @@ import entity.StationTools;
 import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.prescription.MedStockTools;
+import entity.prescription.PrescriptionTools;
 import entity.process.QProcessElement;
 import entity.process.QProcessTools;
 import entity.qms.ControllingTools;
@@ -347,7 +348,7 @@ public class PnlControlling extends CleanablePanel {
     }
 
     private CollapsiblePane createCP4Drugs() {
-        final CollapsiblePane cpOrga = new CollapsiblePane();
+        final CollapsiblePane cpDrugs = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
                 SYSTools.xx("opde.controlling.drugs") +
@@ -357,29 +358,29 @@ public class PnlControlling extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    cpOrga.setCollapsed(!cpOrga.isCollapsed());
+                    cpDrugs.setCollapsed(!cpDrugs.isCollapsed());
                 } catch (PropertyVetoException pve) {
                     // BAH!
                 }
             }
         });
 
-        cpOrga.setTitleLabelComponent(cptitle.getMain());
-        cpOrga.setSlidingDirection(SwingConstants.SOUTH);
-        cpOrga.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+        cpDrugs.setTitleLabelComponent(cptitle.getMain());
+        cpDrugs.setSlidingDirection(SwingConstants.SOUTH);
+        cpDrugs.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpOrga.setContentPane(createContentPanel4Drugs());
+                cpDrugs.setContentPane(createContentPanel4Drugs());
             }
         });
 
-        if (!cpOrga.isCollapsed()) {
-            cpOrga.setContentPane(createContentPanel4Drugs());
+        if (!cpDrugs.isCollapsed()) {
+            cpDrugs.setContentPane(createContentPanel4Drugs());
         }
 
-        cpOrga.setHorizontalAlignment(SwingConstants.LEADING);
+        cpDrugs.setHorizontalAlignment(SwingConstants.LEADING);
 
-        return cpOrga;
+        return cpDrugs;
     }
 
     private CollapsiblePane createCP4Nursing() {
@@ -961,12 +962,19 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        SYSFilesTools.print(MedStockTools.getListForMedControl((Station) cmbStation.getSelectedItem(), progressClosure), false);
-                        return null;
+                        return MedStockTools.getListForMedControl((Station) cmbStation.getSelectedItem(), progressClosure);
                     }
 
                     @Override
                     protected void done() {
+                        try {
+                            SYSFilesTools.print(get().toString(), true);
+                        } catch (ExecutionException ee) {
+                            OPDE.fatal(ee);
+                        } catch (InterruptedException ie) {
+                            // nop
+                        }
+
                         OPDE.getDisplayManager().setProgressBarMessage(null);
                         OPDE.getMainframe().setBlocked(false);
                     }
@@ -977,6 +985,43 @@ public class PnlControlling extends CleanablePanel {
         pnlDrugControl.add(btnDrugControl, BorderLayout.WEST);
         pnlDrugControl.add(cmbStation, BorderLayout.EAST);
         pnlContent.add(pnlDrugControl);
+
+
+        JPanel pnlWeightControllNarcotics = new JPanel(new BorderLayout());
+        final JButton btnWeightControl = GUITools.createHyperlinkButton("opde.controlling.prescription.narcotics.weightcontrol", null, null);
+//               final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox(false));
+        btnWeightControl.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+
+                        return PrescriptionTools.getNarcoticsWeightList(progressClosure);
+                    }
+
+                    @Override
+                    protected void done() {
+
+                        try {
+                            SYSFilesTools.print(get().toString(), true);
+                        } catch (ExecutionException ee) {
+                            OPDE.fatal(ee);
+                        } catch (InterruptedException ie) {
+                            // nop
+                        }
+
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlWeightControllNarcotics.add(btnWeightControl, BorderLayout.WEST);
+//        pnlWeightControllNarcotics.add(cmbStation, BorderLayout.EAST);
+        pnlContent.add(pnlWeightControllNarcotics);
 
 
         return pnlContent;

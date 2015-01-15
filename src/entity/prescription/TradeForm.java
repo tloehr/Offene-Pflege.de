@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 @Entity
 @Table(name = "tradeform")
@@ -29,7 +28,9 @@ public class TradeForm implements Serializable {
     @Basic(optional = false)
     @Column(name = "expDaysWhenOpen")
     private Integer daysToExpireAfterOpened;
-
+    @Basic(optional = false)
+    @Column(name = "weightcontrol")
+    private Boolean weightControlled;
 
     public TradeForm() {
     }
@@ -39,6 +40,7 @@ public class TradeForm implements Serializable {
         this.packages = new ArrayList<MedPackage>();
         this.stocks = new ArrayList<MedStock>();
         this.upr = null;
+        this.weightControlled = false;
     }
 
     public TradeForm(MedProducts medProduct, String subtext, DosageForm dosageForm) {
@@ -48,10 +50,23 @@ public class TradeForm implements Serializable {
         this.packages = new ArrayList<MedPackage>();
         this.stocks = new ArrayList<MedStock>();
         this.upr = null;
+        this.weightControlled = false;
     }
 
     public Long getID() {
         return id;
+    }
+
+    public boolean isWeightControlled(){
+        return weightControlled.equals(Boolean.TRUE);
+    }
+
+    public Boolean getWeightControlled() {
+        return weightControlled;
+    }
+
+    public void setWeightControlled(Boolean weightControlled) {
+        this.weightControlled = weightControlled;
     }
 
     public String getSubtext() {
@@ -110,7 +125,6 @@ public class TradeForm implements Serializable {
     }
 
 
-
     /**
      * This is only relevant for DosageFormTypes UPRn. If this UPR is null, then the UPRs from the single MedStocks are
      * used for calculation. If this UPR is NOT null then it is used for calculations instead.
@@ -132,10 +146,12 @@ public class TradeForm implements Serializable {
 
         TradeForm tradeForm = (TradeForm) o;
 
+        if (id != null ? !id.equals(tradeForm.id) : tradeForm.id != null) return false;
         if (subtext != null ? !subtext.equals(tradeForm.subtext) : tradeForm.subtext != null) return false;
         if (dosageForm != null ? !dosageForm.equals(tradeForm.dosageForm) : tradeForm.dosageForm != null) return false;
         if (medProduct != null ? !medProduct.equals(tradeForm.medProduct) : tradeForm.medProduct != null) return false;
-        if (id != null ? !id.equals(tradeForm.id) : tradeForm.id != null) return false;
+        if (weightControlled != null ? !weightControlled.equals(tradeForm.weightControlled) : tradeForm.weightControlled != null) return false;
+
 
 //        if (packages != null ? !packages.equals(tradeForm.packages) : tradeForm.packages != null) return false;
 //        if (stocks != null ? !stocks.equals(tradeForm.stocks) : tradeForm.stocks != null) return false;
@@ -152,6 +168,7 @@ public class TradeForm implements Serializable {
 //        result = 31 * result + (stocks != null ? stocks.hashCode() : 0);
         result = 31 * result + (dosageForm != null ? dosageForm.hashCode() : 0);
         result = 31 * result + (medProduct != null ? medProduct.hashCode() : 0);
+        result = 31 * result + (weightControlled != null ? weightControlled.hashCode() : 0);
 
         return result;
     }

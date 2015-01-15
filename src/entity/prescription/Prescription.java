@@ -113,9 +113,9 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     @Basic(optional = false)
     @Column(name = "Stellplan")
     private boolean showOnDailyPlan;
-    @Basic(optional = false)
-    @Column(name = "weightcontrol")
-    private boolean weightControl;
+//    @Basic(optional = false)
+//    @Column(name = "weightcontrol")
+//    private boolean weightControl;
 
 
     // ==
@@ -183,7 +183,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.userON = OPDE.getLogin().getUser();
         this.commontags = new ArrayList<Commontags>();
-        this.weightControl = false;
+//        this.weightControl = false;
     }
 
     public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
@@ -207,16 +207,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.docOFF = docOFF;
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.commontags = new ArrayList<Commontags>();
-        this.weightControl = false;
-    }
-
-
-    public boolean isWeightControl() {
-        return weightControl;
-    }
-
-    public void setWeightControl(boolean weightControl) {
-        this.weightControl = weightControl;
+//        this.weightControl = false;
     }
 
     public Collection<Commontags> getCommontags() {

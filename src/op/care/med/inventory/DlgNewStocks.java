@@ -67,7 +67,7 @@ import java.util.List;
 public class DlgNewStocks extends MyJDialog {
     private boolean ignoreEvent;
 
-    private BigDecimal amount;
+    private BigDecimal amount, weight;
     private MedPackage aPackage;
     private TradeForm tradeForm;
     private Resident resident;
@@ -88,6 +88,8 @@ public class DlgNewStocks extends MyJDialog {
 
     public static final String internalClassID = "newstocks";
 
+    private CaretListener weightListener;
+
     public DlgNewStocks(Resident resident) {
         super(false);
         this.resident = resident;
@@ -107,6 +109,7 @@ public class DlgNewStocks extends MyJDialog {
             cmbPackung.setModel(new DefaultComboBoxModel());
             tradeForm = null;
             aPackage = null;
+            txtWeightControl.setEnabled(false);
             initCmbVorrat();
 
         } else {
@@ -181,6 +184,7 @@ public class DlgNewStocks extends MyJDialog {
             btnPrint.setSelected(false);
         }
 
+
         lblPZN.setText(SYSTools.xx("newstocks.lblPZN"));
         lblProd.setText(SYSTools.xx("newstocks.lblProd"));
         lblPack.setText(SYSTools.xx("newstocks.lblPack"));
@@ -246,10 +250,28 @@ public class DlgNewStocks extends MyJDialog {
         });
         txtMenge.setFont(SYSConst.ARIAL14);
         ovrMenge = new DefaultOverlayable(txtMenge);
-        mainPane.add(ovrMenge, CC.xywh(5, 11, 4, 1));
+        mainPane.add(ovrMenge, CC.xy(5, 11));
+
+
+        lblWeightControl.setText(SYSTools.xx("opde.medication.tx.controlWeight"));
+        txtWeightControl.setEnabled(false);
+        weight = null;
+        weightListener = new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent evt) {
+                weight = SYSTools.checkBigDecimal(evt, true);
+            }
+        };
 
         ignoreEvent = false;
         setVisible(true);
+    }
+
+
+    boolean isWeightOk() {
+        if (!txtWeightControl.isEnabled()) return true;
+        boolean weightOK = weight != null && weight.compareTo(BigDecimal.ZERO) > 0;
+        return weightOK;
     }
 
     /**
@@ -267,15 +289,17 @@ public class DlgNewStocks extends MyJDialog {
         hSpacer1 = new JPanel(null);
         btnMed = new JButton();
         lblProd = new JLabel();
-        cmbMProdukt = new JComboBox();
+        cmbMProdukt = new JComboBox<>();
         lblInventory = new JLabel();
         lblResident = new JLabel();
         txtBWSuche = new JTextField();
         lblAmount = new JLabel();
         lblPack = new JLabel();
-        cmbPackung = new JComboBox();
+        cmbPackung = new JComboBox<>();
         lblExpires = new JLabel();
         txtExpires = new JTextField();
+        lblWeightControl = new JLabel();
+        txtWeightControl = new JTextField();
         lblRemark = new JLabel();
         txtBemerkung = new JTextField();
         btnPrint = new JToggleButton();
@@ -293,8 +317,8 @@ public class DlgNewStocks extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                    "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default, $lcgap, default:grow, $lcgap, 14dlu",
+                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- lblPZN ----
             lblPZN.setText("PZN oder Suchbegriff");
@@ -307,12 +331,7 @@ public class DlgNewStocks extends MyJDialog {
 
                 //---- txtMedSuche ----
                 txtMedSuche.setFont(new Font("Arial", Font.PLAIN, 14));
-                txtMedSuche.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtMedSucheActionPerformed(e);
-                    }
-                });
+                txtMedSuche.addActionListener(e -> txtMedSucheActionPerformed(e));
                 panel2.add(txtMedSuche);
                 panel2.add(hSpacer1);
 
@@ -323,15 +342,10 @@ public class DlgNewStocks extends MyJDialog {
                 btnMed.setBorder(null);
                 btnMed.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
                 btnMed.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnMed.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnMedActionPerformed(e);
-                    }
-                });
+                btnMed.addActionListener(e -> btnMedActionPerformed(e));
                 panel2.add(btnMed);
             }
-            mainPane.add(panel2, CC.xywh(5, 3, 4, 1));
+            mainPane.add(panel2, CC.xywh(5, 3, 6, 1));
 
             //---- lblProd ----
             lblProd.setText("Produkt");
@@ -339,17 +353,12 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(lblProd, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
+            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[]{
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbMProdukt.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbMProduktItemStateChanged(e);
-                }
-            });
-            mainPane.add(cmbMProdukt, CC.xywh(5, 5, 4, 1));
+            cmbMProdukt.addItemListener(e -> cmbMProduktItemStateChanged(e));
+            mainPane.add(cmbMProdukt, CC.xywh(5, 5, 6, 1));
 
             //---- lblInventory ----
             lblInventory.setText("vorhandene Vorr\u00e4te");
@@ -363,12 +372,7 @@ public class DlgNewStocks extends MyJDialog {
 
             //---- txtBWSuche ----
             txtBWSuche.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtBWSuche.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtBWSucheCaretUpdate(e);
-                }
-            });
+            txtBWSuche.addCaretListener(e -> txtBWSucheCaretUpdate(e));
             mainPane.add(txtBWSuche, CC.xy(5, 17));
 
             //---- lblAmount ----
@@ -382,17 +386,12 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(lblPack, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
+            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[]{
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbPackung.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbPackungItemStateChanged(e);
-                }
-            });
-            mainPane.add(cmbPackung, CC.xywh(5, 7, 4, 1));
+            cmbPackung.addItemListener(e -> cmbPackungItemStateChanged(e));
+            mainPane.add(cmbPackung, CC.xywh(5, 7, 6, 1));
 
             //---- lblExpires ----
             lblExpires.setText("expires");
@@ -406,18 +405,23 @@ public class DlgNewStocks extends MyJDialog {
                 public void focusGained(FocusEvent e) {
                     txtExpiresFocusGained(e);
                 }
+
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtExpiresFocusLost(e);
                 }
             });
-            txtExpires.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtExpiresActionPerformed(e);
-                }
-            });
-            mainPane.add(txtExpires, CC.xywh(5, 9, 3, 1, CC.DEFAULT, CC.FILL));
+            txtExpires.addActionListener(e -> txtExpiresActionPerformed(e));
+            mainPane.add(txtExpires, CC.xywh(5, 9, 5, 1, CC.DEFAULT, CC.FILL));
+
+            //---- lblWeightControl ----
+            lblWeightControl.setText("Buchungsmenge");
+            lblWeightControl.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblWeightControl, CC.xy(7, 11));
+
+            //---- txtWeightControl ----
+            txtWeightControl.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(txtWeightControl, CC.xy(9, 11, CC.DEFAULT, CC.FILL));
 
             //---- lblRemark ----
             lblRemark.setText("Bemerkung");
@@ -426,25 +430,15 @@ public class DlgNewStocks extends MyJDialog {
 
             //---- txtBemerkung ----
             txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtBemerkung.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtBemerkungCaretUpdate(e);
-                }
-            });
-            mainPane.add(txtBemerkung, CC.xywh(5, 15, 4, 1));
+            txtBemerkung.addCaretListener(e -> txtBemerkungCaretUpdate(e));
+            mainPane.add(txtBemerkung, CC.xywh(5, 15, 6, 1));
 
             //---- btnPrint ----
             btnPrint.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-on.png")));
             btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-off.png")));
             btnPrint.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnPrint.setEnabled(false);
-            btnPrint.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    btnPrintItemStateChanged(e);
-                }
-            });
+            btnPrint.addItemListener(e -> btnPrintItemStateChanged(e));
             mainPane.add(btnPrint, CC.xy(3, 19, CC.RIGHT, CC.DEFAULT));
 
             //======== panel1 ========
@@ -452,28 +446,18 @@ public class DlgNewStocks extends MyJDialog {
                 panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
                 //---- btnClose ----
-                btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_eject.png")));
+                btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
                 btnClose.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnClose.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCloseActionPerformed(e);
-                    }
-                });
+                btnClose.addActionListener(e -> btnCloseActionPerformed(e));
                 panel1.add(btnClose);
 
                 //---- btnApply ----
                 btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
                 btnApply.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnApply.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnApplyActionPerformed(e);
-                    }
-                });
+                btnApply.addActionListener(e -> btnApplyActionPerformed(e));
                 panel1.add(btnApply);
             }
-            mainPane.add(panel1, CC.xywh(7, 19, 2, 1, CC.RIGHT, CC.DEFAULT));
+            mainPane.add(panel1, CC.xywh(9, 19, 2, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(mainPane);
         pack();
@@ -513,6 +497,12 @@ public class DlgNewStocks extends MyJDialog {
         if (inventory == null) {
             text += "Keinen Vorrat ausgewählt. ";
         }
+
+        if (!isWeightOk()) {
+            text += "Kontrollgewicht falsch. ";
+        }
+
+        grmpf;
 
         if (text.isEmpty()) {
             save();
@@ -555,15 +545,8 @@ public class DlgNewStocks extends MyJDialog {
 
             MedStock newStock = em.merge(new MedStock(inventory, tradeForm, aPackage, txtBemerkung.getText(), estimatedUPR, dummyMode));
             newStock.setExpires(expiry);
-            MedStockTransaction buchung = em.merge(new MedStockTransaction(newStock, amount));
-//            newStock.getStockTransaction().add(buchung);
-//            inventory.getMedStocks().add(newStock);
-
-            // i dont want to do this anymore. this messes up the automatic expiry detection by storing wrong "opening" dates.
-//            if (MedStockTools.getStockInUse(inventory) == null) {
-//                MedInventoryTools.openNext(inventory);
-//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("newstocks.new.stock.has.been.opened"));
-//            }
+            MedStockTransaction tx = em.merge(new MedStockTransaction(newStock, amount));
+            tx.setWeight(weight);
 
             em.getTransaction().commit();
             amount = null;
@@ -571,6 +554,7 @@ public class DlgNewStocks extends MyJDialog {
             tradeForm = null;
             inventory = null;
             expiry = null;
+            weight = null;
 
             if (btnPrint.isSelected()) {
                 OPDE.getPrintProcessor().addPrintJob(new PrintListElement(newStock, logicalPrinter, printForm, OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
@@ -578,7 +562,8 @@ public class DlgNewStocks extends MyJDialog {
 
             // if the label printer is not used, the new number is shown until the next message, so the user has time to write the number down manually.
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("newstocks.registration.success.1") + " <b>" + newStock.getID() + "</b> " + SYSTools.xx("newstocks.registration.success.2"), btnPrint.isSelected() ? 2 : 0));
-        } catch (OptimisticLockException ole) { OPDE.warn(ole);
+        } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -808,6 +793,7 @@ public class DlgNewStocks extends MyJDialog {
 
         if (tradeForm != null) {
             DefaultComboBoxModel dcbm = new DefaultComboBoxModel(tradeForm.getPackages().toArray());
+            txtWeightControl.setEnabled(tradeForm.isWeightControlled());
             dcbm.insertElementAt("<Sonderpackung>", 0);
             cmbPackung.setModel(dcbm);
             cmbPackung.setRenderer(MedPackageTools.getMedPackungRenderer());
@@ -820,6 +806,7 @@ public class DlgNewStocks extends MyJDialog {
         } else {
             cmbPackung.setModel(new DefaultComboBoxModel());
             aPackage = null;
+            txtWeightControl.setEnabled(false);
         }
 
         initCmbVorrat();
@@ -844,15 +831,17 @@ public class DlgNewStocks extends MyJDialog {
     private JPanel hSpacer1;
     private JButton btnMed;
     private JLabel lblProd;
-    private JComboBox cmbMProdukt;
+    private JComboBox<String> cmbMProdukt;
     private JLabel lblInventory;
     private JLabel lblResident;
     private JTextField txtBWSuche;
     private JLabel lblAmount;
     private JLabel lblPack;
-    private JComboBox cmbPackung;
+    private JComboBox<String> cmbPackung;
     private JLabel lblExpires;
     private JTextField txtExpires;
+    private JLabel lblWeightControl;
+    private JTextField txtWeightControl;
     private JLabel lblRemark;
     private JTextField txtBemerkung;
     private JToggleButton btnPrint;

@@ -23,7 +23,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     @Basic(optional = false)
     @Column(name = "Menge")
     private BigDecimal amount;
-    @Basic(optional = true)
+    @Basic(optional = false)
     @Column(name = "weight")
     private BigDecimal weight;
     @Column(name = "Text", length = 100)
@@ -44,7 +44,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         this.stock = stock;
         this.amount = amount;
         this.bhp = null;
-        this.weight = null;
+        this.weight = BigDecimal.ZERO;
         this.state = MedStockTransactionTools.STATE_CREDIT;
         this.user = OPDE.getLogin().getUser();
     }
@@ -64,7 +64,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         this.amount = amount;
         this.pit = new Date();
         this.bhp = null;
-        this.weight = null;
+        this.weight = BigDecimal.ZERO;
         this.state = state;
         this.user = OPDE.getLogin().getUser();
     }

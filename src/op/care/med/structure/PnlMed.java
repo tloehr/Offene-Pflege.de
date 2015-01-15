@@ -37,7 +37,6 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.prescription.*;
 import op.OPDE;
 import op.care.med.inventory.DlgNewStocks;
-import op.care.med.inventory.PnlInventory;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.InternalClassACL;
 import op.tools.CleanablePanel;
@@ -277,11 +276,11 @@ public class PnlMed extends CleanablePanel {
     private DefaultMutableTreeNode getRoot() {
         DefaultMutableTreeNode root;
         root = new DefaultMutableTreeNode(product);
-        SYSTools.addAllNodes(root, getDAF());
+        SYSTools.addAllNodes(root, getTradeForms());
         return root;
     }
 
-    private java.util.List getDAF() {
+    private java.util.List<TradeForm> getTradeForms() {
         java.util.List result = new ArrayList();
 
         EntityManager em = OPDE.createEM();

@@ -104,6 +104,7 @@ public class Qmsplan {
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
 
+
     @ManyToMany
     @JoinTable(name = "notify4qmsplan", joinColumns =
     @JoinColumn(name = "qmsplanid"), inverseJoinColumns =

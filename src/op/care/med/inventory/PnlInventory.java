@@ -455,9 +455,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                         myInventory.setTo(new Date());
 
                                         em.getTransaction().commit();
-//
-//                                        lstInventories.remove(inventory);
-//                                        lstInventories.add(myInventory);
+
                                         createCP4(myInventory);
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
@@ -1166,6 +1164,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listTX.size()));
 
                 BigDecimal rowsum = MedStockTools.getSum(stock);
+//                BigDecimal rowsum = MedStockTools.getSum(stock);
 //                Collections.sort(stock.getStockTransaction());
                 for (final MedStockTransaction tx : listTX) {
                     progress++;
@@ -1176,14 +1175,23 @@ public class PnlInventory extends NursingRecordsPanel {
                             + "<br/>[" + tx.getID() + "]"
                             + "</td>" +
                             "<td width=\"200\" align=\"center\">" + SYSTools.catchNull(tx.getText(), "--") + "</td>" +
+
                             "<td width=\"100\" align=\"right\">" +
                             NumberFormat.getNumberInstance().format(tx.getAmount()) +
                             "</td>" +
+
                             "<td width=\"100\" align=\"right\">" +
                             (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
                             NumberFormat.getNumberInstance().format(rowsum) +
                             (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                             "</td>" +
+
+
+                            (stock.getTradeForm().isWeightControlled() ?
+                                    "<td width=\"100\" align=\"right\">" +
+                                            NumberFormat.getNumberInstance().format(tx.getWeight()) + "g" +
+                                            "</td>" : "") +
+
                             "<td width=\"100\" align=\"left\">" +
                             SYSTools.anonymizeUser(tx.getUser().getUID()) +
                             "</td>" +

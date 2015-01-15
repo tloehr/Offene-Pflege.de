@@ -212,13 +212,13 @@ public class MedInventoryTools {
 
         if (stockSum.compareTo(quantity) == 0) {
             if (stock.isToBeClosedSoon()) {
-                MedStockTools.close(em, stock, SYSTools.xx(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                MedStockTools.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
             }
         } else if (stockSum.compareTo(quantity) < 0) {
             if (!stock.hasNext2Open() && stock.isToBeClosedSoon()) {
-                MedStockTools.close(em, stock, SYSTools.xx(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                MedStockTools.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
             } else if (stock.hasNext2Open()) {
-                MedStock nextStock = MedStockTools.close(em, stock, SYSTools.xx(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                MedStock nextStock = MedStockTools.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
                 withdraw(em, nextStock, quantity.subtract(stockSum), weight, bhp);
             }
         }

@@ -38,7 +38,7 @@ public class PnlTradeForm extends JPanel {
     private Closure validate;
     private boolean ignoreEvent = false;
 
-    public static final String internalClassID = MedProductWizard.internalClassID + ".subtext";
+    public static final String internalClassID = "opde.medication.medproduct.wizard.subtext";
 
     public PnlTradeForm(Closure validate, MedProducts product) {
         this.validate = validate;
@@ -56,7 +56,8 @@ public class PnlTradeForm extends JPanel {
             lstDaf.setModel(lmDaf);
             lstDaf.setCellRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
         }
-        lblMsg.setText(SYSTools.xx(internalClassID + ".existingTradeforms"));
+        lblMsg.setText(SYSTools.xx("opde.medication.medproduct.wizard.subtext.existingTradeforms"));
+        cbWeightControlled.setText("opde.medication.medproduct.wizard.subtext.weightControlled");
         lblMsg.setVisible(!product.getTradeforms().isEmpty());
         jsp1.setVisible(!product.getTradeforms().isEmpty());
         lstDaf.setVisible(!product.getTradeforms().isEmpty());
@@ -88,8 +89,8 @@ public class PnlTradeForm extends JPanel {
         tradeForm = new TradeForm(product, "", dosageForm);
 
         rbCalcUPR.setSelected(true);
-        rbCalcUPR.setText(SYSTools.xx(internalClassID + ".calcUPR"));
-        rbSetUPR.setText(SYSTools.xx(internalClassID + ".setUPR"));
+        rbCalcUPR.setText(SYSTools.xx("opde.medication.medproduct.wizard.subtext.calcUPR"));
+        rbSetUPR.setText(SYSTools.xx("opde.medication.medproduct.wizard.subtext.setUPR"));
         txtUPR.setText("10");
         txtUPR.setEnabled(false);
         pnlUPR.setVisible(false);
@@ -233,6 +234,10 @@ public class PnlTradeForm extends JPanel {
         }
     }
 
+    private void cbWeightControlledItemStateChanged(ItemEvent e) {
+        tradeForm.setWeightControlled(e.getStateChange() == ItemEvent.SELECTED);
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -252,34 +257,25 @@ public class PnlTradeForm extends JPanel {
         txtExpiresIn = new JTextField();
         hSpacer2 = new JPanel(null);
         cmbDaysWeeks = new JComboBox();
+        cbWeightControlled = new JCheckBox();
         jsp1 = new JScrollPane();
         lstDaf = new JList();
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
-                "2*(default, $lgap), default, $rgap, pref, 2*($lgap, default), $lgap, default:grow, $lgap, default"));
+            "default, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
+            "2*(default, $lgap), default, $rgap, pref, 2*($lgap, default), $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
         txtZusatz.setInstantSearchDelay(0);
         txtZusatz.setPrompt("Zusatzbezeichnung");
-        txtZusatz.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtZusatzActionPerformed(e);
-            }
-        });
+        txtZusatz.addActionListener(e -> txtZusatzActionPerformed(e));
         add(txtZusatz, CC.xywh(3, 3, 5, 1));
 
         //---- cmbFormen ----
         cmbFormen.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbFormen.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbFormenItemStateChanged(e);
-            }
-        });
+        cmbFormen.addItemListener(e -> cmbFormenItemStateChanged(e));
         add(cmbFormen, CC.xywh(3, 5, 3, 1));
 
         //---- btnAdd ----
@@ -289,12 +285,7 @@ public class PnlTradeForm extends JPanel {
         btnAdd.setBorder(null);
         btnAdd.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
         btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnAddActionPerformed(e);
-            }
-        });
+        btnAdd.addActionListener(e -> btnAddActionPerformed(e));
         add(btnAdd, CC.xy(7, 5));
 
         //---- lbl1 ----
@@ -315,22 +306,12 @@ public class PnlTradeForm extends JPanel {
 
             //---- rbCalcUPR ----
             rbCalcUPR.setText("text");
-            rbCalcUPR.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    rbCalcUPRItemStateChanged(e);
-                }
-            });
+            rbCalcUPR.addItemListener(e -> rbCalcUPRItemStateChanged(e));
             pnlUPR.add(rbCalcUPR);
 
             //---- rbSetUPR ----
             rbSetUPR.setText("text");
-            rbSetUPR.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    rbSetUPRItemStateChanged(e);
-                }
-            });
+            rbSetUPR.addItemListener(e -> rbSetUPRItemStateChanged(e));
             pnlUPR.add(rbSetUPR);
 
             //---- txtUPR ----
@@ -355,12 +336,7 @@ public class PnlTradeForm extends JPanel {
 
             //---- cbExpiresAfterOpened ----
             cbExpiresAfterOpened.setText("expiresAfterOpened");
-            cbExpiresAfterOpened.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cbExpiresAfterOpenedItemStateChanged(e);
-                }
-            });
+            cbExpiresAfterOpened.addItemListener(e -> cbExpiresAfterOpenedItemStateChanged(e));
             panel1.add(cbExpiresAfterOpened);
             panel1.add(hSpacer1);
 
@@ -378,15 +354,15 @@ public class PnlTradeForm extends JPanel {
 
             //---- cmbDaysWeeks ----
             cmbDaysWeeks.setEnabled(false);
-            cmbDaysWeeks.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbDaysWeeksItemStateChanged(e);
-                }
-            });
+            cmbDaysWeeks.addItemListener(e -> cmbDaysWeeksItemStateChanged(e));
             panel1.add(cmbDaysWeeks);
         }
         add(panel1, CC.xy(3, 11));
+
+        //---- cbWeightControlled ----
+        cbWeightControlled.setText("text");
+        cbWeightControlled.addItemListener(e -> cbWeightControlledItemStateChanged(e));
+        add(cbWeightControlled, CC.xywh(5, 11, 3, 1, CC.RIGHT, CC.DEFAULT));
 
         //======== jsp1 ========
         {
@@ -394,12 +370,7 @@ public class PnlTradeForm extends JPanel {
             //---- lstDaf ----
             lstDaf.setFont(new Font("Arial", Font.PLAIN, 14));
             lstDaf.setVisible(false);
-            lstDaf.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    lstDafValueChanged(e);
-                }
-            });
+            lstDaf.addListSelectionListener(e -> lstDafValueChanged(e));
             jsp1.setViewportView(lstDaf);
         }
         add(jsp1, CC.xywh(5, 13, 3, 1, CC.DEFAULT, CC.FILL));
@@ -428,6 +399,7 @@ public class PnlTradeForm extends JPanel {
     private JTextField txtExpiresIn;
     private JPanel hSpacer2;
     private JComboBox cmbDaysWeeks;
+    private JCheckBox cbWeightControlled;
     private JScrollPane jsp1;
     private JList lstDaf;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

@@ -110,7 +110,8 @@ public class TradeFormTools {
     public static String toPrettyStringMediumWithExpiry(TradeForm tradeForm) {
 
         String text = toPrettyStringMedium(tradeForm);
-        text += SYSTools.catchNull(getExpiresInAsString(tradeForm), ", "+SYSTools.xx("tradeform.subtext.expiresAfterOpenedIn")+" ", "");
+        text += SYSTools.catchNull(getExpiresInAsString(tradeForm), ", " + SYSTools.xx("tradeform.subtext.expiresAfterOpenedIn") + " ", "");
+        text += tradeForm.isWeightControlled() ? ", " + SYSTools.xx("opde.medication.tradeform.weightControlled") : "";
         return text;
     }
 
@@ -152,7 +153,6 @@ public class TradeFormTools {
 
         return list;
     }
-
 
 
     public static MedInventory getInventory4Prescription(Prescription prescription) {
@@ -221,12 +221,12 @@ public class TradeFormTools {
      * Trotzdem muss dieses neue Präparat ebenfalls mit auf den Vorrat, der für die Verordnung verwendet wird,
      * draufgebucht werden. Das einzige auf dem OPDE hier besteht ist, dass die beiden Präparate dieselbe bzw.
      * eine äquivalente PrinterForm haben.So können mit der Zeit die Vorräte Bestände mit ganz unterschiedlichen Darreichungen besessen haben.
-     * <p/>
+     * <p>
      * Bei der täglichen Arbeit, besonders bei dem Einbuchen von neuen Medikamenten stellt sich aber immer wieder die
      * Frage: <b>auf welchen Vorrat muss ich dieses Produkt buchen ? Wozu gehört es ?</b>
-     * <p/>
+     * <p>
      * Natürlich sind alle nachfolgenden Überlegungen <i>bewohnerbezogen</i>. Ein Vorrat gehört immer <b>genau einem</b> Bewohner.
-     * <p/>
+     * <p>
      * Die Antwort kann ganz unterschiedlich ausfallen:
      * <ol>
      * <li>Wenn eine Darreichung zu <b>einem früheren Zeitpunkt</b> schonmal zu einem Vorrat zugeordnet war, <b>dann wird diese jetzt wieder</b> zugeordnet. Fall erledigt.</li>
@@ -259,11 +259,11 @@ public class TradeFormTools {
 
         // 3. Anhand der Bestände die passenden Vorräte ermitteln
         Query queryVorraete = em.createQuery(" " +
-                " SELECT DISTINCT b.inventory FROM MedStock b " +
-                " WHERE b.inventory.resident = :resident " +
-                " AND b.inventory.to = :to " +
-                " AND b.tradeform.dosageForm.id  IN " +
-                " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
+                        " SELECT DISTINCT b.inventory FROM MedStock b " +
+                        " WHERE b.inventory.resident = :resident " +
+                        " AND b.inventory.to = :to " +
+                        " AND b.tradeform.dosageForm.id  IN " +
+                        " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
         );
         queryVorraete.setParameter("resident", resident);
         queryVorraete.setParameter("to", SYSConst.DATE_UNTIL_FURTHER_NOTICE);

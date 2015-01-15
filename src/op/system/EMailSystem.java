@@ -135,10 +135,12 @@ public class EMailSystem {
 //            return false;
 //        }
 
+        if (users.isEmpty()) return false;
+
         ArrayList<Recipient> recipients = new ArrayList<>();
 
         users.forEach(user -> {
-            if (user.getMailConfirmed() == UsersTools.MAIL_CONFIRMED) {
+            if (user.isActive()&& user.getMailConfirmed() == UsersTools.MAIL_CONFIRMED) {
                 recipients.add(new Recipient(user));
             }
         });
@@ -149,11 +151,16 @@ public class EMailSystem {
 //            }
 //        }
 
+
+
+
         return sendMail(subject, bodyText, recipients.toArray(new Recipient[]{}), attach);
     }
 
 
     public static boolean sendMail(String subject, String bodyText, Recipient[] recipients, File[] attach) {
+
+        if (recipients.length == 0) return false;
 
         boolean success;
 

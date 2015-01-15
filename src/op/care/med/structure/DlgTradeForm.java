@@ -46,7 +46,10 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
 
 /**
  * @author root
@@ -139,9 +142,15 @@ public class DlgTradeForm extends MyJDialog {
         return tradeForm;
     }
 
+    private void cbWeightControlledItemStateChanged(ItemEvent e) {
+        tradeForm.setWeightControlled(e.getStateChange() == ItemEvent.SELECTED);
+    }
+
     private void initDialog() {
         initPhase = true;
         cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.Days"), SYSTools.xx("misc.msg.weeks")}));
+        cbWeightControlled.setText(SYSTools.xx("opde.medication.medproduct.wizard.subtext.weightControlled"));
+        cbWeightControlled.setSelected(tradeForm.isWeightControlled());
         cbExpiresAfterOpened.setText(SYSTools.xx("tradeform.subtext.expiresAfterOpenedIn"));
         cbExpiresAfterOpened.setSelected(tradeForm.getDaysToExpireAfterOpened() != null);
         txtExpiresIn.setEnabled(cbExpiresAfterOpened.isSelected());
@@ -188,6 +197,7 @@ public class DlgTradeForm extends MyJDialog {
         txtExpiresIn = new JTextField();
         hSpacer3 = new JPanel(null);
         cmbDaysWeeks = new JComboBox();
+        cbWeightControlled = new JCheckBox();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnOK = new JButton();
@@ -202,19 +212,19 @@ public class DlgTradeForm extends MyJDialog {
         //======== jPanel1 ========
         {
             jPanel1.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
-                "fill:14dlu, 2*($lgap, fill:default), $lgap, default, 2*($lgap, fill:default), $lgap, 14dlu"));
+                    "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
+                    "fill:14dlu, 2*($lgap, fill:default), $lgap, default, 2*($lgap, fill:default), $lgap, 14dlu"));
 
             //---- txtZusatz ----
             txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(txtZusatz, CC.xywh(3, 3, 5, 1));
 
             //---- cmbForm ----
-            cmbForm.setModel(new DefaultComboBoxModel<>(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbForm.setModel(new DefaultComboBoxModel<>(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbForm.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbForm, CC.xywh(3, 5, 3, 1));
@@ -230,12 +240,7 @@ public class DlgTradeForm extends MyJDialog {
                 btnAdd.setBorderPainted(false);
                 btnAdd.setContentAreaFilled(false);
                 btnAdd.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                btnAdd.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnAddActionPerformed(e);
-                    }
-                });
+                btnAdd.addActionListener(e -> btnAddActionPerformed(e));
                 panel2.add(btnAdd);
                 panel2.add(hSpacer1);
 
@@ -246,12 +251,7 @@ public class DlgTradeForm extends MyJDialog {
                 btnEdit.setBorderPainted(false);
                 btnEdit.setContentAreaFilled(false);
                 btnEdit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                btnEdit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnEditActionPerformed(e);
-                    }
-                });
+                btnEdit.addActionListener(e -> btnEditActionPerformed(e));
                 panel2.add(btnEdit);
             }
             jPanel1.add(panel2, CC.xy(7, 5));
@@ -262,12 +262,7 @@ public class DlgTradeForm extends MyJDialog {
 
                 //---- cbExpiresAfterOpened ----
                 cbExpiresAfterOpened.setText("expiresAfterOpened");
-                cbExpiresAfterOpened.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cbExpiresAfterOpenedItemStateChanged(e);
-                    }
-                });
+                cbExpiresAfterOpened.addItemListener(e -> cbExpiresAfterOpenedItemStateChanged(e));
                 panel4.add(cbExpiresAfterOpened);
                 panel4.add(hSpacer2);
 
@@ -285,15 +280,15 @@ public class DlgTradeForm extends MyJDialog {
 
                 //---- cmbDaysWeeks ----
                 cmbDaysWeeks.setEnabled(false);
-                cmbDaysWeeks.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbDaysWeeksItemStateChanged(e);
-                    }
-                });
+                cmbDaysWeeks.addItemListener(e -> cmbDaysWeeksItemStateChanged(e));
                 panel4.add(cmbDaysWeeks);
             }
             jPanel1.add(panel4, CC.xywh(3, 7, 5, 1));
+
+            //---- cbWeightControlled ----
+            cbWeightControlled.setText("text");
+            cbWeightControlled.addItemListener(e -> cbWeightControlledItemStateChanged(e));
+            jPanel1.add(cbWeightControlled, CC.xywh(3, 9, 5, 1));
 
             //======== panel1 ========
             {
@@ -302,23 +297,13 @@ public class DlgTradeForm extends MyJDialog {
                 //---- btnCancel ----
                 btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
                 btnCancel.setText(null);
-                btnCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCancelActionPerformed(e);
-                    }
-                });
+                btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
                 panel1.add(btnCancel);
 
                 //---- btnOK ----
                 btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
                 btnOK.setText(null);
-                btnOK.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnOKActionPerformed(e);
-                    }
-                });
+                btnOK.addActionListener(e -> btnOKActionPerformed(e));
                 panel1.add(btnOK);
             }
             jPanel1.add(panel1, CC.xywh(5, 11, 3, 1, CC.RIGHT, CC.DEFAULT));
@@ -371,6 +356,7 @@ public class DlgTradeForm extends MyJDialog {
     private JTextField txtExpiresIn;
     private JPanel hSpacer3;
     private JComboBox cmbDaysWeeks;
+    private JCheckBox cbWeightControlled;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnOK;
