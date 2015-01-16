@@ -54,7 +54,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         this.amount = amount;
         this.pit = new Date();
         this.bhp = bhp;
-        this.weight = weight;
+        this.weight = weight == null ? BigDecimal.ZERO : weight;
         this.state = MedStockTransactionTools.STATE_DEBIT;
         this.user = OPDE.getLogin().getUser();
     }
@@ -75,7 +75,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     }
 
     public void setWeight(BigDecimal weight) {
-        this.weight = weight;
+        this.weight = weight == null ? BigDecimal.ZERO : weight;
     }
 
     public Long getID() {

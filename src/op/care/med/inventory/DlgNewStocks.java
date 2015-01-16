@@ -88,7 +88,7 @@ public class DlgNewStocks extends MyJDialog {
 
     public static final String internalClassID = "newstocks";
 
-    private CaretListener weightListener;
+//    private CaretListener weightListener;
 
     public DlgNewStocks(Resident resident) {
         super(false);
@@ -109,7 +109,8 @@ public class DlgNewStocks extends MyJDialog {
             cmbPackung.setModel(new DefaultComboBoxModel());
             tradeForm = null;
             aPackage = null;
-            txtWeightControl.setEnabled(false);
+            txtWeightControl.setVisible(false);
+            lblWeightControl.setVisible(false);
             initCmbVorrat();
 
         } else {
@@ -184,7 +185,6 @@ public class DlgNewStocks extends MyJDialog {
             btnPrint.setSelected(false);
         }
 
-
         lblPZN.setText(SYSTools.xx("newstocks.lblPZN"));
         lblProd.setText(SYSTools.xx("newstocks.lblProd"));
         lblPack.setText(SYSTools.xx("newstocks.lblPack"));
@@ -252,24 +252,28 @@ public class DlgNewStocks extends MyJDialog {
         ovrMenge = new DefaultOverlayable(txtMenge);
         mainPane.add(ovrMenge, CC.xy(5, 11));
 
-
         lblWeightControl.setText(SYSTools.xx("opde.medication.tx.controlWeight"));
-        txtWeightControl.setEnabled(false);
+        lblWeightControl.setToolTipText(SYSTools.xx("opde.medication.controlWeight.newBottle.bottle.only"));
         weight = null;
-        weightListener = new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent evt) {
-                weight = SYSTools.checkBigDecimal(evt, true);
-            }
-        };
+        txtWeightControl.setVisible(false);
+        txtWeightControl.setText("");
+        lblWeightControl.setVisible(false);
 
         ignoreEvent = false;
         setVisible(true);
     }
 
+    private void txtWeightControlCaretUpdate(CaretEvent evt) {
+        weight = SYSTools.checkBigDecimal(evt, false);
+    }
+
+    private void txtWeightControlFocusGained(FocusEvent e) {
+        txtWeightControl.selectAll();
+    }
+
 
     boolean isWeightOk() {
-        if (!txtWeightControl.isEnabled()) return true;
+        if (!txtWeightControl.isVisible()) return true;
         boolean weightOK = weight != null && weight.compareTo(BigDecimal.ZERO) > 0;
         return weightOK;
     }
@@ -298,6 +302,7 @@ public class DlgNewStocks extends MyJDialog {
         cmbPackung = new JComboBox<>();
         lblExpires = new JLabel();
         txtExpires = new JTextField();
+        panel3 = new JPanel();
         lblWeightControl = new JLabel();
         txtWeightControl = new JTextField();
         lblRemark = new JLabel();
@@ -317,8 +322,8 @@ public class DlgNewStocks extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default, $lcgap, default:grow, $lcgap, 14dlu",
-                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default:grow, $lcgap, 14dlu",
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- lblPZN ----
             lblPZN.setText("PZN oder Suchbegriff");
@@ -345,7 +350,7 @@ public class DlgNewStocks extends MyJDialog {
                 btnMed.addActionListener(e -> btnMedActionPerformed(e));
                 panel2.add(btnMed);
             }
-            mainPane.add(panel2, CC.xywh(5, 3, 6, 1));
+            mainPane.add(panel2, CC.xywh(5, 3, 4, 1));
 
             //---- lblProd ----
             lblProd.setText("Produkt");
@@ -353,12 +358,12 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(lblProd, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[]{
+            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[] {
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMProdukt.addItemListener(e -> cmbMProduktItemStateChanged(e));
-            mainPane.add(cmbMProdukt, CC.xywh(5, 5, 6, 1));
+            mainPane.add(cmbMProdukt, CC.xywh(5, 5, 4, 1));
 
             //---- lblInventory ----
             lblInventory.setText("vorhandene Vorr\u00e4te");
@@ -386,12 +391,12 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(lblPack, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[]{
+            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[] {
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbPackung.addItemListener(e -> cmbPackungItemStateChanged(e));
-            mainPane.add(cmbPackung, CC.xywh(5, 7, 6, 1));
+            mainPane.add(cmbPackung, CC.xywh(5, 7, 4, 1));
 
             //---- lblExpires ----
             lblExpires.setText("expires");
@@ -405,23 +410,39 @@ public class DlgNewStocks extends MyJDialog {
                 public void focusGained(FocusEvent e) {
                     txtExpiresFocusGained(e);
                 }
-
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtExpiresFocusLost(e);
                 }
             });
             txtExpires.addActionListener(e -> txtExpiresActionPerformed(e));
-            mainPane.add(txtExpires, CC.xywh(5, 9, 5, 1, CC.DEFAULT, CC.FILL));
+            mainPane.add(txtExpires, CC.xywh(5, 9, 3, 1, CC.DEFAULT, CC.FILL));
 
-            //---- lblWeightControl ----
-            lblWeightControl.setText("Buchungsmenge");
-            lblWeightControl.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(lblWeightControl, CC.xy(7, 11));
+            //======== panel3 ========
+            {
+                panel3.setLayout(new FormLayout(
+                    "pref, $lcgap, default:grow",
+                    "fill:17dlu"));
 
-            //---- txtWeightControl ----
-            txtWeightControl.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(txtWeightControl, CC.xy(9, 11, CC.DEFAULT, CC.FILL));
+                //---- lblWeightControl ----
+                lblWeightControl.setText("weightcontrol");
+                lblWeightControl.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblWeightControl.setBackground(Color.pink);
+                panel3.add(lblWeightControl, CC.xy(1, 1));
+
+                //---- txtWeightControl ----
+                txtWeightControl.setFont(new Font("Arial", Font.PLAIN, 14));
+                txtWeightControl.setBackground(Color.pink);
+                txtWeightControl.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtWeightControlFocusGained(e);
+                    }
+                });
+                txtWeightControl.addCaretListener(e -> txtWeightControlCaretUpdate(e));
+                panel3.add(txtWeightControl, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
+            }
+            mainPane.add(panel3, CC.xy(7, 11));
 
             //---- lblRemark ----
             lblRemark.setText("Bemerkung");
@@ -431,7 +452,7 @@ public class DlgNewStocks extends MyJDialog {
             //---- txtBemerkung ----
             txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
             txtBemerkung.addCaretListener(e -> txtBemerkungCaretUpdate(e));
-            mainPane.add(txtBemerkung, CC.xywh(5, 15, 6, 1));
+            mainPane.add(txtBemerkung, CC.xywh(5, 15, 4, 1));
 
             //---- btnPrint ----
             btnPrint.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-on.png")));
@@ -457,7 +478,7 @@ public class DlgNewStocks extends MyJDialog {
                 btnApply.addActionListener(e -> btnApplyActionPerformed(e));
                 panel1.add(btnApply);
             }
-            mainPane.add(panel1, CC.xywh(9, 19, 2, 1, CC.RIGHT, CC.DEFAULT));
+            mainPane.add(panel1, CC.xywh(7, 19, 2, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(mainPane);
         pack();
@@ -501,8 +522,6 @@ public class DlgNewStocks extends MyJDialog {
         if (!isWeightOk()) {
             text += "Kontrollgewicht falsch. ";
         }
-
-        grmpf;
 
         if (text.isEmpty()) {
             save();
@@ -793,7 +812,8 @@ public class DlgNewStocks extends MyJDialog {
 
         if (tradeForm != null) {
             DefaultComboBoxModel dcbm = new DefaultComboBoxModel(tradeForm.getPackages().toArray());
-            txtWeightControl.setEnabled(tradeForm.isWeightControlled());
+            txtWeightControl.setVisible(tradeForm.isWeightControlled());
+            lblWeightControl.setVisible(tradeForm.isWeightControlled());
             dcbm.insertElementAt("<Sonderpackung>", 0);
             cmbPackung.setModel(dcbm);
             cmbPackung.setRenderer(MedPackageTools.getMedPackungRenderer());
@@ -806,7 +826,8 @@ public class DlgNewStocks extends MyJDialog {
         } else {
             cmbPackung.setModel(new DefaultComboBoxModel());
             aPackage = null;
-            txtWeightControl.setEnabled(false);
+            txtWeightControl.setVisible(false);
+            lblWeightControl.setVisible(false);
         }
 
         initCmbVorrat();
@@ -840,6 +861,7 @@ public class DlgNewStocks extends MyJDialog {
     private JComboBox<String> cmbPackung;
     private JLabel lblExpires;
     private JTextField txtExpires;
+    private JPanel panel3;
     private JLabel lblWeightControl;
     private JTextField txtWeightControl;
     private JLabel lblRemark;

@@ -45,6 +45,7 @@ import op.care.med.structure.PnlMed;
 import op.system.InternalClassACL;
 import op.system.LogicalPrinter;
 import op.system.PrinterForm;
+import op.system.Validator;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -69,7 +70,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * In OPDE.de gibt es eine Bestandsverwaltung für Medikamente. Bestände werden mit Hilfe von 3 Tabellen
+ * In OPDE gibt es eine Bestandsverwaltung für Medikamente. Bestände werden mit Hilfe von 3 Tabellen
  * in der Datenbank verwaltet.
  * <ul>
  * <li><B>MPVorrat</B> Ein Vorrat ist wie eine Schachtel oder Schublade zu sehen, in denen
@@ -1382,9 +1383,89 @@ public class PnlInventory extends NursingRecordsPanel {
                     btnUndoTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
                     pnlTitle.getRight().add(btnUndoTX);
 
-//                    synchronized (linemap) {
-//                        linemap.put(tx, pnlTitle.getMain());
-//                    }
+                    if (stock.getTradeForm().isWeightControlled() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "nursingrecords.inventory")) {
+                        /***
+                         *               _ __        __   _       _     _
+                         *      ___  ___| |\ \      / /__(_) __ _| |__ | |_
+                         *     / __|/ _ \ __\ \ /\ / / _ \ |/ _` | '_ \| __|
+                         *     \__ \  __/ |_ \ V  V /  __/ | (_| | | | | |_
+                         *     |___/\___|\__| \_/\_/ \___|_|\__, |_| |_|\__|
+                         *                                  |___/
+                         */
+                        final JButton btnSetWeight = new JButton(SYSConst.icon22scales);
+                        btnSetWeight.setPressedIcon(SYSConst.icon22Pressed);
+                        btnSetWeight.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                        btnSetWeight.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        btnSetWeight.setContentAreaFilled(false);
+                        btnSetWeight.setBorder(null);
+                        btnSetWeight.setToolTipText(SYSTools.xx("nursingrecords.inventory.tx.btnUndoTX.tooltip"));
+                        btnSetWeight.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
+
+
+                                BigDecimal weight;
+                                new DlgYesNo(SYSConst.icon48scales, new Closure() {
+                                    @Override
+                                    public void execute(Object o) {
+                                        if (!SYSTools.catchNull(o).isEmpty()) {
+                                            BigDecimal weight = (BigDecimal) o;
+
+                                            EntityManager em = OPDE.createEM();
+                                            try {
+                                                em.getTransaction().begin();
+                                                MedStock myStock = em.merge(stock);
+                                                final MedStockTransaction myTX = em.merge(tx);
+                                                em.lock(myTX, LockModeType.OPTIMISTIC);
+                                                myTX.setWeight(weight);
+                                                em.lock(myStock, LockModeType.OPTIMISTIC);
+                                                em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
+
+                                                em.getTransaction().commit();
+
+                                                createCP4(myStock.getInventory());
+                                                buildPanel();
+                                            } catch (OptimisticLockException ole) {
+                                                OPDE.warn(ole);
+                                                if (em.getTransaction().isActive()) {
+                                                    em.getTransaction().rollback();
+                                                }
+                                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                                    OPDE.getMainframe().emptyFrame();
+                                                    OPDE.getMainframe().afterLogin();
+                                                }
+                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                            } catch (Exception e) {
+                                                if (em.getTransaction().isActive()) {
+                                                    em.getTransaction().rollback();
+                                                }
+                                                OPDE.fatal(e);
+                                            } finally {
+                                                em.close();
+                                            }
+                                        }
+                                    }
+                                }, "nursingrecords.bhp.weight", NumberFormat.getNumberInstance().format(tx.getWeight()), new Validator<BigDecimal>() {
+                                    @Override
+                                    public boolean isValid(String value) {
+                                        BigDecimal bd = parse(value);
+                                        return bd != null && bd.compareTo(BigDecimal.ZERO) > 0;
+
+                                    }
+
+                                    @Override
+                                    public BigDecimal parse(String text) {
+                                        return SYSTools.parseBigDecimal(text);
+                                    }
+                                });
+
+
+                            }
+                        });
+                        btnSetWeight.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_CREDIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
+                        pnlTitle.getRight().add(btnSetWeight);
+                    }
+
                     pnlTX.add(pnlTitle.getMain());
                 }
 

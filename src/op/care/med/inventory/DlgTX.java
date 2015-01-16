@@ -33,6 +33,7 @@ import entity.prescription.MedStockTools;
 import entity.prescription.MedStockTransaction;
 import entity.prescription.MedStockTransactionTools;
 import entity.prescription.TradeFormTools;
+import op.OPDE;
 import op.tools.MyJDialog;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -103,6 +104,7 @@ public class DlgTX extends MyJDialog {
 
     private void txtWeightControlledCaretUpdate(CaretEvent evt) {
         weight = SYSTools.checkBigDecimal(evt, false);
+        OPDE.debug("weight = " + weight.toString());
         btnBuchung.setEnabled(isAmountOk() && isWeightOk());
     }
 
@@ -114,11 +116,8 @@ public class DlgTX extends MyJDialog {
         lblUnit2.setText("g");
         bestandsumme = MedStockTools.getSum(tx.getStock());
         weight = null;
-        txtWeightControlled.setEnabled(tx.getStock().getTradeForm().isWeightControlled());
-
-        if (txtWeightControlled.isEnabled()){
-            txtWeightControlled.setToolTipText(SYSTools.xx("opde.medication.controlWeight.only.after.change"));
-        }
+        txtWeightControlled.setVisible(tx.getStock().getTradeForm().isWeightControlled());
+        lblWeightControl.setVisible(tx.getStock().getTradeForm().isWeightControlled());
 
         lblUnit.setText(TradeFormTools.getPackUnit(tx.getStock().getTradeForm()));
 
@@ -129,6 +128,11 @@ public class DlgTX extends MyJDialog {
         }
 
         txtValue.setText(NumberFormat.getNumberInstance().format(tx.getAmount()));
+
+        if (txtWeightControlled.isVisible()) {
+            txtWeightControlled.setToolTipText(SYSTools.xx("opde.medication.controlWeight.only.after.change"));
+            txtWeightControlled.setText(NumberFormat.getNumberInstance().format(tx.getWeight() != null ? tx.getWeight() : BigDecimal.ZERO));
+        }
         setVisible(true);
     }
 
@@ -155,8 +159,8 @@ public class DlgTX extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
-            "2*(default, $lgap), fill:default, $lgap, default, $lgap, fill:default"));
+                "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
+                "2*(default, $lgap), fill:default, $lgap, default, $lgap, fill:default"));
 
         //---- lblText ----
         lblText.setText("Buchungstext");
@@ -243,19 +247,18 @@ public class DlgTX extends MyJDialog {
 
     private void btnBuchungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchungActionPerformed
         tx.setAmount(amount);
+        tx.setWeight(weight);
         tx.setState(MedStockTransactionTools.STATE_EDIT_MANUAL);
         tx.setText(txtText.getText().trim());
         actionBlock.execute(tx);
         dispose();
     }//GEN-LAST:event_btnBuchungActionPerformed
 
-    private void save() {
-
-    }
 
     private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
-        amount = SYSTools.checkBigDecimal(evt, true);
+        amount = SYSTools.checkBigDecimal(evt, false);
         btnBuchung.setEnabled(isAmountOk() && isWeightOk());
+        OPDE.debug("amount = " + amount.toString());
 //        if (amount.compareTo(BigDecimal.ZERO) < 0) {
 //            btnBuchung.setEnabled(amount.negate().compareTo(bestandsumme) <= 0);
 //        } else if (amount.compareTo(BigDecimal.ZERO) > 0) {

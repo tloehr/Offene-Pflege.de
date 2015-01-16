@@ -8,11 +8,13 @@ import op.care.med.inventory.PnlInventory;
 import op.care.med.structure.DlgUPREditor;
 import op.controlling.PnlControlling;
 import op.tools.Pair;
+import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -76,6 +78,22 @@ public class MedStockTools {
         return list;
     }
 
+
+    public static List<MedStock> getAllWeightControlled(LocalDate from, LocalDate to) {
+        EntityManager em = OPDE.createEM();
+        String jpql = " " +
+                " SELECT b FROM MedStock b " +
+                " WHERE b.tradeform.weightControlled = TRUE " +
+                " AND b.in >= :from AND b.opened >= :from AND b.opened <= :to " +
+                " ORDER BY b.inventory.resident.rid, b.id ";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(to).toDate());
+        List<MedStock> list = query.getResultList();
+        em.close();
+        return list;
+    }
 
     public static MedStock getStockInUse(MedInventory inventory) {
         EntityManager em = OPDE.createEM();
@@ -203,9 +221,9 @@ public class MedStockTools {
     /**
      * This method closes the given MedStock. It forces the current balance to zero by adding a system MedStockTransaction
      * to the existing list of TXs.
-     * <p/>
+     * <p>
      * If there is a next package to be used, it will be opened.
-     * <p/>
+     * <p>
      * If there are prescription (valid until the end of this package) there will be closed, too, unless
      * there are still unused packages in this inventory.
      *
@@ -677,5 +695,74 @@ public class MedStockTools {
 
         em.close();
         return list;
+    }
+
+
+    public static StringBuilder getNarcoticsWeightList(LocalDate from, LocalDate to) throws Exception {
+        StringBuilder html = new StringBuilder(10000);
+
+        ArrayList<MedStock> listStocks = new ArrayList<>(getAllWeightControlled(from, to));
+
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT);
+
+//        int p = -1;
+//        progress.execute(new Pair<Integer, Integer>(p, 100));
+        html.append(SYSConst.html_h1("opde.controlling.prescription.narcotics.weightcontrol"));
+
+        if (listStocks.isEmpty()) {
+            html.append(SYSConst.html_italic("opde.controlling.prescription.narcotics.no.weightcontrols"));
+        } else {
+
+
+            listStocks.forEach(stock -> {
+                html.append(SYSConst.html_h2("[" + stock.getID() + "] " + getAsHTML(stock) + ", " + ResidentTools.getLabelText(stock.getInventory().getResident())));
+
+                final StringBuffer tableContent = new StringBuffer(SYSConst.html_table_tr(SYSConst.html_table_th("Zeit") + SYSConst.html_table_th("Gewicht") + SYSConst.html_table_th("Diff-Gewicht") + SYSConst.html_table_th("Menge") + SYSConst.html_table_th("Diff-Menge") + SYSConst.html_table_th("Verhältnis")));
+
+                Collections.sort(stock.getStockTransaction(), new Comparator<MedStockTransaction>() {
+                    @Override
+                    public int compare(MedStockTransaction o1, MedStockTransaction o2) {
+                        return o1.getPit().compareTo(o2.getPit());
+                    }
+                });
+
+                boolean iamthefirstone = true;
+                BigDecimal previousWeight = BigDecimal.ZERO;
+                BigDecimal previousQuantity = BigDecimal.ZERO;
+                for (MedStockTransaction tx : stock.getStockTransaction()) {
+
+                    BigDecimal weight = tx.getWeight();
+                    BigDecimal quantity = previousQuantity.add(tx.getAmount());
+                    BigDecimal diffQuantity = previousQuantity.subtract(quantity);
+
+
+                    BigDecimal diffWeight = previousWeight.subtract(weight);
+
+                    BigDecimal quota = iamthefirstone ? BigDecimal.ZERO : diffWeight.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : diffQuantity.divide(diffWeight, 2, RoundingMode.HALF_UP);
+                    tableContent.append(SYSConst.html_table_tr(
+                                    SYSConst.html_table_td(df.format(tx.getPit())) +
+                                            SYSConst.html_table_td(weight.toString()) +
+                                            SYSConst.html_table_td(iamthefirstone ? "--" : diffWeight.toString()) +
+                                            SYSConst.html_table_td(quantity.toString()) +
+                                            SYSConst.html_table_td(iamthefirstone ? "--" : diffQuantity.toString()) +
+                                            SYSConst.html_table_td(quota.compareTo(BigDecimal.ZERO) == 0 ? "--" : quota.toString())
+                            )
+                    );
+
+
+                    previousWeight = weight;
+                    previousQuantity = quantity;
+                    iamthefirstone = false;
+                }
+
+                html.append(SYSConst.html_table(tableContent.toString(), "1"));
+
+            });
+
+
+        }
+
+
+        return html;
     }
 }

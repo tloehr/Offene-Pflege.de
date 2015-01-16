@@ -66,6 +66,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -770,7 +771,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                     BHPTools.getScheduleText(bhp.getOutcome4(), "&rdquo;, ", "")
                     )
                     + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + BHPTools.getScheduleText(bhp, ", ", "") +
-                    (bhp.getPrescription().getTradeForm().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : bhp.getStockTransaction().get(0).getWeight().toString() + "g ")) : "") +
+                    (bhp.getPrescription().getTradeForm().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : NumberFormat.getNumberInstance().format(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
 
                     "</font></html>";
@@ -780,7 +781,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
                             " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                     BHPTools.getScheduleText(bhp, ", ", "") +
-                    (bhp.getPrescription().getTradeForm().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : bhp.getStockTransaction().get(0).getWeight().toString() + "g ")) : "") +
+                    (bhp.getPrescription().getTradeForm().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : NumberFormat.getNumberInstance().format(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
                     "</font></html>";
         }
@@ -1004,6 +1005,40 @@ public class PnlBHP extends NursingRecordsPanel {
                             }
 
                             if (BHPTools.isChangeable(bhp)) {
+
+
+                                if (bhp.getPrescription().getTradeForm().isWeightControlled()) {
+                                    new DlgYesNo(SYSConst.icon48scales, new Closure() {
+                                        @Override
+                                        public void execute(Object o) {
+                                            if (SYSTools.catchNull(o).isEmpty()) {
+                                                weight = null;
+                                            } else {
+                                                weight = (BigDecimal) o;
+                                            }
+                                        }
+                                    }, "nursingrecords.bhp.weight", null, new Validator<BigDecimal>() {
+                                        @Override
+                                        public boolean isValid(String value) {
+                                            BigDecimal bd = parse(value);
+                                            return bd != null && bd.compareTo(BigDecimal.ZERO) > 0;
+
+                                        }
+
+                                        @Override
+                                        public BigDecimal parse(String text) {
+                                            return SYSTools.parseBigDecimal(text);
+                                        }
+                                    });
+
+                                }
+
+                                if (bhp.getPrescription().getTradeForm().isWeightControlled() && weight == null) {
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.noweight.nosuccess", DisplayMessage.WARNING));
+                                    return;
+                                }
+
+
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();

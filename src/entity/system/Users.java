@@ -38,6 +38,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author tloehr
@@ -91,8 +92,6 @@ public class Users implements Serializable, Comparable<Users> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSLogin> logins;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "")
-    private Collection<Training> trainings;
 
     @ManyToMany(mappedBy = "notification")
     private Collection<Qmsplan> notifiedAboutQmsplan;
@@ -107,11 +106,19 @@ public class Users implements Serializable, Comparable<Users> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "attendee")
     private Collection<Training2Users> attendedTrainings;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private Set<Notification> notifications;
+
+
     public Users() {
         uid = null;
         groups = new ArrayList<Groups>();
         status = UsersTools.STATUS_ACTIVE;
         mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
+    }
+
+    public Set<Notification> getNotifications() {
+        return notifications;
     }
 
     public int getMailConfirmed() {
@@ -122,9 +129,6 @@ public class Users implements Serializable, Comparable<Users> {
         this.mailConfirmed = mailConfirmed;
     }
 
-    public Collection<Training> getTrainings() {
-        return trainings;
-    }
 
     public String getUID() {
         return uid;

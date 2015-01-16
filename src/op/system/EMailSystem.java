@@ -1,6 +1,7 @@
 package op.system;
 
 import entity.files.SYSFilesTools;
+import entity.system.NotificationTools;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
@@ -79,6 +80,8 @@ public class EMailSystem {
         StringTokenizer st = new StringTokenizer(list, ",");
         if (st.countTokens() == 0) return false;
 
+        boolean error = false;
+
         EntityManager em = OPDE.createEM();
         ArrayList<Users> listUsers = new ArrayList<>();
         while (st.hasMoreElements()) {
@@ -86,19 +89,17 @@ public class EMailSystem {
             Users user = em.find(Users.class, uid);
 
             if (user != null) {
-                listUsers.add(user);
+                try {
+                    sendMail(SYSTools.xx("mail.notification.subject") + ": " + new Date(), SYSTools.xx("hier ist die gewünschte email"), new Recipient(user), NotificationTools.notify(user));
+                } catch (Exception e){
+                    OPDE.error(e);
+                    error = true;
+                }
             }
         }
         em.close();
 
-        StringBuffer html = new StringBuffer();
-
-
-        html.append("<html>it works...</html>");
-
-
-
-        return sendMail(SYSTools.xx("mail.notification.subject") + ": " + new Date(), html.toString(), listUsers, new File[]{SYSFilesTools.getHtmlFile(html.toString(), "html")});
+        return !error;
 
     }
 

@@ -45,12 +45,11 @@ import entity.qms.ControllingTools;
 import entity.qms.Qmsplan;
 import entity.reports.NReportTools;
 import entity.staff.TrainingTools;
-import entity.system.Commontags;
-import entity.system.CommontagsTools;
-import entity.system.SYSPropsTools;
+import entity.system.*;
 import entity.values.ResValueTools;
 import op.OPDE;
 import op.system.InternalClassACL;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -58,11 +57,11 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -986,9 +985,17 @@ public class PnlControlling extends CleanablePanel {
         pnlDrugControl.add(cmbStation, BorderLayout.EAST);
         pnlContent.add(pnlDrugControl);
 
-
+        /***
+         *     __        __   _       _     _    ____            _             _   _   _                     _   _
+         *     \ \      / /__(_) __ _| |__ | |_ / ___|___  _ __ | |_ _ __ ___ | | | \ | | __ _ _ __ ___ ___ | |_(_) ___ ___
+         *      \ \ /\ / / _ \ |/ _` | '_ \| __| |   / _ \| '_ \| __| '__/ _ \| | |  \| |/ _` | '__/ __/ _ \| __| |/ __/ __|
+         *       \ V  V /  __/ | (_| | | | | |_| |__| (_) | | | | |_| | | (_) | | | |\  | (_| | | | (_| (_) | |_| | (__\__ \
+         *        \_/\_/ \___|_|\__, |_| |_|\__|\____\___/|_| |_|\__|_|  \___/|_| |_| \_|\__,_|_|  \___\___/ \__|_|\___|___/
+         *                      |___/
+         */
         JPanel pnlWeightControllNarcotics = new JPanel(new BorderLayout());
         final JButton btnWeightControl = GUITools.createHyperlinkButton("opde.controlling.prescription.narcotics.weightcontrol", null, null);
+
 //               final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox(false));
         btnWeightControl.addActionListener(new ActionListener() {
             @Override
@@ -998,7 +1005,7 @@ public class PnlControlling extends CleanablePanel {
                     @Override
                     protected Object doInBackground() throws Exception {
 
-                        return PrescriptionTools.getNarcoticsWeightList(progressClosure);
+                        return MedStockTools.getNarcoticsWeightList(new LocalDate().minusMonths(1), new LocalDate());
                     }
 
                     @Override
@@ -1019,8 +1026,57 @@ public class PnlControlling extends CleanablePanel {
                 worker.execute();
             }
         });
+
+        final JToggleButton btnNotify = new JToggleButton(SYSConst.icon22mailOFF);
+        btnNotify.setSelectedIcon(SYSConst.icon22mailON);
+        btnNotify.setSelected(NotificationTools.find(OPDE.getLogin().getUser(), NotificationTools.NKEY_DRUG_WEIGHT_CONTROL) != null);
+        btnNotify.setToolTipText(SYSTools.xx("opde.notification.enable.for.this.topic"));
+
+        btnNotify.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Users user = em.merge(OPDE.getLogin().getUser());
+                    em.lock(user, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        Notification myNotification = em.merge(new Notification(NotificationTools.NKEY_DRUG_WEIGHT_CONTROL, user));
+                        user.getNotifications().add(myNotification);
+                    } else {
+                        Notification myNotification = em.merge(NotificationTools.find(OPDE.getLogin().getUser(), NotificationTools.NKEY_DRUG_WEIGHT_CONTROL));
+                        user.getNotifications().remove(myNotification);
+                        em.remove(myNotification);
+                    }
+
+                    em.getTransaction().commit();
+                    OPDE.getLogin().setUser(user);
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
+                }
+
+            }
+        });
+
         pnlWeightControllNarcotics.add(btnWeightControl, BorderLayout.WEST);
-//        pnlWeightControllNarcotics.add(cmbStation, BorderLayout.EAST);
+        pnlWeightControllNarcotics.add(btnNotify, BorderLayout.EAST);
         pnlContent.add(pnlWeightControllNarcotics);
 
 
@@ -1205,12 +1261,7 @@ public class PnlControlling extends CleanablePanel {
             tabMain.setShowTabButtons(true);
             tabMain.setTabPlacement(SwingConstants.LEFT);
             tabMain.setHideOneTab(true);
-            tabMain.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    tabMainStateChanged(e);
-                }
-            });
+            tabMain.addChangeListener(e -> tabMainStateChanged(e));
 
             //======== scrollPane1 ========
             {

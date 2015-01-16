@@ -436,7 +436,7 @@ public class SYSFilesTools {
     /**
      * Diese Methode ermittelt zu einer gebenen Datei und einer gewünschten Aktion das passende Anzeigeprogramm.
      * Falls die Desktop API nicht passendes hat, werdne die lokal definierten Anzeigeprogramme verwendet.
-     * <p/>
+     * <p>
      * Bei Linux müssen dafür unbedingt die Gnome Libraries installiert sein.
      * apt-get install libgnome2-0
      *
@@ -587,32 +587,32 @@ public class SYSFilesTools {
     }
 
 
-    public static File getHtmlFile(String html, String ext){
-            File temp = null;
-            try {
-                // Create temp file.
-                temp = File.createTempFile("opde", ext);
+    public static File getHtmlFile(String html, String prefix, String ext) {
+        File temp = null;
+        try {
+            // Create temp file.
+            temp = File.createTempFile(prefix, ext);
 
-                String text = "<html><head>";
+            String text = "<html><head>";
 
-                text += OPDE.getCSS();
-                text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
-                        + "<hr/>" +
-                        "<div id=\"fonttext\">" +
-                        "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
-                        + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                        + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum() + "</div></body></html>";
+            text += OPDE.getCSS();
+            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
+                    + "<hr/>" +
+                    "<div id=\"fonttext\">" +
+                    "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
+                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
+                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum() + "</div></body></html>";
 
 
-                // Write to temp file
-                BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-                out.write(text);
+            // Write to temp file
+            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+            out.write(text);
 
-                out.close();
-            } catch (IOException e) {
-                OPDE.error(e);
-            }
-            return temp;
+            out.close();
+        } catch (IOException e) {
+            OPDE.error(e);
         }
+        return temp;
+    }
 
 }

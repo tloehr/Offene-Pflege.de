@@ -487,6 +487,8 @@ public class SYSConst {
     public static final Icon icon16delete = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/deleteall.png"));
     public static final Icon icon16unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink_pressed.png"));
     public static final Icon icon22add = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/add.png"));
+    public static final Icon icon22mailON = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_forward.png"));
+    public static final Icon icon22mailOFF = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_delete.png"));
     public static final Icon icon22addGroup = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_group.png"));
     public static final Icon icon22addPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/add-pressed.png"));
     public static final Icon icon22addUser = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_user.png"));
@@ -637,6 +639,7 @@ public class SYSConst {
     public static final Icon icon22comment = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/comment.png"));
     public static final Icon icon48comment = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/comment.png"));
     public static final Icon icon48scales = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/scales_of_balance_48.png"));
+    public static final Icon icon22scales = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/scales_of_balance_22.png"));
     public static final Icon icon22magnify1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/magnify1.png"));
     public static final Icon icon22home = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/home.png"));
     public static final Icon icon22wizard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/wizard.png"));
