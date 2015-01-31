@@ -90,7 +90,7 @@ public class DFNTools {
         LocalDate targetdate = null;
 
         // If (for technical reasons) the lastdfn lies in the past (more than the usual 1 day),
-        // then the generation is interated until the current day.
+        // then the generation is interated to the current day.
         for (int days = 1; days <= Days.daysBetween(lastdfn.plusDays(1), new LocalDate()).getDays() + 1; days++) {
 
             targetdate = lastdfn.plusDays(days);

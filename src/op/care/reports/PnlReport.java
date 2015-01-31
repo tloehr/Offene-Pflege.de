@@ -243,7 +243,7 @@ public class PnlReport extends NursingRecordsPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (SYSTools.catchNull(txtSearch.getText()).trim().length() >= 3) {
-                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
+                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), true, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
                 }
             }
         });
@@ -274,7 +274,7 @@ public class PnlReport extends NursingRecordsPanel {
                 final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), false, null, null), false);
+                        SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), true, null, null), false);
                     }
                 });
                 btnTag.setForeground(GUITools.getColor(commontag.getColor()));
@@ -634,7 +634,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintMonth.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month), false, null, null), true);
+                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month), true, null, null), false);
                 }
             });
             cptitle.getRight().add(btnPrintMonth);
@@ -740,7 +740,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintWeek.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, null, null), true);
+                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week), true, null, null), false);
                 }
             });
             cptitle.getRight().add(btnPrintWeek);
@@ -835,7 +835,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintDay.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day), false, null, null), true);
+                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day), true, null, null), false);
                 }
             });
             titleCPDay.getRight().add(btnPrintDay);
