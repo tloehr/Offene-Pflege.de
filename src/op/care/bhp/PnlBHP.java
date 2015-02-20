@@ -608,7 +608,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
 
 
-                    if (bhp.getPrescription().getTradeForm().isWeightControlled()) {
+                    if (bhp.getPrescription().isWeightControlled()) {
                         new DlgYesNo(SYSConst.icon48scales, new Closure() {
                             @Override
                             public void execute(Object o) {
@@ -634,7 +634,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                     }
 
-                    if (bhp.getPrescription().getTradeForm().isWeightControlled() && weight == null) {
+                    if (bhp.getPrescription().isWeightControlled() && weight == null) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.noweight.nosuccess", DisplayMessage.WARNING));
                         return;
                     }
@@ -771,7 +771,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                     BHPTools.getScheduleText(bhp.getOutcome4(), "&rdquo;, ", "")
                     )
                     + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + BHPTools.getScheduleText(bhp, ", ", "") +
-                    (bhp.getPrescription().getTradeForm().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : NumberFormat.getNumberInstance().format(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
+                    (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : NumberFormat.getNumberInstance().format(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
 
                     "</font></html>";
@@ -781,7 +781,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
                             " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                     BHPTools.getScheduleText(bhp, ", ", "") +
-                    (bhp.getPrescription().getTradeForm().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : NumberFormat.getNumberInstance().format(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
+                    (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : NumberFormat.getNumberInstance().format(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
                     "</font></html>";
         }
@@ -1007,7 +1007,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             if (BHPTools.isChangeable(bhp)) {
 
 
-                                if (bhp.getPrescription().getTradeForm().isWeightControlled()) {
+                                if (bhp.getPrescription().isWeightControlled()) {
                                     new DlgYesNo(SYSConst.icon48scales, new Closure() {
                                         @Override
                                         public void execute(Object o) {
@@ -1033,7 +1033,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                                 }
 
-                                if (bhp.getPrescription().getTradeForm().isWeightControlled() && weight == null) {
+                                if (bhp.getPrescription().isWeightControlled() && weight == null) {
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.noweight.nosuccess", DisplayMessage.WARNING));
                                     return;
                                 }

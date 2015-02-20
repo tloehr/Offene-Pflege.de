@@ -311,6 +311,10 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         return hasMed() && resident.isCalcMediUPR1();
     }
 
+    public boolean isWeightControlled(){
+        return hasMed() && tradeform.isWeightControlled();
+    }
+
     public void setSituation(Situations situation) {
         this.situation = situation;
     }

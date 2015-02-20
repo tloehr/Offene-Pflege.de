@@ -656,7 +656,6 @@ public class PrescriptionTools {
 
         if (prescription.hasMed() && prescription.getTradeForm().getMedProduct().hasSideEffects()) {
             result += "<b><u>" + SYSTools.xx("misc.msg.sideeffects") + ":</u> <font color=\"orange\">" + prescription.getTradeForm().getMedProduct().getSideEffects() + "</font></b>";
-
         }
         if (prescription.isOnDemand()) {
             result += result.isEmpty() ? "" : "<br/>";
@@ -669,7 +668,7 @@ public class PrescriptionTools {
         if (prescription.isOnDailyPlan()) {
             result += "<br/>" + SYSConst.html_italic(SYSTools.xx("nursingrecords.prescription.addedToDailyPlan"));
         }
-        if (prescription.getTradeForm().isWeightControlled()) {
+        if (prescription.isWeightControlled()) {
             result += "<br/>" + SYSConst.html_bold(SYSTools.xx("opde.medication.tradeform.weightControlled"));
         }
 
