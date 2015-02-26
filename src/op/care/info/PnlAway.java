@@ -27,7 +27,6 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Properties;
@@ -37,7 +36,7 @@ import java.util.Properties;
  */
 public class PnlAway extends JPanel {
 
-    public static final int TAB_KH = 0;
+    public static final int TAB_HOSPITAL = 0;
     public static final int TAB_HOLLIDAY = 1;
     public static final int TAB_OTHER = 2;
 
@@ -66,7 +65,7 @@ public class PnlAway extends JPanel {
         cmbHospital.setModel(new DefaultComboBoxModel(list.toArray()));
         cmbHospital.setRenderer(HospitalTools.getKHRenderer());
 
-        tab1.setTitleAt(TAB_KH, SYSTools.xx("misc.msg.hospital"));
+        tab1.setTitleAt(TAB_HOSPITAL, SYSTools.xx("misc.msg.hospital"));
         tab1.setTitleAt(TAB_HOLLIDAY, SYSTools.xx("misc.msg.holliday"));
         tab1.setTitleAt(TAB_OTHER, SYSTools.xx("misc.msg.otherreasons"));
 
@@ -78,14 +77,14 @@ public class PnlAway extends JPanel {
 
         if (props.containsKey("type")) {
             if (props.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL)) {
-                tab1.setSelectedIndex(TAB_KH);
+                tab1.setSelectedIndex(TAB_HOSPITAL);
             } else if (props.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_HOLLIDAY)) {
                 tab1.setSelectedIndex(TAB_HOLLIDAY);
             } else if (props.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_OTHER)) {
                 tab1.setSelectedIndex(TAB_OTHER);
             }
         } else {
-            tab1.setSelectedIndex(TAB_KH);
+            tab1.setSelectedIndex(TAB_HOSPITAL);
         }
 
         Hospital preselect = null;
@@ -134,7 +133,7 @@ public class PnlAway extends JPanel {
     private void btnOKActionPerformed(ActionEvent e) {
 
         switch (tab1.getSelectedIndex()) {
-            case TAB_KH: {
+            case TAB_HOSPITAL: {
                 abwesenheit.setText(txtKH.getText().trim());
 
                 Hospital hospital = (Hospital) cmbHospital.getSelectedItem();
@@ -242,12 +241,7 @@ public class PnlAway extends JPanel {
                         btnAddKH.setBorderPainted(false);
                         btnAddKH.setContentAreaFilled(false);
                         btnAddKH.setBorder(null);
-                        btnAddKH.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnAddKHActionPerformed(e);
-                            }
-                        });
+                        btnAddKH.addActionListener(e -> btnAddKHActionPerformed(e));
                         panel5.add(btnAddKH, CC.xy(2, 1));
 
                         //---- lblKH ----
@@ -273,12 +267,7 @@ public class PnlAway extends JPanel {
                         //---- btnToLeft ----
                         btnToLeft.setText(null);
                         btnToLeft.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1leftarrow.png")));
-                        btnToLeft.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnToLeftActionPerformed(e);
-                            }
-                        });
+                        btnToLeft.addActionListener(e -> btnToLeftActionPerformed(e));
                         pnlRight.add(btnToLeft);
                     }
                     split1.setRightComponent(pnlRight);
@@ -286,7 +275,6 @@ public class PnlAway extends JPanel {
                 pnlKH.add(split1);
             }
             tab1.addTab("text", pnlKH);
-
 
             //======== pnlHolliday ========
             {
@@ -308,7 +296,6 @@ public class PnlAway extends JPanel {
             }
             tab1.addTab("text", pnlHolliday);
 
-
             //======== pnlOther ========
             {
                 pnlOther.setLayout(new BorderLayout());
@@ -328,7 +315,6 @@ public class PnlAway extends JPanel {
                 pnlOther.add(scrollPane2, BorderLayout.CENTER);
             }
             tab1.addTab("text", pnlOther);
-
         }
         add(tab1, CC.xy(3, 3));
 
@@ -339,23 +325,13 @@ public class PnlAway extends JPanel {
             //---- btnCancel ----
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel3.add(btnCancel);
 
             //---- btnOK ----
             btnOK.setText(null);
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
+            btnOK.addActionListener(e -> btnOKActionPerformed(e));
             panel3.add(btnOK);
         }
         add(panel3, CC.xy(3, 5, CC.RIGHT, CC.DEFAULT));

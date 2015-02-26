@@ -575,12 +575,7 @@ public class PnlDev extends CleanablePanel {
 
                 //---- button1 ----
                 button1.setText("ResInfoType Form Test");
-                button1.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        button1ActionPerformed(e);
-                    }
-                });
+                button1.addActionListener(e -> button1ActionPerformed(e));
                 panel1.add(button1, CC.xywh(3, 5, 3, 1));
             }
             tabbedPane1.addTab("text", panel1);
@@ -605,43 +600,23 @@ public class PnlDev extends CleanablePanel {
                 button2.setBorder(null);
                 button2.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1downarrow.png")));
                 button2.setHorizontalTextPosition(SwingConstants.LEADING);
-                button2.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        button2ActionPerformed(e);
-                    }
-                });
+                button2.addActionListener(e -> button2ActionPerformed(e));
                 panel2.add(button2, CC.xy(1, 5));
 
                 //---- txtPZN ----
                 txtPZN.setToolTipText("PZN Check");
-                txtPZN.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtPZNCaretUpdate(e);
-                    }
-                });
+                txtPZN.addCaretListener(e -> txtPZNCaretUpdate(e));
                 panel2.add(txtPZN, CC.xy(1, 11, CC.FILL, CC.DEFAULT));
 
                 //---- btnMod11 ----
                 btnMod11.setText("calc mod11");
                 btnMod11.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
-                btnMod11.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnMod11ActionPerformed(e);
-                    }
-                });
+                btnMod11.addActionListener(e -> btnMod11ActionPerformed(e));
                 panel2.add(btnMod11, CC.xy(1, 13));
 
                 //---- btnImportMedDB ----
                 btnImportMedDB.setText("import meddb.xls");
-                btnImportMedDB.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnImportMedDBActionPerformed(e);
-                    }
-                });
+                btnImportMedDB.addActionListener(e -> btnImportMedDBActionPerformed(e));
                 panel2.add(btnImportMedDB, CC.xy(1, 17));
             }
             tabbedPane1.addTab("text", panel2);

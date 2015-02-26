@@ -968,22 +968,22 @@ public class PnlEditResInfo {
     /**
      * Dieser Handler ist ein SaxParser Handler. Er durchläuft das Struktur XML Dokument und erstellt einen JPanel, der alle
      * notwendigen Swing Komponenten enthält.
-     * <p/>
+     * <p>
      * Folgende XML Konstrukte können verwendet werden:
      * <ol>
      * <li><code>&lt;checkbox name=&quot;aengstlich&quot; label=&quot;ängstlich&quot;/&gt;</code> führt zu <img src="doc-files/checkbox.png">
      * </li>
      * </ol>
-     * <p/>
+     * <p>
      * Die beschriebenen Konstrukte können nacheinander verwendet werden, so dass nach einer Optiongroup mehrere Checkboxes folgen.
      * Ein Konstrukt wird immer in eine eigene JPanel mit einem FlowLayout eingeschlossen (innerpanel).
      * Die innerpanels werden dann alle der Reihe nach wieder in eine JPanel (untereinander, GridLayout) eingefügt (outerpanel).
      * Diese outerpanel ist letztlich das Ergebnis.
-     * <p/>
+     * <p>
      * Ausserdem schreibt der Handler in die beiden HashMaps <code>components</code> und <code>antwort</code>. <code>components</code> enthält die
      * erstellten Components, der Zugriff erfolgt über das <code>name</code> Attribut aus der XML Struktur. So dass man, gemäß des obigen Beispiels unter 1.), über
      * <code>component.get("aengstlich")</code> den Zugriff auf die entsprechend JCheckbox erhält.
-     * <p/>
+     * <p>
      * <code>antwort</code> enthält den aktuellen Zustand des jeweiligen Widgets. Bei Checkboxes (wie im Beispiel beschrieben): ("aengstlich", "false"). Bei Optiongroups
      * setzt sich der Name des einzelnen Radiobuttons aus gruppenname und optionname zusammen: ("hilfebedarf.uA", "true"). Textfelder enthalten den Eingabetext direkt:
      * ("vorname", "Torsten"). Listen enthalten den Primary Key der entsprechenden Tabellenzeile (meist ist das ein <code>long</code> Wert: ("zimm", 38).
@@ -1261,6 +1261,26 @@ public class PnlEditResInfo {
                 focusTraversal.add(j);
                 j.setName(groupname);
 
+
+                int fontstyle = Font.PLAIN;
+                if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                        fontstyle = Font.BOLD;
+                    }
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                        fontstyle = Font.ITALIC;
+                    }
+                }
+                if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
+                    int size = Integer.parseInt(attributes.getValue("size"));
+                    j.setFont(new Font("Arial", fontstyle, size));
+                    jl.setFont(new Font("Arial", fontstyle, size));
+                } else {
+                    j.setFont(new Font("Arial", fontstyle, 12));
+                    jl.setFont(new Font("Arial", fontstyle, 12));
+                }
+
+
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
 
@@ -1318,9 +1338,29 @@ public class PnlEditResInfo {
                         changed = true;
                     }
                 }, neurologist, dermatology);
+
+
+                int fontstyle = Font.PLAIN;
+                if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                        fontstyle = Font.BOLD;
+                    }
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                        fontstyle = Font.ITALIC;
+                    }
+                }
+
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 if (attributes.getValue("label") != null) {
                     JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")) + ":");
+
+                    if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
+                        int size = Integer.parseInt(attributes.getValue("size"));
+                        jl.setFont(new Font("Arial", fontstyle, size));
+                    } else {
+                        jl.setFont(new Font("Arial", fontstyle, 12));
+                    }
+
                     outerpanel.add(layout, jl);
                     layout = "left";
                 }

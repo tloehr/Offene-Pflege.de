@@ -81,8 +81,7 @@ public class ResInfoTypeTools {
     public static final int TYPE_LIVINGWILL= 139;
     public static final int TYPE_AMPUTATION = 140;
     public static final int TYPE_SPECIALIST = 141;
-
-//    public static final String TYPE_HOSPITAL_STAY = "KH";
+    public static final int TYPE_HOSPITAL_STAY = 142;
 
     public static final String TYPE_ABSENCE_HOSPITAL = "HOSPITAL";
     public static final String TYPE_ABSENCE_HOLLIDAY = "HOLLIDAY";
