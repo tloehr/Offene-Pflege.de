@@ -30,9 +30,9 @@ public class CommontagsTools {
     public static final int TYPE_SYS_PAINMGR = 11;
     public static final int TYPE_SYS_METHADONE = 12; // methadon maintenance (Substitutionspräparate)
     public static final int TYPE_SYS_NARCOTICS = 13; // methadon maintenance (Substitutionspräparate)
-
+    public static final int TYPE_SYS_ANTIBIOTICS = 14; // methadon maintenance (Substitutionspräparate)
     // TODO: really ?
-    public static final int TYPE_SYS_DRAIN_INDICATION = 14; // methadon maintenance (Substitutionspräparate)
+//    public static final int TYPE_SYS_DRAIN_INDICATION = 14; // methadon maintenance (Substitutionspräparate)
 
     public static ArrayList<Commontags> getAll() {
         EntityManager em = OPDE.createEM();

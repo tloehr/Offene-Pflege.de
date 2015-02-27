@@ -408,16 +408,19 @@ public class SYSFilesTools {
      * Diese Methode findet aus den properties eine lokal definierte Applikation
      * heraus. Das braucht man nur dann, wenn die Funktionen der Java eigenen
      * Desktop API nicht funktionieren.
+     * z.B. linux-html=/usr/
      *
-     * @param filename
+     * @param file
      * @return String[] der das passende command array für den EXEC Aufruf erhält.
      */
-    public static String[] getLocalDefinedApp(String filename) {
+    public static String[] getLocalDefinedApp(File file) {
         String os = System.getProperty("os.name").toLowerCase();
-        String extension = filenameExtension(filename);
+        if (SYSTools.isMac()) os = "mac";
+
+        String extension = filenameExtension(file.getName());
         String[] result = null;
         if (OPDE.getProps().containsKey(os + "-" + extension)) {
-            result = new String[]{OPDE.getProps().getProperty(os + "-" + extension), filename};
+            result = new String[]{OPDE.getProps().getProperty(os + "-" + extension), file.getAbsolutePath()};
         }
         return result;
     }
@@ -449,9 +452,9 @@ public class SYSFilesTools {
         }
         Desktop desktop = null;
 
-        if (getLocalDefinedApp(file.getName()) != null) {
+        if (getLocalDefinedApp(file) != null) {
             try {
-                Runtime.getRuntime().exec(getLocalDefinedApp(file.getName()));
+                Runtime.getRuntime().exec(getLocalDefinedApp(file));
             } catch (IOException ex) {
                 OPDE.getLogger().error(ex);
             }

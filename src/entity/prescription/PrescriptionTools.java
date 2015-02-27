@@ -20,8 +20,10 @@ import op.OPDE;
 import op.care.prescription.PnlPrescription;
 import op.system.PDF;
 import op.threads.DisplayMessage;
-import op.tools.*;
-import org.apache.commons.collections.Closure;
+import op.tools.HTMLTools;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -33,7 +35,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -675,6 +676,14 @@ public class PrescriptionTools {
         return result + "</div>";
     }
 
+
+    public static boolean allowsAnnotation(Prescription prescription) {
+        for (Commontags tag : prescription.getCommontags()) {
+            if (tag.getType() == CommontagsTools.TYPE_SYS_ANTIBIOTICS) return true;
+        }
+        return false;
+    }
+
 //    public static String getON(Prescription verordnung) {
 //        String result = "<div id=\"fonttext\">";
 //        String datum = DateFormat.getDateInstance().format(verordnung.getFrom());
@@ -1171,9 +1180,6 @@ public class PrescriptionTools {
         }
         return list;
     }
-
-
-
 
 
 }

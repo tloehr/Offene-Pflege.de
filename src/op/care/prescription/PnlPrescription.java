@@ -1476,6 +1476,19 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnEditSideEffects.setEnabled(prescription.hasMed() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlMed.internalClassID));
             pnlMenu.add(btnEditSideEffects);
 
+
+            final JButton btnAnnotation = GUITools.createHyperlinkButton("nursingrecords.prescription.edit.annotations", SYSConst.icon22edited, null);
+            btnAnnotation.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnAnnotation.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                      DlgAnnotations dlg = new DlgAnnotations(prescription);
+                    dlg.setVisible(true);
+                }
+            });
+            btnAnnotation.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlMed.internalClassID));
+            pnlMenu.add(btnAnnotation);
+
             pnlMenu.add(new JSeparator());
 
             /***

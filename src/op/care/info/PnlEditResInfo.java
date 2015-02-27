@@ -1050,6 +1050,7 @@ public class PnlEditResInfo {
                         jl.setFont(new Font("Arial", fontstyle, 14));
                     }
 
+                    // underline it
                     Font original = jl.getFont();
                     Map map = original.getAttributes();
                     map.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
@@ -1103,6 +1104,12 @@ public class PnlEditResInfo {
                 } else {
                     jl.setFont(new Font("Arial", fontstyle, 14));
                 }
+
+                // underline it
+                Font original = jl.getFont();
+                Map map = original.getAttributes();
+                map.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                jl.setFont(original.deriveFont(map));
 
 //                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
