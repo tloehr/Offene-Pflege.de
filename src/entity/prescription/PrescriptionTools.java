@@ -11,6 +11,8 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import entity.Station;
 import entity.files.SYSFilesTools;
+import entity.info.ResInfo;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.Commontags;
@@ -676,10 +678,30 @@ public class PrescriptionTools {
         return result + "</div>";
     }
 
+    public static String getAnnontations(Prescription prescription) {
 
-    public static boolean allowsAnnotation(Prescription prescription) {
+        String result = "<div id=\"fonttext\">";
+
+        if (isAnnotationNecessary(prescription)) {
+            result += "<br/>" + SYSConst.html_bold(SYSTools.xx("nursingrecords.prescription.edit.annotations"))+"<br/>";
+
+            for (Commontags tag : prescription.getCommontags()) {
+                if (CommontagsTools.isAnnotationNecessary(tag)) {
+                    result += SYSConst.html_16x16_Annotate_internal + "&nbsp;" + tag.getText() + "<br/>";
+
+                    ResInfo annotation = ResInfoTools.getAnnotation4Prescription(prescription, tag);
+                    result += annotation == null ? SYSTools.xx("misc.msg.noentryyet") : ResInfoTools.getContentAsHTML(annotation);
+                }
+            }
+        }
+
+        return result + "</div>";
+    }
+
+
+    public static boolean isAnnotationNecessary(Prescription prescription) {
         for (Commontags tag : prescription.getCommontags()) {
-            if (tag.getType() == CommontagsTools.TYPE_SYS_ANTIBIOTICS) return true;
+            if (CommontagsTools.isAnnotationNecessary(tag)) return true;
         }
         return false;
     }

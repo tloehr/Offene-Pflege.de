@@ -515,6 +515,8 @@ public class PnlInformation extends NursingRecordsPanel {
                                         cpsType.add(new JLabel(SYSTools.xx("nursingrecords.info.cant.add.absence.here")));
                                     } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_STAY) {
                                         cpsType.add(new JLabel(SYSTools.xx("nursingrecords.info.cant.add.stays.here")));
+                                    } else if (ResInfoTypeTools.is4Annotations(resInfoType)) {
+                                        cpsType.add(new JLabel(SYSTools.xx("nursingrecords.info.cant.add.annotations.here")));
                                     } else {// if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfoType.getType() != ResInfoTypeTools.TYPE_STAY)
 
                                         String buttonText = "nursingrecords.info.no.entry.yet";

@@ -26,6 +26,7 @@
 package entity.info;
 
 import entity.files.SYSINF2FILE;
+import entity.prescription.Prescription;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
@@ -95,9 +96,16 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     @JoinColumn(name = "resvalueid", referencedColumnName = "BWID")
     @ManyToOne
     private ResValue resValue;
+    @JoinColumn(name = "prescriptionid", referencedColumnName = "verid")
+    @ManyToOne
+    private Prescription prescription;
 
-    public Collection<Commontags> getCommontags() {
-        return commontags;
+    public Prescription getPrescription() {
+        return prescription;
+    }
+
+    public void setPrescription(Prescription prescription) {
+        this.prescription = prescription;
     }
 
     // ==
@@ -108,6 +116,10 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     @JoinColumn(name = "resinfoid"), inverseJoinColumns =
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
+
+    public Collection<Commontags> getCommontags() {
+        return commontags;
+    }
 
     // ==
     // 1:N Relationen

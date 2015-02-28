@@ -1,5 +1,7 @@
 package entity.info;
 
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import op.OPDE;
 
 import javax.persistence.EntityManager;
@@ -140,6 +142,24 @@ public class ResInfoTypeTools {
         return containsOnlyClosedInfos;
     }
 
+    public static ResInfoType getResInfoType4Annotation(Commontags tag){
+        if (tag.getType() == CommontagsTools.TYPE_SYS_ANTIBIOTICS){
+            return getByType(TYPE_ANTIBIOTICS);
+        }
+        return null;
+    }
+
+
+    public static boolean is4Annotations(ResInfoType resInfoType){
+            if (resInfoType.getType() == TYPE_ANTIBIOTICS){
+                return true;
+            }
+            return false;
+        }
+
+
+
+
     public static boolean containsOneActiveObsoleteInfo(ArrayList<ResInfo> listInfos) {
         boolean containsOneActiveObsoleteInfo = false;
         for (ResInfo info : listInfos) {
@@ -151,33 +171,33 @@ public class ResInfoTypeTools {
         return containsOneActiveObsoleteInfo;
     }
 
-    /**
-     * if you hand over an obsolete infotype to this method it returns an
-     * active version for it, using the equiv attribute. If the type is not
-     * obsolete, you will get it back.
-     * If there is no active version you will get NULL instead.
-     * Infotypes without replacements have either none active one withing their
-     * equiv domain or equiv is 0.
-     *
-     * @param resInfoType
-     * @return
-     */
-    public static ResInfoType getActiveVersion4(ResInfoType resInfoType) {
-        if (!resInfoType.isObsolete()) {
-            return resInfoType;
-        }
-        if (resInfoType.getEquiv().intValue() == 0) {
-            return null;
-        }
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.equiv = :equiv AND b.type >= 0 ");
-        query.setParameter("equiv", resInfoType.getEquiv());
-        List<ResInfoType> resInfoTypes = query.getResultList();
-        em.close();
-        if (resInfoTypes.isEmpty()) {
-            return null;
-        }
-        return resInfoTypes.get(0); // there should never be more than one active resinfotype.
-    }
+//    /**
+//     * if you hand over an obsolete infotype to this method it returns an
+//     * active version for it, using the equiv attribute. If the type is not
+//     * obsolete, you will get it back.
+//     * If there is no active version you will get NULL instead.
+//     * Infotypes without replacements have either none active one withing their
+//     * equiv domain or equiv is 0.
+//     *
+//     * @param resInfoType
+//     * @return
+//     */
+//    public static ResInfoType getActiveVersion4(ResInfoType resInfoType) {
+//        if (!resInfoType.isObsolete()) {
+//            return resInfoType;
+//        }
+//        if (resInfoType.getEquiv().intValue() == 0) {
+//            return null;
+//        }
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.equiv = :equiv AND b.type >= 0 ");
+//        query.setParameter("equiv", resInfoType.getEquiv());
+//        List<ResInfoType> resInfoTypes = query.getResultList();
+//        em.close();
+//        if (resInfoTypes.isEmpty()) {
+//            return null;
+//        }
+//        return resInfoTypes.get(0); // there should never be more than one active resinfotype.
+//    }
 
 }

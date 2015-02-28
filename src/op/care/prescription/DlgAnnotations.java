@@ -4,15 +4,23 @@
 
 package op.care.prescription;
 
-import javax.swing.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.info.ResInfo;
+import entity.info.ResInfoTools;
+import entity.info.ResInfoTypeTools;
 import entity.prescription.Prescription;
 import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import op.OPDE;
+import op.care.info.PnlEditResInfo;
 import op.tools.MyJDialog;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 
 /**
@@ -22,45 +30,96 @@ public class DlgAnnotations extends MyJDialog {
 
 
     private final Prescription prescription;
+    private final Closure actionEvent;
 
-    public DlgAnnotations(Prescription prescription) {
+    public DlgAnnotations(Prescription prescription, Closure actionEvent) {
         super(OPDE.getMainframe(), true);
         this.prescription = prescription;
+        this.actionEvent = actionEvent;
+        setTitle(SYSTools.xx("nursingrecords.prescription.edit.annotations"));
         initComponents();
         initDialog();
     }
 
     private void initDialog() {
+//        pnlResInfo.setLayout(new BoxLayout(pnlResInfo, BoxLayout.PAGE_AXIS));
 
         listCommontTags.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                setIcon(SYSConst.icon16tagPurple);
                 return super.getListCellRendererComponent(list, value.toString(), index, isSelected, cellHasFocus);
             }
         });
 
         DefaultListModel<Commontags> listModel = new DefaultListModel<>();
         for (Commontags tag : prescription.getCommontags()) {
-            listModel.addElement(tag);
+            if (CommontagsTools.isAnnotationNecessary(tag)) {
+                listModel.addElement(tag);
+            }
         }
         listCommontTags.setModel(listModel);
+
     }
 
     private void listCommontTagsValueChanged(ListSelectionEvent e) {
-        // TODO add your code here
+        if (e.getValueIsAdjusting()) return;
+
+        Commontags tag = (Commontags) listCommontTags.getSelectedValue();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                pnlResInfo.removeAll();
+                revalidate();
+                repaint();
+            }
+        });
+
+        if (!CommontagsTools.isAnnotationNecessary(tag)) return;
+
+        int mode = PnlEditResInfo.EDIT;
+        ResInfo annotation = ResInfoTools.getAnnotation4Prescription(prescription, tag);
+        if (annotation == null) {
+            annotation = new ResInfo(ResInfoTypeTools.getResInfoType4Annotation(tag), prescription.getResident());
+            annotation.setPrescription(prescription);
+            mode = PnlEditResInfo.NEW;
+        }
+
+        PnlEditResInfo pnl = new PnlEditResInfo(annotation, new Closure() {
+            @Override
+            public void execute(Object o) {
+                setVisible(false);
+                actionEvent.execute(o);
+            }
+        }, Color.WHITE);
+        pnl.setEnabled(true, mode);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                pnlResInfo.add(pnl.getPanel());
+
+                revalidate();
+                repaint();
+            }
+        });
+
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         scrollPane1 = new JScrollPane();
         listCommontTags = new JList();
+        scrollPane2 = new JScrollPane();
         pnlResInfo = new JPanel();
 
         //======== this ========
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setModal(true);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, default:grow",
-            "default:grow, 2*($lgap, default)"));
+                "default, $lcgap, default:grow",
+                "default:grow, 2*($lgap, default)"));
 
         //======== scrollPane1 ========
         {
@@ -71,14 +130,17 @@ public class DlgAnnotations extends MyJDialog {
         }
         contentPane.add(scrollPane1, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
 
-        //======== pnlResInfo ========
+        //======== scrollPane2 ========
         {
-            pnlResInfo.setLayout(new FormLayout(
-                "default:grow",
-                "2*(default, $lgap), default"));
+
+            //======== pnlResInfo ========
+            {
+                pnlResInfo.setLayout(new BoxLayout(pnlResInfo, BoxLayout.PAGE_AXIS));
+            }
+            scrollPane2.setViewportView(pnlResInfo);
         }
-        contentPane.add(pnlResInfo, CC.xy(3, 1, CC.FILL, CC.FILL));
-        pack();
+        contentPane.add(scrollPane2, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
+        setSize(865, 565);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -86,6 +148,7 @@ public class DlgAnnotations extends MyJDialog {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JScrollPane scrollPane1;
     private JList listCommontTags;
+    private JScrollPane scrollPane2;
     private JPanel pnlResInfo;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

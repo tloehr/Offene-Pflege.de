@@ -8,6 +8,9 @@ new FormModel {
 			"$rowSpecs": "default:grow, linegap, default, linegap, default"
 		} ) {
 			name: "this"
+			"defaultCloseOperation": 2
+			"modal": true
+			"$sizePolicy": 1
 			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 				name: "scrollPane1"
 				add( new FormComponent( "javax.swing.JList" ) {
@@ -19,20 +22,20 @@ new FormModel {
 				"gridY": 1
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-				"$columnSpecs": "default:grow"
-				"$rowSpecs": "default, linegap, default, linegap, default"
-			} ) {
-				name: "pnlResInfo"
+			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+				name: "scrollPane2"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+					"axis": 3
+				} ) {
+					name: "pnlResInfo"
+				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
-				"gridY": 1
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 600, 400 )
+			"size": new java.awt.Dimension( 865, 565 )
 		} )
 	}
 }
