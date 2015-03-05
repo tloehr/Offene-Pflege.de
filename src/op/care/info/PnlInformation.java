@@ -15,6 +15,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
 import entity.files.SYSFilesTools;
 import entity.info.*;
+import entity.prescription.PrescriptionTools;
 import entity.process.*;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
@@ -675,7 +676,8 @@ public class PnlInformation extends NursingRecordsPanel {
 
         String title = "<html><body>";
 
-        if (resInfo.isSingleIncident()) {
+
+       if (resInfo.isSingleIncident()) {
             title += DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ")";
         } else {
             title += DateFormat.getDateInstance().format(resInfo.getFrom()) + " (" + (resInfo.getUserON() != null ? resInfo.getUserON().getFullname() : "--") + ") " + " >> ";
@@ -1067,6 +1069,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         && !resInfo.isClosed()
                         && !resInfo.isSingleIncident()
                         && !resInfo.isNoConstraints()
+                        && resInfo.getPrescription() == null
         );
 
         /***
@@ -1237,11 +1240,20 @@ public class PnlInformation extends NursingRecordsPanel {
         CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                if (resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
+                if (resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIAGNOSIS || resInfo.getPrescription() != null) {
                     JTextPane txt = new JTextPane();
                     txt.setContentType("text/html");
                     txt.setEditable(false);
-                    txt.setText(SYSTools.toHTMLForScreen(SYSConst.html_fontface + resInfo.getContentAsHTML() + "</font>"));//   SYSConst.html_div(resInfo.getContentAsHTML()));
+
+
+                    String content = "";
+                    if (resInfo.getPrescription() != null){
+                        content = PrescriptionTools.getPrescriptionAsHTML(resInfo.getPrescription(), false, false, false, false) + "<hrule/><br/>";
+                    }
+
+                    content += resInfo.getContentAsHTML();
+
+                    txt.setText(SYSTools.toHTMLForScreen(SYSConst.html_fontface + content + "</font>"));//   SYSConst.html_div(resInfo.getContentAsHTML()));
                     cpInfo.setContentPane(new JScrollPane(txt));
                 } else {
                     if (!mapInfo2Editor.containsKey(resInfo)) {
@@ -1862,7 +1874,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
             }
         });
-        btnTAGs.setEnabled(!resInfo.isClosed());
+        btnTAGs.setEnabled(!resInfo.isClosed() && resInfo.getPrescription() == null);
         pnlMenu.add(btnTAGs);
 
 
@@ -1912,7 +1924,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     new DlgFiles(resInfo, closure);
                 }
             });
-            btnFiles.setEnabled(OPDE.isFTPworking());
+            btnFiles.setEnabled(OPDE.isFTPworking() && resInfo.getPrescription() == null);
             pnlMenu.add(btnFiles);
 
 
@@ -2015,7 +2027,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     });
                 }
             });
-            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo));
+            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo) && resInfo.getPrescription() == null);
 
             if (!resInfo.getAttachedQProcessConnections().isEmpty()) {
                 JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedQProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);

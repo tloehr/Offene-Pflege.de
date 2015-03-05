@@ -493,6 +493,8 @@ public class PnlSystemSettings extends CleanablePanel {
 
                             btnImportICD.setIcon(SYSConst.icon22ledGreenOn);
                         } catch (Exception e) {
+                            OPDE.debug(e.getMessage());
+                            e.printStackTrace();
                             OPDE.getDisplayManager().addSubMessage("opde.settings.global.noICDFile");
                             listICDs.clear();
                             btnImportICD.setIcon(SYSConst.icon22ledRedOn);

@@ -4,7 +4,7 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JDialog", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "default, labelcompgap, default:grow"
+			"$columnSpecs": "52dlu, labelcompgap, default:grow"
 			"$rowSpecs": "default:grow, linegap, default, linegap, default"
 		} ) {
 			name: "this"

@@ -678,20 +678,23 @@ public class PrescriptionTools {
         return result + "</div>";
     }
 
-    public static String getAnnontations(Prescription prescription) {
+    public static String getAnnontationsAsHTML(Prescription prescription) {
 
         String result = "<div id=\"fonttext\">";
 
         if (isAnnotationNecessary(prescription)) {
-            result += "<br/>" + SYSConst.html_bold(SYSTools.xx("nursingrecords.prescription.edit.annotations"))+"<br/>";
+            result += "<br/>" + SYSConst.html_bold("nursingrecords.prescription.edit.annotations") + "<br/>";
 
-            for (Commontags tag : prescription.getCommontags()) {
-                if (CommontagsTools.isAnnotationNecessary(tag)) {
-                    result += SYSConst.html_16x16_Annotate_internal + "&nbsp;" + tag.getText() + "<br/>";
 
-                    ResInfo annotation = ResInfoTools.getAnnotation4Prescription(prescription, tag);
-                    result += annotation == null ? SYSTools.xx("misc.msg.noentryyet") : ResInfoTools.getContentAsHTML(annotation);
-                }
+            if (prescription.getAnnotations().isEmpty()){
+                result += SYSTools.xx("misc.msg.noentryyet")+ "<br/>";
+            }
+
+            for (ResInfo annotation : prescription.getAnnotations()) {
+                Commontags tag = CommontagsTools.getTagForAnnotation(annotation);
+                result += SYSConst.html_16x16_Annotate_internal + "&nbsp;" + tag.getText() + "<br/>";
+                result += annotation == null ? SYSTools.xx("misc.msg.noentryyet") : ResInfoTools.getContentAsHTML(annotation);
+
             }
         }
 
@@ -1041,7 +1044,7 @@ public class PrescriptionTools {
 
                     result += "<tr>";
                     result += "<td valign=\"top\">" + (withIcon && myprescription.isClosed() ? SYSConst.html_22x22_StopSign : "") + getLongDescription(myprescription);
-                    result += (myprescription.getCommontags().isEmpty() ? "" : "<br/>" + CommontagsTools.getAsHTML(myprescription.getCommontags(), SYSConst.html_16x16_tagPurple));
+                    result += (myprescription.getCommontags().isEmpty() ? "" : "<br/>" + CommontagsTools.getAsHTML(myprescription.getCommontags(), withIcon ? SYSConst.html_16x16_tagPurple : ""));
                     result += "</td>";
                     result += "<td valign=\"top\">" + getDoseAsHTML(myprescription, withmed) + "<br/>";
                     result += getRemark(myprescription);

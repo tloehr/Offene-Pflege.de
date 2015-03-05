@@ -6,12 +6,14 @@
 package entity.prescription;
 
 import entity.files.SYSPRE2FILE;
+import entity.info.ResInfo;
 import entity.info.Resident;
 import entity.nursingprocess.Intervention;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSPRE2PROCESS;
 import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import entity.system.Users;
 import op.OPDE;
 import op.care.prescription.PnlPrescription;
@@ -127,6 +129,9 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     private List<SYSPRE2PROCESS> attachedProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+    private Collection<ResInfo> annotations;
+
     //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
 //    private List<BHP> bhps;
     // ==
@@ -182,7 +187,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.from = new Date();
         this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.userON = OPDE.getLogin().getUser();
-        this.commontags = new ArrayList<Commontags>();
+        this.commontags = new ArrayList<>();
+        this.annotations = new ArrayList<>();
 //        this.weightControl = false;
     }
 
@@ -207,11 +213,15 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.docOFF = docOFF;
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.commontags = new ArrayList<Commontags>();
-//        this.weightControl = false;
+        this.annotations = new ArrayList<>();
     }
 
     public Collection<Commontags> getCommontags() {
         return commontags;
+    }
+
+    public Collection<ResInfo> getAnnotations() {
+        return annotations;
     }
 
     public Date getFrom() {
@@ -311,7 +321,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         return hasMed() && resident.isCalcMediUPR1();
     }
 
-    public boolean isWeightControlled(){
+    public boolean isWeightControlled() {
         return hasMed() && tradeform.isWeightControlled();
     }
 
@@ -536,20 +546,28 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public Prescription clone() {
-        final Prescription copy = new Prescription(from, to, toEndOfPackage, relation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, OPDE.getLogin().getUser(), userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
+        final Prescription prescriptionClone = new Prescription(from, to, toEndOfPackage, relation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, OPDE.getLogin().getUser(), userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
 
         CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
-                PrescriptionSchedule scheduleCopy = ((PrescriptionSchedule) o).createCopy(copy);
-                copy.getPrescriptionSchedule().add(scheduleCopy);
+                PrescriptionSchedule scheduleCopy = ((PrescriptionSchedule) o).createCopy(prescriptionClone);
+                prescriptionClone.getPrescriptionSchedule().add(scheduleCopy);
             }
         });
 
         for (Commontags ctag : commontags) {
-            copy.getCommontags().add(ctag);
+            prescriptionClone.getCommontags().add(ctag);
         }
 
-        return copy;
+        for (ResInfo annotation : annotations){
+
+            ResInfo annotationClone = annotation.clone();
+            annotationClone.setPrescription(prescriptionClone);
+
+            prescriptionClone.getAnnotations().add(annotationClone);
+        }
+
+        return prescriptionClone;
     }
 
     @Override

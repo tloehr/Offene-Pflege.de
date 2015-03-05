@@ -370,7 +370,8 @@ public class ResInfoTools {
                 && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
                 && !resInfo.getResInfoType().isObsolete()
                 && resInfo.getResident().isActive()
-                && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
+                && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident())
+                && resInfo.getPrescription() == null;
     }
 
     /**
@@ -644,24 +645,34 @@ public class ResInfoTools {
         return result;
 
     }
+//
+//    public static ResInfo getAnnotation4Prescription(Prescription prescription, Commontags tag) {
+//        EntityManager em = OPDE.createEM();
+//
+//        int resinfotype_type = -1;
+//        if (tag.getType() == CommontagsTools.TYPE_SYS_ANTIBIOTICS) {
+//            resinfotype_type = ResInfoTypeTools.TYPE_ANTIBIOTICS;
+//        }
+//        if (resinfotype_type == -1) return null;
+//
+//        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.prescription= :prescription AND b.bwinfotyp.type = :resinfotype ");
+//        query.setParameter("prescription", prescription);
+//        query.setParameter("resinfotype", resinfotype_type);
+//
+//        List<ResInfo> bwinfos = query.getResultList();
+//        em.close();
+//
+//        return bwinfos.isEmpty() ? null : bwinfos.get(0);
+//    }
 
     public static ResInfo getAnnotation4Prescription(Prescription prescription, Commontags tag) {
-        EntityManager em = OPDE.createEM();
+        for (ResInfo annotation : prescription.getAnnotations()) {
+            if (CommontagsTools.getTagForAnnotation(annotation).equals(tag)) {
+                return annotation;
+            }
 
-        int resinfotype_type = -1;
-        if (tag.getType() == CommontagsTools.TYPE_SYS_ANTIBIOTICS) {
-            resinfotype_type = ResInfoTypeTools.TYPE_ANTIBIOTICS;
         }
-        if (resinfotype_type == -1) return null;
-
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.prescription= :prescription AND b.bwinfotyp.type = :resinfotype ");
-        query.setParameter("prescription", prescription);
-        query.setParameter("resinfotype", resinfotype_type);
-
-        List<ResInfo> bwinfos = query.getResultList();
-        em.close();
-
-        return bwinfos.isEmpty() ? null : bwinfos.get(0);
+        return null;
     }
 
     private static class HandlerStruktur extends DefaultHandler {
@@ -1832,6 +1843,19 @@ public class ResInfoTools {
         ArrayList<ResInfo> listData = new ArrayList<ResInfo>(query.getResultList());
 
         return listData;
+    }
+
+
+    public static String getPrevalenceAntibioticUse(LocalDate day, Closure progress) {
+        return "";
+    }
+
+    public static String getPrevalenceAntibioticUse(LocalDate day, Station station, Closure progress) {
+        return "";
+    }
+
+    public static String getPrevalenceAntibioticUse(LocalDate day, Resident resident, Closure progress) {
+        return "";
     }
 
 }

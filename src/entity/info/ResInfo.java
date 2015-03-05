@@ -35,9 +35,9 @@ import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
 import op.care.info.PnlInformation;
+import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import org.joda.time.LocalDate;
 
 /**
  * @author tloehr
@@ -122,7 +123,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     }
 
     // ==
-    // 1:N Relationen
+    // 1:N Relations
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
     private Collection<SYSINF2FILE> attachedFilesConnections;
@@ -141,7 +142,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
             this.from = now;
             this.to = now;
         } else if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            this.from = new DateTime().toDateMidnight().toDate();
+            this.from = new LocalDate().toDateTimeAtStartOfDay().toDate();
             this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         } else {
             this.from = now;
@@ -163,7 +164,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.commontags = new HashSet<>();
     }
 
-    public ResInfo(Date from, Date to, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident, Users userON, Users userOFF) {
+    private ResInfo(Date from, Date to, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident, Users userON, Users userOFF, Prescription prescription) {
         this.from = from;
         this.to = to;
         this.html = html;
@@ -177,6 +178,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
         this.commontags = new HashSet<>();
+        this.prescription = prescription;
     }
 
     @Override
@@ -194,7 +196,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     public void setFrom(Date from) {
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            from = new DateTime(from).toDateMidnight().toDate();
+            from = new LocalDate(from).toDateTimeAtStartOfDay().toDate();
         }
         this.from = from;
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
@@ -208,7 +210,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     public void setTo(Date to) {
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            to = new DateTime(to).toDateMidnight().plusDays(1).toDateTime().minusMinutes(1).toDate();
+            to = SYSCalendar.eod(new LocalDate(to)).toDate();
         }
         this.to = to;
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
@@ -444,7 +446,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public ResInfo clone() {
-        return new ResInfo(from, to, html, properties, bemerkung, bwinfotyp, resident, userON, userOFF);
+        return new ResInfo(from, to, html, properties, bemerkung, bwinfotyp, resident, userON, userOFF, prescription);
     }
 
     @Override

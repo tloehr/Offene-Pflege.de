@@ -34,6 +34,7 @@ import com.jidesoft.swing.JideButton;
 import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.prescription.*;
 import entity.process.*;
@@ -53,7 +54,6 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -242,7 +242,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         if (PrescriptionTools.isAnnotationNecessary(prescription)) {
             title += "<tr>" +
-                    "    <td colspan=\"3\">" + PrescriptionTools.getAnnontations(prescription) + "</td>" +
+                    "    <td colspan=\"3\">" + PrescriptionTools.getAnnontationsAsHTML(prescription) + "</td>" +
                     "  </tr>";
         }
 
@@ -1161,13 +1161,30 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 Prescription myPrescription = em.merge(prescription);
                                 em.lock(myPrescription, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                //todo: remove annotations when necessary.
-                                CollectionUtils.disjunction()
-
-                                myPrescription.getCommontags().clear();
-                                for (Commontags commontag : pnlCommonTags.getListSelectedTags()) {
-                                    myPrescription.getCommontags().add(em.merge(commontag));
+                                // merging is important, hence no addAll() for this one
+                                ArrayList<Commontags> listTags2Add = new ArrayList<Commontags>();
+                                for (Commontags tag2add : pnlCommonTags.getListSelectedTags()){
+                                    listTags2Add.add(em.merge(tag2add));
                                 }
+
+                                        // Annotations need to be added, tooo
+                                // these are the remaining tags, that need to be disconnected
+                                myPrescription.getCommontags().addAll(listTags2Add);
+                                ArrayList<Commontags> listTags2Remove = new ArrayList<Commontags>(myPrescription.getCommontags());
+                                listTags2Remove.removeAll(listTags2Add);
+
+                                myPrescription.getCommontags().removeAll(listTags2Remove);
+
+                                ArrayList<ResInfo> annotations2remove = new ArrayList<ResInfo>();
+                                for (Commontags commontag : listTags2Remove) {
+                                    for (ResInfo annotation : myPrescription.getAnnotations()) {
+                                        if (CommontagsTools.getTagForAnnotation(annotation).equals(commontag)) {
+                                            annotations2remove.add(annotation);
+                                            em.remove(annotation);
+                                        }
+                                    }
+                                }
+                                myPrescription.getAnnotations().removeAll(annotations2remove);
 
                                 em.getTransaction().commit();
 
@@ -1265,13 +1282,20 @@ public class PnlPrescription extends NursingRecordsPanel {
 
                                     ResInfo annotation = em.merge((ResInfo) o);
 
+                                    annotation.setHtml(ResInfoTools.getContentAsHTML(annotation));
+
                                     Prescription myPrescription = em.merge(prescription);
                                     em.lock(myPrescription, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                    myPrescription.getAnnotations().remove(annotation); // just in case, it was an EDIT rather than an ADD
+                                    myPrescription.getAnnotations().add(annotation);
+
                                     em.lock(annotation, LockModeType.OPTIMISTIC);
                                     em.getTransaction().commit();
 
                                     lstPrescriptions.remove(prescription);
                                     lstPrescriptions.add(myPrescription);
+
                                     Collections.sort(lstPrescriptions);
                                     final CollapsiblePane myCP = createCP4(myPrescription);
                                     buildPanel();
@@ -1306,7 +1330,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
                 }
             });
-            btnAnnotation.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlMed.internalClassID));
+            btnAnnotation.setEnabled(!prescription.isClosed() && PrescriptionTools.isAnnotationNecessary(prescription));
             pnlMenu.add(btnAnnotation);
         }
 

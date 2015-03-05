@@ -47,8 +47,10 @@ public class DlgAnnotations extends MyJDialog {
         listCommontTags.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                setIcon(SYSConst.icon16tagPurple);
-                return super.getListCellRendererComponent(list, value.toString(), index, isSelected, cellHasFocus);
+
+                JLabel comp = (JLabel) super.getListCellRendererComponent(list, value.toString(), index, isSelected, cellHasFocus);
+                comp.setIcon(SYSConst.icon16tagPurple);
+                return comp;
             }
         });
 
@@ -118,8 +120,8 @@ public class DlgAnnotations extends MyJDialog {
         setModal(true);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, default:grow",
-                "default:grow, 2*($lgap, default)"));
+            "52dlu, $lcgap, default:grow",
+            "default:grow, 2*($lgap, default)"));
 
         //======== scrollPane1 ========
         {

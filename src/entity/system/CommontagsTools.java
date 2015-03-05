@@ -1,6 +1,7 @@
 package entity.system;
 
-import com.itextpdf.text.Chunk;
+import entity.info.ResInfo;
+import entity.info.ResInfoTypeTools;
 import entity.info.Resident;
 import op.OPDE;
 
@@ -35,9 +36,17 @@ public class CommontagsTools {
 //    public static final int TYPE_SYS_DRAIN_INDICATION = 14; // methadon maintenance (Substitutionspräparate)
 
 
-
-    public static boolean isAnnotationNecessary(Commontags tag){
+    public static boolean isAnnotationNecessary(Commontags tag) {
         return tag.getType() == TYPE_SYS_ANTIBIOTICS;
+    }
+
+
+    public static Commontags getTagForAnnotation(ResInfo annotation) {
+        if (annotation.getResInfoType().getType() == ResInfoTypeTools.TYPE_ANTIBIOTICS) {
+            return getType(TYPE_SYS_ANTIBIOTICS);
+        }
+
+        return null;
     }
 
     public static ArrayList<Commontags> getAll() {
@@ -62,27 +71,27 @@ public class CommontagsTools {
     }
 
     public static Commontags getType(int type) {
-            EntityManager em = OPDE.createEM();
-            ArrayList<Commontags> list = null;
+        EntityManager em = OPDE.createEM();
+        ArrayList<Commontags> list = null;
 
-            try {
+        try {
 
-                String jpql = " SELECT c " +
-                        " FROM Commontags c " +
-                        " WHERE c.type = :type ";
+            String jpql = " SELECT c " +
+                    " FROM Commontags c " +
+                    " WHERE c.type = :type ";
 
-                Query query = em.createQuery(jpql);
-                query.setParameter("type", type);
+            Query query = em.createQuery(jpql);
+            query.setParameter("type", type);
 
-                list = new ArrayList<Commontags>(query.getResultList());
+            list = new ArrayList<Commontags>(query.getResultList());
 
-            } catch (Exception se) {
-                OPDE.fatal(se);
-            } finally {
-                em.close();
-            }
-            return list.isEmpty() ? null : list.get(0);
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
         }
+        return list.isEmpty() ? null : list.get(0);
+    }
 
     public static ArrayList<Commontags> getAllUsedInQMSPlans(boolean inactiveOnes2) {
         EntityManager em = OPDE.createEM();
@@ -238,7 +247,7 @@ public class CommontagsTools {
         for (Commontags ctag : commontags) {
             i++;
             result += icon + "&nbsp;" + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font> ";
-            if (maxline > 0 && i % maxline == 0){
+            if (maxline > 0 && i % maxline == 0) {
                 result += "<br/>";
             }
         }
