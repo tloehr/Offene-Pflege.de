@@ -37,6 +37,8 @@ import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -1634,7 +1636,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         public void actionPerformed(ActionEvent actionEvent) {
                             if (resInfo.isSingleIncident()) {
                                 final JidePopup popup = new JidePopup();
-                                PnlPIT pnlPIT = new PnlPIT(resInfo.getFrom(), new Closure() {
+                                PnlPIT pnlPIT = new PnlPIT(new DateTime(resInfo.getFrom()), null, null, new Closure() {
                                     @Override
                                     public void execute(Object o) {
                                         popup.hidePopup();
@@ -1645,9 +1647,9 @@ public class PnlInformation extends NursingRecordsPanel {
                                                 ResInfo editinfo = em.merge(resInfo);
                                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                                 em.lock(editinfo, LockModeType.OPTIMISTIC);
-                                                Date date = (Date) o;
-                                                editinfo.setFrom(date);
-                                                editinfo.setTo(date);
+                                                DateTime date = (DateTime) o;
+                                                editinfo.setFrom(date.toDate());
+                                                editinfo.setTo(date.toDate());
                                                 em.getTransaction().commit();
 
                                                 synchronized (mapType2ResInfos) {
@@ -1770,7 +1772,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
                         }
                     });
-                    btnChangePeriod.setEnabled((ResInfoTools.isEditable(resInfo) || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY) && !resInfo.isSingleIncident()
+                    btnChangePeriod.setEnabled((ResInfoTools.isEditable(resInfo) || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY)  // && !resInfo.isSingleIncident()
                             && (OPDE.isAdmin() ||
                             (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
                     ));

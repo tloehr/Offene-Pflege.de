@@ -14,6 +14,8 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.GP;
 import entity.prescription.GPTools;
+import entity.prescription.Hospital;
+import entity.prescription.HospitalTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypes;
@@ -1345,6 +1347,67 @@ public class PnlEditResInfo {
                         changed = true;
                     }
                 }, neurologist, dermatology);
+
+
+                int fontstyle = Font.PLAIN;
+                if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                        fontstyle = Font.BOLD;
+                    }
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                        fontstyle = Font.ITALIC;
+                    }
+                }
+
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                if (attributes.getValue("label") != null) {
+                    JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")) + ":");
+
+                    if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
+                        int size = Integer.parseInt(attributes.getValue("size"));
+                        jl.setFont(new Font("Arial", fontstyle, size));
+                    } else {
+                        jl.setFont(new Font("Arial", fontstyle, 12));
+                    }
+
+                    outerpanel.add(layout, jl);
+                    layout = "left";
+                }
+
+                components.put(groupname, pnlGP);
+                outerpanel.add(layout, pnlGP);
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+            }
+            /***
+             *      _                     _ _        _          _           _
+             *     | |__   ___  ___ _ __ (_) |_ __ _| |___  ___| | ___  ___| |_
+             *     | '_ \ / _ \/ __| '_ \| | __/ _` | / __|/ _ \ |/ _ \/ __| __|
+             *     | | | | (_) \__ \ |_) | | || (_| | \__ \  __/ |  __/ (__| |_
+             *     |_| |_|\___/|___/ .__/|_|\__\__,_|_|___/\___|_|\___|\___|\__|
+             *                     |_|
+             */
+            if (tagName.equalsIgnoreCase("hospitalselect")) {
+                groupname = attributes.getValue("name");
+                final String thisGroupName = groupname;
+
+
+                PnlHospital pnlHospital = new PnlHospital(new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        long hid;
+                        String hText;
+                        if (o == null) {
+                            hid = -1;
+                            hText = "--";
+                        } else {
+                            hid = ((Hospital) o).getKhid();
+                            hText = HospitalTools.getCompleteAddress((GP) o);
+                        }
+                        content.put(thisGroupName + ".id", Long.toString(gpid));
+                        content.put(thisGroupName + ".text", gpText);
+                        changed = true;
+                    }
+                });
 
 
                 int fontstyle = Font.PLAIN;

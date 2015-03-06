@@ -140,12 +140,7 @@ public class PnlPeriod extends JPanel {
             btnMin.setSelectedIcon(null);
             btnMin.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_start_pressed.png")));
             btnMin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnMin.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnMinActionPerformed(e);
-                }
-            });
+            btnMin.addActionListener(e -> btnMinActionPerformed(e));
             panel1.add(btnMin);
 
             //---- btnBackFrom ----
@@ -156,12 +151,7 @@ public class PnlPeriod extends JPanel {
             btnBackFrom.setBorder(null);
             btnBackFrom.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_rev_pressed.png")));
             btnBackFrom.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnBackFrom.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBackFromActionPerformed(e);
-                }
-            });
+            btnBackFrom.addActionListener(e -> btnBackFromActionPerformed(e));
             panel1.add(btnBackFrom);
 
             //---- btnFwdFrom ----
@@ -172,12 +162,7 @@ public class PnlPeriod extends JPanel {
             btnFwdFrom.setBorder(null);
             btnFwdFrom.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_fwd_pressed.png")));
             btnFwdFrom.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnFwdFrom.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnFwdFromActionPerformed(e);
-                }
-            });
+            btnFwdFrom.addActionListener(e -> btnFwdFromActionPerformed(e));
             panel1.add(btnFwdFrom);
         }
         add(panel1, CC.xy(3, 3));
@@ -185,34 +170,19 @@ public class PnlPeriod extends JPanel {
         //---- jdcVon ----
         jdcVon.setFont(new Font("Arial", Font.PLAIN, 14));
         jdcVon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        jdcVon.addPropertyChangeListener("date", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                jdcVonPropertyChange(e);
-            }
-        });
+        jdcVon.addPropertyChangeListener("date", e -> jdcVonPropertyChange(e));
         add(jdcVon, CC.xy(5, 3));
 
         //---- slider ----
         slider.setPaintLabels(true);
         slider.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        slider.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                sliderPropertyChange(e);
-            }
-        });
+        slider.addPropertyChangeListener(e -> sliderPropertyChange(e));
         add(slider, CC.xy(7, 3));
 
         //---- jdcBis ----
         jdcBis.setFont(new Font("Arial", Font.PLAIN, 14));
         jdcBis.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        jdcBis.addPropertyChangeListener("date", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                jdcBisPropertyChange(e);
-            }
-        });
+        jdcBis.addPropertyChangeListener("date", e -> jdcBisPropertyChange(e));
         add(jdcBis, CC.xy(9, 3));
 
         //======== panel2 ========
@@ -227,12 +197,7 @@ public class PnlPeriod extends JPanel {
             btnBackTo.setBorder(null);
             btnBackTo.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_rev_pressed.png")));
             btnBackTo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnBackTo.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBackToActionPerformed(e);
-                }
-            });
+            btnBackTo.addActionListener(e -> btnBackToActionPerformed(e));
             panel2.add(btnBackTo);
 
             //---- btnFwdTo ----
@@ -243,12 +208,7 @@ public class PnlPeriod extends JPanel {
             btnFwdTo.setBorder(null);
             btnFwdTo.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_fwd_pressed.png")));
             btnFwdTo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnFwdTo.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnFwdToActionPerformed(e);
-                }
-            });
+            btnFwdTo.addActionListener(e -> btnFwdToActionPerformed(e));
             panel2.add(btnFwdTo);
 
             //---- btnMax ----
@@ -259,12 +219,7 @@ public class PnlPeriod extends JPanel {
             btnMax.setBorder(null);
             btnMax.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end_pressed.png")));
             btnMax.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnMax.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnMaxActionPerformed(e);
-                }
-            });
+            btnMax.addActionListener(e -> btnMaxActionPerformed(e));
             panel2.add(btnMax);
         }
         add(panel2, CC.xy(11, 3));
@@ -289,24 +244,14 @@ public class PnlPeriod extends JPanel {
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
             btnCancel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel3.add(btnCancel);
 
             //---- btnOK ----
             btnOK.setText(null);
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
             btnOK.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
+            btnOK.addActionListener(e -> btnOKActionPerformed(e));
             panel3.add(btnOK);
         }
         add(panel3, CC.xywh(3, 7, 9, 1, CC.RIGHT, CC.DEFAULT));
