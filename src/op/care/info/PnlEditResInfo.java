@@ -1348,7 +1348,6 @@ public class PnlEditResInfo {
                     }
                 }, neurologist, dermatology);
 
-
                 int fontstyle = Font.PLAIN;
                 if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
                     if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
@@ -1390,7 +1389,6 @@ public class PnlEditResInfo {
                 groupname = attributes.getValue("name");
                 final String thisGroupName = groupname;
 
-
                 PnlHospital pnlHospital = new PnlHospital(new Closure() {
                     @Override
                     public void execute(Object o) {
@@ -1401,14 +1399,13 @@ public class PnlEditResInfo {
                             hText = "--";
                         } else {
                             hid = ((Hospital) o).getKhid();
-                            hText = HospitalTools.getCompleteAddress((GP) o);
+                            hText = HospitalTools.getCompleteAddress((Hospital) o);
                         }
-                        content.put(thisGroupName + ".id", Long.toString(gpid));
-                        content.put(thisGroupName + ".text", gpText);
+                        content.put(thisGroupName + ".id", Long.toString(hid));
+                        content.put(thisGroupName + ".text", hText);
                         changed = true;
                     }
                 });
-
 
                 int fontstyle = Font.PLAIN;
                 if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
@@ -1435,8 +1432,8 @@ public class PnlEditResInfo {
                     layout = "left";
                 }
 
-                components.put(groupname, pnlGP);
-                outerpanel.add(layout, pnlGP);
+                components.put(groupname, pnlHospital);
+                outerpanel.add(layout, pnlHospital);
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
             }
             /***

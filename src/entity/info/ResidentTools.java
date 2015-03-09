@@ -237,6 +237,7 @@ public class ResidentTools {
                     " JOIN b.resInfoCollection rinfo " +
                     " WHERE rinfo.bwinfotyp.type = :type " +
                     " AND b.adminonly <> 2 " +
+                    " AND b.station IS NOT NULL " +
                     " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
                     " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
                     " (rinfo.from > :from AND rinfo.to < :to)) " +

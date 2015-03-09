@@ -5,7 +5,6 @@
 
 package entity;
 
-import op.OPDE;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
@@ -47,12 +46,26 @@ public class Rooms implements Serializable {
         this.roomID = roomID;
     }
 
+    /**
+     * the floor of this room (0 means ground level, 1 means 1st floor...)
+     *
+     * @return
+     */
     public Short getLevel() {
         return level;
     }
 
     public void setLevel(Short level) {
         this.level = level;
+    }
+
+    /**
+     * is this room a single ?
+     *
+     * @return
+     */
+    public boolean isSingle() {
+        return single;
     }
 
     public Boolean getSingle() {
@@ -63,6 +76,14 @@ public class Rooms implements Serializable {
         this.single = single;
     }
 
+    /**#
+     * does this room has a bath of its own ?
+     * @return
+     */
+    public boolean hasBath(){
+        return bath;
+    }
+
     public Boolean getBath() {
         return bath;
     }
@@ -71,6 +92,10 @@ public class Rooms implements Serializable {
         this.bath = bath;
     }
 
+    /**
+     * to which Station does this room belong ?
+     * @return
+     */
     public Station getStation() {
         return station;
     }
@@ -79,6 +104,10 @@ public class Rooms implements Serializable {
         this.station = station;
     }
 
+    /**
+     * what is the name of that room (e.G. "Nr.1" or simply "1" or what else).
+     * @return
+     */
     public String getText() {
         return text;
     }

@@ -40,11 +40,12 @@ public class TXEssenDoc {
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
 
+    private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private Resident resident;
     private HashMap<String, String> content;
     private ArrayList<ResInfo> listICD;
-    private HashMap<Integer, ResInfo> mapID2Info;
+
 
     private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 8);
 //    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
@@ -53,8 +54,8 @@ public class TXEssenDoc {
 //    private PdfWriter writer = null;
 //
     ByteArrayOutputStream medListStream = null, icdListStream = null;
-    boolean mre, psych = false;
-    int progress, max;
+    boolean mre, psych = false;int progress, max;
+
 
     String generalComment = "";
 

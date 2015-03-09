@@ -32,14 +32,26 @@ public class HospitalTools {
         };
     }
 
+
+    public static String getCompleteAddress(Hospital kh) {
+        if (kh != null) {
+            if (OPDE.isAnonym()) {
+                return "[" + SYSTools.xx("misc.msg.anon") + "]";
+            }
+            return kh.getName() + ", " + kh.getStreet() + ", " + kh.getCity() + ", Tel: " + kh.getTel();
+        } else {
+            return SYSTools.xx("misc.msg.noentryyet");
+        }
+    }
+
     public static String getFullName(Hospital kh) {
         if (kh == null)
             return "--";
 
 
         if (OPDE.isAnonym()) {
-                         return "[" + SYSTools.xx("misc.msg.anon") + "]";
-                    }
+            return "[" + SYSTools.xx("misc.msg.anon") + "]";
+        }
 
         String string = kh.getName() + SYSTools.catchNull(kh.getCity(), ", ", "");
 //        string += SYSTools.catchNull(kh.getTel(), SYSTools.xx("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), SYSTools.xx("misc.msg.fax") + ": ", " ");

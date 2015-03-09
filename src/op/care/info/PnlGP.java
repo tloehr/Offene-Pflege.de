@@ -34,6 +34,10 @@ public class PnlGP extends JPanel {
     private Boolean neurologist;
     private Boolean dermatology;
     ArrayList<GP> listGPs = new ArrayList<GP>();
+    private JComboBox cmbGP;
+    private JPanel panel3;
+    private JButton btnAddGP;
+    private JButton btnEditGP;
 
     public PnlGP(Closure changeEvent) {
         this.changeEvent = changeEvent;
@@ -51,8 +55,8 @@ public class PnlGP extends JPanel {
         initPanel();
     }
 
-    public void setSelected(GP selected){
-        if (listGPs.contains(selected)){
+    public void setSelected(GP selected) {
+        if (listGPs.contains(selected)) {
             cmbGP.setSelectedItem(selected);
         } else {
             cmbGP.setModel(new DefaultComboBoxModel(new GP[]{selected}));
@@ -142,16 +146,16 @@ public class PnlGP extends JPanel {
     }
 
     private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+
+
+
         cmbGP = new JComboBox();
         panel3 = new JPanel();
         btnAddGP = new JButton();
         btnEditGP = new JButton();
 
         //======== this ========
-        setLayout(new FormLayout(
-            "default:grow, $lcgap, default",
-            "default"));
+        setLayout(new BorderLayout(5, 0));
 
         //---- cmbGP ----
         cmbGP.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -161,11 +165,11 @@ public class PnlGP extends JPanel {
                 cmbGPItemStateChanged(e);
             }
         });
-        add(cmbGP, CC.xy(1, 1));
+        add(cmbGP, BorderLayout.CENTER);
 
         //======== panel3 ========
         {
-            panel3.setLayout(new HorizontalLayout(5));
+            panel3.setLayout(new BoxLayout(panel3, BoxLayout.LINE_AXIS));
 
             //---- btnAddGP ----
             btnAddGP.setText(null);
@@ -195,14 +199,8 @@ public class PnlGP extends JPanel {
             });
             panel3.add(btnEditGP);
         }
-        add(panel3, CC.xy(3, 1));
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents
+        add(panel3, BorderLayout.EAST);
+
     }
 
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JComboBox cmbGP;
-    private JPanel panel3;
-    private JButton btnAddGP;
-    private JButton btnEditGP;
-    // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

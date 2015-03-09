@@ -49,6 +49,7 @@ public class PnlHospital extends JPanel {
             }
         });
 
+        btnAdd = new JButton();
         btnAdd.setText(null);
         btnAdd.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
         btnAdd.setBorderPainted(false);
@@ -63,6 +64,7 @@ public class PnlHospital extends JPanel {
         panel3.add(btnAdd);
 
         //---- btnEdit ----
+        btnEdit = new JButton();
         btnEdit.setText(null);
         btnEdit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit3.png")));
         btnEdit.setBorderPainted(false);
@@ -75,6 +77,9 @@ public class PnlHospital extends JPanel {
             }
         });
         panel3.add(btnEdit);
+
+        add(cmbHospital, BorderLayout.CENTER);
+        add(panel3, BorderLayout.EAST);
     }
 
 
