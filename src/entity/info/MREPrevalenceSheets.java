@@ -1,18 +1,21 @@
 package entity.info;
 
-import entity.files.SYSFilesTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSTools;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.LocalDate;
 
+
 import javax.swing.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
@@ -29,45 +32,53 @@ public class MREPrevalenceSheets {
 
     public static final int ROOM_NO = 0;
     public static final int RESIDENT_NAME_OR_RESID = 1; // resident name or just the id (when anonymous is selected)
-    public static final int RUNNING_NO = 2; // running number
-    public static final int PRESENT_YESTERDAY = 3; // resinfotype "ABWE1", TYPE_ABSENCE, presence with a interval overlapping the PIT of the day in question
-    public static final int YEAR_OF_BIRTH = 4; // resident "dob"
-    public static final int MALE = 5; // resident "Geschlecht == 1"
-    public static final int FEMALE = 6; // resident "Geschlecht == 2"
-    public static final int URINE_CATHETER = 7; // resinfotype "INKOAID2", ResInfoTypeTools.TYPE_INCOAID, trans.aid=true
-    public static final int VESSEL_CATHETER = 8;
-    public static final int DECUBITUS = 9; // resinfotype "wound[1..5]", ResInfoTypeTools.TYPE_WOUND1..5
-    public static final int TRACHEOSTOMA = 10; // resinfotype "respi", TYPE_RESPIRATION
-    public static final int OTHER_WOUNDS = 11; // resinfotype "wound[1..5]", ResInfoTypeTools.TYPE_WOUND1..5
-    public static final int PEG = 12; // resinfotype "ARTNUTRIT", TYPE_ARTIFICIAL_NUTRTITION, tubetype=peg
-    public static final int MRSA = 13; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
-    public static final int SURGERY_LAST_30_DAYS = 14; // resinfotype "SURGERY1", presence with a PIT within the last 30 days
-    public static final int HOSPITAL_STAY_LAST_30_DAYS = 15; // resinfotype "ABWE1", presence with a interval overlapping a PIT within the last 30 days. type=HOSPITAL
-    public static final int DESORIENTED_TIME_LOCATION = 16; // resinfotype "ORIENT1", time != yes1 || location != yes3
-    public static final int BEDRIDDEN_WHEELCHAIR = 17; // resinfotype "MOBILITY",bedridden=true || wheel.aid=true
-    public static final int URINARY_INCONTINENCE = 18; // resinfotype "HINKO" OR "HINKON",TYPE_INCO_PROFILE_DAY = 113 OR TYPE_INCO_PROFILE_NIGHT = 114, inkoprofil != kontinenz
-    public static final int FAECAL_INCONTINENCE = 19; // resinfotype "FINCO1",TYPE_INCO_FAECAL = 115,incolevel > 0
-    public static final int DIABETES_INSULINE = 20; // resinfotype "DIABETES1",TYPE_DIABETES = 98,application != none
-    public static final int CARELEVEL0 = 21; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS0" || "0" || "Pflegestufe0"
-    public static final int CARELEVEL1 = 22; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS1" || "1" || "Pflegestufe1"
-    public static final int CARELEVEL2 = 23; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS2" || "2" || "Pflegestufe2"
-    public static final int CARELEVEL3 = 24; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3" || "3" || "Pflegestufe3"
-    public static final int CARELEVEL3p = 25; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3+" || "3+" || "Pflegestufe3+" || "PS3p" || "3p" || "Pflegestufe3p" || "PS3plus" || "3plus" || "Pflegestufe3plus"
-    public static final int PNEUMOCOCCAL_VACCINE = 26; // resinfotype "VACCINE1",TYPE_VACCINE = 144,vaccinetype == 9
-    public static final int RUNNING_ANTIBIOTICS = 27; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+    public static final int RESIDENT_STATION = 2; // resident name or just the id (when anonymous is selected)
+    public static final int RUNNING_NO = 3; // running number
+    public static final int PRESENT_DAY_BEFORE = 4; // resinfotype "ABWE1", TYPE_ABSENCE, presence with a interval overlapping the PIT of the day in question
+    public static final int YEAR_OF_BIRTH = 5; // resident "dob"
+    public static final int MALE = 6; // resident "Geschlecht == 1"
+    public static final int FEMALE = 7; // resident "Geschlecht == 2"
+    public static final int URINE_CATHETER = 8; // resinfotype "INKOAID2", ResInfoTypeTools.TYPE_INCOAID, trans.aid=true
+    public static final int VESSEL_CATHETER = 9;
+    public static final int DECUBITUS = 10; // resinfotype "wound[1..5]", ResInfoTypeTools.TYPE_WOUND1..5
+    public static final int TRACHEOSTOMA = 11; // resinfotype "respi", TYPE_RESPIRATION
+    public static final int OTHER_WOUNDS = 12; // resinfotype "wound[1..5]", ResInfoTypeTools.TYPE_WOUND1..5
+    public static final int PEG = 13; // resinfotype "ARTNUTRIT", TYPE_ARTIFICIAL_NUTRTITION, tubetype=peg
+    public static final int MRSA = 14; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
+    public static final int SURGERY_LAST_30_DAYS = 15; // resinfotype "SURGERY1", presence with a PIT within the last 30 days
+    public static final int HOSPITAL_STAY_LAST_30_DAYS = 16; // resinfotype "ABWE1", presence with a interval overlapping a PIT within the last 30 days. type=HOSPITAL
+    public static final int DESORIENTED_TIME_LOCATION = 17; // resinfotype "ORIENT1", time != yes1 || location != yes3
+    public static final int BEDRIDDEN_WHEELCHAIR = 18; // resinfotype "MOBILITY",bedridden=true || wheel.aid=true
+    public static final int URINARY_INCONTINENCE = 19; // resinfotype "HINKO" OR "HINKON",TYPE_INCO_PROFILE_DAY = 113 OR TYPE_INCO_PROFILE_NIGHT = 114, inkoprofil != kontinenz
+    public static final int FAECAL_INCONTINENCE = 20; // resinfotype "FINCO1",TYPE_INCO_FAECAL = 115,incolevel > 0
+    public static final int DIABETES_INSULINE = 21; // resinfotype "DIABETES1",TYPE_DIABETES = 98,application != none
+    public static final int CARELEVEL0 = 22; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS0" || "0" || "Pflegestufe0"
+    public static final int CARELEVEL1 = 23; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS1" || "1" || "Pflegestufe1"
+    public static final int CARELEVEL2 = 24; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS2" || "2" || "Pflegestufe2"
+    public static final int CARELEVEL3 = 25; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3" || "3" || "Pflegestufe3"
+    public static final int CARELEVEL3p = 26; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3+" || "3+" || "Pflegestufe3+" || "PS3p" || "3p" || "Pflegestufe3p" || "PS3plus" || "3plus" || "Pflegestufe3plus"
+    public static final int PNEUMOCOCCAL_VACCINE = 27; // resinfotype "VACCINE1",TYPE_VACCINE = 144,vaccinetype == 9
+    public static final int RUNNING_ANTIBIOTICS = 28; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
 
+    public static final int MAXCOL_SHEET1 = 29;
+    public static final int SHEET1_START_OF_LIST = ROW_SHEET1_TITLE + 6;
 
     private final int[] NEEDED_TYPES = new int[]{ResInfoTypeTools.TYPE_INCOAID, ResInfoTypeTools.TYPE_INCO_FAECAL, ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT,
             ResInfoTypeTools.TYPE_WOUND1, ResInfoTypeTools.TYPE_WOUND2, ResInfoTypeTools.TYPE_WOUND3, ResInfoTypeTools.TYPE_WOUND4, ResInfoTypeTools.TYPE_WOUND5, ResInfoTypeTools.TYPE_RESPIRATION,
             ResInfoTypeTools.TYPE_ORIENTATION, ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, ResInfoTypeTools.TYPE_INFECTION, ResInfoTypeTools.TYPE_SURGERY, ResInfoTypeTools.TYPE_VACCINE, ResInfoTypeTools.TYPE_ABSENCE};
 
     private final ArrayList<Resident> listResidents;
+    private final LocalDate targetDate;
+    private final boolean anonymous;
     private int progress, max, runningNumber;
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private final HashMap<Integer, ResInfoType> mapResInfoType;
 
-    public MREPrevalenceSheets(final LocalDate targetDate) {
+
+    public MREPrevalenceSheets(final LocalDate targetDate, boolean anonymous) {
+        this.targetDate = targetDate;
+        this.anonymous = anonymous;
 
 
         OPDE.getMainframe().setBlocked(true);
@@ -96,14 +107,20 @@ public class MREPrevalenceSheets {
             @Override
             protected Object doInBackground() throws Exception {
 
+                // prepare a vanilla workbook to fill
+                Workbook workbook = prepareWorkbook();
+
+
                 // get all residents who were at least living here yesterday, even they may have been away on those two days
                 for (Resident resident : listResidents) {
 
+
+                    // load the data for this resident
                     mapID2Info.clear();
                     mapInfo2Properties.clear();
 
                     for (int neededType : NEEDED_TYPES) {
-                        for (ResInfo info : ResInfoTools.getAll(resident, getByType(neededType), targetDate.minusDays(1), targetDate)) {
+                        for (ResInfo info : ResInfoTools.getAll(resident, getResInfoTypeByType(neededType), targetDate.minusDays(1), targetDate)) {
                             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
 
                             if (info.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS) {
@@ -114,26 +131,36 @@ public class MREPrevalenceSheets {
                         }
                     }
 
+                    fillLine(workbook.getSheetAt(0), resident);
 
 //                    SYSFilesTools.handleFile(, Desktop.Action.OPEN);
 
                 }
 
-                return null;
+                return workbook;
             }
 
             @Override
             protected void done() {
-
                 try {
-                    SYSFilesTools.print(get().toString(), true);
-                } catch (ExecutionException ee) {
-                    OPDE.fatal(ee);
-                } catch (InterruptedException ie) {
-                    // nop
+                    FileOutputStream fileOut = new FileOutputStream("/local/workbook.xlsx");
+                    Workbook workbook = (Workbook) get();
+                    workbook.write(fileOut);
+                    fileOut.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
                 }
 
                 mapResInfoType.clear();
+                mapID2Info.clear();
+                mapInfo2Properties.clear();
+
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);
             }
@@ -156,20 +183,40 @@ public class MREPrevalenceSheets {
         return props;
     }
 
+    private void fillLine(Sheet sheet, Resident resident) {
+        runningNumber++;
+
+        String[] content = new String[30];
+        content[ROOM_NO] = SYSTools.catchNull(resident.getRoom(), "--");
+        content[RESIDENT_NAME_OR_RESID] = anonymous ? resident.getRID() : ResidentTools.getLabelText(resident);
+        content[RESIDENT_STATION] = SYSTools.catchNull(resident.getStation(), "--");
+        content[RUNNING_NO] = Integer.toString(runningNumber);
+
+
+        // absent yesterday ?
+        ArrayList<ResInfo> listAbsence = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ABSENCE), targetDate.minusDays(1), targetDate);
+        content[PRESENT_DAY_BEFORE] = listAbsence.isEmpty() ? "" : "X";
+
+        createRows(sheet, 1);
+        for (int i = 0; i < MAXCOL_SHEET1; i++) {
+            sheet.getRow(SHEET1_START_OF_LIST).createCell(i).setCellValue(SYSTools.catchNull(content[i]));
+        }
+    }
+
 
     private Workbook prepareWorkbook() throws IOException {
         Workbook wb = new XSSFWorkbook();
 
-        org.apache.poi.ss.usermodel.Font titleFont = wb.createFont();
+        Font titleFont = wb.createFont();
         titleFont.setFontHeightInPoints((short) 18);
         titleFont.setFontName("Arial");
         CellStyle titleStyle = wb.createCellStyle();
         titleStyle.setFont(titleFont);
 
-        org.apache.poi.ss.usermodel.Font boldFont = wb.createFont();
+        Font boldFont = wb.createFont();
         boldFont.setFontHeightInPoints((short) 12);
         boldFont.setFontName("Arial");
-        boldFont.setBold(true);
+        boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
         CellStyle boldStyle = wb.createCellStyle();
         boldStyle.setFont(boldFont);
 
@@ -191,14 +238,14 @@ public class MREPrevalenceSheets {
         sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("num.of.beds"));
         sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("beds.in.use"));
 
-        for (int i = 0; i < 30; i++) {
-            sheet1.getRow(ROW_SHEET1_TITLE + 6).createCell(i).setCellValue(SYSTools.xx("prevalence.sheet1.col" + String.format("%02d", i + 1) + ".title"));
-            sheet1.getRow(ROW_SHEET1_TITLE + 6).getCell(i).setCellStyle(rotatedStyle);
+        for (int i = 0; i < MAXCOL_SHEET1; i++) {
+            sheet1.getRow(SHEET1_START_OF_LIST).createCell(i).setCellValue(SYSTools.xx("prevalence.sheet1.col" + String.format("%02d", i + 1) + ".title"));
+            sheet1.getRow(SHEET1_START_OF_LIST).getCell(i).setCellStyle(rotatedStyle);
 
         }
 
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < MAXCOL_SHEET1; i++) {
             sheet1.autoSizeColumn(i);
         }
 
@@ -236,12 +283,12 @@ public class MREPrevalenceSheets {
 
         return wb;
     }
-
-    private void addStatLine(Resident resident, boolean anon) {
-        String room = resident.getRoom() != null ? resident.getRoom().toString() : "--";
-        String rid = anon ? resident.getRID() : ResidentTools.getLabelText(resident);
-        String resident_away_yesterday = mapID2Info
-    }
+//
+//    private void addStatLine(Resident resident, boolean anon) {
+//        String room = resident.getRoom() != null ? resident.getRoom().toString() : "--";
+//        String rid = anon ? resident.getRID() : ResidentTools.getLabelText(resident);
+//        String resident_away_yesterday = mapID2Info
+//    }
 
 
     private void createRows(Sheet sheet, int num) {
@@ -251,10 +298,10 @@ public class MREPrevalenceSheets {
         }
     }
 
-    private ResInfoType getResInfoTypeByType(int type){
-          if (!mapResInfoType.containsKey(type)){
-              mapResInfoType.put(type, ResInfoTypeTools.getByType(type));
-          }
+    private ResInfoType getResInfoTypeByType(int type) {
+        if (!mapResInfoType.containsKey(type)) {
+            mapResInfoType.put(type, ResInfoTypeTools.getByType(type));
+        }
         return mapResInfoType.get(type);
     }
 }

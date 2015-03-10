@@ -54,7 +54,7 @@ public class PnlDev extends CleanablePanel {
 
         cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
 
-        tabbedPane1.setComponentAt(1, new PnlCommonTags(new HashSet<Commontags>()));
+//        tabbedPane1.setComponentAt(1, new PnlCommonTags(new HashSet<Commontags>()));
 
     }
 
@@ -518,6 +518,10 @@ public class PnlDev extends CleanablePanel {
         }
     }
 
+    private void button3ActionPerformed(ActionEvent e) {
+        new MREPrevalenceSheets(new LocalDate().minusWeeks(1), false);
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -529,6 +533,8 @@ public class PnlDev extends CleanablePanel {
         txtException = new JTextArea();
         button1 = new JButton();
         panel3 = new JPanel();
+        label1 = new JLabel();
+        button3 = new JButton();
         panel2 = new JPanel();
         cmbMonth = new JComboBox();
         button2 = new JButton();
@@ -582,9 +588,20 @@ public class PnlDev extends CleanablePanel {
 
             //======== panel3 ========
             {
-                panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
+                panel3.setLayout(new FormLayout(
+                    "pref, 9*($lcgap, default)",
+                    "pref, 7*($lgap, default)"));
+
+                //---- label1 ----
+                label1.setText("text");
+                panel3.add(label1, CC.xy(15, 9));
+
+                //---- button3 ----
+                button3.setText("Create xlsx");
+                button3.addActionListener(e -> button3ActionPerformed(e));
+                panel3.add(button3, CC.xy(19, 15));
             }
-            tabbedPane1.addTab("text", panel3);
+            tabbedPane1.addTab("test1", panel3);
 
             //======== panel2 ========
             {
@@ -634,6 +651,8 @@ public class PnlDev extends CleanablePanel {
     private JTextArea txtException;
     private JButton button1;
     private JPanel panel3;
+    private JLabel label1;
+    private JButton button3;
     private JPanel panel2;
     private JComboBox cmbMonth;
     private JButton button2;
