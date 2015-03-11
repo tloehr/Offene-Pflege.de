@@ -13,10 +13,10 @@ import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSPRE2PROCESS;
 import entity.system.Commontags;
-import entity.system.CommontagsTools;
 import entity.system.Users;
 import op.OPDE;
 import op.care.prescription.PnlPrescription;
+import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -24,6 +24,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -375,6 +377,10 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         return new DateTime(to).isBeforeNow();
     }
 
+    public boolean isActiveOn(LocalDate day) {
+        return new Interval(new DateTime(from), new DateTime(to)).overlaps(new Interval(day.toDateTimeAtStartOfDay(), SYSCalendar.eod(day)));
+    }
+
     public boolean isLimited() {
         return to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
@@ -559,7 +565,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
             prescriptionClone.getCommontags().add(ctag);
         }
 
-        for (ResInfo annotation : annotations){
+        for (ResInfo annotation : annotations) {
 
             ResInfo annotationClone = annotation.clone();
             annotationClone.setPrescription(prescriptionClone);

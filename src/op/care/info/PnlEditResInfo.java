@@ -847,12 +847,10 @@ public class PnlEditResInfo {
                 for (String key : enables.get(cbname)) {
                     if (components.containsKey(key) && components.get(key) instanceof Component) {
                         ((Component) components.get(key)).setEnabled(j.isSelected());
-                        //                        if (components.get(key) instanceof JComboBox) {
-                        //                            ((JComboBox) components.get(key)).setSelectedIndex(0);
-                        //                        }
                         if (components.get(key) instanceof JTextComponent) {
                             ((JTextComponent) components.get(key)).setText("");
                         }
+
                     }
                 }
             }
@@ -864,6 +862,8 @@ public class PnlEditResInfo {
                         if (components.get(key) instanceof JTextComponent) {
                             ((JTextComponent) components.get(key)).setText(null);
                         }
+//                        ((Component) components.get(key)).validate();
+//                        ((Component) components.get(key)).repaint();
                     }
                 }
             }

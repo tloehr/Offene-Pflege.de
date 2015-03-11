@@ -87,6 +87,7 @@ public class ResInfoTypeTools {
     public static final int TYPE_ANTIBIOTICS = 143;
     public static final int TYPE_VACCINE = 144;
     public static final int TYPE_SURGERY = 145;
+    public static final int TYPE_VESSEL_CATHETER = 146;
 
     public static final String TYPE_ABSENCE_HOSPITAL = "HOSPITAL";
     public static final String TYPE_ABSENCE_HOLLIDAY = "HOLLIDAY";

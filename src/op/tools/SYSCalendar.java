@@ -769,18 +769,18 @@ public class SYSCalendar {
         return dcbm;
     }
 
-    /**
-     * gibt das heutige Datum zurück, allerdings um die Uhrzeitanteile bereinigt.
-     *
-     * @return das ein um die Uhrzeit bereinigtes Datum.
-     */
-    public static GregorianCalendar trimTime(GregorianCalendar gc) {
-        gc.set(GregorianCalendar.HOUR, 0);
-        gc.set(GregorianCalendar.MINUTE, 0);
-        gc.set(GregorianCalendar.SECOND, 0);
-        gc.set(GregorianCalendar.MILLISECOND, 0);
-        return gc;
-    }
+//    /**
+//     * gibt das heutige Datum zurück, allerdings um die Uhrzeitanteile bereinigt.
+//     *
+//     * @return das ein um die Uhrzeit bereinigtes Datum.
+//     */
+//    public static GregorianCalendar trimTime(GregorianCalendar gc) {
+//        gc.set(GregorianCalendar.HOUR, 0);
+//        gc.set(GregorianCalendar.MINUTE, 0);
+//        gc.set(GregorianCalendar.SECOND, 0);
+//        gc.set(GregorianCalendar.MILLISECOND, 0);
+//        return gc;
+//    }
 
     /**
      * Bereinigt ein Datum um die Uhrzeitanteile, damit die Vergleichsoperatoren richtig funktionieren, wenn man sich nur auf das
@@ -789,56 +789,56 @@ public class SYSCalendar {
      * @param date das zu bereinigende Datum
      * @return das bereinigte Datum
      */
-    public static Date trimTime(Date date) {
-        return new Date(trimTime(toGC(date)).getTimeInMillis());
-    }
-
-    public static boolean betweenDisjunctive(Date from, Date to, Date date) {
-        return date.getTime() > from.getTime() && date.getTime() < to.getTime();
-    }
-
-    public static boolean betweenOverlap(Date from, Date to, Date date) {
-        return betweenDisjunctive(from, to, date) || date.getTime() == from.getTime() || date.getTime() == to.getTime();
-    }
-
-    public static boolean betweenDisjunctive(Date fromInt, Date toInt, Date from, Date to) {
-        return betweenDisjunctive(fromInt, toInt, from) && betweenDisjunctive(fromInt, toInt, to);
-    }
-
-    public static boolean betweenOverlap(Date fromInt, Date toInt, Date from, Date to) {
-        return betweenOverlap(fromInt, toInt, from) && betweenOverlap(fromInt, toInt, to);
-    }
-
-    public static boolean isInRange(JDateChooser jdc) {
-        if (jdc.getDate() != null) {
-            return betweenOverlap(jdc.getMinSelectableDate(), jdc.getMaxSelectableDate(), jdc.getDate());
-        }
-        return false;
-    }
-
-    public static ArrayList getUhrzeitListe(GregorianCalendar start, GregorianCalendar stop, int minutes) {
-        ArrayList result = new ArrayList();
-        while (start.before(stop)) {
-            result.add(toGermanTime(start));
-            start.add(GregorianCalendar.MINUTE, minutes);
-        }
-        return result;
-    }
-
-
-    public static Date addTime2Date(Date date, Time time) {
-        return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
-    }
-
-    public static DateTime addCurrentTime(DateMidnight date) {
-        DateTime time = new DateTime();
-
-        return date.toDateTime().withTime(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute(), time.getMillisOfSecond());
-    }
-
-    public static Date addTime2Date(Date date, Date time) {
-        return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
-    }
+//    public static Date trimTime(Date date) {
+//        return new Date(trimTime(toGC(date)).getTimeInMillis());
+//    }
+//
+//    public static boolean betweenDisjunctive(Date from, Date to, Date date) {
+//        return date.getTime() > from.getTime() && date.getTime() < to.getTime();
+//    }
+//
+//    public static boolean betweenOverlap(Date from, Date to, Date date) {
+//        return betweenDisjunctive(from, to, date) || date.getTime() == from.getTime() || date.getTime() == to.getTime();
+//    }
+//
+//    public static boolean betweenDisjunctive(Date fromInt, Date toInt, Date from, Date to) {
+//        return betweenDisjunctive(fromInt, toInt, from) && betweenDisjunctive(fromInt, toInt, to);
+//    }
+//
+//    public static boolean betweenOverlap(Date fromInt, Date toInt, Date from, Date to) {
+//        return betweenOverlap(fromInt, toInt, from) && betweenOverlap(fromInt, toInt, to);
+//    }
+//
+//    public static boolean isInRange(JDateChooser jdc) {
+//        if (jdc.getDate() != null) {
+//            return betweenOverlap(jdc.getMinSelectableDate(), jdc.getMaxSelectableDate(), jdc.getDate());
+//        }
+//        return false;
+//    }
+//
+//    public static ArrayList getUhrzeitListe(GregorianCalendar start, GregorianCalendar stop, int minutes) {
+//        ArrayList result = new ArrayList();
+//        while (start.before(stop)) {
+//            result.add(toGermanTime(start));
+//            start.add(GregorianCalendar.MINUTE, minutes);
+//        }
+//        return result;
+//    }
+//
+//
+//    public static Date addTime2Date(Date date, Time time) {
+//        return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
+//    }
+//
+//    public static DateTime addCurrentTime(DateMidnight date) {
+//        DateTime time = new DateTime();
+//
+//        return date.toDateTime().withTime(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute(), time.getMillisOfSecond());
+//    }
+//
+//    public static Date addTime2Date(Date date, Date time) {
+//        return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
+//    }
 
     /**
      * Setzt die Zeitkomponente eines GregorianCalendars. Das heisst ganz einfach,

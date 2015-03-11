@@ -834,6 +834,7 @@ public class TXEssenDoc {
 
         String tubetype = "--";
         if (!getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "bitesize").equals("--")) {
+            //todo: this is horrible
             String langKey = "misc.msg." + getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "tubetype");
             tubetype = SYSTools.xx(langKey);
         }

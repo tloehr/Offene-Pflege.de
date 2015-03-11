@@ -9,9 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -52,6 +50,18 @@ public class PnlBodyScheme extends JPanel {
 
         initPanel();
 
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        for (Component comp : Arrays.asList(getComponents())) {
+            if (comp instanceof JCheckBox) {
+                ((JCheckBox) comp).setSelected(false);
+                ((JCheckBox) comp).setEnabled(enabled);
+            }
+        }
+        validate();
+        repaint();
     }
 
     private void initPanel() {
