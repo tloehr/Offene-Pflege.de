@@ -70,7 +70,8 @@ public class MREPrevalenceSheets {
 
     private final int[] NEEDED_TYPES = new int[]{ResInfoTypeTools.TYPE_INCOAID, ResInfoTypeTools.TYPE_INCO_FAECAL, ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT,
             ResInfoTypeTools.TYPE_WOUND1, ResInfoTypeTools.TYPE_WOUND2, ResInfoTypeTools.TYPE_WOUND3, ResInfoTypeTools.TYPE_WOUND4, ResInfoTypeTools.TYPE_WOUND5, ResInfoTypeTools.TYPE_RESPIRATION,
-            ResInfoTypeTools.TYPE_ORIENTATION, ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, ResInfoTypeTools.TYPE_INFECTION, ResInfoTypeTools.TYPE_VACCINE};
+            ResInfoTypeTools.TYPE_ORIENTATION, ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, ResInfoTypeTools.TYPE_INFECTION, ResInfoTypeTools.TYPE_VACCINE, ResInfoTypeTools.TYPE_DIABETES,
+            ResInfoTypeTools.TYPE_NURSING_INSURANCE, ResInfoTypeTools.TYPE_MOBILITY, ResInfoTypeTools.TYPE_VESSEL_CATHETER};
 
     private final ArrayList<Resident> listResidents;
     private final LocalDate targetDate;
@@ -135,10 +136,10 @@ public class MREPrevalenceSheets {
                     for (int neededType : NEEDED_TYPES) {
                         for (ResInfo info : ResInfoTools.getAll(resident, getResInfoTypeByType(neededType), targetDate.minusDays(1), targetDate)) {
 
-                            if (info.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS) {
-                                mapID2Info.put(info.getResInfoType().getType(), info);
-                                mapInfo2Properties.put(info, load(info.getProperties()));
-                            }
+
+                            mapID2Info.put(info.getResInfoType().getType(), info);
+                            mapInfo2Properties.put(info, load(info.getProperties()));
+
 
                         }
                     }
@@ -201,10 +202,14 @@ public class MREPrevalenceSheets {
         return props;
     }
 
+    private String getValue(int type, String key) {
+        return mapID2Info.containsKey(type) &&
+                mapInfo2Properties.containsKey(mapID2Info.get(type)) &&
+                mapInfo2Properties.get(mapID2Info.get(type)).containsKey(key) ? mapInfo2Properties.get(mapID2Info.get(type)).getProperty(key) : "";
+    }
+
     private String getCellContent(int type, String key, String value) {
-        return (mapID2Info.containsKey(getResInfoTypeByType(type)) &&
-                mapInfo2Properties.containsKey(key) &&
-                mapInfo2Properties.get(mapID2Info.get(getResInfoTypeByType(type))).getProperty(key).equalsIgnoreCase(value) ? "X" : "");
+        return getValue(type, key).equalsIgnoreCase(value) ? "X" : "";
     }
 
     private void fillLine(Sheet sheet, Resident resident) {
@@ -230,7 +235,7 @@ public class MREPrevalenceSheets {
         boolean wounds = false;
         for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) {
             bedsore |= getCellContent(type, "bedsore", "true").equals("X");
-            wounds |= mapID2Info.containsKey(getResInfoTypeByType(type));
+            wounds |= mapID2Info.containsKey(type);
         }
         content[BEDSORE] = bedsore ? "X" : "";
         content[OTHER_WOUNDS] = wounds ? "X" : "";
@@ -258,22 +263,26 @@ public class MREPrevalenceSheets {
         boolean immobile = getCellContent(ResInfoTypeTools.TYPE_MOBILITY, "bedridden", "true").equalsIgnoreCase("X") || getCellContent(ResInfoTypeTools.TYPE_MOBILITY, "wheel.aid", "true").equalsIgnoreCase("X");
         content[BEDRIDDEN_WHEELCHAIR] = immobile ? "X" : "";
 
-        boolean urine = !(getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil", "kontinenz").equalsIgnoreCase("X") && getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil", "kontinenz").equalsIgnoreCase("X"));
+//        if (resident.getName().equalsIgnoreCase("Vom Endt")) {
+//            OPDE.debug(resident.getName());
+//            OPDE.debug(mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY));
+//            OPDE.debug(!getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil", "kontinenz").equalsIgnoreCase("X"));
+//            OPDE.debug(mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT));
+//            OPDE.debug(getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil", "kontinenz").equalsIgnoreCase("X"));
+//        }
+        boolean urine = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY) && !getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil", "kontinenz").equalsIgnoreCase("X")) || (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT) && !getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil", "kontinenz").equalsIgnoreCase("X"));
         content[URINARY_INCONTINENCE] = urine ? "X" : "";
 
-        boolean faecal = !getCellContent(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel", "0").equalsIgnoreCase("X");
+        boolean faecal = mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_FAECAL) && !getCellContent(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel", "0").equalsIgnoreCase("X");
         content[FAECAL_INCONTINENCE] = faecal ? "X" : "";
 
-        boolean insuline = !getCellContent(ResInfoTypeTools.TYPE_DIABETES, "application", "none").equalsIgnoreCase("X");
+        boolean insuline = mapID2Info.containsKey(ResInfoTypeTools.TYPE_DIABETES) && !getCellContent(ResInfoTypeTools.TYPE_DIABETES, "application", "none").equalsIgnoreCase("X");
         content[DIABETES_INSULINE] = insuline ? "X" : "";
-
-
-        boolean ps0, ps1, ps2, ps3, ps3p = false;
 
         if (!getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "assigned").equalsIgnoreCase("X")) {
             content[CARELEVEL0] = "X";
         } else {
-            String text = mapInfo2Properties.get(mapID2Info.get(getResInfoTypeByType(ResInfoTypeTools.TYPE_NURSING_INSURANCE))).getProperty("result").replaceAll("\\s", "");
+            String text = getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "result").replaceAll("\\s", "");
 
             Pattern p0 = Pattern.compile("(PS0|0|Pflegestufe0)", Pattern.CASE_INSENSITIVE);
             Matcher m0 = p0.matcher(text);
@@ -287,7 +296,7 @@ public class MREPrevalenceSheets {
             Pattern p3 = Pattern.compile("(PS3|3|Pflegestufe3)", Pattern.CASE_INSENSITIVE);
             Matcher m3 = p3.matcher(text);
 
-            Pattern p3p = Pattern.compile("(PS3p|3p|Pflegestufe3p)", Pattern.CASE_INSENSITIVE);
+            Pattern p3p = Pattern.compile("(PS3p|3p|Pflegestufe3p|PS3\\+|3\\+|Pflegestufe3\\+)", Pattern.CASE_INSENSITIVE);
             Matcher m3p = p3p.matcher(text);
 
             content[CARELEVEL0] = m0.matches() ? "X" : "";
