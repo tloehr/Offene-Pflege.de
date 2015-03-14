@@ -1330,7 +1330,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
                 }
             });
-            btnAnnotation.setEnabled(!prescription.isClosed() && PrescriptionTools.isAnnotationNecessary(prescription));
+            btnAnnotation.setEnabled(!prescription.isClosed() && prescription.hasMed() && PrescriptionTools.isAnnotationNecessary(prescription));
             pnlMenu.add(btnAnnotation);
         }
 
