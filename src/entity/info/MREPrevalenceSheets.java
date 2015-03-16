@@ -96,7 +96,10 @@ public class MREPrevalenceSheets {
     public static final int SHEET2_ADDTIONAL_ISOLATED = ROW_SHEET2_TITLE + 34;
     public static final int SHEET2_ADDTIONAL_RESISTANT = ROW_SHEET2_TITLE + 35;
 
-    public static final int[] SHEET2_INDEX = new int[]{SHEET2_RUNNING_NO, SHEET2_MED, SHEET2_STRENGTH, SHEET2_DOSE};
+    public static final int[] SHEET2_INDEX = new int[]{SHEET2_RUNNING_NO, SHEET2_MED, SHEET2_STRENGTH, SHEET2_DOSE, SHEET2_APPLICATION_LOCAL, SHEET2_APPLICATION_SYSTEM, SHEET2_TREATMENT_PROPHYLACTIC,
+            SHEET2_TREATMENT_THERAPEUTIC, SHEET2_BECAUSE_OF_URINAL, SHEET2_BECAUSE_OF_WOUND, SHEET2_BECAUSE_OF_RESP, SHEET2_BECAUSE_OF_DIGESTIVE,
+            SHEET2_BECAUSE_OF_EYES, SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH, SHEET2_BECAUSE_OF_SYSTEMIC, SHEET2_BECAUSE_OF_OTHER, SHEET2_STARTED_HOME, SHEET2_STARTED_HOSPITAL, SHEET2_STARTED_ELSEWHERE,
+            SHEET2_BY_GP, SHEET2_BY_SPECIALIST, SHEET2_BY_EMERGENCY, SHEET2_ADDTIONAL_URINETEST, SHEET2_ADDTIONAL_MICROBIOLOGY, SHEET2_ADDTIONAL_ISOLATED, SHEET2_ADDTIONAL_RESISTANT};
 
     // hier gehts weiter;
 
@@ -125,7 +128,7 @@ public class MREPrevalenceSheets {
         this.targetDate = targetDate;
         this.anonymous = anonymous;
         progress = 1;
-        sheet2_col_index = COL_SHEET2_TITLE+2;
+        sheet2_col_index = COL_SHEET2_TITLE + 2;
 
 
         OPDE.getMainframe().setBlocked(true);
@@ -198,7 +201,15 @@ public class MREPrevalenceSheets {
 
                 }
 
+                for (int i = 0; i < MAXCOL_SHEET1; i++) {
+                    sheet1.autoSizeColumn(i);
+                }
 
+                if (sheet2 != null) {
+                    for (int i = 0; i < COL_SHEET2_TITLE + runningNumber; i++) {
+                        sheet2.autoSizeColumn(i);
+                    }
+                }
 
                 return null;
             }
@@ -264,17 +275,51 @@ public class MREPrevalenceSheets {
         return getValue(type, key).equalsIgnoreCase(value) ? "X" : "";
     }
 
+    private String getCellContent(Properties properties, String key, String value) {
+        return properties.containsKey(key) && properties.getProperty(key).equalsIgnoreCase(value) ? "X" : "";
+    }
+
 
     private void fillColSheet2(Prescription prescription) {
         ResInfo resInfo = ResInfoTools.getAnnotation4Prescription(prescription, antibiotics);
         Properties properties = resInfo != null ? load(resInfo.getProperties()) : new Properties();
 
-        String[] content = new String[30];
+        String[] content = new String[SHEET2_ADDTIONAL_RESISTANT + 1]; // this is always the last. hence the size of the array
 
         content[SHEET2_RUNNING_NO] = Integer.toString(runningNumber);
         content[SHEET2_MED] = prescription.getTradeForm().getMedProduct().getText();
         content[SHEET2_STRENGTH] = prescription.getTradeForm().getSubtext();
         content[SHEET2_DOSE] = PrescriptionTools.getDoseAsCompactText(prescription);
+
+        content[SHEET2_APPLICATION_LOCAL] = getCellContent(properties, "application", "local");
+        content[SHEET2_APPLICATION_SYSTEM] = getCellContent(properties, "application", "systemic");
+
+        content[SHEET2_TREATMENT_PROPHYLACTIC] = getCellContent(properties, "treatment", "prophylactic");
+        content[SHEET2_TREATMENT_THERAPEUTIC] = getCellContent(properties, "treatment", "therapeutic");
+
+        content[SHEET2_BECAUSE_OF_URINAL] = getCellContent(properties, "inf.urethra", "true");
+        content[SHEET2_BECAUSE_OF_WOUND] = getCellContent(properties, "inf.skin.wound", "true");
+        content[SHEET2_BECAUSE_OF_RESP] = getCellContent(properties, "inf.respiratoric", "true");
+        content[SHEET2_BECAUSE_OF_DIGESTIVE] = getCellContent(properties, "inf.digestive", "true");
+        content[SHEET2_BECAUSE_OF_EYES] = getCellContent(properties, "inf.eyes", "true");
+        content[SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH] = getCellContent(properties, "inf.ear.nose.mouth", "true");
+        content[SHEET2_BECAUSE_OF_SYSTEMIC] = getCellContent(properties, "inf.systemic", "true");
+        content[SHEET2_BECAUSE_OF_FEVER] = getCellContent(properties, "inf.fever", "true");
+        content[SHEET2_BECAUSE_OF_OTHER] = SYSTools.catchNull(properties.getProperty("inf.other"), "--");
+
+        content[SHEET2_STARTED_HOME] = getCellContent(properties, "therapy.start", "here");
+        content[SHEET2_STARTED_HOSPITAL] = getCellContent(properties, "therapy.start", "hospital");
+        content[SHEET2_STARTED_ELSEWHERE] = getCellContent(properties, "therapy.start", "other");
+
+        content[SHEET2_BY_GP] = getCellContent(properties, "prescription.by", "gp");
+        content[SHEET2_BY_SPECIALIST] = getCellContent(properties, "prescription.by", "specialist");
+        content[SHEET2_BY_EMERGENCY] = getCellContent(properties, "prescription.by", "emergency");
+
+        content[SHEET2_ADDTIONAL_URINETEST] = getCellContent(properties, "diag.urinetest", "true");
+        content[SHEET2_ADDTIONAL_MICROBIOLOGY] = getCellContent(properties, "diag.microbiology", "true");
+        content[SHEET2_ADDTIONAL_ISOLATED] = SYSTools.catchNull(properties.getProperty("diag.result"), "--");
+        content[SHEET2_ADDTIONAL_RESISTANT] = SYSTools.catchNull(properties.getProperty("diag.resistent"), "--");
+
 
         for (int row : SHEET2_INDEX) {
             sheet2.getRow(row).createCell(sheet2_col_index).setCellValue(SYSTools.catchNull(content[row]));
@@ -395,6 +440,9 @@ public class MREPrevalenceSheets {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
 
             sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(i).setCellValue(SYSTools.catchNull(content[i]));
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).getRowStyle().setVerticalAlignment(CellStyle.ALIGN_CENTER);
+
+
         }
         return listAntibiotics;
     }
@@ -474,7 +522,6 @@ public class MREPrevalenceSheets {
         sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row9"));
         sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).getCell(1).setCellStyle(bgStyle);
 
-
         sheet2.getRow(SHEET2_STARTED_HOME).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block5"));
         sheet2.getRow(SHEET2_STARTED_HOME).getCell(0).setCellStyle(bgStyle);
         sheet2.getRow(SHEET2_STARTED_HOME).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block5.row1"));
@@ -510,7 +557,6 @@ public class MREPrevalenceSheets {
         sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).createCell(0).setCellStyle(bgStyle);
         sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row4"));
         sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).getCell(1).setCellStyle(bgStyle);
-
     }
 
 
@@ -538,6 +584,7 @@ public class MREPrevalenceSheets {
         CellStyle rotatedStyle = wb.createCellStyle();
         rotatedStyle.setFont(boldFont);
         rotatedStyle.setRotation((short) 90);
+        rotatedStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 
         bgStyle = wb.createCellStyle();
         bgStyle.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
@@ -568,11 +615,6 @@ public class MREPrevalenceSheets {
             sheet1.getRow(SHEET1_START_OF_LIST).createCell(i).setCellValue(SYSTools.xx("prevalence.sheet1.col" + String.format("%02d", i + 1) + ".title"));
             sheet1.getRow(SHEET1_START_OF_LIST).getCell(i).setCellStyle(rotatedStyle);
 
-        }
-
-
-        for (int i = 0; i < MAXCOL_SHEET1; i++) {
-            sheet1.autoSizeColumn(i);
         }
 
     }

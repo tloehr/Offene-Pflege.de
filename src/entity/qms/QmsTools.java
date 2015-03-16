@@ -34,10 +34,11 @@ public class QmsTools {
      * @param numOccurences how many occurences should be generated.
      */
     public static void generate(Qmssched qmssched, int numOccurences) {
-//        ArrayList<Qms> listQms = new ArrayList<>();
+        ArrayList<Qms> listQms = new ArrayList<>(qmssched.getQmsList());
 
-        Collections.sort(qmssched.getQmsList());
-        int maxSequence = qmssched.getQmsList().isEmpty() ? -1 : qmssched.getQmsList().get(qmssched.getQmsList().size() - 1).getSequence();
+
+        Collections.sort(listQms);
+        int maxSequence = listQms.isEmpty() ? -1 : listQms.get(listQms.size() - 1).getSequence();
 
         ArrayList<Date> listSequence = new ArrayList<>();
         if (qmssched.isYearly()){

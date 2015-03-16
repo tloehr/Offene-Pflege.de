@@ -717,6 +717,11 @@ public class PnlHandover extends NursingRecordsPanel {
 
                                 @Override
                                 protected void done() {
+                                    try{
+                                        get();
+                                    } catch (Exception ex1){
+                                        OPDE.fatal(ex1);
+                                    }
                                     OPDE.getDisplayManager().setProgressBarMessage(null);
                                     OPDE.getMainframe().setBlocked(false);
                                 }
@@ -814,25 +819,28 @@ public class PnlHandover extends NursingRecordsPanel {
                     btnInfo.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
-                            OPDE.getMainframe().setBlocked(true);
 
-                            SwingWorker worker = new SwingWorker() {
+                            SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
 
-                                @Override
-                                protected Object doInBackground() throws Exception {
-                                    SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
-                                    return null;
-                                }
-
-                                @Override
-                                protected void done() {
-                                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                                    OPDE.getMainframe().setBlocked(false);
-                                }
-
-                            };
-                            worker.execute();
+//                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
+//                            OPDE.getMainframe().setBlocked(true);
+//
+//                            SwingWorker worker = new SwingWorker() {
+//
+//                                @Override
+//                                protected Object doInBackground() throws Exception {
+//
+//                                    return null;
+//                                }
+//
+//                                @Override
+//                                protected void done() {
+//                                    OPDE.getDisplayManager().setProgressBarMessage(null);
+//                                    OPDE.getMainframe().setBlocked(false);
+//                                }
+//
+//                            };
+//                            worker.execute();
 
                         }
                     });
@@ -871,6 +879,11 @@ public class PnlHandover extends NursingRecordsPanel {
 
             @Override
             protected void done() {
+                try{
+                    get();
+                } catch (Exception ex2){
+                    OPDE.fatal(ex2);
+                }
                 cpDay.setContentPane(dayPanel);
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);

@@ -1,5 +1,6 @@
 package entity.prescription;
 
+import op.OPDE;
 import op.tools.SYSCalendar;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
@@ -324,6 +325,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
 
     /**
      * this is the time in hours after a mandantory description of the outcome of the application of that specific on-demand-prescription needs to be entered by the user.
+     *
      * @return
      */
     public BigDecimal getCheckAfterHours() {
@@ -442,8 +444,8 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
      *
      * @return
      */
-    public boolean verwendetMaximalDosis() {
-        return maxAnzahl > 0;
+    public boolean isOnDemand() {
+        return prescription.isOnDemand();
     }
 
     /**
@@ -653,17 +655,19 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
      */
     @Override
     public int compareTo(PrescriptionSchedule that) {
+
+        OPDE.debug("sorting");
+
+        if (this.isOnDemand()) return 0;
+
         int result = 0;
 
-        if (this.verwendetMaximalDosis() && that.verwendetMaximalDosis()) {
-            result = this.bhppid.compareTo(that.getBhppid());
-        } else if (this.usesTimesOfTheDay() && that.usesTimesOfTheDay()) {
+
+        if (this.usesTimesOfTheDay() && that.usesTimesOfTheDay()) {
             result = this.bhppid.compareTo(that.getBhppid());
         } else if (this.usesTime() && that.usesTime()) {
             result = this.uhrzeit.compareTo(that.getUhrzeit());
         } else if (this.usesTimesOfTheDay()) { // Zeiten zuerst.
-            result = 1;
-        } else if (this.usesTime() && that.verwendetMaximalDosis()) { // dann Uhrzeiten
             result = 1;
         } else {
             result = -1;

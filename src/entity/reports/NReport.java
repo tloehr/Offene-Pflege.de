@@ -68,7 +68,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nReport")
     private Collection<SYSNR2FILE> attachedFilesConnections;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht", fetch = FetchType.EAGER)
     private List<NR2User> usersAcknowledged;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nreport")
     private Collection<SYSNR2PROCESS> attachedProcessConnections;

@@ -46,7 +46,7 @@ public class Handovers implements Serializable, QProcessElement, Comparable<Hand
     @JoinColumn(name = "UID", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht", fetch = FetchType.EAGER)
     private List<Handover2User> usersAcknowledged;
 
     public Handovers() {

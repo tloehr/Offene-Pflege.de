@@ -4,7 +4,6 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Phrase;
-import op.OPDE;
 import op.system.PDF;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
@@ -36,7 +35,7 @@ public class PrescriptionScheduleTools {
         int status = 0;
         if (planung.usesTimesOfTheDay()) {
             status = ROUGHLY;
-        } else if (planung.verwendetMaximalDosis()) {
+        } else if (planung.isOnDemand()) {
             status = MAXDOSE;
         } else {
             status = EXACTTIME;

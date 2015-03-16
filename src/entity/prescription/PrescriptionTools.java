@@ -686,8 +686,8 @@ public class PrescriptionTools {
             result += "<br/>" + SYSConst.html_bold("nursingrecords.prescription.edit.annotations") + "<br/>";
 
 
-            if (prescription.getAnnotations().isEmpty()){
-                result += SYSTools.xx("misc.msg.noentryyet")+ "<br/>";
+            if (prescription.getAnnotations().isEmpty()) {
+                result += SYSTools.xx("misc.msg.noentryyet") + "<br/>";
             }
 
             for (ResInfo annotation : prescription.getAnnotations()) {
@@ -756,30 +756,42 @@ public class PrescriptionTools {
 
     public static String getDoseAsCompactText(Prescription prescription) {
         String result = "";
-        if (prescription.getPrescriptionSchedule().size() > 1) {
-            Collections.sort(prescription.getPrescriptionSchedule());
-        }
-        Iterator<PrescriptionSchedule> schedules = prescription.getPrescriptionSchedule().iterator();
 
-        if (schedules.hasNext()) {
-            while (schedules.hasNext()) {
-                PrescriptionSchedule schedule = schedules.next();
+
+        ArrayList<PrescriptionSchedule> listSchedules = new ArrayList<>(prescription.getPrescriptionSchedule());
+//        if (listSchedules.size() > 1)
+        Collections.sort(listSchedules);
+
+
+        if (listSchedules.isEmpty()) {
+            result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
+        } else {
+            for (PrescriptionSchedule schedule : listSchedules) {
                 result += PrescriptionScheduleTools.getDoseAsCompactText(schedule) + "; ";
             }
             result = result.substring(0, result.length() - 2);
-        } else {
-            result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
         }
+
+//        if (schedules.hasNext()) {
+//            while (schedules.hasNext()) {
+//                PrescriptionSchedule schedule = schedules.next();
+//                result += PrescriptionScheduleTools.getDoseAsCompactText(schedule) + "; ";
+//            }
+//            result = result.substring(0, result.length() - 2);
+//        } else {
+//            result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
+//        }
 
         return result;
     }
 
     public static String getDoseAsHTML(Prescription prescription, boolean showInventory) {
         String result = "";
-        if (prescription.getPrescriptionSchedule().size() > 1) {
-            Collections.sort(prescription.getPrescriptionSchedule());
-        }
-        Iterator<PrescriptionSchedule> planungen = prescription.getPrescriptionSchedule().iterator();
+        ArrayList<PrescriptionSchedule> listSchedules = new ArrayList<>(prescription.getPrescriptionSchedule());
+//        if (listSchedules.size() > 1)
+        Collections.sort(listSchedules);
+
+        Iterator<PrescriptionSchedule> planungen = listSchedules.iterator(); //prescription.getPrescriptionSchedule().iterator();
 
         if (planungen.hasNext()) {
             PrescriptionSchedule previousSchedule = null;

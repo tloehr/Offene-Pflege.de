@@ -152,7 +152,7 @@ public class NursingProcessTools {
             html += SYSConst.html_h3(SYSTools.xx("misc.msg.DateOfEvals"));
             html += "<ul>";
             int numEvals = 0;
-            Collections.sort(np.getEvaluations());
+//            Collections.sort(np.getEvaluations());
             for (NPControl npControl : np.getEvaluations()) {
                 numEvals++;
                 html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(npControl) + "</div></li>";

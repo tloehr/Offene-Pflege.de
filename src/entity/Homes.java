@@ -41,7 +41,7 @@ public class Homes implements Serializable {
     private Long version;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home")
     private Collection<Handovers> handovers;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "home")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
     private List<Station> station;
 
     public Homes() {

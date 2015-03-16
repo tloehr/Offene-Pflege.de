@@ -88,8 +88,9 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<SYSNP2PROCESS> attachedQProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+    @OrderBy("datum DESC")
     private List<NPControl> npControls;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess", fetch = FetchType.EAGER)
     private List<InterventionSchedule> interventionSchedules;
 
 

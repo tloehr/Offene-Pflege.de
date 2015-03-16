@@ -719,7 +719,9 @@ public class MedStockTools {
 
                 final StringBuffer tableContent = new StringBuffer(SYSConst.html_table_tr(SYSConst.html_table_th("Zeit") + SYSConst.html_table_th("Gewicht") + SYSConst.html_table_th("Diff-Gewicht") + SYSConst.html_table_th("Menge") + SYSConst.html_table_th("Diff-Menge") + SYSConst.html_table_th("Verhältnis")));
 
-                Collections.sort(stock.getStockTransaction(), new Comparator<MedStockTransaction>() {
+                ArrayList<MedStockTransaction> listStockTransactions = new ArrayList<MedStockTransaction>(stock.getStockTransaction());
+
+                Collections.sort(listStockTransactions, new Comparator<MedStockTransaction>() {
                     @Override
                     public int compare(MedStockTransaction o1, MedStockTransaction o2) {
                         return o1.getPit().compareTo(o2.getPit());
@@ -729,7 +731,7 @@ public class MedStockTools {
                 boolean iamthefirstone = true;
                 BigDecimal previousWeight = BigDecimal.ZERO;
                 BigDecimal previousQuantity = BigDecimal.ZERO;
-                for (MedStockTransaction tx : stock.getStockTransaction()) {
+                for (MedStockTransaction tx : listStockTransactions) {
 
                     BigDecimal weight = tx.getWeight();
                     BigDecimal quantity = previousQuantity.add(tx.getAmount());
