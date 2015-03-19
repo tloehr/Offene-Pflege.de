@@ -53,6 +53,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
@@ -68,6 +69,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.DateFormat;
@@ -331,7 +333,7 @@ public class PnlControlling extends CleanablePanel {
         cpHygiene.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpHygiene.setContentPane(createContentPanel4Orga());
+                cpHygiene.setContentPane(createContentPanel4Hygiene());
             }
         });
 
@@ -425,8 +427,11 @@ public class PnlControlling extends CleanablePanel {
 
 
         JPanel pnlPrevalence = new JPanel(new BorderLayout());
-        final JButton btnPrevalence = GUITools.createHyperlinkButton("opde.controlling.drugs.prevalence", null, null);
-        final JDateChooser jdc = new JDateChooser();
+        final JButton btnPrevalence = GUITools.createHyperlinkButton("opde.controlling.hygiene.prevalence", null, null);
+        final JDateChooser jdc = new JDateChooser(new Date());
+        final JCheckBox cbAnonymous = new JCheckBox(SYSTools.xx("misc.msg.anon"));
+        cbAnonymous.setSelected(true);
+
         jdc.setMaxSelectableDate(new Date());
 
         btnPrevalence.addActionListener(new ActionListener() {
@@ -436,17 +441,57 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        return ResInfoTools.getPrevalenceAntibioticUse(new LocalDate(jdc.getDate()), progressClosure);
+                        MREPrevalenceSheets mre = new MREPrevalenceSheets(new LocalDate(), cbAnonymous.isSelected(), progressClosure);
+                        return mre.createSheet();
                     }
 
                     @Override
                     protected void done() {
+
+                        Object[] options = {
+                                SYSTools.xx("prevalence.optiondialog.option1"),
+                                SYSTools.xx("prevalence.optiondialog.option2"),
+                                SYSTools.xx("opde.wizards.buttontext.cancel")
+                        };
+
+                        int n = JOptionPane.showOptionDialog(OPDE.getMainframe(),
+                                SYSTools.xx("prevalence.optiondialog.question"),
+                                SYSTools.xx("prevalence.optiondialog.title"),
+                                JOptionPane.YES_NO_CANCEL_OPTION,
+                                JOptionPane.QUESTION_MESSAGE,
+                                null,
+                                options,
+                                options[1]);
+
+                        File copyTargetDirectory = null;
+
+                        if (n == 1) {
+                            JFileChooser chooser = new JFileChooser();
+                            chooser.setDialogTitle("title");
+                            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                            chooser.setMultiSelectionEnabled(false);
+                            chooser.setAcceptAllFileFilterUsed(false);
+
+                            if (chooser.showOpenDialog(pnlPrevalence) == JFileChooser.APPROVE_OPTION) {
+                                copyTargetDirectory = chooser.getSelectedFile();
+                            }
+                        }
+
                         try {
-                            SYSFilesTools.print(get().toString(), true);
+                            if (copyTargetDirectory != null){
+                                FileUtils.copyFile((File) get(), copyTargetDirectory);
+                            } else {
+                                if (n == 0){
+                                    SYSFilesTools.handleFile((File) get(), Desktop.Action.OPEN);
+                                }
+                            }
+
                         } catch (ExecutionException ee) {
                             OPDE.fatal(ee);
                         } catch (InterruptedException ie) {
                             // nop
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
                         }
 
                         OPDE.getDisplayManager().setProgressBarMessage(null);
@@ -457,7 +502,14 @@ public class PnlControlling extends CleanablePanel {
             }
         });
         pnlPrevalence.add(btnPrevalence, BorderLayout.WEST);
-        pnlPrevalence.add(jdc, BorderLayout.EAST);
+
+        JPanel optionPanel = new JPanel();
+        optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.LINE_AXIS));
+
+        optionPanel.add(cbAnonymous);
+        optionPanel.add(jdc);
+
+        pnlPrevalence.add(optionPanel, BorderLayout.EAST);
         pnlContent.add(pnlPrevalence);
 
 

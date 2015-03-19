@@ -519,7 +519,7 @@ public class PnlDev extends CleanablePanel {
     }
 
     private void button3ActionPerformed(ActionEvent e) {
-        new MREPrevalenceSheets(new LocalDate(), false);
+//        new MREPrevalenceSheets(new LocalDate(), false);
     }
 
 

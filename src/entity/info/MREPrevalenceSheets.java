@@ -6,20 +6,17 @@ import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
+import op.tools.Pair;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.LocalDate;
 
-import javax.swing.*;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,6 +111,7 @@ public class MREPrevalenceSheets {
     private final ArrayList<Resident> listResidents;
     private final LocalDate targetDate;
     private final boolean anonymous;
+    private final Closure progressClosure;
     private int progress, max, runningNumber, sheet2_col_index;
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
@@ -124,21 +122,29 @@ public class MREPrevalenceSheets {
     private Sheet sheet1, sheet2;
     private Workbook wb;
 
-    public MREPrevalenceSheets(final LocalDate targetDate, boolean anonymous) {
+    public MREPrevalenceSheets(final LocalDate targetDate, boolean anonymous, Closure progressClosure) {
         this.targetDate = targetDate;
         this.anonymous = anonymous;
+        this.progressClosure = progressClosure;
+        mapID2Info = new HashMap<Integer, ResInfo>();
+        mapInfo2Properties = new HashMap<ResInfo, Properties>();
+        mapResInfoType = new HashMap<>();
+
+        listResidents = ResidentTools.getAllActive(targetDate.minusDays(1), targetDate);
+        antibiotics = CommontagsTools.getType(CommontagsTools.TYPE_SYS_ANTIBIOTICS);
+
+    }
+
+
+    public File createSheet() throws IOException {
         progress = 1;
         sheet2_col_index = COL_SHEET2_TITLE + 2;
 
 
-        OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+        //        OPDE.getMainframe().setBlocked(true);
+        //        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
 
 
-        antibiotics = CommontagsTools.getType(CommontagsTools.TYPE_SYS_ANTIBIOTICS);
-
-
-        listResidents = ResidentTools.getAllActive(targetDate.minusDays(1), targetDate);
         Collections.sort(listResidents, new Comparator<Resident>() {
             @Override
             public int compare(Resident o1, Resident o2) {
@@ -151,106 +157,77 @@ public class MREPrevalenceSheets {
         runningNumber = 0;
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
-
-        mapID2Info = new HashMap<Integer, ResInfo>();
-        mapInfo2Properties = new HashMap<ResInfo, Properties>();
-        mapResInfoType = new HashMap<>();
-
-        SwingWorker worker = new SwingWorker() {
-            @Override
-            protected Object doInBackground() throws Exception {
-
-                // prepare a vanilla workbook to fill
-                prepareWorkbook();
+        progressClosure.execute(new Pair<Integer, Integer>(progress, max));
 
 
-                // get all residents who were at least living here yesterday, even they may have been away on those two days
-                for (Resident resident : listResidents) {
-
-                    progress++;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
-
-                    // load the data for this resident
-                    mapID2Info.clear();
-                    mapInfo2Properties.clear();
-
-                    for (int neededType : NEEDED_TYPES) {
-                        for (ResInfo info : ResInfoTools.getAll(resident, getResInfoTypeByType(neededType), targetDate.minusDays(1), targetDate)) {
-                            mapID2Info.put(info.getResInfoType().getType(), info);
-                            mapInfo2Properties.put(info, load(info.getProperties()));
-                        }
-                    }
-
-                    runningNumber++;
-                    ArrayList<Prescription> listAntibiotics = fillLineSheet1(resident);
-
-                    if (!listAntibiotics.isEmpty()) {
-                        if (sheet2 == null) {
-                            prepareSheet2();
-                        }
-
-                        for (Prescription prescription : listAntibiotics) {
-                            fillColSheet2(prescription);
-                            sheet2_col_index++;
-                        }
-                    }
+        // prepare a vanilla workbook to fill
+        prepareWorkbook();
 
 
-//                    SYSFilesTools.handleFile(, Desktop.Action.OPEN);
+        // get all residents who were at least living here yesterday, even they may have been away on those two days
+        for (Resident resident : listResidents) {
 
+            progress++;
+            //                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+            progressClosure.execute(new Pair<Integer, Integer>(progress, max));
+
+
+            // load the data for this resident
+            mapID2Info.clear();
+            mapInfo2Properties.clear();
+
+            for (int neededType : NEEDED_TYPES) {
+                for (ResInfo info : ResInfoTools.getAll(resident, getResInfoTypeByType(neededType), targetDate.minusDays(1), targetDate)) {
+                    mapID2Info.put(info.getResInfoType().getType(), info);
+                    mapInfo2Properties.put(info, load(info.getProperties()));
                 }
-
-                for (int i = 0; i < MAXCOL_SHEET1; i++) {
-                    sheet1.autoSizeColumn(i);
-                }
-
-                if (sheet2 != null) {
-                    for (int i = 0; i < COL_SHEET2_TITLE + runningNumber; i++) {
-                        sheet2.autoSizeColumn(i);
-                    }
-                }
-
-                return null;
             }
 
-            @Override
-            protected void done() {
-                try {
+            runningNumber++;
+            ArrayList<Prescription> listAntibiotics = fillLineSheet1(resident);
 
-                    progress++;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
-
-                    FileOutputStream fileOut = new FileOutputStream("/local/workbook.xlsx");
-
-                    get(); // to make sure the exceptions are passed on
-
-                    wb.write(fileOut);
-
-                    fileOut.close();
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+            if (!listAntibiotics.isEmpty()) {
+                if (sheet2 == null) {
+                    prepareSheet2();
                 }
 
-                mapResInfoType.clear();
-                mapID2Info.clear();
-                mapInfo2Properties.clear();
-
-                OPDE.getDisplayManager().setProgressBarMessage(null);
-                OPDE.getMainframe().setBlocked(false);
+                for (Prescription prescription : listAntibiotics) {
+                    fillColSheet2(prescription);
+                    sheet2_col_index++;
+                }
             }
-        };
-
-        worker.execute();
 
 
+            //                    SYSFilesTools.handleFile(, Desktop.Action.OPEN);
+
+        }
+
+        for (int i = 0; i < MAXCOL_SHEET1; i++) {
+            sheet1.autoSizeColumn(i);
+        }
+
+        if (sheet2 != null) {
+            for (int i = 0; i < COL_SHEET2_TITLE + runningNumber; i++) {
+                sheet2.autoSizeColumn(i);
+            }
+        }
+
+
+        progress++;
+
+
+        progressClosure.execute(new Pair<Integer, Integer>(progress, max));
+
+        File temp = File.createTempFile("opde-mre", ".xlsx");
+        FileOutputStream fileOut = new FileOutputStream(temp);
+        wb.write(fileOut);
+        fileOut.close();
+
+        mapResInfoType.clear();
+        mapID2Info.clear();
+        mapInfo2Properties.clear();
+
+        return temp;
     }
 
     private Properties load(String text) {
@@ -440,7 +417,7 @@ public class MREPrevalenceSheets {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
 
             sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(i).setCellValue(SYSTools.catchNull(content[i]));
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).getRowStyle().setVerticalAlignment(CellStyle.ALIGN_CENTER);
+//            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).getRowStyle().setVerticalAlignment(CellStyle.ALIGN_CENTER);
 
 
         }
