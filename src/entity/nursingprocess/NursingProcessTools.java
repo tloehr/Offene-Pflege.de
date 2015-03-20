@@ -144,15 +144,11 @@ public class NursingProcessTools {
             html += "</ul>";
         }
 
-//        if (np.getFlag() > 0) {
-//            html += "<br/><b>" + SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
-//        }
-
         if (!np.getEvaluations().isEmpty()) {
             html += SYSConst.html_h3(SYSTools.xx("misc.msg.DateOfEvals"));
             html += "<ul>";
             int numEvals = 0;
-//            Collections.sort(np.getEvaluations());
+            Collections.sort(np.getEvaluations());
             for (NPControl npControl : np.getEvaluations()) {
                 numEvals++;
                 html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(npControl) + "</div></li>";

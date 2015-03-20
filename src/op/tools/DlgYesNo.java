@@ -47,7 +47,8 @@ public class DlgYesNo extends MyJDialog {
      * @param actionBlock
      */
     public DlgYesNo(Icon icon, Closure actionBlock, String title, String preset, Validator validator) {
-        super(false);
+        super(true);
+        setResizable(true);
         this.validator = validator;
 
 
@@ -110,11 +111,12 @@ public class DlgYesNo extends MyJDialog {
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                        "default, $lcgap, 171dlu",
-                        "pref, $lgap, 124dlu, $lgap, pref"));
+                    "default, $lcgap, 171dlu:grow",
+                    "pref, $lgap, fill:124dlu:grow, $lgap, pref"));
 
                 //---- lblTitle ----
                 lblTitle.setText("text");
+                lblTitle.setFont(new Font("Arial", Font.PLAIN, 16));
                 contentPanel.add(lblTitle, CC.xywh(1, 1, 3, 1));
                 contentPanel.add(lblIcon, CC.xy(1, 3, CC.DEFAULT, CC.TOP));
 
@@ -136,22 +138,12 @@ public class DlgYesNo extends MyJDialog {
 
                     //---- cancelButton ----
                     cancelButton.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                    cancelButton.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cancelButtonActionPerformed(e);
-                        }
-                    });
+                    cancelButton.addActionListener(e -> cancelButtonActionPerformed(e));
                     buttonBar.add(cancelButton);
 
                     //---- okButton ----
                     okButton.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                    okButton.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            okButtonActionPerformed(e);
-                        }
-                    });
+                    okButton.addActionListener(e -> okButtonActionPerformed(e));
                     buttonBar.add(okButton);
                 }
                 contentPanel.add(buttonBar, CC.xy(3, 5, CC.RIGHT, CC.DEFAULT));

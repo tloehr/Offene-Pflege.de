@@ -39,7 +39,6 @@ import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.info.Resident;
 import entity.nursingprocess.*;
-import entity.prescription.PrescriptionTools;
 import entity.process.*;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
@@ -63,8 +62,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.util.*;
@@ -654,7 +651,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
 
     private java.util.List<Component> addFilters() {
-           java.util.List<Component> list = new ArrayList<Component>();
+        java.util.List<Component> list = new ArrayList<Component>();
 
 //           if (!listUsedCommontags.isEmpty()) {
 //
@@ -675,8 +672,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 //               list.add(pnlTags);
 //           }
 //
-           return list;
-       }
+        return list;
+    }
 
 
     private List<Component> addCommands() {
@@ -787,14 +784,14 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                         return;
                     }
-                    final JidePopup popup = new JidePopup();
+//                    final JidePopup popup = new JidePopup();
 
                     // first a template is selected
-                    JPanel dlg = new PnlTemplate(new Closure() {
+                    MyJDialog dlg = new PnlTemplate(new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
-                                popup.hidePopup();
+//                                popup.hidePopup();
 
                                 // that selected template is cloned and handed over to the DlgNursingProcess for further editing
                                 NursingProcess template = ((NursingProcess) o).clone();
@@ -880,15 +877,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         }
                     });
 
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    popup.getContentPane().add(dlg);
-                    popup.setOwner(addTemplate);
-                    popup.removeExcludedComponent(addTemplate);
-                    popup.setDefaultFocusComponent(dlg);
-
-                    GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
-
+                    dlg.setVisible(true);
                 }
             });
 

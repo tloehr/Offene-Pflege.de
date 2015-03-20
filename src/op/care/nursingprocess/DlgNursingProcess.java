@@ -86,6 +86,9 @@ public class DlgNursingProcess extends MyJDialog {
 //        lblFlag.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFlag"));
         lblFirstRevision.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFirstRevision"));
 
+        btnPopoutSituation.setToolTipText(SYSTools.xx("misc.msg.presshere.for.larger.window"));
+        btnPopoutGoal.setToolTipText(SYSTools.xx("misc.msg.presshere.for.larger.window"));
+
         txtStichwort.setText(nursingProcess.getTopic());
         txtSituation.setText(nursingProcess.getSituation());
         txtZiele.setText(nursingProcess.getGoal());
@@ -173,6 +176,28 @@ public class DlgNursingProcess extends MyJDialog {
         ((JTextComponent) e.getSource()).selectAll();
     }
 
+    private void btnPopoutSituationActionPerformed(ActionEvent e) {
+        new DlgYesNo(SYSConst.icon48edit, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    txtSituation.setText(o.toString());
+                }
+            }
+        }, "nursingrecords.nursingprocess.dlgplanung.lblSituation", txtSituation.getText(), null);
+    }
+
+    private void btnPopoutGoalActionPerformed(ActionEvent e) {
+        new DlgYesNo(SYSConst.icon48edit, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    txtZiele.setText(o.toString());
+                }
+            }
+        }, "nursingrecords.nursingprocess.dlgplanung.lblGoal", txtZiele.getText(), null);
+    }
+
     /**
      * Reasons why you couldn't save it
      *
@@ -227,10 +252,14 @@ public class DlgNursingProcess extends MyJDialog {
         txtStichwort = new JTextField();
         lblCat = new JLabel();
         cmbKategorie = new JComboBox<>();
+        panel4 = new JPanel();
+        lblSituation = new JLabel();
+        btnPopoutSituation = new JButton();
         jScrollPane3 = new JScrollPane();
         txtSituation = new JTextArea();
-        lblSituation = new JLabel();
+        panel5 = new JPanel();
         lblGoal = new JLabel();
+        btnPopoutGoal = new JButton();
         jScrollPane1 = new JScrollPane();
         txtZiele = new JTextArea();
         lblFirstRevision = new JLabel();
@@ -287,6 +316,28 @@ public class DlgNursingProcess extends MyJDialog {
             cmbKategorie.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel5.add(cmbKategorie, CC.xy(3, 3));
 
+            //======== panel4 ========
+            {
+                panel4.setLayout(new BorderLayout());
+
+                //---- lblSituation ----
+                lblSituation.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblSituation.setText("Situation");
+                panel4.add(lblSituation, BorderLayout.CENTER);
+
+                //---- btnPopoutSituation ----
+                btnPopoutSituation.setText(null);
+                btnPopoutSituation.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/popup.png")));
+                btnPopoutSituation.setBorderPainted(false);
+                btnPopoutSituation.setContentAreaFilled(false);
+                btnPopoutSituation.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                btnPopoutSituation.setBorder(null);
+                btnPopoutSituation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnPopoutSituation.addActionListener(e -> btnPopoutSituationActionPerformed(e));
+                panel4.add(btnPopoutSituation, BorderLayout.EAST);
+            }
+            jPanel5.add(panel4, CC.xy(1, 5, CC.DEFAULT, CC.TOP));
+
             //======== jScrollPane3 ========
             {
 
@@ -306,15 +357,27 @@ public class DlgNursingProcess extends MyJDialog {
             }
             jPanel5.add(jScrollPane3, CC.xy(3, 5));
 
-            //---- lblSituation ----
-            lblSituation.setFont(new Font("Arial", Font.PLAIN, 14));
-            lblSituation.setText("Situation");
-            jPanel5.add(lblSituation, CC.xy(1, 5, CC.DEFAULT, CC.TOP));
+            //======== panel5 ========
+            {
+                panel5.setLayout(new BorderLayout());
 
-            //---- lblGoal ----
-            lblGoal.setFont(new Font("Arial", Font.PLAIN, 14));
-            lblGoal.setText("Ziele");
-            jPanel5.add(lblGoal, CC.xy(1, 7, CC.DEFAULT, CC.TOP));
+                //---- lblGoal ----
+                lblGoal.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblGoal.setText("Ziele");
+                panel5.add(lblGoal, BorderLayout.CENTER);
+
+                //---- btnPopoutGoal ----
+                btnPopoutGoal.setText(null);
+                btnPopoutGoal.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/popup.png")));
+                btnPopoutGoal.setBorderPainted(false);
+                btnPopoutGoal.setContentAreaFilled(false);
+                btnPopoutGoal.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                btnPopoutGoal.setBorder(null);
+                btnPopoutGoal.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnPopoutGoal.addActionListener(e -> btnPopoutGoalActionPerformed(e));
+                panel5.add(btnPopoutGoal, BorderLayout.EAST);
+            }
+            jPanel5.add(panel5, CC.xy(1, 7, CC.DEFAULT, CC.TOP));
 
             //======== jScrollPane1 ========
             {
@@ -395,12 +458,7 @@ public class DlgNursingProcess extends MyJDialog {
                 btnAddIntervention.setBorderPainted(false);
                 btnAddIntervention.setBorder(null);
                 btnAddIntervention.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
-                btnAddIntervention.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnAddInterventionActionPerformed(e);
-                    }
-                });
+                btnAddIntervention.addActionListener(e -> btnAddInterventionActionPerformed(e));
                 panel3.add(btnAddIntervention);
             }
             panel2.add(panel3, CC.xy(1, 3));
@@ -414,23 +472,13 @@ public class DlgNursingProcess extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
             btnCancel.setText(null);
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnSave.setText(null);
-            btnSave.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnSaveActionPerformed(e);
-                }
-            });
+            btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
@@ -576,10 +624,14 @@ public class DlgNursingProcess extends MyJDialog {
     private JTextField txtStichwort;
     private JLabel lblCat;
     private JComboBox<String> cmbKategorie;
+    private JPanel panel4;
+    private JLabel lblSituation;
+    private JButton btnPopoutSituation;
     private JScrollPane jScrollPane3;
     private JTextArea txtSituation;
-    private JLabel lblSituation;
+    private JPanel panel5;
     private JLabel lblGoal;
+    private JButton btnPopoutGoal;
     private JScrollPane jScrollPane1;
     private JTextArea txtZiele;
     private JLabel lblFirstRevision;

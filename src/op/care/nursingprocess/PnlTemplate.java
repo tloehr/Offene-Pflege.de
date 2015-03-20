@@ -6,13 +6,12 @@ package op.care.nursingprocess;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.popup.JidePopup;
 import entity.info.ResidentTools;
 import entity.nursingprocess.NursingProcess;
 import entity.nursingprocess.NursingProcessTools;
 import entity.system.SYSPropsTools;
-import op.OPDE;
 import op.tools.GUITools;
+import op.tools.MyJDialog;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
@@ -26,16 +25,17 @@ import java.awt.event.*;
 /**
  * @author Torsten Löhr
  */
-public class PnlTemplate extends JPanel {
+public class PnlTemplate extends MyJDialog {
     public static final String internalClassID = "nursingrecords.nursingprocess.pnltemplate";
     private JToggleButton tbInactive;
     private Closure actionBlock;
 
     public PnlTemplate(Closure actionBlock) {
+        super(false);
         this.actionBlock = actionBlock;
         initComponents();
-        setPreferredSize(new Dimension(430, 480));
         initPanel();
+        pack();
     }
 
     private void initPanel() {
@@ -54,30 +54,7 @@ public class PnlTemplate extends JPanel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting() && lstTemplates.getSelectedValue() != null) {
-                    JidePopup popup = new JidePopup();
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    JTextPane txtHTML = new JTextPane();
-                    txtHTML.setEditable(false);
-                    txtHTML.setContentType("text/html");
-                    txtHTML.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false, false)));
-                    JPanel content = new JPanel();
-                    content.setLayout(new BoxLayout(content, BoxLayout.LINE_AXIS));
-                    final JScrollPane jsp = new JScrollPane(txtHTML);
-                    content.add(jsp);
-                    content.setPreferredSize(scrollTemplates.getParent().getPreferredSize());
-                    popup.getContentPane().add(content);
-                    popup.setOwner(scrollTemplates.getParent());
-                    popup.removeExcludedComponent(scrollTemplates);
-                    popup.setTransient(true);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            GUITools.scroll2show(jsp, 0, null);
-                        }
-                    });
-
-                    GUITools.showPopup(popup, SwingConstants.SOUTH_EAST);
+                    txtContent.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false, false)));
                 }
             }
         });
@@ -97,6 +74,7 @@ public class PnlTemplate extends JPanel {
 
     private void lstTemplatesMouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
+            dispose();
             actionBlock.execute(lstTemplates.getSelectedValue());
         }
     }
@@ -120,28 +98,39 @@ public class PnlTemplate extends JPanel {
         };
     }
 
+    private void btnApplyActionPerformed(ActionEvent e) {
+        dispose();
+        actionBlock.execute(lstTemplates.getSelectedValue());
+    }
+
+    private void btnCancelActionPerformed(ActionEvent e) {
+        dispose();
+        actionBlock.execute(null);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtSearch = new JXSearchField();
         scrollTemplates = new JScrollPane();
         lstTemplates = new JList();
+        scrollPane1 = new JScrollPane();
+        txtContent = new JTextPane();
+        panel1 = new JPanel();
+        btnCancel = new JButton();
+        btnApply = new JButton();
 
         //======== this ========
-        setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "2*(default, $lgap), default:grow, 3*($lgap, default)"));
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+            "default, $lcgap, 150dlu, $rgap, [250dlu,min]:grow, $lcgap, default",
+            "2*(default, $lgap), [220dlu,min]:grow, 3*($lgap, default)"));
 
         //---- txtSearch ----
         txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
         txtSearch.setPromptFontStyle(null);
         txtSearch.setInstantSearchDelay(1000);
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtSearchActionPerformed(e);
-            }
-        });
-        add(txtSearch, CC.xy(3, 3));
+        txtSearch.addActionListener(e -> txtSearchActionPerformed(e));
+        contentPane.add(txtSearch, CC.xywh(3, 3, 3, 1));
 
         //======== scrollTemplates ========
         {
@@ -157,7 +146,36 @@ public class PnlTemplate extends JPanel {
             });
             scrollTemplates.setViewportView(lstTemplates);
         }
-        add(scrollTemplates, CC.xy(3, 5, CC.FILL, CC.FILL));
+        contentPane.add(scrollTemplates, CC.xy(3, 5, CC.FILL, CC.FILL));
+
+        //======== scrollPane1 ========
+        {
+
+            //---- txtContent ----
+            txtContent.setContentType("text/html");
+            scrollPane1.setViewportView(txtContent);
+        }
+        contentPane.add(scrollPane1, CC.xy(5, 5, CC.FILL, CC.FILL));
+
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
+
+            //---- btnCancel ----
+            btnCancel.setText(null);
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
+            panel1.add(btnCancel);
+
+            //---- btnApply ----
+            btnApply.setText(null);
+            btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnApply.addActionListener(e -> btnApplyActionPerformed(e));
+            panel1.add(btnApply);
+        }
+        contentPane.add(panel1, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
+        setSize(830, 530);
+        setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -165,5 +183,10 @@ public class PnlTemplate extends JPanel {
     private JXSearchField txtSearch;
     private JScrollPane scrollTemplates;
     private JList lstTemplates;
+    private JScrollPane scrollPane1;
+    private JTextPane txtContent;
+    private JPanel panel1;
+    private JButton btnCancel;
+    private JButton btnApply;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
