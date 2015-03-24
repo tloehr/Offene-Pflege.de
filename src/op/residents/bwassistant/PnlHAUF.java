@@ -7,7 +7,7 @@ package op.residents.bwassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
-import entity.Station;
+import entity.building.Station;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSTools;

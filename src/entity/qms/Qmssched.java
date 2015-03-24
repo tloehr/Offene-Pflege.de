@@ -1,7 +1,7 @@
 package entity.qms;
 
-import entity.Homes;
-import entity.Station;
+import entity.building.Homes;
+import entity.building.Station;
 import entity.system.Users;
 import op.OPDE;
 import org.joda.time.LocalDate;

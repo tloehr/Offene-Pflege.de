@@ -29,6 +29,7 @@ public class ResInfoTypeTools {
     public static final int STATUS_INACTIVE_SYSTEM = -10;
 
     public static final int TYPE_ABSENCE = 10;
+    public static final int TYPE_ROOM = 12;
     public static final int TYPE_ALLERGY = 97;
     public static final int TYPE_INFECTION = 99;
     public static final int TYPE_DIABETES = 98;
@@ -38,7 +39,6 @@ public class ResInfoTypeTools {
 
     public static final int TYPE_WARNING = 96;
     public static final int TYPE_WOUNDS = 20;
-
 
     public static final int TYPE_STAY = 100;
     public static final int TYPE_COMMS = 101;

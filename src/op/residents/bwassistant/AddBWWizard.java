@@ -2,8 +2,11 @@ package op.residents.bwassistant;
 
 import com.jidesoft.dialog.*;
 import com.jidesoft.wizard.*;
-import entity.Station;
-import entity.info.*;
+import entity.building.Station;
+import entity.info.ResInfo;
+import entity.info.ResInfoTypeTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.prescription.GP;
 import entity.prescription.GPTools;
 import entity.system.Unique;
@@ -50,13 +53,13 @@ public class AddBWWizard {
         wizard = new WizardDialog(new JFrame(), false);
         PageList model = new PageList();
 
-        AbstractWizardPage page1 = new WelcomePage(SYSTools.xx(internalClassID + ".page1.title"), SYSTools.xx(internalClassID + ".page1.description"));
-        AbstractWizardPage page2 = new BasisInfoPage(SYSTools.xx(PnlBWBasisInfo.internalClassID + ".title"), SYSTools.xx(PnlBWBasisInfo.internalClassID + ".description"));
-        AbstractWizardPage page3 = new PNPage(SYSTools.xx(PnlBV.internalClassID + ".title"), SYSTools.xx(PnlBV.internalClassID + ".description"));
-        AbstractWizardPage page4 = new GPPage(SYSTools.xx(PnlGP.internalClassID + ".title"), SYSTools.xx(PnlGP.internalClassID + ".description"));
+        AbstractWizardPage page1 = new WelcomePage(SYSTools.xx("opde.admin.bw.wizard.page1.title"), SYSTools.xx("opde.admin.bw.wizard.page1.description"));
+        AbstractWizardPage page2 = new BasisInfoPage(SYSTools.xx("opde.admin.bw.wizard.page2.title"), SYSTools.xx("opde.admin.bw.wizard.page2.description"));
+        AbstractWizardPage page3 = new PNPage(SYSTools.xx("opde.admin.bw.wizard.page3.title"), SYSTools.xx("opde.admin.bw.wizard.page3.description"));
+        AbstractWizardPage page4 = new GPPage(SYSTools.xx("opde.admin.bw.wizard.page4.title"), SYSTools.xx("opde.admin.bw.wizard.page4.description"));
 //        AbstractWizardPage page5 = new LCPage(SYSTools.xx(PnlLC.internalClassID + ".title"), SYSTools.xx(PnlLC.internalClassID + ".description"));
-        AbstractWizardPage page6 = new HaufPage(SYSTools.xx(PnlHAUF.internalClassID + ".title"), SYSTools.xx(PnlHAUF.internalClassID + ".description"));
-        AbstractWizardPage page7 = new CompletionPage(SYSTools.xx(internalClassID + ".page7.title"), SYSTools.xx(internalClassID + ".page7.description"));
+        AbstractWizardPage page6 = new HaufPage(SYSTools.xx("opde.admin.bw.wizard.page6.title"), SYSTools.xx("opde.admin.bw.wizard.page6.description"));
+        AbstractWizardPage page7 = new CompletionPage(SYSTools.xx("opde.admin.bw.wizard.page7.title"), SYSTools.xx("opde.admin.bw.wizard.page7.description"));
 
         model.append(page1);
         model.append(page2);
@@ -135,7 +138,7 @@ public class AddBWWizard {
             txt.setContentType("text/html");
             txt.setOpaque(false);
             txt.setText("<html><font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" +
-                    SYSTools.xx(internalClassID + ".page1.welcome") +
+                    SYSTools.xx("opde.admin.bw.wizard.page1.welcome") +
                     "</font></html>");
 
             addComponent(txt, true);
@@ -406,8 +409,8 @@ public class AddBWWizard {
         }
 
         private String check() {
-            String result = "<b>" + SYSTools.xx(internalClassID + ".page7.summaryline1") + "</b><br/>";
-            result += SYSTools.xx(internalClassID + ".page7.summaryline2") + "<br/>";
+            String result = "<b>" + SYSTools.xx("opde.admin.bw.wizard.page7.summaryline1") + "</b><br/>";
+            result += SYSTools.xx("opde.admin.bw.wizard.page7.summaryline2") + "<br/>";
             result += "<ul>";
             result += "<li>" + ResidentTools.getFullName(resident) + "</li>";
             result += "<li>" + SYSTools.xx("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDOB()) + "</li>";
@@ -420,7 +423,7 @@ public class AddBWWizard {
 
             result += "</ul>";
 
-            result += "<p>" + SYSTools.xx(internalClassID + ".page7.summaryline3") + "</p>";
+            result += "<p>" + SYSTools.xx("opde.admin.bw.wizard.page7.summaryline3") + "</p>";
             return result;
         }
 

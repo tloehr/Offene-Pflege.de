@@ -7,10 +7,10 @@ package op.residents;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import entity.Rooms;
-import entity.RoomsTools;
-import entity.Station;
-import entity.StationTools;
+import entity.building.Rooms;
+import entity.building.RoomsTools;
+import entity.building.Station;
+import entity.building.StationTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.GP;
@@ -64,7 +64,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         lblFirstname.setText(SYSTools.xx("misc.msg.firstname"));
         lblDOB.setText(SYSTools.xx("misc.msg.dob"));
         lblGender.setText(SYSTools.xx("misc.msg.gender"));
-        lblRoom.setText(SYSTools.xx("misc.msg.room"));
+//        lblRoom.setText(SYSTools.xx("misc.msg.room"));
         lblStation.setText(SYSTools.xx("misc.msg.subdivision"));
         lblPrimNurse1.setText(SYSTools.xx("misc.msg.primaryNurse") + " 1");
         lblPrimNurse2.setText(SYSTools.xx("misc.msg.primaryNurse") + " 2");
@@ -89,21 +89,21 @@ public class DlgEditResidentBaseData extends MyJDialog {
         cmbStation.setModel(StationTools.getAll4Combobox(false));
         cmbStation.setRenderer(SYSTools.getDefaultRenderer());
         cmbStation.setSelectedItem(resident.getStation());
-        cmbStation.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (ignoreEvent) return;
-                    ignoreEvent = true;
-                    if (cmbRoom.getSelectedItem() != null && ((Rooms) cmbRoom.getSelectedItem()).getStation() != e.getItem()) {
-                        // somebody changed the station so that the room doesnt fit anymore
-                        // set to null then
-                        cmbRoom.setSelectedItem(null);
-                    }
-                    ignoreEvent = false;
-                }
-            }
-        });
+//        cmbStation.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (e.getStateChange() == ItemEvent.SELECTED) {
+//                    if (ignoreEvent) return;
+//                    ignoreEvent = true;
+////                    if (cmbRoom.getSelectedItem() != null && ((Rooms) cmbRoom.getSelectedItem()).getStation() != e.getItem()) {
+////                        // somebody changed the station so that the room doesnt fit anymore
+////                        // set to null then
+////                        cmbRoom.setSelectedItem(null);
+////                    }
+//                    ignoreEvent = false;
+//                }
+//            }
+//        });
 
         ArrayList<Users> listUsers = UsersTools.getUsers(false);
         listUsers.add(0, null);
@@ -114,31 +114,31 @@ public class DlgEditResidentBaseData extends MyJDialog {
         cmbPrimNurse2.setRenderer(UsersTools.getRenderer());
         cmbPrimNurse2.setSelectedItem(resident.getPN2());
 
-        ArrayList<Rooms> listRooms = RoomsTools.getAllActive();
-        listGPs.add(0, null);
-        cmbRoom.setModel(new DefaultComboBoxModel(listRooms.toArray()));
-        cmbRoom.setRenderer(SYSTools.getDefaultRenderer());
-        cmbRoom.setSelectedItem(resident.getRoom());
-        cmbRoom.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (ignoreEvent) return;
-                ignoreEvent = true;
-                if (e.getStateChange() == ItemEvent.SELECTED && e.getItem() != null) {
-                    cmbStation.setSelectedItem(((Rooms) e.getItem()).getStation());
-                }
-                ignoreEvent = false;
-            }
-        });
+//        ArrayList<Rooms> listRooms = RoomsTools.getAllActive();
+//        listGPs.add(0, null);
+//        cmbRoom.setModel(new DefaultComboBoxModel(listRooms.toArray()));
+//        cmbRoom.setRenderer(SYSTools.getDefaultRenderer());
+//        cmbRoom.setSelectedItem(resident.getRoom());
+//        cmbRoom.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (ignoreEvent) return;
+//                ignoreEvent = true;
+//                if (e.getStateChange() == ItemEvent.SELECTED && e.getItem() != null) {
+//                    cmbStation.setSelectedItem(((Rooms) e.getItem()).getStation());
+//                }
+//                ignoreEvent = false;
+//            }
+//        });
 
         tbCalcMediUPR1 = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID+".tbCalcMediUPR1"));
         tbCalcMediUPR1.setToolTipText(SYSTools.xx(internalClassID+".tooltip.tbCalcMediUPR1"));
         tbCalcMediUPR1.setSelected(resident.isCalcMediUPR1());
-        add(tbCalcMediUPR1, CC.xywh(3, 23, 3, 1, CC.LEFT, CC.FILL));
+        add(tbCalcMediUPR1, CC.xywh(3, 21, 3, 1, CC.LEFT, CC.FILL));
 
         tbAdminOnly = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.adminonly"));
         tbAdminOnly.setSelected(resident.getAdminonly() == 2);
-        add(tbAdminOnly, CC.xywh(3, 25, 3, 1, CC.LEFT, CC.FILL));
+        add(tbAdminOnly, CC.xywh(3, 23, 3, 1, CC.LEFT, CC.FILL));
     }
 
     private boolean saveOK() {
@@ -186,7 +186,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         resident.setGP((GP) cmbGP.getSelectedItem());
         resident.setPN1((Users) cmbPrimNurse1.getSelectedItem());
         resident.setPN2((Users) cmbPrimNurse2.getSelectedItem());
-        resident.setRoom((Rooms) cmbRoom.getSelectedItem());
+//        resident.setRoom((Rooms) cmbRoom.getSelectedItem());
         resident.setStation((Station) cmbStation.getSelectedItem());
         resident.setCalcMediUPR1(tbCalcMediUPR1.isSelected());
         resident.setAdminonly(tbAdminOnly.isSelected() ? ResidentTools.ADMINONLY : ResidentTools.NORMAL);
@@ -263,8 +263,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
         panel2 = new JPanel();
         rbMale = new JRadioButton();
         rbFemale = new JRadioButton();
-        lblRoom = new JLabel();
-        cmbRoom = new JComboBox();
         lblStation = new JLabel();
         cmbStation = new JComboBox();
         lblPrimNurse1 = new JLabel();
@@ -284,7 +282,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-            "13dlu, 12*($lgap, default), $lgap, 13dlu"));
+            "13dlu, 11*($lgap, default), $lgap, 13dlu"));
 
         //---- lblName ----
         lblName.setText("text");
@@ -335,52 +333,41 @@ public class DlgEditResidentBaseData extends MyJDialog {
         }
         contentPane.add(panel2, CC.xy(5, 9));
 
-        //---- lblRoom ----
-        lblRoom.setText("text");
-        lblRoom.setFont(new Font("Arial", Font.PLAIN, 14));
-        lblRoom.setEnabled(false);
-        contentPane.add(lblRoom, CC.xy(3, 11));
-
-        //---- cmbRoom ----
-        cmbRoom.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbRoom.setEnabled(false);
-        contentPane.add(cmbRoom, CC.xywh(5, 11, 3, 1));
-
         //---- lblStation ----
         lblStation.setText("text");
         lblStation.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblStation, CC.xy(3, 13));
+        contentPane.add(lblStation, CC.xy(3, 11));
 
         //---- cmbStation ----
         cmbStation.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(cmbStation, CC.xywh(5, 13, 3, 1));
+        contentPane.add(cmbStation, CC.xywh(5, 11, 3, 1));
 
         //---- lblPrimNurse1 ----
         lblPrimNurse1.setText("text");
         lblPrimNurse1.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblPrimNurse1, CC.xy(3, 15));
+        contentPane.add(lblPrimNurse1, CC.xy(3, 13));
 
         //---- cmbPrimNurse1 ----
         cmbPrimNurse1.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(cmbPrimNurse1, CC.xywh(5, 15, 3, 1));
+        contentPane.add(cmbPrimNurse1, CC.xywh(5, 13, 3, 1));
 
         //---- lblPrimNurse2 ----
         lblPrimNurse2.setText("text");
         lblPrimNurse2.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblPrimNurse2, CC.xy(3, 17));
+        contentPane.add(lblPrimNurse2, CC.xy(3, 15));
 
         //---- cmbPrimNurse2 ----
         cmbPrimNurse2.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(cmbPrimNurse2, CC.xywh(5, 17, 3, 1));
+        contentPane.add(cmbPrimNurse2, CC.xywh(5, 15, 3, 1));
 
         //---- lblGP ----
         lblGP.setText("text");
         lblGP.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblGP, CC.xy(3, 19));
+        contentPane.add(lblGP, CC.xy(3, 17));
 
         //---- cmbGP ----
         cmbGP.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(cmbGP, CC.xy(5, 19));
+        contentPane.add(cmbGP, CC.xy(5, 17));
 
         //======== panel3 ========
         {
@@ -392,12 +379,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
             btnAddGP.setBorderPainted(false);
             btnAddGP.setContentAreaFilled(false);
             btnAddGP.setBorder(null);
-            btnAddGP.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAddGPActionPerformed(e);
-                }
-            });
+            btnAddGP.addActionListener(e -> btnAddGPActionPerformed(e));
             panel3.add(btnAddGP);
 
             //---- btnEditGP ----
@@ -406,15 +388,10 @@ public class DlgEditResidentBaseData extends MyJDialog {
             btnEditGP.setBorderPainted(false);
             btnEditGP.setContentAreaFilled(false);
             btnEditGP.setBorder(null);
-            btnEditGP.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnEditGPActionPerformed(e);
-                }
-            });
+            btnEditGP.addActionListener(e -> btnEditGPActionPerformed(e));
             panel3.add(btnEditGP);
         }
-        contentPane.add(panel3, CC.xy(7, 19));
+        contentPane.add(panel3, CC.xy(7, 17));
 
         //======== panel1 ========
         {
@@ -423,26 +400,16 @@ public class DlgEditResidentBaseData extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnApply ----
             btnApply.setText(null);
             btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnApply.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnApplyActionPerformed(e);
-                }
-            });
+            btnApply.addActionListener(e -> btnApplyActionPerformed(e));
             panel1.add(btnApply);
         }
-        contentPane.add(panel1, CC.xywh(5, 25, 3, 1, CC.RIGHT, CC.FILL));
+        contentPane.add(panel1, CC.xywh(5, 23, 3, 1, CC.RIGHT, CC.FILL));
         pack();
         setLocationRelativeTo(getOwner());
 
@@ -464,8 +431,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
     private JPanel panel2;
     private JRadioButton rbMale;
     private JRadioButton rbFemale;
-    private JLabel lblRoom;
-    private JComboBox cmbRoom;
     private JLabel lblStation;
     private JComboBox cmbStation;
     private JLabel lblPrimNurse1;

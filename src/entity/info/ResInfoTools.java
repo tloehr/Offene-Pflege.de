@@ -1,7 +1,7 @@
 package entity.info;
 
-import entity.HomesTools;
-import entity.Station;
+import entity.building.HomesTools;
+import entity.building.Station;
 import entity.prescription.GPTools;
 import entity.prescription.Prescription;
 import entity.prescription.PrescriptionTools;
@@ -117,6 +117,12 @@ public class ResInfoTools {
     public static ArrayList<ResInfo> getAll(Resident resident, ResInfoType type, LocalDate start, LocalDate end) {
         DateTime from = start.toDateTimeAtStartOfDay();
         DateTime to = SYSCalendar.eod(end);
+
+        return getAll(resident, type, from, to);
+    }
+
+
+    public static ArrayList<ResInfo> getAll(Resident resident, ResInfoType type, DateTime from, DateTime to) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(
                 " SELECT rinfo FROM ResInfo rinfo " +
@@ -136,25 +142,48 @@ public class ResInfoTools {
         return resInfos;
     }
 
+
+    public static ArrayList<ResInfo> getAll(ResInfoType type, DateTime pit) {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery(
+                    " SELECT rinfo FROM ResInfo rinfo " +
+                            " WHERE rinfo.bwinfotyp = :bwinfotyp " +
+                            " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
+                            " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
+                            " (rinfo.from > :from AND rinfo.to < :to)) " +
+                            " ORDER BY rinfo.resident DESC"
+            );
+
+        //für die Liste aller räume
+
+            query.setParameter("bewohner", resident);
+            query.setParameter("bwinfotyp", type);
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
+            ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+            em.close();
+            return resInfos;
+        }
+
     public static ArrayList<ResInfo> getAll(Resident resident, LocalDate start, LocalDate end) {
-           DateTime from = start.toDateTimeAtStartOfDay();
-           DateTime to = SYSCalendar.eod(end);
-           EntityManager em = OPDE.createEM();
-           Query query = em.createQuery(
-                   " SELECT rinfo FROM ResInfo rinfo " +
-                           " WHERE rinfo.resident = :bewohner " +
-                           " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
-                           " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
-                           " (rinfo.from > :from AND rinfo.to < :to)) " +
-                           " ORDER BY rinfo.from DESC"
-           );
-           query.setParameter("bewohner", resident);
-           query.setParameter("from", from.toDate());
-           query.setParameter("to", to.toDate());
-           ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
-           em.close();
-           return resInfos;
-       }
+        DateTime from = start.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(end);
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(
+                " SELECT rinfo FROM ResInfo rinfo " +
+                        " WHERE rinfo.resident = :bewohner " +
+                        " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
+                        " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
+                        " (rinfo.from > :from AND rinfo.to < :to)) " +
+                        " ORDER BY rinfo.from DESC"
+        );
+        query.setParameter("bewohner", resident);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
 
     public static ArrayList<ResInfo> getAll(Resident resident, ResInfoType type) {
         EntityManager em = OPDE.createEM();

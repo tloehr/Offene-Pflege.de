@@ -1,13 +1,12 @@
 package entity.values;
 
 
-import entity.Station;
-import entity.StationTools;
+import entity.building.Station;
+import entity.building.StationTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
 import op.OPDE;
-import op.care.values.PnlValues;
 import op.controlling.PnlControlling;
 import op.tools.Pair;
 import op.tools.SYSCalendar;

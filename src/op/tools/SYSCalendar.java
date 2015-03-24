@@ -45,7 +45,6 @@ import org.joda.time.format.DateTimeFormatter;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
-import java.sql.Time;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -960,12 +959,17 @@ public class SYSCalendar {
         return gc.getTimeInMillis();
     }
 
+    public static DateTime midOfDay(LocalDate d) {
+        DateTime dt = d.toDateTimeAtCurrentTime();
+        return dt.withHourOfDay(12).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+    }
+
 
     /**
      * Berechnet zu einem gegebenen Jahr den Ostersonntag. Dieser wird als GregorianCalendar zurückgegeben.
      * Der Algorhythmus wurde von der Internet-Seite www.th-o.de/kalender.htm entnommen.
      * Dort wurde er von Walter Irion beschrieben. Danke, Walter und Thomas.
-     * <p/>
+     * <p>
      * Ich habe leider nicht die geringste Ahnung, was hier passiert. ;-)
      *
      * @param year

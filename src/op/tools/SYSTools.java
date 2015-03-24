@@ -123,6 +123,18 @@ public class SYSTools {
         }
     }
 
+    public static Properties load(String text) {
+           Properties props = new Properties();
+           try {
+               StringReader reader = new StringReader(text);
+               props.load(reader);
+               reader.close();
+           } catch (IOException ex) {
+               OPDE.fatal(ex);
+           }
+           return props;
+       }
+
     public static void center(java.awt.Window w) {
         Dimension us = w.getSize();
         Dimension them = java.awt.Toolkit.getDefaultToolkit().getScreenSize();

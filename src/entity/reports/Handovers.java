@@ -4,7 +4,7 @@
  */
 package entity.reports;
 
-import entity.Homes;
+import entity.building.Homes;
 import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;

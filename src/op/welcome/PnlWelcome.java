@@ -595,7 +595,7 @@ public class PnlWelcome extends CleanablePanel {
 
             //---- btnAbout ----
             btnAbout.setText(null);
-            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
+            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/opde-logo.png")));
             btnAbout.setHorizontalAlignment(SwingConstants.TRAILING);
             btnAbout.setFont(new Font("Arial", Font.BOLD, 14));
             btnAbout.setForeground(Color.red);
@@ -604,12 +604,7 @@ public class PnlWelcome extends CleanablePanel {
             btnAbout.setContentAreaFilled(false);
             btnAbout.setBorder(null);
             btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnAbout.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAboutActionPerformed(e);
-                }
-            });
+            btnAbout.addActionListener(e -> btnAboutActionPerformed(e));
             panel1.add(btnAbout, CC.xy(3, 1));
 
             //======== scrollPane1 ========

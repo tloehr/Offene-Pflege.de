@@ -7,6 +7,8 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.OverlayTextArea;
 import entity.EntityTools;
+import entity.building.Rooms;
+import entity.building.RoomsTools;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
 import entity.info.ResInfoTools;
@@ -787,10 +789,26 @@ public class PnlEditResInfo {
             } else if (entry instanceof PnlBodyScheme) {
                 ((PnlBodyScheme) entry).setContent(content);
             } else if (entry instanceof PnlGP) {
-                long gpid = Long.parseLong(SYSTools.catchNull(content.getProperty(key + ".gpid"), "-1"));
+                long gpid = Long.parseLong(SYSTools.catchNull(content.getProperty(key + ".id"), "-1"));
                 if (gpid > 0) {
                     GP gp = EntityTools.find(GP.class, gpid);
                     ((PnlGP) entry).setSelected(gp);
+                }
+            } else if (entry instanceof PnlHospital) {
+                long hid = Long.parseLong(SYSTools.catchNull(content.getProperty(key + ".id"), "-1"));
+                if (hid > 0) {
+                    Hospital hospital = EntityTools.find(Hospital.class, hid);
+                    ((PnlHospital) entry).setSelected(hospital);
+                }
+            } else if (entry instanceof JPanel) {
+                JPanel thisPanel = ((JPanel) entry);
+                if (((JPanel) entry).getName().equals("roomSelect")) {
+                    long rid = Long.parseLong(SYSTools.catchNull(content.getProperty(key + ".id"), "-1"));
+                    if (rid > 0) {
+                        Rooms room = EntityTools.find(Rooms.class, rid);
+                        JComboBox<Rooms> mycmb = (JComboBox) thisPanel.getComponents()[0]; // there can be only one, highlander :P
+                        mycmb.setSelectedItem(room);
+                    }
                 }
             } else if (entry instanceof JComboBox) {
                 JComboBox cmb = ((JComboBox) entry);
@@ -1375,6 +1393,78 @@ public class PnlEditResInfo {
 
                 components.put(groupname, pnlGP);
                 outerpanel.add(layout, pnlGP);
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+            }
+            /***
+             *                                ____       _           _
+             *      _ __ ___   ___  _ __ ___ / ___|  ___| | ___  ___| |_
+             *     | '__/ _ \ / _ \| '_ ` _ \\___ \ / _ \ |/ _ \/ __| __|
+             *     | | | (_) | (_) | | | | | |___) |  __/ |  __/ (__| |_
+             *     |_|  \___/ \___/|_| |_| |_|____/ \___|_|\___|\___|\__|
+             *
+             */
+            if (tagName.equalsIgnoreCase("roomselect")) {
+                groupname = attributes.getValue("name");
+                final String thisGroupName = groupname;
+
+                JPanel pnlRoom = new JPanel();
+                pnlRoom.setLayout(new BorderLayout());
+                pnlRoom.setName("roomSelect");
+
+                DefaultComboBoxModel<Rooms> dcmb = SYSTools.list2cmb(RoomsTools.getAllActive());
+                dcmb.insertElementAt(null, 0);
+
+                JComboBox<Rooms> cmbRooms = new JComboBox<>(dcmb);
+                cmbRooms.setRenderer(RoomsTools.getRenderer());
+
+                cmbRooms.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        if (e.getStateChange() == ItemEvent.SELECTED) {
+                            long rid;
+                            String roomText;
+                            if (e.getItem() == null) {
+                                rid = -1;
+                                roomText = "--";
+                            } else {
+                                rid = ((Rooms) e.getItem()).getRoomID();
+                                roomText = ((Rooms) e.getItem()).toString();
+                            }
+                            content.put(thisGroupName + ".id", Long.toString(rid));
+                            content.put(thisGroupName + ".text", roomText);
+                            changed = true;
+                        }
+                    }
+                });
+                pnlRoom.add(cmbRooms, BorderLayout.CENTER);
+
+                int fontstyle = Font.PLAIN;
+                if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                        fontstyle = Font.BOLD;
+                    }
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                        fontstyle = Font.ITALIC;
+                    }
+                }
+
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                if (attributes.getValue("label") != null) {
+                    JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")) + ":");
+
+                    if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
+                        int size = Integer.parseInt(attributes.getValue("size"));
+                        jl.setFont(new Font("Arial", fontstyle, size));
+                    } else {
+                        jl.setFont(new Font("Arial", fontstyle, 12));
+                    }
+
+                    outerpanel.add(layout, jl);
+                    layout = "left";
+                }
+
+                components.put(groupname, pnlRoom);
+                outerpanel.add(layout, pnlRoom);
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
             }
             /***

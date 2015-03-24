@@ -147,12 +147,7 @@ public class DlgLogin extends MyJDialog {
             btnAbout.setContentAreaFilled(false);
             btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnAbout.setToolTipText(null);
-            btnAbout.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAboutActionPerformed(e);
-                }
-            });
+            btnAbout.addActionListener(e -> btnAboutActionPerformed(e));
             jPanel2.add(btnAbout);
 
             //---- lblUsernamePassword ----
@@ -162,12 +157,7 @@ public class DlgLogin extends MyJDialog {
 
             //---- txtUsername ----
             txtUsername.setFont(new Font("Arial", Font.PLAIN, 18));
-            txtUsername.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtUsernameActionPerformed(e);
-                }
-            });
+            txtUsername.addActionListener(e -> txtUsernameActionPerformed(e));
             txtUsername.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
@@ -178,12 +168,7 @@ public class DlgLogin extends MyJDialog {
 
             //---- txtPassword ----
             txtPassword.setFont(new Font("Arial", Font.PLAIN, 18));
-            txtPassword.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtPasswordActionPerformed(e);
-                }
-            });
+            txtPassword.addActionListener(e -> txtPasswordActionPerformed(e));
             txtPassword.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
@@ -200,24 +185,14 @@ public class DlgLogin extends MyJDialog {
 
             //---- btnExit ----
             btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/exit.png")));
-            btnExit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnExitActionPerformed(e);
-                }
-            });
+            btnExit.addActionListener(e -> btnExitActionPerformed(e));
             panel1.add(btnExit);
             panel1.add(hSpacer1);
 
             //---- btnLogin ----
             btnLogin.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnLogin.setActionCommand("btnLogin");
-            btnLogin.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    DoLogin(e);
-                }
-            });
+            btnLogin.addActionListener(e -> DoLogin(e));
             panel1.add(btnLogin);
         }
         contentPane.add(panel1, CC.xy(2, 5, CC.RIGHT, CC.DEFAULT));

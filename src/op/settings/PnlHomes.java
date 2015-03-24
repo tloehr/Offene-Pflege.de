@@ -6,7 +6,7 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Homes;
+import entity.building.Homes;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;

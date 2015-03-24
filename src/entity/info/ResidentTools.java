@@ -5,8 +5,9 @@
 package entity.info;
 
 import entity.EntityTools;
-import entity.Homes;
-import entity.Station;
+import entity.building.Homes;
+import entity.building.RoomsTools;
+import entity.building.Station;
 import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.MedInventoryTools;
 import entity.prescription.PrescriptionTools;

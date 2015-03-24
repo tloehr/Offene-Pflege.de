@@ -11,7 +11,7 @@
         <class>entity.info.LCustodian</class>
         <class>entity.info.Resident</class>
         <class>entity.nursingprocess.DFN</class>
-        <class>entity.Homes</class>
+        <class>entity.building.Homes</class>
         <class>entity.system.Groups</class>
         <class>entity.info.ICD</class>
         <class>entity.info.HInsurance</class>
@@ -22,8 +22,8 @@
         <class>entity.reports.NReport</class>
         <class>entity.nursingprocess.NPControl</class>
         <class>entity.nursingprocess.NursingProcess</class>
-        <class>entity.Rooms</class>
-        <class>entity.Station</class>
+        <class>entity.building.Rooms</class>
+        <class>entity.building.Station</class>
         <class>entity.reports.Handover2User</class>
         <class>entity.reports.Handovers</class>
         <class>entity.system.Users</class>
@@ -75,6 +75,7 @@
         <class>entity.system.Commontags</class>
         <class>entity.staff.Training2Users</class>
         <class>entity.system.Notification</class>
+        <class>entity.building.Resident2Rooms</class>
 
     </persistence-unit>
 </persistence>

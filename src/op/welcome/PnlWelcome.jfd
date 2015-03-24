@@ -47,7 +47,7 @@
            <string>icon</string> 
            <object class="com.jformdesigner.model.SwingIcon"> 
             <int>0</int> 
-            <string>/artwork/64x64/OPDE-blue.png</string> 
+            <string>/artwork/64x64/opde-logo.png</string> 
            </object> 
           </void> 
           <void method="setProperty"> 

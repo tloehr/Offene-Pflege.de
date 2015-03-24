@@ -4,7 +4,7 @@
  */
 package entity.reports;
 
-import entity.Homes;
+import entity.building.Homes;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfoTools;
 import entity.info.Resident;

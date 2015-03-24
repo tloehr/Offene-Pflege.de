@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.building;
 
+import entity.EntityTools;
 import op.OPDE;
 import op.tools.SYSTools;
 

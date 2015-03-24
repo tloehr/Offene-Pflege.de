@@ -1,6 +1,6 @@
 package entity.prescription;
 
-import entity.Station;
+import entity.building.Station;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;

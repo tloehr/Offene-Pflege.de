@@ -7,6 +7,7 @@ import entity.system.CommontagsTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.Pair;
+import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
@@ -15,7 +16,9 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.LocalDate;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,12 +109,13 @@ public class MREPrevalenceSheets {
     private final int[] NEEDED_TYPES = new int[]{ResInfoTypeTools.TYPE_INCOAID, ResInfoTypeTools.TYPE_INCO_FAECAL, ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT,
             ResInfoTypeTools.TYPE_WOUND1, ResInfoTypeTools.TYPE_WOUND2, ResInfoTypeTools.TYPE_WOUND3, ResInfoTypeTools.TYPE_WOUND4, ResInfoTypeTools.TYPE_WOUND5, ResInfoTypeTools.TYPE_RESPIRATION,
             ResInfoTypeTools.TYPE_ORIENTATION, ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, ResInfoTypeTools.TYPE_INFECTION, ResInfoTypeTools.TYPE_VACCINE, ResInfoTypeTools.TYPE_DIABETES,
-            ResInfoTypeTools.TYPE_NURSING_INSURANCE, ResInfoTypeTools.TYPE_MOBILITY, ResInfoTypeTools.TYPE_VESSEL_CATHETER};
+            ResInfoTypeTools.TYPE_NURSING_INSURANCE, ResInfoTypeTools.TYPE_MOBILITY, ResInfoTypeTools.TYPE_VESSEL_CATHETER, ResInfoTypeTools.TYPE_ROOM};
 
     private final ArrayList<Resident> listResidents;
     private final LocalDate targetDate;
     private final boolean anonymous;
     private final Closure progressClosure;
+    private final HashMap<Resident, ResInfo> mapRooms;
     private int progress, max, runningNumber, sheet2_col_index;
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
@@ -129,10 +133,9 @@ public class MREPrevalenceSheets {
         mapID2Info = new HashMap<Integer, ResInfo>();
         mapInfo2Properties = new HashMap<ResInfo, Properties>();
         mapResInfoType = new HashMap<>();
-
+        mapRooms = new HashMap<Resident, ResInfo>();
         listResidents = ResidentTools.getAllActive(targetDate.minusDays(1), targetDate);
         antibiotics = CommontagsTools.getType(CommontagsTools.TYPE_SYS_ANTIBIOTICS);
-
     }
 
 
@@ -140,9 +143,17 @@ public class MREPrevalenceSheets {
         progress = 1;
         sheet2_col_index = COL_SHEET2_TITLE + 2;
 
+        ArrayList<ResInfo> rooms = new ArrayList();
 
-        //        OPDE.getMainframe().setBlocked(true);
-        //        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+
+
+        for (Resident resident : listResidents) {
+            for (ResInfo resInfo : ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay(targetDate), SYSCalendar.midOfDay(targetDate))) {
+                mapRooms.put(resInfo.getResident(), resInfo);
+            }
+        }
+
+
 
 
         Collections.sort(listResidents, new Comparator<Resident>() {
@@ -163,8 +174,8 @@ public class MREPrevalenceSheets {
         // prepare a vanilla workbook to fill
         prepareWorkbook();
 
-
         // get all residents who were at least living here yesterday, even they may have been away on those two days
+
         for (Resident resident : listResidents) {
 
             progress++;
@@ -179,7 +190,7 @@ public class MREPrevalenceSheets {
             for (int neededType : NEEDED_TYPES) {
                 for (ResInfo info : ResInfoTools.getAll(resident, getResInfoTypeByType(neededType), targetDate.minusDays(1), targetDate)) {
                     mapID2Info.put(info.getResInfoType().getType(), info);
-                    mapInfo2Properties.put(info, load(info.getProperties()));
+                    mapInfo2Properties.put(info, SYSTools.load(info.getProperties()));
                 }
             }
 
@@ -196,9 +207,6 @@ public class MREPrevalenceSheets {
                     sheet2_col_index++;
                 }
             }
-
-
-            //                    SYSFilesTools.handleFile(, Desktop.Action.OPEN);
 
         }
 
@@ -230,17 +238,6 @@ public class MREPrevalenceSheets {
         return temp;
     }
 
-    private Properties load(String text) {
-        Properties props = new Properties();
-        try {
-            StringReader reader = new StringReader(text);
-            props.load(reader);
-            reader.close();
-        } catch (IOException ex) {
-            OPDE.fatal(ex);
-        }
-        return props;
-    }
 
     private String getValue(int type, String key) {
         return mapID2Info.containsKey(type) &&
@@ -256,10 +253,9 @@ public class MREPrevalenceSheets {
         return properties.containsKey(key) && properties.getProperty(key).equalsIgnoreCase(value) ? "X" : "";
     }
 
-
     private void fillColSheet2(Prescription prescription) {
         ResInfo resInfo = ResInfoTools.getAnnotation4Prescription(prescription, antibiotics);
-        Properties properties = resInfo != null ? load(resInfo.getProperties()) : new Properties();
+        Properties properties = resInfo != null ? SYSTools.load(resInfo.getProperties()) : new Properties();
 
         String[] content = new String[SHEET2_ADDTIONAL_RESISTANT + 1]; // this is always the last. hence the size of the array
 
@@ -297,16 +293,15 @@ public class MREPrevalenceSheets {
         content[SHEET2_ADDTIONAL_ISOLATED] = SYSTools.catchNull(properties.getProperty("diag.result"), "--");
         content[SHEET2_ADDTIONAL_RESISTANT] = SYSTools.catchNull(properties.getProperty("diag.resistent"), "--");
 
-
         for (int row : SHEET2_INDEX) {
             sheet2.getRow(row).createCell(sheet2_col_index).setCellValue(SYSTools.catchNull(content[row]));
         }
     }
 
-    private ArrayList<Prescription> fillLineSheet1(Resident resident) {
-
+    private ArrayList<Prescription> fillLineSheet1(Resident resident, boolean lastForThisStation) {
         String[] content = new String[30];
-        content[ROOM_NO] = SYSTools.catchNull(resident.getRoom(), "--");
+
+        content[ROOM_NO] = getValue(ResInfoTypeTools.TYPE_ROOM, "room.text");
         content[RESIDENT_NAME_OR_RESID] = anonymous ? resident.getRID() : ResidentTools.getLabelText(resident);
         content[RESIDENT_STATION] = SYSTools.catchNull(resident.getStation(), "--");
         content[RUNNING_NO] = Integer.toString(runningNumber);
@@ -341,7 +336,7 @@ public class MREPrevalenceSheets {
         ArrayList<ResInfo> listHospital = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ABSENCE), targetDate.minusMonths(3), targetDate);
         boolean hospital = false;
         for (ResInfo resInfo : listHospital) {
-            Properties p = load(resInfo.getProperties());
+            Properties p = SYSTools.load(resInfo.getProperties());
             hospital |= p.containsKey("type") && p.getProperty("type").equalsIgnoreCase(ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL);
             p.clear();
         }
@@ -355,13 +350,6 @@ public class MREPrevalenceSheets {
         boolean immobile = getCellContent(ResInfoTypeTools.TYPE_MOBILITY, "bedridden", "true").equalsIgnoreCase("X") || getCellContent(ResInfoTypeTools.TYPE_MOBILITY, "wheel.aid", "true").equalsIgnoreCase("X");
         content[BEDRIDDEN_WHEELCHAIR] = immobile ? "X" : "";
 
-//        if (resident.getName().equalsIgnoreCase("Vom Endt")) {
-//            OPDE.debug(resident.getName());
-//            OPDE.debug(mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY));
-//            OPDE.debug(!getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil", "kontinenz").equalsIgnoreCase("X"));
-//            OPDE.debug(mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT));
-//            OPDE.debug(getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil", "kontinenz").equalsIgnoreCase("X"));
-//        }
         boolean urine = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY) && !getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil", "kontinenz").equalsIgnoreCase("X")) || (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT) && !getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil", "kontinenz").equalsIgnoreCase("X"));
         content[URINARY_INCONTINENCE] = urine ? "X" : "";
 
@@ -426,7 +414,6 @@ public class MREPrevalenceSheets {
 
 
     private void prepareSheet2() {
-
         sheet2 = wb.createSheet(WorkbookUtil.createSafeSheetName(SYSTools.xx("prevalence.sheet2.tab.title")));
         sheet2.getPrintSetup().setLandscape(true);
         sheet2.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
@@ -580,9 +567,13 @@ public class MREPrevalenceSheets {
         sheet1.getRow(ROW_SHEET1_TITLE).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("prevalence.sheet1.title"));
         sheet1.getRow(ROW_SHEET1_TITLE).getCell(COL_SHEET1_TITLE).setCellStyle(titleStyle);
 
-        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("home.name"));
+//        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("home.name"));
         sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("num.of.beds"));
         sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("beds.in.use"));
+
+//        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("home.name"));
+        sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE + 1).setCellValue(38);
+        sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE + 1).setCellValue(37);
 
         sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE + 20).setCellValue(SYSTools.xx("day.of.elicitation"));
         sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE + 21).setCellValue(targetDate.toDate());

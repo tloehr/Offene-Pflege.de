@@ -4,16 +4,14 @@
 */
 package entity.reports;
 
-import com.itextpdf.text.*;
 import entity.EntityTools;
-import entity.Homes;
+import entity.building.Homes;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.QProcessElement;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import op.OPDE;
-import op.system.PDF;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -25,7 +23,6 @@ import org.joda.time.MutableInterval;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.Format;

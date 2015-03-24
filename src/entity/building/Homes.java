@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.building;
 
 import entity.reports.Handovers;
 
@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author tloehr

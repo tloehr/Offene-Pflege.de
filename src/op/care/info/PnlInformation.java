@@ -37,8 +37,6 @@ import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormatter;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -679,7 +677,7 @@ public class PnlInformation extends NursingRecordsPanel {
         String title = "<html><body>";
 
 
-       if (resInfo.isSingleIncident()) {
+        if (resInfo.isSingleIncident()) {
             title += DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ")";
         } else {
             title += DateFormat.getDateInstance().format(resInfo.getFrom()) + " (" + (resInfo.getUserON() != null ? resInfo.getUserON().getFullname() : "--") + ") " + " >> ";
@@ -1249,7 +1247,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
 
                     String content = "";
-                    if (resInfo.getPrescription() != null){
+                    if (resInfo.getPrescription() != null) {
                         content = PrescriptionTools.getPrescriptionAsHTML(resInfo.getPrescription(), false, false, false, false) + "<hrule/><br/>";
                     }
 
@@ -2049,7 +2047,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
     private java.util.List<Component> addCommands() {
 
-        java.util.List<Component> list = new ArrayList<Component>();
+        java.util.List<Component> list = new ArrayList();
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
             /***
@@ -2084,6 +2082,33 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
             });
             list.add(addRes);
+
+            // @relates #10
+            JideButton resComesback = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.info.res.comes.back"), SYSConst.icon22addbw, null);
+            resComesback.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+            resComesback.setAlignmentX(Component.LEFT_ALIGNMENT);
+            resComesback.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+//                               final MyJDialog dlg = new MyJDialog(false);
+//                               WizardDialog wizard = new AddBWWizard(new Closure() {
+//                                   @Override
+//                                   public void execute(Object o) {
+//                                       dlg.dispose();
+//                                       // to refresh the resident list
+//                                       OPDE.getMainframe().emptySearchArea();
+//                                       jspSearch = OPDE.getMainframe().prepareSearchArea();
+//                                       prepareSearchArea();
+//                                   }
+//                               }).getWizard();
+//                               dlg.setContentPane(wizard.getContentPane());
+//                               dlg.pack();
+//                               dlg.setSize(new Dimension(800, 550));
+//                               dlg.setVisible(true);
+                }
+            });
+            list.add(resComesback);
+
 
             JideButton editRes = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.info.editbw"), SYSConst.icon22edit3, null);
             editRes.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());

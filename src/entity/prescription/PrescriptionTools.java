@@ -9,7 +9,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
-import entity.Station;
+import entity.building.Station;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
 import entity.info.ResInfoTools;

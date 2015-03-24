@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.building;
 
 import entity.info.Resident;
 import op.tools.SYSTools;

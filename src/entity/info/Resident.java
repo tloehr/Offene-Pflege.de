@@ -26,8 +26,8 @@
 package entity.info;
 
 import entity.Allowance;
-import entity.Rooms;
-import entity.Station;
+import entity.building.Rooms;
+import entity.building.Station;
 import entity.files.Resident2File;
 import entity.prescription.GP;
 import entity.system.Users;
@@ -104,9 +104,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     @JoinColumn(name = "Editor", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editor;
-    @JoinColumn(name = "raumid", referencedColumnName = "RID")
-    @ManyToOne
-    private Rooms room;
+
 
     public Resident() {
     }
@@ -153,13 +151,13 @@ public class Resident implements Serializable, Comparable<Resident> {
         return name;
     }
 
-    public Rooms getRoom() {
-        return room;
-    }
-
-    public void setRoom(Rooms room) {
-        this.room = room;
-    }
+//    public vs getRoom() {
+//        return room;
+//    }
+//
+//    public void setRoom(Rooms room) {
+//        this.room = room;
+//    }
 
     public String getName() {
         return SYSTools.anonymizeName(name, SYSTools.INDEX_LASTNAME);

@@ -1,6 +1,6 @@
 package entity.prescription;
 
-import entity.Homes;
+import entity.building.Homes;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.system.SYSPropsTools;
