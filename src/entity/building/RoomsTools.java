@@ -54,10 +54,10 @@ public class RoomsTools {
     }
 
 
-    public static Pair<Integer, Integer> getOccupancy(LocalDate date, Station station) {
+    public static int getBedsTotal(Station station) {
 
         int total = 0;
-        int inUse = 0;
+//        int inUse = 0;
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.station = :station ");
@@ -70,21 +70,21 @@ public class RoomsTools {
             if (!room.isSingle()) total++;
         }
 
-        ResInfoType rooms = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM);
-        for (Resident resident : ResidentTools.getAllActive(date, date)) {
-            for (ResInfo resInfo : ResInfoTools.getAll(resident, rooms, SYSCalendar.midOfDay(date), SYSCalendar.midOfDay(date))) { // this is only one, sometimes none
-                Properties props = SYSTools.load(resInfo.getProperties());
-                long rid = Long.parseLong(SYSTools.catchNull(props.getProperty("room.id"), "-1"));
-                if (rid > 0) {
-                    Rooms room = EntityTools.find(Rooms.class, rid);
-                    if (room.getStation().equals(station)){
-                        inUse++;
-                    }
-                }
-            }
-        }
+//        ResInfoType rooms = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM);
+//        for (Resident resident : ResidentTools.getAllActive(date, date)) {
+//            for (ResInfo resInfo : ResInfoTools.getAll(resident, rooms, SYSCalendar.midOfDay(date), SYSCalendar.midOfDay(date))) { // this is only one, sometimes none
+//                Properties props = SYSTools.load(resInfo.getProperties());
+//                long rid = Long.parseLong(SYSTools.catchNull(props.getProperty("room.id"), "-1"));
+//                if (rid > 0) {
+//                    Rooms room = EntityTools.find(Rooms.class, rid);
+//                    if (room.getStation().equals(station)){
+//                        inUse++;
+//                    }
+//                }
+//            }
+//        }
 
-        return new Pair(inUse, total);
+        return total;
     }
 
 //    /**

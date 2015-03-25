@@ -100,6 +100,10 @@ public class Rooms implements Serializable {
         return station;
     }
 
+    public int getBeds(){
+        return single ? 1 : 2;
+    }
+
     public void setStation(Station station) {
         this.station = station;
     }

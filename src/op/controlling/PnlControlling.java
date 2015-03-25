@@ -447,51 +447,47 @@ public class PnlControlling extends CleanablePanel {
 
                     @Override
                     protected void done() {
-
-                        Object[] options = {
-                                SYSTools.xx("prevalence.optiondialog.option1"),
-                                SYSTools.xx("prevalence.optiondialog.option2"),
-                                SYSTools.xx("opde.wizards.buttontext.cancel")
-                        };
-
-                        int n = JOptionPane.showOptionDialog(OPDE.getMainframe(),
-                                SYSTools.xx("prevalence.optiondialog.question"),
-                                SYSTools.xx("prevalence.optiondialog.title"),
-                                JOptionPane.YES_NO_CANCEL_OPTION,
-                                JOptionPane.QUESTION_MESSAGE,
-                                null,
-                                options,
-                                options[1]);
-
-                        File copyTargetDirectory = null;
-
-                        if (n == 1) {
-                            JFileChooser chooser = new JFileChooser();
-                            chooser.setDialogTitle("title");
-                            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                            chooser.setMultiSelectionEnabled(false);
-                            chooser.setAcceptAllFileFilterUsed(false);
-
-                            if (chooser.showOpenDialog(pnlPrevalence) == JFileChooser.APPROVE_OPTION) {
-                                copyTargetDirectory = chooser.getSelectedFile();
-                            }
-                        }
-
                         try {
-                            if (copyTargetDirectory != null){
+                            Object[] options = {
+                                    SYSTools.xx("prevalence.optiondialog.option1"),
+                                    SYSTools.xx("prevalence.optiondialog.option2"),
+                                    SYSTools.xx("opde.wizards.buttontext.cancel")
+                            };
+
+                            int n = JOptionPane.showOptionDialog(OPDE.getMainframe(),
+                                    SYSTools.xx("prevalence.optiondialog.question"),
+                                    SYSTools.xx("prevalence.optiondialog.title"),
+                                    JOptionPane.YES_NO_CANCEL_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE,
+                                    null,
+                                    options,
+                                    options[1]);
+
+                            File copyTargetDirectory = null;
+
+                            if (n == 1) {
+                                JFileChooser chooser = new JFileChooser();
+                                chooser.setDialogTitle("title");
+                                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                                chooser.setMultiSelectionEnabled(false);
+                                chooser.setAcceptAllFileFilterUsed(false);
+
+                                if (chooser.showOpenDialog(pnlPrevalence) == JFileChooser.APPROVE_OPTION) {
+                                    copyTargetDirectory = chooser.getSelectedFile();
+                                }
+                            }
+
+
+                            if (copyTargetDirectory != null) {
                                 FileUtils.copyFile((File) get(), copyTargetDirectory);
                             } else {
-                                if (n == 0){
+                                if (n == 0) {
                                     SYSFilesTools.handleFile((File) get(), Desktop.Action.OPEN);
                                 }
                             }
 
-                        } catch (ExecutionException ee) {
-                            OPDE.fatal(ee);
-                        } catch (InterruptedException ie) {
-                            // nop
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
+                        } catch (Exception e) {
+                            OPDE.fatal(e);
                         }
 
                         OPDE.getDisplayManager().setProgressBarMessage(null);

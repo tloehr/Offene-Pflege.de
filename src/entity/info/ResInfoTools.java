@@ -148,18 +148,11 @@ public class ResInfoTools {
             Query query = em.createQuery(
                     " SELECT rinfo FROM ResInfo rinfo " +
                             " WHERE rinfo.bwinfotyp = :bwinfotyp " +
-                            " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
-                            " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
-                            " (rinfo.from > :from AND rinfo.to < :to)) " +
-                            " ORDER BY rinfo.resident DESC"
+                            " AND (rinfo.from <= :pit AND rinfo.to >= :pit) "
             );
 
-        //für die Liste aller räume
-
-            query.setParameter("bewohner", resident);
             query.setParameter("bwinfotyp", type);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
+            query.setParameter("pit", pit.toDate());
             ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
             em.close();
             return resInfos;
