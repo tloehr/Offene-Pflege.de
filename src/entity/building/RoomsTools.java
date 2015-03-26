@@ -1,19 +1,14 @@
 package entity.building;
 
-import entity.EntityTools;
-import entity.info.*;
 import op.OPDE;
-import op.tools.Pair;
-import op.tools.SYSCalendar;
 import op.tools.SYSTools;
-import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,14 +49,34 @@ public class RoomsTools {
     }
 
 
-    public static int getBedsTotal(Station station) {
+    public static short getMaxLevel() {
+
+        short total = 0;
+        //        int inUse = 0;
+
+        try {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT MAX(b.level) FROM Rooms b ");
+
+            total = (short) query.getSingleResult();
+            em.close();
+        } catch (NoResultException nre){
+            total = 0;
+        } catch (Exception e){
+            OPDE.fatal(e);
+        }
+        return total;
+    }
+
+
+    public static int getBedsTotal(short level) {
 
         int total = 0;
 //        int inUse = 0;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.station = :station ");
-        query.setParameter("station", station);
+        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.level = :level ");
+        query.setParameter("level", level);
         ArrayList<Rooms> listRooms = new ArrayList(query.getResultList());
         em.close();
 

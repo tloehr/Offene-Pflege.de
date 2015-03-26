@@ -64,7 +64,7 @@ public class PnlTX extends JPanel {
 
     private void txtTextFocusLost(FocusEvent e) {
         if (txtText.getText().trim().isEmpty()) {
-            txtText.setText(SYSTools.xx(internalClassID + ".txtText"));
+            txtText.setText(SYSTools.xx("admin.residents.cash.pnltx.txtText"));
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptyentry")));
         }
     }
@@ -218,13 +218,13 @@ public class PnlTX extends JPanel {
 
     private void initPanel() {
         lblResident.setText(SYSTools.xx("misc.msg.resident"));
-        lblDate.setText(SYSTools.xx(internalClassID + ".lbldate"));
-        lblText.setText(SYSTools.xx(internalClassID + ".lbltext"));
-        lblCash.setText(SYSTools.xx(internalClassID + ".lblcash"));
+        lblDate.setText(SYSTools.xx("admin.residents.cash.pnltx.lbldate"));
+        lblText.setText(SYSTools.xx("admin.residents.cash.pnltx.lbltext"));
+        lblCash.setText(SYSTools.xx("admin.residents.cash.pnltx.lblcash"));
         txtDate.setText(DateFormat.getDateInstance().format(tx.getPit()));
         txtCash.setText(cf.format(tx.getAmount()));
         if (tx.getId() == null) {
-            txtText.setText(SYSTools.xx(internalClassID + ".txtText"));
+            txtText.setText(SYSTools.xx("admin.residents.cash.pnltx.txtText"));
         } else {
             txtText.setText(tx.getText());
         }

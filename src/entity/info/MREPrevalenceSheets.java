@@ -3,7 +3,6 @@ package entity.info;
 import entity.EntityTools;
 import entity.building.Rooms;
 import entity.building.RoomsTools;
-import entity.building.Station;
 import entity.prescription.Prescription;
 import entity.prescription.PrescriptionTools;
 import entity.system.Commontags;
@@ -22,12 +21,13 @@ import org.joda.time.LocalDate;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * @see <a href="https://github.com/tloehr/Offene-Pflege.de/issues/11">GitHub #11</a>
+ * <p>
  * Created by tloehr on 05.03.15.
  */
 public class MREPrevalenceSheets {
@@ -124,7 +124,7 @@ public class MREPrevalenceSheets {
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private final HashMap<Integer, ResInfoType> mapResInfoType;
-    private final HashMap<Station, Integer> mapBedsTotal, mapBedsInUse;
+    private final int[] mapBedsTotal, mapBedsInUse;
     private final Commontags antibiotics;
     private Font titleFont, boldFont;
     private CellStyle titleStyle, dateStyle, bgStyle;
@@ -141,8 +141,14 @@ public class MREPrevalenceSheets {
         mapRooms = new HashMap<Resident, Rooms>();
         listResidents = ResidentTools.getAllActive(targetDate.minusDays(1), targetDate);
         antibiotics = CommontagsTools.getType(CommontagsTools.TYPE_SYS_ANTIBIOTICS);
-        mapBedsTotal = new HashMap<>();
-        mapBedsInUse = new HashMap<>();
+
+        short maxLevel = RoomsTools.getMaxLevel();
+        mapBedsTotal = new int[maxLevel];
+        mapBedsInUse = new int[maxLevel];
+        for (short level = 0; level < maxLevel; level++) {
+            mapBedsTotal[level] = 0;
+            mapBedsInUse[level] = 0;
+        }
     }
 
 
@@ -156,12 +162,9 @@ public class MREPrevalenceSheets {
                 long rid1 = Long.parseLong(SYSTools.catchNull(p1.getProperty("room.id"), "-1"));
                 Rooms room1 = EntityTools.find(Rooms.class, rid1);
                 mapRooms.put(resInfo.getResident(), room1);
-                if (!mapBedsTotal.containsKey(room1.getStation())){
-                    mapBedsTotal.put(room1.getStation(), RoomsTools.getBedsTotal(room1.getStation()));
-                    mapBedsInUse.put(room1.getStation(), 0);
-                }
 
-                mapBedsInUse.put(room1.getStation(), mapBedsInUse.get(room1.getStation())+1);
+                mapBedsTotal[room1.getLevel()] += RoomsTools.getBedsTotal(room1.getLevel());
+                mapBedsInUse[room1.getLevel()]++;
             }
         }
 
@@ -176,7 +179,7 @@ public class MREPrevalenceSheets {
 
                 if (sort == 0) {
                     if (i1 == 1) {
-                        sort = mapRooms.get(o1).getStation().compareTo(mapRooms.get(o2).getStation());
+                        sort = Short.compare(mapRooms.get(o1).getLevel(), mapRooms.get(o2).getLevel());
                     }
                 }
                 if (sort == 0) sort = o1.getRID().compareTo(o2.getRID());
@@ -196,7 +199,7 @@ public class MREPrevalenceSheets {
 
         // get all residents who were at least living here yesterday, even they may have been away on those two days
 
-        boolean lastForThisStation = false;
+        boolean lastForThisLevel = false;
 
         for (Resident resident : listResidents) {
             progress++;
@@ -216,21 +219,21 @@ public class MREPrevalenceSheets {
             if (runningNumber != 0) {
                 Resident next = listResidents.size() >= runningNumber ? null : listResidents.get(runningNumber + 1);
                 if (next == null) {
-                    lastForThisStation = true;
+                    lastForThisLevel = true;
                 } else if (mapRooms.containsKey(resident) && !mapRooms.containsKey(next)) {
-                    lastForThisStation = true;
+                    lastForThisLevel = true;
                 } else if (!mapRooms.containsKey(resident) && mapRooms.containsKey(next)) {
-                    lastForThisStation = true;
+                    lastForThisLevel = true;
                 } else if (mapRooms.containsKey(resident) && mapRooms.containsKey(next)) {
-                    lastForThisStation = !mapRooms.get(resident).getStation().equals(mapRooms.get(next).getStation());
+                    lastForThisLevel = !mapRooms.get(resident).getLevel().equals(mapRooms.get(next).getLevel());
                 } else {
-                    lastForThisStation = false;
+                    lastForThisLevel = false;
                 }
             }
 
 
             runningNumber++;
-            ArrayList<Prescription> listAntibiotics = fillLineSheet1(resident, lastForThisStation);
+            ArrayList<Prescription> listAntibiotics = fillLineSheet1(resident, lastForThisLevel);
 
             if (!listAntibiotics.isEmpty()) {
                 if (sheet2 == null) {
@@ -333,7 +336,7 @@ public class MREPrevalenceSheets {
         }
     }
 
-    private ArrayList<Prescription> fillLineSheet1(Resident resident, boolean lastForThisStation) throws Exception{
+    private ArrayList<Prescription> fillLineSheet1(Resident resident, boolean lastForThisLevel) throws Exception {
         String[] content = new String[MAXCOL_SHEET1];
 
         content[ROOM_NO] = getValue(ResInfoTypeTools.TYPE_ROOM, "room.text");
@@ -433,7 +436,7 @@ public class MREPrevalenceSheets {
         content[RUNNING_ANTIBIOTICS] = !listAntibiotics.isEmpty() ? "X" : "";
 
         createRows(sheet1, 1);
-        for (int col = 0; col < MAXCOL_SHEET1-2; col++) {
+        for (int col = 0; col < MAXCOL_SHEET1 - 2; col++) {
             progress++;
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
 
@@ -442,9 +445,9 @@ public class MREPrevalenceSheets {
 
         progress += 2; // for the additional 2 columns;
 
-        if (lastForThisStation && mapRooms.containsKey(resident)){
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1-2).setCellValue(mapBedsInUse.get(mapRooms.get(resident).getStation()));
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1-1).setCellValue(mapBedsTotal.get(mapRooms.get(resident).getStation()));
+        if (lastForThisLevel && mapRooms.containsKey(resident)) {
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 2).setCellValue(mapBedsInUse[mapRooms.get(resident).getLevel()]);
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 1).setCellValue(mapBedsTotal[mapRooms.get(resident).getLevel()]);
         }
 
         return listAntibiotics;

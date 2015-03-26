@@ -101,9 +101,19 @@ public class ResInfoTools {
     }
 
 
+    /**
+     *
+     * @see <a href="https://github.com/tloehr/Offene-Pflege.de/issues/10">GitHub #10</a>
+     * ORDER type was "DESC" should be "ASC".
+     *
+     *
+     * @param resident
+     * @param resInfoType
+     * @return
+     */
     public static ResInfo getFirstResinfo(Resident resident, ResInfoType resInfoType) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.bwinfotyp = :resInfoType ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.bwinfotyp = :resInfoType ORDER BY b.from ASC");
         query.setParameter("resident", resident);
         query.setParameter("resInfoType", resInfoType);
         query.setFirstResult(0);
