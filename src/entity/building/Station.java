@@ -34,8 +34,7 @@ public class Station implements Serializable, Comparable<Station> {
     @JoinColumn(name = "EID", referencedColumnName = "EID")
     @ManyToOne
     private Homes home;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
-    private Collection<Rooms> rooms;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
     private Collection<Resident> residents;
 
@@ -45,7 +44,7 @@ public class Station implements Serializable, Comparable<Station> {
     public Station(String name, Homes home) {
         this.name = SYSTools.tidy(name);
         this.home = home;
-        rooms = new ArrayList<Rooms>();
+
         residents = new ArrayList<Resident>();
     }
 
@@ -73,9 +72,7 @@ public class Station implements Serializable, Comparable<Station> {
         return residents;
     }
 
-    public Collection<Rooms> getRooms() {
-        return rooms;
-    }
+
 
     @Override
     public int hashCode() {

@@ -30,9 +30,14 @@ public class Rooms implements Serializable {
     private Boolean single;
     @Column(name = "Bath")
     private Boolean bath;
-    @JoinColumn(name = "StatID", referencedColumnName = "StatID")
+    @Column(name = "inuse")
+    private Boolean inuse;
+    @Column(name = "inactive")
+    private Boolean inactive;
+
+    @JoinColumn(name = "HomeID", referencedColumnName = "EID")
     @ManyToOne
-    private Station station;
+    private Homes home;
 
     public Rooms() {
     }
@@ -76,11 +81,13 @@ public class Rooms implements Serializable {
         this.single = single;
     }
 
-    /**#
+    /**
+     * #
      * does this room has a bath of its own ?
+     *
      * @return
      */
-    public boolean hasBath(){
+    public boolean hasBath() {
         return bath;
     }
 
@@ -92,24 +99,33 @@ public class Rooms implements Serializable {
         this.bath = bath;
     }
 
-    /**
-     * to which Station does this room belong ?
-     * @return
-     */
-    public Station getStation() {
-        return station;
+    public Homes getHome() {
+        return home;
     }
 
-    public int getBeds(){
-        return single ? 1 : 2;
+    public void setHome(Homes home) {
+        this.home = home;
     }
 
-    public void setStation(Station station) {
-        this.station = station;
+    public Boolean isInactive() {
+        return inactive;
+    }
+
+    public void setInactive(Boolean inactive) {
+        this.inactive = inactive;
+    }
+
+    public Boolean isInuse() {
+        return inuse;
+    }
+
+    public void setInuse(Boolean inuse) {
+        this.inuse = inuse;
     }
 
     /**
      * what is the name of that room (e.G. "Nr.1" or simply "1" or what else).
+     *
      * @return
      */
     public String getText() {
@@ -139,7 +155,7 @@ public class Rooms implements Serializable {
 
     @Override
     public String toString() {
-        return SYSTools.xx("misc.msg.room") + " " + text + ", " + station.getName() + ", " + station.getHome().getName();
+        return SYSTools.xx("misc.msg.room") + " " + text + ", " + SYSTools.xx("misc.msg.floor") + ": " + (level == 0 ? SYSTools.xx("misc.msg.groundlevel") : level) + ", " + home.getName();
     }
 
 }

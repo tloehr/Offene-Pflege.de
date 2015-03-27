@@ -9,6 +9,7 @@ import op.OPDE;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -47,5 +48,17 @@ public class HomesTools {
         Station station = (Station) query2.getSingleResult();
         em.close();
         cmb.setSelectedItem(station.getHome());
+    }
+
+
+
+    public static ArrayList<Homes> getAll() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT e FROM Homes e ORDER BY e.eid");
+
+        ArrayList<Homes> list = new ArrayList<Homes>(query.getResultList());
+        em.close();
+
+        return list;
     }
 }

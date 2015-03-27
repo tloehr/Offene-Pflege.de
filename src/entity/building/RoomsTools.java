@@ -40,7 +40,7 @@ public class RoomsTools {
 
     public static ArrayList<Rooms> getAllActive() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery(" SELECT r FROM Rooms r ORDER BY r.station.name, r.text ");
+        Query query = em.createQuery(" SELECT r FROM Rooms r WHERE r.inactive = FALSE ORDER BY r.level, r.text ");
         //SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname");
         ArrayList<Rooms> list = new ArrayList<Rooms>(query.getResultList());
         em.close();
@@ -49,15 +49,15 @@ public class RoomsTools {
     }
 
 
-    public static short getMaxLevel() {
+    public static short getMaxLevel(Homes home) {
 
         short total = 0;
         //        int inUse = 0;
 
         try {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT MAX(b.level) FROM Rooms b ");
-
+            Query query = em.createQuery("SELECT MAX(b.level) FROM Rooms b WHERE b.home = :home ");
+            query.setParameter("home", home);
             total = (short) query.getSingleResult();
             em.close();
         } catch (NoResultException nre){
@@ -69,14 +69,15 @@ public class RoomsTools {
     }
 
 
-    public static int getBedsTotal(short level) {
+    public static int getBedsTotal(Homes home, short level) {
 
         int total = 0;
 //        int inUse = 0;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.level = :level ");
+        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.home = :home AND b.level = :level AND b.inactive = FALSE");
         query.setParameter("level", level);
+        query.setParameter("home", home);
         ArrayList<Rooms> listRooms = new ArrayList(query.getResultList());
         em.close();
 
