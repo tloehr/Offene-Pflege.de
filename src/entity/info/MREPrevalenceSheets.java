@@ -130,7 +130,7 @@ public class MREPrevalenceSheets {
     private final HashMap<Homes, int[]> mapBedsInUse;
     private final Commontags antibiotics;
     private Font titleFont, boldFont;
-    private CellStyle titleStyle, dateStyle, bgStyle;
+    private CellStyle titleStyle, dateStyle, grayStyle, blueGrayStyle;
     private Sheet sheet1, sheet2;
     private Workbook wb;
 
@@ -149,11 +149,12 @@ public class MREPrevalenceSheets {
 
         for (Homes home : HomesTools.getAll()) {
             short maxLevel = RoomsTools.getMaxLevel(home);
+            mapBedsTotal.put(home, new int[maxLevel + 1]);
+            mapBedsInUse.put(home, new int[maxLevel + 1]);
 
             for (short level = 0; level <= maxLevel; level++) {
-                mapBedsTotal.put([level] = RoomsTools.getBedsTotal(level);
-                ;
-                mapBedsInUse[level] = 0;
+                mapBedsTotal.get(home)[level] = RoomsTools.getBedsTotal(home, level);
+                mapBedsInUse.get(home)[level] = 0;
             }
         }
     }
@@ -169,7 +170,7 @@ public class MREPrevalenceSheets {
                 long rid1 = Long.parseLong(SYSTools.catchNull(p1.getProperty("room.id"), "-1"));
                 Rooms room1 = EntityTools.find(Rooms.class, rid1);
                 mapRooms.put(resInfo.getResident(), room1);
-                mapBedsInUse[room1.getLevel()]++;
+                mapBedsInUse.get(room1.getHome())[room1.getLevel()]++;
             }
         }
 
@@ -256,8 +257,13 @@ public class MREPrevalenceSheets {
 
         }
 
-        for (int i = 0; i < MAXCOL_SHEET1; i++) {
-            sheet1.autoSizeColumn(i);
+        for (int col = 0; col < MAXCOL_SHEET1; col++) {
+            sheet1.autoSizeColumn(col);
+//            for (int row = 0; row < sheet1.getLastRowNum()){
+//                sheet1.getRow(col).getCell(row).set
+//            }
+
+
         }
 
         if (sheet2 != null) {
@@ -454,8 +460,13 @@ public class MREPrevalenceSheets {
         progress += 2; // for the additional 2 columns;
 
         if (lastForThisLevel && mapRooms.containsKey(resident)) {
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 2).setCellValue(mapBedsInUse[mapRooms.get(resident).getLevel()]);
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 1).setCellValue(mapBedsTotal[mapRooms.get(resident).getLevel()]);
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 2).setCellValue(mapBedsInUse.get(mapRooms.get(resident).getHome())[mapRooms.get(resident).getLevel()]);
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 1).setCellValue(mapBedsTotal.get(mapRooms.get(resident).getHome())[mapRooms.get(resident).getLevel()]);
+
+            for (int col = 0; col < MAXCOL_SHEET1; col++) {
+                sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).getCell(col).setCellStyle(blueGrayStyle);
+            }
+
         }
 
         return listAntibiotics;
@@ -477,99 +488,99 @@ public class MREPrevalenceSheets {
         sheet2.getRow(ROW_SHEET2_TITLE + 1).getCell(COL_SHEET2_TITLE + 1).setCellStyle(dateStyle);
 
         sheet2.getRow(SHEET2_RUNNING_NO).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block1"));
-        sheet2.getRow(SHEET2_RUNNING_NO).getCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_RUNNING_NO).getCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_RUNNING_NO).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block1.row1") + " " + SYSTools.xx("prevalence.sheet1.title"));
-        sheet2.getRow(SHEET2_RUNNING_NO).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_RUNNING_NO).getCell(1).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_MED).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block1.row2"));
-        sheet2.getRow(SHEET2_MED).createCell(0).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_MED).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_MED).createCell(0).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_MED).getCell(1).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_STRENGTH).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block1.row3"));
-        sheet2.getRow(SHEET2_STRENGTH).createCell(0).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_STRENGTH).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_STRENGTH).createCell(0).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_STRENGTH).getCell(1).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_DOSE).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block1.row4"));
-        sheet2.getRow(SHEET2_DOSE).createCell(0).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_DOSE).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_DOSE).createCell(0).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_DOSE).getCell(1).setCellStyle(grayStyle);
 
         sheet2.getRow(SHEET2_APPLICATION_LOCAL).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block2"));
-        sheet2.getRow(SHEET2_APPLICATION_LOCAL).getCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_APPLICATION_LOCAL).getCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_APPLICATION_LOCAL).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block2.row1"));
-        sheet2.getRow(SHEET2_APPLICATION_LOCAL).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_APPLICATION_SYSTEM).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_APPLICATION_LOCAL).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_APPLICATION_SYSTEM).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_APPLICATION_SYSTEM).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block2.row2"));
-        sheet2.getRow(SHEET2_APPLICATION_SYSTEM).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_APPLICATION_SYSTEM).getCell(1).setCellStyle(grayStyle);
 
         sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block3"));
-        sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).getCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).getCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block3.row1"));
-        sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_TREATMENT_THERAPEUTIC).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_TREATMENT_THERAPEUTIC).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_TREATMENT_THERAPEUTIC).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block3.row2"));
-        sheet2.getRow(SHEET2_TREATMENT_THERAPEUTIC).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_TREATMENT_THERAPEUTIC).getCell(1).setCellStyle(grayStyle);
 
         sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block4"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).getCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).getCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row1"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BECAUSE_OF_WOUND).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_WOUND).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_WOUND).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row2"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_WOUND).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BECAUSE_OF_RESP).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_WOUND).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_RESP).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_RESP).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row3"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_RESP).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BECAUSE_OF_DIGESTIVE).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_RESP).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_DIGESTIVE).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_DIGESTIVE).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row4"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_DIGESTIVE).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BECAUSE_OF_EYES).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_DIGESTIVE).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_EYES).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_EYES).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row5"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_EYES).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_EYES).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row6"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BECAUSE_OF_SYSTEMIC).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_SYSTEMIC).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_SYSTEMIC).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row7"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_SYSTEMIC).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BECAUSE_OF_FEVER).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_SYSTEMIC).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_FEVER).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_FEVER).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row8"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_FEVER).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_FEVER).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row9"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).getCell(1).setCellStyle(grayStyle);
 
         sheet2.getRow(SHEET2_STARTED_HOME).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block5"));
-        sheet2.getRow(SHEET2_STARTED_HOME).getCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_STARTED_HOME).getCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_STARTED_HOME).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block5.row1"));
-        sheet2.getRow(SHEET2_STARTED_HOME).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_STARTED_HOSPITAL).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_STARTED_HOME).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_STARTED_HOSPITAL).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_STARTED_HOSPITAL).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block5.row2"));
-        sheet2.getRow(SHEET2_STARTED_HOSPITAL).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_STARTED_ELSEWHERE).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_STARTED_HOSPITAL).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_STARTED_ELSEWHERE).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_STARTED_ELSEWHERE).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block5.row3"));
-        sheet2.getRow(SHEET2_STARTED_ELSEWHERE).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_STARTED_ELSEWHERE).getCell(1).setCellStyle(grayStyle);
 
         sheet2.getRow(SHEET2_BY_GP).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block6"));
-        sheet2.getRow(SHEET2_BY_GP).getCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BY_GP).getCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BY_GP).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block6.row1"));
-        sheet2.getRow(SHEET2_BY_GP).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BY_SPECIALIST).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BY_GP).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BY_SPECIALIST).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BY_SPECIALIST).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block6.row2"));
-        sheet2.getRow(SHEET2_BY_SPECIALIST).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_BY_EMERGENCY).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BY_SPECIALIST).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_BY_EMERGENCY).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_BY_EMERGENCY).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block6.row3"));
-        sheet2.getRow(SHEET2_BY_EMERGENCY).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_BY_EMERGENCY).getCell(1).setCellStyle(grayStyle);
 
         sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block7"));
-        sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).getCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).getCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row1"));
-        sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_ADDTIONAL_MICROBIOLOGY).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_ADDTIONAL_MICROBIOLOGY).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_ADDTIONAL_MICROBIOLOGY).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row2"));
-        sheet2.getRow(SHEET2_ADDTIONAL_MICROBIOLOGY).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_ADDTIONAL_ISOLATED).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_ADDTIONAL_MICROBIOLOGY).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_ADDTIONAL_ISOLATED).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_ADDTIONAL_ISOLATED).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row3"));
-        sheet2.getRow(SHEET2_ADDTIONAL_ISOLATED).getCell(1).setCellStyle(bgStyle);
-        sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).createCell(0).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_ADDTIONAL_ISOLATED).getCell(1).setCellStyle(grayStyle);
+        sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).createCell(0).setCellStyle(grayStyle);
         sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row4"));
-        sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).getCell(1).setCellStyle(bgStyle);
+        sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).getCell(1).setCellStyle(grayStyle);
     }
 
 
@@ -598,13 +609,26 @@ public class MREPrevalenceSheets {
         rotatedStyle.setFont(boldFont);
         rotatedStyle.setRotation((short) 90);
         rotatedStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        rotatedStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        rotatedStyle.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
+        rotatedStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        Font f0 = wb.createFont();
+        f0.setColor(IndexedColors.WHITE.getIndex());
+        rotatedStyle.setFont(f0);
 
-        bgStyle = wb.createCellStyle();
-        bgStyle.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
-        bgStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        grayStyle = wb.createCellStyle();
+        grayStyle.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
+        grayStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         Font f = wb.createFont();
         f.setColor(IndexedColors.WHITE.getIndex());
-        bgStyle.setFont(f);
+        grayStyle.setFont(f);
+
+        blueGrayStyle = wb.createCellStyle();
+        blueGrayStyle.setFillForegroundColor(IndexedColors.BLUE_GREY.getIndex());
+        blueGrayStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        Font f1 = wb.createFont();
+        f1.setColor(IndexedColors.WHITE.getIndex());
+        blueGrayStyle.setFont(f1);
 
         // sheet1
         sheet1 = wb.createSheet(WorkbookUtil.createSafeSheetName(SYSTools.xx("prevalence.sheet1.tab.title")));
@@ -615,25 +639,23 @@ public class MREPrevalenceSheets {
 
         sheet1.getRow(ROW_SHEET1_TITLE).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("prevalence.sheet1.title"));
         sheet1.getRow(ROW_SHEET1_TITLE).getCell(COL_SHEET1_TITLE).setCellStyle(titleStyle);
-
+/*
 //        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("home.name"));
         sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("num.of.beds"));
         sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("beds.in.use"));
 
 //        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("home.name"));
         sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE + 1).setCellValue(38);
-        sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE + 1).setCellValue(37);
+        sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE + 1).setCellValue(37);*/
 
-        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE + 20).setCellValue(SYSTools.xx("day.of.elicitation"));
-        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE + 21).setCellValue(targetDate.toDate());
-        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE + 21).setCellStyle(dateStyle);
+        sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("day.of.elicitation"));
+        sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE).setCellValue(targetDate.toString("dd.MM.yyyy"));
 
         for (int i = 0; i < MAXCOL_SHEET1; i++) {
             sheet1.getRow(SHEET1_START_OF_LIST).createCell(i).setCellValue(SYSTools.xx("prevalence.sheet1.col" + String.format("%02d", i + 1) + ".title"));
             sheet1.getRow(SHEET1_START_OF_LIST).getCell(i).setCellStyle(rotatedStyle);
 
         }
-
     }
 //
 //    private void addStatLine(Resident resident, boolean anon) {

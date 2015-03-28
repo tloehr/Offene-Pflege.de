@@ -448,6 +448,8 @@ public class PnlControlling extends CleanablePanel {
                     @Override
                     protected void done() {
                         try {
+                            File source = (File) get();
+
                             Object[] options = {
                                     SYSTools.xx("prevalence.optiondialog.option1"),
                                     SYSTools.xx("prevalence.optiondialog.option2"),
@@ -479,7 +481,7 @@ public class PnlControlling extends CleanablePanel {
 
 
                             if (copyTargetDirectory != null) {
-                                FileUtils.copyFile((File) get(), copyTargetDirectory);
+                                FileUtils.copyFile(source, copyTargetDirectory);
                             } else {
                                 if (n == 0) {
                                     SYSFilesTools.handleFile((File) get(), Desktop.Action.OPEN);
