@@ -804,10 +804,12 @@ public class PnlEditResInfo {
                 JPanel thisPanel = ((JPanel) entry);
                 if (((JPanel) entry).getName().equals("roomSelect")) {
                     long rid = Long.parseLong(SYSTools.catchNull(content.getProperty(key + ".id"), "-1"));
+                    JComboBox<Rooms> mycmb = (JComboBox) thisPanel.getComponents()[0]; // there can be only one, highlander :P
                     if (rid > 0) {
                         Rooms room = EntityTools.find(Rooms.class, rid);
-                        JComboBox<Rooms> mycmb = (JComboBox) thisPanel.getComponents()[0]; // there can be only one, highlander :P
                         mycmb.setSelectedItem(room);
+                    } else {
+                        mycmb.setSelectedItem(null);
                     }
                 }
             } else if (entry instanceof JComboBox) {
@@ -1415,6 +1417,8 @@ public class PnlEditResInfo {
                 dcmb.insertElementAt(null, 0);
 
                 JComboBox<Rooms> cmbRooms = new JComboBox<>(dcmb);
+                cmbRooms.setSelectedIndex(0);
+
                 cmbRooms.setRenderer(RoomsTools.getRenderer());
 
                 cmbRooms.addItemListener(new ItemListener() {

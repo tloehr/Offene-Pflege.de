@@ -1,6 +1,8 @@
 package entity.info;
 
+import entity.EntityTools;
 import entity.building.HomesTools;
+import entity.building.Rooms;
 import entity.building.Station;
 import entity.prescription.GPTools;
 import entity.prescription.Prescription;
@@ -102,14 +104,11 @@ public class ResInfoTools {
 
 
     /**
-     *
-     * @see <a href="https://github.com/tloehr/Offene-Pflege.de/issues/10">GitHub #10</a>
-     * ORDER type was "DESC" should be "ASC".
-     *
-     *
      * @param resident
      * @param resInfoType
      * @return
+     * @see <a href="https://github.com/tloehr/Offene-Pflege.de/issues/10">GitHub #10</a>
+     * ORDER type was "DESC" should be "ASC".
      */
     public static ResInfo getFirstResinfo(Resident resident, ResInfoType resInfoType) {
         EntityManager em = OPDE.createEM();
@@ -154,19 +153,19 @@ public class ResInfoTools {
 
 
     public static ArrayList<ResInfo> getAll(ResInfoType type, DateTime pit) {
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery(
-                    " SELECT rinfo FROM ResInfo rinfo " +
-                            " WHERE rinfo.bwinfotyp = :bwinfotyp " +
-                            " AND (rinfo.from <= :pit AND rinfo.to >= :pit) "
-            );
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(
+                " SELECT rinfo FROM ResInfo rinfo " +
+                        " WHERE rinfo.bwinfotyp = :bwinfotyp " +
+                        " AND (rinfo.from <= :pit AND rinfo.to >= :pit) "
+        );
 
-            query.setParameter("bwinfotyp", type);
-            query.setParameter("pit", pit.toDate());
-            ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
-            em.close();
-            return resInfos;
-        }
+        query.setParameter("bwinfotyp", type);
+        query.setParameter("pit", pit.toDate());
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
 
     public static ArrayList<ResInfo> getAll(Resident resident, LocalDate start, LocalDate end) {
         DateTime from = start.toDateTimeAtStartOfDay();
@@ -856,6 +855,23 @@ public class ResInfoTools {
                 result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesTools.getAsText(resident.getStation().getHome()) + "</b></td></tr>";
             }
         }
+
+
+        for (ResInfo resInfo : ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay(), SYSCalendar.midOfDay())) {
+            Properties p1 = SYSTools.load(resInfo.getProperties());
+            long rid1 = Long.parseLong(SYSTools.catchNull(p1.getProperty("room.id"), "-1"));
+            Rooms room1 = EntityTools.find(Rooms.class, rid1);
+
+            result += SYSConst.html_table_tr(
+                    SYSConst.html_table_td(
+                            "misc.msg.room.of.resident", "left", "top"
+                    ) +
+                            SYSConst.html_table_td(
+                                    SYSConst.html_bold(room1.toString()), "left", "top"
+                            )
+            );
+        }
+
 
         ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
 

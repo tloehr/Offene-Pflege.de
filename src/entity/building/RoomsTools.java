@@ -40,7 +40,7 @@ public class RoomsTools {
 
     public static ArrayList<Rooms> getAllActive() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery(" SELECT r FROM Rooms r WHERE r.inactive = FALSE ORDER BY r.level, r.text ");
+        Query query = em.createQuery(" SELECT r FROM Rooms r WHERE r.inactive = FALSE ORDER BY r.home.eid, r.level, r.text ");
         //SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname");
         ArrayList<Rooms> list = new ArrayList<Rooms>(query.getResultList());
         em.close();

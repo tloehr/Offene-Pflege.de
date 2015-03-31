@@ -898,9 +898,7 @@ public class SYSCalendar {
         return startOfDay(new Date());
     }
 
-    public static long midOfDay() {
-        return midOfDay(new Date());
-    }
+
 
     /**
      * Nimmt den aktuellen Zeitpunkt, setzt die Zeit auf 23:59:59 und gibt das Ergebnis zurück.
@@ -943,21 +941,29 @@ public class SYSCalendar {
         return gc.getTimeInMillis();
     }
 
-    /**
-     * nimmt das übergebene Datum und setzt die Uhrzeitkomponente auf 12:00:00
-     *
-     * @param d
-     * @return das Ergebnis als TimeInMillis
-     */
-    public static long midOfDay(Date d) {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTimeInMillis(d.getTime());
-        gc.set(GregorianCalendar.HOUR_OF_DAY, 12);
-        gc.set(GregorianCalendar.MINUTE, 0);
-        gc.set(GregorianCalendar.SECOND, 0);
-        gc.set(GregorianCalendar.MILLISECOND, 0);
-        return gc.getTimeInMillis();
-    }
+
+
+
+//    /**
+//     * nimmt das übergebene Datum und setzt die Uhrzeitkomponente auf 12:00:00
+//     *
+//     * @param d
+//     * @return das Ergebnis als TimeInMillis
+//     */
+//    public static long midOfDay(Date d) {
+//        GregorianCalendar gc = new GregorianCalendar();
+//        gc.setTimeInMillis(d.getTime());
+//        gc.set(GregorianCalendar.HOUR_OF_DAY, 12);
+//        gc.set(GregorianCalendar.MINUTE, 0);
+//        gc.set(GregorianCalendar.SECOND, 0);
+//        gc.set(GregorianCalendar.MILLISECOND, 0);
+//        return gc.getTimeInMillis();
+//    }
+
+
+    public static DateTime midOfDay() {
+              return midOfDay(new LocalDate());
+          }
 
     public static DateTime midOfDay(LocalDate d) {
         DateTime dt = d.toDateTimeAtCurrentTime();
