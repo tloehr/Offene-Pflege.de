@@ -47,7 +47,7 @@ public class MREPrevalenceSheets {
     public static final int MALE = 5; // resident "Geschlecht == 1"
     public static final int FEMALE = 6; // resident "Geschlecht == 2"
     public static final int URINE_CATHETER = 7; // resinfotype "INKOAID2", ResInfoTypeTools.TYPE_INCOAID, trans.aid=true
-    public static final int VESSEL_CATHETER = 8; // "VACTH1", TYPE_VESSEL_CATHETER = 146, vessel.catheter=true
+    public static final int VESSEL_CATHETER = 8; // "VCATH1", TYPE_VESSEL_CATHETER = 146, vessel.catheter=true
     public static final int BEDSORE = 9; // decubitus, resinfotype "wound[1..5]", ResInfoTypeTools.TYPE_WOUND1..5
     public static final int TRACHEOSTOMA = 10; // resinfotype "respi", TYPE_RESPIRATION
     public static final int OTHER_WOUNDS = 11; // resinfotype "wound[1..5]", ResInfoTypeTools.TYPE_WOUND1..5
@@ -65,7 +65,7 @@ public class MREPrevalenceSheets {
     public static final int CARELEVEL2 = 23; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS2" || "2" || "Pflegestufe2"
     public static final int CARELEVEL3 = 24; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3" || "3" || "Pflegestufe3"
     public static final int CARELEVEL3p = 25; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3+" || "3+" || "Pflegestufe3+" || "PS3p" || "3p" || "Pflegestufe3p" || "PS3plus" || "3plus" || "Pflegestufe3plus"
-    public static final int PNEUMOCOCCAL_VACCINE = 26; // resinfotype "VACCINE1",TYPE_VACCINE = 144,vaccinetype == 9
+    public static final int PNEUMOCOCCAL_VACCINE = 26; // resinfotype "VACCIN1",TYPE_VACCINE = 144,vaccinetype == 9
     public static final int RUNNING_ANTIBIOTICS = 27; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
     public static final int BEDS_IN_USE = 28; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
     public static final int BEDS_TOTAL = 29; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
@@ -205,7 +205,6 @@ public class MREPrevalenceSheets {
         prepareWorkbook();
 
         // get all residents who were at least living here yesterday, even they may have been away on those two days
-
         boolean lastForThisLevel = false;
 
         for (Resident resident : listResidents) {
@@ -443,7 +442,7 @@ public class MREPrevalenceSheets {
         ArrayList<Prescription> listPrescripitons = PrescriptionTools.getPrescriptions4Tags(resident, antibiotics);
         ArrayList<Prescription> listAntibiotics = new ArrayList<>();
         for (Prescription prescription : listPrescripitons) {
-            if (prescription.isActiveOn(targetDate)) {
+            if (prescription.isActiveOn(targetDate) && prescription.hasMed()) {
                 listAntibiotics.add(prescription);
             }
         }

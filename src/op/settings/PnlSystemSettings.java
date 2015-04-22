@@ -703,6 +703,8 @@ public class PnlSystemSettings extends CleanablePanel {
                                 createHomesList();
                                 OPDE.getMainframe().emptySearchArea();
                                 OPDE.getMainframe().prepareSearchArea();
+                            } catch (IllegalStateException ise) { // Fix Zendesk #5
+                                OPDE.error(ise);
                             } catch (Exception e) {
                                 em.getTransaction().rollback();
                                 OPDE.fatal(e);
