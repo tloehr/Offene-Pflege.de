@@ -882,7 +882,7 @@ public class PnlEditResInfo {
                         if (components.get(key) instanceof JTextComponent) {
                             ((JTextComponent) components.get(key)).setText(null);
                         }
-//                        ((Component) components.get(key)).validate();
+//                        ((Component) components.get(key)).action();
 //                        ((Component) components.get(key)).repaint();
                     }
                 }

@@ -2,11 +2,9 @@ package op.residents.bwassistant;
 
 import com.jidesoft.dialog.*;
 import com.jidesoft.wizard.*;
+import entity.building.Rooms;
 import entity.building.Station;
-import entity.info.ResInfo;
-import entity.info.ResInfoTypeTools;
-import entity.info.Resident;
-import entity.info.ResidentTools;
+import entity.info.*;
 import entity.prescription.GP;
 import entity.prescription.GPTools;
 import entity.system.Unique;
@@ -14,10 +12,10 @@ import entity.system.UniqueTools;
 import entity.system.Users;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.javatuples.Triplet;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
@@ -26,6 +24,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,7 +40,7 @@ public class AddBWWizard {
     private WizardDialog wizard;
     private Resident resident;
     private Closure finishAction;
-    private ResInfo bwinfo_hauf;
+    private ResInfo resinfo_hauf, resinfo_room;
 
     public AddBWWizard(Closure finishAction) {
         this.finishAction = finishAction;
@@ -109,7 +108,9 @@ public class AddBWWizard {
             resident.setRID(bwkennung);
 
             resident = em.merge(resident);
-            bwinfo_hauf = em.merge(bwinfo_hauf);
+            resinfo_hauf = em.merge(resinfo_hauf);
+            if (resinfo_room != null) em.merge(resinfo_room);
+
             em.getTransaction().commit();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
             finishAction.execute(resident);
@@ -343,7 +344,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(resident == null || bwinfo_hauf == null || resident.getStation() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(resident == null || resinfo_hauf == null || resident.getStation() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -355,13 +356,26 @@ public class AddBWWizard {
             addComponent(new PnlHAUF(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    Date hauf = ((Pair<Date, Station>) o).getFirst();
-                    Station station = ((Pair<Date, Station>) o).getSecond();
+                    Date hauf = ((Triplet<Date, Station, Rooms>) o).getValue0();
+                    Station station = ((Triplet<Date, Station, Rooms>) o).getValue1();
+                    Rooms room = ((Triplet<Date, Station, Rooms>) o).getValue2();
+
                     if (hauf != null) {
-                        bwinfo_hauf = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), resident);
-                        bwinfo_hauf.setFrom(hauf);
+                        resinfo_hauf = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), resident);
+                        resinfo_hauf.setFrom(hauf);
                     } else {
-                        bwinfo_hauf = null;
+                        resinfo_hauf = null;
+                    }
+                    if (room != null) {
+                        resinfo_room = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
+
+                        Properties props = new Properties();
+                        props.put("room.id", Long.toString(room.getRoomID()));
+                        props.put("room.text", room.toString());
+                        ResInfoTools.setContent(resinfo_room, props);
+                        resinfo_room.setFrom(hauf);
+                    } else {
+                        resinfo_room = null;
                     }
                     resident.setStation(station);
                     setupWizardButtons();
@@ -418,7 +432,8 @@ public class AddBWWizard {
             result += "<li>" + SYSTools.xx("misc.msg.gp") + ": " + GPTools.getFullName(resident.getGP()) + "</li>";
 //            result += "<li>" + SYSTools.xx("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
 
-            result += "<li>" + SYSTools.xx("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(resinfo_hauf.getFrom()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.room") + ": " + (resinfo_room == null ? SYSTools.xx("misc.msg.noentryyet") : resinfo_room.toString()) + "</li>";
             result += "<li>" + SYSTools.xx("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";
 
             result += "</ul>";

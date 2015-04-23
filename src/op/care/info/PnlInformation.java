@@ -13,13 +13,13 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
+import entity.building.Rooms;
+import entity.building.Station;
 import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.prescription.PrescriptionTools;
 import entity.process.*;
-import entity.system.Commontags;
-import entity.system.CommontagsTools;
-import entity.system.SYSPropsTools;
+import entity.system.*;
 import entity.values.ResValue;
 import op.OPDE;
 import op.care.PnlCare;
@@ -33,10 +33,12 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
+import org.javatuples.Triplet;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -2083,32 +2085,98 @@ public class PnlInformation extends NursingRecordsPanel {
             });
             list.add(addRes);
 
-            // @relates #10
-            JideButton resComesback = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.info.res.comes.back"), SYSConst.icon22addbw, null);
+            /***
+             *                    _     _            _   ____      _
+             *      _ __ ___  ___(_) __| | ___ _ __ | |_|  _ \ ___| |_ _   _ _ __ _ __  ___
+             *     | '__/ _ \/ __| |/ _` |/ _ \ '_ \| __| |_) / _ \ __| | | | '__| '_ \/ __|
+             *     | | |  __/\__ \ | (_| |  __/ | | | |_|  _ <  __/ |_| |_| | |  | | | \__ \
+             *     |_|  \___||___/_|\__,_|\___|_| |_|\__|_| \_\___|\__|\__,_|_|  |_| |_|___/
+             *
+             */
+            // @relates GitHub #10
+
+            JideButton resComesback = GUITools.createHyperlinkButton(SYSTools.xx("opde.info.dlg.resident.returns"), SYSConst.icon22addbw, null);
             resComesback.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             resComesback.setAlignmentX(Component.LEFT_ALIGNMENT);
             resComesback.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-//                               final MyJDialog dlg = new MyJDialog(false);
-//                               WizardDialog wizard = new AddBWWizard(new Closure() {
-//                                   @Override
-//                                   public void execute(Object o) {
-//                                       dlg.dispose();
-//                                       // to refresh the resident list
-//                                       OPDE.getMainframe().emptySearchArea();
-//                                       jspSearch = OPDE.getMainframe().prepareSearchArea();
-//                                       prepareSearchArea();
-//                                   }
-//                               }).getWizard();
-//                               dlg.setContentPane(wizard.getContentPane());
-//                               dlg.pack();
-//                               dlg.setSize(new Dimension(800, 550));
-//                               dlg.setVisible(true);
+
+
+                    if (ResInfoTools.isDead(resident)) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.isdeadnow"));
+                        return;
+                    }
+                    if (!ResInfoTools.isGone(resident)) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.stillhere"));
+                        return;
+                    }
+                    ResInfo last_stay = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+                    LocalDate departed = new LocalDate().minusDays(2);
+                    if (last_stay != null) {
+                        departed = new LocalDate(last_stay.getTo());
+                    }
+
+                    if (!departed.isBefore(new LocalDate())) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.toorecent"));
+                        return;
+                    }
+
+                    LocalDate minDate = SYSCalendar.max(new LocalDate().minusDays(2), departed).plusDays(1);
+                    minDate = SYSCalendar.min(new LocalDate(), minDate);
+
+
+                    DlgResidentReturns dlg = new DlgResidentReturns(minDate.toDateTimeAtStartOfDay().toDate(), o -> {
+                        if (o == null) return;
+                        Date stay = ((Triplet<Date, Station, Rooms>) o).getValue0();
+                        Station station = ((Triplet<Date, Station, Rooms>) o).getValue1();
+                        Rooms room = ((Triplet<Date, Station, Rooms>) o).getValue2();
+
+                        ResInfo resinfo_stay = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), resident);
+                        resinfo_stay.setFrom(stay);
+
+                        ResInfo resinfo_room = null;
+                        if (room != null) {
+                            resinfo_room = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
+
+                            Properties props = new Properties();
+                            props.put("room.id", Long.toString(room.getRoomID()));
+                            props.put("room.text", room.toString());
+                            ResInfoTools.setContent(resinfo_room, props);
+                            resinfo_room.setFrom(stay);
+                        }
+
+
+
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+
+
+                            Resident myResident = em.merge(resident);
+                            myResident.setStation(station);
+                            resinfo_stay = em.merge(resinfo_stay);
+                            if (resinfo_room != null) em.merge(resinfo_room);
+
+                            em.getTransaction().commit();
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
+                            finishAction.execute(resident);
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+
+
+                    });
+
+                    dlg.setVisible(true);
                 }
             });
             list.add(resComesback);
-
 
             JideButton editRes = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.info.editbw"), SYSConst.icon22edit3, null);
             editRes.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());

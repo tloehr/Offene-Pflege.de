@@ -700,10 +700,16 @@ public class PnlSystemSettings extends CleanablePanel {
                                 em.getTransaction().begin();
                                 Homes home = em.merge((Homes) o);
                                 em.getTransaction().commit();
-                                createHomesList();
-                                OPDE.getMainframe().emptySearchArea();
-                                OPDE.getMainframe().prepareSearchArea();
-                            } catch (IllegalStateException ise) { // Fix Zendesk #5
+                                // Fix Zendesk #5
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        createHomesList();
+                                        OPDE.getMainframe().emptySearchArea();
+                                        OPDE.getMainframe().prepareSearchArea();
+                                    }
+                                });
+                            } catch (IllegalStateException ise) {
                                 OPDE.error(ise);
                             } catch (Exception e) {
                                 em.getTransaction().rollback();
