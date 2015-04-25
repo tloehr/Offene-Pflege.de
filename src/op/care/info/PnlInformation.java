@@ -19,7 +19,9 @@ import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.prescription.PrescriptionTools;
 import entity.process.*;
-import entity.system.*;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
+import entity.system.SYSPropsTools;
 import entity.values.ResValue;
 import op.OPDE;
 import op.care.PnlCare;
@@ -2098,47 +2100,48 @@ public class PnlInformation extends NursingRecordsPanel {
             JideButton resComesback = GUITools.createHyperlinkButton(SYSTools.xx("opde.info.dlg.resident.returns"), SYSConst.icon22addbw, null);
             resComesback.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             resComesback.setAlignmentX(Component.LEFT_ALIGNMENT);
-            resComesback.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
+            resComesback.addActionListener(actionEvent -> {
+
+                if (ResInfoTools.isDead(resident)) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.isdeadnow"));
+                    return;
+                }
+                if (!ResInfoTools.isGone(resident)) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.stillhere"));
+                    return;
+                }
+                ResInfo last_stay = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+                LocalDate departed = new LocalDate().minusDays(2);
+                if (last_stay != null) {
+                    departed = new LocalDate(last_stay.getTo());
+                }
+
+                if (!departed.isBefore(new LocalDate())) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.toorecent"));
+                    return;
+                }
+
+                LocalDate minDate = SYSCalendar.max(new LocalDate().minusDays(2), departed).plusDays(1);
+                minDate = SYSCalendar.min(new LocalDate(), minDate);
 
 
-                    if (ResInfoTools.isDead(resident)) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.isdeadnow"));
-                        return;
-                    }
-                    if (!ResInfoTools.isGone(resident)) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.stillhere"));
-                        return;
-                    }
-                    ResInfo last_stay = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
-                    LocalDate departed = new LocalDate().minusDays(2);
-                    if (last_stay != null) {
-                        departed = new LocalDate(last_stay.getTo());
-                    }
+                DlgResidentReturns dlg = new DlgResidentReturns(minDate.toDateTimeAtStartOfDay().toDate(), o -> {
+                    if (o == null) return;
+                    Date stay = ((Triplet<Date, Station, Rooms>) o).getValue0();
+                    Station station = ((Triplet<Date, Station, Rooms>) o).getValue1();
+                    Rooms room = ((Triplet<Date, Station, Rooms>) o).getValue2();
 
-                    if (!departed.isBefore(new LocalDate())) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.toorecent"));
-                        return;
-                    }
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
 
-                    LocalDate minDate = SYSCalendar.max(new LocalDate().minusDays(2), departed).plusDays(1);
-                    minDate = SYSCalendar.min(new LocalDate(), minDate);
-
-
-                    DlgResidentReturns dlg = new DlgResidentReturns(minDate.toDateTimeAtStartOfDay().toDate(), o -> {
-                        if (o == null) return;
-                        Date stay = ((Triplet<Date, Station, Rooms>) o).getValue0();
-                        Station station = ((Triplet<Date, Station, Rooms>) o).getValue1();
-                        Rooms room = ((Triplet<Date, Station, Rooms>) o).getValue2();
-
-                        ResInfo resinfo_stay = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), resident);
+                        Resident myResident = em.merge(resident);
+                        myResident.setStation(station);
+                        ResInfo resinfo_stay = em.merge(new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), myResident));
                         resinfo_stay.setFrom(stay);
 
-                        ResInfo resinfo_room = null;
                         if (room != null) {
-                            resinfo_room = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
-
+                            ResInfo resinfo_room = em.merge(new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident));
                             Properties props = new Properties();
                             props.put("room.id", Long.toString(room.getRoomID()));
                             props.put("room.text", room.toString());
@@ -2146,87 +2149,83 @@ public class PnlInformation extends NursingRecordsPanel {
                             resinfo_room.setFrom(stay);
                         }
 
+                        em.getTransaction().commit();
 
+                        resident = myResident;
 
-                        EntityManager em = OPDE.createEM();
-                        try {
-                            em.getTransaction().begin();
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
 
-
-                            Resident myResident = em.merge(resident);
-                            myResident.setStation(station);
-                            resinfo_stay = em.merge(resinfo_stay);
-                            if (resinfo_room != null) em.merge(resinfo_room);
-
-                            em.getTransaction().commit();
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
-                            finishAction.execute(resident);
-                        } catch (Exception e) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            OPDE.fatal(e);
-                        } finally {
-                            em.close();
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
                         }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                OPDE.getMainframe().emptySearchArea();
+                                jspSearch = OPDE.getMainframe().prepareSearchArea();
+                                prepareSearchArea();
+                                GUITools.setResidentDisplay(resident);
+                                reload();
+                            }
+                        });
+                    }
 
+                });
 
-                    });
-
-                    dlg.setVisible(true);
-                }
+                dlg.setVisible(true);
             });
             list.add(resComesback);
 
             JideButton editRes = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.info.editbw"), SYSConst.icon22edit3, null);
             editRes.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editRes.setAlignmentX(Component.LEFT_ALIGNMENT);
-            editRes.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (!resident.isActive()) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
-                        return;
-                    }
-                    new DlgEditResidentBaseData(resident, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    Resident myResident = em.merge((Resident) o);
-                                    em.lock(em.merge(myResident), LockModeType.OPTIMISTIC);
-                                    em.getTransaction().commit();
-                                    resident = myResident;
-                                    GUITools.setResidentDisplay(resident);
-                                    // to refresh the resident list
-                                    OPDE.getMainframe().emptySearchArea();
-                                    jspSearch = OPDE.getMainframe().prepareSearchArea();
-                                    prepareSearchArea();
-                                    pnlCare.setJspSearch(jspSearch);
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
+            editRes.addActionListener(actionEvent -> {
+                if (!resident.isActive()) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                    return;
+                }
+                new DlgEditResidentBaseData(resident, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Resident myResident = em.merge((Resident) o);
+                                em.lock(em.merge(myResident), LockModeType.OPTIMISTIC);
+                                em.getTransaction().commit();
+                                resident = myResident;
+                                GUITools.setResidentDisplay(resident);
+                                // to refresh the resident list
+                                OPDE.getMainframe().emptySearchArea();
+                                jspSearch = OPDE.getMainframe().prepareSearchArea();
+                                prepareSearchArea();
+                                pnlCare.setJspSearch(jspSearch);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
                                 }
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
                             }
                         }
-                    });
-                }
+                    }
+                });
             });
             list.add(editRes);
 

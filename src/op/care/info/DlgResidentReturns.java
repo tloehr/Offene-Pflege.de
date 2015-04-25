@@ -39,6 +39,7 @@ public class DlgResidentReturns extends MyJDialog {
 
         initComponents();
         initPanel();
+        pack();
     }
 
     private void initPanel() {

@@ -48,7 +48,6 @@ public class RoomsTools {
         return list;
     }
 
-
     public static short getMaxLevel(Homes home) {
 
         short total = 0;

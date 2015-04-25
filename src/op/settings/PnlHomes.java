@@ -117,8 +117,8 @@ public class PnlHomes extends PopupPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
-                "7*(default, $lgap), default"));
+            "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
+            "7*(default, $lgap), default"));
 
         //---- lblName ----
         lblName.setText("Anrede");

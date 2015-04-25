@@ -12,10 +12,7 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.building.Homes;
-import entity.building.HomesTools;
-import entity.building.Station;
-import entity.building.StationTools;
+import entity.building.*;
 import entity.files.SYSFilesTools;
 import entity.info.ICD;
 import entity.info.ResInfoCategory;
@@ -759,8 +756,113 @@ public class PnlSystemSettings extends CleanablePanel {
 
             pnlContentH.add(btnAddStation);
 
-            Collections.sort(home.getStations());
 
+//            Collections.sort(home.getRooms());
+
+            for (final Rooms room : home.getRooms()) {
+                            String titleR = "<html><font size=+1>" + room.toString() + "</font></html>";
+                            DefaultCPTitle cpTitleR = new DefaultCPTitle(titleR, null);
+
+//                            final JButton btnEditStation = new JButton(SYSConst.icon22edit);
+//                            btnEditStation.setPressedIcon(SYSConst.icon22Pressed);
+//                            btnEditStation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//                            btnEditStation.setContentAreaFilled(false);
+//                            btnEditStation.setBorder(null);
+//
+//                            btnEditStation.addActionListener(new ActionListener() {
+//                                @Override
+//                                public void actionPerformed(ActionEvent e) {
+//
+//                                    final JidePopup popup = GUITools.getTextEditor(station.getName(), 1, 40, new Closure() {
+//                                        @Override
+//                                        public void execute(Object o) {
+//                                            if (o != null && !o.toString().trim().isEmpty()) {
+//                                                EntityManager em = OPDE.createEM();
+//                                                try {
+//                                                    em.getTransaction().begin();
+//                                                    Station myStation = em.merge(station);
+//                                                    myStation.setName(o.toString().trim());
+//                                                    em.getTransaction().commit();
+//                                                    createHomesList();
+//                                                    OPDE.getMainframe().emptySearchArea();
+//                                                    OPDE.getMainframe().prepareSearchArea();
+//                                                } catch (Exception e) {
+//                                                    em.getTransaction().rollback();
+//                                                    OPDE.fatal(e);
+//                                                } finally {
+//                                                    em.close();
+//                                                }
+//                                            }
+//                                        }
+//                                    }, btnEditStation);
+//                                    GUITools.showPopup(popup, SwingConstants.EAST);
+//                                }
+//                            });
+//
+//                            cpTitleS.getRight().add(btnEditStation);
+
+
+//                            if (station.getResidents().isEmpty()) {
+//                                /***
+//                                 *          _      _      _             _        _   _
+//                                 *       __| | ___| | ___| |_ ___   ___| |_ __ _| |_(_) ___  _ __
+//                                 *      / _` |/ _ \ |/ _ \ __/ _ \ / __| __/ _` | __| |/ _ \| '_ \
+//                                 *     | (_| |  __/ |  __/ ||  __/ \__ \ || (_| | |_| | (_) | | | |
+//                                 *      \__,_|\___|_|\___|\__\___| |___/\__\__,_|\__|_|\___/|_| |_|
+//                                 *
+//                                 */
+//                                final JButton btnDeleteStation = new JButton(SYSConst.icon22delete);
+//                                btnDeleteStation.setPressedIcon(SYSConst.icon22Pressed);
+//                                btnDeleteStation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//                                btnDeleteStation.setContentAreaFilled(false);
+//                                btnDeleteStation.setBorder(null);
+//
+//                                btnDeleteStation.addActionListener(new ActionListener() {
+//                                    @Override
+//                                    public void actionPerformed(ActionEvent e) {
+//                                        new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + station.getName() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+//                                            @Override
+//                                            public void execute(Object answer) {
+//                                                if (answer.equals(JOptionPane.YES_OPTION)) {
+//                                                    EntityManager em = OPDE.createEM();
+//                                                    try {
+//                                                        em.getTransaction().begin();
+//                                                        Station myStation = em.merge(station);
+//                                                        em.lock(myStation, LockModeType.OPTIMISTIC);
+//                                                        em.remove(myStation);
+//                                                        em.getTransaction().commit();
+//                                                        createHomesList();
+//                                                        OPDE.getMainframe().emptySearchArea();
+//                                                        OPDE.getMainframe().prepareSearchArea();
+//                                                    } catch (RollbackException ole) {
+//                                                        if (em.getTransaction().isActive()) {
+//                                                            em.getTransaction().rollback();
+//                                                        }
+//                                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+//                                                            OPDE.getMainframe().completeRefresh();
+//                                                        }
+//                                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+//                                                    } catch (Exception e) {
+//                                                        if (em.getTransaction().isActive()) {
+//                                                            em.getTransaction().rollback();
+//                                                        }
+//                                                        OPDE.fatal(e);
+//                                                    } finally {
+//                                                        em.close();
+//                                                    }
+//                                                }
+//                                            }
+//                                        });
+//                                    }
+//                                });
+//                                cpTitleS.getRight().add(btnDeleteStation);
+
+
+                            pnlContentH.add(cpTitleR.getMain());
+
+                        }
+
+            Collections.sort(home.getStations());
             for (final Station station : home.getStations()) {
                 String titleS = "<html><font size=+1>" + station.getName() + "</font></html>";
                 DefaultCPTitle cpTitleS = new DefaultCPTitle(titleS, null);
@@ -1288,18 +1390,13 @@ public class PnlSystemSettings extends CleanablePanel {
 
         //======== tabMain ========
         {
-            tabMain.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    tabMainStateChanged(e);
-                }
-            });
+            tabMain.addChangeListener(e -> tabMainStateChanged(e));
 
             //======== pnlLocal ========
             {
                 pnlLocal.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-                        "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
+                    "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
 
                 //---- lblPrinters ----
                 lblPrinters.setText("labelPrinter");
@@ -1319,30 +1416,15 @@ public class PnlSystemSettings extends CleanablePanel {
                 pnlLocal.add(lblStation, CC.xy(7, 3));
 
                 //---- cmbPhysicalPrinters ----
-                cmbPhysicalPrinters.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbPhysicalPrintersItemStateChanged(e);
-                    }
-                });
+                cmbPhysicalPrinters.addItemListener(e -> cmbPhysicalPrintersItemStateChanged(e));
                 pnlLocal.add(cmbPhysicalPrinters, CC.xy(3, 5));
 
                 //---- cmbStation ----
-                cmbStation.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbStationItemStateChanged(e);
-                    }
-                });
+                cmbStation.addItemListener(e -> cmbStationItemStateChanged(e));
                 pnlLocal.add(cmbStation, CC.xy(7, 5));
 
                 //---- cmbLogicalPrinters ----
-                cmbLogicalPrinters.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbLogicalPrintersItemStateChanged(e);
-                    }
-                });
+                cmbLogicalPrinters.addItemListener(e -> cmbLogicalPrintersItemStateChanged(e));
                 pnlLocal.add(cmbLogicalPrinters, CC.xy(3, 7));
 
                 //---- lblTimeout ----
@@ -1351,23 +1433,13 @@ public class PnlSystemSettings extends CleanablePanel {
                 pnlLocal.add(lblTimeout, CC.xy(7, 7));
 
                 //---- cmbForm ----
-                cmbForm.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        cmbFormItemStateChanged(e);
-                    }
-                });
+                cmbForm.addItemListener(e -> cmbFormItemStateChanged(e));
                 pnlLocal.add(cmbForm, CC.xy(3, 9));
 
                 //---- btnTestLabel ----
                 btnTestLabel.setText("Test");
                 btnTestLabel.setEnabled(false);
-                btnTestLabel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnTestLabelActionPerformed(e);
-                    }
-                });
+                btnTestLabel.addActionListener(e -> btnTestLabelActionPerformed(e));
                 pnlLocal.add(btnTestLabel, CC.xy(3, 11, CC.RIGHT, CC.DEFAULT));
 
                 //======== panel1 ========
@@ -1384,8 +1456,8 @@ public class PnlSystemSettings extends CleanablePanel {
                 //======== pnlGlobal ========
                 {
                     pnlGlobal.setLayout(new FormLayout(
-                            "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
-                            "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
+                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
 
                     //======== panel5 ========
                     {
@@ -1430,8 +1502,8 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlICD ========
                     {
                         pnlICD.setLayout(new FormLayout(
-                                "default:grow, default",
-                                "fill:default:grow, $lgap, 60dlu, $lgap, default"));
+                            "default:grow, default",
+                            "fill:default:grow, $lgap, 60dlu, $lgap, default"));
 
                         //======== scrollPane1 ========
                         {
@@ -1442,22 +1514,12 @@ public class PnlSystemSettings extends CleanablePanel {
                         //---- btnEmptyList ----
                         btnEmptyList.setText(null);
                         btnEmptyList.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/deleteall.png")));
-                        btnEmptyList.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnEmptyListActionPerformed(e);
-                            }
-                        });
+                        btnEmptyList.addActionListener(e -> btnEmptyListActionPerformed(e));
                         pnlICD.add(btnEmptyList, CC.xy(2, 3, CC.DEFAULT, CC.FILL));
 
                         //---- btnImportICD ----
                         btnImportICD.setText("importICD");
-                        btnImportICD.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnImportICDActionPerformed(e);
-                            }
-                        });
+                        btnImportICD.addActionListener(e -> btnImportICDActionPerformed(e));
                         pnlICD.add(btnImportICD, CC.xy(1, 5, CC.LEFT, CC.DEFAULT));
                     }
                     pnlGlobal.add(pnlICD, CC.xywh(7, 5, 1, 3));
@@ -1468,8 +1530,8 @@ public class PnlSystemSettings extends CleanablePanel {
                         //======== pnlMail ========
                         {
                             pnlMail.setLayout(new FormLayout(
-                                    "default, $lcgap, default:grow",
-                                    "13*(default, $lgap), default"));
+                                "default, $lcgap, default:grow",
+                                "13*(default, $lgap), default"));
 
                             //---- lblMailHost ----
                             lblMailHost.setText("host");
@@ -1501,12 +1563,7 @@ public class PnlSystemSettings extends CleanablePanel {
                             pnlMail.add(lblMailRecipient, CC.xy(1, 11));
 
                             //---- txtMailRecipient ----
-                            txtMailRecipient.addCaretListener(new CaretListener() {
-                                @Override
-                                public void caretUpdate(CaretEvent e) {
-                                    txtMailRecipientCaretUpdate(e);
-                                }
-                            });
+                            txtMailRecipient.addCaretListener(e -> txtMailRecipientCaretUpdate(e));
                             pnlMail.add(txtMailRecipient, CC.xy(3, 11));
 
                             //---- lblMailSenderPersonal ----
@@ -1538,12 +1595,7 @@ public class PnlSystemSettings extends CleanablePanel {
 
                             //---- btnTestmail ----
                             btnTestmail.setText("Send Testmail");
-                            btnTestmail.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    btnTestmailActionPerformed(e);
-                                }
-                            });
+                            btnTestmail.addActionListener(e -> btnTestmailActionPerformed(e));
                             pnlMail.add(btnTestmail, CC.xywh(1, 25, 3, 1, CC.LEFT, CC.DEFAULT));
 
                             //---- lblActive ----
@@ -1596,16 +1648,16 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlCalcMed ========
                     {
                         pnlCalcMed.setLayout(new FormLayout(
-                                "default:grow",
-                                "2*(default, $lgap), default"));
+                            "default:grow",
+                            "2*(default, $lgap), default"));
                     }
                     pnlGlobal.add(pnlCalcMed, CC.xy(7, 14));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                                "default, $lcgap, default:grow",
-                                "5*(default, $lgap), default"));
+                            "default, $lcgap, default:grow",
+                            "5*(default, $lgap), default"));
 
                         //---- lblFTPServer ----
                         lblFTPServer.setText("host");
@@ -1634,12 +1686,7 @@ public class PnlSystemSettings extends CleanablePanel {
 
                         //---- btnFTPTest ----
                         btnFTPTest.setText("FTP Test");
-                        btnFTPTest.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnFTPTestActionPerformed(e);
-                            }
-                        });
+                        btnFTPTest.addActionListener(e -> btnFTPTestActionPerformed(e));
                         panel3.add(btnFTPTest, CC.xywh(1, 11, 3, 1, CC.LEFT, CC.DEFAULT));
                     }
                     pnlGlobal.add(panel3, CC.xy(11, 14));
@@ -1655,12 +1702,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         btnAddCat.setBorder(null);
                         btnAddCat.setContentAreaFilled(false);
                         btnAddCat.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                        btnAddCat.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnAddCatActionPerformed(e);
-                            }
-                        });
+                        btnAddCat.addActionListener(e -> btnAddCatActionPerformed(e));
                         panel2.add(btnAddCat);
 
                         //---- btnDeleteCat ----

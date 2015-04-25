@@ -42,8 +42,15 @@ public class Homes implements Serializable {
     private Collection<Handovers> handovers;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
     private List<Station> station;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
+    private List<Rooms> rooms;
 
     public Homes() {
+    }
+
+
+    public List<Rooms> getRooms() {
+        return rooms;
     }
 
     public Homes(String eid) {
