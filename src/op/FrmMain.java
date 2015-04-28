@@ -53,6 +53,7 @@ import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
 import op.dev.PnlDev;
 import op.process.PnlProcess;
+import op.settings.PnlSettings;
 import op.settings.PnlSystemSettings;
 import op.settings.PnlUserSettings;
 import op.system.DlgLogin;
@@ -241,16 +242,22 @@ public class FrmMain extends JFrame {
     }
 
     public void emptySearchArea() {
-        jspSearch.removeAll();
+        if (jspSearch != null)
+            jspSearch.removeAll();
         jspSearch = null;
-        jspApps.removeAll();
+        if (jspApps != null)
+            jspApps.removeAll();
         jspApps = null;
 
-        panesSearch.removeAll();
+        if (panesSearch != null)
+            panesSearch.removeAll();
         panesSearch = null;
-        panesApps.removeAll();
+        if (panesApps != null)
+            panesApps.removeAll();
         panesApps = null;
-        splitPaneLeft.removeAll();
+
+        if (splitPaneLeft != null)
+            splitPaneLeft.removeAll();
     }
 
     private void btnExitActionPerformed(ActionEvent e) {
@@ -745,8 +752,8 @@ public class FrmMain extends JFrame {
             panel = new PnlWelcome(jspSearch);
         } else if (classname.equals("op.controlling.PnlControlling")) {
             panel = new PnlControlling(jspSearch, null);
-        } else if (classname.equals("op.settings.PnlSystemSettings")) {
-            panel = new PnlSystemSettings(jspSearch);
+        } else if (classname.equals("op.settings.PnlSettings")) {
+            panel = new PnlSettings(jspSearch);
         } else if (classname.equals("op.settings.PnlUserSettings")) {
             panel = new PnlUserSettings(jspSearch);
         } else if (classname.equals("op.dev.PnlDev")) {
