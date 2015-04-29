@@ -37,7 +37,7 @@
         </class>
         <class name="opde.systemsettings" short="opde.systemsettings.appinfo.short"
                long="opde.systemsettings.appinfo.long" main="true"
-               javaclass="op.settings.PnlSettings" icon="systemconfig.png">
+               javaclass="op.settings.PnlSettings" icon="config.png">
             <execute langbundle="opde.systemsettings.acl.execute"/>
         </class>
         <class name="admin.residents.cash" short="admin.residents.cash.appinfo.short"

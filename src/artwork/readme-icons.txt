@@ -31,6 +31,7 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- package_network.png (http://findicons.com/icon/234318/package_network), GNU/GPL
 -- radiobuttons for resident tx report (http://www.adaluni.de/wp-content/uploads/2009/04/radiobutton.gif)
 -- tag_purple_delete4.png, tag_purple.png, tag_purple_delete2.png (downloaded from findicons.com, created by http://momentumdesignlab.com/, License CC-BY)
+-- tag.png (http://findicons.com/icon/73167/tag?id=73167)
 -- comment2.png (http://findicons.com/icon/66003/comment?id=66040, Symbolpaket:Juicy Fruitm Designer:Jeremy Sallee, Lizenz:Freeware)
 -- popup.png (http://findicons.com/icon/495805/pop_up?id=520207)
 -- my_computer2.png (http://findicons.com/icon/209797/my_computer2?id=209877)

@@ -1,0 +1,32 @@
+JFDML JFormDesigner: "5.2.1.0.138" Java: "1.6.0_65" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+			"$columnSpecs": "default, labelcompgap, default:grow, labelcompgap, default"
+			"$rowSpecs": "default:grow, linegap, default, linegap, default, linegap, default:grow"
+		} ) {
+			name: "this"
+			add( new FormComponent( "javax.swing.JSpinner" ) {
+				name: "spinTimeout"
+				"font": new java.awt.Font( "Arial", 0, 28 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 3
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTimeout"
+				"text": "text"
+				"font": new java.awt.Font( "Arial", 0, 20 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 5
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 400, 300 )
+		} )
+	}
+}

@@ -258,157 +258,21 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void initLocal() {
-        testStock = null;
 
-        cmbPhysicalPrinters.setModel(new DefaultComboBoxModel());
-        cmbForm.setModel(new DefaultComboBoxModel());
-        cmbLogicalPrinters.setModel(new DefaultComboBoxModel());
-
-        jspSearch.setViewportView(new JPanel());
-
-        PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null);
-
-        // this prevents exceptions when there are no printers installed on the OS yet
-        if (prservices != null && prservices.length == 0) {
-            prservices = null;
-        }
-
-        if (prservices != null) {
-            cmbPhysicalPrinters.setModel(new DefaultComboBoxModel(prservices));
-            cmbPhysicalPrinters.setRenderer(new ListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                    if (o == null)
-                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.xx("misc.msg.error"), i, isSelected, cellHasFocus);
-                    return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrintService) o).getName(), i, isSelected, cellHasFocus);
-                }
-            });
-
-            cmbLogicalPrinters.setRenderer(new ListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                    if (o == null)
-                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.xx("misc.msg.error"), i, isSelected, cellHasFocus);
-                    return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((LogicalPrinter) o).getLabel(), i, isSelected, cellHasFocus);
-                }
-            });
-            cmbForm.setRenderer(new ListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                    if (o == null)
-                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.xx("misc.msg.error"), i, isSelected, cellHasFocus);
-                    return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrinterForm) o).getLabel(), i, isSelected, cellHasFocus);
-                }
-            });
-
-            cmbPhysicalPrinters.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        PrintService printService = (PrintService) cmbPhysicalPrinters.getSelectedItem();
-                        OPDE.getProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
-                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
-                        OPDE.saveLocalProps();
-                    }
-
-                }
-            });
-
-            cmbLogicalPrinters.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        LogicalPrinter logicalPrinter = (LogicalPrinter) cmbLogicalPrinters.getSelectedItem();
-                        cmbForm.setModel(new DefaultComboBoxModel(logicalPrinter.getForms().values().toArray()));
-                        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && logicalPrinter.getForms().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL))) {
-                            cmbForm.setSelectedItem(logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL)));
-                        }
-                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
-                        OPDE.getProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
-                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                        OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-
-                    }
-                }
-            });
-
-            cmbForm.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                    }
-
-                }
-            });
-
-            if (OPDE.getPrintProcessor().isWorking()) {
-                cmbLogicalPrinters.setModel(new DefaultComboBoxModel(OPDE.getLogicalPrinters().getLogicalPrintersList().toArray()));
-                LogicalPrinter logicalPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
-                cmbLogicalPrinters.setSelectedItem(logicalPrinter);
-
-                cmbForm.setModel(new DefaultComboBoxModel(logicalPrinter.getForms().values().toArray()));
-                cmbForm.setSelectedItem(logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL)));
-            }
-            if (OPDE.getProps().containsKey(SYSPropsTools.KEY_PHYSICAL_PRINTER) && OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)) != null) {
-                cmbPhysicalPrinters.setSelectedItem(OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
-            } else {
-                PrintService printService = (PrintService) cmbPhysicalPrinters.getSelectedItem();
-                OPDE.getProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
-                OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
-
-            }
-
-            if (!OPDE.getLogicalPrinters().getLogicalPrintersList().isEmpty()) {
-                cmbLogicalPrinters.setModel(new DefaultComboBoxModel(OPDE.getLogicalPrinters().getLogicalPrintersList().toArray()));
-                LogicalPrinter logicalPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
-                if (logicalPrinter == null) logicalPrinter = OPDE.getLogicalPrinters().getLogicalPrintersList().get(0);
-
-                if (!OPDE.getProps().containsKey(SYSPropsTools.KEY_LOGICAL_PRINTER)) {
-                    OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
-                    OPDE.getProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
-
-                }
-
-                cmbLogicalPrinters.setSelectedItem(logicalPrinter);
-
-                cmbForm.setModel(new DefaultComboBoxModel(logicalPrinter.getForms().values().toArray()));
-                if (OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && logicalPrinter.getForms().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL))) {
-                    cmbForm.setSelectedItem(logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL)));
-                } else {
-                    cmbForm.setSelectedIndex(0);
-                    OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                    OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-
-                }
-            }
-        } else {
-            cmbPhysicalPrinters.setEnabled(false);
-            cmbLogicalPrinters.setEnabled(false);
-            cmbPhysicalPrinters.setEnabled(false);
-        }
-
-        btnTestLabel.setEnabled(prservices != null);
-        cmbForm.setEnabled(prservices != null);
-        cmbLogicalPrinters.setEnabled(prservices != null);
-        cmbPhysicalPrinters.setEnabled(prservices != null);
-
-        lblPrinters.setText(SYSTools.xx("opde.settings.local.labelPrinters"));
         lblStation.setText(SYSTools.xx("opde.settings.local.station"));
-        lblTimeout.setText(SYSTools.xx("opde.settings.local.timeout"));
+//        lblTimeout.setText(SYSTools.xx("opde.settings.local.timeout"));
 
-        SpinnerNumberModel snm = new SpinnerNumberModel(OPDE.getTimeout(), 0, 999, 1);
-        final JSpinner spinTimeout = new JSpinner(snm);
-
-        spinTimeout.setToolTipText(SYSTools.xx("opde.settings.local.timeout.tooltip"));
-        spinTimeout.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                OPDE.setTimeout((Integer) spinTimeout.getValue());
-            }
-        });
-        pnlLocal.add(spinTimeout, CC.xy(7, 9));
+//        SpinnerNumberModel snm = new SpinnerNumberModel(OPDE.getTimeout(), 0, 999, 1);
+//        final JSpinner spinTimeout = new JSpinner(snm);
+//
+//        spinTimeout.setToolTipText(SYSTools.xx("opde.settings.local.timeout.tooltip"));
+//        spinTimeout.addChangeListener(new ChangeListener() {
+//            @Override
+//            public void stateChanged(ChangeEvent e) {
+//                OPDE.setTimeout((Integer) spinTimeout.getValue());
+//            }
+//        });
+//        pnlLocal.add(spinTimeout, CC.xy(7, 9));
 
         cmbStation.setModel(StationTools.getAll4Combobox(false));
         cmbStation.setSelectedItem(StationTools.getStationForThisHost());
@@ -416,7 +280,7 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void initGlobal() {
-        createHomesList();
+//        createHomesList();
         createCountryList();
         createCatList();
         createICDImporter();
@@ -675,447 +539,7 @@ public class PnlSystemSettings extends CleanablePanel {
 
     }
 
-    private void createHomesList() {
-        listHomes = HomesTools.getAll();
-        cpsHomes.removeAll();
-        cpsHomes.setLayout(new JideBoxLayout(cpsHomes, JideBoxLayout.Y_AXIS));
-        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.btnAddHome", SYSConst.icon22add, null);
-        btnAddHome.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final PnlHomes pnlHomes = new PnlHomes(new Homes(UUID.randomUUID().toString().substring(0, 15)));
-                JidePopup popup = GUITools.createPanelPopup(pnlHomes, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Homes home = em.merge((Homes) o);
-                                em.getTransaction().commit();
-                                // Fix Zendesk #5
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        createHomesList();
-                                        OPDE.getMainframe().emptySearchArea();
-                                        OPDE.getMainframe().prepareSearchArea();
-                                    }
-                                });
-                            } catch (IllegalStateException ise) {
-                                OPDE.error(ise);
-                            } catch (Exception e) {
-                                em.getTransaction().rollback();
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-                        }
-                    }
-                }, btnAddHome);
-                GUITools.showPopup(popup, SwingConstants.EAST);
-                pnlHomes.setStartFocus();
-            }
-        });
-        cpsHomes.add(btnAddHome);
-        for (final Homes home : listHomes) {
-            JPanel pnlContentH = new JPanel(new VerticalLayout());
-            final JideButton btnAddStation = GUITools.createHyperlinkButton("opde.settings.btnAddStation", SYSConst.icon22add, null);
-            btnAddStation.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JidePopup popup = GUITools.getTextEditor(null, 1, 40, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null && !o.toString().trim().isEmpty()) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    em.merge(new Station(o.toString(), em.merge(home)));
-                                    em.getTransaction().commit();
-                                    createHomesList();
-                                    OPDE.getMainframe().emptySearchArea();
-                                    OPDE.getMainframe().prepareSearchArea();
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-                            }
-                        }
-                    }, btnAddStation);
-                    GUITools.showPopup(popup, SwingConstants.EAST);
-                }
-            });
 
-
-            pnlContentH.add(btnAddStation);
-
-
-//            Collections.sort(home.getRooms());
-
-            CollapsiblePanes cpsInsideHome = new CollapsiblePanes();
-            cpsInsideHome.setLayout(new JideBoxLayout(cpsInsideHome, JideBoxLayout.Y_AXIS));
-
-            pnlContentH.add(cpsInsideHome);
-
-            CollapsiblePane cpRooms = new CollapsiblePane(SYSTools.xx("misc.msg.room"));
-            cpsInsideHome.add(cpRooms);
-
-            JPanel pnlRooms = new JPanel();
-            pnlRooms.setLayout(new BoxLayout(pnlRooms, BoxLayout.PAGE_AXIS));
-
-            final JideButton btnAddRoom = GUITools.createHyperlinkButton("opde.settings.btnAddRoom", SYSConst.icon22add, null);
-            btnAddRoom.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JidePopup popup = GUITools.getTextEditor(null, 1, 40, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-//                            if (o != null && !o.toString().trim().isEmpty()) {
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//                                    em.merge(new Station(o.toString(), em.merge(home)));
-//                                    em.getTransaction().commit();
-//                                    createHomesList();
-//                                    OPDE.getMainframe().emptySearchArea();
-//                                    OPDE.getMainframe().prepareSearchArea();
-//                                } catch (Exception e) {
-//                                    em.getTransaction().rollback();
-//                                    OPDE.fatal(e);
-//                                } finally {
-//                                    em.close();
-//                                }
-//                            }
-                        }
-                    }, btnAddRoom);
-                    GUITools.showPopup(popup, SwingConstants.EAST);
-                }
-            });
-            pnlRooms.add(btnAddRoom);
-
-            for (final Rooms room : home.getRooms()) {
-                String titleR = "<html><font size=+1>" + room.toString() + "</font></html>";
-                DefaultCPTitle cpTitleR = new DefaultCPTitle(titleR, null);
-
-//                            final JButton btnEditStation = new JButton(SYSConst.icon22edit);
-//                            btnEditStation.setPressedIcon(SYSConst.icon22Pressed);
-//                            btnEditStation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-//                            btnEditStation.setContentAreaFilled(false);
-//                            btnEditStation.setBorder(null);
-//
-//                            btnEditStation.addActionListener(new ActionListener() {
-//                                @Override
-//                                public void actionPerformed(ActionEvent e) {
-//
-//                                    final JidePopup popup = GUITools.getTextEditor(station.getName(), 1, 40, new Closure() {
-//                                        @Override
-//                                        public void execute(Object o) {
-//                                            if (o != null && !o.toString().trim().isEmpty()) {
-//                                                EntityManager em = OPDE.createEM();
-//                                                try {
-//                                                    em.getTransaction().begin();
-//                                                    Station myStation = em.merge(station);
-//                                                    myStation.setName(o.toString().trim());
-//                                                    em.getTransaction().commit();
-//                                                    createHomesList();
-//                                                    OPDE.getMainframe().emptySearchArea();
-//                                                    OPDE.getMainframe().prepareSearchArea();
-//                                                } catch (Exception e) {
-//                                                    em.getTransaction().rollback();
-//                                                    OPDE.fatal(e);
-//                                                } finally {
-//                                                    em.close();
-//                                                }
-//                                            }
-//                                        }
-//                                    }, btnEditStation);
-//                                    GUITools.showPopup(popup, SwingConstants.EAST);
-//                                }
-//                            });
-//
-//                            cpTitleS.getRight().add(btnEditStation);
-
-
-//                            if (station.getResidents().isEmpty()) {
-//                                /***
-//                                 *          _      _      _             _        _   _
-//                                 *       __| | ___| | ___| |_ ___   ___| |_ __ _| |_(_) ___  _ __
-//                                 *      / _` |/ _ \ |/ _ \ __/ _ \ / __| __/ _` | __| |/ _ \| '_ \
-//                                 *     | (_| |  __/ |  __/ ||  __/ \__ \ || (_| | |_| | (_) | | | |
-//                                 *      \__,_|\___|_|\___|\__\___| |___/\__\__,_|\__|_|\___/|_| |_|
-//                                 *
-//                                 */
-//                                final JButton btnDeleteStation = new JButton(SYSConst.icon22delete);
-//                                btnDeleteStation.setPressedIcon(SYSConst.icon22Pressed);
-//                                btnDeleteStation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-//                                btnDeleteStation.setContentAreaFilled(false);
-//                                btnDeleteStation.setBorder(null);
-//
-//                                btnDeleteStation.addActionListener(new ActionListener() {
-//                                    @Override
-//                                    public void actionPerformed(ActionEvent e) {
-//                                        new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + station.getName() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-//                                            @Override
-//                                            public void execute(Object answer) {
-//                                                if (answer.equals(JOptionPane.YES_OPTION)) {
-//                                                    EntityManager em = OPDE.createEM();
-//                                                    try {
-//                                                        em.getTransaction().begin();
-//                                                        Station myStation = em.merge(station);
-//                                                        em.lock(myStation, LockModeType.OPTIMISTIC);
-//                                                        em.remove(myStation);
-//                                                        em.getTransaction().commit();
-//                                                        createHomesList();
-//                                                        OPDE.getMainframe().emptySearchArea();
-//                                                        OPDE.getMainframe().prepareSearchArea();
-//                                                    } catch (RollbackException ole) {
-//                                                        if (em.getTransaction().isActive()) {
-//                                                            em.getTransaction().rollback();
-//                                                        }
-//                                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-//                                                            OPDE.getMainframe().completeRefresh();
-//                                                        }
-//                                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-//                                                    } catch (Exception e) {
-//                                                        if (em.getTransaction().isActive()) {
-//                                                            em.getTransaction().rollback();
-//                                                        }
-//                                                        OPDE.fatal(e);
-//                                                    } finally {
-//                                                        em.close();
-//                                                    }
-//                                                }
-//                                            }
-//                                        });
-//                                    }
-//                                });
-//                                cpTitleS.getRight().add(btnDeleteStation);
-
-
-                pnlContentH.add(cpTitleR.getMain());
-
-            }
-
-            Collections.sort(home.getStations());
-            for (final Station station : home.getStations()) {
-                String titleS = "<html><font size=+1>" + station.getName() + "</font></html>";
-                DefaultCPTitle cpTitleS = new DefaultCPTitle(titleS, null);
-
-                /***
-                 *               _ _ _         _        _   _
-                 *       ___  __| (_) |_   ___| |_ __ _| |_(_) ___  _ __
-                 *      / _ \/ _` | | __| / __| __/ _` | __| |/ _ \| '_ \
-                 *     |  __/ (_| | | |_  \__ \ || (_| | |_| | (_) | | | |
-                 *      \___|\__,_|_|\__| |___/\__\__,_|\__|_|\___/|_| |_|
-                 *
-                 */
-                final JButton btnEditStation = new JButton(SYSConst.icon22edit);
-                btnEditStation.setPressedIcon(SYSConst.icon22Pressed);
-                btnEditStation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnEditStation.setContentAreaFilled(false);
-                btnEditStation.setBorder(null);
-
-                btnEditStation.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-
-                        final JidePopup popup = GUITools.getTextEditor(station.getName(), 1, 40, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                if (o != null && !o.toString().trim().isEmpty()) {
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
-                                        Station myStation = em.merge(station);
-                                        myStation.setName(o.toString().trim());
-                                        em.getTransaction().commit();
-                                        createHomesList();
-                                        OPDE.getMainframe().emptySearchArea();
-                                        OPDE.getMainframe().prepareSearchArea();
-                                    } catch (Exception e) {
-                                        em.getTransaction().rollback();
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                    }
-                                }
-                            }
-                        }, btnEditStation);
-                        GUITools.showPopup(popup, SwingConstants.EAST);
-                    }
-                });
-
-                cpTitleS.getRight().add(btnEditStation);
-
-
-                if (station.getResidents().isEmpty()) {
-                    /***
-                     *          _      _      _             _        _   _
-                     *       __| | ___| | ___| |_ ___   ___| |_ __ _| |_(_) ___  _ __
-                     *      / _` |/ _ \ |/ _ \ __/ _ \ / __| __/ _` | __| |/ _ \| '_ \
-                     *     | (_| |  __/ |  __/ ||  __/ \__ \ || (_| | |_| | (_) | | | |
-                     *      \__,_|\___|_|\___|\__\___| |___/\__\__,_|\__|_|\___/|_| |_|
-                     *
-                     */
-                    final JButton btnDeleteStation = new JButton(SYSConst.icon22delete);
-                    btnDeleteStation.setPressedIcon(SYSConst.icon22Pressed);
-                    btnDeleteStation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    btnDeleteStation.setContentAreaFilled(false);
-                    btnDeleteStation.setBorder(null);
-
-                    btnDeleteStation.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + station.getName() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                                @Override
-                                public void execute(Object answer) {
-                                    if (answer.equals(JOptionPane.YES_OPTION)) {
-                                        EntityManager em = OPDE.createEM();
-                                        try {
-                                            em.getTransaction().begin();
-                                            Station myStation = em.merge(station);
-                                            em.lock(myStation, LockModeType.OPTIMISTIC);
-                                            em.remove(myStation);
-                                            em.getTransaction().commit();
-                                            createHomesList();
-                                            OPDE.getMainframe().emptySearchArea();
-                                            OPDE.getMainframe().prepareSearchArea();
-                                        } catch (RollbackException ole) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                OPDE.getMainframe().completeRefresh();
-                                            }
-                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                        } catch (Exception e) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            OPDE.fatal(e);
-                                        } finally {
-                                            em.close();
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    cpTitleS.getRight().add(btnDeleteStation);
-                }
-
-                pnlContentH.add(cpTitleS.getMain());
-
-            }
-            String titleH = "<html><font size=+1><b>" + home.getName() + "</b></font></html>";
-            DefaultCPTitle cpTitleH = new DefaultCPTitle(titleH, null);
-
-            CollapsiblePane cpH = new CollapsiblePane();
-            cpH.setSlidingDirection(SwingConstants.SOUTH);
-            cpH.setHorizontalAlignment(SwingConstants.LEADING);
-            cpH.setOpaque(false);
-            cpH.setTitleLabelComponent(cpTitleH.getMain());
-
-            /***
-             *               _ _ _     _
-             *       ___  __| (_) |_  | |__   ___  _ __ ___   ___
-             *      / _ \/ _` | | __| | '_ \ / _ \| '_ ` _ \ / _ \
-             *     |  __/ (_| | | |_  | | | | (_) | | | | | |  __/
-             *      \___|\__,_|_|\__| |_| |_|\___/|_| |_| |_|\___|
-             *
-             */
-            final JButton btnEditHome = new JButton(SYSConst.icon22edit);
-            btnEditHome.setPressedIcon(SYSConst.icon22Pressed);
-            btnEditHome.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnEditHome.setContentAreaFilled(false);
-            btnEditHome.setBorder(null);
-            btnEditHome.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    final PnlHomes pnlHomes = new PnlHomes(home);
-                    GUITools.showPopup(GUITools.createPanelPopup(pnlHomes, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    Homes myHome = em.merge((Homes) o);
-                                    em.getTransaction().commit();
-                                    createHomesList();
-                                    OPDE.getMainframe().emptySearchArea();
-                                    OPDE.getMainframe().prepareSearchArea();
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-                            }
-                        }
-                    }, btnEditHome), SwingConstants.SOUTH_WEST);
-
-                }
-            });
-            cpTitleH.getRight().add(btnEditHome);
-
-            if (home.getStations().isEmpty()) {
-                final JButton btnDeleteHome = new JButton(SYSConst.icon22delete);
-                btnDeleteHome.setPressedIcon(SYSConst.icon22Pressed);
-                btnDeleteHome.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnDeleteHome.setContentAreaFilled(false);
-                btnDeleteHome.setBorder(null);
-
-                btnDeleteHome.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + HomesTools.getAsText(home) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                            @Override
-                            public void execute(Object answer) {
-                                if (answer.equals(JOptionPane.YES_OPTION)) {
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
-                                        Homes myHome = em.merge(home);
-                                        em.lock(myHome, LockModeType.OPTIMISTIC);
-                                        em.remove(myHome);
-                                        em.getTransaction().commit();
-                                        createHomesList();
-                                        OPDE.getMainframe().emptySearchArea();
-                                        OPDE.getMainframe().prepareSearchArea();
-                                    } catch (RollbackException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                            OPDE.getMainframe().completeRefresh();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                    }
-                                }
-                            }
-                        });
-                    }
-                });
-                cpTitleH.getRight().add(btnDeleteHome);
-            }
-
-            cpH.setContentPane(pnlContentH);
-            cpsHomes.add(cpH);
-
-        }
-        cpsHomes.addExpansion();
-    }
 
     private void lstCatMousePressed(MouseEvent e) {
         if (e.getClickCount() == 2) {
@@ -1346,7 +770,6 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabMain = new JTabbedPane();
         pnlLocal = new JPanel();
         lblPrinters = new JLabel();
@@ -1432,8 +855,8 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlLocal ========
             {
                 pnlLocal.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-                        "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
+                    "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
 
                 //---- lblPrinters ----
                 lblPrinters.setText("labelPrinter");
@@ -1493,8 +916,8 @@ public class PnlSystemSettings extends CleanablePanel {
                 //======== pnlGlobal ========
                 {
                     pnlGlobal.setLayout(new FormLayout(
-                            "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
-                            "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
+                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
 
                     //======== panel5 ========
                     {
@@ -1539,8 +962,8 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlICD ========
                     {
                         pnlICD.setLayout(new FormLayout(
-                                "default:grow, default",
-                                "fill:default:grow, $lgap, 60dlu, $lgap, default"));
+                            "default:grow, default",
+                            "fill:default:grow, $lgap, 60dlu, $lgap, default"));
 
                         //======== scrollPane1 ========
                         {
@@ -1567,8 +990,8 @@ public class PnlSystemSettings extends CleanablePanel {
                         //======== pnlMail ========
                         {
                             pnlMail.setLayout(new FormLayout(
-                                    "default, $lcgap, default:grow",
-                                    "13*(default, $lgap), default"));
+                                "default, $lcgap, default:grow",
+                                "13*(default, $lgap), default"));
 
                             //---- lblMailHost ----
                             lblMailHost.setText("host");
@@ -1685,16 +1108,16 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlCalcMed ========
                     {
                         pnlCalcMed.setLayout(new FormLayout(
-                                "default:grow",
-                                "2*(default, $lgap), default"));
+                            "default:grow",
+                            "2*(default, $lgap), default"));
                     }
                     pnlGlobal.add(pnlCalcMed, CC.xy(7, 14));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                                "default, $lcgap, default:grow",
-                                "5*(default, $lgap), default"));
+                            "default, $lcgap, default:grow",
+                            "5*(default, $lgap), default"));
 
                         //---- lblFTPServer ----
                         lblFTPServer.setText("host");
@@ -1758,6 +1181,7 @@ public class PnlSystemSettings extends CleanablePanel {
             tabMain.addTab("text", jspGlobal);
         }
         add(tabMain);
+        add(tabMain);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -1797,80 +1221,79 @@ public class PnlSystemSettings extends CleanablePanel {
 
     }
 
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JTabbedPane tabMain;
-    private JPanel pnlLocal;
-    private JLabel lblPrinters;
-    private JPanel panel4;
-    private JLabel lblStation;
-    private JComboBox cmbPhysicalPrinters;
-    private JComboBox cmbStation;
-    private JComboBox cmbLogicalPrinters;
-    private JLabel lblTimeout;
-    private JComboBox cmbForm;
-    private JButton btnTestLabel;
-    private JPanel panel1;
-    private JScrollPane jspGlobal;
-    private JPanel pnlGlobal;
-    private JPanel panel5;
-    private JPanel panel6;
-    private JLabel lblHomes;
-    private JLabel lblICD;
-    private JLabel lblEMail;
-    private JScrollPane jspHomeStation;
-    private CollapsiblePanes cpsHomes;
-    private JPanel pnlICD;
-    private JScrollPane scrollPane1;
-    private JList lstIcdFiles;
-    private JButton btnEmptyList;
-    private JButton btnImportICD;
-    private JScrollPane panel8;
-    private JPanel pnlMail;
-    private JLabel lblMailHost;
-    private JTextField txtMailHost;
-    private JLabel lblMailPort;
-    private JTextField txtMailPort;
-    private JLabel lblMailUser;
-    private JTextField txtMailUser;
-    private JLabel lblMailPassword;
-    private JTextField txtMailPassword;
-    private JLabel lblMailSender;
-    private JTextField txtMailSender;
-    private JLabel lblMailRecipient;
-    private JTextField txtMailRecipient;
-    private JLabel lblMailSenderPersonal;
-    private JTextField txtMailSenderPersonal;
-    private JLabel lblMailRecipientPersonal;
-    private JTextField txtMailRecipientPersonal;
-    private JLabel lblMailSpamFilter;
-    private JTextField txtMailSpamfilter;
-    private JLabel lblAuth;
-    private JLabel lblStarttls;
-    private JLabel lblTLS;
-    private JButton btnTestmail;
-    private JLabel lblActive;
-    private JComboBox cmbCountry;
-    private JPanel panel7;
-    private JLabel lblCat;
-    private JLabel lblCalcMed;
-    private JLabel lblFTP;
-    private JScrollPane jspCat;
-    private JList lstCat;
-    private JPanel pnlCalcMed;
-    private JPanel panel3;
-    private JLabel lblFTPServer;
-    private JTextField txtFTPServer;
-    private JLabel lblFTPPort;
-    private JTextField txtFTPPort;
-    private JLabel lblFTPUser;
-    private JTextField txtFTPUser;
-    private JLabel lblFTPPassword;
-    private JTextField txtFTPPassword;
-    private JLabel lblFTPWD;
-    private JTextField txtFTPWorkingDir;
-    private JButton btnFTPTest;
-    private JPanel panel2;
-    private JButton btnAddCat;
-    private JButton btnDeleteCat;
+private JTabbedPane tabMain;
+private JPanel pnlLocal;
+private JLabel lblPrinters;
+private JPanel panel4;
+private JLabel lblStation;
+private JComboBox cmbPhysicalPrinters;
+private JComboBox cmbStation;
+private JComboBox cmbLogicalPrinters;
+private JLabel lblTimeout;
+private JComboBox cmbForm;
+private JButton btnTestLabel;
+private JPanel panel1;
+private JScrollPane jspGlobal;
+private JPanel pnlGlobal;
+private JPanel panel5;
+private JPanel panel6;
+private JLabel lblHomes;
+private JLabel lblICD;
+private JLabel lblEMail;
+private JScrollPane jspHomeStation;
+private CollapsiblePanes cpsHomes;
+private JPanel pnlICD;
+private JScrollPane scrollPane1;
+private JList lstIcdFiles;
+private JButton btnEmptyList;
+private JButton btnImportICD;
+private JScrollPane panel8;
+private JPanel pnlMail;
+private JLabel lblMailHost;
+private JTextField txtMailHost;
+private JLabel lblMailPort;
+private JTextField txtMailPort;
+private JLabel lblMailUser;
+private JTextField txtMailUser;
+private JLabel lblMailPassword;
+private JTextField txtMailPassword;
+private JLabel lblMailSender;
+private JTextField txtMailSender;
+private JLabel lblMailRecipient;
+private JTextField txtMailRecipient;
+private JLabel lblMailSenderPersonal;
+private JTextField txtMailSenderPersonal;
+private JLabel lblMailRecipientPersonal;
+private JTextField txtMailRecipientPersonal;
+private JLabel lblMailSpamFilter;
+private JTextField txtMailSpamfilter;
+private JLabel lblAuth;
+private JLabel lblStarttls;
+private JLabel lblTLS;
+private JButton btnTestmail;
+private JLabel lblActive;
+private JComboBox cmbCountry;
+private JPanel panel7;
+private JLabel lblCat;
+private JLabel lblCalcMed;
+private JLabel lblFTP;
+private JScrollPane jspCat;
+private JList lstCat;
+private JPanel pnlCalcMed;
+private JPanel panel3;
+private JLabel lblFTPServer;
+private JTextField txtFTPServer;
+private JLabel lblFTPPort;
+private JTextField txtFTPPort;
+private JLabel lblFTPUser;
+private JTextField txtFTPUser;
+private JLabel lblFTPPassword;
+private JTextField txtFTPPassword;
+private JLabel lblFTPWD;
+private JTextField txtFTPWorkingDir;
+private JButton btnFTPTest;
+private JPanel panel2;
+private JButton btnAddCat;
+private JButton btnDeleteCat;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

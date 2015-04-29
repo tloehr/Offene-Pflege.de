@@ -286,6 +286,10 @@ public class SYSConst {
         return "<ul id=\"fonttext\">\n" + SYSTools.xx(content) + "</ul>\n";
     }
 
+    public static String center(String content) {
+        return "<center>" + SYSTools.xx(content) + "</center>";
+    }
+
     public static String html_ol(String content) {
         return "<ol id=\"fonttext\">\n" + SYSTools.xx(content) + "</ol>\n";
     }
