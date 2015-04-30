@@ -89,6 +89,19 @@ public class PnlSettings extends CleanablePanel {
         ((CardLayout) getLayout()).show(this, "single");
     }
 
+    private void btnHomesActionPerformed(ActionEvent e) {
+        if (currentPanel != null) {
+            pnlSingle.remove(currentPanel);
+            currentPanel.cleanup();
+        }
+
+        currentPanel = new PnlHomeStationRoomEditor();
+        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
+        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.homes")));
+        lblSingle.setIcon(btnTimeout.getIcon());
+        ((CardLayout) getLayout()).show(this, "single");
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         pnlAll = new JPanel();
@@ -211,6 +224,7 @@ public class PnlSettings extends CleanablePanel {
             //---- btnHomes ----
             btnHomes.setText(null);
             btnHomes.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/hotel_finder.png")));
+            btnHomes.addActionListener(e -> btnHomesActionPerformed(e));
             pnlAll.add(btnHomes, CC.xy(3, 21, CC.FILL, CC.FILL));
 
             //---- btnICD ----

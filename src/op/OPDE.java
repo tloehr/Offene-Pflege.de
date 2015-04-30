@@ -61,6 +61,8 @@ public class OPDE {
     public static final int ERROR_TIME = 4;
     public static final int START_OF_MODULE_TIME = 6;
 
+    public static final int DEFAULT_SCREEN_RESFRESH_MILLIS = 50;
+
     private static long uptime;
     public static ResourceBundle lang;
 
