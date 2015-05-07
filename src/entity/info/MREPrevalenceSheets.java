@@ -170,7 +170,7 @@ public class MREPrevalenceSheets {
                 long rid1 = Long.parseLong(SYSTools.catchNull(p1.getProperty("room.id"), "-1"));
                 Rooms room1 = EntityTools.find(Rooms.class, rid1);
                 mapRooms.put(resInfo.getResident(), room1);
-                mapBedsInUse.get(room1.getHome())[room1.getLevel()]++;
+                mapBedsInUse.get(room1.getFloor().getHome())[room1.getFloor().getLevel()]++;
             }
         }
 
@@ -185,8 +185,8 @@ public class MREPrevalenceSheets {
 
                 if (sort == 0) {
                     if (i1 == 1) {// both residents have rooms assigned
-                        sort = mapRooms.get(o1).getHome().getEID().compareTo(mapRooms.get(o2).getHome().getEID());
-                        if (sort == 0) sort = Short.compare(mapRooms.get(o1).getLevel(), mapRooms.get(o2).getLevel());
+                        sort = mapRooms.get(o1).getFloor().getHome().getEID().compareTo(mapRooms.get(o2).getFloor().getHome().getEID());
+                        if (sort == 0) sort = Short.compare(mapRooms.get(o1).getFloor().getLevel(), mapRooms.get(o2).getFloor().getLevel());
                     }
                 }
                 if (sort == 0) sort = o1.toString().compareTo(o2.toString());
@@ -231,8 +231,8 @@ public class MREPrevalenceSheets {
                 } else if (!mapRooms.containsKey(resident) && mapRooms.containsKey(next)) {
                     lastForThisLevel = true;
                 } else if (mapRooms.containsKey(resident) && mapRooms.containsKey(next)) {
-                    lastForThisLevel = !mapRooms.get(resident).getHome().equals(mapRooms.get(next).getHome()) ||
-                            !mapRooms.get(resident).getLevel().equals(mapRooms.get(next).getLevel());
+                    lastForThisLevel = !mapRooms.get(resident).getFloor().getHome().equals(mapRooms.get(next).getFloor().getHome()) ||
+                            !mapRooms.get(resident).getFloor().getLevel().equals(mapRooms.get(next).getFloor().getLevel());
                 } else {
                     lastForThisLevel = false;
                 }
@@ -459,8 +459,8 @@ public class MREPrevalenceSheets {
         progress += 2; // for the additional 2 columns;
 
         if (lastForThisLevel && mapRooms.containsKey(resident)) {
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 2).setCellValue(mapBedsInUse.get(mapRooms.get(resident).getHome())[mapRooms.get(resident).getLevel()]);
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 1).setCellValue(mapBedsTotal.get(mapRooms.get(resident).getHome())[mapRooms.get(resident).getLevel()]);
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 2).setCellValue(mapBedsInUse.get(mapRooms.get(resident).getFloor().getHome())[mapRooms.get(resident).getFloor().getLevel()]);
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 1).setCellValue(mapBedsTotal.get(mapRooms.get(resident).getFloor().getHome())[mapRooms.get(resident).getFloor().getLevel()]);
 
             for (int col = 0; col < MAXCOL_SHEET1; col++) {
                 sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).getCell(col).setCellStyle(blueGrayStyle);

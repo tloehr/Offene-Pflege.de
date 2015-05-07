@@ -43,14 +43,13 @@ public class Homes implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
     private List<Station> station;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
-    private List<Rooms> rooms;
+    private List<Floors> floors;
 
     public Homes() {
     }
 
-
-    public List<Rooms> getRooms() {
-        return rooms;
+    public List<Floors> getFloors() {
+        return floors;
     }
 
     public Homes(String eid) {

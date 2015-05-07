@@ -57,7 +57,7 @@ public class PnlTradeForm extends JPanel {
             lstDaf.setCellRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
         }
         lblMsg.setText(SYSTools.xx("opde.medication.medproduct.wizard.subtext.existingTradeforms"));
-        cbWeightControlled.setText("opde.medication.medproduct.wizard.subtext.weightControlled");
+        cbWeightControlled.setText(SYSTools.xx("opde.medication.medproduct.wizard.subtext.weightControlled"));
         lblMsg.setVisible(!product.getTradeforms().isEmpty());
         jsp1.setVisible(!product.getTradeforms().isEmpty());
         lstDaf.setVisible(!product.getTradeforms().isEmpty());

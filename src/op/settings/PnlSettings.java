@@ -35,12 +35,13 @@ public class PnlSettings extends CleanablePanel {
 
     private void i18n() {
         lblPersonal.setText(SYSTools.xx("opde.settings.personal"));
-        lblLocal.setText(SYSTools.xx("opde.settings.global"));
-        lblGlobal.setText(SYSTools.xx("opde.settings.local"));
+        lblLocal.setText(SYSTools.xx("opde.settings.local"));
+        lblGlobal.setText(SYSTools.xx("opde.settings.global"));
         lblPassword.setText(SYSTools.xx("opde.settings.userpassword"));
         lblMyEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.personal.mailsettings")));
         lblLabelPrinter.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.labelPrinters")));
         lblTimeout.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.timeout")));
+        lblHomes.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.homes")));
     }
 
     @Override

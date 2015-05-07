@@ -21,26 +21,23 @@ public class RoomsTools {
 
 
     public static ListCellRenderer getRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.xx("misc.commands.>>noselection<<");
-                } else if (o instanceof Rooms) {
-                    text = ((Rooms) o).toString();
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.xx("misc.commands.>>noselection<<");
+//            } else if (o instanceof Rooms) {
+//                text = o.toString();
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 
 
     public static ArrayList<Rooms> getAllActive() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery(" SELECT r FROM Rooms r WHERE r.inactive = FALSE ORDER BY r.home.eid, r.level, r.text ");
+        Query query = em.createQuery(" SELECT r FROM Rooms r WHERE r.active = TRUE ORDER BY r.floor.home.eid, r.floor.level, r.text ");
         //SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname");
         ArrayList<Rooms> list = new ArrayList<Rooms>(query.getResultList());
         em.close();
@@ -55,7 +52,7 @@ public class RoomsTools {
 
         try {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT MAX(b.level) FROM Rooms b WHERE b.home = :home ");
+            Query query = em.createQuery("SELECT MAX(b.floor.level) FROM Rooms b WHERE b.floor.home = :home ");
             query.setParameter("home", home);
             total = (short) query.getSingleResult();
             em.close();
@@ -74,7 +71,7 @@ public class RoomsTools {
 //        int inUse = 0;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.home = :home AND b.level = :level AND b.inactive = FALSE");
+        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.floor.home = :home AND b.level = :level AND b.active = TRUE");
         query.setParameter("level", level);
         query.setParameter("home", home);
         ArrayList<Rooms> listRooms = new ArrayList(query.getResultList());
@@ -165,4 +162,14 @@ public class RoomsTools {
 //        }
 //
 //    }
+
+    public static DefaultComboBoxModel getCombobox4Levels() {
+
+        ArrayList<Station> listStat = new ArrayList();
+
+        DefaultComboBoxModel result = new DefaultComboBoxModel(listStat.toArray());
+
+        return result;
+    }
+
 }

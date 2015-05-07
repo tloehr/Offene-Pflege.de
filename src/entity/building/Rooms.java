@@ -15,7 +15,6 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "rooms")
-
 public class Rooms implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -24,24 +23,27 @@ public class Rooms implements Serializable {
     private Long roomID;
     @Column(name = "Text")
     private String text;
-    @Column(name = "Level")
-    private Short level;
     @Column(name = "Single")
     private Boolean single;
     @Column(name = "Bath")
     private Boolean bath;
-    @Column(name = "inuse")
-    private Boolean inuse;
-    @Column(name = "inactive")
-    private Boolean inactive;
+    @Column(name = "active")
+    private Boolean active;
 
-    @JoinColumn(name = "HomeID", referencedColumnName = "EID")
+    @JoinColumn(name = "floorid", referencedColumnName = "floorid")
     @ManyToOne
-    private Homes home;
+    private Floors floor;
 
     public Rooms() {
     }
 
+    public Rooms(String text, Boolean single, Boolean bath, Floors floor) {
+        this.text = text;
+        this.single = single;
+        this.bath = bath;
+        this.floor = floor;
+        this.active = true;
+    }
 
     public Long getRoomID() {
         return roomID;
@@ -51,18 +53,6 @@ public class Rooms implements Serializable {
         this.roomID = roomID;
     }
 
-    /**
-     * the floor of this room (0 means ground level, 1 means 1st floor...)
-     *
-     * @return
-     */
-    public Short getLevel() {
-        return level;
-    }
-
-    public void setLevel(Short level) {
-        this.level = level;
-    }
 
     /**
      * is this room a single ?
@@ -99,28 +89,20 @@ public class Rooms implements Serializable {
         this.bath = bath;
     }
 
-    public Homes getHome() {
-        return home;
+    public Floors getFloor() {
+        return floor;
     }
 
-    public void setHome(Homes home) {
-        this.home = home;
+    public void setFloor(Floors floor) {
+        this.floor = floor;
     }
 
-    public Boolean isInactive() {
-        return inactive;
+    public Boolean isActive() {
+        return active;
     }
 
-    public void setInactive(Boolean inactive) {
-        this.inactive = inactive;
-    }
-
-    public Boolean isInuse() {
-        return inuse;
-    }
-
-    public void setInuse(Boolean inuse) {
-        this.inuse = inuse;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     /**
@@ -132,6 +114,10 @@ public class Rooms implements Serializable {
         return text;
     }
 
+
+    public void setText(String text) {
+        this.text = text;
+    }
 
     @Override
     public int hashCode() {
@@ -155,7 +141,7 @@ public class Rooms implements Serializable {
 
     @Override
     public String toString() {
-        return SYSTools.xx("misc.msg.room") + " " + text + ", " + SYSTools.xx("misc.msg.floor") + ": " + (level == 0 ? SYSTools.xx("misc.msg.groundlevel") : level) + ", " + home.getName();
+        return SYSTools.xx("misc.msg.room") + " " + text + ", " + floor.getName() + ", " + floor.getHome().getName();
     }
 
 }

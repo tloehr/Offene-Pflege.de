@@ -11,10 +11,7 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.building.Homes;
-import entity.building.HomesTools;
-import entity.building.Rooms;
-import entity.building.Station;
+import entity.building.*;
 import op.OPDE;
 import op.tools.CleanablePanel;
 import op.tools.DefaultCPTitle;
@@ -26,8 +23,7 @@ import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.UUID;
@@ -97,61 +93,135 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
 
     private void renderPane() {
-
         Enumeration en = root.children();
-        boolean onlyOneHomeButton = false;
-
+        cpsHomes.add(createAddHomeButton());
         while (en.hasMoreElements()) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
+            cpsHomes.add(createCP(node));
+        }
+    }
 
-            if (node.getUserObject() instanceof Homes) {
+    private JPanel createCP(DefaultMutableTreeNode node) {
 
-                if (!onlyOneHomeButton) {
-                    onlyOneHomeButton = true;
-                    cpsHomes.add(createAddHomeButton());
-                }
+        DefaultCPTitle cptitle = null;
+        JPanel contentPanel = new JPanel();
+        JPanel cp;
 
-                cpsHomes.add(createCP((Homes) node.getUserObject()));
-            }
-
-
+        if (node.getUserObject() instanceof Homes) {
+            cptitle = new DefaultCPTitle(((Homes) node.getUserObject()).getName(), null);
+            contentPanel = createContent(node);
+        } else if (node.getUserObject().equals(Floors.class)) {
+            cptitle = new DefaultCPTitle("misc.msg.floor", null);
+            contentPanel = createContent(node);
+        } else if (node.getUserObject() instanceof Floors) {
+            cptitle = new DefaultCPTitle(((Floors) node.getUserObject()).getName(), null);
+            contentPanel = createContent(node);
+        } else if (node.getUserObject() instanceof Rooms) {
+            cptitle = new DefaultCPTitle(((Rooms) node.getUserObject()).getText(), null);
+        } else if (node.getUserObject().equals(Station.class)) {
+            cptitle = new DefaultCPTitle("misc.msg.stations", null);
+            contentPanel = createContent4Stations(node);
         }
 
+        if (!(node.getUserObject() instanceof Rooms)) {
+            cp = new CollapsiblePane();
+            ((CollapsiblePane) cp).setCollapsible(true);
+            ((CollapsiblePane) cp).setTitleLabelComponent(cptitle.getMain());
+            ((CollapsiblePane) cp).setSlidingDirection(SwingConstants.SOUTH);
+            try {
+                ((CollapsiblePane) cp).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();
+            }
+            ((CollapsiblePane) cp).setContentPane(contentPanel);
+        } else {
+            cp = cptitle.getMain();
+        }
 
+        return cp;
     }
 
-    private Component createCP(Homes home) {
-        //            pnlContentH.add(cpsInsideHome);
-        //
-        //            CollapsiblePane cpRooms = new CollapsiblePane(SYSTools.xx("misc.msg.room"));
-        //            cpsInsideHome.add(cpRooms);
+    private JPanel createContent(DefaultMutableTreeNode node) {
 
+        CollapsiblePanes cps = new CollapsiblePanes();
+        Enumeration en = node.children();
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(home.getName(), null);
-        CollapsiblePane cpHome = new CollapsiblePane();
-        cpHome.setCollapsible(false);
-        cpHome.setTitleLabelComponent(cptitle.getMain());
-        cpHome.setSlidingDirection(SwingConstants.SOUTH);
+        while (en.hasMoreElements()) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) en.nextElement();
+            cps.add(createCP(child));
+        }
 
-
-        cpHome.setContentPane(createContent(home));
-
-        return cpHome;
+        return cps;
     }
 
-    private JPanel createContent(Homes home) {
+
+//    private JPanel createContent4Floors(DefaultMutableTreeNode node) {
+////        JPanel pnl = new JPanel();
+////        pnl.setLayout(new BoxLayout(pnl, BoxLayout.PAGE_AXIS));
+//////        pnl.add(new JPanel().add(createAddRoomButton()));
+//
+//
+//        CollapsiblePanes cps = new CollapsiblePanes();
+//        Enumeration en = node.children();
+//
+//        while (en.hasMoreElements()) {
+//            DefaultMutableTreeNode child = (DefaultMutableTreeNode) en.nextElement();
+//            cps.add(createCP(child));
+//        }
+//
+//        return cps;
+//
+//    }
+
+
+//    private JPanel createContent4Floor(DefaultMutableTreeNode node) {
+//
+//            CollapsiblePanes cps = new CollapsiblePanes();
+//            Enumeration en = node.children();
+//
+//            while (en.hasMoreElements()) {
+//                DefaultMutableTreeNode child = (DefaultMutableTreeNode) en.nextElement();
+//                cps.add(createCP(child));
+//            }
+//
+//            return cps;
+//        }
+
+
+    private JPanel createContent4Rooms(DefaultMutableTreeNode node) {
         JPanel pnl = new JPanel();
-
         pnl.setLayout(new BoxLayout(pnl, BoxLayout.PAGE_AXIS));
-        pnl.add(new JLabel("Da hast dus"));
+//        pnl.add(new JPanel().add(createAddRoomButton()));
+
+        Enumeration en = node.children();
+
+        while (en.hasMoreElements()) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) en.nextElement();
+            Rooms room = (Rooms) child.getUserObject();
+            DefaultCPTitle cptitle = new DefaultCPTitle(room.toString(), null);
+            pnl.add(cptitle.getMain());
+        }
 
         return pnl;
     }
 
+    private JPanel createContent4Stations(DefaultMutableTreeNode node) {
+        JPanel pnl = new JPanel();
+        pnl.setLayout(new BoxLayout(pnl, BoxLayout.PAGE_AXIS));
+        pnl.add(createAddStationButton());
 
-    private Component createCP4Rooms(Homes home) {
-        return null;
+        Enumeration en = node.children();
+
+        while (en.hasMoreElements()) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) en.nextElement();
+            Station station = (Station) child.getUserObject();
+            DefaultCPTitle cptitle = new DefaultCPTitle(station.getName(), null);
+            pnl.add(cptitle.getMain());
+        }
+
+        return pnl;
     }
+
 
     private void create(Homes home) {
 
@@ -200,13 +270,25 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 //        });
 //        subtree.add(new DefaultMutableTreeNode(btnAddRoom));
 
-        for (final Rooms room : home.getRooms()) {
-            subtree.add(new DefaultMutableTreeNode(room));
+
+        DefaultMutableTreeNode floorSubtree = new DefaultMutableTreeNode(Floors.class);
+        for (final Floors floor : home.getFloors()) {
+            DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floor);
+            floorSubtree.add(floorNode);
+            for (final Rooms room : floor.getRooms()) {
+                floorNode.add(new DefaultMutableTreeNode(room));
+            }
         }
 
+        DefaultMutableTreeNode stationSubtree = new DefaultMutableTreeNode(Station.class);
         for (final Station station : home.getStations()) {
-            subtree.add(new DefaultMutableTreeNode(station));
+            stationSubtree.add(new DefaultMutableTreeNode(station));
         }
+
+
+        subtree.add(floorSubtree);
+        subtree.add(stationSubtree);
+
 //                String titleR = "<html><font size=+1>" + room.toString() + "</font></html>";
 //                DefaultCPTitle cpTitleR = new DefaultCPTitle(titleR, null);
 //
@@ -577,38 +659,103 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     }
 
 
+    private JideButton createAddRoomButton(Floors floor) {
+        final JideButton btnAddRoom = GUITools.createHyperlinkButton("opde.settings.btnAddRoom", SYSConst.icon22add, null);
+        btnAddRoom.addActionListener(e -> {
+            final PnlRooms pnlRooms = new PnlRooms(new Rooms("", false, false, floor));
+            JidePopup popup = GUITools.createPanelPopup(pnlRooms, new Closure() {
+                @Override
+                public void execute(Object o) {
+                    if (o != null) {
+//                        EntityManager em = OPDE.createEM();
+//                        try {
+//                            em.getTransaction().begin();
+//                            home = em.merge((Homes) o);
+//                            create(home);
+//                            em.getTransaction().commit();
+//
+//                        } catch (IllegalStateException ise) {
+//                            OPDE.error(ise);
+//                        } catch (Exception e) {
+//                            em.getTransaction().rollback();
+//                            OPDE.fatal(e);
+//                        } finally {
+//                            em.close();
+//                            setRefresh(true);
+//                        }
+                    }
+                }
+            }, btnAddRoom);
+            GUITools.showPopup(popup, SwingConstants.EAST);
+            pnlRooms.setStartFocus();
+        });
+
+        btnAddRoom.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        return btnAddRoom;
+
+    }
+
     private JideButton createAddHomeButton() {
         final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.btnAddHome", SYSConst.icon22add, null);
-        btnAddHome.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final PnlHomes pnlHomes = new PnlHomes(new Homes(UUID.randomUUID().toString().substring(0, 15)));
-                JidePopup popup = GUITools.createPanelPopup(pnlHomes, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Homes home = em.merge((Homes) o);
-                                create(home);
-                                em.getTransaction().commit();
+        btnAddHome.addActionListener(e -> {
+            final PnlHomes pnlHomes = new PnlHomes(new Homes(UUID.randomUUID().toString().substring(0, 15)));
+            JidePopup popup = GUITools.createPanelPopup(pnlHomes, o -> {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Homes home = em.merge((Homes) o);
+                        create(home);
+                        em.getTransaction().commit();
 
-                            } catch (IllegalStateException ise) {
-                                OPDE.error(ise);
-                            } catch (Exception e) {
-                                em.getTransaction().rollback();
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                                setRefresh(true);
-                            }
-                        }
+                    } catch (IllegalStateException ise) {
+                        OPDE.error(ise);
+                    } catch (Exception ex) {
+                        em.getTransaction().rollback();
+                        OPDE.fatal(ex);
+                    } finally {
+                        em.close();
+                        setRefresh(true);
                     }
-                }, btnAddHome);
-                GUITools.showPopup(popup, SwingConstants.EAST);
-                pnlHomes.setStartFocus();
-            }
+                }
+            }, btnAddHome);
+            GUITools.showPopup(popup, SwingConstants.EAST);
+            pnlHomes.setStartFocus();
+        });
+
+        return btnAddHome;
+
+    }
+
+
+    private JideButton createAddStationButton() {
+        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.btnAddStation", SYSConst.icon22add, null);
+        btnAddHome.addActionListener(e -> {
+            final PnlHomes pnlHomes = new PnlHomes(new Homes(UUID.randomUUID().toString().substring(0, 15)));
+            JidePopup popup = GUITools.createPanelPopup(pnlHomes, new Closure() {
+                @Override
+                public void execute(Object o) {
+                    if (o != null && !o.toString().trim().isEmpty()) {
+//                            EntityManager em = OPDE.createEM();
+//                            try {
+//                                em.getTransaction().begin();
+//                                em.merge(new Station(o.toString(), em.merge(home)));
+//                                em.getTransaction().commit();
+//                                createHomesList();
+//                                OPDE.getMainframe().emptySearchArea();
+//                                OPDE.getMainframe().prepareSearchArea();
+//                            } catch (Exception e) {
+//                                em.getTransaction().rollback();
+//                                OPDE.fatal(e);
+//                            } finally {
+//                                em.close();
+//                            }
+                    }
+                }
+            }, btnAddHome);
+            GUITools.showPopup(popup, SwingConstants.EAST);
+            pnlHomes.setStartFocus();
         });
 
         return btnAddHome;

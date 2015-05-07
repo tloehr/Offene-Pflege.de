@@ -41,7 +41,7 @@ public class PnlHomes extends PopupPanel {
     }
 
     private void initPanel() {
-        lblName.setText(SYSTools.xx(internalClassID + ".lblName"));
+        lblName.setText(SYSTools.xx("opde.settings.pnlhomes.lblName"));
         lblStrasse.setText(SYSTools.xx("misc.msg.street"));
         lblPLZ.setText(SYSTools.xx("misc.msg.zipcode"));
         lblOrt.setText(SYSTools.xx("misc.msg.city"));

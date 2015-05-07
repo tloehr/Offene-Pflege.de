@@ -76,6 +76,6 @@
         <class>entity.staff.Training2Users</class>
         <class>entity.system.Notification</class>
         <class>entity.building.Resident2Rooms</class>
-
+        <class>entity.building.Floors</class>
     </persistence-unit>
 </persistence>
