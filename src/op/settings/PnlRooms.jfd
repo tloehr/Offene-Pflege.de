@@ -5,7 +5,7 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 			"$columnSpecs": "default, labelcompgap, default, labelcompgap, 162dlu:grow, labelcompgap, default"
-			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default"
+			"$rowSpecs": "default, linegap, default, linegap, default"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JLabel" ) {
@@ -22,33 +22,6 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 5
 				"gridY": 3
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblSingle"
-				"text": "text"
-				"font": #Font0
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 5
-				"gridX": 3
-				"gridWidth": 3
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblBath"
-				"text": "text"
-				"font": #Font0
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 7
-				"gridX": 3
-				"gridWidth": 3
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblActive"
-				"text": "text"
-				"font": #Font0
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridY": 9
-				"gridX": 3
-				"gridWidth": 3
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )

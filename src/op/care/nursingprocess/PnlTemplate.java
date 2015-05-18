@@ -39,13 +39,13 @@ public class PnlTemplate extends MyJDialog {
     }
 
     private void initPanel() {
-        txtSearch.setPrompt(SYSTools.xx(internalClassID + ".searchtopic"));
-        tbInactive = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID + ".inactive"));
-        SYSPropsTools.restoreState(internalClassID + ".tbInactive", tbInactive);
+        txtSearch.setPrompt(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.searchtopic"));
+        tbInactive = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.inactive"));
+        SYSPropsTools.restoreState("nursingrecords.nursingprocess.pnltemplate.tbInactive", tbInactive);
         tbInactive.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ":tbInactive", tbInactive);
+                SYSPropsTools.storeState("nursingrecords.nursingprocess.pnltemplate:tbInactive", tbInactive);
                 refreshDisplay();
             }
         });

@@ -2096,7 +2096,6 @@ public class PnlInformation extends NursingRecordsPanel {
              *
              */
             // @relates GitHub #10
-
             JideButton resComesback = GUITools.createHyperlinkButton(SYSTools.xx("opde.info.dlg.resident.returns"), SYSConst.icon22addbw, null);
             resComesback.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             resComesback.setAlignmentX(Component.LEFT_ALIGNMENT);

@@ -142,6 +142,17 @@ public class GUITools {
         };
     }
 
+
+    public static JToggleButton getNiceToggleButton(String titleORlangbundle, ItemListener il) {
+
+        JToggleButton btn = getNiceToggleButton(titleORlangbundle);
+        btn.addItemListener(il);
+
+        return btn;
+
+
+    }
+
     public static JToggleButton getNiceToggleButton(String titleORlangbundle) {
         String title = SYSTools.catchNull(titleORlangbundle);
         try {

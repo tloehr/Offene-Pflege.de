@@ -99,7 +99,7 @@ public class PnlSettings extends CleanablePanel {
         currentPanel = new PnlHomeStationRoomEditor();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
         lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.homes")));
-        lblSingle.setIcon(btnTimeout.getIcon());
+        lblSingle.setIcon(btnHomes.getIcon());
         ((CardLayout) getLayout()).show(this, "single");
     }
 
