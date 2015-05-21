@@ -32,12 +32,13 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
     ItemListener il;
 
     public PnlRooms(Rooms room, DataChangeListener dcl) {
-        super(room);
+        super();
 
         addDataChangeListener(dcl);
 
         allComponents = new ArrayList<Component>();
         initComponents();
+
         il = new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -54,15 +55,21 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new HorizontalLayout(10));
 
-        btnSingle = GUITools.getNiceToggleButton("misc.msg.single.room", il);
-        btnBath = GUITools.getNiceToggleButton("misc.msg.room.bath", il);
-        btnActive = GUITools.getNiceToggleButton("misc.msg.active", il);
+        btnSingle = GUITools.getNiceToggleButton("misc.msg.single.room");
+        btnBath = GUITools.getNiceToggleButton("misc.msg.room.bath");
+        btnActive = GUITools.getNiceToggleButton("misc.msg.active");
 
         buttonPanel.add(btnSingle);
         buttonPanel.add(btnBath);
         buttonPanel.add(btnActive);
 
         add(buttonPanel, CC.xywh(3, 5, 3, 1));
+
+        setDataObject(room);
+
+        btnSingle.addItemListener(il);
+        btnBath.addItemListener(il);
+        btnActive.addItemListener(il);
 
         initPanel();
     }

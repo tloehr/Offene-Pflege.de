@@ -48,7 +48,6 @@ public class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T>
 
     public EditPanelDefault() {
         super();
-        notify();
         listDCL = new HashSet<>();
     }
 
@@ -58,8 +57,8 @@ public class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T>
         }
     }
 
-    public EditPanelDefault(T data) {
-        this();
-        setDataObject(data);
-    }
+//    public EditPanelDefault(T data) {
+//        this();
+//        setDataObject(data);
+//    }
 }

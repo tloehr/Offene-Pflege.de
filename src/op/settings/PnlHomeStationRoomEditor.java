@@ -15,10 +15,7 @@ import entity.building.*;
 import interfaces.DataChangeEvent;
 import interfaces.DataChangeListener;
 import op.OPDE;
-import op.tools.CleanablePanel;
-import op.tools.DefaultCPTitle;
-import op.tools.GUITools;
-import op.tools.SYSConst;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
@@ -26,7 +23,10 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.beans.PropertyVetoException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * @author Torsten Löhr
@@ -35,9 +35,11 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
     private final DefaultMutableTreeNode root;
     private boolean refresh = false;
+    private boolean reload = false;
     private final Thread thread;
     private HashMap<DefaultMutableTreeNode, Boolean> expansioState;
-    private HashMap<String, Component> index;
+    private HashMap<String, Component> indexC;
+    private HashMap<String, DefaultMutableTreeNode> indexN;
 
     @Override
     public void cleanup() {
@@ -48,7 +50,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     @Override
     public void reload() {
         initDataModel();
-        setRefresh(true);
+        setReload(true);
     }
 
     @Override
@@ -60,7 +62,16 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     public void run() {
         while (!thread.isInterrupted()) {
             try {
-                reloadDisplay();
+                if (reload) {
+                    setReload(false);
+                    reloadDisplay();
+                }
+
+                if (refresh) {
+                    setRefresh(false);
+                    cpsHomes.revalidate();
+                    cpsHomes.repaint();
+                }
                 Thread.sleep(OPDE.DEFAULT_SCREEN_RESFRESH_MILLIS);
             } catch (InterruptedException e) {
                 OPDE.debug("InterruptedException");
@@ -74,9 +85,11 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
         this.refresh = refresh;
     }
 
+    synchronized void setReload(boolean reload) {
+        this.reload = reload;
+    }
+
     synchronized void reloadDisplay() {
-        if (!refresh) return;
-        setRefresh(false);
 
 
         cpsHomes.removeAll();
@@ -88,7 +101,11 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
     public PnlHomeStationRoomEditor() {
         initComponents();
-        index = new HashMap<>();
+        indexC = new HashMap<>();
+        indexN = new HashMap<>();
+
+
+
         root = new DefaultMutableTreeNode();
         thread = new Thread(this);
         thread.start();
@@ -98,20 +115,13 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
     private void renderPane() {
 
-        if (cpsHomes.getComponentCount() == 0) {
-            Enumeration en = root.children();
-            cpsHomes.add(createAddHomeButton());
-            while (en.hasMoreElements()) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
-                cpsHomes.add(createCP(node));
-            }
-        } else {
-            for (Component comp : Arrays.asList(cpsHomes.getComponents())) {
-
-                comp.getName().equals("room:" + ((Rooms) node.getUserObject()).getRoomID());
-            }
-
+        Enumeration en = root.children();
+        cpsHomes.add(createAddHomeButton());
+        while (en.hasMoreElements()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
+            cpsHomes.add(createCP(node));
         }
+
     }
 
     private JPanel createCP(DefaultMutableTreeNode node) {
@@ -119,6 +129,9 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
         DefaultCPTitle cptitle = null;
         JPanel contentPanel = new JPanel();
         JPanel cp = new CollapsiblePane();
+
+        cp.setName(getName(node.getUserObject()));
+
 
         ((CollapsiblePane) cp).setCollapsible(true);
         ((CollapsiblePane) cp).setSlidingDirection(SwingConstants.SOUTH);
@@ -131,7 +144,6 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
         if (node.getUserObject() instanceof Homes) {
             cptitle = new DefaultCPTitle(((Homes) node.getUserObject()).getName(), null);
-            cp.setName("");
             contentPanel = createContent(node);
         } else if (node.getUserObject().equals(Floors.class)) {
             cptitle = new DefaultCPTitle("misc.msg.floor", null);
@@ -141,7 +153,6 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             contentPanel = createContent(node);
         } else if (node.getUserObject() instanceof Rooms) {
             cptitle = new DefaultCPTitle(((Rooms) node.getUserObject()).getText(), null);
-            cp.setName("room:" + ((Rooms) node.getUserObject()).getRoomID());
             contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.PAGE_AXIS));
             contentPanel.add(new PnlRooms((Rooms) node.getUserObject(), new DataChangeListener<Rooms>() {
                 @Override
@@ -153,9 +164,14 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
                         em.getTransaction().commit();
 
-
-                        DefaultMutableTreeNode found = find(evt.getData());
+                        DefaultMutableTreeNode found = indexN.get(getName(myRoom));
                         found.setUserObject(myRoom);
+
+                        createCP(found);
+
+
+//                        DefaultMutableTreeNode found = find(evt.getData());
+//                        found.setUserObject(myRoom);
 
 //                        OPDE.getMainframe().emptySearchArea();
 //                        OPDE.getMainframe().prepareSearchArea();
@@ -164,7 +180,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                         OPDE.fatal(e);
                     } finally {
                         em.close();
-                        renderPane();
+                        setRefresh(true);
                     }
                 }
             }));
@@ -177,6 +193,12 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
         ((CollapsiblePane) cp).setContentPane(contentPanel);
         ((CollapsiblePane) cp).setTitleLabelComponent(cptitle.getMain());
+
+        if (!SYSTools.catchNull(cp.getName()).isEmpty()) {
+            indexC.put(cp.getName(), cp);
+            indexN.put(cp.getName(), node);
+        }
+
 
 //        if (!(node.getUserObject() instanceof Rooms)) {
 //            cp = new CollapsiblePane();
@@ -828,6 +850,19 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
         return btnAddHome;
 
+    }
+
+    private String getName(Object object) {
+        if (object instanceof Rooms)
+            return "room:" + ((Rooms) object).getRoomID();
+        if (object instanceof Homes)
+            return "home:" + ((Homes) object).getEID();
+        if (object instanceof Floors)
+            return "floor:" + ((Floors) object).getFloorid();
+        if (object instanceof Station)
+            return "station:" + ((Station) object).getStatID();
+
+        return null;
     }
 
 
