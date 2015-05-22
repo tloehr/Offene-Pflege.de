@@ -7,28 +7,34 @@ package op.settings;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.building.Homes;
-import op.OPDE;
-import op.threads.DisplayMessage;
+import entity.building.Rooms;
+import interfaces.DataChangeEvent;
+import interfaces.DataChangeListener;
+import interfaces.EditPanelDefault;
 import op.tools.GUITools;
-import op.tools.PopupPanel;
 import op.tools.SYSTools;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlHomes extends PopupPanel {
+public class PnlHomes extends EditPanelDefault<Homes> {
     public static final String internalClassID = "opde.settings.pnlhomes";
-    private Homes home;
+
     private ArrayList<JTextComponent> allTXT;
     private ArrayList<Component> allComponents;
 
-    public PnlHomes(Homes home) {
-        this.home = home;
+    public PnlHomes(Homes data, DataChangeListener dcl) {
+        this.data = data;
+        addDataChangeListener(dcl);
         allTXT = new ArrayList<JTextComponent>();
         allComponents = new ArrayList<Component>();
         initComponents();
@@ -48,12 +54,12 @@ public class PnlHomes extends PopupPanel {
         lblTel.setText(SYSTools.xx("misc.msg.phone"));
         lblFax.setText(SYSTools.xx("misc.msg.fax"));
 
-        txtName.setText(home.getName());
-        txtStrasse.setText(home.getStreet());
-        txtPLZ.setText(home.getZIP());
-        txtOrt.setText(home.getCity());
-        txtFax.setText(home.getFax());
-        txtTel.setText(home.getTel());
+        txtName.setText(data.getName());
+        txtStrasse.setText(data.getStreet());
+        txtPLZ.setText(data.getZIP());
+        txtOrt.setText(data.getCity());
+        txtFax.setText(data.getFax());
+        txtTel.setText(data.getTel());
 
         allTXT.add(txtName);
         allTXT.add(txtStrasse);
@@ -72,33 +78,52 @@ public class PnlHomes extends PopupPanel {
 
         setFocusCycleRoot(true);
         setFocusTraversalPolicy(GUITools.createTraversalPolicy(allComponents));
+
+
+        for (JTextComponent txt : allTXT) {
+            txt.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    data.setName(txtName.getText().trim());
+                    data.setStreet(txtStrasse.getText().trim());
+                    data.setZip(txtPLZ.getText().trim());
+                    data.setCity(txtOrt.getText().trim());
+                    data.setTel(txtTel.getText().trim());
+                    data.setFax(txtFax.getText().trim());
+                    broadcast(new DataChangeEvent<>(this, data));
+                }
+            });
+        }
+
     }
 
-    @Override
-    public Object getResult() {
 
-            home.setName(txtName.getText().trim());
-            home.setStreet(txtStrasse.getText().trim());
-            home.setZip(SYSTools.left(txtPLZ.getText().trim(), 5, ""));
-            home.setCity(txtOrt.getText().trim());
-            home.setTel(txtTel.getText().trim());
-            home.setFax(txtFax.getText().trim());
+    @Override
+    public Homes getResult() {
+
+        data.setName(txtName.getText().trim());
+        data.setStreet(txtStrasse.getText().trim());
+        data.setZip(SYSTools.left(txtPLZ.getText().trim(), 5, ""));
+        data.setCity(txtOrt.getText().trim());
+        data.setTel(txtTel.getText().trim());
+        data.setFax(txtFax.getText().trim());
 //        } else {
 //            home = null;
 //        }
-        return home;
+        return data;
     }
 
     @Override
-    public boolean isSaveOK() {
+    public String doValidation() {
         boolean ok = !GUITools.containsEmpty(allTXT);
 
         if (!ok) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyFields", DisplayMessage.WARNING));
+            return SYSTools.xx("misc.msg.emptyFields");
         }
 
-        return ok;
+        return "";
     }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -117,8 +142,8 @@ public class PnlHomes extends PopupPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
-            "7*(default, $lgap), default"));
+                "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
+                "7*(default, $lgap), default"));
 
         //---- lblName ----
         lblName.setText("Anrede");

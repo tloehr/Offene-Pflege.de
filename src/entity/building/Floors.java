@@ -114,4 +114,8 @@ public class Floors {
                 ", rooms=" + rooms +
                 '}';
     }
+//
+//    public String getKey(){
+//        return "floor:"+floorid;
+//    }
 }

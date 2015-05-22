@@ -5,6 +5,7 @@
 package entity.building;
 
 import entity.reports.Handovers;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -54,6 +55,12 @@ public class Homes implements Serializable {
 
     public Homes(String eid) {
         this.eid = eid;
+        this.name = SYSTools.xx("homes.new.home");
+        this.street = "";
+        this.zip = "12345";
+        this.city = "";
+        this.tel = "";
+        this.fax = "";
     }
 
     public String getEID() {
