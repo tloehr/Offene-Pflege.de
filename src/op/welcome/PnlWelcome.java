@@ -325,7 +325,7 @@ public class PnlWelcome extends CleanablePanel {
                 OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
             }
         });
-//        cptitle.getButton().setCursor(null);
+//        cptitle.getTitleButton().setCursor(null);
 
         if (ResInfoTools.isAway(resident)) {
             cptitle.getButton().setIcon(SYSConst.icon22residentAbsent);
@@ -453,7 +453,7 @@ public class PnlWelcome extends CleanablePanel {
                 OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
             }
         });
-//        cptitle.getButton().setCursor(null);
+//        cptitle.getTitleButton().setCursor(null);
 
         if (ResInfoTools.isAway(resident)) {
             cptitle.getButton().setIcon(SYSConst.icon22residentAbsent);

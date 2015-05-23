@@ -6,7 +6,6 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
@@ -14,17 +13,12 @@ import entity.building.*;
 import interfaces.DataChangeEvent;
 import interfaces.DataChangeListener;
 import op.OPDE;
-import op.tools.CleanablePanel;
-import op.tools.DefaultCPTitle;
-import op.tools.GUITools;
-import op.tools.SYSConst;
+import op.tools.*;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 import java.awt.*;
-import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -36,19 +30,20 @@ import java.util.UUID;
 public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable {
 
     private final DefaultMutableTreeNode root;
-    private Object object2refresh = null;
-    private boolean reload = false;
+    private DefaultMutableTreeNode nodeToRefresh;
+
+    private boolean refresh = false;
     private final Thread thread;
 
-    private HashMap<String, Component> indexC;
-    private HashMap<String, TreeNode[]> indexT;
+    private HashMap<String, DefaultCollapsiblePane> indexC;
+    private HashMap<String, DefaultMutableTreeNode> indexT;
 
 
     public PnlHomeStationRoomEditor() {
         initComponents();
         indexC = new HashMap<>();
         indexT = new HashMap<>();
-
+        nodeToRefresh = null;
 
         root = new DefaultMutableTreeNode();
         thread = new Thread(this);
@@ -60,10 +55,12 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     @Override
     public void reload() {
         initDataModel(null);
-        reload = true;
+        refresh = true;
     }
 
-    private void initDataModel(Homes newHome) {
+    private DefaultMutableTreeNode initDataModel(Homes newHome) {
+
+        DefaultMutableTreeNode subtree = null;
 
         ArrayList<Homes> listHomes = null;
         if (newHome == null) {
@@ -76,24 +73,25 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
         for (final Homes home : listHomes) {
 
-            DefaultMutableTreeNode subtree = new DefaultMutableTreeNode(home);
+            subtree = new DefaultMutableTreeNode(home);
             root.add(subtree);
             DefaultMutableTreeNode stationSubtree = new DefaultMutableTreeNode(Station.class);
             DefaultMutableTreeNode floorSubtree = new DefaultMutableTreeNode(Floors.class);
             subtree.add(floorSubtree);
             subtree.add(stationSubtree);
 
-            indexT.put(getKey(home), subtree.getPath());
+
+            indexT.put(getKey(home), subtree);
 
             for (final Floors floor : home.getFloors()) {
                 DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floor);
-                indexT.put(getKey(floor), floorNode.getPath());
+                indexT.put(getKey(floor), floorNode);
                 floorSubtree.add(floorNode);
                 for (final Rooms room : floor.getRooms()) {
                     DefaultMutableTreeNode roomNode = new DefaultMutableTreeNode(room);
 
                     floorNode.add(roomNode);
-                    indexT.put(getKey(room), roomNode.getPath());
+                    indexT.put(getKey(room), roomNode);
                 }
             }
 
@@ -101,17 +99,21 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             for (final Station station : home.getStations()) {
                 DefaultMutableTreeNode stationNode = new DefaultMutableTreeNode(station);
                 stationSubtree.add(stationNode);
-                indexT.put(getKey(station), stationNode.getPath());
+                indexT.put(getKey(station), stationNode);
             }
 
-
         }
+
+        return subtree;
 
     }
 
     @Override
     public void cleanup() {
         thread.interrupt();
+        indexC.clear();
+        indexT.clear();
+        cpsHomes.removeAll();
         root.removeAllChildren();
     }
 
@@ -125,9 +127,9 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     public void run() {
         while (!thread.isInterrupted()) {
             try {
-                if (reload) {
-                    reload = false;
-                    reloadDisplay();
+                if (refresh) {
+                    refresh = false;
+                    refreshDisplay();
                 }
 
                 Thread.sleep(OPDE.DEFAULT_SCREEN_RESFRESH_MILLIS);
@@ -139,8 +141,12 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     }
 
 
-    synchronized void reloadDisplay() {
-        if (object2refresh == null) {
+    synchronized void refreshDisplay() {
+        refreshDisplay(null);
+    }
+
+    synchronized void refreshDisplay(String thisKeyOnly) {
+        if (thisKeyOnly == null) {
             cpsHomes.removeAll();
             cpsHomes.setLayout(new JideBoxLayout(cpsHomes, JideBoxLayout.Y_AXIS));
 
@@ -152,6 +158,14 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             }
 
             cpsHomes.addExpansion();
+        } else {
+            if (indexC.containsKey(getKey(thisKeyOnly))) {
+
+            } else {
+
+                refreshCP(thisKeyOnly);
+                createCP((DefaultMutableTreeNode) indexT.get(thisKeyOnly)[indexT.get(thisKeyOnly).length - 1]);
+            }
         }
     }
 
@@ -165,37 +179,120 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 //        }
 //    }
 
-    private JPanel createCP(DefaultMutableTreeNode node) {
 
-        DefaultCPTitle cptitle = null;
-        JPanel contentPanel = new JPanel();
-        CollapsiblePane cp = new CollapsiblePane();
+    private DefaultCollapsiblePane refreshCP(String key) {
 
+
+
+
+        DefaultCollapsiblePane cp = indexC.get(key);
+
+        cp.setSlidingDirection(SwingConstants.SOUTH);
+        cp.setBackground(Color.white);
+
+
+        if (nodeToRefresh.getUserObject() instanceof Homes) {
+            cp.setTitleButtonText(((Homes) node.getUserObject()).getName());
+            cp.getTitleButton().setFont(SYSConst.ARIAL24);
+            cp.setContentPane(createContent(node));
+        } else if (node.getUserObject().equals(Floors.class)) {
+            cp.setTitleButtonText("misc.msg.floor");
+            cp.getTitleButton().setFont(SYSConst.ARIAL20);
+            cp.setContentPane(createContent(node));
+        } else if (node.getUserObject() instanceof Floors) {
+            cp.setTitleButtonText(((Floors) node.getUserObject()).getName());
+            cp.setContentPane(createContent(node));
+        } else if (node.getUserObject() instanceof Rooms) {
+            JPanel contentPanel = new JPanel();
+            cp.setTitleButtonText(((Rooms) node.getUserObject()).getText());
+            contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.PAGE_AXIS));
+            contentPanel.add(new PnlRooms((Rooms) node.getUserObject(), new DataChangeListener<Rooms>() {
+                @Override
+                public void dataChanged(DataChangeEvent evt) {
+                    //                    EntityManager em = OPDE.createEM();
+                    //                    try {
+                    //                        em.getTransaction().begin();
+                    //                        Rooms myRoom = em.merge((Rooms) evt.getData());
+                    //
+                    //                        em.getTransaction().commit();
+                    //
+                    //                        DefaultMutableTreeNode found = indexN.get(getName(myRoom));
+                    //                        found.setUserObject(myRoom);
+                    //
+                    //                        createCP(found);
+                    //
+                    //
+                    ////                        DefaultMutableTreeNode found = find(evt.getData());
+                    ////                        found.setUserObject(myRoom);
+                    //
+                    ////                        OPDE.getMainframe().emptySearchArea();
+                    ////                        OPDE.getMainframe().prepareSearchArea();
+                    //                    } catch (Exception e) {
+                    //                        em.getTransaction().rollback();
+                    //                        OPDE.fatal(e);
+                    //                    } finally {
+                    //                        em.close();
+                    //                        setRefresh(true);
+                    //                    }
+                }
+            }));
+            cp.setContentPane(contentPanel);
+        } else if (node.getUserObject().equals(Station.class)) {
+            cp.setTitleButtonText("misc.msg.stations");
+            cp.getTitleButton().setFont(SYSConst.ARIAL20);
+            cp.setContentPane(createContent4Stations(node));
+        }
+
+        if (getKey(node.getUserObject()) != null) {
+            indexC.put(getKey(node.getUserObject()), cp);
+        }
+
+
+        //        if (!(node.getUserObject() instanceof Rooms)) {
+        //            cp = new CollapsiblePane();
+        //            ((CollapsiblePane) cp).setCollapsible(true);
+        //            ((CollapsiblePane) cp).setTitleLabelComponent(cptitle.getMain());
+        //            ((CollapsiblePane) cp).setSlidingDirection(SwingConstants.SOUTH);
+        //            try {
+        //                ((CollapsiblePane) cp).setCollapsed(false);
+        //            } catch (PropertyVetoException e) {
+        //                e.printStackTrace();
+        //            }
+        //            ((CollapsiblePane) cp).setContentPane(contentPanel);
+        //        } else {
+        //            cp = cptitle.getMain();
+        //        }
+
+        return cp;
+    }
+
+    private DefaultCollapsiblePane createCP(DefaultMutableTreeNode node) {
+
+//        DefaultCPTitle cptitle = null;
+
+        DefaultCollapsiblePane cp = new DefaultCollapsiblePane();
+        String title = "";
 //        cp.setName(getKey(node.getUserObject()));
 
 
-        cp.setCollapsible(true);
         cp.setSlidingDirection(SwingConstants.SOUTH);
         cp.setBackground(Color.white);
-        try {
-            cp.setCollapsed(false);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();
-        }
+
 
         if (node.getUserObject() instanceof Homes) {
-            cptitle = new DefaultCPTitle(((Homes) node.getUserObject()).getName(), null);
-            cptitle.getButton().setFont(SYSConst.ARIAL24);
-            contentPanel = createContent(node);
+            cp.setTitleButtonText(((Homes) node.getUserObject()).getName());
+            cp.getTitleButton().setFont(SYSConst.ARIAL24);
+            cp.setContentPane(createContent(node));
         } else if (node.getUserObject().equals(Floors.class)) {
-            cptitle = new DefaultCPTitle("misc.msg.floor", null);
-            cptitle.getButton().setFont(SYSConst.ARIAL20);
-            contentPanel = createContent(node);
+            cp.setTitleButtonText("misc.msg.floor");
+            cp.getTitleButton().setFont(SYSConst.ARIAL20);
+            cp.setContentPane(createContent(node));
         } else if (node.getUserObject() instanceof Floors) {
-            cptitle = new DefaultCPTitle(((Floors) node.getUserObject()).getName(), null);
-            contentPanel = createContent(node);
+            cp.setTitleButtonText(((Floors) node.getUserObject()).getName());
+            cp.setContentPane(createContent(node));
         } else if (node.getUserObject() instanceof Rooms) {
-            cptitle = new DefaultCPTitle(((Rooms) node.getUserObject()).getText(), null);
+            JPanel contentPanel = new JPanel();
+            cp.setTitleButtonText(((Rooms) node.getUserObject()).getText());
             contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.PAGE_AXIS));
             contentPanel.add(new PnlRooms((Rooms) node.getUserObject(), new DataChangeListener<Rooms>() {
                 @Override
@@ -227,19 +324,15 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 //                    }
                 }
             }));
-
+            cp.setContentPane(contentPanel);
         } else if (node.getUserObject().equals(Station.class)) {
-            cptitle = new DefaultCPTitle("misc.msg.stations", null);
-            cptitle.getButton().setFont(SYSConst.ARIAL20);
-            contentPanel = createContent4Stations(node);
+            cp.setTitleButtonText("misc.msg.stations");
+            cp.getTitleButton().setFont(SYSConst.ARIAL20);
+            cp.setContentPane(createContent4Stations(node));
         }
 
-
-        cp.setContentPane(contentPanel);
-        cp.setTitleLabelComponent(cptitle.getMain());
-
         if (getKey(node.getUserObject()) != null) {
-            indexC.put(getKey(node.getUserObject() != null), cp);
+            indexC.put(getKey(node.getUserObject()), cp);
         }
 
 
@@ -845,9 +938,8 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             try {
                 em.getTransaction().begin();
                 Homes home = em.merge(new Homes(UUID.randomUUID().toString().substring(0, 15)));
-                object2refresh = home;
                 em.getTransaction().commit();
-                initDataModel(home);
+                nodeToRefresh = initDataModel(home);
             } catch (IllegalStateException ise) {
                 OPDE.error(ise);
             } catch (Exception ex) {
@@ -855,7 +947,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                 OPDE.fatal(ex);
             } finally {
                 em.close();
-                reload = true;
+                refresh = true;
             }
         });
 

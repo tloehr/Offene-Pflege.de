@@ -1,13 +1,13 @@
 package op.tools;
 
+import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.swing.JideButton;
 import op.OPDE;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.beans.PropertyVetoException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,12 +16,18 @@ import java.awt.event.MouseListener;
  * Time: 11:57
  * To change this template use File | Settings | File Templates.
  */
-public class DefaultCPTitle  {
+public class DefaultCollapsiblePane extends CollapsiblePane {
     JPanel titlePanelleft, titlePanelright, titlePanel, additionalIconPanel;
     JideButton btnTitle;
 
+    ActionListener defaultActionListener;
 
-    public DefaultCPTitle(String title, ActionListener actionListener) {
+    public DefaultCollapsiblePane() {
+        super();
+
+        defaultActionListener = e -> {
+            setCollapsed(!isCollapsed());
+        };
 
         additionalIconPanel = new JPanel();
         additionalIconPanel.setLayout(new BoxLayout(additionalIconPanel, BoxLayout.LINE_AXIS));
@@ -30,9 +36,9 @@ public class DefaultCPTitle  {
         titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
-        btnTitle = GUITools.createHyperlinkButton(title, null, null);
+        btnTitle = GUITools.createHyperlinkButton("", null, null);
         btnTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnTitle.addActionListener(actionListener);
+
 
         titlePanelleft.add(additionalIconPanel);
         titlePanelleft.add(btnTitle);
@@ -58,6 +64,27 @@ public class DefaultCPTitle  {
                 GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                 new Insets(0, 0, 0, 0), 0, 0));
 
+        btnTitle.addActionListener(defaultActionListener);
+
+        setCollapsible(true);
+        setCollapsed(true);
+
+        setTitleLabelComponent(titlePanel);
+    }
+
+    public DefaultCollapsiblePane(String title) {
+        this();
+        setTitleButtonText(title);
+    }
+
+    public DefaultCollapsiblePane(String title, ActionListener actionListener) {
+        this(title);
+        addTitleButtonActionListener(actionListener);
+    }
+
+    public void addTitleButtonActionListener(ActionListener actionListener) {
+        btnTitle.removeActionListener(defaultActionListener);
+        btnTitle.addActionListener(actionListener);
     }
 
     public JPanel getAdditionalIconPanel() {
@@ -68,6 +95,15 @@ public class DefaultCPTitle  {
         return titlePanelleft;
     }
 
+    @Override
+    public void setCollapsed(boolean b) {
+        try {
+            super.setCollapsed(b);
+        } catch (PropertyVetoException pve) {
+            OPDE.warn(pve);
+        }
+    }
+
     public JPanel getRight() {
         return titlePanelright;
     }
@@ -76,7 +112,19 @@ public class DefaultCPTitle  {
         return titlePanel;
     }
 
-    public JideButton getButton(){
+    public void setTitleButtonText(String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                btnTitle.setText(SYSTools.xx(text));
+                revalidate();
+                repaint();
+            }
+        });
+
+    }
+
+    public JideButton getTitleButton() {
         return btnTitle;
     }
 }

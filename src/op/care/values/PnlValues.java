@@ -330,10 +330,10 @@ public class PnlValues extends NursingRecordsPanel {
         }
 
         if (!ResValueTools.getYearsWithValues(resident, vtype).isEmpty()) {
-//            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+//            cptitle.getTitleButton().setIcon(SYSConst.icon22ledGreenOn);
             cpType.setCollapsible(true);
         } else {
-//            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOff);
+//            cptitle.getTitleButton().setIcon(SYSConst.icon22ledGreenOff);
             cpType.setCollapsible(false);
         }
 

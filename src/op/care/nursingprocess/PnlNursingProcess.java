@@ -528,7 +528,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 });
 
                 cptitle.getRight().add(btnPrint);
-                //                cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+                //                cptitle.getTitleButton().setVerticalTextPosition(SwingConstants.TOP);
             }
 
 

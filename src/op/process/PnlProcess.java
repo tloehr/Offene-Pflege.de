@@ -586,13 +586,13 @@ public class PnlProcess extends NursingRecordsPanel {
         list.add(new JLabel(SYSTools.xx("nursingrecords.qprocesses.keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
 
 //        if (qProcess.isRevisionPastDue()) {
-//                   cptitle.getButton().setIcon(SYSConst.icon22ledRedOn);
+//                   cptitle.getTitleButton().setIcon(SYSConst.icon22ledRedOn);
 //               } else if (qProcess.isRevisionDue()) {
-//                   cptitle.getButton().setIcon(SYSConst.icon22ledYellowOn);
+//                   cptitle.getTitleButton().setIcon(SYSConst.icon22ledYellowOn);
 //               } else if (qProcess.isClosed()) {
-//                   cptitle.getButton().setIcon(SYSConst.icon22stopSign);
+//                   cptitle.getTitleButton().setIcon(SYSConst.icon22stopSign);
 //               } else {
-//                   cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+//                   cptitle.getTitleButton().setIcon(SYSConst.icon22ledGreenOn);
 //               }
 
         return list;

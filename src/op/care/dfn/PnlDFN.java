@@ -579,7 +579,7 @@ public class PnlDFN extends NursingRecordsPanel {
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? applyActionListener : null);
         dfnPane.setCollapseOnTitleClick(false);
-//        cptitle.getButton().setIcon(DFNTools.getIcon(dfn));
+//        cptitle.getTitleButton().setIcon(DFNTools.getIcon(dfn));
         JLabel icon1 = new JLabel(DFNTools.getIcon(dfn));
         icon1.setOpaque(false);
         JLabel icon2 = new JLabel(DFNTools.getFloatingIcon(dfn));
