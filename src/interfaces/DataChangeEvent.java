@@ -12,19 +12,21 @@ import java.util.EventObject;
  */
 public class DataChangeEvent<T> extends EventObject {
     T data;
+    String validationResult;
+    boolean valid;
 
     public T getData() {
         return data;
     }
 
-    public DataChangeEvent(Object source, T data) {
+    public DataChangeEvent(Object source, T data, String validationResult) {
         super(source);
         this.data = data;
+        this.validationResult = validationResult;
+        this.valid = validationResult.isEmpty();
     }
 
-//    public DataChangeEvent(Object source) {
-//        super(source);
-//    }
-
-
+    public boolean isValid() {
+        return valid;
+    }
 }

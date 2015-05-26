@@ -3,6 +3,8 @@ package op.tools;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.swing.JideButton;
 import op.OPDE;
+import org.apache.commons.collections.Closure;
+import org.jdesktop.core.animation.timing.Animator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,13 +19,21 @@ import java.beans.PropertyVetoException;
  * To change this template use File | Settings | File Templates.
  */
 public class DefaultCollapsiblePane extends CollapsiblePane {
+    private final Closure contentProvider;
+    private Animator animator = null;
+
     JPanel titlePanelleft, titlePanelright, titlePanel, additionalIconPanel;
     JideButton btnTitle;
+    boolean flashAfterEdit = true;
 
     ActionListener defaultActionListener;
 
-    public DefaultCollapsiblePane() {
+    private final DefaultCollapsiblePane thisPane;
+
+    public DefaultCollapsiblePane(Closure contentProvider) {
         super();
+        thisPane = this;
+        this.contentProvider = contentProvider;
 
         defaultActionListener = e -> {
             setCollapsed(!isCollapsed());
@@ -70,17 +80,20 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
         setCollapsed(true);
 
         setTitleLabelComponent(titlePanel);
+
+        contentProvider.execute(thisPane);
     }
 
-    public DefaultCollapsiblePane(String title) {
-        this();
-        setTitleButtonText(title);
-    }
+//    public DefaultCollapsiblePane(String title,Closure contentProvider) {
+//        this(contentProvider);
+//        setTitleButtonText(title);
+//    }
+//
+//    public DefaultCollapsiblePane(String title, ActionListener actionListener) {
+//        this(title);
+//        addTitleButtonActionListener(actionListener);
+//    }
 
-    public DefaultCollapsiblePane(String title, ActionListener actionListener) {
-        this(title);
-        addTitleButtonActionListener(actionListener);
-    }
 
     public void addTitleButtonActionListener(ActionListener actionListener) {
         btnTitle.removeActionListener(defaultActionListener);
@@ -112,15 +125,22 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
         return titlePanel;
     }
 
-    public void setTitleButtonText(String text) {
+    public void reload() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                btnTitle.setText(SYSTools.xx(text));
+                contentProvider.execute(thisPane);
                 revalidate();
                 repaint();
+                if (flashAfterEdit) {
+                    animator = GUITools.flashBackground(animator, thisPane, Color.YELLOW, 2);
+                }
             }
         });
+    }
+
+    public void setTitleButtonText(String text) {
+        btnTitle.setText(SYSTools.xx(text));
 
     }
 

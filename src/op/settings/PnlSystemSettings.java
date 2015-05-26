@@ -1197,7 +1197,7 @@ public class PnlSystemSettings extends CleanablePanel {
 
     @Override
     public void reload() {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override

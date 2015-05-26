@@ -90,7 +90,7 @@ public class PnlHomes extends EditPanelDefault<Homes> {
                     data.setCity(txtOrt.getText().trim());
                     data.setTel(txtTel.getText().trim());
                     data.setFax(txtFax.getText().trim());
-                    broadcast(new DataChangeEvent<>(this, data));
+                    broadcast(new DataChangeEvent<>(this, data, doValidation()));
                 }
             });
         }

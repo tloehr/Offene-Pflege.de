@@ -52,7 +52,7 @@ public class PnlSettings extends CleanablePanel {
 
     @Override
     public void reload() {
-
+        currentPanel.reload();
     }
 
     @Override
@@ -145,8 +145,8 @@ public class PnlSettings extends CleanablePanel {
         //======== pnlAll ========
         {
             pnlAll.setLayout(new FormLayout(
-                "default, $lcgap, left:55dlu, 6*($ugap, 55dlu), $lcgap, default:grow",
-                "default, $lcgap, default, $lgap, 50dlu, 2*($lgap, default), $ugap, default, $rgap, fill:50dlu, $rgap, default, $lgap, default, $ugap, default, $lgap, 50dlu, $lgap, default, $lcgap, default"));
+                    "default, $lcgap, left:55dlu, 6*($ugap, 55dlu), $lcgap, default:grow",
+                    "default, $lcgap, default, $lgap, 50dlu, 2*($lgap, default), $ugap, default, $rgap, fill:50dlu, $rgap, default, $lgap, default, $ugap, default, $lgap, 50dlu, $lgap, default, $lcgap, default"));
 
             //---- lblPersonal ----
             lblPersonal.setText("Pers\u00f6nliche Einstellungen");
@@ -299,8 +299,8 @@ public class PnlSettings extends CleanablePanel {
         //======== pnlSingle ========
         {
             pnlSingle.setLayout(new FormLayout(
-                "default, $rgap, default:grow, $lcgap, default",
-                "fill:default, $ugap, fill:default:grow"));
+                    "default, $rgap, default:grow, $lcgap, default",
+                    "fill:default, $ugap, fill:default:grow"));
 
             //---- btnBack ----
             btnBack.setText(null);

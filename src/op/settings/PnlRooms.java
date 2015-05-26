@@ -16,8 +16,7 @@ import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 /**
@@ -42,12 +41,11 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
         il = new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    data.setText(txtText.getText().trim());
+                if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
                     data.setActive(btnActive.isSelected());
                     data.setSingle(btnSingle.isSelected());
                     data.setBath(btnBath.isSelected());
-                    broadcast(new DataChangeEvent<Rooms>(this, data));
+                    broadcast(new DataChangeEvent<Rooms>(this, data, doValidation()));
                 }
             }
         };
@@ -91,8 +89,6 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
 
     private void initPanel() {
         lblText.setText(SYSTools.xx("opde.settings.pnlrooms.name"));
-//        lblSingle.setText(SYSTools.xx("misc.msg.single.room"));
-//        lblBath.setText(SYSTools.xx("misc.msg.room.bath"));
 
         allComponents.add(txtText);
         allComponents.add(btnSingle);
@@ -106,12 +102,21 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
     @Override
     public Rooms getResult() {
 
-       return data;
+        return data;
     }
 
     @Override
     public String doValidation() {
         return txtText.getText().isEmpty() ? SYSTools.xx("misc.msg.emptyFields") : "";
+    }
+
+    private void txtTextFocusLost(FocusEvent e) {
+        data.setText(txtText.getText().trim());
+        broadcast(new DataChangeEvent<Rooms>(this, data, doValidation()));
+    }
+
+    private void txtTextActionPerformed(ActionEvent e) {
+        txtTextFocusLost(null);
     }
 
     private void initComponents() {
@@ -121,8 +126,8 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
-                "2*(default, $lgap), default"));
+            "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
+            "2*(default, $lgap), default"));
 
         //---- lblText ----
         lblText.setText("Anrede");
@@ -131,6 +136,13 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
 
         //---- txtText ----
         txtText.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtTextFocusLost(e);
+            }
+        });
+        txtText.addActionListener(e -> txtTextActionPerformed(e));
         add(txtText, CC.xy(5, 3));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

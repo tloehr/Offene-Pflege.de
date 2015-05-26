@@ -188,7 +188,7 @@ public class GUITools {
      * Shows a JidePopup in relation to its owner. Calculates the new position that it leaves the owner
      * visible. The popup is placed according to the <code>location</code> setting. The size of the content
      * pane is taken into the calculation in order to find the necessary <code>x, y</code> coordinates on the screen.
-     * <p/>
+     * <p>
      * <ul>
      * <li>SwingConstants.CENTER <i>You can use this, but I fail to see the sense in it.</i></li>
      * <li>SwingConstants.SOUTH</li>
@@ -538,6 +538,48 @@ public class GUITools {
 //        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
+    public static Animator flashBackground(Animator animator, final JComponent component, final Color flashcolor, int repeatTimes) {
+        if (component == null)
+            return null; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
+        final Color originalColor = component.getBackground();
+
+
+        if (animator == null || !animator.isRunning()) {
+
+            final TimingSource ts = new SwingTimerTimingSource();
+            final boolean wasOpaque = component.isOpaque();
+            Animator.setDefaultTimingSource(ts);
+            ts.init();
+            component.setOpaque(true);
+
+
+            animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(repeatTimes).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+                @Override
+                public void begin(Animator source) {
+                }
+
+                @Override
+                public void timingEvent(Animator animator, final double fraction) {
+                    SwingUtilities.invokeLater(() -> {
+                        component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
+                        component.repaint();
+                    });
+                }
+
+                @Override
+                public void end(Animator source) {
+                    component.setOpaque(wasOpaque);
+                    component.repaint();
+                }
+            }).build();
+        } else {
+            animator.stop();
+        }
+        animator.start();
+
+        return animator;
+    }
+
 
     public static void flashBackground(final JComponent component, final Color flashcolor, int repeatTimes) {
         if (component == null)
@@ -555,13 +597,9 @@ public class GUITools {
 
             @Override
             public void timingEvent(Animator animator, final double fraction) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        // interpolateColor(component.getBackground(), flashcolor, fraction)
-                        component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
-                        component.repaint();
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
+                    component.repaint();
                 });
             }
 
@@ -569,19 +607,9 @@ public class GUITools {
             public void end(Animator source) {
                 component.setOpaque(wasOpaque);
                 component.repaint();
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        // interpolateColor(component.getBackground(), flashcolor, fraction)
-////                        component.setBackground(originalColor);
-//
-//                    }
-//                });
             }
         }).build();
         animator.start();
-
-//        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
     public static Animator flashIcon(final AbstractButton btn, final Icon icon) {
