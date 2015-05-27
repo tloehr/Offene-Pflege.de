@@ -9,7 +9,7 @@ package interfaces;
  */
 public interface EditPanelInterface<T> {
 
-    public T getResult();
+
 
     public void setStartFocus();
 
@@ -22,5 +22,7 @@ public interface EditPanelInterface<T> {
     public void removeDataChangeListener(DataChangeListener<T> dcl);
 
     public void cleanup();
+
+    public void reload();
 
 }

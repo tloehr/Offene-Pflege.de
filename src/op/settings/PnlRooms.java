@@ -12,6 +12,7 @@ import interfaces.DataChangeListener;
 import interfaces.EditPanelDefault;
 import op.tools.GUITools;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
@@ -30,10 +31,8 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
     JToggleButton btnSingle, btnBath, btnActive;
     ItemListener il;
 
-    public PnlRooms(Rooms room, DataChangeListener dcl) {
-        super();
-
-        addDataChangeListener(dcl);
+    public PnlRooms(DataChangeListener dcl, Closure contentProvider) {
+        super(dcl, contentProvider);
 
         allComponents = new ArrayList<Component>();
         initComponents();
@@ -63,8 +62,6 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
 
         add(buttonPanel, CC.xywh(3, 5, 3, 1));
 
-        setDataObject(room);
-
         btnSingle.addItemListener(il);
         btnBath.addItemListener(il);
         btnActive.addItemListener(il);
@@ -73,14 +70,14 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
     }
 
 
-    @Override
-    public void setDataObject(Rooms room) {
-        super.setDataObject(room);
-        txtText.setText(data.getText());
-        btnSingle.setSelected(data.isSingle());
-        btnBath.setSelected(data.hasBath());
-        btnActive.setSelected(data.isActive());
-    }
+//    @Override
+//    public void setDataObject(Rooms room) {
+//        super.setDataObject(room);
+//        txtText.setText(data.getText());
+//        btnSingle.setSelected(data.isSingle());
+//        btnBath.setSelected(data.hasBath());
+//        btnActive.setSelected(data.isActive());
+//    }
 
     @Override
     public void setStartFocus() {
@@ -89,6 +86,8 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
 
     private void initPanel() {
         lblText.setText(SYSTools.xx("opde.settings.pnlrooms.name"));
+
+        refreshDisplay();
 
         allComponents.add(txtText);
         allComponents.add(btnSingle);
@@ -99,11 +98,6 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
         setFocusTraversalPolicy(GUITools.createTraversalPolicy(allComponents));
     }
 
-    @Override
-    public Rooms getResult() {
-
-        return data;
-    }
 
     @Override
     public String doValidation() {
@@ -111,12 +105,20 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
     }
 
     private void txtTextFocusLost(FocusEvent e) {
-        data.setText(txtText.getText().trim());
-        broadcast(new DataChangeEvent<Rooms>(this, data, doValidation()));
+//        data.setText(txtText.getText().trim());
+//        broadcast(new DataChangeEvent<Rooms>(this, data, doValidation()));
     }
 
     private void txtTextActionPerformed(ActionEvent e) {
         txtTextFocusLost(null);
+    }
+
+    @Override
+    public void refreshDisplay() {
+        txtText.setText(data.getText());
+        btnSingle.setSelected(data.isSingle());
+        btnBath.setSelected(data.hasBath());
+        btnActive.setSelected(data.isActive());
     }
 
     private void initComponents() {
@@ -126,8 +128,8 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
-            "2*(default, $lgap), default"));
+                "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
+                "2*(default, $lgap), default"));
 
         //---- lblText ----
         lblText.setText("Anrede");

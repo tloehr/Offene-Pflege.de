@@ -29,6 +29,9 @@ public class Rooms implements Serializable {
     private Boolean bath;
     @Column(name = "active")
     private Boolean active;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @JoinColumn(name = "floorid", referencedColumnName = "floorid")
     @ManyToOne

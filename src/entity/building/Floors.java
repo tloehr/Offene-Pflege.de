@@ -17,6 +17,10 @@ public class Floors {
     private Short level;
     private Short lift;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     private static final long serialVersionUID = 1L;
 
 

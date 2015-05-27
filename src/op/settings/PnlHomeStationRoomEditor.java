@@ -13,10 +13,13 @@ import entity.building.*;
 import interfaces.DataChangeEvent;
 import interfaces.DataChangeListener;
 import op.OPDE;
+import op.threads.DisplayManager;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
@@ -150,7 +153,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
             cpsHomes.addExpansion();
         } else {
-            if (indexView.containsKey(getKey(keyToRefresh))) {
+            if (indexView.containsKey(keyToRefresh)) {
                 indexView.get(keyToRefresh).reload();
             } else {
 
@@ -172,7 +175,6 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             keyToRefresh = null;
         }
     }
-
 
 
     private DefaultCollapsiblePane createCP(DefaultMutableTreeNode node) {
@@ -303,35 +305,59 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
         CollapsiblePanes cps = new CollapsiblePanes();
         Enumeration en = node.children();
-
+        final String key = getKey(node);
 
         if (node.getUserObject() instanceof Homes) {
-            cps.add(new PnlHomes((Homes) node.getUserObject(), new DataChangeListener<Homes>() {
+
+
+
+            cps.add(new PnlHomes(new DataChangeListener<Homes>() {
                 @Override
                 public void dataChanged(DataChangeEvent evt) {
+                    if (!evt.isValid()){
+                        OPDE.getDisplayManager().addSubMessage(evt.getValidationResult());
+                        return;
+                    }
+
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
                         Homes myHome = em.merge((Homes) evt.getData());
+                        em.lock(myHome, LockModeType.OPTIMISTIC);
                         em.getTransaction().commit();
 
                         DefaultMutableTreeNode found = find(evt.getData());
                         found.setUserObject(myHome);
 
                         keyToRefresh = getKey(myHome);
-
                         indexModel.put(keyToRefresh, found);
+
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+
                     } catch (Exception e) {
                         em.getTransaction().rollback();
                         OPDE.fatal(e);
                     } finally {
                         em.close();
+                        ((PnlHomes) evt.getSource()).cleanup(); // this is a one time use panel. will be replaced with the next refresh
                         refresh = true;
                     }
                 }
+            }, o -> {
+                PnlHomes pnl = (PnlHomes) o;
+                pnl.setDataObject((Homes) indexModel.get(key).getUserObject());
             }));
         } else if (node.getUserObject() instanceof Rooms) {
-            cps.add(new PnlRooms((Rooms) node.getUserObject(), new DataChangeListener<Homes>() {
+            cps.add(new PnlRooms(new DataChangeListener<Rooms>() {
                 @Override
                 public void dataChanged(DataChangeEvent evt) {
                     EntityManager em = OPDE.createEM();
@@ -354,6 +380,9 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                         refresh = true;
                     }
                 }
+            }, o -> {
+                PnlRooms pnl = (PnlRooms) o;
+                pnl.setDataObject((Rooms) indexModel.get(key).getUserObject());
             }));
         }
 

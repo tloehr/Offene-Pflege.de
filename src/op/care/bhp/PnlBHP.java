@@ -718,7 +718,6 @@ public class PnlBHP extends NursingRecordsPanel {
                         }
                     } catch (OptimisticLockException ole) {
                         OPDE.warn(ole);
-                        OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }

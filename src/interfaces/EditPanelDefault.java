@@ -1,24 +1,37 @@
 package interfaces;
 
+import org.apache.commons.collections.Closure;
+
 import javax.swing.*;
 import java.util.HashSet;
 
 /**
  * Created by tloehr on 11.05.15.
  */
-public class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T> {
+public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T> {
     protected T data;
     protected HashSet<DataChangeListener<T>> listDCL;
+    private final Closure contentProvider;
+    protected final EditPanelDefault<T> thisPanel = this;
+    protected boolean edited = false;
 
-    @Override
-    public T getResult() {
-        return null;
+    public EditPanelDefault(DataChangeListener dcl, Closure contentProvider) {
+        this(contentProvider);
+        addDataChangeListener(dcl);
     }
 
-    @Override
-    public void setStartFocus() {
-
+    public EditPanelDefault(Closure contentProvider) {
+        super();
+        listDCL = new HashSet<>();
+        this.contentProvider = contentProvider;
+        contentProvider.execute(thisPanel);
     }
+
+
+
+
+    @Override
+    public abstract void setStartFocus();
 
     @Override
     public void setDataObject(T data) {
@@ -26,9 +39,7 @@ public class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T>
     }
 
     @Override
-    public String doValidation() {
-        return "";
-    }
+    public abstract String doValidation();
 
     @Override
     public void addDataChangeListener(DataChangeListener<T> dcl) {
@@ -42,13 +53,9 @@ public class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T>
 
     @Override
     public void cleanup() {
+        edited = false;
         listDCL.clear();
         removeAll();
-    }
-
-    public EditPanelDefault() {
-        super();
-        listDCL = new HashSet<>();
     }
 
     public void broadcast(DataChangeEvent<T> dce) {
@@ -57,8 +64,17 @@ public class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T>
         }
     }
 
-//    public EditPanelDefault(T data) {
-//        this();
-//        setDataObject(data);
-//    }
+    @Override
+    public void reload() {
+        SwingUtilities.invokeLater(() -> {
+            contentProvider.execute(thisPanel);
+            edited = false;
+            refreshDisplay();
+            revalidate();
+            repaint();
+        });
+    }
+
+    public abstract void refreshDisplay();
+
 }

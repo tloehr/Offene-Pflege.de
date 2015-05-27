@@ -7,20 +7,22 @@ package op.settings;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.building.Homes;
-import entity.building.Rooms;
 import interfaces.DataChangeEvent;
 import interfaces.DataChangeListener;
 import interfaces.EditPanelDefault;
 import op.tools.GUITools;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+
+
 
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
 /**
@@ -32,9 +34,10 @@ public class PnlHomes extends EditPanelDefault<Homes> {
     private ArrayList<JTextComponent> allTXT;
     private ArrayList<Component> allComponents;
 
-    public PnlHomes(Homes data, DataChangeListener dcl) {
-        this.data = data;
-        addDataChangeListener(dcl);
+
+
+    public PnlHomes(DataChangeListener dcl, Closure contentProvider) {
+        super(dcl, contentProvider);
         allTXT = new ArrayList<JTextComponent>();
         allComponents = new ArrayList<Component>();
         initComponents();
@@ -46,7 +49,18 @@ public class PnlHomes extends EditPanelDefault<Homes> {
         txtName.requestFocus();
     }
 
+    @Override
+    public void refreshDisplay() {
+        txtName.setText(data.getName());
+        txtStrasse.setText(data.getStreet());
+        txtPLZ.setText(data.getZIP());
+        txtOrt.setText(data.getCity());
+        txtFax.setText(data.getFax());
+        txtTel.setText(data.getTel());
+    }
+
     private void initPanel() {
+
         lblName.setText(SYSTools.xx("opde.settings.pnlhomes.lblName"));
         lblStrasse.setText(SYSTools.xx("misc.msg.street"));
         lblPLZ.setText(SYSTools.xx("misc.msg.zipcode"));
@@ -54,12 +68,7 @@ public class PnlHomes extends EditPanelDefault<Homes> {
         lblTel.setText(SYSTools.xx("misc.msg.phone"));
         lblFax.setText(SYSTools.xx("misc.msg.fax"));
 
-        txtName.setText(data.getName());
-        txtStrasse.setText(data.getStreet());
-        txtPLZ.setText(data.getZIP());
-        txtOrt.setText(data.getCity());
-        txtFax.setText(data.getFax());
-        txtTel.setText(data.getTel());
+        refreshDisplay();
 
         allTXT.add(txtName);
         allTXT.add(txtStrasse);
@@ -75,43 +84,70 @@ public class PnlHomes extends EditPanelDefault<Homes> {
         allComponents.add(txtTel);
         allComponents.add(txtFax);
 
-
         setFocusCycleRoot(true);
         setFocusTraversalPolicy(GUITools.createTraversalPolicy(allComponents));
 
+        CaretListener cl = new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                edited = true;
+            }
+        };
 
         for (JTextComponent txt : allTXT) {
+            txt.addCaretListener(cl);
+
             txt.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
+                    if (!edited) return;
+
                     data.setName(txtName.getText().trim());
                     data.setStreet(txtStrasse.getText().trim());
                     data.setZip(txtPLZ.getText().trim());
                     data.setCity(txtOrt.getText().trim());
                     data.setTel(txtTel.getText().trim());
                     data.setFax(txtFax.getText().trim());
-                    broadcast(new DataChangeEvent<>(this, data, doValidation()));
+                    broadcast(new DataChangeEvent<>(thisPanel, data, doValidation()));
                 }
             });
         }
 
-    }
-
-
-    @Override
-    public Homes getResult() {
-
-        data.setName(txtName.getText().trim());
-        data.setStreet(txtStrasse.getText().trim());
-        data.setZip(SYSTools.left(txtPLZ.getText().trim(), 5, ""));
-        data.setCity(txtOrt.getText().trim());
-        data.setTel(txtTel.getText().trim());
-        data.setFax(txtFax.getText().trim());
-//        } else {
-//            home = null;
+//        for (JTextComponent txt : allTXT) {
+//            ((JTextField) txt).addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+//                    manager.focusNextComponent();
+////                    data.setName(txtName.getText().trim());
+////                    data.setStreet(txtStrasse.getText().trim());
+////                    data.setZip(txtPLZ.getText().trim());
+////                    data.setCity(txtOrt.getText().trim());
+////                    data.setTel(txtTel.getText().trim());
+////                    data.setFax(txtFax.getText().trim());
+////                    broadcast(new DataChangeEvent<>(this, data, doValidation()));
+//                }
+//            });
 //        }
-        return data;
+
     }
+
+
+//    @Override
+//    public Homes getResult() {
+//
+//        data.setName(txtName.getText().trim());
+//        data.setStreet(txtStrasse.getText().trim());
+//        data.setZip(SYSTools.left(txtPLZ.getText().trim(), 5, ""));
+//        data.setCity(txtOrt.getText().trim());
+//        data.setTel(txtTel.getText().trim());
+//        data.setFax(txtFax.getText().trim());
+////        } else {
+////            home = null;
+////        }
+//        return data;
+//    }
+
 
     @Override
     public String doValidation() {

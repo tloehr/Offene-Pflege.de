@@ -26,6 +26,10 @@ public class DataChangeEvent<T> extends EventObject {
         this.valid = validationResult.isEmpty();
     }
 
+    public String getValidationResult() {
+        return validationResult;
+    }
+
     public boolean isValid() {
         return valid;
     }

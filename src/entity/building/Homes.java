@@ -56,11 +56,11 @@ public class Homes implements Serializable {
     public Homes(String eid) {
         this.eid = eid;
         this.name = SYSTools.xx("homes.new.home");
-        this.street = "";
+        this.street = SYSTools.xx("misc.msg.street");
         this.zip = "12345";
-        this.city = "";
-        this.tel = "";
-        this.fax = "";
+        this.city = SYSTools.xx("misc.msg.city");
+        this.tel = SYSTools.xx("misc.msg.phone");;
+        this.fax = SYSTools.xx("misc.msg.fax");;
     }
 
     public String getEID() {
