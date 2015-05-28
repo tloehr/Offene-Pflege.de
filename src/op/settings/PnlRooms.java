@@ -7,6 +7,7 @@ package op.settings;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.building.Rooms;
+import interfaces.ContentProvider;
 import interfaces.DataChangeEvent;
 import interfaces.DataChangeListener;
 import interfaces.EditPanelDefault;
@@ -31,7 +32,7 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
     JToggleButton btnSingle, btnBath, btnActive;
     ItemListener il;
 
-    public PnlRooms(DataChangeListener dcl, Closure contentProvider) {
+    public PnlRooms(DataChangeListener dcl, ContentProvider<Rooms> contentProvider) {
         super(dcl, contentProvider);
 
         allComponents = new ArrayList<Component>();
@@ -44,7 +45,7 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
                     data.setActive(btnActive.isSelected());
                     data.setSingle(btnSingle.isSelected());
                     data.setBath(btnBath.isSelected());
-                    broadcast(new DataChangeEvent<Rooms>(this, data, doValidation()));
+                    broadcast(new DataChangeEvent<Rooms>(thisPanel, data, doValidation()));
                 }
             }
         };
@@ -67,6 +68,8 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
         btnActive.addItemListener(il);
 
         initPanel();
+
+        refreshDisplay();
     }
 
 
@@ -86,8 +89,6 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
 
     private void initPanel() {
         lblText.setText(SYSTools.xx("opde.settings.pnlrooms.name"));
-
-        refreshDisplay();
 
         allComponents.add(txtText);
         allComponents.add(btnSingle);

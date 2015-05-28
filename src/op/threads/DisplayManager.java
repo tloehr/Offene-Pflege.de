@@ -10,6 +10,7 @@ import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -352,6 +353,10 @@ public class DisplayManager extends Thread {
         lastoperation = System.currentTimeMillis();
     }
 
+    public static DisplayMessage getLockMessage(OptimisticLockException ole) {
+        return new DisplayMessage(SYSTools.xx("misc.msg.lockingexception") + ": " + ole.getEntity().getClass().getName(), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
+    }
+
     public static DisplayMessage getLockMessage() {
         return new DisplayMessage(SYSTools.xx("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
     }
@@ -376,7 +381,7 @@ public class DisplayManager extends Thread {
                 processSubMessage();
                 check4MaintenanceMode();
 
-                if (OPDE.isTraining() && OPDE.getLogin() != null && step % 600 == 0){
+                if (OPDE.isTraining() && OPDE.getLogin() != null && step % 600 == 0) {
                     addSubMessage(new DisplayMessage("opde.general.training.version.reminder", DisplayMessage.NORMAL, 3));
                 }
 
@@ -391,7 +396,7 @@ public class DisplayManager extends Thread {
                         pbTimeout.setValue(new BigDecimal(millisToGo / 1000).intValue());
                         pbTOIsInUse = true;
                     } else {
-                        if (pbTOIsInUse){
+                        if (pbTOIsInUse) {
                             pbTimeout.setValue(0);
                             pbTOIsInUse = false;
                         }

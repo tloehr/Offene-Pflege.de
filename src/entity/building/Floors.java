@@ -1,5 +1,7 @@
 package entity.building;
 
+
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -14,8 +16,8 @@ public class Floors {
     @Column(name = "floorid")
     private long floorid;
     private String name;
-    private Short level;
-    private Short lift;
+    private Short level; // 0 means ground floor. negative levels are below ground. positives above
+    private Short lift;  // number of lifts connecting to this floor
 
     @Version
     @Column(name = "version")

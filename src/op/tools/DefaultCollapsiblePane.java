@@ -78,6 +78,8 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
 
         setCollapsible(true);
         setCollapsed(true);
+        setSlidingDirection(SwingConstants.SOUTH);
+
 
         setTitleLabelComponent(titlePanel);
 

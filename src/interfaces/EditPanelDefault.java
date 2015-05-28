@@ -11,20 +11,20 @@ import java.util.HashSet;
 public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T> {
     protected T data;
     protected HashSet<DataChangeListener<T>> listDCL;
-    private final Closure contentProvider;
+    private final ContentProvider<T> contentProvider;
     protected final EditPanelDefault<T> thisPanel = this;
     protected boolean edited = false;
 
-    public EditPanelDefault(DataChangeListener dcl, Closure contentProvider) {
+    public EditPanelDefault(DataChangeListener dcl, ContentProvider<T> contentProvider) {
         this(contentProvider);
         addDataChangeListener(dcl);
     }
 
-    public EditPanelDefault(Closure contentProvider) {
+    public EditPanelDefault(ContentProvider<T> contentProvider) {
         super();
         listDCL = new HashSet<>();
         this.contentProvider = contentProvider;
-        contentProvider.execute(thisPanel);
+        data = contentProvider.getContent();
     }
 
 
@@ -33,10 +33,10 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
     @Override
     public abstract void setStartFocus();
 
-    @Override
-    public void setDataObject(T data) {
-        this.data = data;
-    }
+//    @Override
+//    public void setDataObject(T data) {
+//        this.data = data;
+//    }
 
     @Override
     public abstract String doValidation();
@@ -67,7 +67,7 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
     @Override
     public void reload() {
         SwingUtilities.invokeLater(() -> {
-            contentProvider.execute(thisPanel);
+            data = contentProvider.getContent();
             edited = false;
             refreshDisplay();
             revalidate();

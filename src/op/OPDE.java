@@ -200,7 +200,11 @@ public class OPDE {
     }
 
     public static void warn(Throwable message) {
-        logger.warn(message);
+        warn(logger, message);
+    }
+
+    public static void warn(Logger classLogger, Throwable message) {
+        classLogger.warn(message);
         SyslogTools.warn(ExceptionUtils.getMessage(message) + ": " + ExceptionUtils.getStackTrace(message));
     }
 
@@ -219,29 +223,55 @@ public class OPDE {
     }
 
     public static void fatal(Throwable e) {
-        logger.fatal(e.getMessage(), e);
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            SyslogTools.addLog(em, e.getMessage(), SyslogTools.FATAL);
-            em.getTransaction().commit();
-        } catch (Exception ee) {
-            em.getTransaction().rollback();
-            ee.printStackTrace();
-        } finally {
-            em.close();
-        }
-        e.printStackTrace();
-
-        String html = SYSTools.getThrowableAsHTML(e);
-        File temp = SYSFilesTools.print(html, false);
-
-        if (!isDebug()) {
-            EMailSystem.sendErrorMail(e.getMessage(), temp);
-        }
-
-        System.exit(1);
+        fatal(logger, e);
+//        logger.fatal(e.getMessage(), e);
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+//            SyslogTools.addLog(em, e.getMessage(), SyslogTools.FATAL);
+//            em.getTransaction().commit();
+//        } catch (Exception ee) {
+//            em.getTransaction().rollback();
+//            ee.printStackTrace();
+//        } finally {
+//            em.close();
+//        }
+//        e.printStackTrace();
+//
+//        String html = SYSTools.getThrowableAsHTML(e);
+//        File temp = SYSFilesTools.print(html, false);
+//
+//        if (!isDebug()) {
+//            EMailSystem.sendErrorMail(e.getMessage(), temp);
+//        }
+//
+//        System.exit(1);
     }
+
+    public static void fatal(Logger classLogger, Throwable e) {
+        classLogger.fatal(e.getMessage(), e);
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                SyslogTools.addLog(em, e.getMessage(), SyslogTools.FATAL);
+                em.getTransaction().commit();
+            } catch (Exception ee) {
+                em.getTransaction().rollback();
+                ee.printStackTrace();
+            } finally {
+                em.close();
+            }
+            e.printStackTrace();
+
+            String html = SYSTools.getThrowableAsHTML(e);
+            File temp = SYSFilesTools.print(html, false);
+
+            if (!isDebug()) {
+                EMailSystem.sendErrorMail(e.getMessage(), temp);
+            }
+
+            System.exit(1);
+        }
 
     public static void error(Object message) {
         logger.error(message);

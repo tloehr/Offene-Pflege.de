@@ -7,6 +7,7 @@ package op.settings;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.building.Homes;
+import interfaces.ContentProvider;
 import interfaces.DataChangeEvent;
 import interfaces.DataChangeListener;
 import interfaces.EditPanelDefault;
@@ -36,12 +37,13 @@ public class PnlHomes extends EditPanelDefault<Homes> {
 
 
 
-    public PnlHomes(DataChangeListener dcl, Closure contentProvider) {
+    public PnlHomes(DataChangeListener dcl, ContentProvider<Homes> contentProvider) {
         super(dcl, contentProvider);
         allTXT = new ArrayList<JTextComponent>();
         allComponents = new ArrayList<Component>();
         initComponents();
         initPanel();
+        refreshDisplay();
     }
 
     @Override
@@ -68,7 +70,7 @@ public class PnlHomes extends EditPanelDefault<Homes> {
         lblTel.setText(SYSTools.xx("misc.msg.phone"));
         lblFax.setText(SYSTools.xx("misc.msg.fax"));
 
-        refreshDisplay();
+
 
         allTXT.add(txtName);
         allTXT.add(txtStrasse);

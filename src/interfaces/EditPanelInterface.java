@@ -13,7 +13,7 @@ public interface EditPanelInterface<T> {
 
     public void setStartFocus();
 
-    public void setDataObject(T t);
+//    public void setDataObject(T t);
 
     public String doValidation();
 
