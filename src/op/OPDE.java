@@ -45,6 +45,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 import java.awt.*;
 import java.io.*;
 import java.sql.*;
@@ -81,6 +83,7 @@ public class OPDE {
     protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
     protected static SYSLogin login;
+    protected static ValidatorFactory validatorFactory;
 
     protected static boolean animation = false;
     protected static boolean debug;
@@ -215,6 +218,10 @@ public class OPDE {
     public static void important(Object message) {
         logger.info(message);
         SyslogTools.info(message.toString());
+    }
+
+    public static ValidatorFactory getValidatorFactory() {
+        return validatorFactory;
     }
 
     public static void important(EntityManager em, Object message) throws Exception {
@@ -395,6 +402,9 @@ public class OPDE {
          */
         lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
 
+
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+
         /***
          *       ____      _       _             _ _                                                        _   _
          *      / ___|__ _| |_ ___| |__     __ _| | |  _ __ ___   __ _ _   _  ___    _____  _____ ___ _ __ | |_(_) ___  _ __  ___
@@ -422,9 +432,14 @@ public class OPDE {
          *                              |___/ |___/         |___/       |___/
          */
         logger = Logger.getRootLogger();
+
+
+
         PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
         ConsoleAppender consoleAppender = new ConsoleAppender(layout);
         logger.addAppender(consoleAppender);
+
+        Logger.getLogger("org.jboss.logging").addAppender(consoleAppender);
 
         /***
          *                         _      _               ___        __

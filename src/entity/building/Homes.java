@@ -6,6 +6,7 @@ package entity.building;
 
 import entity.reports.Handovers;
 import op.tools.SYSTools;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,14 +26,19 @@ public class Homes implements Serializable {
     @Column(name = "EID")
     private String eid;
     @Column(name = "Name")
+    @NotEmpty
     private String name;
     @Column(name = "Str")
+    @NotEmpty
     private String street;
     @Column(name = "ZIP")
+    @NotEmpty
     private String zip;
     @Column(name = "City")
+    @NotEmpty
     private String city;
     @Column(name = "Tel")
+    @NotEmpty
     private String tel;
     @Column(name = "Fax")
     private String fax;

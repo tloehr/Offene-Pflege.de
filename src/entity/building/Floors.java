@@ -1,8 +1,13 @@
 package entity.building;
 
 
+import com.sun.istack.internal.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,8 +20,16 @@ public class Floors {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "floorid")
     private long floorid;
+
+    @NotEmpty
     private String name;
+
+    @Min(0)
+    @Max(10)
     private Short level; // 0 means ground floor. negative levels are below ground. positives above
+
+    @Min(0)
+    @Max(10)
     private Short lift;  // number of lifts connecting to this floor
 
     @Version
@@ -35,8 +48,20 @@ public class Floors {
         this.floorid = floorid;
     }
 
+    public Floors() {
+    }
+
+    public Floors(Homes home, String name) {
+        this.home = home;
+        this.name = name;
+        level = 0;
+        lift = 0;
+        rooms = new ArrayList<>();
+    }
+
     @JoinColumn(name = "HomeID", referencedColumnName = "EID")
     @ManyToOne
+    @NotNull
     private Homes home;
 
     @Basic

@@ -5,7 +5,12 @@
 
 package interfaces;
 
+import op.OPDE;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.EventObject;
+import java.util.Set;
 
 /**
  * @author tloehr
@@ -13,6 +18,7 @@ import java.util.EventObject;
 public class DataChangeEvent<T> extends EventObject {
     T data;
     String validationResult;
+    Set<ConstraintViolation<T>> constraintViolations;
     boolean valid;
 
     public T getData() {
@@ -26,8 +32,21 @@ public class DataChangeEvent<T> extends EventObject {
         this.valid = validationResult.isEmpty();
     }
 
+    public DataChangeEvent(Object source, T data) {
+        super(source);
+        Validator validator = OPDE.getValidatorFactory().getValidator();
+
+        this.data = data;
+        constraintViolations = validator.validate(data);
+        this.valid = constraintViolations.isEmpty();
+    }
+
     public String getValidationResult() {
         return validationResult;
+    }
+
+    public Set<ConstraintViolation<T>> getConstraintViolations() {
+        return constraintViolations;
     }
 
     public boolean isValid() {
