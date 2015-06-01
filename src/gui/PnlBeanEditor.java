@@ -8,74 +8,52 @@ import interfaces.DataChangeListener;
 import interfaces.EditPanelDefault;
 import op.OPDE;
 import op.tools.GUITools;
+import op.tools.SYSConst;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
-import javax.validation.ConstraintViolation;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.validation.ConstraintViolationException;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Created by tloehr on 28.05.15.
  */
 public class PnlBeanEditor<T> extends EditPanelDefault<T> {
-    //    final BeanInfo beanInfo;
+    private final Class<T> clazz;
     private final String[] fields;
-    private HashMap<String, PropertyDescriptor> propsMap;
-    private HashMap<String, MethodDescriptor> methodMap;
     private Logger logger = Logger.getLogger(this.getClass());
+    public static final int SAVE_MODE_IMMEDIATE = 0;
+    public static final int SAVE_MODE_OK_CANCEL = 1;
+    private int saveMode;
 
-    public PnlBeanEditor(DataChangeListener dcl, ContentProvider<T> contentProvider, Class<T> clazz, String[] fields) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public PnlBeanEditor(DataChangeListener dcl, ContentProvider<T> contentProvider, Class<T> clazz, String[] fields, int saveMode) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super(dcl, contentProvider);
+        this.clazz = clazz;
         this.fields = fields;
-
-//        beanInfo = Introspector.getBeanInfo(clazz);
-//
-//        beanInfo.getBeanDescriptor();
-//        beanInfo.getAdditionalBeanInfo();
-//        beanInfo.getPropertyDescriptors();
-//        beanInfo.getMethodDescriptors();
-//
-//
-//        propsMap = new HashMap<>();
-//        methodMap = new HashMap<>();
-////        PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-//
-//
-//        for (PropertyDescriptor prop : beanInfo.getPropertyDescriptors()) {
-//            propsMap.put(prop.getName(), prop);
-//        }
-//
-//        for (MethodDescriptor md : beanInfo.getMethodDescriptors()) {
-//            methodMap.put(md.getName(), md);
-//        }
+        this.saveMode = saveMode;
 
         initPanel();
-
-
+        initButtonPanel();
     }
+
 
     void initPanel() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-
-        //todo: validator testen
-
-
-//        )
-//
-//        String rows = StringUtils.repeat("p, 3dlu,", fields.length);
-//        rows = SYSTools.left(rows, rows.length() - 1, "");
-
-        setLayout(new FormLayout("2*(default, $lcgap), 162dlu:grow, $lcgap, default",
-                fields.length + "*(default, $lgap), default"));
+        setLayout(new FormLayout("default, $lcgap, 162dlu:grow, $lcgap, default",
+                (fields.length + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default")));
 
         int row = 1;
         for (String field : fields) {
@@ -88,17 +66,55 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
             if (PropertyUtils.getProperty(data, field) instanceof String) {
                 JTextField txt = new JTextField(PropertyUtils.getProperty(data, field).toString());
-                txt.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
+//                txt.addFocusListener(new FocusAdapter() {
+//                    @Override
+//                    public void focusLost(FocusEvent e) {
+//                        try {
+//                            PropertyUtils.setProperty(data, field, ((JTextField) e.getSource()).getText());
+//                            broadcast(new DataChangeEvent(thisPanel, data));
+//                        } catch (Exception e1) {
+//                            logger.debug(e1);
+//                        }
+//                    }
+//                });
+
+
+                txt.getDocument().addDocumentListener(new DocumentListener() {
+                    public void changedUpdate(DocumentEvent e) {
+                        check(e);
+                    }
+
+                    public void removeUpdate(DocumentEvent e) {
+                        check(e);
+                    }
+
+                    public void insertUpdate(DocumentEvent e) {
+                        check(e);
+                    }
+
+                    public void check(DocumentEvent e) {
+
                         try {
-                            PropertyUtils.setProperty(data, field, ((JTextField) e.getSource()).getText());
+                            String text = e.getDocument().getText(0, e.getDocument().getLength());
+                            PropertyUtils.setProperty(data, field, text);
                             broadcast(new DataChangeEvent(thisPanel, data));
-                        } catch (Exception e1) {
-                            logger.debug(e1);
+                        } catch (BadLocationException e1) {
+                            OPDE.error(logger, e1);
+                        } catch (IllegalAccessException e1) {
+                            OPDE.error(logger, e1);
+                        } catch (InvocationTargetException e1) {
+                            OPDE.error(logger, e1);
+                        } catch (NoSuchMethodException e1) {
+                            OPDE.error(logger, e1);
+                        } catch (ConstraintViolationException e1) {
+                            logger.error(e1);
                         }
+
+                        noch nicht getestet
+
                     }
                 });
+
                 comp = txt;
             } else if (PropertyUtils.getProperty(data, field) instanceof Short || PropertyUtils.getProperty(data, field) instanceof Integer) {
                 JTextField txt = new JTextField(PropertyUtils.getProperty(data, field).toString());
@@ -107,25 +123,24 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
 
                         logger.debug(evt);
-                        Set<ConstraintViolation<T>> constraintViolations = OPDE.getValidatorFactory().getValidator().validateProperty();
-                        //todo: schau mal ob das in die Zukunft gucken kann ?
+                        logger.debug(evt.getPropertyName());
 
 
                     }
                 });
 
-                txt.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        try {
-
-                            PropertyUtils.setProperty(data, field, ((JTextField) e.getSource()).getText());
-                            broadcast(new DataChangeEvent(thisPanel, data));
-                        } catch (Exception e1) {
-                            logger.debug(e1);
-                        }
-                    }
-                });
+//                txt.addFocusListener(new FocusAdapter() {
+//                    @Override
+//                    public void focusLost(FocusEvent e) {
+//                        try {
+//
+//                            PropertyUtils.setProperty(data, field, ((JTextField) e.getSource()).getText());
+//                            broadcast(new DataChangeEvent(thisPanel, data));
+//                        } catch (Exception e1) {
+//                            logger.debug(e1);
+//                        }
+//                    }
+//                });
                 comp = txt;
             } else if (PropertyUtils.getProperty(data, field) instanceof Boolean) {
                 ItemListener il = e -> {
@@ -150,6 +165,43 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             row += 2;
 
         }
+
+
+    }
+
+
+    void initButtonPanel() {
+        if (saveMode == SAVE_MODE_IMMEDIATE) return;
+
+        JPanel buttonPanel = new JPanel(new HorizontalLayout(5));
+
+        JButton btnOK = new JButton(SYSConst.icon22apply);
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    DataChangeEvent dce = new DataChangeEvent(thisPanel, data);
+                    broadcast(dce);
+                } catch (ConstraintViolationException cve) {
+
+                }
+            }
+        });
+
+        JButton btnCancel = new JButton(SYSConst.icon22cancel);
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getValidatorFactory().getValidator().validate(data, clazz);
+                broadcast(new DataChangeEvent(thisPanel, data));
+            }
+        });
+
+        buttonPanel.add(btnOK);
+        buttonPanel.add(new JButton("CANCEL"));
+
+
+//        add(buttonPanel, CC.xyw(1, row));
 
 
     }

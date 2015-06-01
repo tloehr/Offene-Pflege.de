@@ -285,6 +285,11 @@ public class OPDE {
         SyslogTools.error(message.toString());
     }
 
+    public static void error(Logger classLogger, Object message) {
+        classLogger.error(message);
+           SyslogTools.error(message.toString());
+       }
+
     public static void debug(Object message) {
         logger.debug(message);
     }
@@ -434,13 +439,6 @@ public class OPDE {
         logger = Logger.getRootLogger();
 
 
-
-        PatternLayout layout = new PatternLayout("%d{ISO8601} %-5p [%t] %c: %m%n");
-        ConsoleAppender consoleAppender = new ConsoleAppender(layout);
-        logger.addAppender(consoleAppender);
-
-        Logger.getLogger("org.jboss.logging").addAppender(consoleAppender);
-
         /***
          *                         _      _               ___        __
          *      _ __ ___  __ _  __| |    / \   _ __  _ __|_ _|_ __  / _| ___
@@ -569,17 +567,19 @@ public class OPDE {
          */
         if (loadLocalProperties()) {
 
-            try {
-                FileAppender fileAppender = new FileAppender(layout, opwd + sep + "opde.log", true);
-                logger.addAppender(fileAppender);
-            } catch (IOException ex) {
-                fatal(ex);
-            }
+//            try {
+//                FileAppender fileAppender = new FileAppender(layout, , true);
+//                logger.addAppender(fileAppender);
+//            } catch (IOException ex) {
+//                fatal(ex);
+//            }
 
             animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
 
             logger.info("######### START ###########  " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum());
             logger.info(System.getProperty("os.name").toLowerCase());
+
+
 
             /***
              *      _     ____       _                   ___ ___
@@ -591,7 +591,7 @@ public class OPDE {
              */
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty("debug")).equalsIgnoreCase("true")) {
                 debug = true;
-                logger.setLevel(Level.ALL);
+                logger.setLevel(Level.DEBUG);
             } else {
                 debug = false;
                 logger.setLevel(Level.INFO);
@@ -609,6 +609,8 @@ public class OPDE {
             } else {
                 training = false;
             }
+
+
 
 
             /***
@@ -656,8 +658,8 @@ public class OPDE {
             jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
             jpaProps.put("javax.persistence.jdbc.url", url);
 
-            jpaProps.put("eclipselink.cache.shared.default", "false");
-            jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
+            jpaProps.put("eclipselink.cache.shared.default", "true");
+            jpaProps.put("eclipselink.session.customizer", "entity.JPAEclipseLinkSessionCustomizer");
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
 

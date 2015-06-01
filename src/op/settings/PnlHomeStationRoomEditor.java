@@ -386,12 +386,12 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
 
             try {
-                PnlBeanEditor<Floors> pbe = new PnlBeanEditor<Floors>(new DataChangeListener<Floors>() {
+                PnlBeanEditor<Floors> pbe = new PnlBeanEditor<>(new DataChangeListener<Floors>() {
                     @Override
                     public void dataChanged(DataChangeEvent evt) {
 
                     }
-                }, () -> (Floors) indexModel.get(key).getUserObject(), Floors.class, new String[]{"name","level","lift"});
+                }, () -> (Floors) indexModel.get(key).getUserObject(), Floors.class, new String[]{"name", "level", "lift"}, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
                 cps.add(pbe);
             } catch (Exception e) {
                 OPDE.fatal(logger, e);

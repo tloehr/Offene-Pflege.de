@@ -8,6 +8,7 @@ package interfaces;
 import op.OPDE;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.util.EventObject;
 import java.util.Set;
@@ -18,35 +19,39 @@ import java.util.Set;
 public class DataChangeEvent<T> extends EventObject {
     T data;
     String validationResult;
-    Set<ConstraintViolation<T>> constraintViolations;
+
     boolean valid;
 
     public T getData() {
         return data;
     }
 
-    public DataChangeEvent(Object source, T data, String validationResult) {
+    private DataChangeEvent(Object source) {
+        super(source);
+    }
+
+    public DataChangeEvent(Object source, T data, String validationResult) throws ConstraintViolationException {
         super(source);
         this.data = data;
         this.validationResult = validationResult;
         this.valid = validationResult.isEmpty();
     }
 
-    public DataChangeEvent(Object source, T data) {
+    public DataChangeEvent(Object source, T data) throws ConstraintViolationException {
         super(source);
         Validator validator = OPDE.getValidatorFactory().getValidator();
 
+        Set<ConstraintViolation<T>> constraintViolations = validator.validate(data);
+        if (!constraintViolations.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolations);
+        }
+
         this.data = data;
-        constraintViolations = validator.validate(data);
-        this.valid = constraintViolations.isEmpty();
+        this.valid = true;
     }
 
     public String getValidationResult() {
         return validationResult;
-    }
-
-    public Set<ConstraintViolation<T>> getConstraintViolations() {
-        return constraintViolations;
     }
 
     public boolean isValid() {

@@ -1,4 +1,4 @@
-package op.system;
+package entity;
 
 import org.eclipse.persistence.config.SessionCustomizer;
 import org.eclipse.persistence.logging.JavaLog;

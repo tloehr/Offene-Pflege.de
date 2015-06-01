@@ -65,6 +65,7 @@ import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -410,28 +411,6 @@ public class SYSTools {
 
     }
 
-//    public static String anonymizeBW(String nachname, String vorname, String bwkennung, int geschlecht) {
-//
-//        if (OPDE.isAnonym()) {
-//            nachname = anonymizeName(nachname, INDEX_LASTNAME);
-//            if (geschlecht == 2) {
-//                vorname = anonymizeName(vorname, INDEX_FIRSTNAME_FEMALE);
-//            } else {
-//                vorname = anonymizeName(vorname, INDEX_FIRSTNAME_MALE);
-//            }
-//        }
-//        return nachname + ", " + vorname + " [" + bwkennung + "]";
-//    }
-
-//    public static String anonymizeUser(String nachname, String vorname) {
-//        String result;
-//        if (OPDE.isAnonym()) {
-//            result = nachname.substring(0, 1) + "***, " + vorname.substring(0, 1) + "***";
-//        } else {
-//            result = nachname + ", " + vorname;
-//        }
-//        return result;
-//    }
 
     public static String anonymizeUser(String name) {
         String result;
@@ -448,27 +427,6 @@ public class SYSTools {
         jtf.setSelectionStart(0);
         jtf.setSelectionEnd(jtf.getText().length());
     }
-
-//    public static void changeTabTraversal(JTextArea component) {
-//        // Add actions
-//        component.getActionMap().put(nextFocusAction.getValue(Action.NAME), nextFocusAction);
-//        component.getActionMap().put(prevFocusAction.getValue(Action.NAME), prevFocusAction);
-//    }
-
-//    // The actions
-//    public static Action nextFocusAction = new AbstractAction("Move Focus Forwards") {
-//
-//        public void actionPerformed(ActionEvent evt) {
-//            ((Component) evt.getSource()).transferFocus();
-//        }
-//    };
-//    public static Action prevFocusAction = new AbstractAction("Move Focus Backwards") {
-//
-//        public void actionPerformed(ActionEvent evt) {
-//            ((Component) evt.getSource()).transferFocusBackward();
-//        }
-//    };
-
 
     public static DefaultListModel list2dlm(List list) {
         DefaultListModel dlm = new DefaultListModel();
@@ -491,29 +449,6 @@ public class SYSTools {
     }
 
 
-//    // This method iconifies a frame; the maximized bits are not affected.
-//    // taken from: The Java Developers Almanac 1.4
-//    // e564. Iconifying and Maximizing a Frame
-//    public static void iconify(Frame frame) {
-//        int state = frame.getExtendedState();
-//
-//        // Set the iconified bit
-//        state |= Frame.ICONIFIED;
-//
-//        // Iconify the frame
-//        frame.setExtendedState(state);
-//    }
-//
-//    // This method deiconifies a frame; the maximized bits are not affected.
-//    public static void deiconify(Frame frame) {
-//        int state = frame.getExtendedState();
-//
-//        // Clear the iconified bit
-//        state &= ~Frame.ICONIFIED;
-//
-//        // Deiconify the frame
-//        frame.setExtendedState(state);
-//    }
 
     public static String hashword(String password) {
         String hashword = null;
@@ -566,76 +501,26 @@ public class SYSTools {
         return result;
     }
 
-//    public static char[] cleanCharArray(char[] pw) {
-//        if (pw != null) {
-//            for (int i = 0; i < pw.length; i++) {
-//                pw[i] = '\0';
-//            }
-//        }
-//        return new char[]{};
-//    }
-//
-//    public static String[] ArrayList2StringArray(ArrayList al) {
-//        String[] result = new String[al.size()];
-//        for (int i = 0; i < al.size(); i++) {
-//            result[i] = (String) al.get(i);
-//        }
-//        return result.clone();
-//    }
-
 //    /**
-//     * Wählt in einer ComboBox aus ListElements das Element mit einem bestimmten PK aus. Wurde
-//     * entwickelt für Comboboxen mit einem Modell aus der RS2CMB Methode.
-//     *
-//     * @param j  die gesetzt werden soll
-//     * @param pk gesuchter PK
+//     * Wählt in einer ComboBox aus ListElements das Element mit einem bestimmten String aus.
 //     */
-//    public static void selectInComboBox(JComboBox j, long pk) {
+//    public static void selectInComboBox(JComboBox j, String pattern, boolean useValue) {
 //        ComboBoxModel cbm = (ComboBoxModel) j.getModel();
 //        for (int i = 0; i < cbm.getSize(); i++) {
 //            ListElement le = (ListElement) cbm.getElementAt(i);
-//            if (le.getPk() == pk) {
-//                j.setSelectedIndex(i);
-//                return;
-//            }
-//        }
-//    }
+//            if (useValue) {
+//                if (le.getValue().equalsIgnoreCase(pattern)) {
+//                    j.setSelectedIndex(i);
+//                    return;
+//                }
+//            } else {
+//                if (le.getData().equalsIgnoreCase(pattern)) {
+//                    j.setSelectedIndex(i);
+//                    return;
+//                }
 //
-//    public static void selectInList(JList j, long pk) {
-//        ListModel m = (ListModel) j.getModel();
-//        for (int i = 0; i < m.getSize(); i++) {
-//            ListElement le = (ListElement) m.getElementAt(i);
-//            if (le.getPk() == pk) {
-//                j.setSelectedIndex(i);
-//                return;
 //            }
 //        }
-//    }
-
-    /**
-     * Wählt in einer ComboBox aus ListElements das Element mit einem bestimmten String aus.
-     */
-    public static void selectInComboBox(JComboBox j, String pattern, boolean useValue) {
-        ComboBoxModel cbm = (ComboBoxModel) j.getModel();
-        for (int i = 0; i < cbm.getSize(); i++) {
-            ListElement le = (ListElement) cbm.getElementAt(i);
-            if (useValue) {
-                if (le.getValue().equalsIgnoreCase(pattern)) {
-                    j.setSelectedIndex(i);
-                    return;
-                }
-            } else {
-                if (le.getData().equalsIgnoreCase(pattern)) {
-                    j.setSelectedIndex(i);
-                    return;
-                }
-
-            }
-        }
-    }
-
-//    public static void selectInComboBox(JComboBox j, String pattern) {
-//        selectInComboBox(j, pattern, false);
 //    }
 
     public static void addAllNodes(DefaultMutableTreeNode root, java.util.List children) {
@@ -711,36 +596,6 @@ public class SYSTools {
         }
     }
 
-//    public static void collapseAll(JTree tree) {
-//        int row = 0;
-//        while (row < tree.getRowCount()) {
-//            tree.collapseRow(row);
-//            row++;
-//        }
-//    }
-//
-//    public static Vector getExpansionState(JTree tree) {
-//        Vector v = new Vector();
-//        int row = 0;
-//        while (row < tree.getRowCount()) {
-//            v.add(new Boolean(tree.isExpanded(row)));
-//            row++;
-//        }
-//        return v;
-//    }
-//
-//    public static void setExpansionState(JTree tree, Vector v) {
-//        int row = 0;
-//        while (row < tree.getRowCount()) {
-//            Boolean expanded = (Boolean) v.get(row);
-//            if (expanded) {
-//                tree.expandRow(row);
-//            } else {
-//                tree.collapseRow(row);
-//            }
-//            row++;
-//        }
-//    }
 
     public static DefaultListModel cmb2lst(DefaultComboBoxModel dcbm) {
         DefaultListModel dlm = new DefaultListModel();
@@ -775,45 +630,7 @@ public class SYSTools {
         return result;
     }
 
-//    public static ArrayList getSelectedFromTableModel(JTable tbl, int col) {
-//        ArrayList result = new ArrayList();
-//        ListSelectionModel lsm = tbl.getSelectionModel();
-//        TableModel tm = tbl.getModel();
-//        if (!lsm.isSelectionEmpty()) {
-//            for (int i = lsm.getMinSelectionIndex(); i <= lsm.getMaxSelectionIndex(); i++) {
-//                if (lsm.isSelectedIndex(i)) {
-//                    result.add(tm.getValueAt(i, col));
-//                }
-//            }
-//        }
-//        return result;
-//    }
-//
-//    public static List getSelectionAsList(List list, int[] sel) {
-//        List target = null;
-//        if (sel == null) {
-//            target = list;
-//        } else {
-//            target = new ArrayList(sel.length);
-//            if (sel.length > 0) {
-//                for (int i = 0; i < sel.length; i++) {
-//                    target.add(list.get(sel[i]));
-//                }
-//            }
-//        }
-//        return target;
-//    }
 
-//    /**
-//     * Gibt den Teil eines Dateinamens zurück, der als Extension bezeichnet wird. Also html oder pdf etc.
-//     *
-//     * @param name
-//     * @return
-//     */
-//    public static String filenameExtension(String name) {
-//        int dot = name.lastIndexOf(".");
-//        return name.substring(dot + 1);
-//    }
 
     public static String printDouble(double d) {
         String dbl = Double.toString(d);
@@ -868,12 +685,6 @@ public class SYSTools {
     }
 
 
-    //    /**
-//     * Fügt html Tags vor und hinter den Eingangsstring ein.
-//     *
-//     * @param in Eingangsstring
-//     * @return String mit HTML Erweiterungen.
-//     */
     public static String toHTMLForScreen(String in) {
         String out = null;
 
@@ -979,96 +790,12 @@ public class SYSTools {
         return result;
     }
 
-//    public static String unHTML2(String in) {
-//        String result = in;
-//        result = SYSTools.replace(result, "<html>", "", false);
-//        result = SYSTools.replace(result, "</html>", "", false);
-//        result = SYSTools.replace(result, "<body>", "", false);
-//        result = SYSTools.replace(result, "</body>", "", false);
-//        return result;
-//    }
-
     public static String removeTags(String input, String tag) {
         String result = input;
         result = SYSTools.replace(result, "<" + tag + ">", "", false);
         result = SYSTools.replace(result, "</" + tag + ">", "", false);
         return result;
     }
-
-//    public static DefaultComboBoxModel lst2cmb(DefaultListModel dlm) {
-//        DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
-//        for (int i = 0; i < dlm.size(); i++) {
-//            dcbm.addElement(dlm.get(i));
-//        }
-//        return dcbm;
-//    }
-
-//    /**
-//     * Diese Methode findet aus den properties eine lokal definierte Applikation
-//     * heraus. Das braucht man nur dann, wenn die Funktionen der Java eigenen
-//     * Desktop API nicht funktionieren.
-//     *
-//     * @param filename
-//     * @return String[] der das passende command array für den EXEC Aufruf erhält.
-//     */
-//    public static String[] getLocalDefinedApp(String filename) {
-//        String os = System.getProperty("os.name").toLowerCase();
-//        String extension = filenameExtension(filename);
-//        String[] result = null;
-//        if (OPDE.getProps().containsKey(os + "-" + extension)) {
-//            result = new String[]{OPDE.getProps().getProperty(os + "-" + extension), filename};
-//        }
-//        return result;
-//    }
-//
-//    /**
-//     * Wrapper Methode für das Parsing eines Doubles. Ersetzt vorher noch alle Kommas durch Punkte.
-//     * Außerdem werden Brüche wie 1/4, 1/2 usw.
-//     *
-//     * @param text
-//     * @return
-//     */
-//    public static double parseDouble(String text) throws NumberFormatException {
-//        text = text.replace(",", ".");
-//        text = text.replace("1/4", "0.25");
-//        text = text.replace("1/2", "0.5");
-//        text = text.replace("3/4", "0.75");
-//        text = text.replace("1/3", "0.33");
-//        text = text.replace("2/3", "0.66");
-//
-//        return Double.parseDouble(text);
-//    }
-//
-//
-//    /**
-//     * Erstellt ein Teil eines SQL Ausdrucks für "WHERE X IN (1, 2, 3, 4)" ähnliche Ausdrücke.
-//     *
-//     * @param ids ein Array aus longs, die jeweils in die Klammern geschrieben werdenb sollen.
-//     * @return der Klammerausdruck aus dem obigen Beispiel mit jeweils einem Leerzeichen davor und dahinter.
-//     */
-//    public static String array2sqlset(Object[] ids) {
-//        String result = " (-1) ";
-//        if (ids.length > 0) {
-//            result = " (";
-//
-//            for (int i = 0; i < ids.length; i++) {
-//                result += ids[i];
-//                if (i < ids.length - 1) {
-//                    result += ",";
-//                }
-//            }
-//
-//            result += ") ";
-//        }
-//        return result;
-//
-//    }
-//
-//    public static String text2HTMLColumn(String in, int width) {
-//        String out = "<table><tr><td width=\"" + width + "\" align=\"justify\">" + in
-//                + "</td><tr></table>";
-//        return out;
-//    }
 
     /**
      * Habe ich von http://helpdesk.objects.com.au/java/how-can-i-merge-two-java-arrays-into-one-combined-array
@@ -1108,79 +835,7 @@ public class SYSTools {
         }
         return result;
     }
-//
-//    public static DefaultListModel newListModel(String namedQuery) {
-//        return newListModel(namedQuery, null);
-//    }
 
-//    public static DefaultListModel newListModel(String namedQuery, Object[]... params) {
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery(namedQuery);
-//        if (params != null) {
-//            for (Object[] param : params) {
-//                query.setParameter(param[0].toString(), param[1]);
-//            }
-//        }
-//
-//        DefaultListModel lmodel = newListModel(query.getResultList());
-//
-//        em.close();
-//
-//        return lmodel;
-//    }
-//
-//    public static DefaultListModel newListModel(List list) {
-//        DefaultListModel listModel = new DefaultListModel();
-//        if (list != null) {
-//            Iterator it = list.iterator();
-//            while (it.hasNext()) {
-//                listModel.addElement(it.next());
-//            }
-//        }
-//        return listModel;
-//    }
-//
-//    public static DefaultComboBoxModel newComboboxModel(String namedQuery, Object[]... params) {
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery(namedQuery);
-//        if (params != null) {
-//            for (Object[] param : params) {
-//                query.setParameter(param[0].toString(), param[1]);
-//            }
-//        }
-//        DefaultComboBoxModel lcombo = newComboboxModel(query.getResultList());
-//
-//        em.close();
-//
-//        return lcombo;
-//    }
-//
-//    public static DefaultComboBoxModel newComboboxModel(List list) {
-//        DefaultComboBoxModel model = new DefaultComboBoxModel();
-//        if (list != null) {
-//            Iterator it = list.iterator();
-//            while (it.hasNext()) {
-//                model.addElement(it.next());
-//            }
-//        }
-//        return model;
-//    }
-
-//    /**
-//     * Erstellt eine UKennung. Prüft aber <b>nicht</b> danach, ob die schon
-//     * vergeben ist.
-//     *
-//     * @param nachname
-//     * @param vorname
-//     * @return UKennung mit einer Länge von maximal 10 Zeichen.
-//     */
-//    public static String generateUKennung(String nachname, String vorname) {
-//        String kennung = "";
-//        if (nachname.length() > 0 && vorname.length() > 0) {
-//            kennung = vorname.substring(0, 1) + nachname.substring(0, Math.min(9, nachname.length()));
-//        }
-//        return kennung.toLowerCase();
-//    }
 
     public static String padL(String str, int size, String padChar) {
         StringBuilder padded = new StringBuilder(str);
@@ -1210,17 +865,6 @@ public class SYSTools {
         return padded.toString();
     }
 
-//    public static ImageIcon resizeImageIcon(ImageIcon imageIcon, double factor) {
-//        Image image = imageIcon.getImage();
-//
-//        int width = (int) (factor * image.getWidth(null));
-//        int height = (int) (factor * image.getHeight(null));
-//
-//        Image newImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-//        ImageIcon newImageIcon = new ImageIcon(newImage);
-//
-//        return newImageIcon;
-//    }
 
     public static Color getTableCellBackgroundColor(boolean isSelected, int row) {
         Color color;
@@ -1253,10 +897,6 @@ public class SYSTools {
     public static double showSide(JSplitPane split, Double pos) {
         return showSide(split, pos, 0);
     }
-//
-//    public static double showSide(JSplitPane split, Double pos, int speedInMillis) {
-//        return showSide(split, pos, speedInMillis);
-//    }
 
 
     /**
@@ -1320,20 +960,6 @@ public class SYSTools {
         return new Double(max * pos).intValue();
     }
 
-//    public static Double getDividerInRelativePosition(JSplitPane mysplit) {
-//        int max;
-//        int pos = mysplit.getDividerLocation();
-//
-//        if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
-//            max = mysplit.getWidth();
-//        } else {
-//            max = mysplit.getHeight();
-//        }
-//        OPDE.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
-//        OPDE.debug("DIVIDER MAX POSITION: " + max);
-//        OPDE.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
-//        return new Double(pos) / new Double(max);
-//    }
 
     public static Double getDividerInRelativePosition(JideSplitPane mysplit) {
         int max;
@@ -1378,178 +1004,7 @@ public class SYSTools {
 
     }
 
-//    public static Timeline fadeout(JLabel lbl) {
-//        //lbl.setIcon(null);
-//        final JLabel lbl1 = lbl;
-//        final Color foreground = lbl.getForeground();
-//        Timeline timeline1 = new Timeline(lbl);
-//        timeline1.addPropertyToInterpolate("foreground", lbl.getForeground(), lbl.getBackground());
-//        timeline1.setDuration(500);
-//        timeline1.addCallback(new TimelineCallbackAdapter() {
-//            @Override
-//            public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
-//                if (timelineState1 == Timeline.TimelineState.DONE) {
-//                    lbl1.setText(null);
-//                    lbl1.setForeground(foreground);
-//                    lbl1.setIcon(null);
-//                }
-//            }
-//        });
-//        timeline1.play();
-//        return timeline1;
-//    }
-//
-//    public static Timeline fadein(JLabel lbl, String text) {
-//        Timeline timeline1 = null;
-//        final JLabel lbl1 = lbl;
-//        final String text1 = text;
-//        final Color foreground = lbl1.getForeground();
-//        final Color background = lbl1.getBackground();
-//
-//        lbl1.setForeground(background);
-//        lbl1.setText(text);
-//        timeline1 = new Timeline(lbl1);
-//        timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
-//        timeline1.setDuration(700);
-//        timeline1.play();
-//
-////        if (!SYSTools.catchNull(lbl.getText()).isEmpty()) {
-////            timeline1 = new Timeline(lbl1);
-////            timeline1.addPropertyToInterpolate("foreground", foreground, background);
-////            timeline1.setDuration(500);
-////            timeline1.addCallback(new TimelineCallbackAdapter() {
-////                @Override
-////                public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
-////                    if (timelineState1 == Timeline.TimelineState.DONE) {
-////                        lbl1.setIcon(null);
-////                        lbl1.setForeground(background);
-////                        lbl1.setText(text1);
-////                        Timeline timeline2 = new Timeline(lbl1);
-////                        timeline2.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
-////                        timeline2.setDuration(700);
-////                        timeline2.play();
-////                    }
-////                }
-////            });
-////            timeline1.play();
-////        } else {
-////            lbl1.setForeground(background);
-////            lbl1.setText(text);
-////            timeline1 = new Timeline(lbl1);
-////            timeline1.addPropertyToInterpolate("foreground", lbl1.getBackground(), foreground);
-////            timeline1.setDuration(700);
-////            timeline1.play();
-////        }
-//        return timeline1;
-//    }
-//
-//    public static Timeline flashLabel(JLabel lbl1, String text) {
-//        return flashLabel(lbl1, text, 0);
-//    }
-//
-//    public static Timeline flashLabel(JLabel lbl1, String text, int times) {
-//        return flashLabel(lbl1, text, times, Color.RED);
-//    }
-//
-//    public static Timeline flashLabel(JLabel lbl1, String text, int times, Color flashColor) {
-//
-//        final JLabel lbl = lbl1;
-//        final Color oldColor = Color.black; //lbl1.getForeground();
-//        final String oldText = lbl1.getText();
-//        //OPDE.debug("oldText: " + oldText);
-//        lbl.setText(text);
-//        Timeline textmessageTL = new Timeline(lbl);
-//        textmessageTL.addPropertyToInterpolate("foreground", oldColor, flashColor);
-//        textmessageTL.setDuration(600);
-//
-//        textmessageTL.addCallback(new TimelineCallbackAdapter() {
-//            @Override
-//            public void onTimelineStateChanged(Timeline.TimelineState oldState, Timeline.TimelineState newState, float durationFraction, float timelinePosition) {
-//                OPDE.debug(newState);
-//                if (newState == Timeline.TimelineState.CANCELLED || newState == Timeline.TimelineState.DONE) {
-//                    lbl.setText(oldText);
-//                    lbl.setForeground(Color.black);
-//                    OPDE.debug("flashLabel cancelled or done. Label set to: " + oldText);
-//                }
-//            }
-//        });
-//
-//        if (times == 0) {
-//            textmessageTL.playLoop(Timeline.RepeatBehavior.REVERSE);
-//        } else {
-//            textmessageTL.playLoop(times, Timeline.RepeatBehavior.REVERSE);
-//        }
-//        return textmessageTL;
-//    }
-//
-//
-//    public static void fadeinout(JLabel lbl, String text) {
-//        final JLabel lbl1 = lbl;
-//        final Color foreground = Color.black;
-//        final Color background = lbl.getBackground();
-//        lbl.setForeground(lbl.getBackground());
-//        lbl.setText(text);
-//        Timeline timeline1 = new Timeline(lbl);
-//        timeline1.addPropertyToInterpolate("foreground", background, foreground);
-//        timeline1.setDuration(400);
-//        timeline1.addCallback(new TimelineCallback() {
-//            Timeline.TimelineState state;
-//
-//            @Override
-//            public void onTimelineStateChanged(Timeline.TimelineState timelineState, Timeline.TimelineState timelineState1, float v, float v1) {
-//                state = timelineState1;
-//                if (timelineState1 == Timeline.TimelineState.DONE) {
-//                    lbl1.setText("");
-//                    lbl1.setForeground(foreground);
-//                    lbl1.setIcon(null);
-//                }
-//            }
-//
-//            @Override
-//            public void onTimelinePulse(float v, float v1) {
-//                if (state == Timeline.TimelineState.DONE) {
-//                    OPDE.debug("TIMELINESTATE IS DONE");
-//                }
-//            }
-//        });
-//        timeline1.playLoop(2, Timeline.RepeatBehavior.REVERSE);
-//    }
 
-//    public static void packTable(JTable table, int margin) {
-//        for (int colindex = 0; colindex < table.getColumnCount(); colindex++) {
-//            packColumn(table, colindex, margin);
-//        }
-//    }
-
-//    /*
-//     * http://exampledepot.com/egs/javax.swing.table/PackCol.html
-//     */
-//    public static void packColumn(JTable table, int vColIndex, int margin) {
-//        DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
-//        TableColumn col = colModel.getColumn(vColIndex);
-//        int width = 0;
-//
-//        // Get width of column header
-//        TableCellRenderer renderer = col.getHeaderRenderer();
-//        if (renderer == null) {
-//            renderer = table.getTableHeader().getDefaultRenderer();
-//        }
-//        Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
-//        width = comp.getPreferredSize().width;
-//
-//        // Get maximum width of column data
-//        for (int r = 0; r < table.getRowCount(); r++) {
-//            renderer = table.getCellRenderer(r, vColIndex);
-//            comp = renderer.getTableCellRendererComponent(
-//                    table, table.getValueAt(r, vColIndex), false, false, r, vColIndex);
-//            width = Math.max(width, comp.getPreferredSize().width);
-//        }
-//
-//        // Add margin
-//        width += 2 * margin;
-//        // Set the width
-//        col.setPreferredWidth(width);
-//    }
 
 
     public static String getThrowableAsHTML(Throwable exc) {
@@ -1678,9 +1133,22 @@ public class SYSTools {
         return bd;
     }
 
+    // fixes GitHub #17
+    public static String assimilateDecimalSeparators(String in){
+        char sep = new DecimalFormatSymbols(Locale.getDefault(Locale.Category.FORMAT)).getDecimalSeparator();
+        char replace = '.';
+
+        if (sep == '.'){
+            replace = ',';
+        }
+
+        return in.replace(replace, sep);
+    }
+
     public static BigDecimal checkBigDecimal(String txt) {
         BigDecimal bd = null;
-        txt = txt.replace(".", ",");
+
+        txt = assimilateDecimalSeparators(txt);
         try {
             NumberFormat nf = DecimalFormat.getNumberInstance();
             Number number = nf.parse(txt);
@@ -1735,8 +1203,12 @@ public class SYSTools {
     }
 
     public static BigDecimal parseDecimal(String test) {
+        //TODO: GitHub #17
         NumberFormat nf = DecimalFormat.getNumberInstance();
-        test = test.replace(".", ",");
+
+//        Locale.getDefault().getExtension()
+
+        test = assimilateDecimalSeparators(test);
         Number num;
         try {
             num = nf.parse(test);
@@ -1763,7 +1235,7 @@ public class SYSTools {
 
     public static BigDecimal parseCurrency(String test) {
         NumberFormat nf = DecimalFormat.getCurrencyInstance();
-        test = test.replace(".", ",");
+        test = assimilateDecimalSeparators(test);
         Number num;
         try {
             num = nf.parse(test);
@@ -1843,16 +1315,7 @@ public class SYSTools {
         return 0;
     }
 
-//    /**
-//     * http://www.mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/
-//     *
-//     * @return
-//     */
-//    public static boolean isValidEMail(String mail) {
-//        String EMAIL_PATTERN = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-//        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-//        return pattern.matcher(mail.trim()).matches();
-//    }
+
 
     public static String generatePassword(String firstname, String lastname) {
         Random generator = new Random(System.currentTimeMillis());
