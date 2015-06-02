@@ -7,6 +7,7 @@ import interfaces.DataChangeEvent;
 import interfaces.DataChangeListener;
 import interfaces.EditPanelDefault;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.SYSConst;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -14,8 +15,6 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.validation.ConstraintViolationException;
 import java.awt.*;
@@ -49,71 +48,41 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         initButtonPanel();
     }
 
-
     void initPanel() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-        setLayout(new FormLayout("default, $lcgap, 162dlu:grow, $lcgap, default",
-                (fields.length + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default")));
+        setLayout(new FormLayout("5dlu, default, $lcgap, 162dlu:grow, $lcgap, 5dlu",
+                "5dlu, " + (fields.length + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default, 5dlu")));
 
         int row = 1;
         for (String field : fields) {
 
             JLabel lblName = new JLabel(field);
             lblName.setFont(new Font("Arial", Font.PLAIN, 14));
-            add(lblName, CC.xy(1, row));
+            add(lblName, CC.xy(2, row + 1));
 
             Component comp = null;
 
             if (PropertyUtils.getProperty(data, field) instanceof String) {
                 JTextField txt = new JTextField(PropertyUtils.getProperty(data, field).toString());
-//                txt.addFocusListener(new FocusAdapter() {
-//                    @Override
-//                    public void focusLost(FocusEvent e) {
-//                        try {
-//                            PropertyUtils.setProperty(data, field, ((JTextField) e.getSource()).getText());
-//                            broadcast(new DataChangeEvent(thisPanel, data));
-//                        } catch (Exception e1) {
-//                            logger.debug(e1);
-//                        }
-//                    }
-//                });
 
-
-                txt.getDocument().addDocumentListener(new DocumentListener() {
-                    public void changedUpdate(DocumentEvent e) {
-                        check(e);
+                txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
+                    System.out.println(de.toString());
+                    try {
+                        String text = de.getDocument().getText(0, de.getDocument().getLength());
+                        PropertyUtils.setProperty(data, field, text);
+                        broadcast(new DataChangeEvent(thisPanel, data));
+                    } catch (BadLocationException e1) {
+                        OPDE.error(logger, e1);
+                    } catch (IllegalAccessException e1) {
+                        OPDE.error(logger, e1);
+                    } catch (InvocationTargetException e1) {
+                        OPDE.error(logger, e1);
+                    } catch (NoSuchMethodException e1) {
+                        OPDE.error(logger, e1);
+                    } catch (ConstraintViolationException e1) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage()));
                     }
-
-                    public void removeUpdate(DocumentEvent e) {
-                        check(e);
-                    }
-
-                    public void insertUpdate(DocumentEvent e) {
-                        check(e);
-                    }
-
-                    public void check(DocumentEvent e) {
-
-                        try {
-                            String text = e.getDocument().getText(0, e.getDocument().getLength());
-                            PropertyUtils.setProperty(data, field, text);
-                            broadcast(new DataChangeEvent(thisPanel, data));
-                        } catch (BadLocationException e1) {
-                            OPDE.error(logger, e1);
-                        } catch (IllegalAccessException e1) {
-                            OPDE.error(logger, e1);
-                        } catch (InvocationTargetException e1) {
-                            OPDE.error(logger, e1);
-                        } catch (NoSuchMethodException e1) {
-                            OPDE.error(logger, e1);
-                        } catch (ConstraintViolationException e1) {
-                            logger.error(e1);
-                        }
-
-                        noch nicht getestet
-
-                    }
-                });
+                }));
 
                 comp = txt;
             } else if (PropertyUtils.getProperty(data, field) instanceof Short || PropertyUtils.getProperty(data, field) instanceof Integer) {
@@ -121,26 +90,11 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 txt.addVetoableChangeListener(new VetoableChangeListener() {
                     @Override
                     public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-
                         logger.debug(evt);
                         logger.debug(evt.getPropertyName());
-
-
                     }
                 });
 
-//                txt.addFocusListener(new FocusAdapter() {
-//                    @Override
-//                    public void focusLost(FocusEvent e) {
-//                        try {
-//
-//                            PropertyUtils.setProperty(data, field, ((JTextField) e.getSource()).getText());
-//                            broadcast(new DataChangeEvent(thisPanel, data));
-//                        } catch (Exception e1) {
-//                            logger.debug(e1);
-//                        }
-//                    }
-//                });
                 comp = txt;
             } else if (PropertyUtils.getProperty(data, field) instanceof Boolean) {
                 ItemListener il = e -> {
@@ -160,7 +114,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             }
 
 
-            add(comp == null ? new JLabel("??") : comp, CC.xy(3, row));
+            add(comp == null ? new JLabel("??") : comp, CC.xy(4, row + 1));
 
             row += 2;
 
@@ -168,7 +122,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
 
     }
-
 
     void initButtonPanel() {
         if (saveMode == SAVE_MODE_IMMEDIATE) return;
@@ -197,15 +150,13 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             }
         });
 
-        buttonPanel.add(btnOK);
-        buttonPanel.add(new JButton("CANCEL"));
+        buttonPanel.add(btnCancel);
 
 
-//        add(buttonPanel, CC.xyw(1, row));
+        add(buttonPanel, CC.xyw(1, fields.length + 5, 5));
 
 
     }
-
 
     @Override
     public void setStartFocus() {

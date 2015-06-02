@@ -24,7 +24,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -388,10 +387,37 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             try {
                 PnlBeanEditor<Floors> pbe = new PnlBeanEditor<>(new DataChangeListener<Floors>() {
                     @Override
-                    public void dataChanged(DataChangeEvent evt) {
+                    public void dataChanged(DataChangeEvent<Floors> evt) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            Floors myFloor = em.merge(evt.getData());
+                            em.getTransaction().commit();
+
+                            DefaultMutableTreeNode found = find(evt.getData());
+                            found.setUserObject(myFloor);
+
+                            keyToRefresh = getKey(myFloor);
+
+                            indexModel.put(keyToRefresh, found);
+                        } catch (OptimisticLockException ole) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.warn(logger, ole);
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage(ole));
+                        } catch (Exception e) {
+                            em.getTransaction().rollback();
+                            OPDE.fatal(logger, e);
+                        } finally {
+                            em.close();
+                            ((PnlBeanEditor) evt.getSource()).cleanup(); // this is a one time use panel. will be replaced with the next refresh
+                            refresh = true;
+                        }
+
 
                     }
-                }, () -> (Floors) indexModel.get(key).getUserObject(), Floors.class, new String[]{"name", "level", "lift"}, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+                }, () -> (Floors) indexModel.get(key).getUserObject(), Floors.class, new String[]{"name", "level", "lift"}, PnlBeanEditor.SAVE_MODE_OK_CANCEL);
                 cps.add(pbe);
             } catch (Exception e) {
                 OPDE.fatal(logger, e);
@@ -404,8 +430,6 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             DefaultMutableTreeNode child = (DefaultMutableTreeNode) en.nextElement();
             cps.add(createCP(child));
         }
-
-
 
 
         cps.addExpansion();
