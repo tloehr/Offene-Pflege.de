@@ -2,6 +2,7 @@ package entity;
 
 import op.OPDE;
 import op.threads.DisplayManager;
+import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -113,15 +114,13 @@ public class EntityTools {
     }
 
     public static <T> T refresh(T entity) {
-//        boolean success = false;
-//        T refreshedEntity;
 
         EntityManager em = OPDE.createEM();
         try {
             em.refresh(em.merge(entity));
 //            success = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(EntityTools.class).error(e);
         } finally {
             em.close();
         }

@@ -2,6 +2,10 @@ package op.tools;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.swing.JideButton;
+import gui.events.ContentRequestedEvent;
+import gui.events.ContentRequestedEventListener;
+import gui.events.DataChangeEvent;
+import gui.events.DataChangeListener;
 import op.OPDE;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.core.animation.timing.Animator;
@@ -10,6 +14,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,7 +24,8 @@ import java.beans.PropertyVetoException;
  * To change this template use File | Settings | File Templates.
  */
 public class DefaultCollapsiblePane extends CollapsiblePane {
-    private final Closure contentProvider;
+//    private final Closure contentProvider;
+    private final ContentRequestedEventListener cre;
     private Animator animator = null;
 
     JPanel titlePanelleft, titlePanelright, titlePanel, additionalIconPanel;
@@ -30,10 +36,10 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
 
     private final DefaultCollapsiblePane thisPane;
 
-    public DefaultCollapsiblePane(Closure contentProvider) {
+    public DefaultCollapsiblePane(ContentRequestedEventListener cre) {
         super();
+        this.cre = cre;
         thisPane = this;
-        this.contentProvider = contentProvider;
 
         defaultActionListener = e -> {
             setCollapsed(!isCollapsed());
@@ -83,8 +89,14 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
 
         setTitleLabelComponent(titlePanel);
 
-        contentProvider.execute(thisPane);
+
+        cre.contentRequested(new ContentRequestedEvent(thisPane));
+
+
     }
+
+
+
 
 //    public DefaultCollapsiblePane(String title,Closure contentProvider) {
 //        this(contentProvider);
@@ -128,22 +140,18 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
     }
 
     public void reload() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                contentProvider.execute(thisPane);
-                revalidate();
-                repaint();
-                if (flashAfterEdit) {
-                    animator = GUITools.flashBackground(animator, thisPane, Color.YELLOW, 2);
-                }
+        cre.contentRequested(new ContentRequestedEvent(thisPane));
+        SwingUtilities.invokeLater(() -> {
+            revalidate();
+            repaint();
+            if (flashAfterEdit) {
+                animator = GUITools.flashBackground(animator, thisPane, Color.YELLOW, 2);
             }
         });
     }
 
     public void setTitleButtonText(String text) {
         btnTitle.setText(SYSTools.xx(text));
-
     }
 
     public JideButton getTitleButton() {

@@ -7,6 +7,7 @@ package entity.building;
 
 import entity.info.Resident;
 import op.tools.SYSTools;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -27,6 +28,7 @@ public class Station implements Serializable, Comparable<Station> {
     private Long statID;
     @Basic(optional = false)
     @Column(name = "Name")
+    @NotEmpty
     private String name;
     @Version
     @Column(name = "version")

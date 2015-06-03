@@ -1,5 +1,7 @@
 package interfaces;
 
+import gui.events.DataChangeListener;
+
 /**
  * Created with IntelliJ IDEA.
  * User: tloehr

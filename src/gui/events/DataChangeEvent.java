@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package interfaces;
+package gui.events;
 
 import op.OPDE;
 
@@ -28,13 +28,6 @@ public class DataChangeEvent<T> extends EventObject {
 
     private DataChangeEvent(Object source) {
         super(source);
-    }
-
-    public DataChangeEvent(Object source, T data, String validationResult) throws ConstraintViolationException {
-        super(source);
-        this.data = data;
-        this.validationResult = validationResult;
-        this.valid = validationResult.isEmpty();
     }
 
     public DataChangeEvent(Object source, T data) throws ConstraintViolationException {

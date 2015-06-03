@@ -6,6 +6,7 @@
 package entity.building;
 
 import op.tools.SYSTools;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ public class Rooms implements Serializable {
     @Column(name = "RID")
     private Long roomID;
     @Column(name = "Text")
+    @NotEmpty
     private String text;
     @Column(name = "Single")
     private Boolean single;

@@ -8,13 +8,11 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.building.Homes;
 import interfaces.ContentProvider;
-import interfaces.DataChangeEvent;
-import interfaces.DataChangeListener;
+import gui.events.DataChangeEvent;
+import gui.events.DataChangeListener;
 import interfaces.EditPanelDefault;
 import op.tools.GUITools;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
-
 
 
 import javax.swing.*;
@@ -110,7 +108,7 @@ public class PnlHomes extends EditPanelDefault<Homes> {
                     data.setCity(txtOrt.getText().trim());
                     data.setTel(txtTel.getText().trim());
                     data.setFax(txtFax.getText().trim());
-                    broadcast(new DataChangeEvent<>(thisPanel, data, doValidation()));
+                    broadcast(new DataChangeEvent<>(thisPanel, data));
                 }
             });
         }
@@ -180,8 +178,8 @@ public class PnlHomes extends EditPanelDefault<Homes> {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
-                "7*(default, $lgap), default"));
+            "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
+            "7*(default, $lgap), default"));
 
         //---- lblName ----
         lblName.setText("Anrede");
@@ -231,7 +229,7 @@ public class PnlHomes extends EditPanelDefault<Homes> {
         //---- lblFax ----
         lblFax.setText("text");
         lblFax.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblFax, CC.xy(3, 13));
+        add(lblFax, CC.xy(3, 13, CC.RIGHT, CC.DEFAULT));
 
         //---- txtFax ----
         txtFax.setFont(new Font("Arial", Font.PLAIN, 14));

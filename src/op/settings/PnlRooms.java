@@ -8,12 +8,11 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.building.Rooms;
 import interfaces.ContentProvider;
-import interfaces.DataChangeEvent;
-import interfaces.DataChangeListener;
+import gui.events.DataChangeEvent;
+import gui.events.DataChangeListener;
 import interfaces.EditPanelDefault;
 import op.tools.GUITools;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
@@ -45,7 +44,7 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
                     data.setActive(btnActive.isSelected());
                     data.setSingle(btnSingle.isSelected());
                     data.setBath(btnBath.isSelected());
-                    broadcast(new DataChangeEvent<Rooms>(thisPanel, data, doValidation()));
+                    broadcast(new DataChangeEvent<Rooms>(thisPanel, data));
                 }
             }
         };

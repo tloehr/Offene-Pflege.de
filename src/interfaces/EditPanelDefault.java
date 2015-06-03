@@ -1,6 +1,7 @@
 package interfaces;
 
-import org.apache.commons.collections.Closure;
+import gui.events.DataChangeEvent;
+import gui.events.DataChangeListener;
 
 import javax.swing.*;
 import java.util.HashSet;
@@ -54,6 +55,7 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
     @Override
     public void cleanup() {
         edited = false;
+        data = null;
         listDCL.clear();
         removeAll();
     }

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package interfaces;
+package gui.events;
 
 import java.util.EventListener;
 

@@ -658,7 +658,7 @@ public class OPDE {
             jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
             jpaProps.put("javax.persistence.jdbc.url", url);
 
-            jpaProps.put("eclipselink.cache.shared.default", "true");
+            jpaProps.put("eclipselink.cache.shared.default", "false");
             jpaProps.put("eclipselink.session.customizer", "entity.JPAEclipseLinkSessionCustomizer");
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
