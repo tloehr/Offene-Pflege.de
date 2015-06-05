@@ -553,6 +553,7 @@ public class SYSTools {
             if (result.isEmpty()) {
                 result = neutral;
             }
+            result = xx(result);
         }
         return result;
     }

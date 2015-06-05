@@ -47,7 +47,7 @@ public class RiverLayout
     Insets totalInsets = new Insets(0, 0, 0, 0);// Dummy values. Set by getInsets()
 
     /**
-     * <p>RiverLayout makes it very simple to construct user interfaces as components
+     * <p>RiverLayout makes it very simple to construct user gui.interfaces as components
      * are laid out similar to how text is added to a word processor (Components flow
      * like a "river". RiverLayout is however much more powerful than FlowLayout:
      * Components added with the add() method generally gets laid out horizontally,

@@ -1,6 +1,6 @@
 package gui;
 
-import interfaces.GenericClosure;
+import gui.interfaces.GenericClosure;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;

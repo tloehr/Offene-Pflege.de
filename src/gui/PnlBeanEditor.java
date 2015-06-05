@@ -2,15 +2,19 @@ package gui;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import interfaces.ContentProvider;
+import gui.interfaces.ContentProvider;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
-import interfaces.EditPanelDefault;
+import gui.interfaces.EditPanelDefault;
+import gui.interfaces.EditorComponent;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.AnnotationUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.HorizontalLayout;
 
@@ -25,7 +29,9 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 
 /**
@@ -33,17 +39,19 @@ import java.util.HashSet;
  */
 public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private final Class<T> clazz;
-    private final String[] fields;
+    private final String[][] fields;
     private Logger logger = Logger.getLogger(this.getClass());
     private HashSet<Component> componentSet;
     public static final int SAVE_MODE_IMMEDIATE = 0;
     public static final int SAVE_MODE_OK_CANCEL = 1;
     private int saveMode;
 
-    public PnlBeanEditor(DataChangeListener dcl, ContentProvider<T> contentProvider, Class<T> clazz, String[] fields, int saveMode) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public PnlBeanEditor(DataChangeListener dcl, ContentProvider<T> contentProvider, Class<T> clazz, String[][] fields, int saveMode)
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super(dcl, contentProvider);
         this.clazz = clazz;
         this.fields = fields;
+
         this.saveMode = saveMode;
         this.componentSet = new HashSet<>();
 
@@ -53,17 +61,30 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
     void initPanel() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
+
         setLayout(new FormLayout("5dlu, default, $lcgap, 162dlu:grow, $lcgap, 5dlu",
                 "5dlu, " + (fields.length + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default, 5dlu")));
 
         int row = 1;
-        for (String field : fields) {
+        for (String[] line : fields) {
 
-            JLabel lblName = new JLabel(field);
+            String field = line[0];
+            String label = SYSTools.catchNull(line[1]);
+
+            JLabel lblName = new JLabel(label);
             lblName.setFont(new Font("Arial", Font.PLAIN, 14));
             add(lblName, CC.xy(2, row + 1));
 
             Component comp = null;
+
+
+            Field[] f1 = data.getClass().getDeclaredFields();
+            // data.getClass().getDeclaredFields()[1].getAnnotation(EditorComponent.class)
+            for (Field f : f1){
+                if (f.isAnnotationPresent(EditorComponent.class)){
+                    logger.debug(f.getAnnotations());
+                }
+            }
 
             if (PropertyUtils.getProperty(data, field) instanceof String) {
                 JTextField txt = new JTextField(PropertyUtils.getProperty(data, field).toString());

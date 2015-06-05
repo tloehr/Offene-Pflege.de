@@ -1,4 +1,4 @@
-package interfaces;
+package gui.interfaces;
 
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;

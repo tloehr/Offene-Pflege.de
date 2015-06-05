@@ -4,17 +4,16 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.swing.JideButton;
 import gui.events.ContentRequestedEvent;
 import gui.events.ContentRequestedEventListener;
-import gui.events.DataChangeEvent;
-import gui.events.DataChangeListener;
 import op.OPDE;
-import org.apache.commons.collections.Closure;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.lf5.LogLevel;
 import org.jdesktop.core.animation.timing.Animator;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,26 +23,32 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class DefaultCollapsiblePane extends CollapsiblePane {
-//    private final Closure contentProvider;
+    //    private final Closure contentProvider;
     private final ContentRequestedEventListener cre;
     private Animator animator = null;
 
     JPanel titlePanelleft, titlePanelright, titlePanel, additionalIconPanel;
-    JideButton btnTitle;
+    final JideButton btnTitle;
     boolean flashAfterEdit = true;
+   final long id = System.nanoTime();
 
     ActionListener defaultActionListener;
 
     private final DefaultCollapsiblePane thisPane;
+    private Logger logger;
 
     public DefaultCollapsiblePane(ContentRequestedEventListener cre) {
         super();
         this.cre = cre;
         thisPane = this;
+//        String id = UUID.randomUUID().toString();
 
-        defaultActionListener = e -> {
-            setCollapsed(!isCollapsed());
-        };
+
+
+        logger = Logger.getLogger(getClass()+": id");
+        logger.setLevel(Level.DEBUG);
+
+
 
         additionalIconPanel = new JPanel();
         additionalIconPanel.setLayout(new BoxLayout(additionalIconPanel, BoxLayout.LINE_AXIS));
@@ -80,7 +85,13 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
                 GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                 new Insets(0, 0, 0, 0), 0, 0));
 
+
+        defaultActionListener = e -> {
+            logger.debug(btnTitle.getName() + " "+  btnTitle.getText());
+            setCollapsed(!isCollapsed());
+        };
         btnTitle.addActionListener(defaultActionListener);
+        btnTitle.setName("btn"+id);
 
         setCollapsible(true);
         setCollapsed(true);
@@ -94,8 +105,6 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
 
 
     }
-
-
 
 
 //    public DefaultCollapsiblePane(String title,Closure contentProvider) {
@@ -141,17 +150,12 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
 
     public void reload() {
         cre.contentRequested(new ContentRequestedEvent(thisPane));
-        SwingUtilities.invokeLater(() -> {
-            revalidate();
-            repaint();
-            if (flashAfterEdit) {
-                animator = GUITools.flashBackground(animator, thisPane, Color.YELLOW, 2);
-            }
-        });
     }
 
     public void setTitleButtonText(String text) {
+        logger.debug("setTitleButtonText: " + text);
         btnTitle.setText(SYSTools.xx(text));
+        logger.debug(btnTitle.getName() + " "+  btnTitle.getText());
     }
 
     public JideButton getTitleButton() {

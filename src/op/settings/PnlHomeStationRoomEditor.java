@@ -16,10 +16,11 @@ import gui.events.ContentRequestedEvent;
 import gui.events.ContentRequestedEventListener;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
-import interfaces.ContentProvider;
+import gui.interfaces.ContentProvider;
 import op.OPDE;
 import op.threads.DisplayManager;
 import op.tools.*;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
@@ -27,8 +28,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.*;
 
 /**
@@ -54,6 +53,8 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
         parentCPS = new HashMap<>();
         objectToRefresh = null;
 
+        logger.setLevel(Level.DEBUG);
+
         thread = new Thread(this);
         thread.start();
         reload();
@@ -66,46 +67,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
         refresh = true;
     }
 
-    private String initDataModel(Homes newHome) {
-        DefaultMutableTreeNode subtree = null;
 
-        ArrayList<Homes> listHomes = null;
-        if (newHome == null) {
-            listHomes = HomesTools.getAll();
-        } else {
-            listHomes = new ArrayList<>();
-            listHomes.add(newHome);
-        }
-
-        for (final Homes home : listHomes) {
-
-
-            DefaultCollapsiblePane homePane = createCP(home);
-
-
-            DefaultMutableTreeNode stationSubtree = new DefaultMutableTreeNode(Station.class);
-            DefaultMutableTreeNode floorSubtree = new DefaultMutableTreeNode(Floors.class);
-            subtree.add(floorSubtree);
-            subtree.add(stationSubtree);
-
-            for (final Floors floor : home.getFloors()) {
-                DefaultMutableTreeNode floorNode = new DefaultMutableTreeNode(floor);
-                floorSubtree.add(floorNode);
-                for (final Rooms room : floor.getRooms()) {
-                    DefaultMutableTreeNode roomNode = new DefaultMutableTreeNode(room);
-
-                    floorNode.add(roomNode);
-                }
-            }
-
-            for (final Station station : home.getStations()) {
-                DefaultMutableTreeNode stationNode = new DefaultMutableTreeNode(station);
-                stationSubtree.add(stationNode);
-            }
-        }
-
-        return getKey(newHome);
-    }
 
     @Override
     public void cleanup() {
@@ -152,13 +114,13 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             cpsHomes.addExpansion();
         } else {
             if (indexView.containsKey(getKey(objectToRefresh))) {
-                indexView.get(getKey(objectToRefresh)).reload();
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        cpsHomes.revalidate();
-                        cpsHomes.repaint();
-                    }
+
+                final String key = getKey(objectToRefresh);
+
+                SwingUtilities.invokeLater(() -> {
+                    indexView.get(key).reload();
+                    indexView.get(key).revalidate();
+                    indexView.get(key).repaint();
                 });
             } else {
 
@@ -201,7 +163,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     private DefaultCollapsiblePane createCP(Object userObject) {
         if (userObject == null) return null;
 
-        logger.debug("neuer CP erstellt");
+        logger.debug("neuer CP erstellt: "+userObject);
 
         ContentRequestedEventListener<DefaultCollapsiblePane> contentRequestedEventListener = null;
 
@@ -223,10 +185,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                 public void contentRequested(ContentRequestedEvent<DefaultCollapsiblePane> cre) {
                     DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                     Floors floor = EntityTools.find(Floors.class, ((Floors) userObject).getFloorid());
-//                    dcp.setTitleButtonText(floor.getName());
-
-                    //todo: hier stimmt was nicht. warum kein update der panes ?
-                    dcp.setTitleButtonText(new Date().toString());
+                    dcp.setTitleButtonText(floor.getName());
                     dcp.setContentPane(createContent(floor));
                 }
             };
@@ -345,9 +304,9 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
             cps.add(createCPFloorsFor((Homes) userObject));
 
-            for (final Floors floor : ((Homes) userObject).getFloors()) {
-                createCP(floor);
-            }
+//            for (final Floors floor : ((Homes) userObject).getFloors()) {
+//                createCP(floor);
+//            }
 
             for (final Station station : ((Homes) userObject).getStations()) {
 
@@ -415,7 +374,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                             refresh = true;
                         }
                     }
-                }, () -> EntityTools.find(Floors.class, ((Floors) userObject).getFloorid()), Floors.class, new String[]{"name", "level", "lift"}, PnlBeanEditor.SAVE_MODE_OK_CANCEL);
+                }, () -> EntityTools.find(Floors.class, ((Floors) userObject).getFloorid()), Floors.class, new String[][]{{"name","name1"}, {"level","level1"}, {"lift","lift1"}}, PnlBeanEditor.SAVE_MODE_OK_CANCEL);
                 cps.add(pbe);
             } catch (Exception e) {
                 OPDE.fatal(logger, e);

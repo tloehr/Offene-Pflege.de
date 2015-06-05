@@ -2,6 +2,7 @@ package entity.building;
 
 
 import com.sun.istack.internal.NotNull;
+import gui.interfaces.EditorComponent;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
@@ -22,14 +23,17 @@ public class Floors {
     private long floorid;
 
     @NotEmpty
+    @EditorComponent(label = "Name")
     private String name;
 
-    @Min(0)
-    @Max(10)
+    @Min(-2)
+    @Max(9)
+    @EditorComponent(label = "Etage", combobox = {"2.Untergeschoss", "1.Untergeschoss", "Erdgeschoss", "1.Etage", "2.Etage", "3.Etage", "4.Etage", "5.Etage", "6.Etage"})
     private Short level; // 0 means ground floor. negative levels are below ground. positives above
 
     @Min(0)
     @Max(10)
+    @EditorComponent(label = "Aufzüge", tooltip = "Anzahl der Aufzüge, die diese Etage erreichen")
     private Short lift;  // number of lifts connecting to this floor
 
     @Version
