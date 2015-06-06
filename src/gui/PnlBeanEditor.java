@@ -2,19 +2,17 @@ package gui;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import gui.interfaces.ContentProvider;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
+import gui.interfaces.ContentProvider;
 import gui.interfaces.EditPanelDefault;
 import gui.interfaces.EditorComponent;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.SYSConst;
-import op.tools.SYSTools;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.AnnotationUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.HorizontalLayout;
 
@@ -26,12 +24,8 @@ import javax.validation.ConstraintViolationException;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 
 /**
@@ -46,11 +40,11 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     public static final int SAVE_MODE_OK_CANCEL = 1;
     private int saveMode;
 
-    public PnlBeanEditor(DataChangeListener dcl, ContentProvider<T> contentProvider, Class<T> clazz, String[][] fields, int saveMode)
+    public PnlBeanEditor(DataChangeListener dcl, ContentProvider<T> contentProvider, Class<T> clazz, int saveMode)
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super(dcl, contentProvider);
         this.clazz = clazz;
-        this.fields = fields;
+        this.fields = null;
 
         this.saveMode = saveMode;
         this.componentSet = new HashSet<>();
@@ -61,87 +55,108 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
     void initPanel() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-
+        Field[] f1 = data.getClass().getDeclaredFields();
         setLayout(new FormLayout("5dlu, default, $lcgap, 162dlu:grow, $lcgap, 5dlu",
-                "5dlu, " + (fields.length + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default, 5dlu")));
+                "5dlu, " + (f1.length + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default, 5dlu")));
 
         int row = 1;
-        for (String[] line : fields) {
-
-            String field = line[0];
-            String label = SYSTools.catchNull(line[1]);
-
-            JLabel lblName = new JLabel(label);
-            lblName.setFont(new Font("Arial", Font.PLAIN, 14));
-            add(lblName, CC.xy(2, row + 1));
-
-            Component comp = null;
 
 
-            Field[] f1 = data.getClass().getDeclaredFields();
-            // data.getClass().getDeclaredFields()[1].getAnnotation(EditorComponent.class)
-            for (Field f : f1){
-                if (f.isAnnotationPresent(EditorComponent.class)){
-                    logger.debug(f.getAnnotations());
-                }
-            }
+        for (final Field field : f1) {
+            if (field.isAnnotationPresent(EditorComponent.class)) {
 
-            if (PropertyUtils.getProperty(data, field) instanceof String) {
-                JTextField txt = new JTextField(PropertyUtils.getProperty(data, field).toString());
+                EditorComponent editorComponent = field.getAnnotation(EditorComponent.class);
 
-                txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
-                    try {
-                        String text = de.getDocument().getText(0, de.getDocument().getLength());
-                        PropertyUtils.setProperty(data, field, text);
-                        if (saveMode == SAVE_MODE_IMMEDIATE) broadcast(new DataChangeEvent(thisPanel, data));
-                    } catch (BadLocationException e1) {
-                        OPDE.error(logger, e1);
-                    } catch (IllegalAccessException e1) {
-                        OPDE.error(logger, e1);
-                    } catch (InvocationTargetException e1) {
-                        OPDE.error(logger, e1);
-                    } catch (NoSuchMethodException e1) {
-                        OPDE.error(logger, e1);
-                    } catch (ConstraintViolationException e1) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage()));
-                    }
-                }));
+                JLabel lblName = new JLabel();
+                lblName.setFont(new Font("Arial", Font.PLAIN, 14));
+                add(lblName, CC.xy(2, row + 1));
+
+                Component comp = null;
 
 
-                comp = txt;
-            } else if (PropertyUtils.getProperty(data, field) instanceof Short || PropertyUtils.getProperty(data, field) instanceof Integer) {
-                JTextField txt = new JTextField(PropertyUtils.getProperty(data, field).toString());
-                txt.addVetoableChangeListener(new VetoableChangeListener() {
-                    @Override
-                    public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-                        logger.debug(evt);
-                        logger.debug(evt.getPropertyName());
-                    }
-                });
+                if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
+                    lblName.setText(editorComponent.label());
 
-                comp = txt;
-            } else if (PropertyUtils.getProperty(data, field) instanceof Boolean) {
-                ItemListener il = e -> {
-                    if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
+                    JTextField txt = new JTextField(PropertyUtils.getProperty(data, field.getName()).toString());
+
+                    txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
                         try {
-                            PropertyUtils.setProperty(data, field, new Boolean(e.getStateChange() == ItemEvent.SELECTED));
-                            broadcast(new DataChangeEvent(thisPanel, data));
-                        } catch (Exception e1) {
-                            logger.debug(e1);
+                            String text = de.getDocument().getText(0, de.getDocument().getLength());
+                            Object value = text;
+                            if (!editorComponent.parserClass().isEmpty()) {
+                                String p =  editorComponent.parserClass();
+
+
+                                   //error: object is not an instance of declaring class
+
+                                Class parserClazz = Class.forName(p);
+
+                                value = parserClazz.getMethod("parse", String.class).invoke(parserClazz.newInstance(), text);
+                            }
+
+                            PropertyUtils.setProperty(data, field.getName(), field.getType().cast(value));
+
+                            if (saveMode == SAVE_MODE_IMMEDIATE) broadcast(new DataChangeEvent(thisPanel, data));
+                        } catch (BadLocationException e1) {
+                            OPDE.error(logger, e1);
+                        } catch (IllegalAccessException e1) {
+                            OPDE.error(logger, e1);
+                        } catch (InvocationTargetException e1) {
+                            OPDE.error(logger, e1);
+                        } catch (NoSuchMethodException e1) {
+                            OPDE.error(logger, e1);
+                        } catch (ConstraintViolationException e1) {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage()));
+                        } catch (ClassNotFoundException e) {
+                            OPDE.error(logger, e);
+                        } catch (InstantiationException e) {
+                            OPDE.error(logger, e);
                         }
-                    }
-                };
+                    }));
+                    comp = txt;
+                } else if (editorComponent.component()[0].equalsIgnoreCase("combobox")) {
+                    ItemListener il = e -> {
+                        if (e.getStateChange() == ItemEvent.SELECTED) {
+                            try {
+                                PropertyUtils.setProperty(data, field.getName(), field.getType().cast(((JComboBox) e.getSource()).getSelectedIndex()));
+                                broadcast(new DataChangeEvent(thisPanel, data));
+                            } catch (Exception e1) {
+                                logger.debug(e1);
+                            }
+                        }
+                    };
 
-                JToggleButton btnSingle = GUITools.getNiceToggleButton(field);
-                btnSingle.addItemListener(il);
-                comp = btnSingle;
+                    JComboBox combobox = new JComboBox(new DefaultComboBoxModel<>(ArrayUtils.subarray(editorComponent.component(), 1, editorComponent.component().length - 1)));
+                    combobox.setSelectedIndex(Integer.parseInt(PropertyUtils.getProperty(data, field.getName()).toString()));
+                    combobox.setToolTipText(editorComponent.tooltip());
+                    combobox.addItemListener(il);
+                    comp = combobox;
+                } else if (editorComponent.component()[0].equalsIgnoreCase("onoffswitch")) {
+                    ItemListener il = e -> {
+                        if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
+                            try {
+                                PropertyUtils.setProperty(data, field.getName(), new Boolean(e.getStateChange() == ItemEvent.SELECTED));
+                                broadcast(new DataChangeEvent(thisPanel, data));
+                            } catch (Exception e1) {
+                                logger.debug(e1);
+                            }
+                        }
+                    };
+
+                    JToggleButton btnSingle = GUITools.getNiceToggleButton(editorComponent.label());
+                    btnSingle.setToolTipText(editorComponent.tooltip());
+                    btnSingle.addItemListener(il);
+                    comp = btnSingle;
+                }
+                comp.setName(field.getName());
+                componentSet.add(comp);
+
+                add(comp == null ? new JLabel("??") : comp, CC.xy(4, row + 1));
+
+                row += 2;
+
             }
-            comp.setName(field);
-            componentSet.add(comp);
 
-            add(comp == null ? new JLabel("??") : comp, CC.xy(4, row + 1));
-
-            row += 2;
 
         }
 
@@ -158,10 +173,11 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             try {
                 broadcast(new DataChangeEvent(thisPanel, data));
             } catch (ConstraintViolationException cve) {
+                String violations = "";
                 for (ConstraintViolation cv : cve.getConstraintViolations()) {
-                    System.err.println(cv.getMessage());
-                    logger.debug(cv.getConstraintDescriptor());
+                    violations += cv.getMessage() + "; ";
                 }
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(violations, DisplayMessage.WARNING));
             }
             reload();
         });
@@ -192,7 +208,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     public void refreshDisplay() {
         logger.debug(data.toString());
         for (Component comp : componentSet) {
-            if (comp instanceof JTextComponent){
+            if (comp instanceof JTextComponent) {
                 try {
                     ((JTextComponent) comp).setText(PropertyUtils.getProperty(data, comp.getName()).toString());
                 } catch (IllegalAccessException e) {

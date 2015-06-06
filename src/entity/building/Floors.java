@@ -23,18 +23,18 @@ public class Floors {
     private long floorid;
 
     @NotEmpty
-    @EditorComponent(label = "Name")
+    @EditorComponent(label = "Name", component = {"textfield"})
     private String name;
 
-    @Min(-2)
-    @Max(9)
-    @EditorComponent(label = "Etage", combobox = {"2.Untergeschoss", "1.Untergeschoss", "Erdgeschoss", "1.Etage", "2.Etage", "3.Etage", "4.Etage", "5.Etage", "6.Etage"})
-    private Short level; // 0 means ground floor. negative levels are below ground. positives above
+    @Min(0)
+    @Max(8)
+    @EditorComponent(label = "Etage", component = {"combobox", "2.Untergeschoss", "1.Untergeschoss", "Erdgeschoss", "1.Etage", "2.Etage", "3.Etage", "4.Etage", "5.Etage", "6.Etage"})
+    private Integer level;
 
     @Min(0)
     @Max(10)
-    @EditorComponent(label = "Aufzüge", tooltip = "Anzahl der Aufzüge, die diese Etage erreichen")
-    private Short lift;  // number of lifts connecting to this floor
+    @EditorComponent(label = "misc.msg.lifts", parserClass = "gui.interfaces.IntegerParser", component = {"textfield"}, tooltip = "misc.msg.lifts.connecting.this.floor")
+    private Integer lift;  // number of lifts connecting to this floor
 
     @Version
     @Column(name = "version")
@@ -58,7 +58,7 @@ public class Floors {
     public Floors(Homes home, String name) {
         this.home = home;
         this.name = name;
-        level = 0;
+        level = 2; // means groundfloor
         lift = 0;
         rooms = new ArrayList<>();
     }
@@ -80,21 +80,21 @@ public class Floors {
 
     @Basic
     @Column(name = "level", nullable = true, insertable = true, updatable = true)
-    public Short getLevel() {
+    public Integer getLevel() {
         return level;
     }
 
-    public void setLevel(Short level) {
+    public void setLevel(Integer level) {
         this.level = level;
     }
 
     @Basic
     @Column(name = "lift", nullable = true, insertable = true, updatable = true)
-    public Short getLift() {
+    public Integer getLift() {
         return lift;
     }
 
-    public void setLift(Short lift) {
+    public void setLift(Integer lift) {
         this.lift = lift;
     }
 

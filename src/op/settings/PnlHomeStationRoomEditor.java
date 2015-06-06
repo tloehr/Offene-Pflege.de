@@ -374,7 +374,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                             refresh = true;
                         }
                     }
-                }, () -> EntityTools.find(Floors.class, ((Floors) userObject).getFloorid()), Floors.class, new String[][]{{"name","name1"}, {"level","level1"}, {"lift","lift1"}}, PnlBeanEditor.SAVE_MODE_OK_CANCEL);
+                }, () -> EntityTools.find(Floors.class, ((Floors) userObject).getFloorid()), Floors.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
                 cps.add(pbe);
             } catch (Exception e) {
                 OPDE.fatal(logger, e);

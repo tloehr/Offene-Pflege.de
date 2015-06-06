@@ -439,6 +439,7 @@ public class OPDE {
         logger = Logger.getRootLogger();
 
 
+
         /***
          *                         _      _               ___        __
          *      _ __ ___  __ _  __| |    / \   _ __  _ __|_ _|_ __  / _| ___
@@ -596,6 +597,8 @@ public class OPDE {
                 debug = false;
                 logger.setLevel(Level.INFO);
             }
+
+            Logger.getLogger("org.hibernate").setLevel(Level.OFF);
 
             if (cl.hasOption("x") || SYSTools.catchNull(localProps.getProperty("experimental")).equalsIgnoreCase("true")) {
                 experimental = true;

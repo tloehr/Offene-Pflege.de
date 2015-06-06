@@ -186,7 +186,7 @@ public class MREPrevalenceSheets {
                 if (sort == 0) {
                     if (i1 == 1) {// both residents have rooms assigned
                         sort = mapRooms.get(o1).getFloor().getHome().getEID().compareTo(mapRooms.get(o2).getFloor().getHome().getEID());
-                        if (sort == 0) sort = Short.compare(mapRooms.get(o1).getFloor().getLevel(), mapRooms.get(o2).getFloor().getLevel());
+                        if (sort == 0) sort = Integer.compare(mapRooms.get(o1).getFloor().getLevel(), mapRooms.get(o2).getFloor().getLevel());
                     }
                 }
                 if (sort == 0) sort = o1.toString().compareTo(o2.toString());

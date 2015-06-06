@@ -37,8 +37,6 @@ import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayMessage;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -71,7 +69,6 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 public class SYSTools {
 
@@ -102,10 +99,10 @@ public class SYSTools {
         };
     }
 
-    public static String[] translate(String[] list){
+    public static String[] translate(String[] list) {
         String[] translated = new String[list.length];
-        int i=0;
-        for (String element : list){
+        int i = 0;
+        for (String element : list) {
             translated[i] = xx(element);
             i++;
         }
@@ -125,16 +122,16 @@ public class SYSTools {
     }
 
     public static Properties load(String text) {
-           Properties props = new Properties();
-           try {
-               StringReader reader = new StringReader(text);
-               props.load(reader);
-               reader.close();
-           } catch (IOException ex) {
-               OPDE.fatal(ex);
-           }
-           return props;
-       }
+        Properties props = new Properties();
+        try {
+            StringReader reader = new StringReader(text);
+            props.load(reader);
+            reader.close();
+        } catch (IOException ex) {
+            OPDE.fatal(ex);
+        }
+        return props;
+    }
 
     public static void center(java.awt.Window w) {
         Dimension us = w.getSize();
@@ -174,7 +171,7 @@ public class SYSTools {
     public static void handleBigDecimalFocusLost(FocusEvent evt, BigDecimal min, BigDecimal max, BigDecimal def) {
         BigDecimal myBD;
         try {
-            myBD = BigDecimal.valueOf(Double.parseDouble(((JTextField) evt.getSource()).getText().replaceAll(",", "\\.")));
+            myBD = BigDecimal.valueOf(Double.parseDouble(assimilateDecimalSeparators(((JTextField) evt.getSource()).getText())));
         } catch (NumberFormatException ex) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongentry")));
             myBD = def;
@@ -438,7 +435,7 @@ public class SYSTools {
         return dlm;
     }
 
-    public static <T> DefaultComboBoxModel<T>  list2cmb(List<T> list) {
+    public static <T> DefaultComboBoxModel<T> list2cmb(List<T> list) {
         DefaultComboBoxModel cmb = new DefaultComboBoxModel<T>();
         if (list != null) {
             for (T t : list) {
@@ -447,7 +444,6 @@ public class SYSTools {
         }
         return cmb;
     }
-
 
 
     public static String hashword(String password) {
@@ -632,7 +628,6 @@ public class SYSTools {
     }
 
 
-
     public static String printDouble(double d) {
         String dbl = Double.toString(d);
         if (dbl.substring(dbl.length() - 2).equals(".0")) {
@@ -733,19 +728,20 @@ public class SYSTools {
 
     /**
      * removes any dangerous char or html stuff from a string.
+     *
      * @param in
      * @return
      */
     public static String tidy(String in) {
 
-        if (in == null){
+        if (in == null) {
             return null;
         }
 
-        String result = in.replaceAll("\\<[^>]*>","");
+        String result = in.replaceAll("\\<[^>]*>", "");
 
-        result = result.replaceAll("[\\>\\<]","");
-        result = result.replaceAll("\\&.*\\;","");
+        result = result.replaceAll("[\\>\\<]", "");
+        result = result.replaceAll("\\&.*\\;", "");
 
         return result.trim();
     }
@@ -1006,8 +1002,6 @@ public class SYSTools {
     }
 
 
-
-
     public static String getThrowableAsHTML(Throwable exc) {
         String html = "";
         StackTraceElement[] stacktrace = exc.getStackTrace();
@@ -1089,17 +1083,6 @@ public class SYSTools {
     }
 
 
-    public static BigDecimal parseBigDecimal(String txt) {
-        BigDecimal bd;
-        try {
-            bd = BigDecimal.valueOf(Double.parseDouble(txt.replaceAll(",", "\\.")));
-        } catch (Exception ex) {
-            bd = null;
-        }
-        return bd;
-    }
-
-
     public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt, boolean nees2BePositive) {
         BigDecimal bd = null;
         JTextComponent txt = (JTextComponent) evt.getSource();
@@ -1109,7 +1092,7 @@ public class SYSTools {
             toolTipAction.actionPerformed(hideTip);
         }
         try {
-            bd = BigDecimal.valueOf(Double.parseDouble(txt.getText().replaceAll(",", "\\.")));
+            bd = BigDecimal.valueOf(Double.parseDouble(assimilateDecimalSeparators(txt.getText())));
             if (nees2BePositive && bd.compareTo(BigDecimal.ZERO) <= 0) {
                 txt.setToolTipText("<html><font color=\"red\"><b>" + SYSTools.xx("misc.msg.invalidnumber") + "</b></font></html>");
                 toolTipAction = txt.getActionMap().get("postTip");
@@ -1135,11 +1118,11 @@ public class SYSTools {
     }
 
     // fixes GitHub #17
-    public static String assimilateDecimalSeparators(String in){
+    public static String assimilateDecimalSeparators(String in) {
         char sep = new DecimalFormatSymbols(Locale.getDefault(Locale.Category.FORMAT)).getDecimalSeparator();
         char replace = '.';
 
-        if (sep == '.'){
+        if (sep == '.') {
             replace = ',';
         }
 
@@ -1203,11 +1186,27 @@ public class SYSTools {
         return text;
     }
 
-    public static BigDecimal parseDecimal(String test) {
-        //TODO: GitHub #17
-        NumberFormat nf = DecimalFormat.getNumberInstance();
 
-//        Locale.getDefault().getExtension()
+    public static BigDecimal parseBigDecimal(String txt) {
+//           BigDecimal bd;
+//
+//           try {
+//               bd = BigDecimal.valueOf(Double.parseDouble(assimilateDecimalSeparators(txt)));
+//           } catch (Exception ex) {
+//               bd = null;
+//           }
+//           return bd;
+
+        //todo: replace me
+        return parseDecimal(txt);
+
+
+    }
+
+
+    //FIXES: GitHub #17
+    public static BigDecimal parseDecimal(String test) {
+        NumberFormat nf = DecimalFormat.getNumberInstance();
 
         test = assimilateDecimalSeparators(test);
         Number num;
@@ -1317,7 +1316,6 @@ public class SYSTools {
     }
 
 
-
     public static String generatePassword(String firstname, String lastname) {
         Random generator = new Random(System.currentTimeMillis());
         return lastname.substring(0, 1).toLowerCase() + firstname.substring(0, 1).toLowerCase() + SYSTools.padL(Integer.toString(generator.nextInt(9999)), 4, "0");
@@ -1402,43 +1400,43 @@ public class SYSTools {
 
 
     public static void packTable(JTable table, int margin) {
-           for (int colindex = 0; colindex < table.getColumnCount(); colindex++) {
-               packColumn(table, colindex, margin);
-           }
-       }
+        for (int colindex = 0; colindex < table.getColumnCount(); colindex++) {
+            packColumn(table, colindex, margin);
+        }
+    }
 
     /*
          * http://exampledepot.com/egs/javax.swing.table/PackCol.html
          */
-        public static void packColumn(JTable table, int vColIndex, int margin) {
-            TableModel model = table.getModel();
-            DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
-            TableColumn col = colModel.getColumn(vColIndex);
-            int width = 0;
+    public static void packColumn(JTable table, int vColIndex, int margin) {
+        TableModel model = table.getModel();
+        DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
+        TableColumn col = colModel.getColumn(vColIndex);
+        int width = 0;
 
-            // Get width of column header
-            TableCellRenderer renderer = col.getHeaderRenderer();
-            if (renderer == null) {
-                renderer = table.getTableHeader().getDefaultRenderer();
-            }
-            Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
-            width = comp.getPreferredSize().width;
-
-            // Get maximum width of column data
-            for (int r = 0; r < table.getRowCount(); r++) {
-                renderer = table.getCellRenderer(r, vColIndex);
-                comp = renderer.getTableCellRendererComponent(
-                        table, table.getValueAt(r, vColIndex), false, false, r, vColIndex);
-                width = Math.max(width, comp.getPreferredSize().width);
-            }
-
-            // Add margin
-            width += 2 * margin;
-            // Set the width
-            col.setPreferredWidth(width);
-
-            OPDE.debug("packColumn/3: col="+vColIndex+"  width="+width);
+        // Get width of column header
+        TableCellRenderer renderer = col.getHeaderRenderer();
+        if (renderer == null) {
+            renderer = table.getTableHeader().getDefaultRenderer();
         }
+        Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
+        width = comp.getPreferredSize().width;
+
+        // Get maximum width of column data
+        for (int r = 0; r < table.getRowCount(); r++) {
+            renderer = table.getCellRenderer(r, vColIndex);
+            comp = renderer.getTableCellRendererComponent(
+                    table, table.getValueAt(r, vColIndex), false, false, r, vColIndex);
+            width = Math.max(width, comp.getPreferredSize().width);
+        }
+
+        // Add margin
+        width += 2 * margin;
+        // Set the width
+        col.setPreferredWidth(width);
+
+        OPDE.debug("packColumn/3: col=" + vColIndex + "  width=" + width);
+    }
 
     public static void checkForSoftwareupdates() {
 //        final String FTPServer = "ftp.offene-pflege.de";
