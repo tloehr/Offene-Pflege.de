@@ -11,6 +11,7 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
@@ -26,6 +27,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.HashSet;
 
 /**
@@ -33,18 +35,19 @@ import java.util.HashSet;
  */
 public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private final Class<T> clazz;
-    private final String[][] fields;
+    //    private final String[][] fields;
     private Logger logger = Logger.getLogger(this.getClass());
     private HashSet<Component> componentSet;
     public static final int SAVE_MODE_IMMEDIATE = 0;
     public static final int SAVE_MODE_OK_CANCEL = 1;
     private int saveMode;
 
+
     public PnlBeanEditor(DataChangeListener dcl, ContentProvider<T> contentProvider, Class<T> clazz, int saveMode)
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super(dcl, contentProvider);
         this.clazz = clazz;
-        this.fields = null;
+//        this.fields = null;
 
         this.saveMode = saveMode;
         this.componentSet = new HashSet<>();
@@ -55,14 +58,23 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
     void initPanel() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-        Field[] f1 = data.getClass().getDeclaredFields();
+        Field[] fields = data.getClass().getDeclaredFields();
+
+        // I have to count them first.
+        int numfields = 0;
+        for (final Field field : fields) {
+            if (field.isAnnotationPresent(EditorComponent.class)) {
+                numfields++;
+            }
+        }
+
         setLayout(new FormLayout("5dlu, default, $lcgap, 162dlu:grow, $lcgap, 5dlu",
-                "5dlu, " + (f1.length + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default, 5dlu")));
+                "5dlu, " + (numfields + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default, 5dlu")));
 
         int row = 1;
 
 
-        for (final Field field : f1) {
+        for (final Field field : fields) {
             if (field.isAnnotationPresent(EditorComponent.class)) {
 
                 EditorComponent editorComponent = field.getAnnotation(EditorComponent.class);
@@ -71,11 +83,11 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 lblName.setFont(new Font("Arial", Font.PLAIN, 14));
                 add(lblName, CC.xy(2, row + 1));
 
-                Component comp = null;
+                JComponent comp = null;
 
 
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
-                    lblName.setText(editorComponent.label());
+                    lblName.setText(SYSTools.xx(editorComponent.label()));
 
                     JTextField txt = new JTextField(PropertyUtils.getProperty(data, field.getName()).toString());
 
@@ -84,29 +96,30 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             String text = de.getDocument().getText(0, de.getDocument().getLength());
                             Object value = text;
                             if (!editorComponent.parserClass().isEmpty()) {
-                                String p =  editorComponent.parserClass();
-
-
-                                   //error: object is not an instance of declaring class
-
+                                String p = editorComponent.parserClass();
                                 Class parserClazz = Class.forName(p);
-
                                 value = parserClazz.getMethod("parse", String.class).invoke(parserClazz.newInstance(), text);
                             }
 
                             PropertyUtils.setProperty(data, field.getName(), field.getType().cast(value));
-
                             if (saveMode == SAVE_MODE_IMMEDIATE) broadcast(new DataChangeEvent(thisPanel, data));
                         } catch (BadLocationException e1) {
                             OPDE.error(logger, e1);
                         } catch (IllegalAccessException e1) {
                             OPDE.error(logger, e1);
-                        } catch (InvocationTargetException e1) {
-                            OPDE.error(logger, e1);
+                        } catch (InvocationTargetException ite) {
+                            if (ite.getTargetException() instanceof ParseException) {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ite.getTargetException().getMessage(), DisplayMessage.WARNING));
+                            } else {
+                                OPDE.error(logger, ite);
+                            }
                         } catch (NoSuchMethodException e1) {
                             OPDE.error(logger, e1);
                         } catch (ConstraintViolationException e1) {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage()));
+
+
+
                         } catch (ClassNotFoundException e) {
                             OPDE.error(logger, e);
                         } catch (InstantiationException e) {
@@ -128,7 +141,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                     JComboBox combobox = new JComboBox(new DefaultComboBoxModel<>(ArrayUtils.subarray(editorComponent.component(), 1, editorComponent.component().length - 1)));
                     combobox.setSelectedIndex(Integer.parseInt(PropertyUtils.getProperty(data, field.getName()).toString()));
-                    combobox.setToolTipText(editorComponent.tooltip());
                     combobox.addItemListener(il);
                     comp = combobox;
                 } else if (editorComponent.component()[0].equalsIgnoreCase("onoffswitch")) {
@@ -144,23 +156,18 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     };
 
                     JToggleButton btnSingle = GUITools.getNiceToggleButton(editorComponent.label());
-                    btnSingle.setToolTipText(editorComponent.tooltip());
                     btnSingle.addItemListener(il);
                     comp = btnSingle;
                 }
                 comp.setName(field.getName());
+                comp.setToolTipText(editorComponent.tooltip().isEmpty() ? null : SYSTools.xx(editorComponent.tooltip()));
                 componentSet.add(comp);
 
                 add(comp == null ? new JLabel("??") : comp, CC.xy(4, row + 1));
 
                 row += 2;
-
             }
-
-
         }
-
-
     }
 
     void initButtonPanel() {
@@ -191,7 +198,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         buttonPanel.add(btnCancel);
 
 
-        add(buttonPanel, CC.xyw(1, fields.length + 5, 5, CC.RIGHT, CC.DEFAULT));
+        add(buttonPanel, CC.xyw(1, componentSet.size() + 5, 5, CC.RIGHT, CC.DEFAULT));
     }
 
     @Override

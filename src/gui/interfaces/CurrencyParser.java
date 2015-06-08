@@ -10,18 +10,17 @@ import java.text.ParseException;
 /**
  * Created by tloehr on 06.06.15.
  */
-public class NumberParser implements TextParser<BigDecimal> {
-    NumberFormat nf = DecimalFormat.getNumberInstance();
+public class CurrencyParser implements TextParser<BigDecimal> {
+    NumberFormat nf = DecimalFormat.getCurrencyInstance();
 
     @Override
-    public BigDecimal parse(String in) {
+    public BigDecimal parse(String in) throws ParseException {
         in = SYSTools.assimilateDecimalSeparators(in);
         Number num;
-        try {
-            num = nf.parse(in);
-        } catch (ParseException ex) {
-            num = null;
-        }
+
+        num = nf.parse(in);
+
+//        throw new ParseException(SYSTools.xx("exception.integer.parser"), pe.getErrorOffset());
 
         BigDecimal value = null;
         if (num != null) {

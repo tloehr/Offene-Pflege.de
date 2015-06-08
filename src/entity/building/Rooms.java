@@ -5,6 +5,7 @@
 
 package entity.building;
 
+import gui.interfaces.EditorComponent;
 import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -24,6 +25,7 @@ public class Rooms implements Serializable {
     private Long roomID;
     @Column(name = "Text")
     @NotEmpty
+    @EditorComponent(label = "Name", component = {"textfield"})
     private String text;
     @Column(name = "Single")
     private Boolean single;

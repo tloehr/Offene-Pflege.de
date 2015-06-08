@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +23,27 @@ public class Floors {
     @Column(name = "floorid")
     private long floorid;
 
+    @JoinColumn(name = "HomeID", referencedColumnName = "EID")
+    @ManyToOne
+    @NotNull
+    private Homes home;
+
+    @Basic
+    @Column(name = "name", nullable = true, insertable = true, updatable = true, length = 30)
+    @Size(min = 1, max = 30)
     @NotEmpty
     @EditorComponent(label = "Name", component = {"textfield"})
     private String name;
 
+    @Basic
+    @Column(name = "level", nullable = true, insertable = true, updatable = true)
     @Min(0)
     @Max(8)
     @EditorComponent(label = "Etage", component = {"combobox", "2.Untergeschoss", "1.Untergeschoss", "Erdgeschoss", "1.Etage", "2.Etage", "3.Etage", "4.Etage", "5.Etage", "6.Etage"})
     private Integer level;
 
+    @Basic
+    @Column(name = "lift", nullable = true, insertable = true, updatable = true)
     @Min(0)
     @Max(10)
     @EditorComponent(label = "misc.msg.lifts", parserClass = "gui.interfaces.IntegerParser", component = {"textfield"}, tooltip = "misc.msg.lifts.connecting.this.floor")
@@ -63,13 +76,7 @@ public class Floors {
         rooms = new ArrayList<>();
     }
 
-    @JoinColumn(name = "HomeID", referencedColumnName = "EID")
-    @ManyToOne
-    @NotNull
-    private Homes home;
 
-    @Basic
-    @Column(name = "name", nullable = true, insertable = true, updatable = true, length = 30)
     public String getName() {
         return name;
     }
@@ -78,8 +85,7 @@ public class Floors {
         this.name = name;
     }
 
-    @Basic
-    @Column(name = "level", nullable = true, insertable = true, updatable = true)
+
     public Integer getLevel() {
         return level;
     }
@@ -88,8 +94,7 @@ public class Floors {
         this.level = level;
     }
 
-    @Basic
-    @Column(name = "lift", nullable = true, insertable = true, updatable = true)
+
     public Integer getLift() {
         return lift;
     }

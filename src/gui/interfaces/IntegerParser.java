@@ -13,15 +13,12 @@ public class IntegerParser implements TextParser<Integer> {
     NumberFormat nf = NumberFormat.getIntegerInstance();
 
     @Override
-    public Integer parse(String in) {
-        in = SYSTools.assimilateDecimalSeparators(in);
-        Integer num = null;
+    public Integer parse(String in) throws ParseException{
+//        in = SYSTools.assimilateDecimalSeparators(in);
         try {
-            num = nf.parse(in).intValue();
-        } catch (ParseException ex) {
-            num = null;
+            return nf.parse(in).intValue();
+        } catch (ParseException pe){
+            throw new ParseException(SYSTools.xx("exception.integer.parser"), pe.getErrorOffset());
         }
-
-        return num;
     }
 }
