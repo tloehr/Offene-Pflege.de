@@ -8,6 +8,7 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import javax.persistence.OptimisticLockException;
@@ -354,7 +355,9 @@ public class DisplayManager extends Thread {
     }
 
     public static DisplayMessage getLockMessage(OptimisticLockException ole) {
-        return new DisplayMessage(SYSTools.xx("misc.msg.lockingexception") + ": " + ole.getEntity().getClass().getName(), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
+//        Logger.getLogger(ole.getClass()).debug("LOCKING FFS!!!!");
+        // ole.getEntity().getClass().getName()
+        return new DisplayMessage(SYSTools.xx("misc.msg.lockingexception") + ": " + ole.getMessage() + "", DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
     }
 
     public static DisplayMessage getLockMessage() {

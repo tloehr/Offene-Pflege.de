@@ -74,7 +74,7 @@ public class OPDE {
     protected static Properties props;
     protected static boolean anonym;
     protected static SortedProperties localProps;
-    protected static Logger logger;
+    private final static Logger logger = Logger.getRootLogger();
     public static HashMap[] anonymize = null;
 
     public static String SUBDIR_TEMPLATES = "templates";
@@ -427,17 +427,6 @@ public class OPDE {
 
         localProps = new SortedProperties();
         props = new Properties();
-
-        /***
-         *      _       _ _     _                   _                             _
-         *     (_)_ __ (_) |_  | | ___   __ _  __ _(_)_ __   __ _   ___ _   _ ___| |_ ___ _ __ ___
-         *     | | '_ \| | __| | |/ _ \ / _` |/ _` | | '_ \ / _` | / __| | | / __| __/ _ \ '_ ` _ \
-         *     | | | | | | |_  | | (_) | (_| | (_| | | | | | (_| | \__ \ |_| \__ \ ||  __/ | | | | |
-         *     |_|_| |_|_|\__| |_|\___/ \__, |\__, |_|_| |_|\__, | |___/\__, |___/\__\___|_| |_| |_|
-         *                              |___/ |___/         |___/       |___/
-         */
-        logger = Logger.getRootLogger();
-
 
 
         /***

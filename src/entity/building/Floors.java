@@ -32,7 +32,7 @@ public class Floors {
     @Column(name = "name", nullable = true, insertable = true, updatable = true, length = 30)
     @Size(min = 1, max = 30)
     @NotEmpty
-    @EditorComponent(label = "Name", component = {"textfield"})
+    @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
     private String name;
 
     @Basic

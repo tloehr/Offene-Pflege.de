@@ -4,6 +4,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
+import gui.events.RelaxedDocumentListener;
 import gui.interfaces.ContentProvider;
 import gui.interfaces.EditPanelDefault;
 import gui.interfaces.EditorComponent;
@@ -79,7 +80,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 EditorComponent editorComponent = field.getAnnotation(EditorComponent.class);
 
-                JLabel lblName = new JLabel();
+                JLabel lblName = new JLabel(SYSTools.xx(editorComponent.label()));
                 lblName.setFont(new Font("Arial", Font.PLAIN, 14));
                 add(lblName, CC.xy(2, row + 1));
 
@@ -87,7 +88,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
 
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
-                    lblName.setText(SYSTools.xx(editorComponent.label()));
 
                     JTextField txt = new JTextField(PropertyUtils.getProperty(data, field.getName()).toString());
 
@@ -115,11 +115,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             }
                         } catch (NoSuchMethodException e1) {
                             OPDE.error(logger, e1);
-                        } catch (ConstraintViolationException e1) {
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage()));
-
-
-
+                        } catch (ConstraintViolationException cve) {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
                         } catch (ClassNotFoundException e) {
                             OPDE.error(logger, e);
                         } catch (InstantiationException e) {
@@ -213,7 +210,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
     @Override
     public void refreshDisplay() {
-        logger.debug(data.toString());
+//        logger.debug(data.toString());
         for (Component comp : componentSet) {
             if (comp instanceof JTextComponent) {
                 try {

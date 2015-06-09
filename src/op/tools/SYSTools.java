@@ -555,7 +555,7 @@ public class SYSTools {
     }
 
     public static String catchNull(String in) {
-        return (in == null ? "" : in.trim());
+        return (in == null ? "" : xx(in.trim()));
     }
 
     /**
@@ -1389,7 +1389,9 @@ public class SYSTools {
      * @return replaced message or the original message if there is no appropriate language key.
      */
     public static String xx(String message) {
-        String title = SYSTools.catchNull(message);
+        if (message == null || message.isEmpty()) return "";
+
+        String title = message;
         try {
             title = OPDE.lang.getString(message);
         } catch (Exception e) {

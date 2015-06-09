@@ -1,13 +1,14 @@
-package op.tools;
+package gui.interfaces;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.swing.JideButton;
 import gui.events.ContentRequestedEvent;
 import gui.events.ContentRequestedEventListener;
 import op.OPDE;
+import op.tools.GUITools;
+import op.tools.SYSTools;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.lf5.LogLevel;
 import org.jdesktop.core.animation.timing.Animator;
 
 import javax.swing.*;
@@ -41,14 +42,8 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
         super();
         this.cre = cre;
         thisPane = this;
-//        String id = UUID.randomUUID().toString();
-
-
-
         logger = Logger.getLogger(getClass()+": id");
         logger.setLevel(Level.DEBUG);
-
-
 
         additionalIconPanel = new JPanel();
         additionalIconPanel.setLayout(new BoxLayout(additionalIconPanel, BoxLayout.LINE_AXIS));
@@ -99,10 +94,7 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
 
 
         setTitleLabelComponent(titlePanel);
-
-
         cre.contentRequested(new ContentRequestedEvent(thisPane));
-
 
     }
 

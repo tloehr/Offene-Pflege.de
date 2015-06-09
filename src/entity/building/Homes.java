@@ -5,10 +5,12 @@
 package entity.building;
 
 import entity.reports.Handovers;
+import gui.interfaces.EditorComponent;
 import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -25,22 +27,35 @@ public class Homes implements Serializable {
     @Id
     @Column(name = "EID")
     private String eid;
-    @Column(name = "Name")
+    @Column(name = "Name", length = 30)
+    @Size(min = 1, max = 30)
     @NotEmpty
+    @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
     private String name;
-    @Column(name = "Str")
+    @Column(name = "Str", length = 30)
+    @Size(min = 1, max = 30)
     @NotEmpty
+    @EditorComponent(label = "misc.msg.street", component = {"textfield"})
     private String street;
-    @Column(name = "ZIP")
+    @Column(name = "ZIP", length = 5)
+    @Size(min = 1, max = 5)
+    @EditorComponent(label = "misc.msg.zipcode", component = {"textfield"})
     @NotEmpty
     private String zip;
-    @Column(name = "City")
+    @Column(name = "City", length = 30)
+    @Size(min = 1, max = 30)
     @NotEmpty
+    @EditorComponent(label = "misc.msg.city", component = {"textfield"})
     private String city;
-    @Column(name = "Tel")
+    @Column(name = "Tel", length = 30)
+    @Size(min = 1, max = 30)
     @NotEmpty
+    @EditorComponent(label = "misc.msg.phone", component = {"textfield"})
     private String tel;
-    @Column(name = "Fax")
+    @Column(name = "Fax", length = 30)
+    @Size(min = 1, max = 30)
+    @NotEmpty
+    @EditorComponent(label = "misc.msg.fax", component = {"textfield"})
     private String fax;
     @Version
     @Column(name = "version")
@@ -65,8 +80,8 @@ public class Homes implements Serializable {
         this.street = SYSTools.xx("misc.msg.street");
         this.zip = "12345";
         this.city = SYSTools.xx("misc.msg.city");
-        this.tel = SYSTools.xx("misc.msg.phone");;
-        this.fax = SYSTools.xx("misc.msg.fax");;
+        this.tel = SYSTools.xx("misc.msg.phone");
+        this.fax = SYSTools.xx("misc.msg.fax");
     }
 
     public String getEID() {
@@ -120,6 +135,10 @@ public class Homes implements Serializable {
 
     public void setZip(String zip) {
         this.zip = zip;
+    }
+
+    public String getZip() {
+        return zip;
     }
 
     @Override

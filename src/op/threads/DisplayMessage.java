@@ -4,6 +4,7 @@ package op.threads;
 import op.OPDE;
 import op.tools.SYSTools;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.UUID;
 
@@ -57,8 +58,18 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.classname = "";
     }
 
-    public DisplayMessage(ConstraintViolationException cve){
-        hier gehts weiter
+    public DisplayMessage(ConstraintViolationException cve) {
+        message = "";
+        for (ConstraintViolation cv : cve.getConstraintViolations()) {
+            message += SYSTools.xx(cv.getMessage()) + ", ";
+        }
+        this.priority = WARNING;
+        this.timestamp = System.currentTimeMillis();
+        this.processed = 0;
+        this.secondsToShow = OPDE.WARNING_TIME;
+        this.percentage = 0;
+        uid = UUID.randomUUID().toString();
+        this.classname = "";
     }
 
     public DisplayMessage(String message, int progress, int max) {
