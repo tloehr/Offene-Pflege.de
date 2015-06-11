@@ -12,17 +12,19 @@ import com.jidesoft.swing.JideButton;
 import entity.EntityTools;
 import entity.building.*;
 import gui.PnlBeanEditor;
-import gui.events.*;
-import gui.interfaces.ContentProvider;
+import gui.events.ContentRequestedEvent;
+import gui.events.ContentRequestedEventListener;
+import gui.events.JPADataChangeListener;
 import gui.interfaces.DefaultCollapsiblePane;
 import op.OPDE;
-import op.threads.DisplayManager;
-import op.tools.*;
+import op.tools.CleanablePanel;
+import op.tools.DefaultCPTitle;
+import op.tools.GUITools;
+import op.tools.SYSConst;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
-import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
@@ -48,7 +50,21 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     private Logger logger = Logger.getLogger(this.getClass());
 
     public PnlHomeStationRoomEditor() {
-        initComponents();
+
+
+        cpsHomes = new CollapsiblePanes();
+
+        setLayout(new FormLayout(
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default:grow, $lgap, default"));
+
+
+
+            scrollPane1.setViewportView(cpsHomes);
+
+        add(scrollPane1, CC.xy(3, 3, CC.FILL, CC.FILL));
+
+
         indexView = new HashMap<>();
         parentCPS = new HashMap<>();
         objectToRefresh = null;
@@ -114,7 +130,6 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
             cpsHomes.addExpansion();
         } else {
             if (indexView.containsKey(getKey(objectToRefresh))) {
-
                 final String key = getKey(objectToRefresh);
 
                 SwingUtilities.invokeLater(() -> {
@@ -150,10 +165,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                         cps.revalidate();
                         cps.repaint();
                     });
-
                 }
-
-
             }
             objectToRefresh = null;
         }
@@ -162,6 +174,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
     private DefaultCollapsiblePane createCP(Object userObject) {
         if (userObject == null) return null;
+        String key = getKey(userObject);
 
         logger.debug("neuer CP erstellt: " + userObject);
 
@@ -172,10 +185,11 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 Homes home = EntityTools.find(Homes.class, ((Homes) userObject).getEID());
                 dcp.setTitleButtonText(home.getName());
-                dcp.getTitleButton().setFont(SYSConst.ARIAL24);
 
-                // das hier darf nur einmal sein, ansonsten nur reload.
-                dcp.setContentPane(createContent(home));
+                if (!indexView.containsKey(key)) {
+                    dcp.getTitleButton().setFont(SYSConst.ARIAL24);
+                    dcp.setContentPane(createContent(home));
+                }
 
             };
 
@@ -185,14 +199,18 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 Floors floor = EntityTools.find(Floors.class, ((Floors) userObject).getFloorid());
                 dcp.setTitleButtonText(floor.getName());
-                dcp.setContentPane(createContent(floor));
+                if (!indexView.containsKey(key)) {
+                    dcp.setContentPane(createContent(userObject));
+                }
             };
 
         } else if (userObject instanceof Rooms) {
             contentRequestedEventListener = cre -> {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 dcp.setTitleButtonText(((Rooms) userObject).getText());
-                dcp.setContentPane(createContent(userObject));
+                if (!indexView.containsKey(key)) {
+                    dcp.setContentPane(createContent(userObject));
+                }
             };
         }
 //        else if (userObject.equals(Station.class)) {
@@ -231,10 +249,8 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                 dcp.setTitleButtonText("misc.msg.floor");
                 dcp.getTitleButton().setFont(SYSConst.ARIAL20);
 
-
                 CollapsiblePanes cps = new CollapsiblePanes();
                 cps.setLayout(new JideBoxLayout(cps, JideBoxLayout.Y_AXIS));
-
 
                 for (final Floors floor : home.getFloors()) {
                     cps.add(createCP(floor));
@@ -269,6 +285,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                 cps.add(pnlBeanEditor);
                 cps.add(createCPFloorsFor((Homes) userObject));
 
+
             } catch (Exception e) {
                 OPDE.fatal(logger, e);
             }
@@ -284,32 +301,32 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
 
         } else if (userObject instanceof Rooms) {
-            cps.add(new PnlRooms(new DataChangeListener<Rooms>() {
-                @Override
-                public void dataChanged(DataChangeEvent evt) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        Rooms myRoom = em.merge((Rooms) evt.getData());
-                        em.getTransaction().commit();
-
-
-                    } catch (OptimisticLockException ole) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.warn(logger, ole);
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage(ole));
-                    } catch (Exception e) {
-                        em.getTransaction().rollback();
-                        OPDE.fatal(logger, e);
-                    } finally {
-                        em.close();
-                        ((PnlRooms) evt.getSource()).cleanup(); // this is a one time use panel. will be replaced with the next refresh
-                        refresh = true;
-                    }
-                }
-            }, () -> EntityTools.find(Rooms.class, ((Rooms) userObject).getRoomID())));
+//            cps.add(new PnlRooms(new DataChangeListener<Rooms>() {
+//                @Override
+//                public void dataChanged(DataChangeEvent evt) {
+//                    EntityManager em = OPDE.createEM();
+//                    try {
+//                        em.getTransaction().begin();
+//                        Rooms myRoom = em.merge((Rooms) evt.getData());
+//                        em.getTransaction().commit();
+//
+//
+//                    } catch (OptimisticLockException ole) {
+//                        if (em.getTransaction().isActive()) {
+//                            em.getTransaction().rollback();
+//                        }
+//                        OPDE.warn(logger, ole);
+//                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage(ole));
+//                    } catch (Exception e) {
+//                        em.getTransaction().rollback();
+//                        OPDE.fatal(logger, e);
+//                    } finally {
+//                        em.close();
+//                        ((PnlRooms) evt.getSource()).cleanup(); // this is a one time use panel. will be replaced with the next refresh
+//                        refresh = true;
+//                    }
+//                }
+//            }, () -> EntityTools.find(Rooms.class, ((Rooms) userObject).getRoomID())));
         } else if (userObject instanceof Floors) {
             try {
                 PnlBeanEditor<Floors> pbe = new PnlBeanEditor<>(new JPADataChangeListener<>(o -> {
@@ -317,6 +334,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                     refresh = true;
                 }), () -> EntityTools.find(Floors.class, ((Floors) userObject).getFloorid()), Floors.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
                 cps.add(pbe);
+
             } catch (Exception e) {
                 OPDE.fatal(logger, e);
             }

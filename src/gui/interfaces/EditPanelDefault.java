@@ -28,9 +28,6 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
         data = contentProvider.getContent();
     }
 
-
-
-
     @Override
     public abstract void setStartFocus();
 
