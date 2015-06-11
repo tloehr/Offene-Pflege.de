@@ -7,7 +7,7 @@ package op.settings;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.building.Homes;
-import gui.interfaces.ContentProvider;
+import gui.interfaces.DataProvider;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
 import gui.interfaces.EditPanelDefault;
@@ -35,8 +35,8 @@ public class PnlHomes extends EditPanelDefault<Homes> {
 
 
 
-    public PnlHomes(DataChangeListener dcl, ContentProvider<Homes> contentProvider) {
-        super(dcl, contentProvider);
+    public PnlHomes(DataChangeListener dcl, DataProvider<Homes> dataProvider) {
+        super(dcl, dataProvider);
         allTXT = new ArrayList<JTextComponent>();
         allComponents = new ArrayList<Component>();
         initComponents();

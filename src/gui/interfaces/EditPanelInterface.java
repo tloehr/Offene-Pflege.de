@@ -25,6 +25,6 @@ public interface EditPanelInterface<T> {
 
     public void cleanup();
 
-    public void reload();
+
 
 }

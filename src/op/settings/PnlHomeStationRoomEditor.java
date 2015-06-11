@@ -16,6 +16,7 @@ import gui.events.ContentRequestedEvent;
 import gui.events.ContentRequestedEventListener;
 import gui.events.JPADataChangeListener;
 import gui.interfaces.DefaultCollapsiblePane;
+import gui.interfaces.DefaultContentPane;
 import op.OPDE;
 import op.tools.CleanablePanel;
 import op.tools.DefaultCPTitle;
@@ -27,7 +28,6 @@ import org.apache.log4j.Logger;
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.UUID;
@@ -59,8 +59,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
                 "default, $lgap, default:grow, $lgap, default"));
 
 
-
-            scrollPane1.setViewportView(cpsHomes);
+        scrollPane1.setViewportView(cpsHomes);
 
         add(scrollPane1, CC.xy(3, 3, CC.FILL, CC.FILL));
 
@@ -115,60 +114,122 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     }
 
     synchronized void refreshDisplay() {
+
         if (objectToRefresh == null) {
-            indexView.clear();
+
             cpsHomes.removeAll();
             cpsHomes.setLayout(new JideBoxLayout(cpsHomes, JideBoxLayout.Y_AXIS));
-            cpsHomes.add(createAddHomeButton());
 
-            ArrayList<Homes> listHomes = HomesTools.getAll();
-            for (final Homes home : listHomes) {
-                parentCPS.put(getKey(home), cpsHomes);
+            for (final Homes home : HomesTools.getAll()) {
                 cpsHomes.add(createCP(home));
             }
-
             cpsHomes.addExpansion();
-        } else {
-            if (indexView.containsKey(getKey(objectToRefresh))) {
-                final String key = getKey(objectToRefresh);
-
-                SwingUtilities.invokeLater(() -> {
-                    indexView.get(key).reload();
-                    indexView.get(key).revalidate();
-                    indexView.get(key).repaint();
-                });
-            } else {
-
-                if (objectToRefresh instanceof Homes) {
-                    cpsHomes.remove(cpsHomes.getComponentCount() - 1); // remove old Expansion
-                    cpsHomes.add(createCP(objectToRefresh));
-                    cpsHomes.addExpansion();
-
-                    parentCPS.put(getKey(objectToRefresh), cpsHomes);
-
-                    SwingUtilities.invokeLater(() -> {
-                        cpsHomes.revalidate();
-                        cpsHomes.repaint();
-                    });
-
-                } else if (objectToRefresh instanceof Floors) {
-
-                    CollapsiblePanes cps = parentCPS.get("fl#" + getKey(((Floors) objectToRefresh).getHome()));
-
-                    cps.remove(cpsHomes.getComponentCount() - 1); // remove old Expansion
-                    cps.add(createCP(objectToRefresh));
-                    cps.addExpansion();
-
-                    indexView.get(getKey(objectToRefresh)).reload();
-
-                    SwingUtilities.invokeLater(() -> {
-                        cps.revalidate();
-                        cps.repaint();
-                    });
-                }
-            }
-            objectToRefresh = null;
         }
+
+
+//        if (objectToRefresh == null) {
+//            indexView.clear();
+//            cpsHomes.removeAll();
+//            cpsHomes.setLayout(new JideBoxLayout(cpsHomes, JideBoxLayout.Y_AXIS));
+//            cpsHomes.add(createAddHomeButton());
+//
+//            ArrayList<Homes> listHomes = HomesTools.getAll();
+//            for (final Homes home : listHomes) {
+//                parentCPS.put(getKey(home), cpsHomes);
+//                cpsHomes.add(createCP(home));
+//            }
+//
+//            cpsHomes.addExpansion();
+//        } else {
+//            if (indexView.containsKey(getKey(objectToRefresh))) {
+//                final String key = getKey(objectToRefresh);
+//
+//                SwingUtilities.invokeLater(() -> {
+//                    indexView.get(key).reload();
+//                    indexView.get(key).revalidate();
+//                    indexView.get(key).repaint();
+//                });
+//            } else {
+//
+//                if (objectToRefresh instanceof Homes) {
+//                    cpsHomes.remove(cpsHomes.getComponentCount() - 1); // remove old Expansion
+//                    cpsHomes.add(createCP(objectToRefresh));
+//                    cpsHomes.addExpansion();
+//
+//                    parentCPS.put(getKey(objectToRefresh), cpsHomes);
+//
+//                    SwingUtilities.invokeLater(() -> {
+//                        cpsHomes.revalidate();
+//                        cpsHomes.repaint();
+//                    });
+//
+//                } else if (objectToRefresh instanceof Floors) {
+//
+//                    CollapsiblePanes cps = parentCPS.get("fl#" + getKey(((Floors) objectToRefresh).getHome()));
+//
+//                    cps.remove(cpsHomes.getComponentCount() - 1); // remove old Expansion
+//                    cps.add(createCP(objectToRefresh));
+//                    cps.addExpansion();
+//
+//                    indexView.get(getKey(objectToRefresh)).reload();
+//
+//                    SwingUtilities.invokeLater(() -> {
+//                        cps.revalidate();
+//                        cps.repaint();
+//                    });
+//                }
+//            }
+//            objectToRefresh = null;
+//        }
+    }
+
+    private DefaultCollapsiblePane createCP(final Homes home) {
+
+        ContentRequestedEventListener<DefaultCollapsiblePane> contentRequestedEventListener = cre -> {
+            DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
+            Homes myHome = EntityTools.find(Homes.class, home.getEID());
+
+            dcp.setTitleButtonText(myHome.getName());
+
+            if (!indexView.containsKey(key)) {
+                dcp.getTitleButton().setFont(SYSConst.ARIAL24);
+                dcp.setContentPane(createContent(home));
+            }
+
+        };
+
+        DefaultCollapsiblePane cp = new DefaultCollapsiblePane(contentRequestedEventListener);
+        return cp;
+    }
+
+    private DefaultContentPane createContent(final Homes home) {
+
+        DefaultContentPane dce = new DefaultContentPane();
+
+
+        try {
+            PnlBeanEditor<Homes> pnlBeanEditor = new PnlBeanEditor<>(new JPADataChangeListener<>(o -> {
+                objectToRefresh = o;
+                refresh = true;
+            }), () -> EntityTools.find(Homes.class, home.getEID()), Homes.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+
+            dce.add(pnlBeanEditor);
+
+
+//            cps.add(createCPFloorsFor((Homes) userObject));
+
+
+        } catch (Exception e) {
+            OPDE.fatal(logger, e);
+        }
+
+
+        dce.addExpansion();
+
+        parentCPS.put(getKey(userObject), cps);
+
+
+        return cps;
     }
 
 

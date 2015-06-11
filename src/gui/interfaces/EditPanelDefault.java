@@ -9,23 +9,23 @@ import java.util.HashSet;
 /**
  * Created by tloehr on 11.05.15.
  */
-public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T> {
+public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInterface<T>, Reloadable {
     protected T data;
     protected HashSet<DataChangeListener<T>> listDCL;
-    private final ContentProvider<T> contentProvider;
+    private final DataProvider<T> dataProvider;
     protected final EditPanelDefault<T> thisPanel = this;
     protected boolean edited = false;
 
-    public EditPanelDefault(DataChangeListener dcl, ContentProvider<T> contentProvider) {
-        this(contentProvider);
+    public EditPanelDefault(DataChangeListener dcl, DataProvider<T> dataProvider) {
+        this(dataProvider);
         addDataChangeListener(dcl);
     }
 
-    public EditPanelDefault(ContentProvider<T> contentProvider) {
+    public EditPanelDefault(DataProvider<T> dataProvider) {
         super();
         listDCL = new HashSet<>();
-        this.contentProvider = contentProvider;
-        data = contentProvider.getContent();
+        this.dataProvider = dataProvider;
+        data = dataProvider.getContent();
     }
 
     @Override
@@ -66,7 +66,7 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
     @Override
     public void reload() {
         SwingUtilities.invokeLater(() -> {
-            data = contentProvider.getContent();
+            data = dataProvider.getContent();
             edited = false;
             refreshDisplay();
             revalidate();

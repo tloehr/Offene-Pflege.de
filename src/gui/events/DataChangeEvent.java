@@ -18,9 +18,6 @@ import java.util.Set;
  */
 public class DataChangeEvent<T> extends EventObject {
     T data;
-    String validationResult;
-
-    boolean valid;
 
     public T getData() {
         return data;
@@ -40,14 +37,7 @@ public class DataChangeEvent<T> extends EventObject {
         }
 
         this.data = data;
-        this.valid = true;
     }
 
-    public String getValidationResult() {
-        return validationResult;
-    }
 
-    public boolean isValid() {
-        return valid;
-    }
 }

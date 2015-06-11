@@ -5,7 +5,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
 import gui.events.RelaxedDocumentListener;
-import gui.interfaces.ContentProvider;
+import gui.interfaces.DataProvider;
 import gui.interfaces.EditPanelDefault;
 import gui.interfaces.EditorComponent;
 import op.OPDE;
@@ -44,9 +44,9 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private int saveMode;
 
 
-    public PnlBeanEditor(DataChangeListener dcl, ContentProvider<T> contentProvider, Class<T> clazz, int saveMode)
+    public PnlBeanEditor(DataChangeListener dcl, DataProvider<T> dataProvider, Class<T> clazz, int saveMode)
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        super(dcl, contentProvider);
+        super(dcl, dataProvider);
         this.clazz = clazz;
 //        this.fields = null;
 

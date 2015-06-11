@@ -7,7 +7,7 @@ package op.settings;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.building.Rooms;
-import gui.interfaces.ContentProvider;
+import gui.interfaces.DataProvider;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
 import gui.interfaces.EditPanelDefault;
@@ -31,8 +31,8 @@ public class PnlRooms extends EditPanelDefault<Rooms> {
     JToggleButton btnSingle, btnBath, btnActive;
     ItemListener il;
 
-    public PnlRooms(DataChangeListener dcl, ContentProvider<Rooms> contentProvider) {
-        super(dcl, contentProvider);
+    public PnlRooms(DataChangeListener dcl, DataProvider<Rooms> dataProvider) {
+        super(dcl, dataProvider);
 
         allComponents = new ArrayList<Component>();
         initComponents();

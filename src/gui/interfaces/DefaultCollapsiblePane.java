@@ -23,7 +23,7 @@ import java.beans.PropertyVetoException;
  * Time: 11:57
  * To change this template use File | Settings | File Templates.
  */
-public class DefaultCollapsiblePane extends CollapsiblePane {
+public class DefaultCollapsiblePane extends CollapsiblePane implements Reloadable {
     //    private final Closure contentProvider;
     private final ContentRequestedEventListener cre;
     private Animator animator = null;
@@ -140,6 +140,7 @@ public class DefaultCollapsiblePane extends CollapsiblePane {
         return titlePanel;
     }
 
+    @Override
     public void reload() {
         cre.contentRequested(new ContentRequestedEvent(thisPane));
     }
