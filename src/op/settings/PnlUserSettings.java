@@ -14,7 +14,7 @@ import op.system.EMailSystem;
 import op.system.Recipient;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.CleanablePanel;
+import gui.interfaces.CleanablePanel;
 import op.tools.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

@@ -33,6 +33,8 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.system.*;
+import gui.interfaces.CleanablePanel;
+import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClass;
 import op.threads.DisplayManager;

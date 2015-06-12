@@ -25,6 +25,7 @@ import entity.info.ResidentTools;
 import entity.process.*;
 import entity.system.Users;
 import entity.system.UsersTools;
+import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;

@@ -1,7 +1,8 @@
-package op.tools;
+package gui.interfaces;
 
 import com.jidesoft.swing.JideButton;
 import op.OPDE;
+import op.tools.GUITools;
 
 import javax.swing.*;
 import java.awt.*;

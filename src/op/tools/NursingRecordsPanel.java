@@ -1,6 +1,7 @@
 package op.tools;
 
 import entity.info.Resident;
+import gui.interfaces.CleanablePanel;
 
 /**
  * Created by IntelliJ IDEA.

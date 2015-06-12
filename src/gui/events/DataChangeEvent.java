@@ -6,6 +6,7 @@
 package gui.events;
 
 import op.OPDE;
+import org.apache.log4j.Logger;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -29,14 +30,17 @@ public class DataChangeEvent<T> extends EventObject {
 
     public DataChangeEvent(Object source, T data) throws ConstraintViolationException {
         super(source);
+        this.data = data;
         Validator validator = OPDE.getValidatorFactory().getValidator();
 
-        Set<ConstraintViolation<T>> constraintViolations = validator.validate(data);
+        Logger.getLogger(getClass()).debug(data);
+
+        Set<ConstraintViolation<T>> constraintViolations = validator.validate(this.data);
         if (!constraintViolations.isEmpty()) {
             throw new ConstraintViolationException(constraintViolations);
         }
 
-        this.data = data;
+
     }
 
 

@@ -21,7 +21,7 @@ import op.care.sysfiles.PnlFiles;
 import op.care.values.PnlLiquidBalance;
 import op.care.values.PnlValues;
 import op.process.PnlProcess;
-import op.tools.CleanablePanel;
+import gui.interfaces.CleanablePanel;
 import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;

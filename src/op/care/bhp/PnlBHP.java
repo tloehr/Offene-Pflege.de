@@ -40,6 +40,7 @@ import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.*;
+import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.system.Validator;

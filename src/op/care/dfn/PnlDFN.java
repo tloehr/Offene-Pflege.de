@@ -42,6 +42,7 @@ import entity.nursingprocess.DFN;
 import entity.nursingprocess.DFNTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.NursingProcessTools;
+import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.nursingprocess.PnlSelectIntervention;
 import op.system.InternalClassACL;

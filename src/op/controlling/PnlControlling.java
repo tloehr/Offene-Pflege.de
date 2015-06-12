@@ -47,6 +47,8 @@ import entity.reports.NReportTools;
 import entity.staff.TrainingTools;
 import entity.system.*;
 import entity.values.ResValueTools;
+import gui.interfaces.CleanablePanel;
+import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;

@@ -25,7 +25,7 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
         super();
         listDCL = new HashSet<>();
         this.dataProvider = dataProvider;
-        data = dataProvider.getContent();
+        data = dataProvider.getData();
     }
 
     @Override
@@ -63,15 +63,29 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
         }
     }
 
+    public void reload(T data) {
+            this.data = data;
+            edited = false;
+    //        SwingUtilities.invokeLater(() -> {
+    //
+    //            edited = false;
+    //            refreshDisplay();
+    //            revalidate();
+    //            repaint();
+    //        });
+        }
+
     @Override
     public void reload() {
-        SwingUtilities.invokeLater(() -> {
-            data = dataProvider.getContent();
-            edited = false;
-            refreshDisplay();
-            revalidate();
-            repaint();
-        });
+        data = dataProvider.getData();
+        edited = false;
+//        SwingUtilities.invokeLater(() -> {
+//
+//            edited = false;
+//            refreshDisplay();
+//            revalidate();
+//            repaint();
+//        });
     }
 
     public abstract void refreshDisplay();

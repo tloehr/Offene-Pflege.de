@@ -4,6 +4,8 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.swing.JideButton;
 import gui.events.ContentRequestedEvent;
 import gui.events.ContentRequestedEventListener;
+import gui.events.DataChangeEvent;
+import gui.events.DataChangeListener;
 import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSTools;
@@ -23,26 +25,27 @@ import java.beans.PropertyVetoException;
  * Time: 11:57
  * To change this template use File | Settings | File Templates.
  */
-public class DefaultCollapsiblePane extends CollapsiblePane implements Reloadable {
+public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reloadable, DataChangeListener<T> {
     //    private final Closure contentProvider;
-    private final ContentRequestedEventListener cre;
+    private final ContentRequestedEventListener headerUpdate, contentUpdate;
     private Animator animator = null;
 
     JPanel titlePanelleft, titlePanelright, titlePanel, additionalIconPanel;
     final JideButton btnTitle;
     boolean flashAfterEdit = true;
-   final long id = System.nanoTime();
+    final long id = System.nanoTime();
 
     ActionListener defaultActionListener;
 
     private final DefaultCollapsiblePane thisPane;
     private Logger logger;
 
-    public DefaultCollapsiblePane(ContentRequestedEventListener cre) {
+    public DefaultCollapsiblePane(ContentRequestedEventListener headerUpdate, ContentRequestedEventListener contentUpdate) {
         super();
-        this.cre = cre;
+        this.headerUpdate = headerUpdate;
+        this.contentUpdate = contentUpdate;
         thisPane = this;
-        logger = Logger.getLogger(getClass()+": id");
+        logger = Logger.getLogger(getClass() + ": id");
         logger.setLevel(Level.DEBUG);
 
         additionalIconPanel = new JPanel();
@@ -82,24 +85,29 @@ public class DefaultCollapsiblePane extends CollapsiblePane implements Reloadabl
 
 
         defaultActionListener = e -> {
-            logger.debug(btnTitle.getName() + " "+  btnTitle.getText());
+            logger.debug(btnTitle.getName() + " " + btnTitle.getText());
             setCollapsed(!isCollapsed());
         };
         btnTitle.addActionListener(defaultActionListener);
-        btnTitle.setName("btn"+id);
+        btnTitle.setName("btn" + id);
 
         setCollapsible(true);
         setCollapsed(true);
         setSlidingDirection(SwingConstants.SOUTH);
 
-
         setTitleLabelComponent(titlePanel);
-        cre.contentRequested(new ContentRequestedEvent(thisPane));
+
+        headerUpdate.contentRequested(new ContentRequestedEvent(thisPane));
+        contentUpdate.contentRequested(new ContentRequestedEvent(thisPane));
 
     }
 
+    @Override
+    public void dataChanged(DataChangeEvent evt) {
+        headerUpdate.contentRequested(new ContentRequestedEvent(thisPane));
+    }
 
-//    public DefaultCollapsiblePane(String title,Closure contentProvider) {
+    //    public DefaultCollapsiblePane(String title,Closure contentProvider) {
 //        this(contentProvider);
 //        setTitleButtonText(title);
 //    }
@@ -142,13 +150,13 @@ public class DefaultCollapsiblePane extends CollapsiblePane implements Reloadabl
 
     @Override
     public void reload() {
-        cre.contentRequested(new ContentRequestedEvent(thisPane));
+
     }
 
     public void setTitleButtonText(String text) {
         logger.debug("setTitleButtonText: " + text);
         btnTitle.setText(SYSTools.xx(text));
-        logger.debug(btnTitle.getName() + " "+  btnTitle.getText());
+        logger.debug(btnTitle.getName() + " " + btnTitle.getText());
     }
 
     public JideButton getTitleButton() {

@@ -39,7 +39,7 @@ import op.OPDE;
 import op.care.med.inventory.DlgNewStocks;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.InternalClassACL;
-import op.tools.CleanablePanel;
+import gui.interfaces.CleanablePanel;
 import op.tools.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

@@ -44,9 +44,9 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private int saveMode;
 
 
-    public PnlBeanEditor(DataChangeListener dcl, DataProvider<T> dataProvider, Class<T> clazz, int saveMode)
+    public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz, int saveMode)
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        super(dcl, dataProvider);
+        super(dataProvider);
         this.clazz = clazz;
 //        this.fields = null;
 

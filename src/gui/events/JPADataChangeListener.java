@@ -1,5 +1,6 @@
 package gui.events;
 
+import gui.interfaces.GenericClosure;
 import op.OPDE;
 import op.threads.DisplayManager;
 import org.apache.commons.collections.Closure;
@@ -14,9 +15,9 @@ import javax.persistence.OptimisticLockException;
  */
 public class JPADataChangeListener<T> implements DataChangeListener<T> {
 
-    private final Closure afterGlow;
+    private final GenericClosure<T> afterGlow;
 
-    public JPADataChangeListener(Closure afterGlow) {
+    public JPADataChangeListener(GenericClosure<T> afterGlow) {
         this.afterGlow = afterGlow;
     }
 

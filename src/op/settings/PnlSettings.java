@@ -7,7 +7,7 @@ package op.settings;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import op.OPDE;
-import op.tools.CleanablePanel;
+import gui.interfaces.CleanablePanel;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 

@@ -6,20 +6,20 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.EntityTools;
 import entity.building.*;
 import gui.PnlBeanEditor;
-import gui.events.ContentRequestedEvent;
 import gui.events.ContentRequestedEventListener;
+import gui.events.DataChangeEvent;
+import gui.events.DataChangeListener;
 import gui.events.JPADataChangeListener;
+import gui.interfaces.CleanablePanel;
+import gui.interfaces.DefaultCPTitle;
 import gui.interfaces.DefaultCollapsiblePane;
-import gui.interfaces.DefaultContentPane;
+import gui.interfaces.DefaultCollapsiblePanes;
 import op.OPDE;
-import op.tools.CleanablePanel;
-import op.tools.DefaultCPTitle;
 import op.tools.GUITools;
 import op.tools.SYSConst;
 import org.apache.log4j.Level;
@@ -29,7 +29,6 @@ import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -44,28 +43,25 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     private boolean refresh = false;
     private final Thread thread;
 
-    private HashMap<String, CollapsiblePanes> parentCPS;
-    private HashMap<String, DefaultCollapsiblePane> indexView;
+    //    private HashMap<String, CollapsiblePanes> parentCPS;
+//    private HashMap<String, DefaultCollapsiblePane> indexView;
     //    private HashMap<String, DefaultMutableTreeNode> indexMoadel;
     private Logger logger = Logger.getLogger(this.getClass());
+    private JScrollPane scrollPane1;
+    private DefaultCollapsiblePanes cpsHomes;
 
     public PnlHomeStationRoomEditor() {
-
-
-        cpsHomes = new CollapsiblePanes();
-
+        cpsHomes = new DefaultCollapsiblePanes();
+        scrollPane1 = new JScrollPane();
         setLayout(new FormLayout(
                 "default, $lcgap, default:grow, $lcgap, default",
                 "default, $lgap, default:grow, $lgap, default"));
 
-
         scrollPane1.setViewportView(cpsHomes);
-
         add(scrollPane1, CC.xy(3, 3, CC.FILL, CC.FILL));
 
-
-        indexView = new HashMap<>();
-        parentCPS = new HashMap<>();
+//        indexView = new HashMap<>();
+//        parentCPS = new HashMap<>();
         objectToRefresh = null;
 
         logger.setLevel(Level.DEBUG);
@@ -86,7 +82,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     @Override
     public void cleanup() {
         thread.interrupt();
-        indexView.clear();
+//        indexView.clear();
         cpsHomes.removeAll();
     }
 
@@ -185,230 +181,221 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
 
     private DefaultCollapsiblePane createCP(final Homes home) {
 
-        ContentRequestedEventListener<DefaultCollapsiblePane> contentRequestedEventListener = cre -> {
+        ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate = cre -> {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
             Homes myHome = EntityTools.find(Homes.class, home.getEID());
-
             dcp.setTitleButtonText(myHome.getName());
-
-            if (!indexView.containsKey(key)) {
-                dcp.getTitleButton().setFont(SYSConst.ARIAL24);
-                dcp.setContentPane(createContent(home));
-            }
-
+            dcp.getTitleButton().setFont(SYSConst.ARIAL24);
         };
 
-        DefaultCollapsiblePane cp = new DefaultCollapsiblePane(contentRequestedEventListener);
+        ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
+            DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
+            Homes myHome = EntityTools.find(Homes.class, home.getEID());
+            dcp.setContentPane(createContent(myHome, (DefaultCollapsiblePane<Homes>) cre.getSource()));
+        };
+
+        DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate);
         return cp;
     }
 
-    private DefaultContentPane createContent(final Homes home) {
+    private DefaultCollapsiblePanes createContent(final Homes home, DataChangeListener<Homes> dcl) {
 
-        DefaultContentPane dce = new DefaultContentPane();
-
+        DefaultCollapsiblePanes dcps = new DefaultCollapsiblePanes();
 
         try {
-            PnlBeanEditor<Homes> pnlBeanEditor = new PnlBeanEditor<>(new JPADataChangeListener<>(o -> {
-                objectToRefresh = o;
-                refresh = true;
-            }), () -> EntityTools.find(Homes.class, home.getEID()), Homes.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
-
-            dce.add(pnlBeanEditor);
-
-
-//            cps.add(createCPFloorsFor((Homes) userObject));
-
-
+            PnlBeanEditor<Homes> pnlBeanEditor = new PnlBeanEditor<>(() -> EntityTools.find(Homes.class, home.getEID()), Homes.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+            pnlBeanEditor.addDataChangeListener(new JPADataChangeListener<>(editedHome -> {
+                pnlBeanEditor.reload(editedHome);
+                dcl.dataChanged(new DataChangeEvent<>(pnlBeanEditor, editedHome));
+            }));
+            dcps.add(pnlBeanEditor);
+//                                    .add(createCPFloorsFor((Homes) userObject));
+            dcps.addExpansion();
         } catch (Exception e) {
             OPDE.fatal(logger, e);
         }
 
 
-        dce.addExpansion();
-
-        parentCPS.put(getKey(userObject), cps);
-
-
-        return cps;
+        return dcps;
     }
 
 
-    private DefaultCollapsiblePane createCP(Object userObject) {
-        if (userObject == null) return null;
-        String key = getKey(userObject);
-
-        logger.debug("neuer CP erstellt: " + userObject);
-
-        ContentRequestedEventListener<DefaultCollapsiblePane> contentRequestedEventListener = null;
-
-        if (userObject instanceof Homes) {
-            contentRequestedEventListener = cre -> {
-                DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-                Homes home = EntityTools.find(Homes.class, ((Homes) userObject).getEID());
-                dcp.setTitleButtonText(home.getName());
-
-                if (!indexView.containsKey(key)) {
-                    dcp.getTitleButton().setFont(SYSConst.ARIAL24);
-                    dcp.setContentPane(createContent(home));
-                }
-
-            };
-
-        } else if (userObject instanceof Floors) {
-
-            contentRequestedEventListener = cre -> {
-                DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-                Floors floor = EntityTools.find(Floors.class, ((Floors) userObject).getFloorid());
-                dcp.setTitleButtonText(floor.getName());
-                if (!indexView.containsKey(key)) {
-                    dcp.setContentPane(createContent(userObject));
-                }
-            };
-
-        } else if (userObject instanceof Rooms) {
-            contentRequestedEventListener = cre -> {
-                DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-                dcp.setTitleButtonText(((Rooms) userObject).getText());
-                if (!indexView.containsKey(key)) {
-                    dcp.setContentPane(createContent(userObject));
-                }
-            };
-        }
-//        else if (userObject.equals(Station.class)) {
+//    private DefaultCollapsiblePane createCP(Object userObject) {
+//        if (userObject == null) return null;
+//        String key = getKey(userObject);
 //
-//            contentRequestedEventListener = new ContentRequestedEventListener<DefaultCollapsiblePane>() {
-//                @Override
-//                public void contentRequested(ContentRequestedEvent<DefaultCollapsiblePane> cre) {
-//                    DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-//                    dcp.setTitleButtonText("misc.msg.station");
-//                    dcp.getTitleButton().setFont(SYSConst.ARIAL20);
+//        logger.debug("neuer CP erstellt: " + userObject);
+//
+//        ContentRequestedEventListener<DefaultCollapsiblePane> contentRequestedEventListener = null;
+//
+//        if (userObject instanceof Homes) {
+//            contentRequestedEventListener = cre -> {
+//                DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
+//                Homes home = EntityTools.find(Homes.class, ((Homes) userObject).getEID());
+//                dcp.setTitleButtonText(home.getName());
+//
+//                if (!indexView.containsKey(key)) {
+//                    dcp.getTitleButton().setFont(SYSConst.ARIAL24);
+//                    dcp.setContentPane(createContent(home));
+//                }
+//
+//            };
+//
+//        } else if (userObject instanceof Floors) {
+//
+//            contentRequestedEventListener = cre -> {
+//                DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
+//                Floors floor = EntityTools.find(Floors.class, ((Floors) userObject).getFloorid());
+//                dcp.setTitleButtonText(floor.getName());
+//                if (!indexView.containsKey(key)) {
 //                    dcp.setContentPane(createContent(userObject));
 //                }
 //            };
 //
-//
-//        }
-
-
-        DefaultCollapsiblePane cp = new DefaultCollapsiblePane(contentRequestedEventListener);
-
-//        cp.setBackground(Color.white);
-
-
-        indexView.put(getKey(userObject), cp);
-
-
-        return cp;
-    }
-
-
-    private DefaultCollapsiblePane createCPFloorsFor(Homes home) {
-        ContentRequestedEventListener<DefaultCollapsiblePane> contentRequestedEventListener = new ContentRequestedEventListener<DefaultCollapsiblePane>() {
-            @Override
-            public void contentRequested(ContentRequestedEvent<DefaultCollapsiblePane> cre) {
-                DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-                dcp.setTitleButtonText("misc.msg.floor");
-                dcp.getTitleButton().setFont(SYSConst.ARIAL20);
-
-                CollapsiblePanes cps = new CollapsiblePanes();
-                cps.setLayout(new JideBoxLayout(cps, JideBoxLayout.Y_AXIS));
-
-                for (final Floors floor : home.getFloors()) {
-                    cps.add(createCP(floor));
-                    parentCPS.put(getKey(floor), cps);
-                    parentCPS.put("fl#" + getKey(home), cps);
-                }
-                cps.addExpansion();
-                dcp.setContentPane(cps);
-            }
-        };
-        DefaultCollapsiblePane cp = new DefaultCollapsiblePane(contentRequestedEventListener);
-        indexView.put(getKey(home), cp);
-
-        return cp;
-    }
-
-    private JPanel createContent(Object userObject) {
-
-        CollapsiblePanes cps = new CollapsiblePanes();
-        cps.setLayout(new JideBoxLayout(cps, JideBoxLayout.Y_AXIS));
-
-        Object id;
-
-        if (userObject instanceof Homes) {
-
-            try {
-                PnlBeanEditor<Homes> pnlBeanEditor = new PnlBeanEditor<>(new JPADataChangeListener<>(o -> {
-                    objectToRefresh = o;
-                    refresh = true;
-                }), () -> EntityTools.find(Homes.class, ((Homes) userObject).getEID()), Homes.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
-
-                cps.add(pnlBeanEditor);
-                cps.add(createCPFloorsFor((Homes) userObject));
-
-
-            } catch (Exception e) {
-                OPDE.fatal(logger, e);
-            }
-
-//            for (final Floors floor : ((Homes) userObject).getFloors()) {
-//                createCP(floor);
-//            }
-
-//            for (final Station station : ((Homes) userObject).getStations()) {
-//
-//
-//            }
-
-
-        } else if (userObject instanceof Rooms) {
-//            cps.add(new PnlRooms(new DataChangeListener<Rooms>() {
-//                @Override
-//                public void dataChanged(DataChangeEvent evt) {
-//                    EntityManager em = OPDE.createEM();
-//                    try {
-//                        em.getTransaction().begin();
-//                        Rooms myRoom = em.merge((Rooms) evt.getData());
-//                        em.getTransaction().commit();
-//
-//
-//                    } catch (OptimisticLockException ole) {
-//                        if (em.getTransaction().isActive()) {
-//                            em.getTransaction().rollback();
-//                        }
-//                        OPDE.warn(logger, ole);
-//                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage(ole));
-//                    } catch (Exception e) {
-//                        em.getTransaction().rollback();
-//                        OPDE.fatal(logger, e);
-//                    } finally {
-//                        em.close();
-//                        ((PnlRooms) evt.getSource()).cleanup(); // this is a one time use panel. will be replaced with the next refresh
-//                        refresh = true;
-//                    }
+//        } else if (userObject instanceof Rooms) {
+//            contentRequestedEventListener = cre -> {
+//                DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
+//                dcp.setTitleButtonText(((Rooms) userObject).getText());
+//                if (!indexView.containsKey(key)) {
+//                    dcp.setContentPane(createContent(userObject));
 //                }
-//            }, () -> EntityTools.find(Rooms.class, ((Rooms) userObject).getRoomID())));
-        } else if (userObject instanceof Floors) {
-            try {
-                PnlBeanEditor<Floors> pbe = new PnlBeanEditor<>(new JPADataChangeListener<>(o -> {
-                    objectToRefresh = o;
-                    refresh = true;
-                }), () -> EntityTools.find(Floors.class, ((Floors) userObject).getFloorid()), Floors.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
-                cps.add(pbe);
+//            };
+//        }
+////        else if (userObject.equals(Station.class)) {
+////
+////            contentRequestedEventListener = new ContentRequestedEventListener<DefaultCollapsiblePane>() {
+////                @Override
+////                public void contentRequested(ContentRequestedEvent<DefaultCollapsiblePane> cre) {
+////                    DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
+////                    dcp.setTitleButtonText("misc.msg.station");
+////                    dcp.getTitleButton().setFont(SYSConst.ARIAL20);
+////                    dcp.setContentPane(createContent(userObject));
+////                }
+////            };
+////
+////
+////        }
+//
+//
+//        DefaultCollapsiblePane cp = new DefaultCollapsiblePane(contentRequestedEventListener);
+//
+////        cp.setBackground(Color.white);
+//
+//
+//        indexView.put(getKey(userObject), cp);
+//
+//
+//        return cp;
+//    }
+//
+//
+//    private DefaultCollapsiblePane createCPFloorsFor(Homes home) {
+//        ContentRequestedEventListener<DefaultCollapsiblePane> contentRequestedEventListener = new ContentRequestedEventListener<DefaultCollapsiblePane>() {
+//            @Override
+//            public void contentRequested(ContentRequestedEvent<DefaultCollapsiblePane> cre) {
+//                DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
+//                dcp.setTitleButtonText("misc.msg.floor");
+//                dcp.getTitleButton().setFont(SYSConst.ARIAL20);
+//
+//                CollapsiblePanes cps = new CollapsiblePanes();
+//                cps.setLayout(new JideBoxLayout(cps, JideBoxLayout.Y_AXIS));
+//
+//                for (final Floors floor : home.getFloors()) {
+//                    cps.add(createCP(floor));
+//                    parentCPS.put(getKey(floor), cps);
+//                    parentCPS.put("fl#" + getKey(home), cps);
+//                }
+//                cps.addExpansion();
+//                dcp.setContentPane(cps);
+//            }
+//        };
+//        DefaultCollapsiblePane cp = new DefaultCollapsiblePane(contentRequestedEventListener);
+//        indexView.put(getKey(home), cp);
+//
+//        return cp;
+//    }
 
-            } catch (Exception e) {
-                OPDE.fatal(logger, e);
-            }
-        }
-
-
-        cps.addExpansion();
-
-        parentCPS.put(getKey(userObject), cps);
-
-
-        return cps;
-    }
+//    private JPanel createContent(Object userObject) {
+//
+//        CollapsiblePanes cps = new CollapsiblePanes();
+//        cps.setLayout(new JideBoxLayout(cps, JideBoxLayout.Y_AXIS));
+//
+//        Object id;
+//
+//        if (userObject instanceof Homes) {
+//
+//            try {
+//                PnlBeanEditor<Homes> pnlBeanEditor = new PnlBeanEditor<>(new JPADataChangeListener<>(o -> {
+//                    objectToRefresh = o;
+//                    refresh = true;
+//                }), () -> EntityTools.find(Homes.class, ((Homes) userObject).getEID()), Homes.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+//
+//                cps.add(pnlBeanEditor);
+//                cps.add(createCPFloorsFor((Homes) userObject));
+//
+//
+//            } catch (Exception e) {
+//                OPDE.fatal(logger, e);
+//            }
+//
+////            for (final Floors floor : ((Homes) userObject).getFloors()) {
+////                createCP(floor);
+////            }
+//
+////            for (final Station station : ((Homes) userObject).getStations()) {
+////
+////
+////            }
+//
+//
+//        } else if (userObject instanceof Rooms) {
+////            cps.add(new PnlRooms(new DataChangeListener<Rooms>() {
+////                @Override
+////                public void dataChanged(DataChangeEvent evt) {
+////                    EntityManager em = OPDE.createEM();
+////                    try {
+////                        em.getTransaction().begin();
+////                        Rooms myRoom = em.merge((Rooms) evt.getData());
+////                        em.getTransaction().commit();
+////
+////
+////                    } catch (OptimisticLockException ole) {
+////                        if (em.getTransaction().isActive()) {
+////                            em.getTransaction().rollback();
+////                        }
+////                        OPDE.warn(logger, ole);
+////                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage(ole));
+////                    } catch (Exception e) {
+////                        em.getTransaction().rollback();
+////                        OPDE.fatal(logger, e);
+////                    } finally {
+////                        em.close();
+////                        ((PnlRooms) evt.getSource()).cleanup(); // this is a one time use panel. will be replaced with the next refresh
+////                        refresh = true;
+////                    }
+////                }
+////            }, () -> EntityTools.find(Rooms.class, ((Rooms) userObject).getRoomID())));
+//        } else if (userObject instanceof Floors) {
+//            try {
+//                PnlBeanEditor<Floors> pbe = new PnlBeanEditor<>(new JPADataChangeListener<>(o -> {
+//                    objectToRefresh = o;
+//                    refresh = true;
+//                }), () -> EntityTools.find(Floors.class, ((Floors) userObject).getFloorid()), Floors.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+//                cps.add(pbe);
+//
+//            } catch (Exception e) {
+//                OPDE.fatal(logger, e);
+//            }
+//        }
+//
+//
+//        cps.addExpansion();
+//
+//        parentCPS.put(getKey(userObject), cps);
+//
+//
+//        return cps;
+//    }
 
 
 //    private JPanel createContent4Floors(DefaultMutableTreeNode node) {
@@ -1009,26 +996,4 @@ public class PnlHomeStationRoomEditor extends CleanablePanel implements Runnable
     }
 
 
-    private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        scrollPane1 = new JScrollPane();
-        cpsHomes = new CollapsiblePanes();
-
-        //======== this ========
-        setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default:grow, $lgap, default"));
-
-        //======== scrollPane1 ========
-        {
-            scrollPane1.setViewportView(cpsHomes);
-        }
-        add(scrollPane1, CC.xy(3, 3, CC.FILL, CC.FILL));
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents
-    }
-
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JScrollPane scrollPane1;
-    private CollapsiblePanes cpsHomes;
-    // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

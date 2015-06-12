@@ -44,6 +44,7 @@ import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
+import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;

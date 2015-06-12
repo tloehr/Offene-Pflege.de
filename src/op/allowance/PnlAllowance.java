@@ -38,6 +38,8 @@ import entity.AllowanceTools;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import gui.interfaces.CleanablePanel;
+import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
@@ -49,7 +51,6 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
-import org.joda.time.Period;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;

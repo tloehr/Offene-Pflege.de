@@ -25,7 +25,7 @@
  * 
  */
 
-package op.tools;
+package gui.interfaces;
 
 /**
  * @author tloehr

@@ -34,7 +34,7 @@ import com.jidesoft.swing.JideTabbedPane;
 import entity.prescription.PrescriptionSchedule;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.CleanablePanel;
+import gui.interfaces.CleanablePanel;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

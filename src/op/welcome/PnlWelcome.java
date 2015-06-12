@@ -23,6 +23,8 @@ import entity.qms.QmsTools;
 import entity.system.CommontagsTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
+import gui.interfaces.CleanablePanel;
+import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.PnlCare;
 import op.care.info.PnlInformation;

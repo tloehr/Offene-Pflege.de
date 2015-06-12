@@ -11,7 +11,7 @@ import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.system.LogicalPrinter;
 import op.system.PrinterForm;
-import op.tools.CleanablePanel;
+import gui.interfaces.CleanablePanel;
 import op.tools.PrintListElement;
 import op.tools.SYSTools;
 
