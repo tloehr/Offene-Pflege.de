@@ -4,6 +4,7 @@ import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
 
 import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 
 /**
@@ -57,7 +58,7 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
         removeAll();
     }
 
-    public void broadcast(DataChangeEvent<T> dce) {
+    public void broadcast(DataChangeEvent<T> dce) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         for (DataChangeListener<T> dcl : listDCL) {
             dcl.dataChanged(dce);
         }

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by tloehr on 09.06.15.
@@ -22,7 +23,7 @@ public class JPADataChangeListener<T> implements DataChangeListener<T> {
     }
 
     @Override
-    public void dataChanged(DataChangeEvent<T> evt) {
+    public void dataChanged(DataChangeEvent<T> evt) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         T myEntity = null;
 
         EntityManager em = OPDE.createEM();

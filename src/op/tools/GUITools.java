@@ -612,73 +612,63 @@ public class GUITools {
         animator.start();
     }
 
-    public static Animator flashIcon(final AbstractButton btn, final Icon icon) {
+    public static void flashIcon(final AbstractButton btn, final Icon icon) {
 
+        if (btn == null)
+            return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
 
-        final Icon originalIcon = btn.isSelected() ? btn.getSelectedIcon() : btn.getIcon();
+        int textposition = btn.getHorizontalTextPosition();
+        btn.setHorizontalTextPosition(SwingConstants.TRAILING);
 
+        final Icon originalIcon = btn.getIcon();
         final TimingSource ts = new SwingTimerTimingSource();
+//        final boolean wasOpaque = component.isOpaque();
         Animator.setDefaultTimingSource(ts);
         ts.init();
 
-        Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(Animator.INFINITE).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
-            @Override
+        Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(2).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+            Animator.Direction dir;
+
             public void begin(Animator source) {
-
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (btn.isSelected()) {
-                            btn.setSelectedIcon(icon);
-                        } else {
-                            btn.setIcon(icon);
-                        }
-
-                    }
-                });
-
-
+                dir = null;
             }
 
             @Override
-            public void reverse(Animator source) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (btn.isSelected()) {
-                            btn.setSelectedIcon(icon);
-                        } else {
+            public void timingEvent(Animator animator, final double fraction) {
+
+                if (dir == null || !dir.equals(animator.getCurrentDirection())) {
+
+                    dir = animator.getCurrentDirection();
+
+                    SwingUtilities.invokeLater(() -> {
+
+                        if (animator.getCurrentDirection().equals(Animator.Direction.FORWARD)) {
                             btn.setIcon(icon);
-                        }
-
-                    }
-                });
-            }
-
-            @Override
-            public void repeat(Animator source) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (btn.isSelected()) {
-                            btn.setSelectedIcon(originalIcon);
                         } else {
                             btn.setIcon(originalIcon);
                         }
 
-                    }
-                });
+//                    Logger.getLogger(getClass()).debug(fraction);
+//                    btn.setIcon();
+//                    component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
+                        btn.revalidate();
+                        btn.repaint();
+                    });
+                }
             }
 
             @Override
             public void end(Animator source) {
-                repeat(source);
+                SwingUtilities.invokeLater(() -> {
+                    btn.setHorizontalTextPosition(textposition);
+                    btn.setIcon(originalIcon);
+                    btn.repaint();
+                });
             }
         }).build();
+        animator.start();
 
 
-        return animator;
-        //        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
     /**

@@ -64,6 +64,7 @@ public class OPDE {
     public static final int START_OF_MODULE_TIME = 6;
 
     public static final int DEFAULT_SCREEN_RESFRESH_MILLIS = 50;
+    public static final int DEFAULT_DOCUMENT_LISTENER_REACTION_TIME_IN_MILLIS = 500;
 
     private static long uptime;
     public static ResourceBundle lang;

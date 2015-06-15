@@ -4,6 +4,7 @@
  */
 package gui.events;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.EventListener;
 
 /**
@@ -12,6 +13,6 @@ import java.util.EventListener;
  */
 public interface DataChangeListener<T> extends EventListener {
 
-    void dataChanged(DataChangeEvent<T> evt);
+    void dataChanged(DataChangeEvent<T> evt) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException;
 
 }

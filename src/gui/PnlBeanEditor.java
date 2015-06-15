@@ -86,11 +86,9 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 JComponent comp = null;
 
-
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
-
                     JTextField txt = new JTextField(PropertyUtils.getProperty(data, field.getName()).toString());
-
+//                    txt.setEditable(editorComponent.readonly().equals("false"));
                     txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
                         try {
                             String text = de.getDocument().getText(0, de.getDocument().getLength());
@@ -137,6 +135,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     };
 
                     JComboBox combobox = new JComboBox(new DefaultComboBoxModel<>(ArrayUtils.subarray(editorComponent.component(), 1, editorComponent.component().length - 1)));
+
                     combobox.setSelectedIndex(Integer.parseInt(PropertyUtils.getProperty(data, field.getName()).toString()));
                     combobox.addItemListener(il);
                     comp = combobox;
@@ -156,6 +155,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     btnSingle.addItemListener(il);
                     comp = btnSingle;
                 }
+
+                comp.setEnabled(editorComponent.readonly().equals("false"));
                 comp.setName(field.getName());
                 comp.setToolTipText(editorComponent.tooltip().isEmpty() ? null : SYSTools.xx(editorComponent.tooltip()));
                 componentSet.add(comp);
@@ -167,7 +168,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         }
     }
 
-    void initButtonPanel() {
+    void initButtonPanel()  {
         if (saveMode == SAVE_MODE_IMMEDIATE) return;
 
         JPanel buttonPanel = new JPanel(new HorizontalLayout(5));
@@ -182,6 +183,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     violations += cv.getMessage() + "; ";
                 }
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(violations, DisplayMessage.WARNING));
+            } catch (InvocationTargetException e1) {
+                e1.printStackTrace();
+            } catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            } catch (IllegalAccessException e1) {
+                e1.printStackTrace();
             }
             reload();
         });

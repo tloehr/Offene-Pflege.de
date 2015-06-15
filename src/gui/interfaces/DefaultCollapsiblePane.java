@@ -8,15 +8,16 @@ import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
 import op.OPDE;
 import op.tools.GUITools;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jdesktop.core.animation.timing.Animator;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,11 +29,11 @@ import java.beans.PropertyVetoException;
 public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reloadable, DataChangeListener<T> {
     //    private final Closure contentProvider;
     private final ContentRequestedEventListener headerUpdate, contentUpdate;
-    private Animator animator = null;
+
 
     JPanel titlePanelleft, titlePanelright, titlePanel, additionalIconPanel;
     final JideButton btnTitle;
-    boolean flashAfterEdit = true;
+    boolean flashAfterEdit = false;
     final long id = System.nanoTime();
 
     ActionListener defaultActionListener;
@@ -40,7 +41,7 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
     private final DefaultCollapsiblePane thisPane;
     private Logger logger;
 
-    public DefaultCollapsiblePane(ContentRequestedEventListener headerUpdate, ContentRequestedEventListener contentUpdate) {
+    public DefaultCollapsiblePane(ContentRequestedEventListener headerUpdate, ContentRequestedEventListener contentUpdate) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super();
         this.headerUpdate = headerUpdate;
         this.contentUpdate = contentUpdate;
@@ -57,7 +58,6 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
 
         btnTitle = GUITools.createHyperlinkButton("", null, null);
         btnTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
 
         titlePanelleft.add(additionalIconPanel);
         titlePanelleft.add(btnTitle);
@@ -94,16 +94,19 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
         setCollapsible(true);
         setCollapsed(true);
         setSlidingDirection(SwingConstants.SOUTH);
+        setBackground(Color.white);
 
         setTitleLabelComponent(titlePanel);
 
         headerUpdate.contentRequested(new ContentRequestedEvent(thisPane));
         contentUpdate.contentRequested(new ContentRequestedEvent(thisPane));
 
+        flashAfterEdit = true;
+
     }
 
     @Override
-    public void dataChanged(DataChangeEvent evt) {
+    public void dataChanged(DataChangeEvent evt) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         headerUpdate.contentRequested(new ContentRequestedEvent(thisPane));
     }
 
@@ -154,9 +157,10 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
     }
 
     public void setTitleButtonText(String text) {
-        logger.debug("setTitleButtonText: " + text);
         btnTitle.setText(SYSTools.xx(text));
-        logger.debug(btnTitle.getName() + " " + btnTitle.getText());
+        if (flashAfterEdit) {
+            GUITools.flashIcon(btnTitle, SYSConst.icon22apply);
+        }
     }
 
     public JideButton getTitleButton() {

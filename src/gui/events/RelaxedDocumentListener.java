@@ -1,9 +1,12 @@
 package gui.events;
 
 import gui.interfaces.GenericClosure;
+import op.OPDE;
+import org.apache.log4j.Logger;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,7 +24,7 @@ public class RelaxedDocumentListener implements DocumentListener {
     }
 
     public RelaxedDocumentListener(GenericClosure<DocumentEvent> handleAction) {
-        this(250, handleAction);
+        this(OPDE.DEFAULT_DOCUMENT_LISTENER_REACTION_TIME_IN_MILLIS, handleAction);
     }
 
     public void changedUpdate(DocumentEvent e) {
@@ -50,8 +53,11 @@ public class RelaxedDocumentListener implements DocumentListener {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.err.println("running the resheduled");
-                handleAction.execute(e);
+                try {
+                    handleAction.execute(e);
+                } catch (Exception e1) {
+                    OPDE.fatal(Logger.getLogger(getClass()), e1);
+                }
             }
         }, reactionDelayInMillis);
     }

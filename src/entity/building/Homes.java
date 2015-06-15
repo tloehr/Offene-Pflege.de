@@ -25,7 +25,8 @@ public class Homes implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "EID")
+    @Column(name = "EID", length = 10)
+    @EditorComponent(label = "misc.msg.primary.key", component = {"textfield"}, readonly="true")
     private String eid;
     @Column(name = "Name", length = 30)
     @Size(min = 1, max = 30)
@@ -84,9 +85,13 @@ public class Homes implements Serializable {
         this.fax = SYSTools.xx("misc.msg.fax");
     }
 
-    public String getEID() {
+    public String getEid() {
         return eid;
     }
+
+//    public String getEID() {
+//        return eid;
+//    }
 
     public String getName() {
         return name;
