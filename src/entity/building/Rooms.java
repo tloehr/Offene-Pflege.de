@@ -22,16 +22,20 @@ public class Rooms implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RID")
+    @EditorComponent(label = "misc.msg.primary.key", component = {"textfield"}, readonly = "true")
     private Long roomID;
     @Column(name = "Text")
     @NotEmpty
-    @EditorComponent(label = "Name", component = {"textfield"})
+    @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
     private String text;
     @Column(name = "Single")
+    @EditorComponent(label = "misc.msg.single.room", component = {"onoffswitch"})
     private Boolean single;
     @Column(name = "Bath")
+    @EditorComponent(label = "misc.msg.room.bath", component = {"onoffswitch"})
     private Boolean bath;
     @Column(name = "active")
+    @EditorComponent(label = "misc.msg.active", component = {"onoffswitch"})
     private Boolean active;
     @Version
     @Column(name = "version")
@@ -66,10 +70,6 @@ public class Rooms implements Serializable {
      *
      * @return
      */
-    public boolean isSingle() {
-        return single;
-    }
-
     public Boolean getSingle() {
         return single;
     }
@@ -84,10 +84,6 @@ public class Rooms implements Serializable {
      *
      * @return
      */
-    public boolean hasBath() {
-        return bath;
-    }
-
     public Boolean getBath() {
         return bath;
     }
@@ -96,15 +92,8 @@ public class Rooms implements Serializable {
         this.bath = bath;
     }
 
-    public Floors getFloor() {
-        return floor;
-    }
 
-    public void setFloor(Floors floor) {
-        this.floor = floor;
-    }
-
-    public Boolean isActive() {
+    public Boolean getActive() {
         return active;
     }
 
@@ -121,9 +110,13 @@ public class Rooms implements Serializable {
         return text;
     }
 
-
     public void setText(String text) {
         this.text = text;
+    }
+
+
+    public Floors getFloor() {
+        return floor;
     }
 
     @Override

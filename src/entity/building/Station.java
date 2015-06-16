@@ -6,6 +6,7 @@
 package entity.building;
 
 import entity.info.Resident;
+import gui.interfaces.EditorComponent;
 import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -25,10 +26,12 @@ public class Station implements Serializable, Comparable<Station> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "StatID")
+    @EditorComponent(label = "misc.msg.primary.key", component = {"textfield"}, readonly = "true")
     private Long statID;
     @Basic(optional = false)
     @Column(name = "Name")
     @NotEmpty
+    @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
     private String name;
     @Version
     @Column(name = "version")
@@ -46,8 +49,7 @@ public class Station implements Serializable, Comparable<Station> {
     public Station(String name, Homes home) {
         this.name = SYSTools.tidy(name);
         this.home = home;
-
-        residents = new ArrayList<Resident>();
+        residents = new ArrayList<>();
     }
 
     public Long getStatID() {
@@ -73,7 +75,6 @@ public class Station implements Serializable, Comparable<Station> {
     public Collection<Resident> getResidents() {
         return residents;
     }
-
 
 
     @Override

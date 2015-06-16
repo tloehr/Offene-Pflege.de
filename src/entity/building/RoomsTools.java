@@ -79,7 +79,7 @@ public class RoomsTools {
 
         for (Rooms room : listRooms) {
             total++;
-            if (!room.isSingle()) total++;
+            if (!room.getSingle()) total++;
         }
 
 //        ResInfoType rooms = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM);

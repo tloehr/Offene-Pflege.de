@@ -27,10 +27,12 @@ public class SyslogTools {
 
     public static void error(String message) {
         addLog(message, ERROR);
+        System.err.println(message);
     }
 
     public static void warn(String message) {
         addLog(message, WARN);
+        System.err.println(message);
     }
 
     public static void fatal(String message) {
@@ -44,7 +46,7 @@ public class SyslogTools {
 
         SYSLogin login = OPDE.getLogin();
 
-        message = String.format("[%s] [%s] %s", Integer.toString(OPDE.getAppInfo().getBuildnum()), login != null ? login.getUser().getUID() : "nobody" , message);
+        message = String.format("[%s] [%s] %s", Integer.toString(OPDE.getAppInfo().getBuildnum()), login != null ? login.getUser().getUID() : "nobody", message);
 
         try {
             localMachine = InetAddress.getLocalHost();

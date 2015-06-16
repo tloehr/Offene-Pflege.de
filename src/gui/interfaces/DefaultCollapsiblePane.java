@@ -1,6 +1,7 @@
 package gui.interfaces;
 
 import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
 import gui.events.ContentRequestedEvent;
 import gui.events.ContentRequestedEventListener;
@@ -42,6 +43,10 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
     private Logger logger;
 
     public DefaultCollapsiblePane(ContentRequestedEventListener headerUpdate, ContentRequestedEventListener contentUpdate) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        this(headerUpdate, contentUpdate, null);
+    }
+
+    public DefaultCollapsiblePane(ContentRequestedEventListener headerUpdate, ContentRequestedEventListener contentUpdate, JPanel menuPanel) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super();
         this.headerUpdate = headerUpdate;
         this.contentUpdate = contentUpdate;
@@ -97,6 +102,31 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
         setBackground(Color.white);
 
         setTitleLabelComponent(titlePanel);
+
+        if ( menuPanel != null) {
+
+            final JButton btnMenu = new JButton(SYSConst.icon22menu);
+            btnMenu.setPressedIcon(SYSConst.icon22Pressed);
+            btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+            btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnMenu.setContentAreaFilled(false);
+            btnMenu.setBorder(null);
+            btnMenu.addActionListener(e -> {
+                JidePopup popup = new JidePopup();
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(btnMenu);
+                popup.removeExcludedComponent(btnMenu);
+
+                popup.getContentPane().add(menuPanel);
+                popup.setDefaultFocusComponent(menuPanel);
+
+                GUITools.showPopup(popup, SwingConstants.WEST);
+            });
+            titlePanelright.add(btnMenu);
+        }
+
 
         headerUpdate.contentRequested(new ContentRequestedEvent(thisPane));
         contentUpdate.contentRequested(new ContentRequestedEvent(thisPane));

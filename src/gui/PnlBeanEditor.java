@@ -1,6 +1,7 @@
 package gui;
 
 import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
@@ -48,7 +49,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super(dataProvider);
         this.clazz = clazz;
-//        this.fields = null;
+        setOpaque(false);
 
         this.saveMode = saveMode;
         this.componentSet = new HashSet<>();
@@ -82,7 +83,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 JLabel lblName = new JLabel(SYSTools.xx(editorComponent.label()));
                 lblName.setFont(new Font("Arial", Font.PLAIN, 14));
-                add(lblName, CC.xy(2, row + 1));
+
 
                 JComponent comp = null;
 
@@ -90,6 +91,9 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     JTextField txt = new JTextField(PropertyUtils.getProperty(data, field.getName()).toString());
 //                    txt.setEditable(editorComponent.readonly().equals("false"));
                     txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
+
+                        reload();
+
                         try {
                             String text = de.getDocument().getText(0, de.getDocument().getLength());
                             Object value = text;
@@ -125,6 +129,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 } else if (editorComponent.component()[0].equalsIgnoreCase("combobox")) {
                     ItemListener il = e -> {
                         if (e.getStateChange() == ItemEvent.SELECTED) {
+                            reload();
                             try {
                                 PropertyUtils.setProperty(data, field.getName(), field.getType().cast(((JComboBox) e.getSource()).getSelectedIndex()));
                                 broadcast(new DataChangeEvent(thisPanel, data));
@@ -142,6 +147,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 } else if (editorComponent.component()[0].equalsIgnoreCase("onoffswitch")) {
                     ItemListener il = e -> {
                         if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
+                            reload();
                             try {
                                 PropertyUtils.setProperty(data, field.getName(), new Boolean(e.getStateChange() == ItemEvent.SELECTED));
                                 broadcast(new DataChangeEvent(thisPanel, data));
@@ -152,8 +158,16 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     };
 
                     JToggleButton btnSingle = GUITools.getNiceToggleButton(editorComponent.label());
+                    btnSingle.setSelected((boolean) PropertyUtils.getProperty(data, field.getName()));
                     btnSingle.addItemListener(il);
                     comp = btnSingle;
+                }
+
+                CellConstraints cc = CC.xy(4, row + 1);
+                if (!(comp instanceof JToggleButton)){
+                    add(lblName, CC.xy(2, row + 1));
+                } else {
+                    cc = CC.xyw(4, row + 1, 2, CC.LEFT, CC.DEFAULT);
                 }
 
                 comp.setEnabled(editorComponent.readonly().equals("false"));
@@ -161,7 +175,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 comp.setToolTipText(editorComponent.tooltip().isEmpty() ? null : SYSTools.xx(editorComponent.tooltip()));
                 componentSet.add(comp);
 
-                add(comp == null ? new JLabel("??") : comp, CC.xy(4, row + 1));
+                add(comp == null ? new JLabel("??") : comp, cc);
 
                 row += 2;
             }

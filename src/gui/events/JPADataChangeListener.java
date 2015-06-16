@@ -32,6 +32,7 @@ public class JPADataChangeListener<T> implements DataChangeListener<T> {
             myEntity = em.merge(evt.getData());
             em.lock(myEntity, LockModeType.OPTIMISTIC);
             em.getTransaction().commit();
+            afterGlow.execute(myEntity);
         } catch (OptimisticLockException ole) {
             em.getTransaction().rollback();
             if (em.getTransaction().isActive()) {
@@ -43,7 +44,7 @@ public class JPADataChangeListener<T> implements DataChangeListener<T> {
             OPDE.fatal(Logger.getLogger(evt.getSource().getClass()), e);
         } finally {
             em.close();
-            afterGlow.execute(myEntity);
+
         }
     }
 }

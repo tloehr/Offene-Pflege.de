@@ -3,6 +3,7 @@ package entity.building;
 
 import com.sun.istack.internal.NotNull;
 import gui.interfaces.EditorComponent;
+import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
@@ -74,6 +75,8 @@ public class Floors {
         level = 2; // means groundfloor
         lift = 0;
         rooms = new ArrayList<>();
+        Rooms newRoom = new Rooms(SYSTools.xx("opde.settings.btnAddRoom"), true, true, this);
+        rooms.add(newRoom);
     }
 
 

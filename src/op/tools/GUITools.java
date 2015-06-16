@@ -613,12 +613,16 @@ public class GUITools {
     }
 
     public static void flashIcon(final AbstractButton btn, final Icon icon) {
+        flashIcon(btn, icon, 2);
+    }
+
+    public static void flashIcon(final AbstractButton btn, final Icon icon, int repeat) {
 
         if (btn == null)
             return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
 
         int textposition = btn.getHorizontalTextPosition();
-        btn.setHorizontalTextPosition(SwingConstants.TRAILING);
+        btn.setHorizontalTextPosition(SwingConstants.LEADING);
 
         final Icon originalIcon = btn.getIcon();
         final TimingSource ts = new SwingTimerTimingSource();
@@ -626,7 +630,7 @@ public class GUITools {
         Animator.setDefaultTimingSource(ts);
         ts.init();
 
-        Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(2).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+        Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(repeat).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
             Animator.Direction dir;
 
             public void begin(Animator source) {

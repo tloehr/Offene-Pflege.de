@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class Homes implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "EID", length = 10)
-    @EditorComponent(label = "misc.msg.primary.key", component = {"textfield"}, readonly="true")
+    @EditorComponent(label = "misc.msg.primary.key", component = {"textfield"}, readonly = "true")
     private String eid;
     @Column(name = "Name", length = 30)
     @Size(min = 1, max = 30)
@@ -77,21 +78,27 @@ public class Homes implements Serializable {
 
     public Homes(String eid) {
         this.eid = eid;
-        this.name = SYSTools.xx("homes.new.home");
+        this.name = SYSTools.xx("opde.settings.btnAddHome");
         this.street = SYSTools.xx("misc.msg.street");
         this.zip = "12345";
         this.city = SYSTools.xx("misc.msg.city");
         this.tel = SYSTools.xx("misc.msg.phone");
         this.fax = SYSTools.xx("misc.msg.fax");
+        handovers = new ArrayList<>();
+        station = new ArrayList<>();
+        floors = new ArrayList<>();
+
+        Station newStation = new Station(SYSTools.xx("opde.settings.btnAddStation"), this);
+        Floors newFloor = new Floors(this, SYSTools.xx("opde.settings.btnAddLevel"));
+
+        station.add(newStation);
+        floors.add(newFloor);
+
     }
 
     public String getEid() {
         return eid;
     }
-
-//    public String getEID() {
-//        return eid;
-//    }
 
     public String getName() {
         return name;
