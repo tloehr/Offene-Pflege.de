@@ -17,6 +17,7 @@ import entity.staff.Training2Users;
 import entity.staff.TrainingTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
+import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;

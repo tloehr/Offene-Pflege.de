@@ -41,7 +41,7 @@ import op.OPDE;
 import op.residents.PnlEditGP;
 import op.residents.PnlEditHospital;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

@@ -34,6 +34,7 @@ import entity.EntityTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
 import entity.prescription.*;
+import gui.GUITools;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
 import op.residents.PnlEditGP;

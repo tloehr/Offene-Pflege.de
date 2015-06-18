@@ -41,6 +41,7 @@ import entity.reports.NReport;
 import entity.reports.NReportTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
+import gui.GUITools;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;

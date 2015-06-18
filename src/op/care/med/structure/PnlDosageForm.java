@@ -11,7 +11,7 @@ import entity.nursingprocess.InterventionTools;
 import entity.prescription.DosageForm;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.PopupPanel;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

@@ -16,7 +16,7 @@ import entity.prescription.Hospital;
 import entity.prescription.HospitalTools;
 import op.OPDE;
 import op.residents.PnlEditHospital;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;

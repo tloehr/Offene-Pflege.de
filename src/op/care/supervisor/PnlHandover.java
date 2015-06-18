@@ -39,6 +39,7 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.reports.*;
 import entity.system.SYSPropsTools;
+import gui.GUITools;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClassACL;

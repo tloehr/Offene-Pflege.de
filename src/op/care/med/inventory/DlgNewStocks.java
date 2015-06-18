@@ -35,6 +35,7 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.info.Resident;
 import entity.prescription.*;
 import entity.system.SYSPropsTools;
+import gui.GUITools;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.LogicalPrinter;

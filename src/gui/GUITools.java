@@ -1,4 +1,4 @@
-package op.tools;
+package gui;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.popup.JidePopup;
@@ -7,6 +7,9 @@ import entity.info.*;
 import op.OPDE;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
+import op.tools.PopupPanel;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
@@ -28,6 +31,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -54,6 +58,14 @@ public class GUITools {
 
     }
 
+    public static String createStringListFrom(Collection<String> collection) {
+        String result = "";
+        for (String s : collection) {
+            result += SYSTools.xx(s) + ", ";
+        }
+        return result.isEmpty() ? "" : result.substring(0, result.length() - 2);
+    }
+
 
     public static ByteArrayOutputStream getAsImage(JPanel pnl) throws Exception {
         BufferedImage bi = new BufferedImage(pnl.getPreferredSize().width, pnl.getPreferredSize().height, BufferedImage.TYPE_INT_ARGB);
@@ -72,6 +84,7 @@ public class GUITools {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         exportToPNG(pnl, new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + prefix + "_" + sdf.format(new Date()) + ".png"));
     }
+
 
     public static JideButton createHyperlinkButton(String titleORlangbundle, Icon icon, ActionListener actionListener) {
 

@@ -27,6 +27,8 @@
 
 package gui.interfaces;
 
+import javax.swing.*;
+
 /**
  * @author tloehr
  */

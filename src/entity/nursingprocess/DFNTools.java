@@ -5,7 +5,7 @@ import entity.info.Resident;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.dfn.PnlDFN;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

@@ -33,6 +33,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.system.*;
+import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;

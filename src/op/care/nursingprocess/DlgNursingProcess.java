@@ -35,6 +35,7 @@ import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionSchedule;
 import entity.nursingprocess.NursingProcess;
+import gui.GUITools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.*;

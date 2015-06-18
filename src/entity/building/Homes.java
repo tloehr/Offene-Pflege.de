@@ -4,8 +4,10 @@
  */
 package entity.building;
 
+import entity.qms.Qmssched;
 import entity.reports.Handovers;
 import gui.interfaces.EditorComponent;
+import gui.interfaces.NotRemovableUnlessEmpty;
 import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -55,19 +57,25 @@ public class Homes implements Serializable {
     @EditorComponent(label = "misc.msg.phone", component = {"textfield"})
     private String tel;
     @Column(name = "Fax", length = 30)
-    @Size(min = 1, max = 30)
+    @Size(min = 1, max = 30, message = "Die Länge muss zwischen 1 und 30 liegen.")
     @NotEmpty
     @EditorComponent(label = "misc.msg.fax", component = {"textfield"})
     private String fax;
     @Version
     @Column(name = "version")
     private Long version;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home")
+    @NotRemovableUnlessEmpty
     private Collection<Handovers> handovers;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
+    @NotRemovableUnlessEmpty(message = "msg.homes.validation.cantberemoved.stations.assigned")
     private List<Station> station;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
     private List<Floors> floors;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
+    @NotRemovableUnlessEmpty
+    private List<Qmssched> qmsscheds;
 
     public Homes() {
     }
@@ -78,7 +86,7 @@ public class Homes implements Serializable {
 
     public Homes(String eid) {
         this.eid = eid;
-        this.name = SYSTools.xx("opde.settings.btnAddHome");
+        this.name = SYSTools.xx("opde.settings.home.btnAddHome");
         this.street = SYSTools.xx("misc.msg.street");
         this.zip = "12345";
         this.city = SYSTools.xx("misc.msg.city");
@@ -87,9 +95,10 @@ public class Homes implements Serializable {
         handovers = new ArrayList<>();
         station = new ArrayList<>();
         floors = new ArrayList<>();
+        qmsscheds = new ArrayList<>();
 
-        Station newStation = new Station(SYSTools.xx("opde.settings.btnAddStation"), this);
-        Floors newFloor = new Floors(this, SYSTools.xx("opde.settings.btnAddLevel"));
+        Station newStation = new Station(SYSTools.xx("opde.settings.home.btnAddStation"), this);
+        Floors newFloor = new Floors(this, SYSTools.xx("opde.settings.home.btnAddLevel"));
 
         station.add(newStation);
         floors.add(newFloor);
@@ -152,6 +161,20 @@ public class Homes implements Serializable {
     public String getZip() {
         return zip;
     }
+
+
+    public Collection<Handovers> getHandovers() {
+        return handovers;
+    }
+
+    public List<Station> getStation() {
+        return station;
+    }
+
+    public List<Qmssched> getQmsscheds() {
+        return qmsscheds;
+    }
+
 
     @Override
     public int hashCode() {

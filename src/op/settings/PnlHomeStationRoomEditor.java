@@ -11,18 +11,18 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
 import entity.EntityTools;
 import entity.building.*;
-import entity.info.ResInfo;
 import gui.PnlBeanEditor;
+import gui.PnlYesNo;
 import gui.events.ContentRequestedEventListener;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
 import gui.events.JPADataChangeListener;
-import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCollapsiblePane;
 import gui.interfaces.DefaultCollapsiblePanes;
+import gui.interfaces.DefaultPanel;
 import op.OPDE;
-import op.tools.GUITools;
-import op.tools.PopupPanel;
+import op.threads.DisplayMessage;
+import gui.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.log4j.Level;
@@ -33,32 +33,40 @@ import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlHomeStationRoomEditor extends CleanablePanel {
+public class PnlHomeStationRoomEditor extends DefaultPanel {
 
+    private HashMap<String, DefaultCollapsiblePane> cpMap;
     private HashMap<String, DefaultCollapsiblePanes> parentCPS;
     private Logger logger = Logger.getLogger(this.getClass());
     private JScrollPane scrollPane1;
     private DefaultCollapsiblePanes cpsHomes;
 
+
+    private String internalClassID = "opde.settings.home";
+
     public PnlHomeStationRoomEditor() {
-        cpsHomes = new DefaultCollapsiblePanes();
-        scrollPane1 = new JScrollPane();
-        setLayout(new FormLayout(
+        super();
+
+        mainPanel.setLayout(new FormLayout(
                 "default, $lcgap, default:grow, $lcgap, default",
                 "default, $lgap, default:grow, $lgap, default"));
 
-        scrollPane1.setViewportView(cpsHomes);
-        add(scrollPane1, CC.xy(3, 3, CC.FILL, CC.FILL));
+        cpsHomes = new DefaultCollapsiblePanes();
+        scrollPane1 = new JScrollPane();
 
+        scrollPane1.setViewportView(cpsHomes);
+        mainPanel.add(scrollPane1, CC.xy(3, 3, CC.FILL, CC.FILL));
+
+        cpMap = new HashMap<>();
         parentCPS = new HashMap<>();
         logger.setLevel(Level.DEBUG);
         reload();
@@ -74,9 +82,12 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
     @Override
     public void cleanup() {
 
-        for (CollapsiblePanes cps : parentCPS.entrySet().toArray(new CollapsiblePanes[]{})) {
-            cps.removeAll();
+        Iterator it = parentCPS.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, CollapsiblePanes> pair = (Map.Entry) it.next();
+            pair.getValue().removeAll();
         }
+
         parentCPS.clear();
         cpsHomes.removeAll();
     }
@@ -84,7 +95,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
 
     @Override
     public String getInternalClassID() {
-        return null;
+        return internalClassID;
     }
 
 
@@ -102,6 +113,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
             }
         }
         cpsHomes.addExpansion();
+
     }
 
     private DefaultCollapsiblePane createCP(final Homes home) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
@@ -119,6 +131,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
         };
 
         DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(home));
+        cpMap.put(getKey(home), cp);
         return cp;
     }
 
@@ -153,7 +166,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
                 dcp.setContentPane(dcps1);
             };
 
-            dcps.add(new DefaultCollapsiblePane<>(headerUpdate1, contentUpdate1, getMenu(home)));
+            dcps.add(new DefaultCollapsiblePane<>(headerUpdate1, contentUpdate1));
 
 
             ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate2 = cre -> {
@@ -178,7 +191,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
                 dcp.setContentPane(dcps1);
             };
 
-            dcps.add(new DefaultCollapsiblePane<>(headerUpdate2, contentUpdate2, getMenu(home)));
+            dcps.add(new DefaultCollapsiblePane<>(headerUpdate2, contentUpdate2));
 
 
             dcps.addExpansion();
@@ -204,7 +217,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
             dcp.setContentPane(createContent(myFloor, (DefaultCollapsiblePane<Floors>) cre.getSource()));
         };
 
-        DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate);
+        DefaultCollapsiblePane<Floors> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(floor));
         return cp;
     }
 
@@ -240,7 +253,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
 
                 dcp.setContentPane(dcps1);
             };
-            dcps.add(new DefaultCollapsiblePane<>(headerUpdate, contentUpdate));
+            dcps.add(new DefaultCollapsiblePane<Floors>(headerUpdate, contentUpdate));
 
             dcps.addExpansion();
         } catch (Exception e) {
@@ -318,7 +331,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
 
 
     private JideButton createAddHomeButton() {
-        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.btnAddHome", SYSConst.icon22add, null);
+        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.home.btnAddHome", SYSConst.icon22add, null);
         btnAddHome.addActionListener(e -> {
 
             Homes newHome = null;
@@ -351,7 +364,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
 
 
     private JideButton createAddFloorButton(final Homes home) {
-        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.btnAddFloor", SYSConst.icon22add, null);
+        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.home.btnAddFloor", SYSConst.icon22add, null);
         btnAddHome.addActionListener(e -> {
 
             Homes myHome = EntityTools.find(Homes.class, home.getEid());
@@ -360,7 +373,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                newFloor = em.merge(new Floors(em.merge(myHome), SYSTools.xx("opde.settings.btnAddFloor")));
+                newFloor = em.merge(new Floors(em.merge(myHome), SYSTools.xx("opde.settings.home.btnAddFloor")));
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 em.getTransaction().rollback();
@@ -383,7 +396,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
     }
 
     private JideButton createAddRoomButton(final Floors floor) {
-        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.btnAddRoom", SYSConst.icon22add, null);
+        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.home.btnAddRoom", SYSConst.icon22add, null);
         btnAddHome.addActionListener(e -> {
 
             Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
@@ -392,7 +405,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                newRoom = em.merge(new Rooms(SYSTools.xx("opde.settings.btnAddRoom"), true, true, em.merge(myFloor)));
+                newRoom = em.merge(new Rooms(SYSTools.xx("opde.settings.home.btnAddRoom"), true, true, em.merge(myFloor)));
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 em.getTransaction().rollback();
@@ -414,7 +427,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
     }
 
     private JideButton createAddStationButton(final Homes home) {
-        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.btnAddStation", SYSConst.icon22add, null);
+        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.home.btnAddStation", SYSConst.icon22add, null);
         btnAddHome.addActionListener(e -> {
 
             Homes myHome = EntityTools.find(Homes.class, home.getEid());
@@ -423,7 +436,7 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                newStation = em.merge(new Station(SYSTools.xx("opde.settings.btnAddStation"), em.merge(myHome)));
+                newStation = em.merge(new Station(SYSTools.xx("opde.settings.home.btnAddStation"), em.merge(myHome)));
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 em.getTransaction().rollback();
@@ -445,24 +458,64 @@ public class PnlHomeStationRoomEditor extends CleanablePanel {
 
     }
 
-
     private JPanel getMenu(final Homes home) {
-
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
-
-
-
-        final JButton btnStop = GUITools.createHyperlinkButton("nursingrecords.info.btnStop.tooltip", SYSConst.icon22playerStop, null);
+        final JButton btnStop = GUITools.createHyperlinkButton("opde.settings.home.btnDelHome", SYSConst.icon22delete, null);
         pnlMenu.add(btnStop);
 
         btnStop.addActionListener(e -> {
-            ((JidePopup) pnlMenu.getParent()).hidePopup();
+            if (!OPDE.isAdmin()) return;
+            String message = EntityTools.mayBeDeleted(EntityTools.find(Homes.class, home.getEid()));
+            if (message != null) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
+                return;
+            }
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + home.getName() + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelHome", SYSConst.icon48delete, o -> {
+                Container c = pnlMenu.getParent();
+                ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
+
+                if (o.equals(JOptionPane.YES_OPTION)) {
+                    EntityTools.delete(EntityTools.find(Homes.class, home.getEid()));
+                    cpsHomes.remove(cpMap.get(getKey(home)));
+                    cpMap.remove(getKey(home));
+                }
+                mainView();
+            }));
         });
 
-
         return pnlMenu;
-
     }
+
+    private JPanel getMenu(final Floors floor) {
+            final JPanel pnlMenu = new JPanel(new VerticalLayout());
+            final JButton btnStop = GUITools.createHyperlinkButton("opde.settings.home.btnDelFloor", SYSConst.icon22delete, null);
+            pnlMenu.add(btnStop);
+
+            btnStop.addActionListener(e -> {
+                if (!OPDE.isAdmin()) return;
+                String message = EntityTools.mayBeDeleted(EntityTools.find(Floors.class, floor.getFloorid()));
+                if (message != null) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
+                    return;
+                }
+
+                // wird nicht angezeigt ??
+
+                ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + floor.getName() + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+                    Container c = pnlMenu.getParent();
+                    ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
+
+                    if (o.equals(JOptionPane.YES_OPTION)) {
+                        EntityTools.delete(EntityTools.find(Floors.class, floor.getFloorid()));
+                        parentCPS.get(getKey(floor)).remove(cpMap.get(getKey(floor)));
+                        cpMap.remove(getKey(floor));
+                    }
+                    mainView();
+                }));
+            });
+
+            return pnlMenu;
+        }
 
     private String getKey(Object object) {
         if (object instanceof DefaultMutableTreeNode)

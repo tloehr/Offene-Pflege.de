@@ -9,7 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import entity.system.Groups;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.MyJDialog;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;

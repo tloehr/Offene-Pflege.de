@@ -31,6 +31,8 @@ public class HomesTools {
         return einrichtung.getName() + "\n" + einrichtung.getStreet() + "\n" + einrichtung.getZIP() + " " + einrichtung.getCity() + "\nTel.: " + einrichtung.getTel() + "\nFax.: " + einrichtung.getFax();
     }
 
+
+
     /**
      * Setzt eine ComboBox mit der Liste der Homes. Wenn möglich wird direkt die eigene Einrichtung (abhängig von der Standard-Station) eingestellt.
      *

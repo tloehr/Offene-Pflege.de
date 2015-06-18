@@ -10,7 +10,7 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

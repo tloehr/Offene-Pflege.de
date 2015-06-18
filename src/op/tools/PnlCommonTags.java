@@ -9,6 +9,7 @@ import com.jidesoft.swing.AutoCompletion;
 import com.jidesoft.swing.SelectAllUtils;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
+import gui.GUITools;
 import op.OPDE;
 import org.apache.commons.collections.Closure;
 

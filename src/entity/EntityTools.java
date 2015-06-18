@@ -1,14 +1,17 @@
 package entity;
 
+import gui.GUITools;
+import gui.interfaces.NotRemovableUnlessEmpty;
 import op.OPDE;
 import op.threads.DisplayManager;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
-import java.util.Iterator;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,7 +59,9 @@ public class EntityTools {
             mergedEntity = em.merge(entity);
             em.lock(mergedEntity, LockModeType.OPTIMISTIC);
             em.getTransaction().commit();
-        } catch (OptimisticLockException ole) { OPDE.warn(ole); OPDE.warn(ole);
+        } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
+            OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -150,5 +155,33 @@ public class EntityTools {
         pattern = pattern.trim().replaceAll("%", "");
         pattern = "%" + pattern + "%";
         return pattern;
+    }
+
+
+    /**
+     * checks if an entity may be deleted due to the constraints of the @NotRemovableUnlessEmpty annotation
+     * @param entity
+     * @return
+     */
+    public static String mayBeDeleted(Object entity) {
+        HashSet<String> mayBeDeleted = new HashSet<>();
+
+        Field[] fields = entity.getClass().getDeclaredFields();
+        for (final Field field : fields) {
+            if (field.isAnnotationPresent(NotRemovableUnlessEmpty.class)) {
+                NotRemovableUnlessEmpty annotation = field.getAnnotation(NotRemovableUnlessEmpty.class);
+                try {
+                    if (PropertyUtils.getProperty(entity, field.getName()) instanceof Collection) {
+                        if (!((Collection) PropertyUtils.getProperty(entity, field.getName())).isEmpty()){
+                            mayBeDeleted.add(annotation.message());
+                        }
+                    }
+                } catch (Exception e) {
+                    OPDE.fatal(Logger.getLogger(entity.getClass()), e);
+                }
+            }
+        }
+
+        return GUITools.createStringListFrom(mayBeDeleted);
     }
 }

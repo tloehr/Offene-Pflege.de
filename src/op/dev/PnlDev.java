@@ -11,6 +11,7 @@ import com.jidesoft.popup.JidePopup;
 import entity.info.*;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.*;
+import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.care.info.PnlEditResInfo;

@@ -9,7 +9,7 @@ import op.system.InternalClass;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.RiverLayout;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

@@ -6,7 +6,9 @@
 package entity.building;
 
 import entity.info.Resident;
+import entity.qms.Qmssched;
 import gui.interfaces.EditorComponent;
+import gui.interfaces.NotRemovableUnlessEmpty;
 import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -41,7 +43,16 @@ public class Station implements Serializable, Comparable<Station> {
     private Homes home;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
+    @NotRemovableUnlessEmpty
     private Collection<Resident> residents;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
+    @NotRemovableUnlessEmpty
+    private Collection<Qmssched> qmsscheds;
+
+    public Collection<Qmssched> getQmsscheds() {
+        return qmsscheds;
+    }
 
     public Station() {
     }

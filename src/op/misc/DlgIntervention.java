@@ -14,7 +14,7 @@ import op.OPDE;
 import op.care.nursingprocess.PnlSelectIntervention;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.MyJDialog;
 import op.tools.SYSTools;
 import org.jdesktop.swingx.JXSearchField;

@@ -1,14 +1,11 @@
 package gui.interfaces;
 
 import com.jidesoft.swing.JideButton;
-import op.OPDE;
-import op.tools.GUITools;
+import gui.GUITools;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 /**
  * Created by IntelliJ IDEA.

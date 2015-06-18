@@ -10,7 +10,7 @@ import com.jidesoft.popup.JidePopup;
 import entity.prescription.GP;
 import entity.prescription.GPTools;
 import op.residents.PnlEditGP;
-import op.tools.GUITools;
+import gui.GUITools;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;

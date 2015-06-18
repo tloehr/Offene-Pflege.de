@@ -45,6 +45,7 @@ import entity.info.*;
 import entity.prescription.PrescriptionTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
+import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import op.allowance.PnlAllowance;
 import op.care.PnlCare;

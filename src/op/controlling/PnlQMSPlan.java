@@ -8,6 +8,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.qms.*;
 import entity.system.Commontags;
+import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;

@@ -14,7 +14,7 @@ import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
 import op.process.PnlProcess;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

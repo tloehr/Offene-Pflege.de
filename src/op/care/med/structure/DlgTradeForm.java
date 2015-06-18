@@ -35,7 +35,7 @@ import entity.prescription.TradeForm;
 import entity.prescription.TradeFormTools;
 import op.OPDE;
 import op.system.InternalClassACL;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.MyJDialog;
 import op.tools.Pair;
 import op.tools.SYSTools;

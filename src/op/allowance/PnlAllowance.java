@@ -38,6 +38,7 @@ import entity.AllowanceTools;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;

@@ -37,7 +37,7 @@ import entity.info.Resident;
 import op.OPDE;
 import op.care.reports.PnlReport;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

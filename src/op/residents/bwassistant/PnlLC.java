@@ -11,7 +11,7 @@ import entity.info.LCustodian;
 import entity.info.LCustodianTools;
 import op.OPDE;
 import op.residents.PnlEditLC;
-import op.tools.GUITools;
+import gui.GUITools;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;

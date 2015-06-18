@@ -14,7 +14,7 @@ import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;

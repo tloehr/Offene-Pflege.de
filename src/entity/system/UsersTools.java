@@ -6,7 +6,7 @@ package entity.system;
 
 import entity.EntityTools;
 import op.OPDE;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;

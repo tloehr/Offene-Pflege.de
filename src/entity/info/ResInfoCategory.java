@@ -5,7 +5,7 @@
 
 package entity.info;
 
-import op.tools.GUITools;
+import gui.GUITools;
 
 import javax.persistence.*;
 import java.awt.*;

@@ -28,6 +28,7 @@ package op.tools;
 
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Image;
+import gui.GUITools;
 import op.OPDE;
 import op.system.AppInfo;
 

@@ -20,6 +20,7 @@ import entity.prescription.MedStock;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import entity.system.SYSPropsTools;
+import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.system.*;

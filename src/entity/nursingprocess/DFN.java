@@ -1,10 +1,9 @@
 package entity.nursingprocess;
 
 import entity.info.Resident;
-import entity.reports.NReport;
 import entity.system.Users;
 import op.OPDE;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 

@@ -37,6 +37,7 @@ import entity.EntityTools;
 import entity.info.Resident;
 import entity.prescription.*;
 import entity.system.SYSPropsTools;
+import gui.GUITools;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.info.PnlInformation;

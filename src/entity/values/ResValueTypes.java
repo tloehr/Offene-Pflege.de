@@ -1,6 +1,6 @@
 package entity.values;
 
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSTools;
 
 import javax.persistence.*;

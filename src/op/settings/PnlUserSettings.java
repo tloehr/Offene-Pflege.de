@@ -15,7 +15,7 @@ import op.system.Recipient;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import gui.interfaces.CleanablePanel;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 

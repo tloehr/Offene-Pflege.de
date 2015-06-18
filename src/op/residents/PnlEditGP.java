@@ -7,8 +7,7 @@ package op.residents;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.GP;
-import op.OPDE;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.PopupPanel;
 import op.tools.SYSTools;
 

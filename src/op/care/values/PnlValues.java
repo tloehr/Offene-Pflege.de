@@ -42,6 +42,7 @@ import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypes;
 import entity.values.ResValueTypesTools;
+import gui.GUITools;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;

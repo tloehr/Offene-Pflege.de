@@ -9,7 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.RangeSlider;
 import com.toedter.calendar.JDateChooser;
 import op.OPDE;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
@@ -19,11 +19,9 @@ import org.joda.time.Days;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Date;
 
 /**

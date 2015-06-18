@@ -5,7 +5,7 @@ import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

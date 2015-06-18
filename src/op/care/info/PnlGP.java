@@ -4,16 +4,13 @@
 
 package op.care.info;
 
-import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import entity.prescription.GP;
 import entity.prescription.GPTools;
 import op.OPDE;
 import op.residents.PnlEditGP;
-import op.tools.GUITools;
+import gui.GUITools;
 import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;

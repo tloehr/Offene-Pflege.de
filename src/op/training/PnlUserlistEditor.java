@@ -16,7 +16,7 @@ import entity.system.UsersTools;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.threads.DisplayManager;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.RiverLayout;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

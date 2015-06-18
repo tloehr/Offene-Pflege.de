@@ -22,7 +22,7 @@ import op.care.values.PnlLiquidBalance;
 import op.care.values.PnlValues;
 import op.process.PnlProcess;
 import gui.interfaces.CleanablePanel;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 

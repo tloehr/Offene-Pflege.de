@@ -3,7 +3,7 @@ package entity.prescription;
 import entity.info.Resident;
 import entity.system.Users;
 import op.OPDE;
-import op.tools.GUITools;
+import gui.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 //import org.eclipse.persistence.annotations.OptimisticLocking;
@@ -16,7 +16,6 @@ import java.awt.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
