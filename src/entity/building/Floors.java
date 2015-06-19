@@ -75,7 +75,7 @@ public class Floors {
         level = 2; // means groundfloor
         lift = 0;
         rooms = new ArrayList<>();
-        Rooms newRoom = new Rooms(SYSTools.xx("opde.settings.btnAddRoom"), true, true, this);
+        Rooms newRoom = new Rooms(SYSTools.xx("opde.settings.home.btnAddRoom"), true, true, this);
         rooms.add(newRoom);
     }
 

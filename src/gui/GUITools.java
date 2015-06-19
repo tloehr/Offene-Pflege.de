@@ -63,7 +63,7 @@ public class GUITools {
         for (String s : collection) {
             result += SYSTools.xx(s) + ", ";
         }
-        return result.isEmpty() ? "" : result.substring(0, result.length() - 2);
+        return result.isEmpty() ? null : result.substring(0, result.length() - 2);
     }
 
 

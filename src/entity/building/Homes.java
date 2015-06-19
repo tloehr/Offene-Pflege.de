@@ -66,15 +66,15 @@ public class Homes implements Serializable {
     private Long version;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home")
-    @NotRemovableUnlessEmpty
+    @NotRemovableUnlessEmpty(message = "msg.cantberemoved.handovers.assigned")
     private Collection<Handovers> handovers;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
-    @NotRemovableUnlessEmpty(message = "msg.homes.validation.cantberemoved.stations.assigned")
+    @NotRemovableUnlessEmpty(message = "msg.cantberemoved.stations.assigned")
     private List<Station> station;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
     private List<Floors> floors;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
-    @NotRemovableUnlessEmpty
+    @NotRemovableUnlessEmpty(message = "msg.cantberemoved.qmssched.assigned")
     private List<Qmssched> qmsscheds;
 
     public Homes() {
@@ -98,7 +98,7 @@ public class Homes implements Serializable {
         qmsscheds = new ArrayList<>();
 
         Station newStation = new Station(SYSTools.xx("opde.settings.home.btnAddStation"), this);
-        Floors newFloor = new Floors(this, SYSTools.xx("opde.settings.home.btnAddLevel"));
+        Floors newFloor = new Floors(this, SYSTools.xx("opde.settings.home.btnAddFloor"));
 
         station.add(newStation);
         floors.add(newFloor);
