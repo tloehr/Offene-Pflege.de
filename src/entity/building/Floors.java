@@ -22,6 +22,7 @@ public class Floors {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "floorid")
+    @EditorComponent(label = "misc.msg.primary.key", component = {"textfield"}, readonly = "true")
     private long floorid;
 
     @JoinColumn(name = "HomeID", referencedColumnName = "EID")

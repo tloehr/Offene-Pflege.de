@@ -131,7 +131,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         };
 
         DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(home));
-        cpMap.put(getKey(home), cp);
+        cp.setName(getKey(home));
+        cpMap.put(cp.getName(), cp);
         return cp;
     }
 
@@ -155,6 +156,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 Homes myHome = EntityTools.find(Homes.class, home.getEid());
                 DefaultCollapsiblePanes dcps1 = new DefaultCollapsiblePanes();
+                parentCPS.put(getKey(home) + ":floors", dcps1);
 
                 dcps1.add(createAddFloorButton(home));
                 for (final Floors floor : myHome.getFloors()) {
@@ -163,11 +165,11 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 }
                 dcps1.addExpansion();
 
+
                 dcp.setContentPane(dcps1);
             };
 
             dcps.add(new DefaultCollapsiblePane<>(headerUpdate1, contentUpdate1));
-            parentCPS.put(getKey(home) + ":floors", dcps);
 
             ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate2 = cre -> {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
@@ -179,6 +181,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 Homes myHome = EntityTools.find(Homes.class, home.getEid());
                 DefaultCollapsiblePanes dcps1 = new DefaultCollapsiblePanes();
+                parentCPS.put(getKey(home) + ":station", dcps1);
 
                 dcps1.add(createAddStationButton(home));
                 for (final Station station : myHome.getStations()) {
@@ -193,7 +196,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             };
 
             dcps.add(new DefaultCollapsiblePane<>(headerUpdate2, contentUpdate2));
-            parentCPS.put(getKey(home) + ":station", dcps);
+
 
             dcps.addExpansion();
         } catch (Exception e) {
@@ -219,7 +222,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         };
 
         DefaultCollapsiblePane<Floors> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(floor));
-        cpMap.put(getKey(floor), cp);
+        cp.setName(getKey(floor));
+        cpMap.put(cp.getName(), cp);
         return cp;
     }
 
@@ -280,6 +284,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         };
 
         DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate);
+        cp.setName(getKey(room));
+        cpMap.put(cp.getName(), cp);
         return cp;
     }
 
@@ -313,6 +319,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         };
 
         DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate);
+        cp.setName(getKey(station));
+        cpMap.put(cp.getName(), cp);
         return cp;
     }
 
@@ -475,7 +483,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
                 return;
             }
-            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + home.getName() + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelHome", SYSConst.icon48delete, o -> {
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + home.getName() + " (" + home.getEid() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelHome", SYSConst.icon48delete, o -> {
 
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     EntityTools.delete(EntityTools.find(Homes.class, home.getEid()));
@@ -507,16 +515,46 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
             // wird nicht angezeigt ??
 
-            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + floor.getName() + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
-                if (o.equals(JOptionPane.YES_OPTION)){
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + floor.getName() + " (" + floor.getFloorid() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+                if (o.equals(JOptionPane.YES_OPTION)) {
                     Floors myFloor = floor;
                     String key = getKey(myFloor);
                     EntityTools.delete(EntityTools.find(Floors.class, floor.getFloorid()));
 
-                    // Wird irgendwie nicht gelöscht
-                    parentCPS.get(getKey(myFloor.getHome()) + ":floors").getC.remove(cpMap.get(key));
+                    parentCPS.get(getKey(myFloor.getHome()) + ":floors").remove(cpMap.get(key));
                     cpMap.remove(key);
+                }
+                mainView();
+            }));
+        });
 
+        return pnlMenu;
+    }
+
+    private JPanel getMenu(final Rooms room) {
+        final JPanel pnlMenu = new JPanel(new VerticalLayout());
+        final JButton btnDelete = GUITools.createHyperlinkButton("opde.settings.home.btnDelRoom", SYSConst.icon22delete, null);
+        pnlMenu.add(btnDelete);
+
+        btnDelete.addActionListener(e -> {
+
+            Container c = pnlMenu.getParent();
+            ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
+
+            String message = EntityTools.mayBeDeleted(EntityTools.find(Rooms.class, room.getRoomID()));
+            if (message != null) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
+                return;
+            }
+
+            // wird nicht angezeigt ??
+
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + room.getText() + " (" + room.getRoomID() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+                if (o.equals(JOptionPane.YES_OPTION)) {
+                    EntityTools.delete(EntityTools.find(Rooms.class, room.getRoomID()));
+
+                    parentCPS.get(getKey(room.getFloor())).remove(cpMap.get(getKey(room.getFloor())));
+                    cpMap.remove(getKey(room.getFloor()));
                 }
                 mainView();
             }));
