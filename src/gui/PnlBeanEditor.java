@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
+import javax.swing.colorchooser.ColorSelectionModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.validation.ConstraintViolation;
@@ -54,6 +55,17 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
         initPanel();
         initButtonPanel();
+    }
+
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+
+        if (componentSet == null) return;
+
+        for (Component comp : componentSet) {
+            comp.setBackground(GUITools.blend(bg, Color.WHITE, 0.2f));
+        }
     }
 
     void initPanel() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
@@ -159,13 +171,28 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     btnSingle.setSelected((boolean) PropertyUtils.getProperty(data, field.getName()));
                     btnSingle.addItemListener(il);
                     comp = btnSingle;
+                } else if (editorComponent.component()[0].equalsIgnoreCase("colorset")) {
+
+                    JColorChooser clr = new JColorChooser(GUITools.getColor(PropertyUtils.getProperty(data, field.getName()).toString()));
+                    clr.getSelectionModel().addChangeListener(e -> {
+                        reload();
+                        try {
+                            PropertyUtils.setProperty(data, field.getName(), GUITools.toHexString(((ColorSelectionModel) e.getSource()).getSelectedColor()));
+                            broadcast(new DataChangeEvent(thisPanel, data));
+                        } catch (Exception e1) {
+                            logger.debug(e1);
+                        }
+
+                    });
+
+                    comp = clr;
                 }
 
                 CellConstraints cc = CC.xy(4, row + 1);
-                if (!(comp instanceof JToggleButton)){
+                if (!(comp instanceof JToggleButton)) {
                     add(lblName, CC.xy(2, row + 1));
                 } else {
-                    cc = CC.xyw(4, row + 1, 2, CC.LEFT, CC.DEFAULT);
+                    cc = CC.xyw(4, row + 1, 2, CC.LEFT, CC.TOP);
                 }
 
                 comp.setEnabled(editorComponent.readonly().equals("false"));
@@ -180,7 +207,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         }
     }
 
-    void initButtonPanel()  {
+    void initButtonPanel() {
         if (saveMode == SAVE_MODE_IMMEDIATE) return;
 
         JPanel buttonPanel = new JPanel(new HorizontalLayout(5));

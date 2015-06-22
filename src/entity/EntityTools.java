@@ -11,7 +11,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -160,19 +163,37 @@ public class EntityTools {
 
     /**
      * checks if an entity may be deleted due to the constraints of the @NotRemovableUnlessEmpty annotation
+     *
      * @param entity
      * @return
      */
     public static String mayBeDeleted(Object entity) {
         HashSet<String> mayBeDeleted = new HashSet<>();
 
+        if (entity.getClass().isAnnotationPresent(NotRemovableUnlessEmpty.class) && !entity.getClass().getAnnotation(NotRemovableUnlessEmpty.class).evalualedByClass().isEmpty()) {
+            try {
+                NotRemovableUnlessEmpty annotation = entity.getClass().getAnnotation(NotRemovableUnlessEmpty.class);
+                Class evalClazz = Class.forName(annotation.evalualedByClass());
+
+                Boolean removable = (Boolean) evalClazz.getMethod("isRemovable", Object.class).invoke(evalClazz.newInstance(), entity);
+
+                if (!removable) {
+                    mayBeDeleted.add(annotation.message());
+                }
+
+            } catch (Exception e) {
+                OPDE.fatal(Logger.getLogger(entity.getClass()), e);
+            }
+        }
+
         Field[] fields = entity.getClass().getDeclaredFields();
         for (final Field field : fields) {
             if (field.isAnnotationPresent(NotRemovableUnlessEmpty.class)) {
                 NotRemovableUnlessEmpty annotation = field.getAnnotation(NotRemovableUnlessEmpty.class);
+
                 try {
                     if (PropertyUtils.getProperty(entity, field.getName()) instanceof Collection) {
-                        if (!((Collection) PropertyUtils.getProperty(entity, field.getName())).isEmpty()){
+                        if (!((Collection) PropertyUtils.getProperty(entity, field.getName())).isEmpty()) {
                             mayBeDeleted.add(annotation.message());
                         }
                     }
@@ -184,4 +205,29 @@ public class EntityTools {
 
         return GUITools.createStringListFrom(mayBeDeleted);
     }
+
+
+//    public static boolean setupDB(Connection jdbcConnection, String catalog) {
+//           boolean ok = false;
+//
+//           try {
+//               String query = " SELECT p.V FROM SYSProps p WHERE p.K = ? ";
+//               PreparedStatement stmt = jdbcConnection.prepareStatement(query);
+//               stmt.setString(1, "dbstructure");
+//               ResultSet rs = stmt.executeQuery();
+//
+//               if (!rs.first()) {
+//                   ok = false;
+//               } else {
+//                   String version = rs.getString("V");
+//                   ok = Integer.parseInt(version) == Main.getHistory().get(Main.getBuildnum()).getDbstructure();
+//               }
+//
+//               jdbcConnection.close();
+//           } catch (SQLException e) {
+//               Main.logger.error(e);
+//               ok = false;
+//           }
+//           return ok;
+//       }
 }

@@ -3,12 +3,12 @@ package gui.interfaces;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
+import gui.GUITools;
 import gui.events.ContentRequestedEvent;
 import gui.events.ContentRequestedEventListener;
 import gui.events.DataChangeEvent;
 import gui.events.DataChangeListener;
 import op.OPDE;
-import gui.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.log4j.Level;
@@ -50,6 +50,9 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
         super();
         this.headerUpdate = headerUpdate;
         this.contentUpdate = contentUpdate;
+
+        setStyle(CollapsiblePane.TREE_STYLE);
+
         thisPane = this;
         logger = Logger.getLogger(getClass() + ": id");
         logger.setLevel(Level.DEBUG);
@@ -103,7 +106,7 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
 
         setTitleLabelComponent(titlePanel);
 
-        if ( menuPanel != null) {
+        if (menuPanel != null) {
 
             final JButton btnMenu = new JButton(SYSConst.icon22menu);
             btnMenu.setPressedIcon(SYSConst.icon22Pressed);

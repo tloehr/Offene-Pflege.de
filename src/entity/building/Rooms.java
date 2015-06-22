@@ -6,6 +6,7 @@
 package entity.building;
 
 import gui.interfaces.EditorComponent;
+import gui.interfaces.NotRemovableUnlessEmpty;
 import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -17,6 +18,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "rooms")
+@NotRemovableUnlessEmpty(message = "msg.cantberemoved.resinfo.assigned", evalualedByClass = "entity.building.RoomsNotRemovableEvaluation")
 public class Rooms implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

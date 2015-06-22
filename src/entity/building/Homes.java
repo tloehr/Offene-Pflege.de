@@ -61,6 +61,9 @@ public class Homes implements Serializable {
     @NotEmpty
     @EditorComponent(label = "misc.msg.fax", component = {"textfield"})
     private String fax;
+    @Column(name = "color", length = 6)
+    @EditorComponent(label = "misc.msg.colorset", component = {"colorset"})
+    private String color;
     @Version
     @Column(name = "version")
     private Long version;
@@ -129,6 +132,13 @@ public class Homes implements Serializable {
         return zip;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public String getCity() {
         return city;

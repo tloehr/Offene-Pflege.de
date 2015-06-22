@@ -1033,6 +1033,10 @@ public class GUITools {
         return new Color(afResult[0], afResult[1], afResult[2]);
     }
 
+    public static Color blend(String clOne, Color clTwo, float fAmount) {
+            return blend(GUITools.getColor(clOne), clTwo, fAmount);
+        }
+
 //    public static Color brighter(Color originalColour, float FACTOR) {
 //
 //

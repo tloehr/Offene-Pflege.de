@@ -6,6 +6,7 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
@@ -25,6 +26,8 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
@@ -69,13 +72,19 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         cpMap = new HashMap<>();
         parentCPS = new HashMap<>();
         logger.setLevel(Level.DEBUG);
-        reload();
+        loadAllData();
     }
 
 
     @Override
     public void reload() {
-        refreshDisplay();
+
+        CollectionUtils.forAllDo(cpMap.entrySet(), o -> {
+            ((DefaultCollapsiblePane) o).reload();
+        });
+
+
+
     }
 
 
@@ -99,7 +108,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     }
 
 
-    synchronized void refreshDisplay() {
+    synchronized void loadAllData() {
 
         cpsHomes.removeAll();
 
@@ -121,6 +130,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
             Homes myHome = EntityTools.find(Homes.class, home.getEid());
             dcp.setTitleButtonText(myHome.getName());
+            dcp.getTitleButton().setForeground(GUITools.getColor(myHome.getColor()));
             dcp.getTitleButton().setFont(SYSConst.ARIAL24);
         };
 
@@ -213,6 +223,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
             Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
             dcp.setTitleButtonText(myFloor.getName());
+            dcp.getTitleButton().setForeground(GUITools.blend(myFloor.getHome().getColor(), Color.BLACK, 0.7f));
         };
 
         ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
@@ -237,6 +248,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 dcl.dataChanged(new DataChangeEvent<>(pbe, editedFloor));
             }));
             pbe.setOpaque(true);
+            pbe.setBackground(GUITools.blend(floor.getHome().getColor(), Color.WHITE, 0.35f));
+
             dcps.add(pbe);
 
             ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate = cre -> {
@@ -250,11 +263,11 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
 
                 DefaultCollapsiblePanes dcps1 = new DefaultCollapsiblePanes();
+                parentCPS.put("rooms4:" + getKey(floor), dcps1);
 
                 dcps1.add(createAddRoomButton(floor));
                 for (final Rooms room : myFloor.getRooms()) {
                     dcps1.add(createCP(room));
-                    parentCPS.put(getKey(room), dcps1);
                 }
                 dcps1.addExpansion();
 
@@ -283,7 +296,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             dcp.setContentPane(createContent(myRoom, (DefaultCollapsiblePane<Rooms>) cre.getSource()));
         };
 
-        DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate);
+        DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(room));
         cp.setName(getKey(room));
         cpMap.put(cp.getName(), cp);
         return cp;
@@ -426,9 +439,9 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             }
 
             try {
-                parentCPS.get(getKey(floor)).removeExpansion();
-                parentCPS.get(getKey(floor)).add(createCP(newRoom));
-                parentCPS.get(getKey(floor)).addExpansion();
+                parentCPS.get("rooms4:" + getKey(floor)).removeExpansion();
+                parentCPS.get("rooms4:" + getKey(floor)).add(createCP(newRoom));
+                parentCPS.get("rooms4:" + getKey(floor)).addExpansion();
             } catch (Exception e1) {
                 OPDE.fatal(logger, e1);
             }
@@ -471,6 +484,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     private JPanel getMenu(final Homes home) {
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
+
         final JButton btnDelete = GUITools.createHyperlinkButton("opde.settings.home.btnDelHome", SYSConst.icon22delete, null);
         pnlMenu.add(btnDelete);
 
@@ -513,8 +527,6 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 return;
             }
 
-            // wird nicht angezeigt ??
-
             ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + floor.getName() + " (" + floor.getFloorid() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     Floors myFloor = floor;
@@ -547,14 +559,12 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 return;
             }
 
-            // wird nicht angezeigt ??
-
             ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + room.getText() + " (" + room.getRoomID() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     EntityTools.delete(EntityTools.find(Rooms.class, room.getRoomID()));
 
-                    parentCPS.get(getKey(room.getFloor())).remove(cpMap.get(getKey(room.getFloor())));
-                    cpMap.remove(getKey(room.getFloor()));
+                    parentCPS.get(getKey(room)).remove(cpMap.get(getKey(room)));
+                    cpMap.remove(getKey(room));
                 }
                 mainView();
             }));
