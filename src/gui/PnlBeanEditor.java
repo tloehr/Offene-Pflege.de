@@ -8,6 +8,7 @@ import gui.events.RelaxedDocumentListener;
 import gui.interfaces.DataProvider;
 import gui.interfaces.EditPanelDefault;
 import gui.interfaces.EditorComponent;
+import gui.interfaces.YesNoToggleButton;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
@@ -68,6 +69,17 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         }
     }
 
+    @Override
+    public void setOpaque(boolean isOpaque) {
+        super.setOpaque(isOpaque);
+        if (componentSet == null) return;
+        for (Component comp : componentSet){
+            if (comp instanceof JColorChooser){
+                ((JColorChooser) comp).setOpaque(isOpaque);
+            }
+        }
+    }
+
     void initPanel() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
         Field[] fields = data.getClass().getDeclaredFields();
@@ -92,7 +104,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 EditorComponent editorComponent = field.getAnnotation(EditorComponent.class);
 
                 JLabel lblName = new JLabel(SYSTools.xx(editorComponent.label()));
-                lblName.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblName.setFont(new Font("Arial", Font.BOLD, 14));
 
 
                 JComponent comp = null;
@@ -173,26 +185,32 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     comp = btnSingle;
                 } else if (editorComponent.component()[0].equalsIgnoreCase("colorset")) {
 
-                    JColorChooser clr = new JColorChooser(GUITools.getColor(PropertyUtils.getProperty(data, field.getName()).toString()));
-                    clr.getSelectionModel().addChangeListener(e -> {
-                        reload();
-                        try {
-                            PropertyUtils.setProperty(data, field.getName(), GUITools.toHexString(((ColorSelectionModel) e.getSource()).getSelectedColor()));
-                            broadcast(new DataChangeEvent(thisPanel, data));
-                        } catch (Exception e1) {
-                            logger.debug(e1);
-                        }
+//                    JColorChooser clr = new JColorChooser(GUITools.getColor(PropertyUtils.getProperty(data, field.getName()).toString()));
+//                    clr.getSelectionModel().addChangeListener(e -> {
+//                        reload();
+//                        try {
+//                            PropertyUtils.setProperty(data, field.getName(), GUITools.toHexString(((ColorSelectionModel) e.getSource()).getSelectedColor()));
+//
+//                            DataChangeEvent<T> dce = new DataChangeEvent(thisPanel, data);
+//                            dce.setTriggersReload(true);
+//                            broadcast(dce);
+//                        } catch (Exception e1) {
+//                            logger.debug(e1);
+//                        }
+//
+//                    });
 
-                    });
-
-                    comp = clr;
+                    comp = new YesNoToggleButton();
                 }
 
                 CellConstraints cc = CC.xy(4, row + 1);
                 if (!(comp instanceof JToggleButton)) {
-                    add(lblName, CC.xy(2, row + 1));
+                    add(lblName, CC.xy(2, row + 1, CC.LEFT, CC.TOP));
+                    if (comp instanceof YesNoToggleButton){
+                        cc = CC.xy(4, row + 1, CC.LEFT, CC.DEFAULT);
+                    }
                 } else {
-                    cc = CC.xyw(4, row + 1, 2, CC.LEFT, CC.TOP);
+                    cc = CC.xyw(4, row + 1, 2, CC.LEFT, CC.DEFAULT);
                 }
 
                 comp.setEnabled(editorComponent.readonly().equals("false"));

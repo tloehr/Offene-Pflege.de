@@ -27,6 +27,8 @@
 
 package gui.interfaces;
 
+import op.OPDE;
+
 import javax.swing.*;
 
 /**
@@ -34,6 +36,8 @@ import javax.swing.*;
  */
 public abstract class CleanablePanel extends javax.swing.JPanel {
     public abstract void cleanup();
-    public abstract void reload();
+    public void reload(){
+        OPDE.getEMF().getCache().evictAll();
+    };
     public abstract String getInternalClassID();
 }

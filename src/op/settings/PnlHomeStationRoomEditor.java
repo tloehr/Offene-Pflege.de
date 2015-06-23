@@ -6,7 +6,6 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
@@ -26,7 +25,6 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -52,7 +50,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     private Logger logger = Logger.getLogger(this.getClass());
     private JScrollPane scrollPane1;
     private DefaultCollapsiblePanes cpsHomes;
-
+    private int i = 0;  // just for the progressbar
 
     private String internalClassID = "opde.settings.home";
 
@@ -78,13 +76,34 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     @Override
     public void reload() {
+        super.reload();
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, cpMap.size()));
 
-        CollectionUtils.forAllDo(cpMap.entrySet(), o -> {
-            ((DefaultCollapsiblePane) o).reload();
-        });
+        SwingWorker worker = new SwingWorker() {
 
+            @Override
+            protected Object doInBackground() throws Exception {
+                i = -1;
+                CollectionUtils.forAllDo(cpMap.values(), o -> {
+                    try {
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i, cpMap.size()));
+                        i++;
+                        ((DefaultCollapsiblePane) o).reload();
+                    } catch (Exception e) {
+                        OPDE.fatal(logger, e);
+                    }
+                });
+                return null;
+            }
 
-
+            @Override
+            protected void done() {
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+            }
+        };
+        worker.execute();
     }
 
 
@@ -114,14 +133,37 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
         cpsHomes.add(createAddHomeButton());
 
-        for (final Homes home : HomesTools.getAll()) {
-            try {
-                cpsHomes.add(createCP(home));
-            } catch (Exception e) {
-                OPDE.fatal(logger, e);
+
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 0, -1));
+
+        SwingWorker worker = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                i = 0;
+
+                for (final Homes home : HomesTools.getAll()) {
+                    try {
+//                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 0, -1));
+                        cpsHomes.add(createCP(home));
+                    } catch (Exception e) {
+                        OPDE.fatal(logger, e);
+                    }
+                }
+                cpsHomes.addExpansion();
+
+                return null;
             }
-        }
-        cpsHomes.addExpansion();
+
+            @Override
+            protected void done() {
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+            }
+        };
+        worker.execute();
+
 
     }
 
@@ -130,7 +172,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
             Homes myHome = EntityTools.find(Homes.class, home.getEid());
             dcp.setTitleButtonText(myHome.getName());
-            dcp.getTitleButton().setForeground(GUITools.getColor(myHome.getColor()));
+            dcp.getTitleButton().setForeground(GUITools.blend(myHome.getColor(), Color.BLACK, 0.85f));
+            dcp.setBackground(GUITools.blend(myHome.getColor(), Color.WHITE, 0.05f));
             dcp.getTitleButton().setFont(SYSConst.ARIAL24);
         };
 
@@ -148,17 +191,27 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     private DefaultCollapsiblePanes createContent(final Homes home, DataChangeListener<Homes> dcl) {
         DefaultCollapsiblePanes dcps = new DefaultCollapsiblePanes();
+        dcps.setBackground(GUITools.blend(home.getColor(), Color.WHITE, 0.08f));
         try {
             PnlBeanEditor<Homes> pnlBeanEditor = new PnlBeanEditor<>(() -> EntityTools.find(Homes.class, home.getEid()), Homes.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
-            pnlBeanEditor.addDataChangeListener(new JPADataChangeListener<>(editedHome -> {
-                pnlBeanEditor.reload(editedHome);
-                dcl.dataChanged(new DataChangeEvent<>(pnlBeanEditor, editedHome));
+            pnlBeanEditor.addDataChangeListener(new JPADataChangeListener<>((DataChangeListener<Homes>) evt -> {
+                if (evt.isTriggersReload()) {
+                    reload();
+                } else {
+                    pnlBeanEditor.reload(evt.getData());
+                    dcl.dataChanged(new DataChangeEvent<>(pnlBeanEditor, evt.getData()));
+                }
             }));
+//            pnlBeanEditor.setOpaque(false);
+//            pnlBeanEditor.setBackground(GUITools.blend(home.getColor(), Color.WHITE, 0.25f));
             dcps.add(pnlBeanEditor);
 
             ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate1 = cre -> {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 dcp.setTitleButtonText("misc.msg.floor");
+                Homes myHome = EntityTools.find(Homes.class, home.getEid());
+                dcp.getTitleButton().setForeground(GUITools.blend(myHome.getColor(), Color.BLACK, 0.85f));
+                dcp.setBackground(GUITools.blend(myHome.getColor(), Color.WHITE, 0.12f));
                 dcp.getTitleButton().setFont(SYSConst.ARIAL20);
             };
 
@@ -166,6 +219,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 Homes myHome = EntityTools.find(Homes.class, home.getEid());
                 DefaultCollapsiblePanes dcps1 = new DefaultCollapsiblePanes();
+                dcps1.setBackground(GUITools.blend(myHome.getColor(), Color.WHITE, 0.15f));
                 parentCPS.put(getKey(home) + ":floors", dcps1);
 
                 dcps1.add(createAddFloorButton(home));
@@ -184,6 +238,9 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate2 = cre -> {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 dcp.setTitleButtonText("misc.msg.station");
+                Homes myHome = EntityTools.find(Homes.class, home.getEid());
+                dcp.getTitleButton().setForeground(GUITools.blend(myHome.getColor(), Color.BLACK, 0.85f));
+                dcp.setBackground(GUITools.blend(myHome.getColor(), Color.WHITE, 0.12f));
                 dcp.getTitleButton().setFont(SYSConst.ARIAL20);
             };
 
@@ -191,6 +248,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 Homes myHome = EntityTools.find(Homes.class, home.getEid());
                 DefaultCollapsiblePanes dcps1 = new DefaultCollapsiblePanes();
+                dcps1.setBackground(GUITools.blend(myHome.getColor(), Color.WHITE, 0.15f));
                 parentCPS.put(getKey(home) + ":station", dcps1);
 
                 dcps1.add(createAddStationButton(home));
@@ -223,7 +281,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
             Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
             dcp.setTitleButtonText(myFloor.getName());
-            dcp.getTitleButton().setForeground(GUITools.blend(myFloor.getHome().getColor(), Color.BLACK, 0.7f));
+            dcp.getTitleButton().setForeground(GUITools.blend(floor.getHome().getColor(), Color.BLACK, 0.85f));
+            dcp.setBackground(GUITools.blend(floor.getHome().getColor(), Color.WHITE, 0.18f));
         };
 
         ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
@@ -240,21 +299,24 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     private DefaultCollapsiblePanes createContent(final Floors floor, DefaultCollapsiblePane<Floors> dcl) {
         DefaultCollapsiblePanes dcps = new DefaultCollapsiblePanes();
+        dcps.setBackground(GUITools.blend(floor.getHome().getColor(), Color.WHITE, 0.2f));
         try {
             PnlBeanEditor<Floors> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Floors.class, floor.getFloorid()), Floors.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
 
-            pbe.addDataChangeListener(new JPADataChangeListener<>(editedFloor -> {
-                pbe.reload(editedFloor);
-                dcl.dataChanged(new DataChangeEvent<>(pbe, editedFloor));
+            pbe.addDataChangeListener(new JPADataChangeListener<Floors>(evt -> {
+                pbe.reload(evt.getData());
+                dcl.dataChanged(new DataChangeEvent<>(pbe, evt.getData()));
             }));
             pbe.setOpaque(true);
-            pbe.setBackground(GUITools.blend(floor.getHome().getColor(), Color.WHITE, 0.35f));
+            pbe.setBackground(GUITools.blend(floor.getHome().getColor(), Color.WHITE, 0.23f));
 
             dcps.add(pbe);
 
             ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate = cre -> {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
                 dcp.setTitleButtonText("misc.msg.room");
+                dcp.getTitleButton().setForeground(GUITools.blend(floor.getHome().getColor(), Color.BLACK, 0.85f));
+                dcp.setBackground(GUITools.blend(floor.getHome().getColor(), Color.WHITE, 0.26f));
                 dcp.getTitleButton().setFont(dcp.getTitleButton().getFont().deriveFont(Font.BOLD));
             };
 
@@ -263,6 +325,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
 
                 DefaultCollapsiblePanes dcps1 = new DefaultCollapsiblePanes();
+                dcps1.setBackground(GUITools.blend(myFloor.getHome().getColor(), Color.WHITE, 0.29f));
                 parentCPS.put("rooms4:" + getKey(floor), dcps1);
 
                 dcps1.add(createAddRoomButton(floor));
@@ -288,6 +351,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
             Rooms myRoom = EntityTools.find(Rooms.class, room.getRoomID());
             dcp.setTitleButtonText(myRoom.getText());
+            dcp.getTitleButton().setForeground(GUITools.blend(room.getFloor().getHome().getColor(), Color.BLACK, 0.85f));
+            dcp.setBackground(GUITools.blend(room.getFloor().getHome().getColor(), Color.WHITE, 0.29f));
         };
 
         ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
@@ -306,10 +371,11 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         JPanel result = null;
         try {
             PnlBeanEditor<Rooms> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Rooms.class, room.getRoomID()), Rooms.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
-
-            pbe.addDataChangeListener(new JPADataChangeListener<>(editedRoom -> {
-                pbe.reload(editedRoom);
-                dcl.dataChanged(new DataChangeEvent<>(pbe, editedRoom));
+            pbe.setOpaque(true);
+            pbe.setBackground(GUITools.blend(room.getFloor().getHome().getColor(), Color.WHITE, 0.33f));
+            pbe.addDataChangeListener(new JPADataChangeListener<>(evt -> {
+                pbe.reload(evt.getData());
+                dcl.dataChanged(new DataChangeEvent<>(pbe, evt.getData()));
             }));
             result = pbe;
         } catch (Exception e) {
@@ -322,6 +388,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate = cre -> {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
             Station myStation = EntityTools.find(Station.class, station.getStatID());
+            dcp.getTitleButton().setForeground(GUITools.blend(station.getHome().getColor(), Color.BLACK, 0.85f));
+            dcp.setBackground(GUITools.blend(myStation.getHome().getColor(), Color.WHITE, 0.2f));
             dcp.setTitleButtonText(myStation.getName());
         };
 
@@ -342,9 +410,9 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         try {
             PnlBeanEditor<Station> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Station.class, station.getStatID()), Station.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
 
-            pbe.addDataChangeListener(new JPADataChangeListener<>(editedRoom -> {
-                pbe.reload(editedRoom);
-                dcl.dataChanged(new DataChangeEvent<>(pbe, editedRoom));
+            pbe.addDataChangeListener(new JPADataChangeListener<>(evt -> {
+                pbe.reload(evt.getData());
+                dcl.dataChanged(new DataChangeEvent<>(pbe, evt.getData()));
             }));
             result = pbe;
         } catch (Exception e) {
@@ -389,10 +457,10 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     private JideButton createAddFloorButton(final Homes home) {
         final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.home.btnAddFloor", SYSConst.icon22add, null);
+
         btnAddHome.addActionListener(e -> {
-
             Homes myHome = EntityTools.find(Homes.class, home.getEid());
-
+            btnAddHome.setForeground(GUITools.blend(myHome.getColor(), Color.BLACK, 0.85f));
             Floors newFloor = null;
             EntityManager em = OPDE.createEM();
             try {

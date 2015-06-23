@@ -1,9 +1,7 @@
 package gui.events;
 
-import gui.interfaces.GenericClosure;
 import op.OPDE;
 import op.threads.DisplayManager;
-import org.apache.commons.collections.Closure;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
@@ -16,10 +14,18 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class JPADataChangeListener<T> implements DataChangeListener<T> {
 
-    private final GenericClosure<T> afterGlow;
+    //    private final GenericClosure<T> afterGlow;
+    private final DataChangeListener<T> postProcessing;
 
-    public JPADataChangeListener(GenericClosure<T> afterGlow) {
-        this.afterGlow = afterGlow;
+//    public JPADataChangeListener(GenericClosure<T> afterGlow) {
+//        this.afterGlow = afterGlow;
+//        postProcessing = null;
+//    }
+
+
+    public JPADataChangeListener(DataChangeListener<T> postProcessing) {
+        this.postProcessing = postProcessing;
+//        this.afterGlow = null;
     }
 
     @Override
@@ -32,7 +38,10 @@ public class JPADataChangeListener<T> implements DataChangeListener<T> {
             myEntity = em.merge(evt.getData());
             em.lock(myEntity, LockModeType.OPTIMISTIC);
             em.getTransaction().commit();
-            afterGlow.execute(myEntity);
+
+            // Passes this on to the postProcessing
+            evt.setData(myEntity);
+            postProcessing.dataChanged(evt);
         } catch (OptimisticLockException ole) {
             em.getTransaction().rollback();
             if (em.getTransaction().isActive()) {

@@ -166,6 +166,29 @@ public class GUITools {
 
     }
 
+//    public static JPanel getNiceToggleButton(String titleORlangbundleYes, String titleORlangbundleNo) {
+//        JPanel pnl = new JPanel(new GridLayout(1, 2));
+////        pnl.setLayout(new BoxLayout(pnl, BoxLayout.LINE_AXIS));
+//
+//        JToggleButton tbYes = new JToggleButton(SYSTools.xx(titleORlangbundleYes));
+//        JToggleButton tbNo = new JToggleButton(SYSTools.xx(titleORlangbundleNo));
+//
+//        pnl.add(tbYes);
+//        pnl.add(tbNo);
+//
+//        tbYes.setSelected(true);
+//        tbNo.setSelected(false);
+//        tbYes.setOpaque(true);
+//        tbNo.setOpaque(true);
+//        tbNo.setBackground(SYSConst.darkred);
+//        tbYes.setBackground(SYSConst.darkgreen);
+//        tbYes.addItemListener(e -> tbNo.setSelected(e.getStateChange() != ItemEvent.SELECTED));
+//
+//        tbNo.addItemListener(e -> tbYes.setSelected(e.getStateChange() != ItemEvent.SELECTED));
+//
+//        return pnl;
+//    }
+
     public static JToggleButton getNiceToggleButton(String titleORlangbundle) {
         String title = SYSTools.catchNull(titleORlangbundle);
         try {
@@ -1034,8 +1057,8 @@ public class GUITools {
     }
 
     public static Color blend(String clOne, Color clTwo, float fAmount) {
-            return blend(GUITools.getColor(clOne), clTwo, fAmount);
-        }
+        return blend(GUITools.getColor(clOne), clTwo, fAmount);
+    }
 
 //    public static Color brighter(Color originalColour, float FACTOR) {
 //

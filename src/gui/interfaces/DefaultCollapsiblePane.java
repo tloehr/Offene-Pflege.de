@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
  * Time: 11:57
  * To change this template use File | Settings | File Templates.
  */
-public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reloadable, DataChangeListener<T> {
+public class DefaultCollapsiblePane<T> extends CollapsiblePane implements DataChangeListener<T> {
     //    private final Closure contentProvider;
     private final ContentRequestedEventListener headerUpdate, contentUpdate;
 
@@ -55,7 +55,7 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
 
         thisPane = this;
         logger = Logger.getLogger(getClass() + ": id");
-        logger.setLevel(Level.DEBUG);
+//        logger.setLevel(Level.DEBUG);
 
         additionalIconPanel = new JPanel();
         additionalIconPanel.setLayout(new BoxLayout(additionalIconPanel, BoxLayout.LINE_AXIS));
@@ -93,7 +93,7 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
 
 
         defaultActionListener = e -> {
-            logger.debug(btnTitle.getName() + " " + btnTitle.getText());
+//            logger.debug(btnTitle.getName() + " " + btnTitle.getText());
             setCollapsed(!isCollapsed());
         };
         btnTitle.addActionListener(defaultActionListener);
@@ -130,9 +130,7 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
             titlePanelright.add(btnMenu);
         }
 
-
-        headerUpdate.contentRequested(new ContentRequestedEvent(thisPane));
-        contentUpdate.contentRequested(new ContentRequestedEvent(thisPane));
+        reload();
 
         flashAfterEdit = true;
 
@@ -143,16 +141,11 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
         headerUpdate.contentRequested(new ContentRequestedEvent(thisPane));
     }
 
-    //    public DefaultCollapsiblePane(String title,Closure contentProvider) {
-//        this(contentProvider);
-//        setTitleButtonText(title);
-//    }
-//
-//    public DefaultCollapsiblePane(String title, ActionListener actionListener) {
-//        this(title);
-//        addTitleButtonActionListener(actionListener);
-//    }
 
+    public void reload() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        headerUpdate.contentRequested(new ContentRequestedEvent(thisPane));
+        contentUpdate.contentRequested(new ContentRequestedEvent(thisPane));
+    }
 
     public void addTitleButtonActionListener(ActionListener actionListener) {
         btnTitle.removeActionListener(defaultActionListener);
@@ -184,10 +177,10 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements Reload
         return titlePanel;
     }
 
-    @Override
-    public void reload() {
-
-    }
+//    @Override
+//    public void reload() {
+//
+//    }
 
     public void setTitleButtonText(String text) {
         btnTitle.setText(SYSTools.xx(text));

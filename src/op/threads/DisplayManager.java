@@ -47,6 +47,8 @@ public class DisplayManager extends Thread {
     private Icon[] reloading;
     private int currentAnimationFrameForReload = -1; // -1 means, no animation
     final int timeoutmins;
+    private final Logger logger = Logger.getLogger(getClass());
+
 //    private int TIMEOUTMINS;
 
 //    private DateFormat df;
@@ -222,9 +224,9 @@ public class DisplayManager extends Thread {
                 progressBarMessage.setSecond(-1);
                 jp.setStringPainted(false);
             } else {
-
                 progressBarMessage.setFirst(pbMessage.getMessage() == null ? "" : pbMessage.getMessage());
                 progressBarMessage.setSecond(pbMessage.getPercentage());
+//                logger.debug("pbMessage.getPercentage(): "+pbMessage.getPercentage());
                 jp.setStringPainted(true);
             }
         }
@@ -313,40 +315,39 @@ public class DisplayManager extends Thread {
     }
 
     private void processProgressBar() {
-        synchronized (progressBarMessage) {
-            if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
-                if (progressBarMessage.getSecond() < 0) {
-                    if (currentAnimationFrameForReload == -1) currentAnimationFrameForReload = 0;
-                } else {
-                    currentAnimationFrameForReload = -1;
+//        synchronized (progressBarMessage) {
+        if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond().intValue() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
+            if (progressBarMessage.getSecond().intValue() < 0) {
+                if (currentAnimationFrameForReload == -1) {
+                    currentAnimationFrameForReload = 0;
                 }
-                if (progressBarMessage.getSecond() >= 0) {
-                    jp.setValue(progressBarMessage.getSecond());
-                }
-                jp.setString(progressBarMessage.getFirst());
-                pbIsInUse = true;
-            } else {
-
-                if (progressBarMessage.getSecond() < 0 && pbIsInUse) {
-//                    jp.setIndeterminate(false);
-//                    currentAnimationFrameForReload = -1;
-                    OPDE.getMainframe().getBtnReload().setIcon(SYSConst.icon32reload0);
-                    jp.setValue(0);
-                    jp.setString(null);
-                }
-
-                if (jp.getValue() > 0) {
-
-//                    if (jp.isIndeterminate()) {
-//                        jp.setIndeterminate(false);
-//                    }
-                    jp.setValue(0);
-                    jp.setString(null);
-                }
-                currentAnimationFrameForReload = -1;
-                pbIsInUse = false;
             }
+
+//            else {
+//                            currentAnimationFrameForReload = -1;
+//                        }
+
+            if (progressBarMessage.getSecond().intValue() >= 0) {
+                jp.setValue(progressBarMessage.getSecond());
+            }
+            jp.setString(progressBarMessage.getFirst());
+            pbIsInUse = true;
+        } else {
+
+            if (progressBarMessage.getSecond().intValue() < 0 && pbIsInUse) {
+                OPDE.getMainframe().getBtnReload().setIcon(SYSConst.icon32reload0);
+                jp.setValue(0);
+                jp.setString(null);
+            }
+
+            if (jp.getValue() > 0) {
+                jp.setValue(0);
+                jp.setString(null);
+            }
+            currentAnimationFrameForReload = -1;
+            pbIsInUse = false;
         }
+//        }
 
     }
 
@@ -410,6 +411,7 @@ public class DisplayManager extends Thread {
                     }
                 }
 
+
                 if (currentAnimationFrameForReload >= 0 && step % 4 == 0) {
 
                     if (currentAnimationFrameForReload > reloading.length - 1) {
@@ -423,9 +425,9 @@ public class DisplayManager extends Thread {
                 Thread.sleep(50);
             } catch (InterruptedException ie) {
                 interrupted = true;
-                System.out.println("DisplayManager interrupted!");
+                logger.debug("DisplayManager interrupted!");
             } catch (Exception e) {
-                OPDE.fatal(e);
+                OPDE.fatal(logger, e);
             }
         }
     }

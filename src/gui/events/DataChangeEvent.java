@@ -19,6 +19,7 @@ import java.util.Set;
  */
 public class DataChangeEvent<T> extends EventObject {
     T data;
+    private boolean triggersReload = false;
 
     public T getData() {
         return data;
@@ -30,6 +31,10 @@ public class DataChangeEvent<T> extends EventObject {
 
     public DataChangeEvent(Object source, T data) throws ConstraintViolationException {
         super(source);
+        setData(data);
+    }
+
+    public void setData(T data) throws ConstraintViolationException {
         this.data = data;
         Validator validator = OPDE.getValidatorFactory().getValidator();
 
@@ -39,9 +44,13 @@ public class DataChangeEvent<T> extends EventObject {
         if (!constraintViolations.isEmpty()) {
             throw new ConstraintViolationException(constraintViolations);
         }
-
-
     }
 
+    public boolean isTriggersReload() {
+        return triggersReload;
+    }
 
+    public void setTriggersReload(boolean triggersReload) {
+        this.triggersReload = triggersReload;
+    }
 }
