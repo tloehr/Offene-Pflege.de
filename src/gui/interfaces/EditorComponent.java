@@ -12,7 +12,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface EditorComponent {
 
-    String[] component() default "textfield"; // syntax like component = {"textfield"} or component = {"combobox", "2.Untergeschoss", "1.Untergeschoss", "Erdgeschoss", "1.Etage", "2.Etage", "3.Etage", "4.Etage", "5.Etage", "6.Etage"}
+    // syntax like component = {"textfield"} or component = {"combobox", "2.Untergeschoss", "1.Untergeschoss", "Erdgeschoss", "1.Etage", "2.Etage", "3.Etage", "4.Etage", "5.Etage", "6.Etage"}
+    // component = {"onoffswitch", "leftext", "righttext"}
+    String[] component() default "textfield";
     String readonly() default "false";
     String label();
     String tooltip() default "";

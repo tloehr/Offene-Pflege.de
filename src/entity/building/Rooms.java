@@ -31,13 +31,13 @@ public class Rooms implements Serializable {
     @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
     private String text;
     @Column(name = "Single")
-    @EditorComponent(label = "misc.msg.single.room", component = {"onoffswitch"})
+    @EditorComponent(label = "misc.msg.room", component = {"onoffswitch", "misc.msg.single.room", "misc.msg.double.room"})
     private Boolean single;
     @Column(name = "Bath")
-    @EditorComponent(label = "misc.msg.room.bath", component = {"onoffswitch"})
+    @EditorComponent(label = "misc.msg.room.bath", component = {"onoffswitch", "misc.msg.with", "misc.msg.without"})
     private Boolean bath;
     @Column(name = "active")
-    @EditorComponent(label = "misc.msg.active", component = {"onoffswitch"})
+    @EditorComponent(label = "misc.msg.active", component = {"onoffswitch","misc.msg.active","misc.msg.inactive"})
     private Boolean active;
     @Version
     @Column(name = "version")

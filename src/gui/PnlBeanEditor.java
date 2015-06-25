@@ -3,6 +3,7 @@ package gui;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.pane.CollapsiblePane;
 import gui.events.DataChangeEvent;
 import gui.events.RelaxedDocumentListener;
 import gui.interfaces.DataProvider;
@@ -24,9 +25,11 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Size;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyVetoException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
@@ -73,8 +76,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     public void setOpaque(boolean isOpaque) {
         super.setOpaque(isOpaque);
         if (componentSet == null) return;
-        for (Component comp : componentSet){
-            if (comp instanceof JColorChooser){
+        for (Component comp : componentSet) {
+            if (comp instanceof JColorChooser) {
                 ((JColorChooser) comp).setOpaque(isOpaque);
             }
         }
@@ -111,7 +114,10 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
                     JTextField txt = new JTextField(PropertyUtils.getProperty(data, field.getName()).toString());
-//                    txt.setEditable(editorComponent.readonly().equals("false"));
+
+                    // its not that simple
+                    // txt.setColumns(field.getAnnotation(Size.class) != null ? field.getAnnotation(Size.class).max() : 0);
+
                     txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
 
                         reload();
@@ -167,50 +173,64 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     combobox.addItemListener(il);
                     comp = combobox;
                 } else if (editorComponent.component()[0].equalsIgnoreCase("onoffswitch")) {
-                    ItemListener il = e -> {
-                        if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
-                            reload();
-                            try {
-                                PropertyUtils.setProperty(data, field.getName(), new Boolean(e.getStateChange() == ItemEvent.SELECTED));
-                                broadcast(new DataChangeEvent(thisPanel, data));
-                            } catch (Exception e1) {
-                                logger.debug(e1);
-                            }
-                        }
-                    };
+                    String yesText = "misc.msg.yes";
+                    String noText = "misc.msg.no";
+                    if (editorComponent.component().length == 3) {
+                        yesText = editorComponent.component()[1];
+                        noText = editorComponent.component()[2];
+                    }
 
-                    JToggleButton btnSingle = GUITools.getNiceToggleButton(editorComponent.label());
-                    btnSingle.setSelected((boolean) PropertyUtils.getProperty(data, field.getName()));
-                    btnSingle.addItemListener(il);
-                    comp = btnSingle;
+                    comp = new YesNoToggleButton(yesText, noText, (boolean) PropertyUtils.getProperty(data, field.getName()));
+
+                    ((YesNoToggleButton) comp).addItemListener(e -> {
+                        reload();
+                        try {
+                            PropertyUtils.setProperty(data, field.getName(), new Boolean(e.getStateChange() == ItemEvent.SELECTED));
+                            broadcast(new DataChangeEvent(thisPanel, data));
+                        } catch (Exception e1) {
+                            logger.debug(e1);
+                        }
+                    });
                 } else if (editorComponent.component()[0].equalsIgnoreCase("colorset")) {
 
-//                    JColorChooser clr = new JColorChooser(GUITools.getColor(PropertyUtils.getProperty(data, field.getName()).toString()));
-//                    clr.getSelectionModel().addChangeListener(e -> {
-//                        reload();
-//                        try {
-//                            PropertyUtils.setProperty(data, field.getName(), GUITools.toHexString(((ColorSelectionModel) e.getSource()).getSelectedColor()));
-//
-//                            DataChangeEvent<T> dce = new DataChangeEvent(thisPanel, data);
-//                            dce.setTriggersReload(true);
-//                            broadcast(dce);
-//                        } catch (Exception e1) {
-//                            logger.debug(e1);
-//                        }
-//
-//                    });
+                    JColorChooser clr = new JColorChooser(GUITools.getColor(PropertyUtils.getProperty(data, field.getName()).toString()));
+                    clr.getSelectionModel().addChangeListener(e -> {
+                        reload();
+                        try {
+                            PropertyUtils.setProperty(data, field.getName(), GUITools.toHexString(((ColorSelectionModel) e.getSource()).getSelectedColor()));
+                            DataChangeEvent<T> dce = new DataChangeEvent(thisPanel, data);
+                            dce.setTriggersReload(true);
+                            broadcast(dce);
+                        } catch (Exception e1) {
+                            logger.debug(e1);
+                        }
+                    });
 
-                    comp = new YesNoToggleButton();
+
+                    CollapsiblePane cp = new CollapsiblePane(SYSTools.xx(editorComponent.label()));
+                    cp.setStyle(CollapsiblePane.PLAIN_STYLE);
+                    cp.setIcon(SYSConst.icon22colorset);
+                    try {
+                        cp.setCollapsed(true);
+                    } catch (PropertyVetoException e) {
+                        //bah
+                    }
+                    cp.setOpaque(false);
+                    cp.setContentPane(clr);
+
+                    comp = cp;
+
+                } else {
+                    OPDE.fatal(logger, new IllegalStateException("invalid component name in EditorComponent Annotation"));
                 }
 
                 CellConstraints cc = CC.xy(4, row + 1);
-                if (!(comp instanceof JToggleButton)) {
+
+
+                if (!(comp instanceof CollapsiblePane)) {
                     add(lblName, CC.xy(2, row + 1, CC.LEFT, CC.TOP));
-                    if (comp instanceof YesNoToggleButton){
-                        cc = CC.xy(4, row + 1, CC.LEFT, CC.DEFAULT);
-                    }
                 } else {
-                    cc = CC.xyw(4, row + 1, 2, CC.LEFT, CC.DEFAULT);
+                    cc = CC.xyw(2, row + 1, 4, CC.FILL, CC.DEFAULT);
                 }
 
                 comp.setEnabled(editorComponent.readonly().equals("false"));
