@@ -75,6 +75,7 @@ public class Homes implements Serializable {
     @NotRemovableUnlessEmpty(message = "msg.cantberemoved.stations.assigned")
     private List<Station> station;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
+    @NotRemovableUnlessEmpty(message = "msg.cantberemoved.floors.assigned")
     private List<Floors> floors;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home", fetch = FetchType.EAGER)
     @NotRemovableUnlessEmpty(message = "msg.cantberemoved.qmssched.assigned")

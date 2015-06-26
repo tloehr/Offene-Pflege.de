@@ -8,10 +8,10 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.MedStock;
 import entity.system.SYSPropsTools;
+import gui.interfaces.DefaultPanel;
 import op.OPDE;
 import op.system.LogicalPrinter;
 import op.system.PrinterForm;
-import gui.interfaces.CleanablePanel;
 import op.tools.PrintListElement;
 import op.tools.SYSTools;
 
@@ -29,10 +29,11 @@ import java.math.BigInteger;
 /**
  * @author Torsten Löhr
  */
-public class PnlLabelPrinterSetup extends CleanablePanel {
+public class PnlLabelPrinterSetup extends DefaultPanel {
     private MedStock testStock;
 
     public PnlLabelPrinterSetup() {
+        internalClassID = "opde.settings.label.printer";
         initComponents();
         initPanel();
     }
@@ -173,22 +174,6 @@ public class PnlLabelPrinterSetup extends CleanablePanel {
         cmbPhysicalPrinters.setEnabled(prservices != null);
 
 
-    }
-
-
-    @Override
-    public void cleanup() {
-
-    }
-
-    @Override
-    public void reload() {
-
-    }
-
-    @Override
-    public String getInternalClassID() {
-        return null;
     }
 
     private void btnTestLabelActionPerformed(ActionEvent e) {

@@ -52,11 +52,11 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     private DefaultCollapsiblePanes cpsHomes;
     private int i = 0;  // just for the progressbar
 
-    private String internalClassID = "opde.settings.home";
+
 
     public PnlHomeStationRoomEditor() {
         super();
-
+        internalClassID = "opde.settings.home";
         mainPanel.setLayout(new FormLayout(
                 "default, $lcgap, default:grow, $lcgap, default",
                 "default, $lgap, default:grow, $lgap, default"));
@@ -119,13 +119,6 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         parentCPS.clear();
         cpsHomes.removeAll();
     }
-
-
-    @Override
-    public String getInternalClassID() {
-        return internalClassID;
-    }
-
 
     synchronized void loadAllData() {
 
@@ -399,7 +392,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             dcp.setContentPane(createContent(myStation, (DefaultCollapsiblePane<Station>) cre.getSource()));
         };
 
-        DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate);
+        DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(station));
         cp.setName(getKey(station));
         cpMap.put(cp.getName(), cp);
         return cp;
@@ -633,6 +626,38 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
                     parentCPS.get(getKey(room)).remove(cpMap.get(getKey(room)));
                     cpMap.remove(getKey(room));
+                }
+                mainView();
+            }));
+        });
+
+        return pnlMenu;
+    }
+
+    private JPanel getMenu(final Station station) {
+        final JPanel pnlMenu = new JPanel(new VerticalLayout());
+        final JButton btnDelete = GUITools.createHyperlinkButton("opde.settings.home.btnDelStation", SYSConst.icon22delete, null);
+        pnlMenu.add(btnDelete);
+
+        btnDelete.addActionListener(e -> {
+
+            Container c = pnlMenu.getParent();
+            ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
+
+            String message = EntityTools.mayBeDeleted(EntityTools.find(Station.class, station.getStatID()));
+            if (message != null) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
+                return;
+            }
+
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + station.getName() + " (" + station.getStatID() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+                if (o.equals(JOptionPane.YES_OPTION)) {
+                    Station myStation = station;
+                    String key = getKey(myStation);
+                    EntityTools.delete(EntityTools.find(String.class, station.getStatID()));
+
+                    parentCPS.get(getKey(myStation.getHome()) + ":station").remove(cpMap.get(key));
+                    cpMap.remove(key);
                 }
                 mainView();
             }));

@@ -469,16 +469,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -489,12 +489,7 @@ public class FrmMain extends JFrame {
                 btnTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnTX.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2_pressed.png")));
                 btnTX.setContentAreaFilled(false);
-                btnTX.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnTXActionPerformed(e);
-                    }
-                });
+                btnTX.addActionListener(e -> btnTXActionPerformed(e));
                 pnlMainMessage.add(btnTX, CC.xywh(3, 3, 1, 3));
 
                 //======== panel1 ========
@@ -529,12 +524,7 @@ public class FrmMain extends JFrame {
                 btnExit.setToolTipText("Abmelden");
                 btnExit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/lock_pressed.png")));
-                btnExit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnExitActionPerformed(e);
-                    }
-                });
+                btnExit.addActionListener(e -> btnExitActionPerformed(e));
                 pnlMainMessage.add(btnExit, CC.xywh(7, 3, 1, 3));
 
                 //---- lblSubMsg ----
@@ -542,7 +532,8 @@ public class FrmMain extends JFrame {
                 lblSubMsg.setFont(new Font("Arial", Font.PLAIN, 14));
                 lblSubMsg.setForeground(new Color(105, 80, 69));
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
-                pnlMainMessage.add(lblSubMsg, CC.xy(5, 5));
+                lblSubMsg.setVerticalAlignment(SwingConstants.TOP);
+                pnlMainMessage.add(lblSubMsg, CC.xywh(5, 5, 1, 3));
 
                 //---- btnHelp ----
                 btnHelp.setText(null);
@@ -551,19 +542,14 @@ public class FrmMain extends JFrame {
                 btnHelp.setContentAreaFilled(false);
                 btnHelp.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/help_pressed.png")));
                 btnHelp.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnHelp.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnHelpActionPerformed(e);
-                    }
-                });
-                pnlMainMessage.add(btnHelp, CC.xy(3, 7));
+                btnHelp.addActionListener(e -> btnHelpActionPerformed(e));
+                pnlMainMessage.add(btnHelp, CC.xywh(3, 7, 1, 3));
 
                 //---- pbMsg ----
                 pbMsg.setValue(50);
                 pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
                 pbMsg.setForeground(new Color(105, 80, 69));
-                pnlMainMessage.add(pbMsg, CC.xy(5, 7, CC.FILL, CC.FILL));
+                pnlMainMessage.add(pbMsg, CC.xy(5, 9, CC.FILL, CC.FILL));
 
                 //---- btnReload ----
                 btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload0000.png")));
@@ -574,26 +560,16 @@ public class FrmMain extends JFrame {
                 btnReload.setToolTipText("Ansicht aktualisieren");
                 btnReload.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnReload.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload_pressed.png")));
-                btnReload.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnReloadActionPerformed(e);
-                    }
-                });
-                pnlMainMessage.add(btnReload, CC.xy(7, 7));
+                btnReload.addActionListener(e -> btnReloadActionPerformed(e));
+                pnlMainMessage.add(btnReload, CC.xywh(7, 7, 1, 3));
             }
-            pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1));
+            pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1, CC.DEFAULT, CC.FILL));
 
             //---- splitPaneLeft ----
             splitPaneLeft.setOneTouchExpandable(true);
             splitPaneLeft.setProportionalLayout(true);
             splitPaneLeft.setShowGripper(true);
-            splitPaneLeft.addPropertyChangeListener("dividerLocation", new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    splitPaneLeftPropertyChange(e);
-                }
-            });
+            splitPaneLeft.addPropertyChangeListener("dividerLocation", e -> splitPaneLeftPropertyChange(e));
             pnlMain.add(splitPaneLeft, CC.xy(3, 4, CC.FILL, CC.FILL));
 
             //======== pnlCard ========
@@ -623,12 +599,7 @@ public class FrmMain extends JFrame {
                 btnResetSplitpane.setText(null);
                 btnResetSplitpane.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/view_top_bottom.png")));
                 btnResetSplitpane.setAlignmentY(1.0F);
-                btnResetSplitpane.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnResetSplitpaneActionPerformed(e);
-                    }
-                });
+                btnResetSplitpane.addActionListener(e -> btnResetSplitpaneActionPerformed(e));
                 panel2.add(btnResetSplitpane);
 
                 //---- statusBar ----

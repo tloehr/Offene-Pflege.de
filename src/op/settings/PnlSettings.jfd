@@ -99,8 +99,9 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnStation"
-					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"text": "e"
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/etage.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnStationActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 7
 					"gridY": 13
@@ -164,6 +165,7 @@ new FormModel {
 					name: "btnICD"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/icd10.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnICDActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridY": 21
 					"gridX": 5
@@ -174,6 +176,7 @@ new FormModel {
 					name: "btnGlobalEMail"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/mail_config_global.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnGlobalEMailActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 7
 					"gridY": 21

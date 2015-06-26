@@ -3,6 +3,7 @@ package entity.building;
 
 import com.sun.istack.internal.NotNull;
 import gui.interfaces.EditorComponent;
+import gui.interfaces.NotRemovableUnlessEmpty;
 import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -54,6 +55,11 @@ public class Floors {
     @Version
     @Column(name = "version")
     private Long version;
+
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "floor", fetch = FetchType.EAGER)
+    @NotRemovableUnlessEmpty(message = "msg.cantberemoved.rooms.assigned")
+    private List<Rooms> rooms;
 
     private static final long serialVersionUID = 1L;
 
@@ -118,9 +124,6 @@ public class Floors {
     public List<Rooms> getRooms() {
         return rooms;
     }
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "floor", fetch = FetchType.EAGER)
-    private List<Rooms> rooms;
 
     @Override
     public boolean equals(Object o) {

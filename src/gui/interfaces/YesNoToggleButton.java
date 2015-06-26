@@ -38,11 +38,10 @@ public class YesNoToggleButton extends JPanel implements ItemSelectable {
             tbNo.setSelected(e.getStateChange() != ItemEvent.SELECTED);
             broadcast(e);
         });
-//        tbYes.addItemListener(e -> tbYes.setForeground(e.getStateChange() != ItemEvent.SELECTED ? Color.WHITE : Color.BLACK));
+
         tbNo.addItemListener(e -> {
             tbYes.setSelected(e.getStateChange() != ItemEvent.SELECTED);
         });
-//        tbNo.addItemListener(e -> tbNo.setForeground(e.getStateChange() != ItemEvent.SELECTED ? Color.WHITE : Color.BLACK));
 
         tbYes.setSelected(selectYes);
         tbNo.setSelected(!selectYes);

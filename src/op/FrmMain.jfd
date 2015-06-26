@@ -43,7 +43,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>relgap, default, relgap, default:grow, 3dlu, narrowlinegap, bottom:pref, linegap, 0dlu</string> 
+          <string>relgap, pref, relgap, default:grow, 3dlu, narrowlinegap, bottom:pref, linegap, 0dlu</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -60,7 +60,7 @@
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>0dlu, linegap, 15dlu, linegap, fill:11dlu, linegap, pref, linegap, 0dlu</string> 
+            <string>0dlu, linegap, 15dlu, linegap, fill:11dlu, linegap, fill:pref:grow, linegap, pref, linegap, 0dlu</string> 
            </void> 
           </object> 
           <void method="setProperty"> 
@@ -342,6 +342,10 @@
              <string>horizontalAlignment</string> 
              <int>0</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>verticalAlignment</string> 
+             <int>1</int> 
+            </void> 
             <void property="name"> 
              <string>lblSubMsg</string> 
             </void> 
@@ -355,6 +359,10 @@
             <void method="setProperty"> 
              <string>gridX</string> 
              <int>5</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridHeight</string> 
+             <int>3</int> 
             </void> 
            </object> 
           </void> 
@@ -415,6 +423,10 @@
              <string>gridY</string> 
              <int>7</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>gridHeight</string> 
+             <int>3</int> 
+            </void> 
            </object> 
           </void> 
           <void method="add"> 
@@ -449,7 +461,7 @@
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
             <void method="setProperty"> 
              <string>gridY</string> 
-             <int>7</int> 
+             <int>9</int> 
             </void> 
             <void method="setProperty"> 
              <string>hAlign</string> 
@@ -528,6 +540,10 @@
              <string>gridY</string> 
              <int>7</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>gridHeight</string> 
+             <int>3</int> 
+            </void> 
            </object> 
           </void> 
          </object> 
@@ -544,6 +560,10 @@
           <void method="setProperty"> 
            <string>gridX</string> 
            <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>vAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
           </void> 
          </object> 
         </void> 

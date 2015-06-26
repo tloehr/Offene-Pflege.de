@@ -2,6 +2,7 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import gui.interfaces.DefaultPanel;
 import op.OPDE;
 import gui.interfaces.CleanablePanel;
 import op.tools.SYSConst;
@@ -13,7 +14,7 @@ import java.awt.*;
 /**
  * Created by tloehr on 29.04.15.
  */
-public class PnlTimeout extends CleanablePanel {
+public class PnlTimeout extends DefaultPanel {
 
 
     public PnlTimeout() {
@@ -47,8 +48,8 @@ public class PnlTimeout extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default:grow, 2*($lgap, default), $lgap, default:grow"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default:grow, 2*($lgap, default), $lgap, default:grow"));
 
         //---- spinTimeout ----
         spinTimeout.setFont(new Font("Arial", Font.PLAIN, 28));
