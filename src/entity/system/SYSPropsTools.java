@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -101,6 +102,12 @@ public class SYSPropsTools {
             em.close();
         }
 
+    }
+
+    public static void storeProps(Properties props) {
+        for (Map.Entry m : props.entrySet()) {
+            storeProp(m.getKey().toString(), m.getValue().toString(), null);
+        }
     }
 
     public static void storeProp(String key, String value) {

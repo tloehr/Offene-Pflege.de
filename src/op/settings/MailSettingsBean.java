@@ -1,7 +1,11 @@
 package op.settings;
 
+import entity.system.SYSPropsTools;
 import gui.interfaces.EditorComponent;
+import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import java.util.Properties;
 
 /**
  * Created by tloehr on 26.06.15.
@@ -13,7 +17,7 @@ public class MailSettingsBean {
     String host = "";
     @NotEmpty
     @EditorComponent(label = "opde.settings.global.mail.port", component = {"textfield"})
-    String port = "";
+    String port = "25";
     @NotEmpty
     @EditorComponent(label = "opde.settings.global.mail.user", component = {"textfield"})
     String user = "";
@@ -32,7 +36,6 @@ public class MailSettingsBean {
     @NotEmpty
     @EditorComponent(label = "opde.settings.global.mail.recipient.personal", component = {"textfield"})
     String sender_recipient = "";
-    @NotEmpty
     @EditorComponent(label = "opde.settings.global.mail.recipient.spamfilter", component = {"textfield"})
     String spamfiler_key = "";
     @EditorComponent(label = "opde.settings.global.mail.auth", component = {"onoffswitch"})
@@ -42,8 +45,20 @@ public class MailSettingsBean {
     @EditorComponent(label = "opde.settings.global.mail.tls", component = {"onoffswitch"})
     boolean tls = false;
 
-    public MailSettingsBean() {
+    public MailSettingsBean(Properties preset) {
 
+        host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_HOST));
+        port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_PORT), "25");
+        user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_USER));
+        password = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_PASSWORD));
+        sender = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_SENDER));
+        recipient = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT));
+        sender_personal = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_SENDER_PERSONAL));
+        sender_recipient = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL));
+        spamfiler_key = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY));
+        auth = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_AUTH)).equalsIgnoreCase("true");
+        starttls = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_STARTTLS)).equalsIgnoreCase("true");
+        tls = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_TLS)).equalsIgnoreCase("true");
 
     }
 
@@ -142,5 +157,21 @@ public class MailSettingsBean {
 
     public void setTls(boolean tls) {
         this.tls = tls;
+    }
+
+    public Properties toProperties(Properties props){
+        props.put(SYSPropsTools.KEY_MAIL_HOST, host.trim());
+        props.put(SYSPropsTools.KEY_MAIL_PORT, port.trim());
+        props.put(SYSPropsTools.KEY_MAIL_USER, user.trim());
+        props.put(SYSPropsTools.KEY_MAIL_PASSWORD, password.trim());
+        props.put(SYSPropsTools.KEY_MAIL_SENDER, sender.trim());
+        props.put(SYSPropsTools.KEY_MAIL_RECIPIENT, recipient.trim());
+        props.put(SYSPropsTools.KEY_MAIL_SENDER_PERSONAL, sender_personal.trim());
+        props.put(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL, sender_recipient.trim());
+        props.put(SYSPropsTools.KEY_MAIL_AUTH, Boolean.toString(auth));
+        props.put(SYSPropsTools.KEY_MAIL_TLS, Boolean.toString(tls));
+        props.put(SYSPropsTools.KEY_MAIL_STARTTLS, Boolean.toString(starttls));
+        props.put(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY, SYSTools.tidy(SYSTools.catchNull(spamfiler_key)));
+        return props;
     }
 }

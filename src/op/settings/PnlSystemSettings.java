@@ -465,11 +465,9 @@ public class PnlSystemSettings extends CleanablePanel {
             public void itemStateChanged(ItemEvent e) {
                 SYSPropsTools.storeProp(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE, Boolean.toString(tbactive.isSelected()));
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-
                     for (Map.Entry entry : getMailProps().entrySet()) {
                         SYSPropsTools.storeProp(entry.getKey().toString(), entry.getValue().toString());
                     }
-
                 }
             }
         });

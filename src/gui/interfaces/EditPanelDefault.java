@@ -17,10 +17,10 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
     protected final EditPanelDefault<T> thisPanel = this;
     protected boolean edited = false;
 
-    public EditPanelDefault(DataChangeListener dcl, DataProvider<T> dataProvider) {
-        this(dataProvider);
-        addDataChangeListener(dcl);
-    }
+//    public EditPanelDefault(DataChangeListener dcl, DataProvider<T> dataProvider) {
+//        this(dataProvider);
+//        addDataChangeListener(dcl);
+//    }
 
     public EditPanelDefault(DataProvider<T> dataProvider) {
         super();
@@ -32,10 +32,6 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
     @Override
     public abstract void setStartFocus();
 
-//    @Override
-//    public void setDataObject(T data) {
-//        this.data = data;
-//    }
 
     @Override
     public abstract String doValidation();
@@ -67,26 +63,12 @@ public abstract class EditPanelDefault<T> extends JPanel implements EditPanelInt
     public void reload(T data) {
             this.data = data;
             edited = false;
-    //        SwingUtilities.invokeLater(() -> {
-    //
-    //            edited = false;
-    //            refreshDisplay();
-    //            revalidate();
-    //            repaint();
-    //        });
         }
 
     @Override
     public void reload() {
         data = dataProvider.getData();
         edited = false;
-//        SwingUtilities.invokeLater(() -> {
-//
-//            edited = false;
-//            refreshDisplay();
-//            revalidate();
-//            repaint();
-//        });
     }
 
     public abstract void refreshDisplay();

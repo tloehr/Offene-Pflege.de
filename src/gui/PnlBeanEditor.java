@@ -25,7 +25,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.Size;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -40,11 +39,13 @@ import java.util.HashSet;
  */
 public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private final Class<T> clazz;
+    //    private JPanel customPanel;
     //    private final String[][] fields;
     private Logger logger = Logger.getLogger(this.getClass());
     private HashSet<Component> componentSet;
     public static final int SAVE_MODE_IMMEDIATE = 0;
     public static final int SAVE_MODE_OK_CANCEL = 1;
+    public static final int SAVE_MODE_CUSTOM = 2; // requires ButtonPanel
     private int saveMode;
 
 
@@ -57,8 +58,19 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         this.saveMode = saveMode;
         this.componentSet = new HashSet<>();
 
+//        if (saveMode == SAVE_MODE_CUSTOM) throw new NoSuchMethodException("wrong constructor for this mode");
+
         initPanel();
         initButtonPanel();
+    }
+
+    public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz)
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        this(dataProvider, clazz, SAVE_MODE_CUSTOM);
+    }
+
+    public void setCustomPanel(JPanel customPanel){
+        add(customPanel, CC.xyw(1, componentSet.size() * 2 + 2, 5, CC.FILL, CC.FILL));
     }
 
     @Override
@@ -246,7 +258,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     }
 
     void initButtonPanel() {
-        if (saveMode == SAVE_MODE_IMMEDIATE) return;
+        if (saveMode != SAVE_MODE_OK_CANCEL) return;
 
         JPanel buttonPanel = new JPanel(new HorizontalLayout(5));
 
@@ -279,7 +291,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         buttonPanel.add(btnCancel);
 
 
-        add(buttonPanel, CC.xyw(1, componentSet.size() + 5, 5, CC.RIGHT, CC.DEFAULT));
+        add(buttonPanel, CC.xyw(1, componentSet.size() * 2 + 2, 5, CC.RIGHT, CC.DEFAULT));
+    }
+
+
+    public void broadcast() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        super.broadcast(new DataChangeEvent(thisPanel, data));
     }
 
     @Override
