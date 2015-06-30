@@ -53,7 +53,6 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     private int i = 0;  // just for the progressbar
 
 
-
     public PnlHomeStationRoomEditor() {
         super();
         internalClassID = "opde.settings.home";
@@ -69,7 +68,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
         cpMap = new HashMap<>();
         parentCPS = new HashMap<>();
-        logger.setLevel(Level.DEBUG);
+
         loadAllData();
     }
 
@@ -120,7 +119,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         cpsHomes.removeAll();
     }
 
-    synchronized void loadAllData() {
+    private void loadAllData() {
 
         cpsHomes.removeAll();
 
@@ -138,7 +137,6 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
                 for (final Homes home : HomesTools.getAll()) {
                     try {
-//                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 0, -1));
                         cpsHomes.add(createCP(home));
                     } catch (Exception e) {
                         OPDE.fatal(logger, e);
@@ -156,7 +154,6 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             }
         };
         worker.execute();
-
 
     }
 
@@ -588,7 +585,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 return;
             }
 
-            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + floor.getName() + " (" + floor.getFloorid() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + floor.getName() + " (#" + floor.getFloorid() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     Floors myFloor = floor;
                     String key = getKey(myFloor);
@@ -620,7 +617,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 return;
             }
 
-            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + room.getText() + " (" + room.getRoomID() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + room.getText() + " (#" + room.getRoomID() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     EntityTools.delete(EntityTools.find(Rooms.class, room.getRoomID()));
 

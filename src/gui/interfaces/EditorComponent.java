@@ -16,8 +16,11 @@ public @interface EditorComponent {
     // component = {"onoffswitch", "leftext", "righttext"}
     String[] component() default "textfield";
     String readonly() default "false";
+    String filled() default "true"; // should the line be filled with the component or left orientated
     String label();
     String tooltip() default "";
     String parserClass() default "";
+    String renderer() default "";
+    String model() default "";
 
 }

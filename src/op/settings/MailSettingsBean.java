@@ -38,11 +38,11 @@ public class MailSettingsBean {
     String sender_recipient = "";
     @EditorComponent(label = "opde.settings.global.mail.recipient.spamfilter", component = {"textfield"})
     String spamfiler_key = "";
-    @EditorComponent(label = "opde.settings.global.mail.auth", component = {"onoffswitch"})
+    @EditorComponent(label = "opde.settings.global.mail.auth", component = {"onoffswitch"}, filled = "false")
     boolean auth = false;
-    @EditorComponent(label = "opde.settings.global.mail.starttls", component = {"onoffswitch"})
+    @EditorComponent(label = "opde.settings.global.mail.starttls", component = {"onoffswitch"}, filled = "false")
     boolean starttls = false;
-    @EditorComponent(label = "opde.settings.global.mail.tls", component = {"onoffswitch"})
+    @EditorComponent(label = "opde.settings.global.mail.tls", component = {"onoffswitch"}, filled = "false")
     boolean tls = false;
 
     public MailSettingsBean(Properties preset) {

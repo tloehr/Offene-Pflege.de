@@ -24,6 +24,9 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class EntityTools {
+
+    static Logger logger = Logger.getLogger(EntityTools.class);
+
     public static boolean persist(Object entity) {
         boolean success = false;
 
@@ -54,7 +57,13 @@ public class EntityTools {
         return foundEntity;
     }
 
+    /**
+     * @param entity to merge
+     * @param <T>
+     * @return merged entity. null if failed. happens only with optimistic locking exceptions.
+     */
     public static <T> T merge(T entity) {
+
         T mergedEntity = null;
         EntityManager em = OPDE.createEM();
         try {
@@ -63,8 +72,7 @@ public class EntityTools {
             em.lock(mergedEntity, LockModeType.OPTIMISTIC);
             em.getTransaction().commit();
         } catch (OptimisticLockException ole) {
-            OPDE.warn(ole);
-            OPDE.warn(ole);
+            OPDE.warn(logger, ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -77,7 +85,7 @@ public class EntityTools {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            OPDE.fatal(e);
+            OPDE.fatal(logger, e);
         } finally {
             em.close();
         }

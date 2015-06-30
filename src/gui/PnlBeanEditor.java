@@ -1,15 +1,11 @@
 package gui;
 
 import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import gui.events.DataChangeEvent;
 import gui.events.RelaxedDocumentListener;
-import gui.interfaces.DataProvider;
-import gui.interfaces.EditPanelDefault;
-import gui.interfaces.EditorComponent;
-import gui.interfaces.YesNoToggleButton;
+import gui.interfaces.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
@@ -25,6 +21,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Size;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -58,8 +55,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         this.saveMode = saveMode;
         this.componentSet = new HashSet<>();
 
-//        if (saveMode == SAVE_MODE_CUSTOM) throw new NoSuchMethodException("wrong constructor for this mode");
-
         initPanel();
         initButtonPanel();
     }
@@ -69,7 +64,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         this(dataProvider, clazz, SAVE_MODE_CUSTOM);
     }
 
-    public void setCustomPanel(JPanel customPanel){
+    public void setCustomPanel(JPanel customPanel) {
         add(customPanel, CC.xyw(1, componentSet.size() * 2 + 2, 5, CC.FILL, CC.FILL));
     }
 
@@ -125,10 +120,14 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 JComponent comp = null;
 
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
-                    JTextField txt = new JTextField(PropertyUtils.getProperty(data, field.getName()).toString());
 
-                    // its not that simple
-                    // txt.setColumns(field.getAnnotation(Size.class) != null ? field.getAnnotation(Size.class).max() : 0);
+                    JTextField txt = new JTextField();
+                    if (field.isAnnotationPresent(Size.class)) {
+                        Size sizeConstraint = field.getAnnotation(Size.class);
+                        txt = new BoundedTextField(sizeConstraint.min(), sizeConstraint.max());
+                    }
+
+                    txt.setText(PropertyUtils.getProperty(data, field.getName()).toString());
 
                     txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
 
@@ -167,6 +166,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     }));
                     comp = txt;
                 } else if (editorComponent.component()[0].equalsIgnoreCase("combobox")) {
+
+                    // this is the default ItemListener, if there is no renderer defined
                     ItemListener il = e -> {
                         if (e.getStateChange() == ItemEvent.SELECTED) {
                             reload();
@@ -179,10 +180,53 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         }
                     };
 
-                    JComboBox combobox = new JComboBox(new DefaultComboBoxModel<>(ArrayUtils.subarray(editorComponent.component(), 1, editorComponent.component().length - 1)));
+                    ListCellRenderer<T> renderer = null;
+                    DefaultComboBoxModel dcbm = new DefaultComboBoxModel<>(ArrayUtils.subarray(editorComponent.component(), 1, editorComponent.component().length - 1));
+                    try {
+                        if (!editorComponent.renderer().isEmpty()) {
+                            String r = editorComponent.renderer();
+                            Class rendererClazz = Class.forName(r);
 
-                    combobox.setSelectedIndex(Integer.parseInt(PropertyUtils.getProperty(data, field.getName()).toString()));
+                            renderer = (ListCellRenderer) rendererClazz.newInstance();
+
+
+                            String m = editorComponent.model();
+                            Class modelClazz = Class.forName(m);
+
+                            dcbm = (DefaultComboBoxModel) modelClazz.newInstance();
+
+
+                            // if there is a renderer weg got for the object itself, rather than the selected index
+                            il = e -> {
+                                if (e.getStateChange() == ItemEvent.SELECTED) {
+                                    reload();
+                                    try {
+                                        PropertyUtils.setProperty(data, field.getName(), field.getType().cast(((JComboBox) e.getSource()).getSelectedItem()));
+                                        broadcast(new DataChangeEvent(thisPanel, data));
+                                    } catch (Exception e1) {
+                                        logger.debug(e1);
+                                    }
+                                }
+                            };
+
+                        }
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    JComboBox combobox = new JComboBox(dcbm);
+                    if (renderer != null) {
+                        combobox.setSelectedItem(PropertyUtils.getProperty(data, field.getName()));
+                    } else {
+                        combobox = new JComboBox(new DefaultComboBoxModel<>(ArrayUtils.subarray(editorComponent.component(), 1, editorComponent.component().length - 1)));
+                    }
+
                     combobox.addItemListener(il);
+                    if (renderer != null) combobox.setRenderer(renderer);
+
                     comp = combobox;
                 } else if (editorComponent.component()[0].equalsIgnoreCase("onoffswitch")) {
                     String yesText = "misc.msg.yes";
@@ -236,13 +280,14 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     OPDE.fatal(logger, new IllegalStateException("invalid component name in EditorComponent Annotation"));
                 }
 
-                CellConstraints cc = CC.xy(4, row + 1);
-
-
-                if (!(comp instanceof CollapsiblePane)) {
+                if (comp instanceof CollapsiblePane) {
+                    add(comp, CC.xyw(2, row + 1, 4, CC.FILL, CC.DEFAULT));
+                } else if (editorComponent.filled().equals("false")) {
                     add(lblName, CC.xy(2, row + 1, CC.LEFT, CC.TOP));
+                    add(comp, CC.xy(4, row + 1, CC.LEFT, CC.TOP));
                 } else {
-                    cc = CC.xyw(2, row + 1, 4, CC.FILL, CC.DEFAULT);
+                    add(lblName, CC.xy(2, row + 1, CC.LEFT, CC.TOP));
+                    add(comp, CC.xy(4, row + 1));
                 }
 
                 comp.setEnabled(editorComponent.readonly().equals("false"));
@@ -250,7 +295,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 comp.setToolTipText(editorComponent.tooltip().isEmpty() ? null : SYSTools.xx(editorComponent.tooltip()));
                 componentSet.add(comp);
 
-                add(comp == null ? new JLabel("??") : comp, cc);
 
                 row += 2;
             }

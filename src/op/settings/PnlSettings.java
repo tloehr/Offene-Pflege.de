@@ -6,15 +6,20 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.system.SYSPropsTools;
+import gui.PnlBeanEditor;
 import gui.interfaces.CleanablePanel;
+import gui.interfaces.DataProvider;
 import gui.interfaces.DefaultPanel;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Torsten Löhr
@@ -29,9 +34,30 @@ public class PnlSettings extends CleanablePanel {
     }
 
     private void initPanel() {
+        authorize();
         i18n();
         OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
         OPDE.getDisplayManager().clearAllIcons();
+    }
+
+    private void authorize() {
+
+        boolean admin = OPDE.isAdmin() || OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID);
+
+        btnMyEMail.setEnabled(true);
+        btnPassword.setEnabled(true);
+        btnLabelPrinter.setEnabled(admin);
+        btnTimeout.setEnabled(admin);
+        btnTags.setEnabled(admin);
+        btnHomes.setEnabled(admin);
+        btnGlobalEMail.setEnabled(admin);
+        btnModel.setEnabled(admin);
+        btnICD.setEnabled(admin);
+        btnMedication.setEnabled(admin);
+        btnFTP.setEnabled(admin);
+        btnStation.setEnabled(admin);
+
+
     }
 
     private void i18n() {
@@ -46,6 +72,8 @@ public class PnlSettings extends CleanablePanel {
         lblStation.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.station")));
         lblICD.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.icd.btnImport")));
         lblGlobalEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.mail.lblEMail")));
+        lblModel.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.categories")));
+        lblMedication.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.categories")));
     }
 
     @Override
@@ -148,6 +176,47 @@ public class PnlSettings extends CleanablePanel {
         ((CardLayout) getLayout()).show(this, "single");
     }
 
+    private void btnModelActionPerformed(ActionEvent e) {
+        if (currentPanel != null) {
+            pnlSingle.remove(currentPanel);
+            currentPanel.cleanup();
+        }
+
+        currentPanel = new PnlModelEditor();
+        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
+        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.categories")));
+        lblSingle.setIcon(btnModel.getIcon());
+        ((CardLayout) getLayout()).show(this, "single");
+    }
+
+    private void btnMedicationActionPerformed(ActionEvent e) {
+        if (currentPanel != null) {
+            pnlSingle.remove(currentPanel);
+            currentPanel.cleanup();
+        }
+
+        try {
+            currentPanel = new PnlBeanEditor<MedicationConfigBean>(new DataProvider<MedicationConfigBean>() {
+                @Override
+                public MedicationConfigBean getData() {
+                    return new MedicationConfigBean(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR1)).equalsIgnoreCase("true"));
+                }
+            }, MedicationConfigBean.class);
+        } catch (IllegalAccessException e1) {
+            e1.printStackTrace();
+        } catch (NoSuchMethodException e1) {
+            e1.printStackTrace();
+        } catch (InvocationTargetException e1) {
+            e1.printStackTrace();
+        }
+
+
+        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
+        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.categories")));
+        lblSingle.setIcon(btnModel.getIcon());
+        ((CardLayout) getLayout()).show(this, "single");
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         pnlAll = new JPanel();
@@ -169,7 +238,7 @@ public class PnlSettings extends CleanablePanel {
         btnHomes = new JButton();
         btnICD = new JButton();
         btnGlobalEMail = new JButton();
-        btnModell = new JButton();
+        btnModel = new JButton();
         btnMedication = new JButton();
         btnFTP = new JButton();
         btnTags = new JButton();
@@ -190,8 +259,8 @@ public class PnlSettings extends CleanablePanel {
         //======== pnlAll ========
         {
             pnlAll.setLayout(new FormLayout(
-                "default, $lcgap, left:55dlu, 6*($ugap, 55dlu), $lcgap, default:grow",
-                "default, $lcgap, default, $lgap, 50dlu, 2*($lgap, default), $ugap, default, $rgap, fill:50dlu, $rgap, default, $lgap, default, $ugap, default, $lgap, 50dlu, $lgap, default, $lcgap, default"));
+                    "default, $lcgap, left:55dlu, 6*($ugap, 55dlu), $lcgap, default:grow",
+                    "default, $lcgap, default, $lgap, 50dlu, 2*($lgap, default), $ugap, default, $rgap, fill:50dlu, $rgap, default, $lgap, default, $ugap, default, $lgap, 50dlu, $lgap, default, $lcgap, default"));
 
             //---- lblPersonal ----
             lblPersonal.setText("Pers\u00f6nliche Einstellungen");
@@ -240,7 +309,7 @@ public class PnlSettings extends CleanablePanel {
             pnlAll.add(btnTimeout, CC.xy(5, 13));
 
             //---- btnStation ----
-            btnStation.setText("e");
+            btnStation.setText(null);
             btnStation.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/etage.png")));
             btnStation.addActionListener(e -> btnStationActionPerformed(e));
             pnlAll.add(btnStation, CC.xy(7, 13));
@@ -286,14 +355,16 @@ public class PnlSettings extends CleanablePanel {
             btnGlobalEMail.addActionListener(e -> btnGlobalEMailActionPerformed(e));
             pnlAll.add(btnGlobalEMail, CC.xy(7, 21, CC.FILL, CC.FILL));
 
-            //---- btnModell ----
-            btnModell.setText(null);
-            btnModell.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/network.png")));
-            pnlAll.add(btnModell, CC.xy(9, 21, CC.FILL, CC.FILL));
+            //---- btnModel ----
+            btnModel.setText(null);
+            btnModel.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/network.png")));
+            btnModel.addActionListener(e -> btnModelActionPerformed(e));
+            pnlAll.add(btnModel, CC.xy(9, 21, CC.FILL, CC.FILL));
 
             //---- btnMedication ----
             btnMedication.setText(null);
             btnMedication.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/drug_basket.png")));
+            btnMedication.addActionListener(e -> btnMedicationActionPerformed(e));
             pnlAll.add(btnMedication, CC.xy(11, 21, CC.FILL, CC.FILL));
 
             //---- btnFTP ----
@@ -347,8 +418,8 @@ public class PnlSettings extends CleanablePanel {
         //======== pnlSingle ========
         {
             pnlSingle.setLayout(new FormLayout(
-                "default, $rgap, default:grow, $lcgap, default",
-                "fill:default, $ugap, fill:default:grow"));
+                    "default, $rgap, default:grow, $lcgap, default",
+                    "fill:default, $ugap, fill:default:grow"));
 
             //---- btnBack ----
             btnBack.setText(null);
@@ -385,7 +456,7 @@ public class PnlSettings extends CleanablePanel {
     private JButton btnHomes;
     private JButton btnICD;
     private JButton btnGlobalEMail;
-    private JButton btnModell;
+    private JButton btnModel;
     private JButton btnMedication;
     private JButton btnFTP;
     private JButton btnTags;

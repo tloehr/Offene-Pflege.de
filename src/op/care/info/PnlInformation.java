@@ -49,8 +49,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.RollbackException;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -254,88 +252,88 @@ public class PnlInformation extends NursingRecordsPanel {
 
                             GUITools.addExpandCollapseButtons(cpCat, cpTitleCat.getRight());
 
-                            /***
-                             *                _
-                             *       ___ ___ | | ___  _ __
-                             *      / __/ _ \| |/ _ \| '__|
-                             *     | (_| (_) | | (_) | |
-                             *      \___\___/|_|\___/|_|
-                             *
-                             */
-                            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
-                                final JButton btnColor = new JButton(SYSConst.icon22colorset);
-                                btnColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                                btnColor.setContentAreaFilled(false);
-                                btnColor.setBorder(null);
-                                btnColor.setToolTipText(SYSTools.xx("misc.msg.colorset"));
-                                btnColor.setSelectedIcon(SYSConst.icon22colorsetPressed);
-                                btnColor.addActionListener(new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        final JColorChooser clr = new JColorChooser(cat.getColor());
-                                        final JidePopup popup = new JidePopup();
-                                        clr.getSelectionModel().addChangeListener(new ChangeListener() {
-                                            @Override
-                                            public void stateChanged(ChangeEvent e) {
-                                                popup.hidePopup();
-                                                EntityManager em = OPDE.createEM();
-                                                try {
-                                                    em.getTransaction().begin();
-                                                    ResInfoCategory myCat = em.merge(cat);
-                                                    em.lock(myCat, LockModeType.OPTIMISTIC);
-                                                    myCat.setColor(clr.getColor());
-                                                    em.getTransaction().commit();
-                                                    synchronized (listCategories) {
-                                                        listCategories.remove(cat);
-                                                        listCategories.add(myCat);
-                                                    }
-                                                    sortData();
-                                                    reload();
-                                                } catch (OptimisticLockException ole) {
-                                                    OPDE.warn(ole);
-                                                    if (em.getTransaction().isActive()) {
-                                                        em.getTransaction().rollback();
-                                                    }
-                                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                } catch (RollbackException ole) {
-                                                    if (em.getTransaction().isActive()) {
-                                                        em.getTransaction().rollback();
-                                                    }
-                                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                        OPDE.getMainframe().emptyFrame();
-                                                        OPDE.getMainframe().afterLogin();
-                                                    }
-                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ole.getMessage(), DisplayMessage.IMMEDIATELY));
-                                                } catch (Exception ex) {
-                                                    if (em.getTransaction().isActive()) {
-                                                        em.getTransaction().rollback();
-                                                    }
-                                                    OPDE.fatal(ex);
-                                                } finally {
-                                                    em.close();
-                                                }
-                                            }
-                                        });
-
-                                        popup.setMovable(false);
-                                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                                        popup.setPopupType(JidePopup.HEAVY_WEIGHT_POPUP);
-
-                                        popup.setOwner(btnColor);
-                                        popup.removeExcludedComponent(btnColor);
-                                        popup.setTransient(false);
-                                        popup.getContentPane().add(clr);
-                                        popup.setDefaultFocusComponent(clr);
-                                        GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
-                                    }
-                                });
-                                cpTitleCat.getRight().add(btnColor);
-                            }
+//                            /***
+//                             *                _
+//                             *       ___ ___ | | ___  _ __
+//                             *      / __/ _ \| |/ _ \| '__|
+//                             *     | (_| (_) | | (_) | |
+//                             *      \___\___/|_|\___/|_|
+//                             *
+//                             */
+//                            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
+//                                final JButton btnColor = new JButton(SYSConst.icon22colorset);
+//                                btnColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//                                btnColor.setContentAreaFilled(false);
+//                                btnColor.setBorder(null);
+//                                btnColor.setToolTipText(SYSTools.xx("misc.msg.colorset"));
+//                                btnColor.setSelectedIcon(SYSConst.icon22colorsetPressed);
+//                                btnColor.addActionListener(new ActionListener() {
+//                                    @Override
+//                                    public void actionPerformed(ActionEvent e) {
+//                                        final JColorChooser clr = new JColorChooser(cat.getColor());
+//                                        final JidePopup popup = new JidePopup();
+//                                        clr.getSelectionModel().addChangeListener(new ChangeListener() {
+//                                            @Override
+//                                            public void stateChanged(ChangeEvent e) {
+//                                                popup.hidePopup();
+//                                                EntityManager em = OPDE.createEM();
+//                                                try {
+//                                                    em.getTransaction().begin();
+//                                                    ResInfoCategory myCat = em.merge(cat);
+//                                                    em.lock(myCat, LockModeType.OPTIMISTIC);
+//                                                    myCat.setColor(clr.getColor());
+//                                                    em.getTransaction().commit();
+//                                                    synchronized (listCategories) {
+//                                                        listCategories.remove(cat);
+//                                                        listCategories.add(myCat);
+//                                                    }
+//                                                    sortData();
+//                                                    reload();
+//                                                } catch (OptimisticLockException ole) {
+//                                                    OPDE.warn(ole);
+//                                                    if (em.getTransaction().isActive()) {
+//                                                        em.getTransaction().rollback();
+//                                                    }
+//                                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+//                                                } catch (RollbackException ole) {
+//                                                    if (em.getTransaction().isActive()) {
+//                                                        em.getTransaction().rollback();
+//                                                    }
+//                                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+//                                                        OPDE.getMainframe().emptyFrame();
+//                                                        OPDE.getMainframe().afterLogin();
+//                                                    }
+//                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ole.getMessage(), DisplayMessage.IMMEDIATELY));
+//                                                } catch (Exception ex) {
+//                                                    if (em.getTransaction().isActive()) {
+//                                                        em.getTransaction().rollback();
+//                                                    }
+//                                                    OPDE.fatal(ex);
+//                                                } finally {
+//                                                    em.close();
+//                                                }
+//                                            }
+//                                        });
+//
+//                                        popup.setMovable(false);
+//                                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+//                                        popup.setPopupType(JidePopup.HEAVY_WEIGHT_POPUP);
+//
+//                                        popup.setOwner(btnColor);
+//                                        popup.removeExcludedComponent(btnColor);
+//                                        popup.setTransient(false);
+//                                        popup.getContentPane().add(clr);
+//                                        popup.setDefaultFocusComponent(clr);
+//                                        GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
+//                                    }
+//                                });
+//                                cpTitleCat.getRight().add(btnColor);
+//                            }
 
                             cpTitleCat.getButton().setFont(SYSConst.ARIAL24);
-                            cpTitleCat.getButton().setForeground(GUITools.getForeground(cat.getColor()));
+                            cpTitleCat.getButton().setForeground(GUITools.getForeground(GUITools.getColor(cat.getColor())));
 
-                            cpTitleCat.getButton().setForeground(cat.getColor());
+                            cpTitleCat.getButton().setForeground(GUITools.getColor(cat.getColor()));
                             cpCat.setBackground(Color.white);
                             cpCat.setTitleLabelComponent(cpTitleCat.getMain());
 
@@ -616,7 +614,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                             }
                                                         }
                                                     }
-                                                }, resInfoType.getResInfoCat().getColor());
+                                                }, GUITools.getColor(resInfoType.getResInfoCat().getColor()));
                                                 pnlEditResInfo.setEnabled(true, PnlEditResInfo.NEW);
 
                                                 dlgPopup.getContentPane().setLayout(new BoxLayout(dlgPopup.getContentPane(), BoxLayout.X_AXIS));
@@ -1263,7 +1261,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     cpInfo.setContentPane(new JScrollPane(txt));
                 } else {
                     if (!mapInfo2Editor.containsKey(resInfo)) {
-                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone(), resInfo.getResInfoType().getResInfoCat().getColor()));
+                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone(), GUITools.getColor(resInfo.getResInfoType().getResInfoCat().getColor())));
                     }
                     cpInfo.setContentPane(new JScrollPane(mapInfo2Editor.get(resInfo).getPanel()));
                 }

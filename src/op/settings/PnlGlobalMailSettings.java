@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
@@ -36,7 +37,6 @@ public class PnlGlobalMailSettings extends DefaultPanel {
         initComponents();
 
         try {
-
             final PnlBeanEditor<MailSettingsBean> pbe = new PnlBeanEditor<>(() -> new MailSettingsBean(OPDE.getProps()), MailSettingsBean.class);
             pbe.setCustomPanel(getButtonPanel(pbe));
             pbe.addDataChangeListener(evt -> SYSPropsTools.storeProps(evt.getData().toProperties(new Properties())));
@@ -49,9 +49,6 @@ public class PnlGlobalMailSettings extends DefaultPanel {
 
 
     private JPanel getButtonPanel(PnlBeanEditor<MailSettingsBean> pbe) {
-
-
-//        JPanel buttonPanel = new JPanel(new HorizontalLayout(5));
 
 
         final YesNoToggleButton tbActive = new YesNoToggleButton("opde.settings.global.mail.active", "opde.settings.global.mail.inactive", SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE)).equalsIgnoreCase("true"));
@@ -113,7 +110,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
 
 
         tbActive.addItemListener(e -> {
-            if (!lastCheckOk) {
+            if (e.getStateChange() == ItemEvent.SELECTED && !lastCheckOk) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.mail.yet.untested", DisplayMessage.WARNING));
             }
             SYSPropsTools.storeProp(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE, Boolean.toString(e.getStateChange() == ItemEvent.SELECTED));
@@ -121,16 +118,19 @@ public class PnlGlobalMailSettings extends DefaultPanel {
 
 //        buttonPanel.add(tbActive);
 
-        Box page = Box.createVerticalBox();
-        page.add(new JSeparator());
 
         Box line = Box.createHorizontalBox();
         line.add(Box.createHorizontalGlue());
         line.add(btnTestmail);
-        line.add(tbActive);
         line.add(Box.createHorizontalGlue());
+        line.add(tbActive);
 
+        Box page = Box.createVerticalBox();
+        page.add(Box.createRigidArea(new Dimension(0, 10)));
+        page.add(new JSeparator());
+        page.add(Box.createRigidArea(new Dimension(0, 10)));
         page.add(line);
+        page.add(Box.createVerticalGlue());
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));

@@ -42,7 +42,7 @@ public class Floors {
     @Column(name = "level", nullable = true, insertable = true, updatable = true)
     @Min(0)
     @Max(8)
-    @EditorComponent(label = "Etage", component = {"combobox", "2.Untergeschoss", "1.Untergeschoss", "Erdgeschoss", "1.Etage", "2.Etage", "3.Etage", "4.Etage", "5.Etage", "6.Etage"})
+    @EditorComponent(label = "misc.msg.floor", component = {"combobox", "2.Untergeschoss", "1.Untergeschoss", "Erdgeschoss", "1.Etage", "2.Etage", "3.Etage", "4.Etage", "5.Etage", "6.Etage"})
     private Integer level;
 
     @Basic

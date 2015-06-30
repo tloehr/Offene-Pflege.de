@@ -100,6 +100,7 @@ public class Homes implements Serializable {
         station = new ArrayList<>();
         floors = new ArrayList<>();
         qmsscheds = new ArrayList<>();
+        this.color = "ffffff";
 
         Station newStation = new Station(SYSTools.xx("opde.settings.home.btnAddStation"), this);
         Floors newFloor = new Floors(this, SYSTools.xx("opde.settings.home.btnAddFloor"));

@@ -52,12 +52,6 @@ public class PnlCats extends PopupPanel {
     public Object getResult() {
         resInfoCategory.setText(txtName.getText().trim());
         resInfoCategory.setCatType(ResInfoCategoryTools.TYPES[cmbCatType.getSelectedIndex()]);
-//        if (isSaveOK()) {
-//            resInfoCategory.setText(txtName.getText().trim());
-//            resInfoCategory.setCatType(ResInfoCategoryTools.TYPES[cmbCatType.getSelectedIndex()]);
-//        } else {
-//            resInfoCategory = null;
-//        }
         return resInfoCategory;
     }
 

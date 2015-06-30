@@ -99,7 +99,7 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnStation"
-					"text": "e"
+					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/etage.png" )
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnStationActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
@@ -184,9 +184,10 @@ new FormModel {
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "btnModell"
+					name: "btnModel"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/network.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnModelActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridY": 21
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
@@ -197,6 +198,7 @@ new FormModel {
 					name: "btnMedication"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/drug_basket.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnMedicationActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridY": 21
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
