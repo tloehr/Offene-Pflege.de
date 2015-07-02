@@ -68,7 +68,7 @@ import java.util.ArrayList;
  */
 public class PnlMed extends CleanablePanel {
 
-    public static final String internalClassID = "opde.medication";
+
     private DefaultTreeModel tree;
     private MedProducts product;
     private JPopupMenu menu;
@@ -83,6 +83,7 @@ public class PnlMed extends CleanablePanel {
      * Creates new form FrmMed
      */
     public PnlMed(JScrollPane jspSearch) {
+        super("opde.medication");
         this.jspSearch = jspSearch;
         initComponents();
         initDialog();

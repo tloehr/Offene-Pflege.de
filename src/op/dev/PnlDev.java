@@ -45,9 +45,10 @@ import java.util.*;
  * @author Torsten Löhr
  */
 public class PnlDev extends CleanablePanel {
-    public static final String internalClassID = "opde.dev";
+
 
     public PnlDev() {
+        super("opde.dev");
         initComponents();
 
         cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));

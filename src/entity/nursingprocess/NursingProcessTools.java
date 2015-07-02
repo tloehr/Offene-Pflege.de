@@ -100,7 +100,7 @@ public class NursingProcessTools {
      * @return
      */
     public static String getAsHTML(NursingProcess np, boolean withHeader, boolean withDetails, boolean withIcon, boolean showAllEvals) {
-        String html = SYSConst.html_h2((withHeader ? SYSTools.xx(PnlNursingProcess.internalClassID) + " " + SYSTools.xx("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")" : "") + "&nbsp;&raquo;" + np.getTopic() + "&laquo");
+        String html = SYSConst.html_h2((withHeader ? SYSTools.xx("nursingrecords.nursingprocess") + " " + SYSTools.xx("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")" : "") + "&nbsp;&raquo;" + np.getTopic() + "&laquo");
 
         html += withIcon && np.isClosed() ? SYSConst.html_22x22_StopSign : "";
 

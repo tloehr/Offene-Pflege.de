@@ -63,7 +63,7 @@ import java.util.HashSet;
  * @author tloehr
  */
 public class PnlFiles extends NursingRecordsPanel {
-    public static final String internalClassID = "nursingrecords.files";
+
     private JPopupMenu menu;
     private Resident resident;
     private JScrollPane jspSearch;
@@ -76,6 +76,7 @@ public class PnlFiles extends NursingRecordsPanel {
      * Creates new form PnlFiles
      */
     public PnlFiles(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.files");
         initComponents();
         this.jspSearch = jspSearch;
         initPanel();

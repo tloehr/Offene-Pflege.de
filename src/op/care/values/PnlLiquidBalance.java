@@ -54,7 +54,7 @@ import java.util.Vector;
  * @author Torsten Löhr
  */
 public class PnlLiquidBalance extends NursingRecordsPanel {
-    public static final String internalClassID = "nursingrecords.liquidbalances";
+
     private Resident resident;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
@@ -69,6 +69,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
     private Properties controlProps;
 
     public PnlLiquidBalance(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.liquidbalances");
         this.resident = resident;
         this.jspSearch = jspSearch;
         LIQUIDBALANCE = ResValueTypesTools.getType(ResValueTypesTools.LIQUIDBALANCE);

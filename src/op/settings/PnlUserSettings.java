@@ -35,12 +35,13 @@ import java.util.Random;
  * @author Torsten Löhr
  */
 public class PnlUserSettings extends CleanablePanel {
-    public static final String internalClassID = "opde.usersettings";
+
     private final JScrollPane jspSearch;
     private JToggleButton tbNotify;
     private boolean ignoreTBNotify;
 
     public PnlUserSettings(JScrollPane jspSearch) {
+        super("opde.usersettings");
         this.jspSearch = jspSearch;
         initComponents();
         initPanel();

@@ -138,7 +138,7 @@ public class HandoversTools {
             ArrayList<Resident> listAllActiveResidents;
             HashMap<Resident, HashMap<Byte, Long>> bhpStats;
             ArrayList<BHP> listOpenBHPs;
-            String html = "<h1 id=\"fonth1\" >" + SYSTools.xx(PnlHandover.internalClassID + ".supervisorsReport") + ": " + DateFormat.getDateInstance().format(day.toDate()) + "</h1>";
+            String html = "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.handover.supervisorsReport") + ": " + DateFormat.getDateInstance().format(day.toDate()) + "</h1>";
 
             @Override
             protected Object doInBackground() throws Exception {
@@ -164,7 +164,7 @@ public class HandoversTools {
                  *     |_____|_| |_| |_| .__/ \__|\__, | |_| \_|_| \_\___| .__/ \___/|_|   \__|___/
                  *                     |_|        |___/                  |_|
                  */
-                html += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID + ".residentsWONReports") + "</h2>";
+                html += "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.handover.residentsWONReports") + "</h2>";
 
                 String htmlul1 = "";
                 for (Resident resident : listAllActiveResidents) {
@@ -200,7 +200,7 @@ public class HandoversTools {
                  *           |_|
                  */
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 2, 4));
-                html += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID + ".openBHPs") + "</h2>";
+                html += "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.handover.openBHPs") + "</h2>";
 
                 Collections.sort(listOpenBHPs, new Comparator<BHP>() {
                     @Override
@@ -259,7 +259,7 @@ public class HandoversTools {
                  *                     |_|        |___/
                  */
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 3, 4));
-                html += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID + ".emptyInventories") + "</h2>";
+                html += "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.handover.emptyInventories") + "</h2>";
                 String htmlul3 = "";
                 for (Resident resident : listAllActiveResidents) {
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
@@ -276,8 +276,8 @@ public class HandoversTools {
                         if (stock == null || stockSum.compareTo(BigDecimal.ZERO) <= 0) {
                             htmlul2 += "<li>" + inventory.getText() + ": <b>";
                             htmlul2 += (stock == null ?
-                                    SYSTools.xx(PnlInventory.internalClassID + ".noOpenStock") :
-                                    "[" + stock.getID() + "] " + SYSTools.xx(PnlInventory.internalClassID + ".StockSum") + " " + stockSum.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + TradeFormTools.getPackUnit(stock.getTradeForm()));
+                                    SYSTools.xx("nursingrecords.inventory.noOpenStock") :
+                                    "[" + stock.getID() + "] " + SYSTools.xx("nursingrecords.inventory.StockSum") + " " + stockSum.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + TradeFormTools.getPackUnit(stock.getTradeForm()));
                             htmlul2 += "</b></li>";
                         }
                     }

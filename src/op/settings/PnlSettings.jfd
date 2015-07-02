@@ -209,6 +209,7 @@ new FormModel {
 					name: "btnFTP"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/transfer_p2p.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnFTPActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridY": 21
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL

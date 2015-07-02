@@ -11,11 +11,12 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.building.*;
+import entity.building.Homes;
+import entity.building.Station;
+import entity.building.StationTools;
 import entity.files.SYSFilesTools;
 import entity.info.ICD;
 import entity.info.ResInfoCategory;
-import entity.info.ResInfoCategoryTools;
 import entity.prescription.MedStock;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
@@ -26,12 +27,16 @@ import op.OPDE;
 import op.system.*;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.*;
-import org.apache.commons.collections.Closure;
+import op.tools.MyJDialog;
+import op.tools.PrintListElement;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.ChangeEvent;
@@ -52,7 +57,6 @@ import java.util.*;
 public class PnlSystemSettings extends CleanablePanel {
     private final int TAB_LOCAL = 0;
     private final int TAB_GLOBAL = 1;
-    public static final String internalClassID = "opde.settings";
     private MedStock testStock;
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JPanel> cpPanel;
@@ -64,6 +68,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private CollapsiblePanes searchPanes;
 
     public PnlSystemSettings(JScrollPane jspSearch) {
+        super("opde.settings");
         this.jspSearch = jspSearch;
         cpMap = new HashMap<String, CollapsiblePane>();
         cpPanel = new HashMap<String, JPanel>();
@@ -520,71 +525,70 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void createFTPSystem() {
-        btnFTPTest.setText(SYSTools.xx("opde.settings.global.mail.btnFTPTest"));
+        btnFTPTest.setText(SYSTools.xx("opde.settings.ftp.test"));
 
-        txtFTPServer.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_SERVER)));
+        txtFTPServer.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_HOST)));
         txtFTPPort.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_PORT), "21"));
         txtFTPUser.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_USER)));
         txtFTPPassword.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_PASSWORD)));
         txtFTPWorkingDir.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_WD)));
 
         lblFTP.setText(SYSTools.xx("opde.settings.global.ftp"));
-        lblFTPServer.setText(SYSTools.xx("opde.settings.global.ftp.server"));
-        lblFTPPort.setText(SYSTools.xx("opde.settings.global.ftp.port"));
-        lblFTPUser.setText(SYSTools.xx("opde.settings.global.ftp.user"));
-        lblFTPPassword.setText(SYSTools.xx("opde.settings.global.ftp.password"));
-        lblFTPWD.setText(SYSTools.xx("opde.settings.global.ftp.wd"));
+        lblFTPServer.setText(SYSTools.xx("opde.settings.ftp.host"));
+        lblFTPPort.setText(SYSTools.xx("opde.settings.ftp.port"));
+        lblFTPUser.setText(SYSTools.xx("opde.settings.ftp.user"));
+        lblFTPPassword.setText(SYSTools.xx("opde.settings.ftp.password"));
+        lblFTPWD.setText(SYSTools.xx("opde.settings.ftp.wd"));
 
     }
-
 
 
     private void lstCatMousePressed(MouseEvent e) {
-        if (e.getClickCount() == 2) {
-            final PnlCats pnlCats = new PnlCats((ResInfoCategory) lstCat.getSelectedValue());
-            GUITools.showPopup(GUITools.createPanelPopup(pnlCats, new Closure() {
-                @Override
-                public void execute(Object o) {
-                    if (o != null) {
-                        EntityManager em = OPDE.createEM();
-                        try {
-                            em.getTransaction().begin();
-                            ResInfoCategory myCat = em.merge((ResInfoCategory) o);
-                            em.getTransaction().commit();
-                            createCatList();
-                        } catch (Exception e) {
-                            em.getTransaction().rollback();
-                            OPDE.fatal(e);
-                        } finally {
-                            em.close();
-                        }
-                    }
-                }
-            }, lblCat), SwingConstants.NORTH_EAST);
-        }
+//        if (e.getClickCount() == 2) {
+//            final PnlCats pnlCats = new PnlCats((ResInfoCategory) lstCat.getSelectedValue());
+//            GUITools.showPopup(GUITools.createPanelPopup(pnlCats, new Closure() {
+//                @Override
+//                public void execute(Object o) {
+//                    if (o != null) {
+//                        EntityManager em = OPDE.createEM();
+//                        try {
+//                            em.getTransaction().begin();
+//                            ResInfoCategory myCat = em.merge((ResInfoCategory) o);
+//                            em.getTransaction().commit();
+//                            createCatList();
+//                        } catch (Exception e) {
+//                            em.getTransaction().rollback();
+//                            OPDE.fatal(e);
+//                        } finally {
+//                            em.close();
+//                        }
+//                    }
+//                }
+//            }, lblCat), SwingConstants.NORTH_EAST);
+//        }
     }
 
     private void btnAddCatActionPerformed(ActionEvent e) {
-        final PnlCats pnlCats = new PnlCats(new ResInfoCategory(ResInfoCategoryTools.BASICS));
-        GUITools.showPopup(GUITools.createPanelPopup(pnlCats, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        ResInfoCategory myCat = em.merge((ResInfoCategory) o);
-                        em.getTransaction().commit();
-                        createCatList();
-                    } catch (Exception e) {
-                        em.getTransaction().rollback();
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
-                    }
-                }
-            }
-        }, lblCat), SwingConstants.NORTH_EAST);
+//        final PnlCats pnlCats = new PnlCats(new ResInfoCategory(ResInfoCategoryTools.BASICS));
+//        GUITools.showPopup(GUITools.createPanelPopup(pnlCats, new Closure() {
+//            @Override
+//            public void execute(Object o) {
+//                if (o != null) {
+//                    EntityManager em = OPDE.createEM();
+//                    try {
+//                        em.getTransaction().begin();
+//                        ResInfoCategory myCat = em.merge((ResInfoCategory) o);
+//                        em.getTransaction().commit();
+//                        createCatList();
+//                    } catch (Exception e) {
+//                        em.getTransaction().rollback();
+//                        OPDE.fatal(e);
+//                    } finally {
+//                        em.close();
+//                    }
+//                }
+//            }
+//        }, lblCat), SwingConstants.NORTH_EAST);
     }
 
     private void btnImportICDActionPerformed(ActionEvent e) {
@@ -673,7 +677,7 @@ public class PnlSystemSettings extends CleanablePanel {
 
     private Properties getFTPProps() {
         Properties myFTPProps = new Properties();
-        myFTPProps.put(SYSPropsTools.KEY_FTP_SERVER, txtFTPServer.getText().trim());
+        myFTPProps.put(SYSPropsTools.KEY_FTP_HOST, txtFTPServer.getText().trim());
         myFTPProps.put(SYSPropsTools.KEY_FTP_PORT, txtFTPPort.getText().trim());
         myFTPProps.put(SYSPropsTools.KEY_FTP_USER, txtFTPUser.getText().trim());
         myFTPProps.put(SYSPropsTools.KEY_FTP_PASSWORD, txtFTPPassword.getText().trim());
@@ -723,21 +727,21 @@ public class PnlSystemSettings extends CleanablePanel {
             File file = new File(OPDE.getOPWD() + File.separator + "opdestart.jar");
             String md5a = SYSTools.getMD5Checksum(file);
             ftp.uploadFile(file.getPath(), "ftptest.file");
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.ftp.msg.upload", 1));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.upload", 1));
             ftp.downloadFile(OPDE.getOPWD() + File.separator + "ftptest.file", "ftptest.file");
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.ftp.msg.download", 1));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.download", 1));
             File file2 = new File(OPDE.getOPWD() + File.separator + "ftptest.file");
             String md5b = SYSTools.getMD5Checksum(file2);
             if (md5b.equalsIgnoreCase(md5a)) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.ftp.msg.files.equal", 1));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.files.equal", 1));
             } else {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.ftp.msg.files.not.equal", DisplayMessage.WARNING));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.files.differ", DisplayMessage.WARNING));
                 throw new Exception("MD5 error");
             }
             FileUtils.deleteQuietly(file2);
             ftp.deleteFile("ftptest.file");
             ftp.disconnect();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.ftp.msg.test.ok", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.test.ok", 2));
             SYSPropsTools.storeProp(SYSPropsTools.KEY_FTP_IS_WORKING, "true");
             for (Map.Entry entry : ftpprops.entrySet()) {
                 SYSPropsTools.storeProp(entry.getKey().toString(), entry.getValue().toString());
@@ -853,8 +857,8 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlLocal ========
             {
                 pnlLocal.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
+                        "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+                        "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
 
                 //---- lblPrinters ----
                 lblPrinters.setText("labelPrinter");
@@ -914,8 +918,8 @@ public class PnlSystemSettings extends CleanablePanel {
                 //======== pnlGlobal ========
                 {
                     pnlGlobal.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
-                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
+                            "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
+                            "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
 
                     //======== panel5 ========
                     {
@@ -960,8 +964,8 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlICD ========
                     {
                         pnlICD.setLayout(new FormLayout(
-                            "default:grow, default",
-                            "fill:default:grow, $lgap, 60dlu, $lgap, default"));
+                                "default:grow, default",
+                                "fill:default:grow, $lgap, 60dlu, $lgap, default"));
 
                         //======== scrollPane1 ========
                         {
@@ -988,8 +992,8 @@ public class PnlSystemSettings extends CleanablePanel {
                         //======== pnlMail ========
                         {
                             pnlMail.setLayout(new FormLayout(
-                                "default, $lcgap, default:grow",
-                                "13*(default, $lgap), default"));
+                                    "default, $lcgap, default:grow",
+                                    "13*(default, $lgap), default"));
 
                             //---- lblMailHost ----
                             lblMailHost.setText("host");
@@ -1106,16 +1110,16 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlCalcMed ========
                     {
                         pnlCalcMed.setLayout(new FormLayout(
-                            "default:grow",
-                            "2*(default, $lgap), default"));
+                                "default:grow",
+                                "2*(default, $lgap), default"));
                     }
                     pnlGlobal.add(pnlCalcMed, CC.xy(7, 14));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                            "default, $lcgap, default:grow",
-                            "5*(default, $lgap), default"));
+                                "default, $lcgap, default:grow",
+                                "5*(default, $lgap), default"));
 
                         //---- lblFTPServer ----
                         lblFTPServer.setText("host");
@@ -1213,85 +1217,85 @@ public class PnlSystemSettings extends CleanablePanel {
         tabMain.setTitleAt(TAB_LOCAL, SYSTools.xx("opde.settings.local"));
         tabMain.setTitleAt(TAB_GLOBAL, SYSTools.xx("opde.settings.global"));
 
-        lblHomes.setText(SYSTools.xx("opde.settings.global.homes"));
-        lblCat.setText(SYSTools.xx("opde.settings.global.categories"));
+        lblHomes.setText(SYSTools.xx("opde.settings.homes"));
+        lblCat.setText(SYSTools.xx("opde.settings.categories"));
         tabMainStateChanged(null);
 
     }
 
-private JTabbedPane tabMain;
-private JPanel pnlLocal;
-private JLabel lblPrinters;
-private JPanel panel4;
-private JLabel lblStation;
-private JComboBox cmbPhysicalPrinters;
-private JComboBox cmbStation;
-private JComboBox cmbLogicalPrinters;
-private JLabel lblTimeout;
-private JComboBox cmbForm;
-private JButton btnTestLabel;
-private JPanel panel1;
-private JScrollPane jspGlobal;
-private JPanel pnlGlobal;
-private JPanel panel5;
-private JPanel panel6;
-private JLabel lblHomes;
-private JLabel lblICD;
-private JLabel lblEMail;
-private JScrollPane jspHomeStation;
-private CollapsiblePanes cpsHomes;
-private JPanel pnlICD;
-private JScrollPane scrollPane1;
-private JList lstIcdFiles;
-private JButton btnEmptyList;
-private JButton btnImportICD;
-private JScrollPane panel8;
-private JPanel pnlMail;
-private JLabel lblMailHost;
-private JTextField txtMailHost;
-private JLabel lblMailPort;
-private JTextField txtMailPort;
-private JLabel lblMailUser;
-private JTextField txtMailUser;
-private JLabel lblMailPassword;
-private JTextField txtMailPassword;
-private JLabel lblMailSender;
-private JTextField txtMailSender;
-private JLabel lblMailRecipient;
-private JTextField txtMailRecipient;
-private JLabel lblMailSenderPersonal;
-private JTextField txtMailSenderPersonal;
-private JLabel lblMailRecipientPersonal;
-private JTextField txtMailRecipientPersonal;
-private JLabel lblMailSpamFilter;
-private JTextField txtMailSpamfilter;
-private JLabel lblAuth;
-private JLabel lblStarttls;
-private JLabel lblTLS;
-private JButton btnTestmail;
-private JLabel lblActive;
-private JComboBox cmbCountry;
-private JPanel panel7;
-private JLabel lblCat;
-private JLabel lblCalcMed;
-private JLabel lblFTP;
-private JScrollPane jspCat;
-private JList lstCat;
-private JPanel pnlCalcMed;
-private JPanel panel3;
-private JLabel lblFTPServer;
-private JTextField txtFTPServer;
-private JLabel lblFTPPort;
-private JTextField txtFTPPort;
-private JLabel lblFTPUser;
-private JTextField txtFTPUser;
-private JLabel lblFTPPassword;
-private JTextField txtFTPPassword;
-private JLabel lblFTPWD;
-private JTextField txtFTPWorkingDir;
-private JButton btnFTPTest;
-private JPanel panel2;
-private JButton btnAddCat;
-private JButton btnDeleteCat;
+    private JTabbedPane tabMain;
+    private JPanel pnlLocal;
+    private JLabel lblPrinters;
+    private JPanel panel4;
+    private JLabel lblStation;
+    private JComboBox cmbPhysicalPrinters;
+    private JComboBox cmbStation;
+    private JComboBox cmbLogicalPrinters;
+    private JLabel lblTimeout;
+    private JComboBox cmbForm;
+    private JButton btnTestLabel;
+    private JPanel panel1;
+    private JScrollPane jspGlobal;
+    private JPanel pnlGlobal;
+    private JPanel panel5;
+    private JPanel panel6;
+    private JLabel lblHomes;
+    private JLabel lblICD;
+    private JLabel lblEMail;
+    private JScrollPane jspHomeStation;
+    private CollapsiblePanes cpsHomes;
+    private JPanel pnlICD;
+    private JScrollPane scrollPane1;
+    private JList lstIcdFiles;
+    private JButton btnEmptyList;
+    private JButton btnImportICD;
+    private JScrollPane panel8;
+    private JPanel pnlMail;
+    private JLabel lblMailHost;
+    private JTextField txtMailHost;
+    private JLabel lblMailPort;
+    private JTextField txtMailPort;
+    private JLabel lblMailUser;
+    private JTextField txtMailUser;
+    private JLabel lblMailPassword;
+    private JTextField txtMailPassword;
+    private JLabel lblMailSender;
+    private JTextField txtMailSender;
+    private JLabel lblMailRecipient;
+    private JTextField txtMailRecipient;
+    private JLabel lblMailSenderPersonal;
+    private JTextField txtMailSenderPersonal;
+    private JLabel lblMailRecipientPersonal;
+    private JTextField txtMailRecipientPersonal;
+    private JLabel lblMailSpamFilter;
+    private JTextField txtMailSpamfilter;
+    private JLabel lblAuth;
+    private JLabel lblStarttls;
+    private JLabel lblTLS;
+    private JButton btnTestmail;
+    private JLabel lblActive;
+    private JComboBox cmbCountry;
+    private JPanel panel7;
+    private JLabel lblCat;
+    private JLabel lblCalcMed;
+    private JLabel lblFTP;
+    private JScrollPane jspCat;
+    private JList lstCat;
+    private JPanel pnlCalcMed;
+    private JPanel panel3;
+    private JLabel lblFTPServer;
+    private JTextField txtFTPServer;
+    private JLabel lblFTPPort;
+    private JTextField txtFTPPort;
+    private JLabel lblFTPUser;
+    private JTextField txtFTPUser;
+    private JLabel lblFTPPassword;
+    private JTextField txtFTPPassword;
+    private JLabel lblFTPWD;
+    private JTextField txtFTPWorkingDir;
+    private JButton btnFTPTest;
+    private JPanel panel2;
+    private JButton btnAddCat;
+    private JButton btnDeleteCat;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

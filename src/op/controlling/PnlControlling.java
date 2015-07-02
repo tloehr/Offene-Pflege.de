@@ -97,7 +97,7 @@ public class PnlControlling extends CleanablePanel {
     public static final int TAB_CONTROLLING = 0;
     public static final int TAB_QMSPLAN = 1;
 
-    public static final String internalClassID = "opde.controlling";
+
     private JScrollPane jspSearch;
     private Qmsplan showMeFirst;
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
@@ -123,15 +123,12 @@ public class PnlControlling extends CleanablePanel {
 //
 
 
-    @Override
-    public String getInternalClassID() {
-        return internalClassID;
-    }
 
     /**
      * Creates new form PnlControlling
      */
     public PnlControlling(JScrollPane jspSearch, Qmsplan showMeFirst) {
+        super("opde.controlling");
         this.jspSearch = jspSearch;
         this.showMeFirst = showMeFirst;
         progressClosure = new Closure() {
@@ -152,7 +149,7 @@ public class PnlControlling extends CleanablePanel {
         tabMain.setTitleAt(TAB_CONTROLLING, SYSTools.xx("opde.controlling.tab.controlling"));
 //        tabMain.setTitleAt(TAB_QMS, SYSTools.xx("opde.controlling.tab.qms"));
         tabMain.setTitleAt(TAB_QMSPLAN, SYSTools.xx("opde.controlling.tab.qmsplan"));
-        tabMain.setEnabledAt(TAB_QMSPLAN, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID));
+        tabMain.setEnabledAt(TAB_QMSPLAN, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, getInternalClassID()));
 
         if (showMeFirst != null) {
             tabMain.setSelectedIndex(TAB_QMSPLAN);

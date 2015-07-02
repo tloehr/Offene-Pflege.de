@@ -76,7 +76,7 @@ import java.util.*;
  * createContent4Value - creates the JPanel with the actual values in it.
  */
 public class PnlValues extends NursingRecordsPanel {
-    public static final String internalClassID = "nursingrecords.vitalparameters";
+
 
     private Resident resident;
     private JScrollPane jspSearch;
@@ -91,6 +91,7 @@ public class PnlValues extends NursingRecordsPanel {
 //    private Color[] color1, color2;
 
     public PnlValues(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.vitalparameters");
         this.resident = resident;
         this.jspSearch = jspSearch;
 //        LIQUIDBALANCE = ResValueTypesTools.getType(ResValueTypesTools.LIQUIDBALANCE);

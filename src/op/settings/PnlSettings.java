@@ -6,12 +6,10 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.system.SYSPropsTools;
-import gui.PnlBeanEditor;
 import gui.interfaces.CleanablePanel;
-import gui.interfaces.DataProvider;
 import gui.interfaces.DefaultPanel;
 import op.OPDE;
+import op.settings.subpanels.*;
 import op.system.InternalClassACL;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -19,16 +17,17 @@ import op.tools.SYSTools;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlSettings extends CleanablePanel {
-    public static final String internalClassID = "opde.settings";
+    //    public static final String internalClassID = "opde.settings";
     DefaultPanel currentPanel;
 
     public PnlSettings(JScrollPane jspSearch) {
+        super("opde.settings");
+        helpkey = OPDE.getAppInfo().getInternalClasses().get(internalClassID).getHelpurl();
         initComponents();
         initPanel();
     }
@@ -66,14 +65,15 @@ public class PnlSettings extends CleanablePanel {
         lblGlobal.setText(SYSTools.xx("opde.settings.global"));
         lblPassword.setText(SYSTools.xx("opde.settings.userpassword"));
         lblMyEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.personal.mailsettings")));
-        lblLabelPrinter.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.labelPrinters")));
+        lblLabelPrinter.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.labelPrinters")));
         lblTimeout.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.timeout")));
-        lblHomes.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.homes")));
+        lblHomes.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.homes")));
         lblStation.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.station")));
         lblICD.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.icd.btnImport")));
-        lblGlobalEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.mail.lblEMail")));
-        lblModel.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.categories")));
-        lblMedication.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.categories")));
+        lblGlobalEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.mail")));
+        lblModel.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.categories")));
+        lblMedication.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.medication.calc")));
+        lblFTP.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.ftp")));
     }
 
     @Override
@@ -82,6 +82,7 @@ public class PnlSettings extends CleanablePanel {
             currentPanel.cleanup();
             pnlSingle.remove(currentPanel);
         }
+        currentPanel = null;
     }
 
     @Override
@@ -101,7 +102,7 @@ public class PnlSettings extends CleanablePanel {
         }
         currentPanel = new PnlLabelPrinterSetup();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.labelPrinters")));
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
         lblSingle.setIcon(btnLabelPrinter.getIcon());
         ((CardLayout) getLayout()).show(this, "single");
     }
@@ -119,7 +120,7 @@ public class PnlSettings extends CleanablePanel {
 
         currentPanel = new PnlTimeout();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.timeout")));
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
         lblSingle.setIcon(btnTimeout.getIcon());
         ((CardLayout) getLayout()).show(this, "single");
     }
@@ -132,7 +133,7 @@ public class PnlSettings extends CleanablePanel {
 
         currentPanel = new PnlHomeStationRoomEditor();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.homes")));
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
         lblSingle.setIcon(btnHomes.getIcon());
         ((CardLayout) getLayout()).show(this, "single");
     }
@@ -145,7 +146,7 @@ public class PnlSettings extends CleanablePanel {
 
         currentPanel = new PnlStation();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.station")));
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
         lblSingle.setIcon(btnStation.getIcon());
         ((CardLayout) getLayout()).show(this, "single");
     }
@@ -158,7 +159,7 @@ public class PnlSettings extends CleanablePanel {
 
         currentPanel = new PnlICD();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.icd.btnImport")));
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
         lblSingle.setIcon(btnICD.getIcon());
         ((CardLayout) getLayout()).show(this, "single");
     }
@@ -171,7 +172,7 @@ public class PnlSettings extends CleanablePanel {
 
         currentPanel = new PnlGlobalMailSettings();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.mail.lblEMail")));
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
         lblSingle.setIcon(btnGlobalEMail.getIcon());
         ((CardLayout) getLayout()).show(this, "single");
     }
@@ -184,7 +185,7 @@ public class PnlSettings extends CleanablePanel {
 
         currentPanel = new PnlModelEditor();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.categories")));
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
         lblSingle.setIcon(btnModel.getIcon());
         ((CardLayout) getLayout()).show(this, "single");
     }
@@ -195,25 +196,34 @@ public class PnlSettings extends CleanablePanel {
             currentPanel.cleanup();
         }
 
-        try {
-            currentPanel = new PnlBeanEditor<MedicationConfigBean>(new DataProvider<MedicationConfigBean>() {
-                @Override
-                public MedicationConfigBean getData() {
-                    return new MedicationConfigBean(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR1)).equalsIgnoreCase("true"));
-                }
-            }, MedicationConfigBean.class);
-        } catch (IllegalAccessException e1) {
-            e1.printStackTrace();
-        } catch (NoSuchMethodException e1) {
-            e1.printStackTrace();
-        } catch (InvocationTargetException e1) {
-            e1.printStackTrace();
-        }
-
-
+        currentPanel = new PnlMedication();
         pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.categories")));
-        lblSingle.setIcon(btnModel.getIcon());
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
+        lblSingle.setIcon(btnMedication.getIcon());
+        ((CardLayout) getLayout()).show(this, "single");
+    }
+
+
+    private void btnFTPActionPerformed(ActionEvent e) {
+        genericButtonAction(new PnlFTP(), ((JButton) e.getSource()).getIcon());
+    }
+
+
+    @Override
+    public String getHelpKey() {
+        return currentPanel == null ? super.getHelpKey() : currentPanel.getHelpKey();
+    }
+
+
+    private void genericButtonAction(DefaultPanel pnl, Icon icon) {
+        if (currentPanel != null) {
+            pnlSingle.remove(currentPanel);
+            currentPanel.cleanup();
+        }
+        currentPanel = pnl;
+        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
+        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
+        lblSingle.setIcon(icon);
         ((CardLayout) getLayout()).show(this, "single");
     }
 
@@ -370,6 +380,7 @@ public class PnlSettings extends CleanablePanel {
             //---- btnFTP ----
             btnFTP.setText(null);
             btnFTP.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/transfer_p2p.png")));
+            btnFTP.addActionListener(e -> btnFTPActionPerformed(e));
             pnlAll.add(btnFTP, CC.xy(13, 21, CC.FILL, CC.FILL));
 
             //---- btnTags ----

@@ -3,9 +3,8 @@ package entity.nursingprocess;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.system.SYSPropsTools;
-import op.OPDE;
-import op.care.dfn.PnlDFN;
 import gui.GUITools;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -42,7 +41,7 @@ public class DFNTools {
     public static final byte SHIFT_VERY_LATE = 3;
 
     public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
-    public static final String[] SHIFT_TEXT = new String[]{PnlDFN.internalClassID + ".shift.veryearly", PnlDFN.internalClassID + ".shift.early", PnlDFN.internalClassID + ".shift.late", PnlDFN.internalClassID + ".shift.verylate"};
+    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.dfn.shift.veryearly", "nursingrecords.dfn.shift.early", "nursingrecords.dfn.shift.late", "nursingrecords.dfn.shift.verylate"};
     public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
     public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
 
@@ -166,7 +165,7 @@ public class DFNTools {
      * </ol>
      * </li>
      * </ol>
-     * <p/>
+     * <p>
      * Diese Methode kann von verschiednenen Seiten aufgerufen werden. Zum einen von der "anderen" erzeugen Methode, die einen vollständigen Tagesplan für
      * alle BWs erzeugt oder von dem Verordnungs Editor, der seinerseits nur eine einzige Verordnung nachtragen möchte. Auf jeden Fall kann die Liste <code>list</code>
      * auch Einträge enthalten, die unpassend sind. Sie dient nur der Vorauswahl und wird innerhalb dieser Methode dann genau geprüft. Sie "pickt" sich also

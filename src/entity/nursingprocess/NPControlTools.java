@@ -22,7 +22,7 @@ public class NPControlTools {
 //        result += "<p><b>Durchgeführt von:</b> " + kontrolle.getUser().getFullname() + "</p>";
 //        result += "<p><b>Ergebnis:</b> " + kontrolle.getText() + "</p>";
         if (npcontrol.isLastValidation()) {
-            result += "<br/><b>"+ SYSTools.xx(PnlNursingProcess.internalClassID + ".isClosedAfterThisNPControl")+"</b>";
+            result += "<br/><b>"+ SYSTools.xx("nursingrecords.nursingprocess.isClosedAfterThisNPControl")+"</b>";
         }
 
         return result;

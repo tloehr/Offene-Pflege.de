@@ -47,9 +47,9 @@ public class NR2UserTools {
 
     public static String getAsHTML(NReport nReport) {
         String result = "";
-        result += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID) + "</h2>";
+        result += "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.handover") + "</h2>";
         if (!nReport.getUsersAcknowledged().isEmpty()) {
-            result += "<h3 id=\"fonth3\" >" + SYSTools.xx(PnlHandover.internalClassID + ".ListOfUsersAcknowledged") + "</h3>";
+            result += "<h3 id=\"fonth3\" >" + SYSTools.xx("nursingrecords.handover.ListOfUsersAcknowledged") + "</h3>";
             result += NReportTools.getAsHTML(nReport, null);
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +

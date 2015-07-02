@@ -52,7 +52,7 @@ import java.util.*;
  * @author tloehr
  */
 public class PnlTraining extends CleanablePanel {
-    public static final String internalClassID = "opde.training";
+
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private Map<String, CollapsiblePane> cpMap;
@@ -63,6 +63,7 @@ public class PnlTraining extends CleanablePanel {
     private CollapsiblePanes cpsMain;
 
     public PnlTraining(JScrollPane jspSearch) {
+        super("opde.training");
         this.jspSearch = jspSearch;
         filterTag = null;
         initPanel();

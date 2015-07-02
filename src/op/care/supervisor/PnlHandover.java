@@ -70,7 +70,7 @@ import java.util.*;
 import java.util.List;
 
 public class PnlHandover extends NursingRecordsPanel {
-    public static final String internalClassID = "nursingrecords.handover";
+
 
     private JXSearchField txtSearch;
     private JComboBox yearCombo;
@@ -96,6 +96,7 @@ public class PnlHandover extends NursingRecordsPanel {
      * Creates new form PnlHandover
      */
     public PnlHandover(JScrollPane jspSearch) {
+        super("nursingrecords.handover");
         this.jspSearch = jspSearch;
         initComponents();
         initPanel();

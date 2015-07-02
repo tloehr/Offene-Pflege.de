@@ -487,7 +487,7 @@ public class ResValueTools {
 
         StringBuilder html = new StringBuilder(1000);
 
-        html.append(SYSConst.html_h1(SYSTools.xx(PnlControlling.internalClassID + ".nutrition.liquidbalance")));
+        html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nutrition.liquidbalance")));
         html.append(SYSConst.html_h2(monthFormmatter.format(month.toDate())));
 
         p = 0;
@@ -573,7 +573,7 @@ public class ResValueTools {
         ArrayList<Resident> listResidents = new ArrayList<Resident>(listData.keySet());
         Collections.sort(listResidents);
 
-        html.append(SYSConst.html_h1(SYSTools.xx(PnlControlling.internalClassID + ".nutrition.weightstats")));
+        html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nutrition.weightstats")));
         html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
         ResValueTypes heightType = ResValueTypesTools.getType(ResValueTypesTools.HEIGHT);

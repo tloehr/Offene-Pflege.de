@@ -1,4 +1,4 @@
-package op.settings;
+package op.settings.subpanels;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -42,8 +42,8 @@ public class PnlModelEditor extends DefaultPanel {
     private int i = 0;  // just for the progressbar
 
     public PnlModelEditor() {
-        super();
-        internalClassID = "opde.settings.model";
+        super("opde.settings.model");
+
         mainPanel.setLayout(new FormLayout(
                 "default, $lcgap, default:grow, $lcgap, default",
                 "default, $lgap, default:grow, $lgap, default"));

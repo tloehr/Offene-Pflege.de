@@ -77,7 +77,7 @@ public class DlgDiscontinue extends MyJDialog {
         this.actionBlock = actionBlock;
         this.prescription = prescription;
         initComponents();
-        lblQuestion.setText(SYSTools.xx(PnlPrescription.internalClassID + ".dlgDiscontinue.question"));
+        lblQuestion.setText(SYSTools.xx( "nursingrecords.prescription.dlgDiscontinue.question"));
         fillCMBs();
         setVisible(true);
     }
@@ -185,7 +185,7 @@ public class DlgDiscontinue extends MyJDialog {
         Hospital hospital = (Hospital) cmbKHAb.getSelectedItem();
 
         if (doc == null && hospital == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(PnlPrescription.internalClassID + ".dlgDiscontinue.docandhospitalempty"));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage( "nursingrecords.prescription.dlgDiscontinue.docandhospitalempty"));
         } else {
             prescription.setDocOFF(doc);
             prescription.setHospitalOFF(hospital);

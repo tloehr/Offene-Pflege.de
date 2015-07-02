@@ -499,7 +499,7 @@ public class SYSFilesTools {
     public static FileTransferClient getFTPClient(Properties ftpProps) throws Exception {
         FileTransferClient ftp = new FileTransferClient();
 
-        ftp.setRemoteHost(ftpProps.getProperty(SYSPropsTools.KEY_FTP_SERVER));
+        ftp.setRemoteHost(ftpProps.getProperty(SYSPropsTools.KEY_FTP_HOST));
         ftp.setUserName(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER));
         ftp.setPassword(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
         ftp.setRemotePort(Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));

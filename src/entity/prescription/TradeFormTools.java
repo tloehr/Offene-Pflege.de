@@ -85,7 +85,7 @@ public class TradeFormTools {
             String altPreparation = SYSTools.catchNull(alternative.getDosageForm().getPreparation());
             String altUsageText = SYSTools.catchNull(alternative.getDosageForm().getUsageText());
             String altSubtext = SYSTools.catchNull(alternative.getSubtext());
-            text += "(" + SYSTools.xx(PnlPrescription.internalClassID + ".originalprescription") + ": " + alternative.getMedProduct().getText() + (altSubtext.isEmpty() ? "" : " " + altSubtext);
+            text += "(" + SYSTools.xx( "nursingrecords.prescription.originalprescription") + ": " + alternative.getMedProduct().getText() + (altSubtext.isEmpty() ? "" : " " + altSubtext);
             text += altPreparation.isEmpty() ? " " : ", " + altPreparation + ", ";
             text += altUsageText.isEmpty() ? SYSConst.UNITS[alternative.getDosageForm().getUsageUnit()] : altUsageText;
             text += ")";

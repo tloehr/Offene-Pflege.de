@@ -52,7 +52,7 @@ import java.beans.PropertyVetoException;
  * @author tloehr
  */
 public class PnlResOverview extends NursingRecordsPanel {
-    public static final String internalClassID = "nursingrecords.overview";
+
 
     private Resident resident;
     private CollapsiblePanes searchPanes;
@@ -71,6 +71,7 @@ public class PnlResOverview extends NursingRecordsPanel {
      * Creates new form PnlResOverview
      */
     public PnlResOverview(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.overview");
         initComponents();
         this.jspSearch = jspSearch;
         initPanel();
@@ -242,7 +243,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         labelPanel.add(tbMedi);
 //        SYSPropsTools.restoreState(internalClassID + ":tbMedi", tbMedi);
 
-        tbBerichte = GUITools.getNiceToggleButton(SYSTools.xx(PnlReport.internalClassID));
+        tbBerichte = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.reports"));
         tbBerichte.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {

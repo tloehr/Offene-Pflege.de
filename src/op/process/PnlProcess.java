@@ -55,7 +55,7 @@ import java.util.List;
  */
 public class PnlProcess extends NursingRecordsPanel {
 
-    public static final String internalClassID = "nursingrecords.qprocesses";
+
 
     private Resident resident;
     private boolean initPhase = false;
@@ -69,6 +69,7 @@ public class PnlProcess extends NursingRecordsPanel {
     private int MAX_TEXT_LENGTH = 65;
 
     public PnlProcess(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.qprocesses");
         initPhase = true;
         this.jspSearch = jspSearch;
         this.resident = resident;
@@ -79,6 +80,7 @@ public class PnlProcess extends NursingRecordsPanel {
     }
 
     public PnlProcess(JScrollPane jspSearch) {
+        super("nursingrecords.qprocesses");
         initPhase = true;
         this.jspSearch = jspSearch;
         this.resident = null;

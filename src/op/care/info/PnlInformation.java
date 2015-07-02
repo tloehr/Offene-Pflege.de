@@ -65,7 +65,7 @@ import java.util.List;
 public class PnlInformation extends NursingRecordsPanel {
 
 
-    public static final String internalClassID = "nursingrecords.info";
+
 
     private Resident resident;
     private JScrollPane jspSearch;
@@ -88,6 +88,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
 
     public PnlInformation(Resident resident, JScrollPane jspSearch, PnlCare pnlCare) {
+        super("nursingrecords.info");
         this.resident = resident;
         this.jspSearch = jspSearch;
         this.pnlCare = pnlCare;

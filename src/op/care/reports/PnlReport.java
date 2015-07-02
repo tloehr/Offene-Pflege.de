@@ -74,7 +74,7 @@ import java.util.List;
  */
 public class PnlReport extends NursingRecordsPanel {
 
-    public static final String internalClassID = "nursingrecords.reports";
+
 
     private JXSearchField txtSearch;
     private JToggleButton tbShowReplaced;
@@ -110,6 +110,7 @@ public class PnlReport extends NursingRecordsPanel {
      * Creates new form PnlReport
      */
     public PnlReport(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.reports");
         this.initPhase = true;
         initComponents();
         this.jspSearch = jspSearch;

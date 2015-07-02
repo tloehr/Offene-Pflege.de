@@ -1015,7 +1015,7 @@ public class SYSTools {
             html += SYSConst.html_h3("ResID: " + OPDE.getMainframe().getCurrentResident().getRID());
         }
 
-        html += SYSConst.html_h3(OPDE.getMainframe().getCurrentClassname());
+        html += SYSConst.html_h3(OPDE.getMainframe().getCurrentVisiblePanel().getInternalClassID());
 
         String table = SYSConst.html_table_th("mail.errormail.attachment.tab.col1") +
                 SYSConst.html_table_th("mail.errormail.attachment.tab.col2") +

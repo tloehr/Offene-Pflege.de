@@ -76,7 +76,7 @@ import java.util.*;
  */
 public class PnlBHP extends NursingRecordsPanel {
 
-    public static final String internalClassID = "nursingrecords.bhp";
+
     private Resident resident;
     private boolean initPhase;
 
@@ -96,6 +96,7 @@ public class PnlBHP extends NursingRecordsPanel {
     private BigDecimal weight = null;
 
     public PnlBHP(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.bhp");
         initComponents();
         this.jspSearch = jspSearch;
 //        thisPanel = this;

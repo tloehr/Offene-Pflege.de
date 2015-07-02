@@ -50,7 +50,7 @@ public class PnlSelectIntervention extends JPanel {
         initComponents();
         initPanel();
         btnEdit.setEnabled(false);
-        btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlNursingProcess.internalClassID));
+        btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "nursingrecords.nursingprocess"));
     }
 
     private void initPanel() {

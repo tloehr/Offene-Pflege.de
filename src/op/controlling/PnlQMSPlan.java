@@ -16,7 +16,9 @@ import op.care.sysfiles.DlgFiles;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.*;
+import op.tools.DlgYesNo;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
@@ -45,7 +47,7 @@ import java.util.HashMap;
  * see PnlControlling
  */
 public class PnlQMSPlan extends CleanablePanel {
-    public static final String internalClassID = "opde.controlling.qms.pnlqmsplan";
+
     CollapsiblePanes cpsMain;
 
     private HashMap<Qms, CollapsiblePane> mapQms2Panel;
@@ -60,6 +62,7 @@ public class PnlQMSPlan extends CleanablePanel {
     private boolean closedOnes2;
 
     public PnlQMSPlan(Qmsplan expandMe) {
+        super("opde.controlling.qms.pnlqmsplan");
         listQMSPlans = new ArrayList<>();
         this.expandMe = expandMe;
         cpMap = new HashMap<>();
@@ -205,7 +208,7 @@ public class PnlQMSPlan extends CleanablePanel {
         cptitle.getRight().add(btnMenu);
 
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.controlling")) {
             /***
              *       ___           _____   __  __   ____       _              _       _
              *      / _ \ _ __    / / _ \ / _|/ _| / ___|  ___| |__   ___  __| |_   _| | ___
@@ -305,7 +308,7 @@ public class PnlQMSPlan extends CleanablePanel {
         cpSched.setOpaque(true);
         cpSched.setHorizontalAlignment(SwingConstants.LEADING);
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.controlling")) {
             /***
              *      _____    _ _ _     ____       _              _       _
              *     | ____|__| (_) |_  / ___|  ___| |__   ___  __| |_   _| | ___
@@ -378,8 +381,8 @@ public class PnlQMSPlan extends CleanablePanel {
 
         }
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, PnlControlling.internalClassID) ||
-                OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlControlling.internalClassID)
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, "opde.controlling") ||
+                OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "opde.controlling")
                 ) {
             /***
              *          _      _      _
@@ -400,7 +403,7 @@ public class PnlQMSPlan extends CleanablePanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
-                    if (!QmsschedTools.isUnused(qmssched) && !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlControlling.internalClassID)) {
+                    if (!QmsschedTools.isUnused(qmssched) && !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "opde.controlling")) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.already.used.cant.edit"));
                         return;
                     }
@@ -450,7 +453,7 @@ public class PnlQMSPlan extends CleanablePanel {
 
         }
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.controlling")) {
             /***
              *       ___           _____   __  __   ____       _              _       _
              *      / _ \ _ __    / / _ \ / _|/ _| / ___|  ___| |__   ___  __| |_   _| | ___
@@ -724,7 +727,7 @@ public class PnlQMSPlan extends CleanablePanel {
         cptitle.getButton().setIcon(QmsTools.getIcon(qms));
 
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlControlling.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, "opde.controlling")) {
             if (qms.getQmsplan().isActive()) {
 
                 /***
@@ -1053,7 +1056,7 @@ public class PnlQMSPlan extends CleanablePanel {
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
 //        long numQMS = 0l;//DFNTools.getNumDFNs(np);
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.controlling")) {
 
 
             /***
@@ -1116,7 +1119,7 @@ public class PnlQMSPlan extends CleanablePanel {
          *      \__,_|\___|_|\___|\__\___|
          *
          */
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, PnlControlling.internalClassID)) {  // => ACL_MATRIX
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, "opde.controlling")) {  // => ACL_MATRIX
             JButton btnDelete = GUITools.createHyperlinkButton("misc.commands.delete", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(new ActionListener() {

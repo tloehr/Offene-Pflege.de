@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Tue Apr 28 15:59:43 CEST 2015
  */
 
-package op.settings;
+package op.settings.subpanels;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -33,7 +33,7 @@ public class PnlLabelPrinterSetup extends DefaultPanel {
     private MedStock testStock;
 
     public PnlLabelPrinterSetup() {
-        internalClassID = "opde.settings.label.printer";
+        super("opde.settings.label.printer");
         initComponents();
         initPanel();
     }

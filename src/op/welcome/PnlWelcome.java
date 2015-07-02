@@ -28,18 +28,17 @@ import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.PnlCare;
-import op.care.info.PnlInformation;
-import op.care.nursingprocess.PnlNursingProcess;
-import op.care.values.PnlValues;
 import op.controlling.PnlControlling;
 import op.dev.PnlDev;
 import op.misc.DlgIntervention;
-import op.process.PnlProcess;
 import op.residents.bwassistant.AddBWWizard;
 import op.system.InternalClass;
 import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
-import op.tools.*;
+import op.tools.MyJDialog;
+import op.tools.Pair;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
@@ -64,7 +63,6 @@ import java.util.Properties;
  * @author Torsten Löhr
  */
 public class PnlWelcome extends CleanablePanel {
-    public static final String internalClassID = "opde.welcome";
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private java.util.List<QProcess> processList;
@@ -76,6 +74,7 @@ public class PnlWelcome extends CleanablePanel {
     private final int BIRTHDAY = 4;
 
     public PnlWelcome(JScrollPane jspSearch) {
+        super("opde.welcome");
         this.jspSearch = jspSearch;
         initComponents();
         initPanel();
@@ -115,7 +114,7 @@ public class PnlWelcome extends CleanablePanel {
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
 
             if (!ic.getInternalClassID().equals(internalClassID)
-                    && (!ic.getInternalClassID().equals(PnlDev.internalClassID) || (OPDE.isExperimental() && OPDE.isAdmin()))
+                    && (!ic.getInternalClassID().equals("opde.dev") || (OPDE.isExperimental() && OPDE.isAdmin()))
                     && OPDE.getAppInfo().isAllowedTo(InternalClassACL.EXECUTE, ic.getInternalClassID())) {
 
                 final String shortDescription = ic.getShortDescription();
@@ -182,7 +181,7 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!processList.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            SYSTools.xx(PnlProcess.internalClassID) +
+                            SYSTools.xx("nursingrecords.qprocesses") +
                             "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -239,7 +238,7 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!noStoolList.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            SYSTools.xx(PnlValues.internalClassID + ".residentsWithNoStool") + "</font></html>";
+                            SYSTools.xx("nursingrecords.vitalparameters.residentsWithNoStool") + "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
                     for (Object[] ns : noStoolList) {
@@ -593,8 +592,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow, $lcgap, pref",
-                "default, default:grow"));
+                    "default:grow, $lcgap, pref",
+                    "default, default:grow"));
 
             //---- btnAbout ----
             btnAbout.setText(null);
@@ -640,7 +639,7 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlInformation.internalClassID)) { // => ACLMATRIX
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "nursingrecords.info")) { // => ACLMATRIX
             JideButton addbw = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome.addbw"), SYSConst.icon22addbw, null);
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
 
@@ -666,7 +665,7 @@ public class PnlWelcome extends CleanablePanel {
         }
 
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "nursingrecords.nursingprocess")) {
             JideButton editInterventions = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome.editInterventions"), SYSConst.icon22work, null);
             editInterventions.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editInterventions.setAlignmentX(Component.LEFT_ALIGNMENT);

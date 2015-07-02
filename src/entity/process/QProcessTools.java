@@ -138,9 +138,9 @@ public class QProcessTools {
         html += "<div id=\"fonttext\" >";
 
         if (qProcess.getResident() != null) {
-            html += "<br/>" + SYSTools.xx(PnlProcess.internalClassID + ".belongsto") + ": <b>" + ResidentTools.getLabelText(qProcess.getResident()) + "</b><br/>";
+            html += "<br/>" + SYSTools.xx( "nursingrecords.qprocesses.belongsto") + ": <b>" + ResidentTools.getLabelText(qProcess.getResident()) + "</b><br/>";
         } else {
-            html += "<br/>" + SYSTools.xx(PnlProcess.internalClassID + ".commonprocess") + "<br/>";
+            html += "<br/>" + SYSTools.xx( "nursingrecords.qprocesses.commonprocess") + "<br/>";
         }
         html += "<b>" + SYSTools.xx("misc.msg.from") + ":</b> " + DateFormat.getDateInstance().format(qProcess.getFrom());
         if (qProcess.isClosed()) {
@@ -160,10 +160,10 @@ public class QProcessTools {
             html += "<font " + SYSConst.html_darkgreen + ">";
         }
 
-        html += "&nbsp;&nbsp;<b>" + SYSTools.xx(PnlProcess.internalClassID + ".revision") + ":</b> ";
+        html += "&nbsp;&nbsp;<b>" + SYSTools.xx( "nursingrecords.qprocesses.revision") + ":</b> ";
         html += DateFormat.getDateInstance().format(qProcess.getRevision()) + "</font>";
-        html += "<br/><b>" + SYSTools.xx(PnlProcess.internalClassID + ".createdby") + ":</b> " + qProcess.getCreator().getFullname();
-        html += "&nbsp;&nbsp;<b>" + SYSTools.xx(PnlProcess.internalClassID + ".ownedby") + ":</b> " + qProcess.getOwner().getFullname();
+        html += "<br/><b>" + SYSTools.xx("nursingrecords.qprocesses.createdby") + ":</b> " + qProcess.getCreator().getFullname();
+        html += "&nbsp;&nbsp;<b>" + SYSTools.xx( "nursingrecords.qprocesses.ownedby") + ":</b> " + qProcess.getOwner().getFullname();
 
         if (qProcess.getPDCA() != null) {
             html += "<br/><b>" + getPDCA(qProcess.getPDCA()) + "</b>";
@@ -194,7 +194,7 @@ public class QProcessTools {
     public static String getElementsAsHTML(QProcess qProcess, boolean includeSystemReports) {
         String html = "";
         DateFormat df = DateFormat.getDateTimeInstance();
-        html += "<h2  id=\"fonth2\" >" + SYSTools.xx(PnlProcess.internalClassID + ".elementlist") + "</h2>";
+        html += "<h2  id=\"fonth2\" >" + SYSTools.xx( "nursingrecords.qprocesses.elementlist") + "</h2>";
         html += "<table  id=\"fonttext\" border=\"1\"><tr>" +
                 "<th>" + SYSTools.xx("misc.msg.Date") + "</th><th>" + SYSTools.xx("misc.msg.content") + "</th></tr>";
 

@@ -9,6 +9,8 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePanes;
 import entity.EntityTools;
 import entity.info.Resident;
+import gui.GUITools;
+import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.care.bhp.PnlBHP;
 import op.care.dfn.PnlDFN;
@@ -21,8 +23,6 @@ import op.care.sysfiles.PnlFiles;
 import op.care.values.PnlLiquidBalance;
 import op.care.values.PnlValues;
 import op.process.PnlProcess;
-import gui.interfaces.CleanablePanel;
-import gui.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 
@@ -35,7 +35,7 @@ import javax.swing.event.ChangeListener;
  */
 public class PnlCare extends NursingRecordsPanel {
 
-    public static final String internalClassID = "nursingrecords.main";
+
     public static final int TAB_UEBERSICHT = 0;
     public static final int TAB_PB = 1;
     public static final int TAB_DFN = 2;
@@ -71,6 +71,7 @@ public class PnlCare extends NursingRecordsPanel {
     private NursingRecordsPanel previousPanel;
 
     public PnlCare(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.main");
         initPhase = true;
         initComponents();
         this.jspSearch = jspSearch;
@@ -88,6 +89,11 @@ public class PnlCare extends NursingRecordsPanel {
 //
 //
 
+    }
+
+    @Override
+    public String getHelpKey() {
+        return ((CleanablePanel) jtpPflegeakte.getSelectedComponent()).getHelpKey();
     }
 
     @Override
@@ -139,73 +145,61 @@ public class PnlCare extends NursingRecordsPanel {
             case TAB_UEBERSICHT: {
                 previousPanel = new PnlResOverview(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlResOverview.internalClassID);
                 break;
             }
             case TAB_PB: {
                 previousPanel = new PnlReport(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_PB, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlResOverview.internalClassID);
                 break;
             }
             case TAB_DFN: {
                 previousPanel = new PnlDFN(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_DFN, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlReport.internalClassID);
                 break;
             }
             case TAB_LIQUID: {
                 previousPanel = new PnlLiquidBalance(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_LIQUID, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(previousPanel.getInternalClassID());
                 break;
             }
             case TAB_VITAL: {
                 previousPanel = new PnlValues(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VITAL, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlValues.internalClassID);
                 break;
             }
             case TAB_INFO: {
                 previousPanel = new PnlInformation(resident, jspSearch, this);
                 jtpPflegeakte.setComponentAt(TAB_INFO, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlInformation.internalClassID);
                 break;
             }
             case TAB_BHP: {
                 previousPanel = new PnlBHP(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_BHP, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlBHP.internalClassID);
                 break;
             }
             case TAB_PPLANUNG: {
                 previousPanel = new PnlNursingProcess(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_PPLANUNG, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlNursingProcess.internalClassID);
                 break;
             }
             case TAB_VERORDNUNG: {
                 previousPanel = new PnlPrescription(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VERORDNUNG, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlPrescription.internalClassID);
                 break;
             }
             case TAB_VORRAT: {
                 previousPanel = new PnlInventory(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VORRAT, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlInventory.internalClassID);
                 break;
             }
             case TAB_VORGANG: {
                 previousPanel = new PnlProcess(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VORGANG, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlProcess.internalClassID);
                 break;
             }
             case TAB_FILES: {
                 previousPanel = new PnlFiles(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_FILES, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlFiles.internalClassID);
                 break;
             }
 //            case TAB_INFO2: {
@@ -217,6 +211,7 @@ public class PnlCare extends NursingRecordsPanel {
             default: {
             }
         }
+//        OPDE.getMainframe().setCurrentClassname(previousPanel.getInternalClassID());
     }
 
 

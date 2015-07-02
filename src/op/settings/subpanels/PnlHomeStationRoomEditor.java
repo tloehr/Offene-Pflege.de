@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Thu Apr 30 14:43:18 CEST 2015
  */
 
-package op.settings;
+package op.settings.subpanels;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -54,8 +54,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
 
     public PnlHomeStationRoomEditor() {
-        super();
-        internalClassID = "opde.settings.home";
+        super("opde.settings.home");
+
         mainPanel.setLayout(new FormLayout(
                 "default, $lcgap, default:grow, $lcgap, default",
                 "default, $lgap, default:grow, $lgap, default"));

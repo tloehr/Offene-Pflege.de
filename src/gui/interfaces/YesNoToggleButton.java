@@ -19,7 +19,11 @@ public class YesNoToggleButton extends JPanel implements ItemSelectable {
     protected ColoredToggleButton tbYes, tbNo;
 
     public YesNoToggleButton() {
-        this("misc.msg.yes", "misc.msg.no", true);
+        this(true);
+    }
+
+    public YesNoToggleButton(boolean selectYes) {
+        this("misc.msg.yes", "misc.msg.no", selectYes);
     }
 
     public YesNoToggleButton(String yes, String no, boolean selectYes) {
@@ -68,7 +72,7 @@ public class YesNoToggleButton extends JPanel implements ItemSelectable {
         CollectionUtils.forAllDo(itemListenerList, o -> ((ItemListener) o).itemStateChanged(e));
     }
 
-    public void setSelected(boolean selected){
+    public void setSelected(boolean selected) {
         tbYes.setSelected(selected);
     }
 
@@ -76,5 +80,15 @@ public class YesNoToggleButton extends JPanel implements ItemSelectable {
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         SYSTools.setXEnabled(this, enabled);
+    }
+
+    @Override
+    public void setFont(Font font) {
+        if (tbYes == null) {
+            super.setFont(font);
+        } else {
+            tbYes.setFont(font);
+            tbNo.setFont(font);
+        }
     }
 }

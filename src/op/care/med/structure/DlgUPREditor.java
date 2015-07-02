@@ -31,7 +31,7 @@ import java.util.HashMap;
  * @author Torsten Löhr
  */
 public class DlgUPREditor extends MyJDialog {
-    public static final String internalClassID = "upreditor";
+    private static final String internalClassID = "upreditor";
 
     private TradeForm tradeForm;
     private ArrayList<MedStock> listStocks;

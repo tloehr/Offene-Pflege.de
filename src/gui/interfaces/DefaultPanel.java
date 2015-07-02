@@ -9,23 +9,12 @@ import java.awt.*;
 /**
  * Created by tloehr on 18.06.15.
  */
-public abstract class DefaultPanel extends JPanel {
+public abstract class DefaultPanel extends CleanablePanel {
     protected JPanel mainPanel, dialogPanel;
     protected DefaultPanel thisPanel;
-    protected String internalClassID = null;
 
-    public void cleanup() {}
-
-    public void reload() {
-        OPDE.getEMF().getCache().evictAll();
-    }
-
-    public String getInternalClassID() {
-        return internalClassID;
-    }
-
-    public DefaultPanel() {
-        super();
+    public DefaultPanel(String internalClassID) {
+        super(internalClassID);
         thisPanel = this;
         setLayout(new CardLayout());
         mainPanel = new JPanel();
@@ -34,6 +23,12 @@ public abstract class DefaultPanel extends JPanel {
         add(dialogPanel, "dialog");
         mainView();
     }
+
+    @Override
+       public void cleanup() {
+           // usually tidy enough
+       }
+
 
     public void mainView() {
         ((CardLayout) getLayout()).show(this, "main");

@@ -1,4 +1,4 @@
-package op.settings;
+package op.settings.subpanels;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -17,7 +17,7 @@ import java.awt.*;
 public class PnlStation extends DefaultPanel {
 
     public PnlStation() {
-        internalClassID = "opde.settings.default.station";
+        super("opde.settings.default.station");
         initComponents();
         cmbStation.setModel(StationTools.getAll4Combobox(false));
         cmbStation.setSelectedItem(StationTools.getStationForThisHost());
@@ -30,13 +30,6 @@ public class PnlStation extends DefaultPanel {
 
     }
 
-    @Override
-    public void cleanup() {
-    }
-
-    @Override
-    public void reload() {
-    }
 
 
     private void initComponents() {

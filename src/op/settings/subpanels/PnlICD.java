@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Fri Jun 26 15:31:19 CEST 2015
  */
 
-package op.settings;
+package op.settings.subpanels;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -11,6 +11,8 @@ import entity.info.ICD;
 import gui.GUITools;
 import gui.interfaces.DefaultPanel;
 import op.OPDE;
+import op.settings.ClaMLImporter;
+import op.settings.ICDImporter;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -36,7 +38,7 @@ public class PnlICD extends DefaultPanel {
 
 
     public PnlICD() {
-        internalClassID = "opde.settings.icd";
+        super("opde.settings.icd");
         initComponents();
 
         dlmICDFiles = new DefaultListModel<>();

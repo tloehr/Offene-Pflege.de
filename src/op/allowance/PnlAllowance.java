@@ -76,7 +76,7 @@ import java.util.HashMap;
  * @author tloehr
  */
 public class PnlAllowance extends CleanablePanel {
-    public static final String internalClassID = "admin.residents.cash";
+
     NumberFormat cf = NumberFormat.getCurrencyInstance();
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
 
@@ -98,7 +98,7 @@ public class PnlAllowance extends CleanablePanel {
     private CollapsiblePanes cpsCash;
 
     public PnlAllowance(JScrollPane jspSearch) {
-        super();
+        super("admin.residents.cash");
         this.jspSearch = jspSearch;
         initComponents();
         prepareSearchArea();

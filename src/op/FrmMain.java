@@ -49,7 +49,6 @@ import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import op.allowance.PnlAllowance;
 import op.care.PnlCare;
-import op.care.info.PnlInformation;
 import op.care.med.structure.PnlMed;
 import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
@@ -62,7 +61,9 @@ import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
-import op.tools.*;
+import op.tools.NursingRecordsPanel;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import op.training.PnlTraining;
 import op.users.PnlUser;
 import op.welcome.PnlWelcome;
@@ -77,7 +78,6 @@ import javax.swing.border.SoftBevelBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.net.URI;
@@ -110,7 +110,7 @@ public class FrmMain extends JFrame {
 
     private CleanablePanel currentVisiblePanel;
     private Resident currentResident;
-    private String currentClassname;
+//    private String currentClassname;
     private JideButton previousProgButton;
     private LabelStatusBarItem labelUSER;
     private JScrollPane jspSearch, jspApps;
@@ -297,13 +297,27 @@ public class FrmMain extends JFrame {
         }
     }
 
+    public CleanablePanel getCurrentVisiblePanel() {
+        return currentVisiblePanel;
+    }
+
     private void btnHelpActionPerformed(ActionEvent e) {
-        if (currentVisiblePanel != null && Desktop.isDesktopSupported() && currentVisiblePanel.getInternalClassID() != null && OPDE.getAppInfo().getInternalClasses().containsKey(currentVisiblePanel.getInternalClassID())) {
+        if (currentVisiblePanel != null && Desktop.isDesktopSupported() ) { // && currentVisiblePanel.getInternalClassID() != null && OPDE.getAppInfo().getInternalClasses().containsKey(currentVisiblePanel.getInternalClassID())
 
-            if (OPDE.getAppInfo().getInternalClasses().get(currentVisiblePanel.getInternalClassID()).getHelpurl() != null) {
+//            if (OPDE.getAppInfo().getInternalClasses().get(currentVisiblePanel.getInternalClassID()).getHelpurl() != null) {
+//                try {
+//                    URI uri = new URI(SYSTools.xx(OPDE.getAppInfo().getInternalClasses().get(currentVisiblePanel.getInternalClassID()).getHelpurl()));
+//                    Desktop.getDesktop().browse(uri);
+//                } catch (Exception ex) {
+//                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
+//                }
+//            } else {
+//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
+//            }
 
+            if (currentVisiblePanel.getHelpKey() != null) {
                 try {
-                    URI uri = new URI(SYSTools.xx(OPDE.getAppInfo().getInternalClasses().get(currentVisiblePanel.getInternalClassID()).getHelpurl()));
+                    URI uri = new URI(SYSTools.xx(currentVisiblePanel.getHelpKey()));
                     Desktop.getDesktop().browse(uri);
                 } catch (Exception ex) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
@@ -469,16 +483,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -643,7 +657,7 @@ public class FrmMain extends JFrame {
         panesApps.setLayout(new JideBoxLayout(panesApps, JideBoxLayout.Y_AXIS));
 
 
-        homeButton = GUITools.createHyperlinkButton(SYSTools.xx(PnlWelcome.internalClassID), SYSConst.icon22home, new ActionListener() {
+        homeButton = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome"), SYSConst.icon22home, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (previousProgButton != null) {
@@ -654,7 +668,7 @@ public class FrmMain extends JFrame {
                 previousProgButton = (JideButton) actionEvent.getSource();
                 previousProgButton.setBackground(Color.YELLOW);
                 previousProgButton.setOpaque(true);
-                displayManager.setMainMessage(SYSTools.xx(PnlWelcome.internalClassID));
+                displayManager.setMainMessage(SYSTools.xx("opde.welcome"));
                 displayManager.addSubMessage(new DisplayMessage(SYSTools.xx("opde.welcome.longDescription")));
                 displayManager.clearAllIcons();
                 setPanelTo(new PnlWelcome(jspSearch));
@@ -672,7 +686,7 @@ public class FrmMain extends JFrame {
 
 
         // May see the archive
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInformation.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, "nursingrecords.info")) {
             panesApps.add(addNursingRecords(null));
         }
 
@@ -709,7 +723,7 @@ public class FrmMain extends JFrame {
     public CleanablePanel loadPanel(String classname) {
         CleanablePanel panel = null;
         currentResident = null;
-        currentClassname = classname;
+//        currentClassname = classname;
         if (classname.equals("op.allowance.PnlAllowance")) {
             panel = new PnlAllowance(jspSearch);
         } else if (classname.equals("op.process.PnlProcess")) {
@@ -736,13 +750,13 @@ public class FrmMain extends JFrame {
         return panel;
     }
 
-    public String getCurrentClassname() {
-        return currentClassname;
-    }
-
-    public void setCurrentClassname(String currentClassname) {
-        this.currentClassname = currentClassname;
-    }
+//    public String getCurrentClassname() {
+//        return currentClassname;
+//    }
+//
+//    public void setCurrentClassname(String currentClassname) {
+//        this.currentClassname = currentClassname;
+//    }
 
     private CollapsiblePane addNursingRecords(final Station station) {
 //        bwButtonMap = new HashMap<Resident, JideButton>();
@@ -905,12 +919,9 @@ public class FrmMain extends JFrame {
         if (blocked) {
             lblWait.setVisible(true);
             JPanel glass = new JPanel();
-            glass.addMouseListener(new MouseAdapter() {
-            });
-            glass.addMouseMotionListener(new MouseMotionAdapter() {
-            });
-            glass.addKeyListener(new KeyAdapter() {
-            });
+            glass.addMouseListener(new MouseAdapter() {});
+            glass.addMouseMotionListener(new MouseMotionAdapter() {});
+            glass.addKeyListener(new KeyAdapter() {});
             glass.setOpaque(false);
             setGlassPane(glass);
             getGlassPane().setVisible(true);

@@ -98,7 +98,7 @@ import java.util.List;
  * @author tloehr
  */
 public class PnlInventory extends NursingRecordsPanel {
-    public static final String internalClassID = "nursingrecords.inventory";
+
 
     private Resident resident;
 
@@ -117,7 +117,7 @@ public class PnlInventory extends NursingRecordsPanel {
      * Creates new form DlgVorrat
      */
     public PnlInventory(Resident resident, JScrollPane jspSearch) {
-        super();
+        super("nursingrecords.inventory");
         this.jspSearch = jspSearch;
         initComponents();
 
@@ -1525,7 +1525,7 @@ public class PnlInventory extends NursingRecordsPanel {
             if (stock != null) {
                 final String key = stock.getInventory().getID() + ".xinventory";
                 if (!resident.equals(stock.getInventory().getResident())) {
-                    if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInformation.internalClassID)) {
+                    if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, "nursingrecords.info")) {
                         switchResident(stock.getInventory().getResident(), stock.getInventory(), new Closure() {
                             @Override
                             public void execute(Object o) {
@@ -1756,7 +1756,7 @@ public class PnlInventory extends NursingRecordsPanel {
         btnExpiry.setEnabled(!stock.isClosed());
         pnlMenu.add(btnExpiry);
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "opde.medication")) {
             /***
              *      _____              _      _____                    _____    _ _ _
              *     |_   _| __ __ _  __| | ___|  ___|__  _ __ _ __ ___ | ____|__| (_) |_ ___  _ __

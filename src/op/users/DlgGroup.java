@@ -41,7 +41,7 @@ public class DlgGroup extends MyJDialog {
 
 
     private void initPanel() {
-        tbQualified = GUITools.getNiceToggleButton(PnlUser.internalClassID+".qualifiedGroup");
+        tbQualified = GUITools.getNiceToggleButton("opde.users.qualifiedGroup");
         tbQualified.setSelected(group.isQualified());
         txtText.setText(group.getDescription());
 

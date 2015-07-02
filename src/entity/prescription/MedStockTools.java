@@ -4,9 +4,6 @@ import entity.building.Station;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
-import op.care.med.inventory.PnlInventory;
-import op.care.med.structure.DlgUPREditor;
-import op.controlling.PnlControlling;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -381,17 +378,17 @@ public class MedStockTools {
         if (stock.getTradeForm().getDosageForm().isUPRn()) {
             result += ", APV: ";
             if (stock.getTradeForm().getUPR() != null) {
-                result += stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP).toString() + " (" + SYSTools.xx(DlgUPREditor.internalClassID + ".constant.upr") + ")";
+                result += stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP).toString() + " (" + SYSTools.xx("upreditor.constant.upr") + ")";
             } else {
                 result += stock.getUPR().setScale(2, RoundingMode.HALF_UP).toString();
             }
-            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getUPR() != null ? SYSTools.xx(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
+            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getUPR() != null ? SYSTools.xx("nursingrecords.inventory.UPRwillBeReplaced") : "");
         }
 
         if (stock.hasNext2Open()) {
-            result += ", <b>" + SYSTools.xx(PnlInventory.internalClassID + ".nextstock") + ": " + stock.getNextStock().getID() + "</b>";
+            result += ", <b>" + SYSTools.xx("nursingrecords.inventory.nextstock") + ": " + stock.getNextStock().getID() + "</b>";
         } else if (stock.isToBeClosedSoon()) {
-            result += ", <b>" + SYSTools.xx(PnlInventory.internalClassID + ".stockWillBeClosedSoon") + "</b>";
+            result += ", <b>" + SYSTools.xx("nursingrecords.inventory.stockWillBeClosedSoon") + "</b>";
         }
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
@@ -480,23 +477,23 @@ public class MedStockTools {
         StringBuilder table = new StringBuilder(1000);
         DateFormat df = DateFormat.getDateInstance();
 
-        html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".drugs.controllist"));
+        html.append(SYSConst.html_h1("opde.controlling.drugs.controllist"));
         html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.subdivision") + ": " + station.getName()));
         html.append(SYSConst.html_h3("misc.msg.key"));
         html.append(SYSConst.html_ul(
-                SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.1") +
-                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.2") +
-                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.3") +
-                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.4") +
-                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.5") +
-                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.6") +
-                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.7") +
-                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.8")
+                SYSConst.html_li("opde.controlling.drugs.controllist.key.1") +
+                        SYSConst.html_li("opde.controlling.drugs.controllist.key.2") +
+                        SYSConst.html_li("opde.controlling.drugs.controllist.key.3") +
+                        SYSConst.html_li("opde.controlling.drugs.controllist.key.4") +
+                        SYSConst.html_li("opde.controlling.drugs.controllist.key.5") +
+                        SYSConst.html_li("opde.controlling.drugs.controllist.key.6") +
+                        SYSConst.html_li("opde.controlling.drugs.controllist.key.7") +
+                        SYSConst.html_li("opde.controlling.drugs.controllist.key.8")
         ));
 
         table.append(SYSConst.html_table_tr(
                 SYSConst.html_table_th("misc.msg.resident") +
-                        SYSConst.html_table_th(PnlInventory.internalClassID + ".search.stockid") +
+                        SYSConst.html_table_th("nursingrecords.inventory.search.stockid") +
                         SYSConst.html_table_th("misc.msg.medication") +
                         SYSConst.html_table_th("misc.msg.opened") +
                         SYSConst.html_table_th("#1") +

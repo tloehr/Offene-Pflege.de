@@ -451,7 +451,7 @@ public class PrescriptionTools {
                     }
                     html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(schedule);
                     if (prescription.getTo().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
-                        html += "<br/><b>" + SYSTools.xx(PnlPrescription.internalClassID + ".endsAtChrono") + ": " + DateFormat.getDateInstance().format(prescription.getTo()) + "</b>";
+                        html += "<br/><b>" + SYSTools.xx("nursingrecords.prescription.endsAtChrono") + ": " + DateFormat.getDateInstance().format(prescription.getTo()) + "</b>";
                     }
                     html += "</td>\n";
                     html += "</tr>\n\n";

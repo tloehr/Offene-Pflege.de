@@ -73,7 +73,7 @@ import java.util.List;
  * @author tloehr
  */
 public class PnlNursingProcess extends NursingRecordsPanel {
-    public static final String internalClassID = "nursingrecords.nursingprocess";
+
 
     private Resident resident;
     private JScrollPane jspSearch;
@@ -92,6 +92,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
      * Creates new form PnlNursingProcess
      */
     public PnlNursingProcess(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.nursingprocess");
         this.jspSearch = jspSearch;
 
         initComponents();

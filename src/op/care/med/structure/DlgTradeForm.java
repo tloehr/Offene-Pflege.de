@@ -170,8 +170,8 @@ public class DlgTradeForm extends MyJDialog {
         cmbForm.setSelectedItem(tradeForm.getDosageForm());
         txtZusatz.setText(SYSTools.catchNull(tradeForm.getSubtext()));
 
-        btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID));
-        btnEdit.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID));
+        btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "opde.medication"));
+        btnEdit.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "opde.medication"));
         initPhase = false;
     }
 

@@ -94,7 +94,7 @@ public class InterventionScheduleTools {
         result += SYSTools.catchNull(termin.getBemerkung(), "<div id=\"fonttext\"><b>" + SYSTools.xx("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
 
         if (termin.isFloating()) {
-            result += "<div id=\"fonttext\"><font color=\"blue\">" + SYSTools.xx(PnlNursingProcess.internalClassID + ".floatinginterventions") + "</font></div>";
+            result += "<div id=\"fonttext\"><font color=\"blue\">" + SYSTools.xx( "nursingrecords.nursingprocess.floatinginterventions") + "</font></div>";
         }
 
         return result;

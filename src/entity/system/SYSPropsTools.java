@@ -43,14 +43,14 @@ public class SYSPropsTools {
     public static final String KEY_MAIL_SENDER_PERSONAL = "mail.sender.personal";
     public static final String KEY_MAIL_RECIPIENT_PERSONAL = "mail.recipient.personal";
     public static final String KEY_MAIL_SYSTEM_ACTIVE = "mail.system.active";
-    public static final String KEY_FTP_SERVER = "FTPServer";
+    public static final String KEY_FTP_HOST = "FTPServer";
     public static final String KEY_FTP_USER = "FTPUser";
     public static final String KEY_FTP_PASSWORD = "FTPPassword";
     public static final String KEY_FTP_WD = "FTPWorkingDirectory";
     public static final String KEY_FTP_PORT = "FTPPort";
     public static final String KEY_FTP_IS_WORKING = "FTPIsWorking";
     public static final String BHP_MAX_MINUTES_TO_WITHDRAW = "bhp_max_minutes_to_withdraw";
-    public static final String KEY_CALC_MEDI_UPR1 = "calc.medi.upr1"; // means that calcula
+    public static final String KEY_CALC_MEDI_UPR1 = "calc.medi.upr1";
     public static final String KEY_CALC_MEDI_OTHER = "calc.medi.other"; // yet unused
     public static final String KEY_MAINTENANCE_MODE = "system.maintenance.mode";
 

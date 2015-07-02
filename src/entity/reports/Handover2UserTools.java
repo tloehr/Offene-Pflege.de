@@ -48,9 +48,9 @@ public class Handover2UserTools {
 
     public static String getAsHTML(Handovers handover) {
         String result = "";
-        result += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID) + "</h2>";
+        result += "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.handover") + "</h2>";
         if (!handover.getUsersAcknowledged().isEmpty()) {
-            result += "<h3 id=\"fonth3\" >" + SYSTools.xx(PnlHandover.internalClassID + ".ListOfUsersAcknowledged") + "</h3>";
+            result += "<h3 id=\"fonth3\" >" + SYSTools.xx("nursingrecords.handover.ListOfUsersAcknowledged") + "</h3>";
             result += HandoversTools.getAsHTML(handover);
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +

@@ -1,4 +1,4 @@
-package op.settings;
+package op.settings.subpanels;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -18,27 +18,13 @@ public class PnlTimeout extends DefaultPanel {
 
 
     public PnlTimeout() {
+        super("opde.settings.local.timeout");
         initComponents();
         SpinnerNumberModel snm = new SpinnerNumberModel(OPDE.getTimeout(), 0, 999, 1);
         spinTimeout.setModel(snm);
         ((JSpinner.NumberEditor) spinTimeout.getEditor()).getTextField().setFont(SYSConst.ARIAL28);
         lblTimeout.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.timeout.tooltip")));
         spinTimeout.addChangeListener(e -> OPDE.setTimeout((Integer) spinTimeout.getValue()));
-    }
-
-    @Override
-    public void cleanup() {
-
-    }
-
-    @Override
-    public void reload() {
-
-    }
-
-    @Override
-    public String getInternalClassID() {
-        return null;
     }
 
     private void initComponents() {

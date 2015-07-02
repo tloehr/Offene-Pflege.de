@@ -2,13 +2,14 @@
  * Created by JFormDesigner on Fri Jun 26 16:37:31 CEST 2015
  */
 
-package op.settings;
+package op.settings.subpanels;
 
 import entity.system.SYSPropsTools;
 import gui.PnlBeanEditor;
 import gui.interfaces.DefaultPanel;
 import gui.interfaces.YesNoToggleButton;
 import op.OPDE;
+import op.settings.MailSettingsBean;
 import op.system.EMailSystem;
 import op.system.Recipient;
 import op.threads.DisplayMessage;
@@ -33,8 +34,8 @@ public class PnlGlobalMailSettings extends DefaultPanel {
     Logger logger = Logger.getLogger(getClass());
 
     public PnlGlobalMailSettings() {
-        internalClassID = "opde.settings.global.mail";
-        initComponents();
+        super("opde.settings.global.mail");
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         try {
             final PnlBeanEditor<MailSettingsBean> pbe = new PnlBeanEditor<>(() -> new MailSettingsBean(OPDE.getProps()), MailSettingsBean.class);
@@ -140,15 +141,4 @@ public class PnlGlobalMailSettings extends DefaultPanel {
 
     }
 
-
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    // JFormDesigner - End of variables declaration  //GEN-END:variables
-
-    private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-
-        //======== this ========
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents
-    }
 }

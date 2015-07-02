@@ -78,7 +78,7 @@ import java.util.List;
  */
 public class PnlDFN extends NursingRecordsPanel {
 
-    public static final String internalClassID = "nursingrecords.dfn";
+
 
     Resident resident;
 
@@ -94,6 +94,7 @@ public class PnlDFN extends NursingRecordsPanel {
     private int MAX_TEXT_LENGTH = 65;
 
     public PnlDFN(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.dfn");
         initComponents();
         this.jspSearch = jspSearch;
         initPanel();

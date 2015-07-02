@@ -64,7 +64,7 @@ import java.util.HashMap;
  * @author tloehr
  */
 public class PnlUser extends CleanablePanel {
-    public static final String internalClassID = "opde.users";
+
 
     private final int TAB_USER = 0;
     private final int TAB_GROUPS = 1;
@@ -92,6 +92,7 @@ public class PnlUser extends CleanablePanel {
      * Creates new form PnlUser
      */
     public PnlUser(JScrollPane jspSearch) {
+        super("opde.users");
         this.jspSearch = jspSearch;
         initComponents();
 

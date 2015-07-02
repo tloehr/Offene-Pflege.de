@@ -55,7 +55,7 @@ import java.util.Date;
  * @author tloehr
  */
 public class PnlScheduleDose extends CleanablePanel {
-    public static final String internalClassID = PnlPrescription.internalClassID + ".pnlscheduledose";
+
     private int MIN = 0;
     private int MAX = 1;
     private int DEFAULT = 2;
@@ -77,6 +77,7 @@ public class PnlScheduleDose extends CleanablePanel {
     private final int TAB_MONTHLY = 2;
 
     public PnlScheduleDose(PrescriptionSchedule schedule, Closure actionBlock) {
+        super("nursingrecords.prescription.pnlscheduledose");
         this.actionBlock = actionBlock;
 //        this.currentSelectedTime = null;
 

@@ -249,7 +249,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String getTitle() {
-        return SYSTools.xx(PnlNursingProcess.internalClassID) + ": " + topic;
+        return SYSTools.xx("nursingrecords.nursingprocess") + ": " + topic;
     }
 
     @Override

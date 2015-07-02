@@ -46,7 +46,6 @@ public class MailSettingsBean {
     boolean tls = false;
 
     public MailSettingsBean(Properties preset) {
-
         host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_HOST));
         port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_PORT), "25");
         user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_USER));
@@ -59,7 +58,6 @@ public class MailSettingsBean {
         auth = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_AUTH)).equalsIgnoreCase("true");
         starttls = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_STARTTLS)).equalsIgnoreCase("true");
         tls = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_TLS)).equalsIgnoreCase("true");
-
     }
 
 
@@ -159,7 +157,7 @@ public class MailSettingsBean {
         this.tls = tls;
     }
 
-    public Properties toProperties(Properties props){
+    public Properties toProperties(Properties props) {
         props.put(SYSPropsTools.KEY_MAIL_HOST, host.trim());
         props.put(SYSPropsTools.KEY_MAIL_PORT, port.trim());
         props.put(SYSPropsTools.KEY_MAIL_USER, user.trim());

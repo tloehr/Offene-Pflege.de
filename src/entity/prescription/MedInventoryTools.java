@@ -351,7 +351,7 @@ public class MedInventoryTools {
                     MedStock mystock = em.merge(stock);
                     em.lock(mystock, LockModeType.OPTIMISTIC);
                     mystock.setNextStock(null);
-                    MedStockTools.close(em, mystock, SYSTools.xx(PnlInventory.internalClassID + ".stock.msg.allinvetories.closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
+                    MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.allinvetories.closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
                 }
             }
             // close inventory

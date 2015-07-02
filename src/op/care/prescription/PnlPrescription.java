@@ -77,7 +77,7 @@ import java.util.List;
  */
 public class PnlPrescription extends NursingRecordsPanel {
 
-    public static final String internalClassID = "nursingrecords.prescription";
+
 
     private Resident resident;
 
@@ -96,6 +96,7 @@ public class PnlPrescription extends NursingRecordsPanel {
      * Creates new form PnlPrescription
      */
     public PnlPrescription(Resident resident, JScrollPane jspSearch) {
+        super("nursingrecords.prescription");
         this.jspSearch = jspSearch;
         this.resident = resident;
         initComponents();
@@ -1583,7 +1584,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
             });
             // checked for acls
-            btnEditSideEffects.setEnabled(prescription.hasMed() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlMed.internalClassID));
+            btnEditSideEffects.setEnabled(prescription.hasMed() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.medication"));
             pnlMenu.add(btnEditSideEffects);
 
 
