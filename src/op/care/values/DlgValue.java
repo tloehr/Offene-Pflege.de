@@ -8,7 +8,6 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
 import entity.values.ResValue;
-import op.OPDE;
 import op.tools.MyJDialog;
 import op.tools.PnlPIT;
 import op.tools.SYSTools;
@@ -91,10 +90,9 @@ public class DlgValue extends MyJDialog {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
+        } else {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
-//        else {
-//            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
-//        }
     }
 
     private void txtWert2FocusLost(FocusEvent e) {
@@ -103,10 +101,9 @@ public class DlgValue extends MyJDialog {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
+        } else {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
-//        else {
-//            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
-//        }
     }
 
     private void txtWert3FocusLost(FocusEvent e) {
@@ -115,10 +112,9 @@ public class DlgValue extends MyJDialog {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
+        } else {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
-//        else {
-//            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
-//        }
     }
 
     private boolean saveOK() {
@@ -202,8 +198,8 @@ public class DlgValue extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",
-            "14dlu, $lgap, pref, 3*($lgap, default), 2*($lgap, fill:default:grow), $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",
+                "14dlu, $lgap, pref, 3*($lgap, default), 2*($lgap, fill:default:grow), $lgap, 14dlu"));
 
         //======== panel4 ========
         {

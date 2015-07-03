@@ -37,6 +37,7 @@ import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayMessage;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -82,6 +83,8 @@ public class SYSTools {
 
     public static final int SPEED_NORMAL = 500;
     public static final int SPEED_SLOW = 700;
+
+//    private static final Logger logger = Logger.getLogger(this.getClass());
 
 
     public static ListCellRenderer getDefaultRenderer() {
@@ -1092,7 +1095,13 @@ public class SYSTools {
             toolTipAction.actionPerformed(hideTip);
         }
         try {
-            bd = BigDecimal.valueOf(Double.parseDouble(assimilateDecimalSeparators(txt.getText())));
+            OPDE.debug(txt.getText());
+            OPDE.debug(assimilateDecimalSeparators(txt.getText()));
+
+            bd = parseDecimal(txt.getText());
+
+//            bd = BigDecimal.valueOf(Double.parseDouble(assimilateDecimalSeparators(txt.getText())));
+            OPDE.debug(bd);
             if (nees2BePositive && bd.compareTo(BigDecimal.ZERO) <= 0) {
                 txt.setToolTipText("<html><font color=\"red\"><b>" + SYSTools.xx("misc.msg.invalidnumber") + "</b></font></html>");
                 toolTipAction = txt.getActionMap().get("postTip");
@@ -1119,6 +1128,8 @@ public class SYSTools {
 
     // fixes GitHub #17
     public static String assimilateDecimalSeparators(String in) {
+        if (SYSTools.catchNull(in).isEmpty()) return in;
+
         char sep = new DecimalFormatSymbols(Locale.getDefault(Locale.Category.FORMAT)).getDecimalSeparator();
         char replace = '.';
 
@@ -1186,24 +1197,6 @@ public class SYSTools {
         return text;
     }
 
-
-    public static BigDecimal parseBigDecimal(String txt) {
-//           BigDecimal bd;
-//
-//           try {
-//               bd = BigDecimal.valueOf(Double.parseDouble(assimilateDecimalSeparators(txt)));
-//           } catch (Exception ex) {
-//               bd = null;
-//           }
-//           return bd;
-
-        //todo: replace me
-        return parseDecimal(txt);
-
-
-    }
-
-
     //FIXES: GitHub #17
     public static BigDecimal parseDecimal(String test) {
         NumberFormat nf = DecimalFormat.getNumberInstance();
@@ -1212,7 +1205,7 @@ public class SYSTools {
         Number num;
         try {
             num = nf.parse(test);
-        } catch (ParseException ex) {
+        } catch (Exception ex) {
             num = null;
         }
 

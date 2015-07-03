@@ -55,8 +55,6 @@ public class PnlSettings extends CleanablePanel {
         btnMedication.setEnabled(admin);
         btnFTP.setEnabled(admin);
         btnStation.setEnabled(admin);
-
-
     }
 
     private void i18n() {
@@ -74,6 +72,7 @@ public class PnlSettings extends CleanablePanel {
         lblModel.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.categories")));
         lblMedication.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.medication.calc")));
         lblFTP.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.ftp")));
+        lblTags.setText(SYSTools.toHTMLForScreen(SYSConst.center("misc.msg.commontags")));
     }
 
     @Override
@@ -96,15 +95,7 @@ public class PnlSettings extends CleanablePanel {
     }
 
     private void btnLabelPrinterActionPerformed(ActionEvent e) {
-        if (currentPanel != null) {
-            pnlSingle.remove(currentPanel);
-            currentPanel.cleanup();
-        }
-        currentPanel = new PnlLabelPrinterSetup();
-        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
-        lblSingle.setIcon(btnLabelPrinter.getIcon());
-        ((CardLayout) getLayout()).show(this, "single");
+        genericButtonAction(new PnlLabelPrinterSetup(), ((JButton) e.getSource()).getIcon());
     }
 
     private void btnBackActionPerformed(ActionEvent e) {
@@ -113,94 +104,32 @@ public class PnlSettings extends CleanablePanel {
     }
 
     private void btnTimeoutActionPerformed(ActionEvent e) {
-        if (currentPanel != null) {
-            pnlSingle.remove(currentPanel);
-            currentPanel.cleanup();
-        }
-
-        currentPanel = new PnlTimeout();
-        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
-        lblSingle.setIcon(btnTimeout.getIcon());
-        ((CardLayout) getLayout()).show(this, "single");
+        genericButtonAction(new PnlTimeout(), ((JButton) e.getSource()).getIcon());
     }
 
     private void btnHomesActionPerformed(ActionEvent e) {
-        if (currentPanel != null) {
-            pnlSingle.remove(currentPanel);
-            currentPanel.cleanup();
-        }
-
-        currentPanel = new PnlHomeStationRoomEditor();
-        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
-        lblSingle.setIcon(btnHomes.getIcon());
-        ((CardLayout) getLayout()).show(this, "single");
+        genericButtonAction(new PnlHomeStationRoomEditor(), ((JButton) e.getSource()).getIcon());
     }
 
     private void btnStationActionPerformed(ActionEvent e) {
-        if (currentPanel != null) {
-            pnlSingle.remove(currentPanel);
-            currentPanel.cleanup();
-        }
-
-        currentPanel = new PnlStation();
-        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
-        lblSingle.setIcon(btnStation.getIcon());
-        ((CardLayout) getLayout()).show(this, "single");
+        genericButtonAction(new PnlStation(), ((JButton) e.getSource()).getIcon());
     }
 
     private void btnICDActionPerformed(ActionEvent e) {
-        if (currentPanel != null) {
-            pnlSingle.remove(currentPanel);
-            currentPanel.cleanup();
-        }
-
-        currentPanel = new PnlICD();
-        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
-        lblSingle.setIcon(btnICD.getIcon());
-        ((CardLayout) getLayout()).show(this, "single");
+        genericButtonAction(new PnlICD(), ((JButton) e.getSource()).getIcon());
     }
 
     private void btnGlobalEMailActionPerformed(ActionEvent e) {
-        if (currentPanel != null) {
-            pnlSingle.remove(currentPanel);
-            currentPanel.cleanup();
-        }
+        genericButtonAction(new PnlGlobalMailSettings(), ((JButton) e.getSource()).getIcon());
 
-        currentPanel = new PnlGlobalMailSettings();
-        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
-        lblSingle.setIcon(btnGlobalEMail.getIcon());
-        ((CardLayout) getLayout()).show(this, "single");
     }
 
     private void btnModelActionPerformed(ActionEvent e) {
-        if (currentPanel != null) {
-            pnlSingle.remove(currentPanel);
-            currentPanel.cleanup();
-        }
-
-        currentPanel = new PnlModelEditor();
-        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
-        lblSingle.setIcon(btnModel.getIcon());
-        ((CardLayout) getLayout()).show(this, "single");
+        genericButtonAction(new PnlModelEditor(), ((JButton) e.getSource()).getIcon());
     }
 
     private void btnMedicationActionPerformed(ActionEvent e) {
-        if (currentPanel != null) {
-            pnlSingle.remove(currentPanel);
-            currentPanel.cleanup();
-        }
-
-        currentPanel = new PnlMedication();
-        pnlSingle.add(currentPanel, CC.xyw(1, 3, 3));
-        lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
-        lblSingle.setIcon(btnMedication.getIcon());
-        ((CardLayout) getLayout()).show(this, "single");
+        genericButtonAction(new PnlMedication(), ((JButton) e.getSource()).getIcon());
     }
 
 
@@ -225,6 +154,10 @@ public class PnlSettings extends CleanablePanel {
         lblSingle.setText(SYSTools.toHTMLForScreen(currentPanel.getInternalClassID()));
         lblSingle.setIcon(icon);
         ((CardLayout) getLayout()).show(this, "single");
+    }
+
+    private void btnTagsActionPerformed(ActionEvent e) {
+        genericButtonAction(new PnlCommonTags(), ((JButton) e.getSource()).getIcon());
     }
 
     private void initComponents() {
@@ -269,8 +202,8 @@ public class PnlSettings extends CleanablePanel {
         //======== pnlAll ========
         {
             pnlAll.setLayout(new FormLayout(
-                    "default, $lcgap, left:55dlu, 6*($ugap, 55dlu), $lcgap, default:grow",
-                    "default, $lcgap, default, $lgap, 50dlu, 2*($lgap, default), $ugap, default, $rgap, fill:50dlu, $rgap, default, $lgap, default, $ugap, default, $lgap, 50dlu, $lgap, default, $lcgap, default"));
+                "default, $lcgap, left:55dlu, 6*($ugap, 55dlu), $lcgap, default:grow",
+                "default, $lcgap, default, $lgap, 50dlu, 2*($lgap, default), $ugap, default, $rgap, fill:50dlu, $rgap, default, $lgap, default, $ugap, default, $lgap, 50dlu, $lgap, default, $lcgap, default"));
 
             //---- lblPersonal ----
             lblPersonal.setText("Pers\u00f6nliche Einstellungen");
@@ -386,6 +319,7 @@ public class PnlSettings extends CleanablePanel {
             //---- btnTags ----
             btnTags.setText(null);
             btnTags.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/tag.png")));
+            btnTags.addActionListener(e -> btnTagsActionPerformed(e));
             pnlAll.add(btnTags, CC.xy(15, 21, CC.FILL, CC.FILL));
 
             //---- lblHomes ----
@@ -429,8 +363,8 @@ public class PnlSettings extends CleanablePanel {
         //======== pnlSingle ========
         {
             pnlSingle.setLayout(new FormLayout(
-                    "default, $rgap, default:grow, $lcgap, default",
-                    "fill:default, $ugap, fill:default:grow"));
+                "default, $rgap, default:grow, $lcgap, default",
+                "fill:default, $ugap, fill:default:grow"));
 
             //---- btnBack ----
             btnBack.setText(null);

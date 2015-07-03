@@ -445,7 +445,7 @@ public class PnlDev extends CleanablePanel {
 
                     BigDecimal amount = BigDecimal.ZERO;
                     if (sheet.getRow(rowindex).getCell(AMOUNT).getCellType() == Cell.CELL_TYPE_STRING) {
-                        amount = SYSTools.parseBigDecimal(sheet.getRow(rowindex).getCell(AMOUNT).getStringCellValue());
+                        amount = SYSTools.parseDecimal(sheet.getRow(rowindex).getCell(AMOUNT).getStringCellValue());
                     } else if (sheet.getRow(rowindex).getCell(AMOUNT).getCellType() == Cell.CELL_TYPE_NUMERIC) {
                         amount = new BigDecimal(sheet.getRow(rowindex).getCell(AMOUNT).getNumericCellValue());
                     }

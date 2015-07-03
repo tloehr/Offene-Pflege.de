@@ -71,7 +71,7 @@ public class PnlPackage extends JPanel {
     }
 
     private void txtInhaltCaretUpdate(CaretEvent e) {
-        inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
+        inhalt = SYSTools.parseDecimal(txtInhalt.getText());
         if (inhalt == null) {
             if (!txtInhalt.getText().isEmpty()) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die Inhaltsangabe ist falsch.", DisplayMessage.WARNING));

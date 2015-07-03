@@ -114,7 +114,7 @@ public class PnlSchedule extends JPanel {
     }
 
     private void txtMinutesFocusLost(FocusEvent e) {
-        BigDecimal bd = SYSTools.parseBigDecimal(txtMinutes.getText());
+        BigDecimal bd = SYSTools.parseDecimal(txtMinutes.getText());
         if (bd == null || bd.compareTo(BigDecimal.ZERO) <= 0){
             txtMinutes.setText(is.getDauer().toPlainString());
         }
@@ -1093,7 +1093,7 @@ public class PnlSchedule extends JPanel {
 
         is.setFloating(tbFloating.isSelected());
         is.setBemerkung(txtBemerkung.getText());
-        is.setDauer(SYSTools.parseBigDecimal(txtMinutes.getText()));
+        is.setDauer(SYSTools.parseDecimal(txtMinutes.getText()));
 
         if (!is.isValid()) {
             throw new NumberFormatException("Anzahl muss min. 1 sein");

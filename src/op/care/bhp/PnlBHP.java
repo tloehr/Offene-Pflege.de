@@ -631,7 +631,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                             @Override
                             public BigDecimal parse(String text) {
-                                return SYSTools.parseBigDecimal(text);
+                                return SYSTools.parseDecimal(text);
                             }
                         });
 
@@ -1029,7 +1029,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                                         @Override
                                         public BigDecimal parse(String text) {
-                                            return SYSTools.parseBigDecimal(text);
+                                            return SYSTools.parseDecimal(text);
                                         }
                                     });
 

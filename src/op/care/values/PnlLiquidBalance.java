@@ -272,9 +272,9 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
     private void parseControlling() {
         controlProps = resident.getControlling();
-        lowIn = SYSTools.parseBigDecimal(controlProps.getProperty(ResidentTools.KEY_LOWIN));
-        targetIn = SYSTools.parseBigDecimal(controlProps.getProperty(ResidentTools.KEY_TARGETIN));
-        highIn = SYSTools.parseBigDecimal(controlProps.getProperty(ResidentTools.KEY_HIGHIN));
+        lowIn = SYSTools.parseDecimal(controlProps.getProperty(ResidentTools.KEY_LOWIN));
+        targetIn = SYSTools.parseDecimal(controlProps.getProperty(ResidentTools.KEY_TARGETIN));
+        highIn = SYSTools.parseDecimal(controlProps.getProperty(ResidentTools.KEY_HIGHIN));
 
     }
 

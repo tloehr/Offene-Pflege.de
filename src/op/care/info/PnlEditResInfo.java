@@ -1150,7 +1150,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("option")) {
                 BigDecimal score = BigDecimal.ZERO;
                 if (scalemode) {
-                    score = SYSTools.parseBigDecimal(attributes.getValue("score"));
+                    score = SYSTools.parseDecimal(attributes.getValue("score"));
                 }
                 JRadioButton j = new JRadioButton(SYSTools.xx(attributes.getValue("label")));
                 j.setOpaque(false);

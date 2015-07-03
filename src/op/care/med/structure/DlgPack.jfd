@@ -139,19 +139,13 @@
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
-        <string>javax.swing.JFormattedTextField</string> 
+        <string>javax.swing.JTextField</string> 
         <void method="setProperty"> 
          <string>font</string> 
          <object idref="Font0"/> 
         </void> 
         <void property="name"> 
          <string>txtPZN</string> 
-        </void> 
-        <void method="auxiliary"> 
-         <void method="setProperty"> 
-          <string>JavaCodeGenerator.customCreateCode</string> 
-          <string>new javax.swing.JFormattedTextField(new DecimalFormat(&quot;0000000&quot;));;</string> 
-         </void> 
         </void> 
         <void method="addEvent"> 
          <object class="com.jformdesigner.model.FormEvent"> 
@@ -222,12 +216,6 @@
         </void> 
         <void property="name"> 
          <string>txtInhalt</string> 
-        </void> 
-        <void method="auxiliary"> 
-         <void method="setProperty"> 
-          <string>JavaCodeGenerator.customCreateCode</string> 
-          <string>new javax.swing.JFormattedTextField(new DecimalFormat(&quot;#####.##&quot;));;</string> 
-         </void> 
         </void> 
         <void method="addEvent"> 
          <object class="com.jformdesigner.model.FormEvent"> 

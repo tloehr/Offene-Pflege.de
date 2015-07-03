@@ -85,9 +85,9 @@ public class DlgPack extends MyJDialog {
         lblPZN = new JLabel();
         cmbGroesse = new JComboBox<>();
         jLabel3 = new JLabel();
-        txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));;
+        txtPZN = new JTextField();
         lblInhalt = new JLabel();
-        txtInhalt = new javax.swing.JFormattedTextField(new DecimalFormat("#####.##"));;
+        txtInhalt = new JTextField();
         lblPackEinheit = new JLabel();
         panel1 = new JPanel();
         btnCancel = new JButton();
@@ -161,23 +161,13 @@ public class DlgPack extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
             btnCancel.setText(null);
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnOK ----
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
             btnOK.setText(null);
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
+            btnOK.addActionListener(e -> btnOKActionPerformed(e));
             panel1.add(btnOK);
         }
         contentPane.add(panel1, CC.xywh(5, 11, 5, 1, CC.RIGHT, CC.DEFAULT));
@@ -196,8 +186,8 @@ public class DlgPack extends MyJDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
         String pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), aPackage.getID() != null ? aPackage : null);
-        BigDecimal inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
-        if (inhalt.compareTo(BigDecimal.ZERO) <= 0) {
+        BigDecimal inhalt = SYSTools.parseDecimal(txtInhalt.getText());
+        if (inhalt != null && inhalt.compareTo(BigDecimal.ZERO) <= 0) {
             inhalt = null;
         }
 
@@ -249,7 +239,7 @@ public class DlgPack extends MyJDialog {
     private JLabel lblPZN;
     private JComboBox<String> cmbGroesse;
     private JLabel jLabel3;
-    private JFormattedTextField txtPZN;
+    private JTextField txtPZN;
     private JLabel lblInhalt;
     private JTextField txtInhalt;
     private JLabel lblPackEinheit;

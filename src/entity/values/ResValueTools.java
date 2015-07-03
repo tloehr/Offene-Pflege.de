@@ -496,7 +496,7 @@ public class ResValueTools {
             progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
             Properties controlling = resident.getControlling();
             if (controlling.containsKey(ResidentTools.KEY_BALANCE) && controlling.getProperty(ResidentTools.KEY_BALANCE).equals("on")) {
-                BigDecimal targetIn = SYSTools.parseBigDecimal(controlling.getProperty(ResidentTools.KEY_TARGETIN));
+                BigDecimal targetIn = SYSTools.parseDecimal(controlling.getProperty(ResidentTools.KEY_TARGETIN));
 
                 html.append(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
                 html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.targetDrink")) + ": " + targetIn.setScale(2, RoundingMode.HALF_UP).toString() + " ml"));

@@ -220,6 +220,7 @@ new FormModel {
 					name: "btnTags"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/tag.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnTagsActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridY": 21
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
