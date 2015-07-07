@@ -10,7 +10,10 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Arrays;
 
 /**
  * Created by tloehr on 30.06.15.
@@ -38,5 +41,39 @@ public class PnlMedication extends DefaultPanel {
         mainPanel.add(lbl, CC.xy(3, 5));
 
     }
+
+
+//    private void createCountryList() {
+//
+//
+//
+//           String[] countries = new String[]{"germany", "austria", "switzerland"};
+//           cmbCountry.setModel(SYSTools.list2cmb(Arrays.asList(countries)));
+//           cmbCountry.setRenderer(new ListCellRenderer() {
+//               @Override
+//               public Component getListCellRendererComponent(JList jList, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+//                   String text = SYSTools.xx("country." + value.toString());
+//                   return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, index, isSelected, cellHasFocus);
+//               }
+//           });
+//
+//           cmbCountry.addItemListener(new ItemListener() {
+//               @Override
+//               public void itemStateChanged(ItemEvent e) {
+//                   if (e.getStateChange() == ItemEvent.SELECTED) {
+//                       SYSPropsTools.storeProp(SYSPropsTools.KEY_COUNTRY, e.getItem().toString());
+//                   }
+//               }
+//           });
+//
+//
+//           if (OPDE.getProps().containsKey(SYSPropsTools.KEY_COUNTRY)) {
+//               cmbCountry.setSelectedItem(OPDE.getProps().getProperty(SYSPropsTools.KEY_COUNTRY));
+//           } else {
+//               cmbCountry.setSelectedItem("germany");
+//               SYSPropsTools.storeProp(SYSPropsTools.KEY_COUNTRY, "germany");
+//           }
+//
+//       }
 
 }

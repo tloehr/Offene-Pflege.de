@@ -10,10 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -254,14 +251,16 @@ public class SYSPropsTools {
         }
     }
 
-    public static String getCountry() {
-        String country = "germany";
-        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_COUNTRY)) {
-            country = OPDE.getProps().getProperty(SYSPropsTools.KEY_COUNTRY);
-        } else {
-            SYSPropsTools.storeProp(SYSPropsTools.KEY_COUNTRY, country);
-        }
-        return country;
-    }
+//    public static String getCountry() {
+//        OPDE.debug(Locale.getDefault().getCountry());
+//        OPDE.debug(Locale.getDefault().getDisplayCountry());
+//        String country = "germany";
+//        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_COUNTRY)) {
+//            country = OPDE.getProps().getProperty(SYSPropsTools.KEY_COUNTRY);
+//        } else {
+//            SYSPropsTools.storeProp(SYSPropsTools.KEY_COUNTRY, country);
+//        }
+//        return country;
+//    }
 
 }

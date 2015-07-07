@@ -116,7 +116,14 @@ public class DlgNewStocks extends MyJDialog {
 
         } else {
 
-            String pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
+            String pzn = null;
+            try {
+                pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
+            } catch (NumberFormatException nfe){
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(nfe.getMessage(), DisplayMessage.WARNING));
+                pzn = null;
+            }
+
             if (pzn != null) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
                 EntityManager em = OPDE.createEM();
                 Query query = em.createQuery("SELECT m FROM MedPackage m WHERE m.pzn = :pzn");

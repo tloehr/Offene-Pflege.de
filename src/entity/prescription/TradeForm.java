@@ -57,7 +57,7 @@ public class TradeForm implements Serializable {
         return id;
     }
 
-    public boolean isWeightControlled(){
+    public boolean isWeightControlled() {
         return weightControlled.equals(Boolean.TRUE);
     }
 
@@ -96,7 +96,13 @@ public class TradeForm implements Serializable {
     private Collection<MedPackage> packages;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tradeform")
+    private Collection<Prescription> prescriptions;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tradeform")
     private Collection<MedStock> stocks;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tradeform")
+    private Collection<BHP> bhps;
 
     // N:1 Relationen
     @JoinColumn(name = "MedPID", referencedColumnName = "MedPID")
@@ -122,6 +128,10 @@ public class TradeForm implements Serializable {
 
     public Collection<MedStock> getMedStocks() {
         return stocks;
+    }
+
+    public Collection<Prescription> getPrescriptions() {
+        return prescriptions;
     }
 
 
@@ -150,7 +160,8 @@ public class TradeForm implements Serializable {
         if (subtext != null ? !subtext.equals(tradeForm.subtext) : tradeForm.subtext != null) return false;
         if (dosageForm != null ? !dosageForm.equals(tradeForm.dosageForm) : tradeForm.dosageForm != null) return false;
         if (medProduct != null ? !medProduct.equals(tradeForm.medProduct) : tradeForm.medProduct != null) return false;
-        if (weightControlled != null ? !weightControlled.equals(tradeForm.weightControlled) : tradeForm.weightControlled != null) return false;
+        if (weightControlled != null ? !weightControlled.equals(tradeForm.weightControlled) : tradeForm.weightControlled != null)
+            return false;
 
 
 //        if (packages != null ? !packages.equals(tradeForm.packages) : tradeForm.packages != null) return false;
@@ -178,6 +189,9 @@ public class TradeForm implements Serializable {
         return "entity.rest.TradeForm[ID=" + id + "]";
     }
 
+    public Collection<BHP> getBhps() {
+        return bhps;
+    }
 }
 
 

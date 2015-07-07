@@ -205,7 +205,14 @@ public class DlgOnDemand extends MyJDialog {
         } else {
             EntityManager em = OPDE.createEM();
 
-            String pzn = MedPackageTools.parsePZN(txtMed.getText());
+            String pzn = null;
+            try {
+                pzn = MedPackageTools.parsePZN(txtMed.getText());
+            } catch (NumberFormatException nfe){
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(nfe.getMessage(), DisplayMessage.WARNING));
+                pzn = null;
+            }
+
 
             if (pzn != null) {
 

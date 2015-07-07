@@ -297,7 +297,7 @@ public class PnlDev extends CleanablePanel {
     }
 
     private void btnMod11ActionPerformed(ActionEvent e) {
-        OPDE.debug(MedPackageTools.getMOD11(txtPZN.getText().trim() + "0"));
+        OPDE.debug(MedPackageTools.getMOD11Checksum(txtPZN.getText().trim() + "0"));
     }
 
     private void btnImportMedDBActionPerformed(ActionEvent e) {
@@ -427,6 +427,7 @@ public class PnlDev extends CleanablePanel {
                     if (pzn.length() < 7) {
                         pzn = StringUtils.repeat("0", 7 - pzn.length()) + pzn;
                     }
+
 
                     pzn = MedPackageTools.parsePZN(pzn);
 

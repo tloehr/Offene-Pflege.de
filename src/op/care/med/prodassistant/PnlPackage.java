@@ -7,8 +7,8 @@ package op.care.med.prodassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.MedPackage;
-import entity.prescription.TradeForm;
 import entity.prescription.MedPackageTools;
+import entity.prescription.TradeForm;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSTools;
@@ -28,7 +28,7 @@ import java.math.BigDecimal;
  * @author Torsten Löhr
  */
 public class PnlPackage extends JPanel {
-    public static final String internalClassID = MedProductWizard.internalClassID+".package";
+    public static final String internalClassID = MedProductWizard.internalClassID + ".package";
     String pzn;
     BigDecimal inhalt;
     private TradeForm darreichung;
@@ -55,18 +55,23 @@ public class PnlPackage extends JPanel {
         txtPZN.setText(template);
     }
 
-    public void setLabelEinheit(String text){
+    public void setLabelEinheit(String text) {
         lblUnit.setText(text);
     }
 
     private void txtPZNActionPerformed(ActionEvent e) {
-        pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), null);
 
-        if (MedPackageTools.parsePZN(txtPZN.getText().trim()) == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist falsch. Sie muss aus 7 oder 8 Ziffern bestehen.", DisplayMessage.WARNING));
-        } else if (pzn == null){
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist wird bereits verwendet.", DisplayMessage.WARNING));
+        try {
+            pzn = MedPackageTools.parsePZN(txtPZN.getText().trim());
+            if (MedPackageTools.checkNewPZN(pzn, null) == null) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist wird bereits verwendet.", DisplayMessage.WARNING));
+                pzn = null;
+            }
+        } catch (NumberFormatException nfe) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(nfe.getMessage(), DisplayMessage.WARNING));
+            pzn = null;
         }
+
         check();
     }
 
@@ -96,8 +101,8 @@ public class PnlPackage extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "4*(default, $lgap), default"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "4*(default, $lgap), default"));
 
         //---- txtPZN ----
         txtPZN.setFont(new Font("Arial", Font.PLAIN, 14));
