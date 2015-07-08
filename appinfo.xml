@@ -40,6 +40,7 @@
                javaclass="op.settings.PnlSettings" icon="config.png">
             <execute langbundle="opde.settings.acl.execute"/>
             <manager langbundle="opde.settings.acl.manager"/>
+            <user1 langbundle="opde.settings.acl.user1"/>
         </class>
         <class name="admin.residents.cash" short="admin.residents.cash.appinfo.short"
                long="admin.residents.cash.appinfo.long" main="true"

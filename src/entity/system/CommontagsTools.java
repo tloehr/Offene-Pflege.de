@@ -30,7 +30,7 @@ public class CommontagsTools {
     public static final int TYPE_SYS_COMPLAINT = 9;
     public static final int TYPE_SYS_PAINMGR = 11;
     public static final int TYPE_SYS_METHADONE = 12; // methadon maintenance (Substitutionspräparate)
-    public static final int TYPE_SYS_NARCOTICS = 13; // general narcotics (enhance legal action necessary)
+    public static final int TYPE_SYS_NARCOTICS = 13; // general narcotics (enhanced legal action necessary)
     public static final int TYPE_SYS_ANTIBIOTICS = 14; // antibiotics (relevant for prevalence analysis)
     // TODO: really ?
 //    public static final int TYPE_SYS_DRAIN_INDICATION = 14; // methadon maintenance (Substitutionspräparate)

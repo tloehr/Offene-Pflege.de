@@ -11,6 +11,7 @@ import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import gui.GUITools;
 import op.OPDE;
+import op.system.InternalClassACL;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -39,12 +40,12 @@ public class PnlCommonTags extends JPanel {
     //    private Closure editAction;
     int MAXLINE = 8;
 
-    public PnlCommonTags(Collection<Commontags> listSelectedTags) {
-        this(listSelectedTags, false);
-    }
+//    public PnlCommonTags(Collection<Commontags> listSelectedTags) {
+//        this(listSelectedTags, false);
+//    }
 
     public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode, int maxline) {
-        this(listSelectedTags, editmode, false, maxline);
+        this(listSelectedTags, editmode, OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, "opde.settings"), maxline);
     }
 
     public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode, boolean addNewTags, int maxline) {

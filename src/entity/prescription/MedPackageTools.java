@@ -92,12 +92,12 @@ public class MedPackageTools {
     public static String parsePZN(String pzn) throws NumberFormatException {
         pzn = pzn.trim();
         pzn = pzn.replaceAll("[^\\d]", "");
+        String countrycode = Locale.getDefault().getCountry().toLowerCase();
 
+        if (!countrycode.matches("de|at|ch"))
+            countrycode = "de";
 
-        //        OPDE.debug(Locale.getDefault().getCountry());
-        //        OPDE.debug(Locale.getDefault().getDisplayCountry());
-
-        if (Locale.getDefault().getCountry().equalsIgnoreCase("de")) {
+        if (countrycode.equals("de")) {
             if (pzn.matches("^\\d{7,8}")) {
                 //            pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
 
@@ -113,7 +113,7 @@ public class MedPackageTools {
             } else {
                 throw new NumberFormatException("error.pzn.de");
             }
-        } else if (Locale.getDefault().getCountry().equalsIgnoreCase("at")) {
+        } else if (countrycode.equals("at")) {
             // the austrian PZNs are also checked by teh MOD11 procedure.
             if (pzn.matches("^\\d{7}")) {
 
@@ -141,7 +141,7 @@ public class MedPackageTools {
             } else {
                 pzn = null;
             }
-        } else if (Locale.getDefault().getCountry().equalsIgnoreCase("ch")) {
+        } else if (countrycode.equals("ch")) {
             if (pzn.matches("^\\d{13}")) {
                 if (pzn.startsWith("7680") && isPZNValid(pzn, getSwissmedicChecksum(pzn.substring(0, 12)))) { // GS1-CH prefix for pharmaceuticals
                     pzn = pzn.substring(4, 12); // we only need the pharma part of the number. the table can handle only 8 digits anyways.

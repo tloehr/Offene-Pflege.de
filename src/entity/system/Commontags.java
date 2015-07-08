@@ -6,8 +6,11 @@ import entity.prescription.Prescription;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
+import gui.interfaces.EditorComponent;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 
 /**
@@ -31,7 +34,10 @@ public class Commontags implements Comparable<Commontags> {
     }
 
     @Basic
-    @Column(name = "text", nullable = false, insertable = true, updatable = true, length = 100, unique = true)
+    @Column(name = "text", nullable = false, insertable = true, updatable = true, length = 15, unique = true)
+    @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
+    @Size(min = 1, max = 15)
+    @NotEmpty
     private String text;
 
     public String getText() {
@@ -56,6 +62,7 @@ public class Commontags implements Comparable<Commontags> {
     }
 
     @Column(name = "color", nullable = false, insertable = true, updatable = true, length = 6)
+    @EditorComponent(label = "misc.msg.colorset", component = {"colorset"})
     private String color;
 
     public String getColor() {
@@ -66,10 +73,38 @@ public class Commontags implements Comparable<Commontags> {
         this.color = color;
     }
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     //TODO: add a sorter row
 
     @ManyToMany(mappedBy = "commontags")
     private Collection<Training> trainings;
+
+    public Collection<Training> getTrainings() {
+        return trainings;
+    }
+
+    public Collection<Qmsplan> getQmsplans() {
+        return qmsplans;
+    }
+
+    public Collection<NReport> getnReports() {
+        return nReports;
+    }
+
+    public Collection<Prescription> getPrescriptions() {
+        return prescriptions;
+    }
+
+    public Collection<ResInfo> getResinfos() {
+        return resinfos;
+    }
+
+    public Collection<NursingProcess> getNursingProcesses() {
+        return nursingProcesses;
+    }
 
     @ManyToMany(mappedBy = "commontags")
     private Collection<Qmsplan> qmsplans;

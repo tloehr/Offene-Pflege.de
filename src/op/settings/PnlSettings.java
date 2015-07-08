@@ -72,7 +72,7 @@ public class PnlSettings extends CleanablePanel {
         lblModel.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.categories")));
         lblMedication.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.medication.calc")));
         lblFTP.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.ftp")));
-        lblTags.setText(SYSTools.toHTMLForScreen(SYSConst.center("misc.msg.commontags")));
+        lblTags.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.commontags")));
     }
 
     @Override
