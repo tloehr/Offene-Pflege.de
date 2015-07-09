@@ -488,12 +488,7 @@ public class GUITools {
                 @Override
                 public void timingEvent(Animator animator, double fraction) {
                     final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            jsp.getVerticalScrollBar().setValue(value.intValue());
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> jsp.getVerticalScrollBar().setValue(value.intValue()));
                 }
 
                 @Override
@@ -505,21 +500,27 @@ public class GUITools {
             animator.start();
         } else {
             final int myend = end;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    jsp.getVerticalScrollBar().setValue(myend);
-                }
-            });
+            SwingUtilities.invokeLater(() -> jsp.getVerticalScrollBar().setValue(myend));
         }
-//        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
+
+    /**
+     * scrolls the given scrollpane to show the component within the surrounding container.
+     * <b>IMPORTANT: always validate() the container b4 using this method. otherwise the frigging
+     * scrollpane won't budge.</b>
+     * @param jsp
+     * @param component
+     * @param container
+     * @param what2doAfterwards
+     */
     public static void scroll2show(final JScrollPane jsp, final JComponent component, Container container, final Closure what2doAfterwards) {
         if (component == null)
             return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
+
         final int start = jsp.getVerticalScrollBar().getValue();
         final int end = SwingUtilities.convertPoint(component, component.getLocation(), container).y;
+
 
         if (OPDE.isAnimation()) {
             final int distance = end - start;
@@ -535,23 +536,18 @@ public class GUITools {
                 @Override
                 public void timingEvent(final Animator animator, double fraction) {
                     final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            Rectangle r = component.getVisibleRect();
-                            if (r.getSize().equals(component.getSize())) {
-                                animator.stop();
-                            } else if (r.isEmpty()) {
-                                OPDE.debug("not visible");
-                                jsp.getVerticalScrollBar().setValue(value.intValue());
-                            } else {
-                                OPDE.debug("partly visible");
-                                jsp.getVerticalScrollBar().setValue(value.intValue());
-                            }
+                    SwingUtilities.invokeLater(() -> {
+                        Rectangle r = component.getVisibleRect();
+                        if (r.getSize().equals(component.getSize())) {
+                            animator.stop();
+                        } else if (r.isEmpty()) {
+                            OPDE.debug("not visible");
+                            jsp.getVerticalScrollBar().setValue(value.intValue());
+                        } else {
+                            OPDE.debug("partly visible");
+                            jsp.getVerticalScrollBar().setValue(value.intValue());
                         }
                     });
-
-
                 }
 
                 @Override
@@ -564,14 +560,8 @@ public class GUITools {
             animator.start();
         } else {
             final int myend = end;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    jsp.getVerticalScrollBar().setValue(myend);
-                }
-            });
+            SwingUtilities.invokeLater(() -> jsp.getVerticalScrollBar().setValue(myend));
         }
-//        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
     public static Animator flashBackground(Animator animator, final JComponent component, final Color flashcolor, int repeatTimes) {

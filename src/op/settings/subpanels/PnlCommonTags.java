@@ -22,6 +22,7 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
@@ -189,8 +190,11 @@ public class PnlCommonTags extends DefaultPanel {
                     cpsMain.removeExpansion();
                     cpsMain.add(createCP(newTag));
                     cpsMain.addExpansion();
+                    cpsMain.validate();
 
-                    //todo: wär cool wenn das fenster da hin scrollt.
+                    //TODO: Null pointer exception when deleting
+
+                    GUITools.scroll2show(scrollPane1, cpMap.get(newTag), cpsMain, o -> GUITools.flashBackground(cpMap.get(newTag), Color.YELLOW, 2));
                 } catch (Exception exc) {
                     OPDE.fatal(logger, exc);
                 }
