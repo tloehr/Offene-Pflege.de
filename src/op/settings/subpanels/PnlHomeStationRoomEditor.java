@@ -54,7 +54,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
 
     public PnlHomeStationRoomEditor() {
-        super("opde.settings.home");
+        super("opde.settings.homes");
 
         mainPanel.setLayout(new FormLayout(
                 "default, $lcgap, default:grow, $lcgap, default",

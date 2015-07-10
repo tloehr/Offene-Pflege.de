@@ -143,7 +143,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             }
 
                             PropertyUtils.setProperty(data, field.getName(), field.getType().cast(value));
-                            if (saveMode == SAVE_MODE_IMMEDIATE) broadcast(new DataChangeEvent(thisPanel, data));
+                            broadcast(new DataChangeEvent(thisPanel, data));
                         } catch (BadLocationException e1) {
                             OPDE.error(logger, e1);
                         } catch (IllegalAccessException e1) {
@@ -309,7 +309,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         JButton btnOK = new JButton(SYSConst.icon22apply);
         btnOK.addActionListener(e -> {
             try {
-                broadcast(new DataChangeEvent(thisPanel, data));
+                super.broadcast(new DataChangeEvent(thisPanel, data));
             } catch (ConstraintViolationException cve) {
                 String violations = "";
                 for (ConstraintViolation cv : cve.getConstraintViolations()) {
@@ -323,13 +323,14 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             } catch (IllegalAccessException e1) {
                 e1.printStackTrace();
             }
-            reload();
+            super.reload();
         });
         buttonPanel.add(btnOK);
 
         JButton btnCancel = new JButton(SYSConst.icon22cancel);
         btnCancel.addActionListener(e -> {
-            reload(); // revert to old bean state
+            super.reload();
+            ; // revert to old bean state
         });
 
         buttonPanel.add(btnCancel);
@@ -338,14 +339,41 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         add(buttonPanel, CC.xyw(1, componentSet.size() * 2 + 2, 5, CC.RIGHT, CC.DEFAULT));
     }
 
+//    @Override
+//    public void broadcast() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+//        if (saveMode != SAVE_MODE_IMMEDIATE) return;
+//        super.broadcast(new DataChangeEvent(thisPanel, data));
+//    }
+
 
     public void broadcast() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        if (saveMode != SAVE_MODE_IMMEDIATE) return;
         super.broadcast(new DataChangeEvent(thisPanel, data));
+    }
+
+    @Override
+    public void broadcast(DataChangeEvent<T> dce) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        if (saveMode != SAVE_MODE_IMMEDIATE) return;
+        super.broadcast(new DataChangeEvent(thisPanel, data));
+    }
+
+    @Override
+    public void reload() {
+        if (saveMode != SAVE_MODE_IMMEDIATE) return;
+        super.reload();
     }
 
     @Override
     public void setStartFocus() {
 
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        for (Component comp : componentSet) {
+            comp.setEnabled(enabled);
+        }
+        super.setEnabled(enabled);
     }
 
     @Override

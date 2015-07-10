@@ -5,7 +5,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
 import entity.EntityTools;
-import entity.info.ResInfoCategory;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import gui.GUITools;
@@ -22,7 +21,6 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
@@ -44,7 +42,7 @@ public class PnlCommonTags extends DefaultPanel {
     private int i = 0;  // just for the progressbar
 
     public PnlCommonTags() {
-        super("opde.settings.tags");
+        super("opde.settings.commontags");
 
         mainPanel.setLayout(new FormLayout(
                 "default, $lcgap, default:grow, $lcgap, default",
@@ -163,13 +161,14 @@ public class PnlCommonTags extends DefaultPanel {
                     }
                 }));
 
+                pnlBeanEditor.setEnabled(tag.getType() == CommontagsTools.TYPE_SYS_USER);
                 dcp.setContentPane(pnlBeanEditor);
             } catch (Exception e) {
                 OPDE.fatal(logger, e);
             }
         };
 
-        DefaultCollapsiblePane<ResInfoCategory> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(tag));
+        DefaultCollapsiblePane<Commontags> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(tag));
 
         cpMap.put(tag, cp);
         return cp;
@@ -192,8 +191,6 @@ public class PnlCommonTags extends DefaultPanel {
                     cpsMain.addExpansion();
                     cpsMain.validate();
 
-                    //TODO: Null pointer exception when deleting
-
                     GUITools.scroll2show(scrollPane1, cpMap.get(newTag), cpsMain, o -> GUITools.flashBackground(cpMap.get(newTag), Color.YELLOW, 2));
                 } catch (Exception exc) {
                     OPDE.fatal(logger, exc);
@@ -214,7 +211,7 @@ public class PnlCommonTags extends DefaultPanel {
             Container c = pnlMenu.getParent();
             ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
 
-            String message = EntityTools.mayBeDeleted(EntityTools.find(ResInfoCategory.class, tag.getId()));
+            String message = EntityTools.mayBeDeleted(EntityTools.find(Commontags.class, tag.getId()));
             if (message != null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
                 return;
@@ -222,13 +219,15 @@ public class PnlCommonTags extends DefaultPanel {
             ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + tag.getText() + " (#" + tag.getId() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.btnDelCommontags", SYSConst.icon48delete, o -> {
 
                 if (o.equals(JOptionPane.YES_OPTION)) {
-                    EntityTools.delete(EntityTools.find(ResInfoCategory.class, tag.getId()));
+                    EntityTools.delete(EntityTools.find(Commontags.class, tag.getId()));
                     cpsMain.remove(cpMap.get(tag));
                     cpMap.remove(tag);
                 }
                 mainView();
             }));
         });
+
+        btnDelete.setEnabled(tag.getType() == CommontagsTools.TYPE_SYS_USER);
 
         return pnlMenu;
     }

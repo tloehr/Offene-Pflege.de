@@ -24,6 +24,7 @@ new FormModel {
 					name: "btnPassword"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/password.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnPasswordActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 3
 					"gridY": 5

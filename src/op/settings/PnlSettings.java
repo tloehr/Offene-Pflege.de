@@ -61,15 +61,15 @@ public class PnlSettings extends CleanablePanel {
         lblPersonal.setText(SYSTools.xx("opde.settings.personal"));
         lblLocal.setText(SYSTools.xx("opde.settings.local"));
         lblGlobal.setText(SYSTools.xx("opde.settings.global"));
-        lblPassword.setText(SYSTools.xx("opde.settings.userpassword"));
-        lblMyEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.personal.mailsettings")));
+        lblPassword.setText(SYSTools.xx("opde.settings.personal.password"));
+        lblMyEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.personal.mail")));
         lblLabelPrinter.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.labelPrinters")));
         lblTimeout.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.timeout")));
         lblHomes.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.homes")));
-        lblStation.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.station")));
-        lblICD.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.icd.btnImport")));
+        lblStation.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.default.station")));
+        lblICD.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.icd")));
         lblGlobalEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.mail")));
-        lblModel.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.categories")));
+        lblModel.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.model")));
         lblMedication.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.medication.calc")));
         lblFTP.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.ftp")));
         lblTags.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.commontags")));
@@ -160,6 +160,10 @@ public class PnlSettings extends CleanablePanel {
         genericButtonAction(new PnlCommonTags(), ((JButton) e.getSource()).getIcon());
     }
 
+    private void btnPasswordActionPerformed(ActionEvent e) {
+        genericButtonAction(new PnlPasswordChange(), ((JButton) e.getSource()).getIcon());
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         pnlAll = new JPanel();
@@ -214,6 +218,7 @@ public class PnlSettings extends CleanablePanel {
             //---- btnPassword ----
             btnPassword.setText(null);
             btnPassword.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/password.png")));
+            btnPassword.addActionListener(e -> btnPasswordActionPerformed(e));
             pnlAll.add(btnPassword, CC.xy(3, 5, CC.FILL, CC.FILL));
 
             //---- btnMyEMail ----

@@ -45,7 +45,7 @@ public class PnlICD extends DefaultPanel {
         lstIcdFiles.setModel(dlmICDFiles);
         listICDs = new ArrayList<>();
 
-        btnImportICD.setText(SYSTools.xx("opde.settings.icd.btnImport"));
+        btnImportICD.setText(SYSTools.xx("opde.settings.icd"));
         btnImportICD.setIcon(SYSConst.icon22ledRedOn);
         btnEmptyList.setToolTipText(SYSTools.xx("opde.settings.icd.btnEmptyList"));
         pnlICD.add(GUITools.getDropPanel(files -> {

@@ -33,7 +33,7 @@ public class PnlLabelPrinterSetup extends DefaultPanel {
     private MedStock testStock;
 
     public PnlLabelPrinterSetup() {
-        super("opde.settings.label.printer");
+        super("opde.settings.labelPrinters");
         initComponents();
         initPanel();
     }

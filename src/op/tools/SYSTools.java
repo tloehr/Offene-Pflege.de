@@ -689,7 +689,7 @@ public class SYSTools {
 
         if (!catchNull(in).isEmpty()) {
             out = "<html>"
-                    + in + "</html>";
+                    + xx(in) + "</html>";
         }
         return htmlUmlautConversion(out);
     }

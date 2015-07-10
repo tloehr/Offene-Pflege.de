@@ -150,7 +150,7 @@ public class PnlUserSettings extends CleanablePanel {
         EntityManager em = OPDE.createEM();
         Users user = em.merge(OPDE.getLogin().getUser());
         if (!user.getMd5pw().equals(SYSTools.hashword(txtOld.getText().trim()))) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.usersettings.oldpwwrong")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.settings.personal.oldpw.wrong")));
             return;
         }
         if (txtNew.getText().trim().isEmpty()) {
@@ -378,12 +378,7 @@ public class PnlUserSettings extends CleanablePanel {
         btnChangePW.setText(null);
         btnChangePW.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
         btnChangePW.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnChangePW.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnChangePWActionPerformed(e);
-            }
-        });
+        btnChangePW.addActionListener(e -> btnChangePWActionPerformed(e));
         add(btnChangePW, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
 
         //---- lblMailTitle ----
@@ -398,22 +393,12 @@ public class PnlUserSettings extends CleanablePanel {
 
         //---- txtMailAddress ----
         txtMailAddress.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtMailAddress.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtMailAddressActionPerformed(e);
-            }
-        });
+        txtMailAddress.addActionListener(e -> txtMailAddressActionPerformed(e));
         add(txtMailAddress, CC.xy(5, 15));
 
         //---- btnSendTestMail ----
         btnSendTestMail.setText("SendTestMail");
-        btnSendTestMail.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnSendTestMailActionPerformed(e);
-            }
-        });
+        btnSendTestMail.addActionListener(e -> btnSendTestMailActionPerformed(e));
         add(btnSendTestMail, CC.xy(5, 17));
 
         //---- lblMailKey ----
@@ -430,12 +415,7 @@ public class PnlUserSettings extends CleanablePanel {
             //---- txtMailKey ----
             txtMailKey.setColumns(4);
             txtMailKey.setFont(new Font("Arial", Font.PLAIN, 16));
-            txtMailKey.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtMailKeyActionPerformed(e);
-                }
-            });
+            txtMailKey.addActionListener(e -> txtMailKeyActionPerformed(e));
             panel1.add(txtMailKey, CC.xy(1, 1));
 
             //---- lblMailStatus ----
