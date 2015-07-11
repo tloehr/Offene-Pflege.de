@@ -38,6 +38,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private final Class<T> clazz;
     //    private JPanel customPanel;
     //    private final String[][] fields;
+    private boolean ignoreListener = false;
     private Logger logger = Logger.getLogger(this.getClass());
     private HashSet<Component> componentSet;
     public static final int SAVE_MODE_IMMEDIATE = 0;
@@ -121,6 +122,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
 
+                    if (ignoreListener) return;
+
                     JTextField txt = new JTextField();
                     if (field.isAnnotationPresent(Size.class)) {
                         Size sizeConstraint = field.getAnnotation(Size.class);
@@ -130,7 +133,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     txt.setText(PropertyUtils.getProperty(data, field.getName()).toString());
 
                     txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
-
                         reload();
 
                         try {
@@ -157,7 +159,9 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         } catch (NoSuchMethodException e1) {
                             OPDE.error(logger, e1);
                         } catch (ConstraintViolationException cve) {
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
+                            if (saveMode == SAVE_MODE_IMMEDIATE)
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
+
                         } catch (ClassNotFoundException e) {
                             OPDE.error(logger, e);
                         } catch (InstantiationException e) {
@@ -169,6 +173,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                     // this is the default ItemListener, if there is no renderer defined
                     ItemListener il = e -> {
+                        if (ignoreListener) return;
+
                         if (e.getStateChange() == ItemEvent.SELECTED) {
                             reload();
                             try {
@@ -199,6 +205,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             // if there is a renderer weg got for the object itself, rather than the selected index
                             il = e -> {
                                 if (e.getStateChange() == ItemEvent.SELECTED) {
+                                    if (ignoreListener) return;
                                     reload();
                                     try {
                                         PropertyUtils.setProperty(data, field.getName(), field.getType().cast(((JComboBox) e.getSource()).getSelectedItem()));
@@ -239,6 +246,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     comp = new YesNoToggleButton(yesText, noText, (boolean) PropertyUtils.getProperty(data, field.getName()));
 
                     ((YesNoToggleButton) comp).addItemListener(e -> {
+                        if (ignoreListener) return;
                         reload();
                         try {
                             PropertyUtils.setProperty(data, field.getName(), new Boolean(e.getStateChange() == ItemEvent.SELECTED));
@@ -311,11 +319,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             try {
                 super.broadcast(new DataChangeEvent(thisPanel, data));
             } catch (ConstraintViolationException cve) {
-                String violations = "";
-                for (ConstraintViolation cv : cve.getConstraintViolations()) {
-                    violations += cv.getMessage() + "; ";
-                }
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(violations, DisplayMessage.WARNING));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
             } catch (InvocationTargetException e1) {
                 e1.printStackTrace();
             } catch (NoSuchMethodException e1) {
@@ -323,14 +327,15 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             } catch (IllegalAccessException e1) {
                 e1.printStackTrace();
             }
-            super.reload();
+            reload();
         });
         buttonPanel.add(btnOK);
 
         JButton btnCancel = new JButton(SYSConst.icon22cancel);
         btnCancel.addActionListener(e -> {
             super.reload();
-            ; // revert to old bean state
+            refreshDisplay();
+            // revert to old bean state
         });
 
         buttonPanel.add(btnCancel);
@@ -384,6 +389,9 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     @Override
     public void refreshDisplay() {
 //        logger.debug(data.toString());
+
+        ignoreListener = true;
+
         for (Component comp : componentSet) {
             if (comp instanceof JTextComponent) {
                 try {
@@ -395,7 +403,19 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 } catch (NoSuchMethodException e) {
                     OPDE.error(logger, e);
                 }
+            } else if (comp instanceof YesNoToggleButton) {
+                try {
+                    ((YesNoToggleButton) comp).setSelected((boolean) PropertyUtils.getProperty(data, comp.getName()));
+                } catch (IllegalAccessException e) {
+                    OPDE.error(logger, e);
+                } catch (InvocationTargetException e) {
+                    OPDE.error(logger, e);
+                } catch (NoSuchMethodException e) {
+                    OPDE.error(logger, e);
+                }
             }
         }
+
+        ignoreListener = false;
     }
 }
