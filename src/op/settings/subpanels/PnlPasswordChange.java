@@ -4,7 +4,7 @@ import entity.EntityTools;
 import gui.PnlBeanEditor;
 import gui.interfaces.DefaultPanel;
 import op.OPDE;
-import op.settings.PasswordBean;
+import op.settings.databeans.PasswordBean;
 import op.threads.DisplayMessage;
 import op.tools.SYSTools;
 import org.apache.log4j.Logger;

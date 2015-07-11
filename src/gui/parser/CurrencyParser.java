@@ -1,4 +1,4 @@
-package gui.interfaces;
+package gui.parser;
 
 import op.tools.SYSTools;
 

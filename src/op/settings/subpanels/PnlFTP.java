@@ -6,7 +6,7 @@ import entity.system.SYSPropsTools;
 import gui.PnlBeanEditor;
 import gui.interfaces.DefaultPanel;
 import op.OPDE;
-import op.settings.FTPConfigBean;
+import op.settings.databeans.FTPConfigBean;
 import op.threads.DisplayMessage;
 import op.tools.SYSTools;
 import org.apache.commons.io.FileUtils;

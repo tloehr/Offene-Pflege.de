@@ -1,7 +1,3 @@
-/*
- * Created by JFormDesigner on Fri Jun 26 16:37:31 CEST 2015
- */
-
 package op.settings.subpanels;
 
 import entity.system.SYSPropsTools;
@@ -26,15 +22,16 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 /**
- * @author Torsten Löhr
+ * Created by tloehr on 11.07.15.
  */
-public class PnlGlobalMailSettings extends DefaultPanel {
+public class PnlUserMailSettings extends DefaultPanel {
+
     boolean checkInProgress = false;
     boolean lastCheckOk = false;
     Logger logger = Logger.getLogger(getClass());
 
-    public PnlGlobalMailSettings() {
-        super("opde.settings.global.mail");
+    public PnlUserMailSettings() {
+        super("opde.settings.personal.mail");
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         try {
@@ -52,7 +49,6 @@ public class PnlGlobalMailSettings extends DefaultPanel {
     private JPanel getButtonPanel(PnlBeanEditor<MailSettingsBean> pbe) {
 
 
-        final YesNoToggleButton tbActive = new YesNoToggleButton("opde.settings.global.mail.active", "opde.settings.global.mail.inactive", SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE)).equalsIgnoreCase("true"));
         final JButton btnTestmail = new JButton(SYSTools.xx("opde.settings.global.mail.btnTestmail"));
         btnTestmail.addActionListener(e -> {
             try {
@@ -107,7 +103,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
             }
             reload();
         });
-//        buttonPanel.add(btnTestmail);
+        //        buttonPanel.add(btnTestmail);
 
 
         tbActive.addItemListener(e -> {
@@ -117,7 +113,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
             SYSPropsTools.storeProp(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE, Boolean.toString(e.getStateChange() == ItemEvent.SELECTED));
         });
 
-//        buttonPanel.add(tbActive);
+        //        buttonPanel.add(tbActive);
 
 
         Box line = Box.createHorizontalBox();

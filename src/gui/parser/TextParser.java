@@ -1,4 +1,4 @@
-package gui.interfaces;
+package gui.parser;
 
 import javax.validation.ConstraintViolationException;
 import java.text.ParseException;

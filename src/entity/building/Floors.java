@@ -49,7 +49,7 @@ public class Floors {
     @Column(name = "lift", nullable = true, insertable = true, updatable = true)
     @Min(0)
     @Max(10)
-    @EditorComponent(label = "misc.msg.lifts", parserClass = "gui.interfaces.IntegerParser", component = {"textfield"}, tooltip = "misc.msg.lifts.connecting.this.floor")
+    @EditorComponent(label = "misc.msg.lifts", parserClass = "gui.parser.IntegerParser", component = {"textfield"}, tooltip = "misc.msg.lifts.connecting.this.floor")
     private Integer lift;  // number of lifts connecting to this floor
 
     @Version

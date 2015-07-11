@@ -1,4 +1,4 @@
-package op.settings;
+package op.settings.databeans;
 
 import entity.system.SYSPropsTools;
 import gui.interfaces.EditorComponent;

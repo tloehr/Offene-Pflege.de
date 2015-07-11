@@ -1,4 +1,4 @@
-package op.settings;
+package op.settings.databeans;
 
 import entity.system.SYSPropsTools;
 import gui.interfaces.EditorComponent;
@@ -16,7 +16,7 @@ public class FTPConfigBean {
     @EditorComponent(label = "opde.settings.ftp.host", component = {"textfield"})
     String host = "";
     @NotEmpty
-    @EditorComponent(label = "opde.settings.ftp.port", parserClass = "gui.interfaces.IntegerParser", component = {"textfield"})
+    @EditorComponent(label = "opde.settings.ftp.port", parserClass = "gui.parser.IntegerParser", component = {"textfield"})
     String port = "20";
     @NotEmpty
     @EditorComponent(label = "opde.settings.ftp.user", component = {"textfield"})

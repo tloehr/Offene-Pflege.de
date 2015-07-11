@@ -1,5 +1,6 @@
 package gui.interfaces;
 
+import gui.parser.TextParser;
 import op.tools.SYSTools;
 
 import java.math.BigDecimal;

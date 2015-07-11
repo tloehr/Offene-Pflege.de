@@ -1,6 +1,5 @@
-package gui.interfaces;
+package gui.parser;
 
-import op.system.Recipient;
 import op.tools.SYSTools;
 
 import java.text.NumberFormat;
@@ -9,12 +8,11 @@ import java.text.ParseException;
 /**
  * Created by tloehr on 06.06.15.
  */
-public class MailParser implements TextParser<Recipient> {
+public class IntegerParser implements TextParser<Integer> {
     NumberFormat nf = NumberFormat.getIntegerInstance();
 
     @Override
-    public Recipient parse(String in) throws ParseException{
-//        in = SYSTools.assimilateDecimalSeparators(in);
+    public Integer parse(String in) throws ParseException{
         try {
             return nf.parse(in).intValue();
         } catch (ParseException pe){
