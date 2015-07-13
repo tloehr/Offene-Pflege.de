@@ -53,11 +53,12 @@ public class PnlGlobalMailSettings extends DefaultPanel {
 
 
         final YesNoToggleButton tbActive = new YesNoToggleButton("opde.settings.global.mail.active", "opde.settings.global.mail.inactive", SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE)).equalsIgnoreCase("true"));
-        final JButton btnTestmail = new JButton(SYSTools.xx("opde.settings.global.mail.btnTestmail"));
+        final JButton btnTestmail = new JButton(SYSTools.xx("opde.settings.global.mail.sendtest"));
         btnTestmail.addActionListener(e -> {
             try {
                 if (checkInProgress) return;
 
+                checkInProgress = true;
                 pbe.broadcast();
 
                 final Recipient testRecipient = new Recipient(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL));
@@ -67,6 +68,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
                     @Override
                     protected Object doInBackground() {
                         lastCheckOk = false;
+
                         return EMailSystem.sendMail(SYSTools.xx("opde.settings.global.mail.testsubject"), SYSTools.xx("opde.settings.global.mail.testbody"), testRecipient, null);
                     }
 

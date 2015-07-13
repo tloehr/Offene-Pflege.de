@@ -8,8 +8,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "notification")
 public class Notification {
-
-
     private String nkey;
 
     private static final long serialVersionUID = 1L;

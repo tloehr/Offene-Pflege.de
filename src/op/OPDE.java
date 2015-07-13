@@ -409,6 +409,7 @@ public class OPDE {
         lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
 
 
+
         validatorFactory = Validation.buildDefaultValidatorFactory();
 
         /***
@@ -456,7 +457,7 @@ public class OPDE {
         opts.addOption("w", "workingdir", true, "Damit kannst Du ein anderes Arbeitsverzeichnis setzen. Wenn Du diese Option weglässt, dann ist das Dein Benutzerverzeichnis: " + System.getProperty("user.home"));
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
         opts.addOption("t", "training", false, "Wird für Einarbeitungsversionen benötigt. Färbt die Oberfläche anders ein und zeigt eine Warnmeldung nach jeder Anmeldung.");
-        Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(lang.getString("cmdline.ftpserver")).create("f");
+        Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(SYSTools.xx("cmdline.ftpserver")).create("f");
         opts.addOption(optFTPserver);
 //        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
 
@@ -464,7 +465,7 @@ public class OPDE {
         notification.setArgName("Liste der Empfänger (durch Komma getrennt, ohne Leerzeichen. UID verwenden). Damit kannst Du die Benachrichtigungen einschränken. Fehlt diese Liste, erhalten ALLE Empfänger eine Mail.");
         opts.addOption(notification);
 
-        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(lang.getString("cmdline.jdbc")).create("j"));
+        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(SYSTools.xx("cmdline.jdbc")).create("j"));
 
         Option dfnimport = OptionBuilder //.withArgName("datum")
                 .withLongOpt("dfnimport").hasOptionalArg()
@@ -620,7 +621,7 @@ public class OPDE {
             DesEncrypter desEncrypter = new DesEncrypter(hostkey);
             Connection jdbcConnection = DriverManager.getConnection(url, localProps.getProperty("javax.persistence.jdbc.user"), desEncrypter.decrypt(cryptpassword));
             if (appInfo.getDbversion() != getDBVersion(jdbcConnection)) {
-                SYSFilesTools.print(lang.getString("cant.start.with.version.mismatch"), false);
+                SYSFilesTools.print(SYSTools.xx("cant.start.with.version.mismatch"), false);
                 System.exit(1);
             }
             jdbcConnection.close();
@@ -859,7 +860,7 @@ public class OPDE {
 
             success = true;
         } catch (FileNotFoundException ex) {
-            fatal(new Throwable(lang.getString("misc.msg.installation.error")));
+            fatal(new Throwable(SYSTools.xx("misc.msg.installation.error")));
 //            // Keine local.properties. Wir richten wohl gerade einen neuen Client ein.
 //
 //            FrmInit frame = new FrmInit();

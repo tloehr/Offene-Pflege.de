@@ -55,7 +55,6 @@ import op.controlling.PnlControlling;
 import op.dev.PnlDev;
 import op.process.PnlProcess;
 import op.settings.PnlSettings;
-import op.settings.PnlUserSettings;
 import op.system.DlgLogin;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
@@ -740,8 +739,6 @@ public class FrmMain extends JFrame {
             panel = new PnlControlling(jspSearch, null);
         } else if (classname.equals("op.settings.PnlSettings")) {
             panel = new PnlSettings(jspSearch);
-        } else if (classname.equals("op.settings.PnlUserSettings")) {
-            panel = new PnlUserSettings(jspSearch);
         } else if (classname.equals("op.dev.PnlDev")) {
             panel = new PnlDev();
         } else if (classname.equals("op.training.PnlTraining")) {

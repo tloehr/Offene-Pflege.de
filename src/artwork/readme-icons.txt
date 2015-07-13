@@ -42,3 +42,4 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- hotel_finder (http://findicons.com/icon/583442/hotel_finder?id=583592)
 -- icd10.png based on emblem_library.png (http://findicons.com/icon/93370/emblem_library?id=93370)
 -- timer.png (http://findicons.com/icon/567889/timer?id=569127)
+-- language.png (http://findicons.com/icon/50917/language?id=50982)

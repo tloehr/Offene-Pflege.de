@@ -123,6 +123,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
 
                     if (ignoreListener) return;
+//                    boolean accepted = false;
+
+                    JPanel innerPanel = new JPanel();
+                    innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.LINE_AXIS));
+                    final JLabel lblOK = new JLabel(SYSConst.icon16apply);
+                    lblOK.setOpaque(false);
 
                     JTextField txt = new JTextField();
                     if (field.isAnnotationPresent(Size.class)) {
@@ -146,8 +152,11 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                             PropertyUtils.setProperty(data, field.getName(), field.getType().cast(value));
                             broadcast(new DataChangeEvent(thisPanel, data));
+                            OPDE.getDisplayManager().clearSubMessages();
+                            lblOK.setIcon(SYSConst.icon16apply);
                         } catch (BadLocationException e1) {
                             OPDE.error(logger, e1);
+                            lblOK.setIcon(SYSConst.icon16cancel);
                         } catch (IllegalAccessException e1) {
                             OPDE.error(logger, e1);
                         } catch (InvocationTargetException ite) {
@@ -156,19 +165,28 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             } else {
                                 OPDE.error(logger, ite);
                             }
+                            lblOK.setIcon(SYSConst.icon16cancel);
                         } catch (NoSuchMethodException e1) {
                             OPDE.error(logger, e1);
+                            lblOK.setIcon(SYSConst.icon16cancel);
                         } catch (ConstraintViolationException cve) {
-                            if (saveMode == SAVE_MODE_IMMEDIATE)
+                            if (saveMode == SAVE_MODE_IMMEDIATE) {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
-
+                            }
+                            lblOK.setIcon(SYSConst.icon16cancel);
                         } catch (ClassNotFoundException e) {
                             OPDE.error(logger, e);
+                            lblOK.setIcon(SYSConst.icon16cancel);
                         } catch (InstantiationException e) {
                             OPDE.error(logger, e);
+                            lblOK.setIcon(SYSConst.icon16cancel);
                         }
                     }));
-                    comp = txt;
+
+                    innerPanel.add(txt);
+                    innerPanel.add(lblOK);
+
+                    comp = innerPanel;
                 } else if (editorComponent.component()[0].equalsIgnoreCase("combobox")) {
 
                     // this is the default ItemListener, if there is no renderer defined
@@ -298,7 +316,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     add(comp, CC.xy(4, row + 1));
                 }
 
-                comp.setEnabled(editorComponent.readonly().equals("false"));
+                SYSTools.setXEnabled(comp, editorComponent.readonly().equals("false"));
+//                comp.setEnabled();
                 comp.setName(field.getName());
                 comp.setToolTipText(editorComponent.tooltip().isEmpty() ? null : SYSTools.xx(editorComponent.tooltip()));
                 componentSet.add(comp);
@@ -351,16 +370,23 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 //    }
 
 
+    /**
+     * causes the editor to send the current state of its data to all listeners.
+     *
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
+
     public void broadcast() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        if (saveMode != SAVE_MODE_IMMEDIATE) return;
         super.broadcast(new DataChangeEvent(thisPanel, data));
     }
 
-    @Override
-    public void broadcast(DataChangeEvent<T> dce) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        if (saveMode != SAVE_MODE_IMMEDIATE) return;
-        super.broadcast(new DataChangeEvent(thisPanel, data));
-    }
+//    @Override
+//    public void broadcast(DataChangeEvent<T> dce) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+//        if (saveMode != SAVE_MODE_IMMEDIATE) return;
+//        super.broadcast(new DataChangeEvent(thisPanel, data));
+//    }
 
     @Override
     public void reload() {

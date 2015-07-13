@@ -1,5 +1,7 @@
 package gui.parser;
 
+import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.SYSTools;
 
 import javax.mail.internet.AddressException;
@@ -10,20 +12,20 @@ import java.text.ParseException;
 /**
  * Created by tloehr on 06.06.15.
  */
-public class MailParser implements TextParser<InternetAddress> {
+public class MailParser implements TextParser<String> {
     NumberFormat nf = NumberFormat.getIntegerInstance();
 
     @Override
-    public InternetAddress parse(String in) throws ParseException {
+    public String parse(String in) throws ParseException {
 //        in = SYSTools.assimilateDecimalSeparators(in);
         try {
 
             InternetAddress emailAddr = new InternetAddress(in);
             emailAddr.validate();
 
-            return emailAddr;
+            return emailAddr.toString();
         } catch (AddressException e) {
-            throw new ParseException(SYSTools.xx("exception.integer.parser"), e.getPos());
+            throw new ParseException(SYSTools.xx("exception.mail.parser"), e.getPos());
         }
     }
 }

@@ -1,6 +1,8 @@
 package op.settings.databeans;
 
+import entity.system.Users;
 import gui.interfaces.EditorComponent;
+import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -16,6 +18,10 @@ public class PersonalMailBean {
         this.mail = "";
     }
 
+    public PersonalMailBean(Users user) {
+        this.mail = SYSTools.catchNull(user.getEMail());
+    }
+
     public String getMail() {
         return mail;
     }
@@ -23,4 +29,5 @@ public class PersonalMailBean {
     public void setMail(String mail) {
         this.mail = mail;
     }
+
 }
