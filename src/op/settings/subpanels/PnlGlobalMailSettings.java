@@ -22,6 +22,7 @@ import javax.validation.ConstraintViolationException;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
@@ -38,7 +39,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         try {
-            final PnlBeanEditor<MailSettingsBean> pbe = new PnlBeanEditor<>(() -> new MailSettingsBean(OPDE.getProps()), MailSettingsBean.class);
+            final PnlBeanEditor<MailSettingsBean> pbe = new PnlBeanEditor<>(() -> new MailSettingsBean(OPDE.getProps()), MailSettingsBean.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
             pbe.setCustomPanel(getButtonPanel(pbe));
             pbe.addDataChangeListener(evt -> SYSPropsTools.storeProps(evt.getData().toProperties(new Properties())));
             add(pbe);
@@ -105,6 +106,8 @@ public class PnlGlobalMailSettings extends DefaultPanel {
             } catch (NoSuchMethodException e1) {
                 e1.printStackTrace();
             } catch (IllegalAccessException e1) {
+                e1.printStackTrace();
+            } catch (SQLIntegrityConstraintViolationException e1) {
                 e1.printStackTrace();
             }
             reload();

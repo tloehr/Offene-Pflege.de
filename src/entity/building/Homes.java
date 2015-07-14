@@ -32,7 +32,7 @@ public class Homes implements Serializable {
     @EditorComponent(label = "misc.msg.primary.key", component = {"textfield"}, readonly = "true")
     private String eid;
     @Column(name = "Name", length = 30)
-    @Size(min = 1, max = 30)
+    @Size(min = 1, max = 30, message="Die Anzahl der Zeichen stimmt nicht")
     @NotEmpty
     @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
     private String name;

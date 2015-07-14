@@ -5,6 +5,7 @@
 package gui.events;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.EventListener;
 
 /**
@@ -13,6 +14,6 @@ import java.util.EventListener;
  */
 public interface DataChangeListener<T> extends EventListener {
 
-    void dataChanged(DataChangeEvent<T> evt) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException;
+    void dataChanged(DataChangeEvent<T> evt) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, SQLIntegrityConstraintViolationException;
 
 }

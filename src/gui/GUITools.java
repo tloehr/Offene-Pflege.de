@@ -608,35 +608,39 @@ public class GUITools {
 
 
     public static void flashBackground(final JComponent component, final Color flashcolor, int repeatTimes) {
-        if (component == null)
-            return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
-        final Color originalColor = component.getBackground();
-        final TimingSource ts = new SwingTimerTimingSource();
-        final boolean wasOpaque = component.isOpaque();
-        Animator.setDefaultTimingSource(ts);
-        ts.init();
-        component.setOpaque(true);
-        Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(repeatTimes).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
-            @Override
-            public void begin(Animator source) {
-            }
-
-            @Override
-            public void timingEvent(Animator animator, final double fraction) {
-                SwingUtilities.invokeLater(() -> {
-                    component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
-                    component.repaint();
-                });
-            }
-
-            @Override
-            public void end(Animator source) {
-                component.setOpaque(wasOpaque);
-                component.repaint();
-            }
-        }).build();
-        animator.start();
+        flashBackground(component, flashcolor, component.getBackground(), repeatTimes);
     }
+
+    public static void flashBackground(final JComponent component, final Color flashcolor, final Color originalColor, int repeatTimes) {
+            if (component == null)
+                return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
+//            final Color originalColor = component.getBackground();
+            final TimingSource ts = new SwingTimerTimingSource();
+            final boolean wasOpaque = component.isOpaque();
+            Animator.setDefaultTimingSource(ts);
+            ts.init();
+            component.setOpaque(true);
+            Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(repeatTimes).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+                @Override
+                public void begin(Animator source) {
+                }
+
+                @Override
+                public void timingEvent(Animator animator, final double fraction) {
+                    SwingUtilities.invokeLater(() -> {
+                        component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
+                        component.repaint();
+                    });
+                }
+
+                @Override
+                public void end(Animator source) {
+                    component.setOpaque(wasOpaque);
+                    component.repaint();
+                }
+            }).build();
+            animator.start();
+        }
 
     public static void flashIcon(final AbstractButton btn, final Icon icon) {
         flashIcon(btn, icon, 2);
@@ -652,7 +656,6 @@ public class GUITools {
 
         final Icon originalIcon = btn.getIcon();
         final TimingSource ts = new SwingTimerTimingSource();
-//        final boolean wasOpaque = component.isOpaque();
         Animator.setDefaultTimingSource(ts);
         ts.init();
 

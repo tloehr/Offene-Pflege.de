@@ -31,7 +31,7 @@ public class PnlFTP extends DefaultPanel {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         try {
-            final PnlBeanEditor<FTPConfigBean> pbe = new PnlBeanEditor<>(() -> new FTPConfigBean(OPDE.getProps()), FTPConfigBean.class);
+            final PnlBeanEditor<FTPConfigBean> pbe = new PnlBeanEditor<>(() -> new FTPConfigBean(OPDE.getProps()), FTPConfigBean.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
             pbe.setCustomPanel(getButtonPanel(pbe));
             pbe.addDataChangeListener(evt -> SYSPropsTools.storeProps(evt.getData().toProperties(new Properties())));
             add(pbe);

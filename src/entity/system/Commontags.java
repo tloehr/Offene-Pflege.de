@@ -36,8 +36,7 @@ public class Commontags implements Comparable<Commontags> {
     @Basic
     @Column(name = "text", nullable = false, insertable = true, updatable = true, length = 15, unique = true)
     @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
-    @Size(min = 1, max = 15)
-    @NotEmpty
+    @Size(min = 1, max = 15, message = "msg.validation.string.length.error")
     private String text;
 
     public String getText() {

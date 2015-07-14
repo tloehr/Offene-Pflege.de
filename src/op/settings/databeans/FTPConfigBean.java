@@ -5,6 +5,7 @@ import gui.interfaces.EditorComponent;
 import op.tools.SYSTools;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.Size;
 import java.util.Properties;
 
 /**
@@ -12,27 +13,27 @@ import java.util.Properties;
  */
 public class FTPConfigBean {
 
-    @NotEmpty
+    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
     @EditorComponent(label = "opde.settings.ftp.host", component = {"textfield"})
-    String host = "";
-    @NotEmpty
+    String host;
+    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
     @EditorComponent(label = "opde.settings.ftp.port", parserClass = "gui.parser.IntegerParser", component = {"textfield"})
-    String port = "20";
-    @NotEmpty
+    String port;
+    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
     @EditorComponent(label = "opde.settings.ftp.user", component = {"textfield"})
     String user;
-    @NotEmpty
+    @Size(min = 0, max = 200, message = "msg.validation.string.length.error")
     @EditorComponent(label = "misc.msg.password", component = {"textfield"})
     String password;
-    @NotEmpty
+    @Size(min = 0, max = 200, message = "msg.validation.string.length.error")
     @EditorComponent(label = "opde.settings.ftp.wd", component = {"textfield"})
-    String workingdir = "/";
+    String workingdir;
 
     public FTPConfigBean(Properties preset) {
         host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_HOST));
         port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PORT), "20");
-        user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
-        password = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_MAIL_PASSWORD));
+        user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_USER));
+        password = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
         workingdir = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_WD, "/"));
     }
 
@@ -84,4 +85,5 @@ public class FTPConfigBean {
         myFTPProps.put(SYSPropsTools.KEY_FTP_WD, workingdir.trim());
         return myFTPProps;
     }
+
 }

@@ -235,6 +235,7 @@ new FormModel {
 						name: "btnLanguage"
 						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/48x48/language48.png" )
+						"visible": false
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnLanguageActionPerformed", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 21
@@ -310,6 +311,7 @@ new FormModel {
 						name: "lblLanguage"
 						"text": "text"
 						"font": #Font1
+						"visible": false
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridY": 23
 						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER

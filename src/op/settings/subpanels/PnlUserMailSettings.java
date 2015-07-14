@@ -24,6 +24,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -128,6 +129,8 @@ public class PnlUserMailSettings extends DefaultPanel {
             } catch (NoSuchMethodException e1) {
                 e1.printStackTrace();
             } catch (IllegalAccessException e1) {
+                e1.printStackTrace();
+            } catch (SQLIntegrityConstraintViolationException e1) {
                 e1.printStackTrace();
             }
             reload();

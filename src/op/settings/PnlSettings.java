@@ -347,6 +347,7 @@ public class PnlSettings extends CleanablePanel {
                 //---- btnLanguage ----
                 btnLanguage.setText(null);
                 btnLanguage.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/language48.png")));
+                btnLanguage.setVisible(false);
                 btnLanguage.addActionListener(e -> btnLanguageActionPerformed(e));
                 pnlAll.add(btnLanguage, CC.xy(17, 21, CC.FILL, CC.FILL));
 
@@ -389,6 +390,7 @@ public class PnlSettings extends CleanablePanel {
                 //---- lblLanguage ----
                 lblLanguage.setText("text");
                 lblLanguage.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblLanguage.setVisible(false);
                 pnlAll.add(lblLanguage, CC.xy(17, 23, CC.CENTER, CC.DEFAULT));
             }
             panel1.setViewportView(pnlAll);
