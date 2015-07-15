@@ -27,20 +27,18 @@ public class PnlPasswordChange extends DefaultPanel {
 
             pbe.addDataChangeListener(evt -> {
 
-
                 if (!evt.getData().getNewPassword().trim().equals(evt.getData().getNewPasswordAgain().trim())) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.settings.personal.newpw.wrong")));
-                    return;
-                }
-
-
-                if (!OPDE.getLogin().getUser().getMd5pw().equals(SYSTools.hashword(evt.getData().getOldPassword().trim()))) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.settings.personal.oldpw.wrong")));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.personal.newpw.wrong"));
                     return;
                 }
 
                 OPDE.getLogin().getUser().setMd5pw(SYSTools.hashword(evt.getData().getNewPassword().trim()));
                 OPDE.getLogin().setUser(EntityTools.merge(OPDE.getLogin().getUser()));
+
+                pbe.reload();
+                pbe.refreshDisplay();
+
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.personal.pwchanged"));
 
             });
             add(pbe);

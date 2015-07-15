@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class PasswordBean {
 
     @NotEmpty(message = "opde.settings.personal.oldpw.empty")
-    @EditorComponent(label = "opde.settings.personal.oldpw", component = {"textfield"})
+    @EditorComponent(label = "opde.settings.personal.oldpw", parserClass = "gui.parser.OldPasswordParser", component = {"textfield"})
     String oldPassword;
 
     @NotEmpty(message = "opde.settings.personal.newpw.empty")

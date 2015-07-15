@@ -46,7 +46,7 @@ public class DisplayManager extends Thread {
     private boolean pbIsInUse, pbTOIsInUse, sublabelIsInUse; // for optimization. the jp.setString() was called a trillion times without any need.
     private Icon[] reloading;
     private int currentAnimationFrameForReload = -1; // -1 means, no animation
-    final int timeoutmins;
+    private int timeoutmins;
     private final Logger logger = Logger.getLogger(getClass());
 
 //    private int TIMEOUTMINS;
@@ -432,4 +432,8 @@ public class DisplayManager extends Thread {
         }
     }
 
+
+    public void setTimeoutmins(int timeoutmins) {
+        this.timeoutmins = timeoutmins;
+    }
 }

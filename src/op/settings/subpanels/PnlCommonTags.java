@@ -28,7 +28,6 @@ import org.jdesktop.swingx.VerticalLayout;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Random;
 

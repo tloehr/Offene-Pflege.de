@@ -327,6 +327,7 @@ public class OPDE {
 
     public static void setTimeout(int timeout) {
         localProps.setProperty("timeout", Integer.toString(timeout));
+        getDisplayManager().setTimeoutmins(timeout);
         saveLocalProps();
     }
 

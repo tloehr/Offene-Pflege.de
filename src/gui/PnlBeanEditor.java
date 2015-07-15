@@ -120,7 +120,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 JLabel lblName = new JLabel(SYSTools.xx(editorComponent.label()));
                 lblName.setFont(new Font("Arial", Font.BOLD, 14));
 
-
                 JComponent comp = null;
 
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
@@ -129,6 +128,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 //                    boolean accepted = false;
 
                     JPanel innerPanel = new JPanel();
+                    innerPanel.setName("innerPanel");
                     innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.LINE_AXIS));
                     final JLabel lblOK = new JLabel(SYSConst.icon16apply);
 
@@ -150,7 +150,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     });
 
                     txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
-                        reload();
+                        if (saveMode == SAVE_MODE_IMMEDIATE)
+                            reload();
 
                         try {
                             String text = de.getDocument().getText(0, de.getDocument().getLength());
@@ -162,7 +163,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             }
 
                             PropertyUtils.setProperty(data, field.getName(), field.getType().cast(value));
-                            broadcast(new DataChangeEvent(thisPanel, data));
+                            if (saveMode == SAVE_MODE_IMMEDIATE)
+                                broadcast();
                             OPDE.getDisplayManager().clearSubMessages();
                             lblOK.setIcon(SYSConst.icon16apply);
                             lblOK.setToolTipText(null);
@@ -190,13 +192,29 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             if (saveMode == SAVE_MODE_IMMEDIATE) {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
                             }
-                            lblOK.setIcon(SYSConst.icon16cancel);
+
                             String message = "";
                             for (ConstraintViolation cv : cve.getConstraintViolations()) {
-                                message += SYSTools.xx(cv.getMessage()) + ", ";
+                                logger.debug(cv.getPropertyPath().toString());
+                                logger.debug(field.getName());
+                                if (cv.getPropertyPath().toString().equals(field.getName())) {
+                                    message = cv.getMessage();
+                                    break;
+                                }
                             }
-                            lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(message)));
-                            GUITools.flashBackground(txt, SYSConst.orangered, Color.white, 2);
+
+                            if (message.isEmpty()) {
+                                OPDE.getDisplayManager().clearSubMessages();
+                                lblOK.setIcon(SYSConst.icon16apply);
+                                lblOK.setToolTipText(null);
+                                GUITools.flashBackground(txt, SYSConst.darkolivegreen1, Color.white, 2);
+                            } else {
+                                lblOK.setIcon(SYSConst.icon16cancel);
+                                lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(message)));
+                                GUITools.flashBackground(txt, SYSConst.orangered, Color.white, 2);
+                            }
+
+
                         } catch (ClassNotFoundException e) {
                             OPDE.error(logger, e);
                             lblOK.setIcon(SYSConst.icon16cancel);
@@ -225,10 +243,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         if (ignoreListener) return;
 
                         if (e.getStateChange() == ItemEvent.SELECTED) {
-                            reload();
+                            if (saveMode == SAVE_MODE_IMMEDIATE)
+                                reload();
                             try {
                                 PropertyUtils.setProperty(data, field.getName(), field.getType().cast(((JComboBox) e.getSource()).getSelectedIndex()));
-                                broadcast(new DataChangeEvent(thisPanel, data));
+                                if (saveMode == SAVE_MODE_IMMEDIATE)
+                                    broadcast();
                             } catch (Exception e1) {
                                 logger.debug(e1);
                             }
@@ -244,7 +264,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                             renderer = (ListCellRenderer) rendererClazz.newInstance();
 
-
                             String m = editorComponent.model();
                             Class modelClazz = Class.forName(m);
 
@@ -255,10 +274,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             il = e -> {
                                 if (e.getStateChange() == ItemEvent.SELECTED) {
                                     if (ignoreListener) return;
-                                    reload();
+                                    if (saveMode == SAVE_MODE_IMMEDIATE)
+                                        reload();
                                     try {
                                         PropertyUtils.setProperty(data, field.getName(), field.getType().cast(((JComboBox) e.getSource()).getSelectedItem()));
-                                        broadcast(new DataChangeEvent(thisPanel, data));
+                                        if (saveMode == SAVE_MODE_IMMEDIATE)
+                                            broadcast();
                                     } catch (Exception e1) {
                                         logger.debug(e1);
                                     }
@@ -296,10 +317,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                     ((YesNoToggleButton) comp).addItemListener(e -> {
                         if (ignoreListener) return;
-                        reload();
+                        if (saveMode == SAVE_MODE_IMMEDIATE)
+                            reload();
                         try {
                             PropertyUtils.setProperty(data, field.getName(), new Boolean(e.getStateChange() == ItemEvent.SELECTED));
-                            broadcast(new DataChangeEvent(thisPanel, data));
+                            if (saveMode == SAVE_MODE_IMMEDIATE)
+                                broadcast();
                         } catch (Exception e1) {
                             logger.debug(e1);
                         }
@@ -308,12 +331,14 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                     JColorChooser clr = new JColorChooser(GUITools.getColor(PropertyUtils.getProperty(data, field.getName()).toString()));
                     clr.getSelectionModel().addChangeListener(e -> {
-                        reload();
+                        if (saveMode == SAVE_MODE_IMMEDIATE)
+                            reload();
                         try {
                             PropertyUtils.setProperty(data, field.getName(), GUITools.toHexString(((ColorSelectionModel) e.getSource()).getSelectedColor()));
                             DataChangeEvent<T> dce = new DataChangeEvent(thisPanel, data);
                             dce.setTriggersReload(true);
-                            broadcast(dce);
+                            if (saveMode == SAVE_MODE_IMMEDIATE)
+                                broadcast();
                         } catch (Exception e1) {
                             logger.debug(e1);
                         }
@@ -367,7 +392,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         JButton btnOK = new JButton(SYSConst.icon22apply);
         btnOK.addActionListener(e -> {
             try {
-                super.broadcast(new DataChangeEvent(thisPanel, data));
+                broadcast(new DataChangeEvent(thisPanel, data));
             } catch (ConstraintViolationException cve) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
             } catch (InvocationTargetException e1) {
@@ -377,15 +402,17 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             } catch (IllegalAccessException e1) {
                 e1.printStackTrace();
             } catch (SQLIntegrityConstraintViolationException e1) {
-                e1.printStackTrace();
+                OPDE.warn(logger, e1);
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage()));
             }
-            reload();
+            if (saveMode == SAVE_MODE_IMMEDIATE)
+                reload();
         });
         buttonPanel.add(btnOK);
 
         JButton btnCancel = new JButton(SYSConst.icon22cancel);
         btnCancel.addActionListener(e -> {
-            super.reload();
+            reload();
             refreshDisplay();
             // revert to old bean state
         });
@@ -421,11 +448,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 //        super.broadcast(new DataChangeEvent(thisPanel, data));
 //    }
 
-    @Override
-    public void reload() {
-        if (saveMode != SAVE_MODE_IMMEDIATE) return;
-        super.reload();
-    }
 
     @Override
     public void setStartFocus() {
@@ -451,16 +473,23 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
         ignoreListener = true;
 
+
+        //grrrrrr: geht immer noch nicht. Dran bleiben.
+
         for (Component comp : componentSet) {
-            if (comp instanceof JTextComponent) {
-                try {
-                    ((JTextComponent) comp).setText(PropertyUtils.getProperty(data, comp.getName()).toString());
-                } catch (IllegalAccessException e) {
-                    OPDE.error(logger, e);
-                } catch (InvocationTargetException e) {
-                    OPDE.error(logger, e);
-                } catch (NoSuchMethodException e) {
-                    OPDE.error(logger, e);
+            if (comp instanceof JPanel && comp.getName().equals("innerPanel")) {  // textcomponents are embedded in a JPanel
+                for (Component innerComp : ((JPanel) comp).getComponents()) {
+                    if (innerComp instanceof JTextComponent) {
+                        try {
+                            ((JTextComponent) innerComp).setText(PropertyUtils.getProperty(data, comp.getName()).toString());
+                        } catch (IllegalAccessException e) {
+                            OPDE.error(logger, e);
+                        } catch (InvocationTargetException e) {
+                            OPDE.error(logger, e);
+                        } catch (NoSuchMethodException e) {
+                            OPDE.error(logger, e);
+                        }
+                    }
                 }
             } else if (comp instanceof YesNoToggleButton) {
                 try {
@@ -472,9 +501,21 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 } catch (NoSuchMethodException e) {
                     OPDE.error(logger, e);
                 }
+            } else if (comp instanceof JComboBox) {
+
+                //TODO: Das muss noch fertig werden
+                JComboBox combobox = (JComboBox) comp;
+
+//                                    if (renderer != null) {
+//                                        combobox.setSelectedItem(PropertyUtils.getProperty(data, field.getName()));
+//                                    } else {
+//                                        combobox = new JComboBox(new DefaultComboBoxModel<>(ArrayUtils.subarray(editorComponent.component(), 1, editorComponent.component().length - 1)));
+//                                    }
             }
         }
 
         ignoreListener = false;
     }
+
+
 }

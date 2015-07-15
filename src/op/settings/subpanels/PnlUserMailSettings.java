@@ -139,10 +139,12 @@ public class PnlUserMailSettings extends DefaultPanel {
 
         lblLED.setText(SYSTools.xx("opde.settings.personal.mail.key"));
         BoundedTextField btf = new BoundedTextField(4, 4);
-        btf.setText(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TESTKEY));
+        btf.setText(OPDE.getLogin().getUser().getMailConfirmed() == UsersTools.MAIL_UNCONFIRMED ? "" : OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TESTKEY));
 //        btf.getDocument().insertString(0, SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TESTKEY)), null);
         btf.getDocument().addDocumentListener(new RelaxedDocumentListener(var1 -> {
             try {
+                if (!OPDE.getProps().containsKey(SYSPropsTools.KEY_MAIL_TESTKEY)) return;
+
                 String text = var1.getDocument().getText(0, var1.getDocument().getLength());
                 IntegerParser parser = new IntegerParser();
                 parser.parse(text);
@@ -161,7 +163,7 @@ public class PnlUserMailSettings extends DefaultPanel {
             }
 
         }));
-        btf.setEnabled(OPDE.getProps().containsKey(SYSPropsTools.KEY_MAIL_TESTKEY));
+//        btf.setEnabled(OPDE.getProps().containsKey(SYSPropsTools.KEY_MAIL_TESTKEY));
 
         Box line1 = Box.createHorizontalBox();
         line1.add(btnTestmail);
