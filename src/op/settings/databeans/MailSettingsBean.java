@@ -3,7 +3,6 @@ package op.settings.databeans;
 import entity.system.SYSPropsTools;
 import gui.interfaces.EditorComponent;
 import op.tools.SYSTools;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
 import java.util.Properties;
@@ -13,31 +12,31 @@ import java.util.Properties;
  */
 public class MailSettingsBean {
 
-    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 1, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.host", component = {"textfield"})
     String host = "";
-    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 1, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.port", component = {"textfield"})
     String port = "25";
-    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 1, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.user", component = {"textfield"})
     String user = "";
-    @Size(min = 0, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 0, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.password", component = {"textfield"})
     String password = "";
-    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 1, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.sender", component = {"textfield"})
     String sender = "";
-    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 1, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.recipient", component = {"textfield"})
     String recipient = "";
-    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 1, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.sender.personal", component = {"textfield"})
     String sender_personal = "";
-    @Size(min = 1, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 1, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.recipient.personal", component = {"textfield"})
     String sender_recipient = "";
-    @Size(min = 0, max = 200, message = "msg.validation.string.length.error")
+    @Size(min = 0, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.global.mail.recipient.spamfilter", component = {"textfield"})
     String spamfiler_key = "";
     @EditorComponent(label = "opde.settings.global.mail.auth", component = {"onoffswitch"}, filled = "false")

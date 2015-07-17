@@ -48,7 +48,7 @@ public class JPADataChangeListener<T> implements DataChangeListener<T> {
             for (Throwable t = e.getCause(); t != null; t = t.getCause()) {
                 if (t instanceof SQLIntegrityConstraintViolationException) {
                     OPDE.warn(Logger.getLogger(evt.getSource().getClass()), t);
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(t.getMessage()));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("error.sql.integrity"));
                     throw (new SQLIntegrityConstraintViolationException(t));
                 }
             }

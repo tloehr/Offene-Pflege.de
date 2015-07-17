@@ -10,7 +10,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author tloehr
@@ -18,13 +21,19 @@ import java.util.*;
 public class SYSPropsTools {
 
 
-    public static final String KEY_DAILYPLAN_PAGEBREAK = "dailyplan_pagebreak_after_element_no";
+    // vital parameters. needs to be present
     public static final String KEY_CASH_PAGEBREAK = "cash_pagebreak_after_element_no";
+    public static final String BHP_MAX_MINUTES_TO_WITHDRAW = "bhp_max_minutes_to_withdraw";
+    public static final String DFN_MAX_MINUTES_TO_WITHDRAW = "dfn_max_minutes_to_withdraw";
+    public static final String KEY_STATION = "station";
+
+
+    // Other parameters
     public static final String KEY_PHYSICAL_PRINTER = "printer.physical.name";
     public static final String KEY_LOGICAL_PRINTER = "printer.logical.name";
     public static final String KEY_MEDSTOCK_LABEL = "printer.medstock.label.name";
-    public static final String KEY_STATION = "station";
-    public static final String KEY_COUNTRY = "country";
+
+//    public static final String KEY_COUNTRY = "country";
     public static final String KEY_MAIL_HOST = "mail.smtp.host";
     public static final String KEY_MAIL_SPAMFILTER_KEY = "mail.spamfilter.key";
     public static final String KEY_MAIL_TESTKEY = "mail.testkey";
@@ -46,11 +55,12 @@ public class SYSPropsTools {
     public static final String KEY_FTP_WD = "FTPWorkingDirectory";
     public static final String KEY_FTP_PORT = "FTPPort";
     public static final String KEY_FTP_IS_WORKING = "FTPIsWorking";
-    public static final String BHP_MAX_MINUTES_TO_WITHDRAW = "bhp_max_minutes_to_withdraw";
+
     public static final String KEY_CALC_MEDI_UPR1 = "calc.medi.upr1";
     public static final String KEY_CALC_MEDI_OTHER = "calc.medi.other"; // yet unused
     public static final String KEY_MAINTENANCE_MODE = "system.maintenance.mode";
 
+    //should be useless in future
     public static final String LOCAL_KEY_CIPHER_NIC = "cipher.nic.id";
 
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {

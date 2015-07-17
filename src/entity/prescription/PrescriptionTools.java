@@ -75,7 +75,7 @@ public class PrescriptionTools {
      *
      * @param station Die Station, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
      */
-    public static void printDailyPlan(Station station, String type) {
+    public static void printDailyPlan(Station station) {
         EntityManager em = OPDE.createEM();
         try {
             Query query = em.createNativeQuery("" +
@@ -103,11 +103,8 @@ public class PrescriptionTools {
                     " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Text, Ms.Bezeichnung)");
             query.setParameter(1, station.getStatID());
 
-            if (type.equalsIgnoreCase("html")) {
-                printDailyPlan(station, query.getResultList());
-            } else {
-                printDailyPlanAsPDF(station, query.getResultList());
-            }
+            printDailyPlanAsPDF(station, query.getResultList());
+
 
             em.close();
         } catch (Exception e) {
@@ -324,163 +321,163 @@ public class PrescriptionTools {
 
     }
 
-    private static void printDailyPlan(final Station station, final List data) {
-
-        OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
-
-        final EntityManager em = OPDE.createEM();
-
-        SwingWorker worker = new SwingWorker() {
-
-            @Override
-            protected Object doInBackground() throws Exception {
-                DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
-                int progress = -1;
-                int DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.KEY_DAILYPLAN_PAGEBREAK));
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, data.size()));
-                String resID = "";
-                int elementNumber = 1;
-                boolean pagebreak = false;
-                String header = SYSTools.xx("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date());
-                String html = SYSConst.html_h1(header + " (" + station.getName() + ")");
-                html += "<div align=\"center\" id=\"fonttext\" >" + SYSTools.xx("nursingrecords.prescription.dailyplan.warning") + "</div>\n";
-
-                for (Object obj : data) {
-                    progress++;
-
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, data.size()));
-
-                    Object[] objects = (Object[]) obj;
-                    Prescription prescription = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
-                    PrescriptionSchedule schedule = em.find(PrescriptionSchedule.class, ((BigInteger) objects[1]).longValue());
-                    BigInteger bestid = (BigInteger) objects[2];
-                    BigInteger formid = (BigInteger) objects[4];
-
-                    // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
-                    boolean gray = false;
-                    if (formid != null) {
-                        DosageForm form = em.find(DosageForm.class, formid.longValue());
-                        gray = form.getDailyPlan() > 0;
-                    }
-
-                    // Wenn der Bewohnername sich in der Liste ändert, muss
-                    // einmal die Überschrift drüber gesetzt werden.
-                    boolean bewohnerWechsel = !resID.equalsIgnoreCase(prescription.getResident().getRID());
-
-                    if (pagebreak || bewohnerWechsel) {
-                        // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
-                        // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
-                        // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
-                        // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
-                        pagebreak = (elementNumber + 2 + 2) > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
-
-                        // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
-                        if (pagebreak || !resID.equals("")) {
-                            html += "</table>";
-                        }
-
-                        resID = prescription.getResident().getRID();
-
-                        html += "<h2 id=\"fonth2\" " +
-                                (pagebreak ? "style=\"page-break-before:always\">" : ">") +
-                                ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "")
-                                + ResidentTools.getLabelText(prescription.getResident())
-                                + "</h2>\n";
-                        html += "<table id=\"font14\" border=\"1\" cellspacing=\"0\">";
-                        html += SYSConst.html_table_tr(
-                                SYSConst.html_table_th("nursingrecords.prescription.dailyplan.table.col1")
-                                        + SYSConst.html_table_th("misc.msg.earlyinthemorning.short")
-                                        + SYSConst.html_table_th("misc.msg.morning.short")
-                                        + SYSConst.html_table_th("misc.msg.noon.short")
-                                        + SYSConst.html_table_th("misc.msg.afternoon.short")
-                                        + SYSConst.html_table_th("misc.msg.evening.short")
-                                        + SYSConst.html_table_th("misc.msg.lateatnight.short")
-                                        + SYSConst.html_table_th("misc.msg.comment")
-                        );
-                        elementNumber += 2;
-
-                        if (pagebreak) {
-                            elementNumber = 1;
-                            pagebreak = false;
-                        }
-                    }
-
-                    html += "<tr style=\"page-break-before:avoid\" " + (gray ? "id=\"fonttextgray14\">" : ">\n");
-                    html += "<td width=\"300\" valign=\"top\">" + getShortDescription(prescription);   // (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getName())
-//                    html += (bestid != null ? "<br/><i>" + SYSTools.xx("nursingrecords.prescription.dailyplan.stockInUse") + " " + SYSTools.xx("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
-                    if (bestid != null) {
-                        MedStock stock = em.find(MedStock.class, bestid.longValue());
-                        html += "<br/><i>" + SYSTools.xx("nursingrecords.prescription.dailyplan.stockInUse") + " " + SYSTools.xx("misc.msg.number") + " " + stock.getID() + "</i>";
-
-
-                        String warning = "";
-                        warning += (stock.expiresIn(7) ? "!!" : "");
-                        warning += (stock.expiresIn(0) ? "!!!!" : "");
-                        // variable expiry ?
-                        if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
-                            html += "<br/>" + warning + "&nbsp;" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate());
-                        }
-                        if (stock.getExpires() != null) {
-                            DateFormat sdf = df;
-                            // if expiry isa at the end of a month then it has a different format
-                            if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
-                                sdf = new SimpleDateFormat("MM/yy");
-                            }
-                            html += "<br/>" + SYSTools.xx("misc.msg.expires") + ": " + sdf.format(stock.getExpires());
-                        }
-                    }
-                    html += "</td>\n";
-
-                    if (schedule.usesTime()) {
-                        html += "<td colspan=\"6\" align=\"center\">";
-
-                        html += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</u></b> ";
-                        html += HTMLTools.printDouble(schedule.getUhrzeitDosis());
-                        html += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
-
-                        html += "</td>\n";
-                    } else {
-
-                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachtMo()) + "</td>\n";
-                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getMorgens()) + "</td>\n";
-                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getMittags()) + "</td>\n";
-                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachmittags()) + "</td>\n";
-                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getAbends()) + "</td>\n";
-                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachtAb()) + "</td>\n";
-                    }
-                    html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(schedule);
-                    if (prescription.getTo().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
-                        html += "<br/><b>" + SYSTools.xx("nursingrecords.prescription.endsAtChrono") + ": " + DateFormat.getDateInstance().format(prescription.getTo()) + "</b>";
-                    }
-                    html += "</td>\n";
-                    html += "</tr>\n\n";
-                    elementNumber += 1;
-
-                    pagebreak = elementNumber > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
-                }
-                return html + "</table>";
-            }
-
-            @Override
-            protected void done() {
-                OPDE.getDisplayManager().setProgressBarMessage(null);
-                OPDE.getMainframe().setBlocked(false);
-
-                try {
-                    SYSFilesTools.print(get().toString(), true);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                } catch (ExecutionException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-                em.close();
-            }
-        };
-        worker.execute();
-
-//        return result;
-    }
+//    private static void printDailyPlan(final Station station, final List data) {
+//
+//        OPDE.getMainframe().setBlocked(true);
+//        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
+//
+//        final EntityManager em = OPDE.createEM();
+//
+//        SwingWorker worker = new SwingWorker() {
+//
+//            @Override
+//            protected Object doInBackground() throws Exception {
+//                DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+//                int progress = -1;
+//                int DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.KEY_DAILYPLAN_PAGEBREAK));
+//                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, data.size()));
+//                String resID = "";
+//                int elementNumber = 1;
+//                boolean pagebreak = false;
+//                String header = SYSTools.xx("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date());
+//                String html = SYSConst.html_h1(header + " (" + station.getName() + ")");
+//                html += "<div align=\"center\" id=\"fonttext\" >" + SYSTools.xx("nursingrecords.prescription.dailyplan.warning") + "</div>\n";
+//
+//                for (Object obj : data) {
+//                    progress++;
+//
+//                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, data.size()));
+//
+//                    Object[] objects = (Object[]) obj;
+//                    Prescription prescription = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
+//                    PrescriptionSchedule schedule = em.find(PrescriptionSchedule.class, ((BigInteger) objects[1]).longValue());
+//                    BigInteger bestid = (BigInteger) objects[2];
+//                    BigInteger formid = (BigInteger) objects[4];
+//
+//                    // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
+//                    boolean gray = false;
+//                    if (formid != null) {
+//                        DosageForm form = em.find(DosageForm.class, formid.longValue());
+//                        gray = form.getDailyPlan() > 0;
+//                    }
+//
+//                    // Wenn der Bewohnername sich in der Liste ändert, muss
+//                    // einmal die Überschrift drüber gesetzt werden.
+//                    boolean bewohnerWechsel = !resID.equalsIgnoreCase(prescription.getResident().getRID());
+//
+//                    if (pagebreak || bewohnerWechsel) {
+//                        // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
+//                        // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
+//                        // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
+//                        // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
+//                        pagebreak = (elementNumber + 2 + 2) > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+//
+//                        // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
+//                        if (pagebreak || !resID.equals("")) {
+//                            html += "</table>";
+//                        }
+//
+//                        resID = prescription.getResident().getRID();
+//
+//                        html += "<h2 id=\"fonth2\" " +
+//                                (pagebreak ? "style=\"page-break-before:always\">" : ">") +
+//                                ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "")
+//                                + ResidentTools.getLabelText(prescription.getResident())
+//                                + "</h2>\n";
+//                        html += "<table id=\"font14\" border=\"1\" cellspacing=\"0\">";
+//                        html += SYSConst.html_table_tr(
+//                                SYSConst.html_table_th("nursingrecords.prescription.dailyplan.table.col1")
+//                                        + SYSConst.html_table_th("misc.msg.earlyinthemorning.short")
+//                                        + SYSConst.html_table_th("misc.msg.morning.short")
+//                                        + SYSConst.html_table_th("misc.msg.noon.short")
+//                                        + SYSConst.html_table_th("misc.msg.afternoon.short")
+//                                        + SYSConst.html_table_th("misc.msg.evening.short")
+//                                        + SYSConst.html_table_th("misc.msg.lateatnight.short")
+//                                        + SYSConst.html_table_th("misc.msg.comment")
+//                        );
+//                        elementNumber += 2;
+//
+//                        if (pagebreak) {
+//                            elementNumber = 1;
+//                            pagebreak = false;
+//                        }
+//                    }
+//
+//                    html += "<tr style=\"page-break-before:avoid\" " + (gray ? "id=\"fonttextgray14\">" : ">\n");
+//                    html += "<td width=\"300\" valign=\"top\">" + getShortDescription(prescription);   // (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getName())
+////                    html += (bestid != null ? "<br/><i>" + SYSTools.xx("nursingrecords.prescription.dailyplan.stockInUse") + " " + SYSTools.xx("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
+//                    if (bestid != null) {
+//                        MedStock stock = em.find(MedStock.class, bestid.longValue());
+//                        html += "<br/><i>" + SYSTools.xx("nursingrecords.prescription.dailyplan.stockInUse") + " " + SYSTools.xx("misc.msg.number") + " " + stock.getID() + "</i>";
+//
+//
+//                        String warning = "";
+//                        warning += (stock.expiresIn(7) ? "!!" : "");
+//                        warning += (stock.expiresIn(0) ? "!!!!" : "");
+//                        // variable expiry ?
+//                        if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
+//                            html += "<br/>" + warning + "&nbsp;" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate());
+//                        }
+//                        if (stock.getExpires() != null) {
+//                            DateFormat sdf = df;
+//                            // if expiry isa at the end of a month then it has a different format
+//                            if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
+//                                sdf = new SimpleDateFormat("MM/yy");
+//                            }
+//                            html += "<br/>" + SYSTools.xx("misc.msg.expires") + ": " + sdf.format(stock.getExpires());
+//                        }
+//                    }
+//                    html += "</td>\n";
+//
+//                    if (schedule.usesTime()) {
+//                        html += "<td colspan=\"6\" align=\"center\">";
+//
+//                        html += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</u></b> ";
+//                        html += HTMLTools.printDouble(schedule.getUhrzeitDosis());
+//                        html += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
+//
+//                        html += "</td>\n";
+//                    } else {
+//
+//                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachtMo()) + "</td>\n";
+//                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getMorgens()) + "</td>\n";
+//                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getMittags()) + "</td>\n";
+//                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachmittags()) + "</td>\n";
+//                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getAbends()) + "</td>\n";
+//                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachtAb()) + "</td>\n";
+//                    }
+//                    html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(schedule);
+//                    if (prescription.getTo().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
+//                        html += "<br/><b>" + SYSTools.xx("nursingrecords.prescription.endsAtChrono") + ": " + DateFormat.getDateInstance().format(prescription.getTo()) + "</b>";
+//                    }
+//                    html += "</td>\n";
+//                    html += "</tr>\n\n";
+//                    elementNumber += 1;
+//
+//                    pagebreak = elementNumber > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+//                }
+//                return html + "</table>";
+//            }
+//
+//            @Override
+//            protected void done() {
+//                OPDE.getDisplayManager().setProgressBarMessage(null);
+//                OPDE.getMainframe().setBlocked(false);
+//
+//                try {
+//                    SYSFilesTools.print(get().toString(), true);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                } catch (ExecutionException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                }
+//                em.close();
+//            }
+//        };
+//        worker.execute();
+//
+////        return result;
+//    }
 
     public static String getShortDescription(Prescription prescription) {
         String result = "";

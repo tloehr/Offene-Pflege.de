@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface NotRemovableUnlessEmpty {
-    String message() default "msg.validation.cantberemoved.collection.not.empty";
+    String message() default "msg.cantberemoved.collection.not.empty";
     // only for Target ElementType.TYPE
     String evalualedByClass() default "";
 }

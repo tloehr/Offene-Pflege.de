@@ -7,7 +7,6 @@ import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
 import gui.interfaces.EditorComponent;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -36,7 +35,7 @@ public class Commontags implements Comparable<Commontags> {
     @Basic
     @Column(name = "text", nullable = false, insertable = true, updatable = true, length = 15, unique = true)
     @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
-    @Size(min = 1, max = 15, message = "msg.validation.string.length.error")
+    @Size(min = 1, max = 15, message = "msg.string.length.error")
     private String text;
 
     public String getText() {

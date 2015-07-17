@@ -326,7 +326,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 }
 
                 for (DFN dfn : listDFN) {
-                    npPanel.setBackground(dfn.getBG());
+                    npPanel.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
                     CollapsiblePane cp1 = createCP4(dfn);
                     synchronized (mapDFN2Pane) {
                         mapDFN2Pane.put(dfn, cp1);
@@ -384,7 +384,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 }
 
                 for (DFN dfn : listDFN) {
-                    npPanel.setBackground(dfn.getBG());
+                    npPanel.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
                     CollapsiblePane cp1 = createCP4(dfn);
                     synchronized (mapDFN2Pane) {
                         mapDFN2Pane.put(dfn, cp1);
@@ -415,7 +415,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     listDFN = mapShift2DFN.get(shift);
                 }
                 for (DFN dfn : listDFN) {
-                    npPanel.setBackground(dfn.getBG());
+                    npPanel.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
                     CollapsiblePane cp1 = createCP4(dfn);
                     synchronized (mapDFN2Pane) {
                         mapDFN2Pane.put(dfn, cp1);
@@ -469,7 +469,7 @@ public class PnlDFN extends NursingRecordsPanel {
 
         if (list != null && !list.isEmpty()) {
             for (DFN dfn : list) {
-                npPanel.setBackground(dfn.getBG());
+                npPanel.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
                 CollapsiblePane cp = createCP4(dfn);
                 synchronized (mapDFN2Pane) {
                     mapDFN2Pane.put(dfn, cp);
@@ -911,8 +911,8 @@ public class PnlDFN extends NursingRecordsPanel {
 
         dfnPane.setTitleLabelComponent(cptitle.getMain());
 
-        dfnPane.setBackground(dfn.getBG());
-        dfnPane.setForeground(dfn.getFG());
+        dfnPane.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
+        dfnPane.setForeground(SYSCalendar.getFGSHIFT(dfn.getShift()));
         try {
             dfnPane.setCollapsed(true);
         } catch (PropertyVetoException e) {

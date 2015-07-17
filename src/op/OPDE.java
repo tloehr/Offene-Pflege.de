@@ -39,7 +39,8 @@ import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -232,54 +233,32 @@ public class OPDE {
 
     public static void fatal(Throwable e) {
         fatal(logger, e);
-//        logger.fatal(e.getMessage(), e);
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            em.getTransaction().begin();
-//            SyslogTools.addLog(em, e.getMessage(), SyslogTools.FATAL);
-//            em.getTransaction().commit();
-//        } catch (Exception ee) {
-//            em.getTransaction().rollback();
-//            ee.printStackTrace();
-//        } finally {
-//            em.close();
-//        }
-//        e.printStackTrace();
-//
-//        String html = SYSTools.getThrowableAsHTML(e);
-//        File temp = SYSFilesTools.print(html, false);
-//
-//        if (!isDebug()) {
-//            EMailSystem.sendErrorMail(e.getMessage(), temp);
-//        }
-//
-//        System.exit(1);
     }
 
     public static void fatal(Logger classLogger, Throwable e) {
         classLogger.fatal(e.getMessage(), e);
-            EntityManager em = OPDE.createEM();
-            try {
-                em.getTransaction().begin();
-                SyslogTools.addLog(em, e.getMessage(), SyslogTools.FATAL);
-                em.getTransaction().commit();
-            } catch (Exception ee) {
-                em.getTransaction().rollback();
-                ee.printStackTrace();
-            } finally {
-                em.close();
-            }
-            e.printStackTrace();
-
-            String html = SYSTools.getThrowableAsHTML(e);
-            File temp = SYSFilesTools.print(html, false);
-
-            if (!isDebug()) {
-                EMailSystem.sendErrorMail(e.getMessage(), temp);
-            }
-
-            System.exit(1);
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            SyslogTools.addLog(em, e.getMessage(), SyslogTools.FATAL);
+            em.getTransaction().commit();
+        } catch (Exception ee) {
+            em.getTransaction().rollback();
+            ee.printStackTrace();
+        } finally {
+            em.close();
         }
+        e.printStackTrace();
+
+        String html = SYSTools.getThrowableAsHTML(e);
+        File temp = SYSFilesTools.print(html, false);
+
+        if (!isDebug()) {
+            EMailSystem.sendErrorMail(e.getMessage(), temp);
+        }
+
+        System.exit(1);
+    }
 
     public static void error(Object message) {
         logger.error(message);
@@ -288,8 +267,8 @@ public class OPDE {
 
     public static void error(Logger classLogger, Object message) {
         classLogger.error(message);
-           SyslogTools.error(message.toString());
-       }
+        SyslogTools.error(message.toString());
+    }
 
     public static void debug(Object message) {
         logger.debug(message);
@@ -408,9 +387,6 @@ public class OPDE {
          *                       |___/             |___/
          */
         lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
-
-
-
         validatorFactory = Validation.buildDefaultValidatorFactory();
 
         /***
@@ -455,9 +431,9 @@ public class OPDE {
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
         opts.addOption("x", "experimental", false, "Schaltet experimentelle Programm-Module für User frei, die Admin Rechte haben. VORSICHT !!!!");
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
-        opts.addOption("w", "workingdir", true, "Damit kannst Du ein anderes Arbeitsverzeichnis setzen. Wenn Du diese Option weglässt, dann ist das Dein Benutzerverzeichnis: " + System.getProperty("user.home"));
+//        opts.addOption("w", "workingdir", true, "Damit kannst Du ein anderes Arbeitsverzeichnis setzen. Wenn Du diese Option weglässt, dann ist das Dein Benutzerverzeichnis: " + System.getProperty("user.home"));
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
-        opts.addOption("t", "training", false, "Wird für Einarbeitungsversionen benötigt. Färbt die Oberfläche anders ein und zeigt eine Warnmeldung nach jeder Anmeldung.");
+//        opts.addOption("t", "training", false, "Wird für Einarbeitungsversionen benötigt. Färbt die Oberfläche anders ein und zeigt eine Warnmeldung nach jeder Anmeldung.");
         Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(SYSTools.xx("cmdline.ftpserver")).create("f");
         opts.addOption(optFTPserver);
 //        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
@@ -495,8 +471,7 @@ public class OPDE {
             cl = parser.parse(opts, args);
         } catch (ParseException ex) {
             HelpFormatter f = new HelpFormatter();
-            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion()
-                    + " Build:" + appInfo.getBuildnum(), opts, footer);
+            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion() + " [" + appInfo.getBuildnum() + "]", opts, footer);
             System.exit(0);
         }
 
@@ -508,8 +483,7 @@ public class OPDE {
 
         if (cl.hasOption("h")) {
             HelpFormatter f = new HelpFormatter();
-            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion()
-                    + " Build:" + appInfo.getBuildnum(), opts, footer);
+            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion() + " [" + appInfo.getBuildnum() + "]", opts, footer);
             System.exit(0);
         }
 
@@ -573,7 +547,6 @@ public class OPDE {
             logger.info(System.getProperty("os.name").toLowerCase());
 
 
-
             /***
              *      _     ____       _                   ___ ___
              *     (_)___|  _ \  ___| |__  _   _  __ _  |__ \__ \
@@ -604,8 +577,6 @@ public class OPDE {
             } else {
                 training = false;
             }
-
-
 
 
             /***
@@ -650,7 +621,7 @@ public class OPDE {
                 System.exit(1);
             }
 
-            jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
+            jpaProps.put("javax.persistence.jdbc.driver", "com.mysql.jdbc.Driver");
             jpaProps.put("javax.persistence.jdbc.url", url);
 
 
@@ -848,10 +819,23 @@ public class OPDE {
 
     private static boolean loadLocalProperties() {
         boolean success = false;
-        Properties sysprops = System.getProperties();
+
 
         try {
-            FileInputStream in = new FileInputStream(new File(opwd + sep + AppInfo.fileConfig));
+            File configFile = new File(opwd + sep + AppInfo.fileConfig);
+
+            // make sure the file exists
+            configFile.createNewFile();
+
+            // make sure the minimum requirements for the configs are present. this will be overwritten by any contents in the actual configFile.
+            // missing these settings will most definitely cause exceptions
+            localProps.put(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW, 30);
+            localProps.put(SYSPropsTools.DFN_MAX_MINUTES_TO_WITHDRAW, 30);
+            localProps.put(SYSPropsTools.KEY_CASH_PAGEBREAK, 30);
+            localProps.put(SYSPropsTools.KEY_STATION, 1);
+
+
+            FileInputStream in = new FileInputStream(configFile);
             Properties p = new Properties();
             p.load(in);
             localProps.putAll(p);
@@ -862,17 +846,16 @@ public class OPDE {
             success = true;
         } catch (FileNotFoundException ex) {
             fatal(new Throwable(SYSTools.xx("misc.msg.installation.error")));
-//            // Keine local.properties. Wir richten wohl gerade einen neuen Client ein.
-//
-//            FrmInit frame = new FrmInit();
-//            frame.setVisible(true);
-//            SYSTools.center(frame);
-
-
+        } catch (SecurityException se) {
+            fatal(new Throwable(SYSTools.xx("misc.msg.file.security.error")));
         } catch (IOException ex) {
             fatal(ex);
-//            System.exit(1);
         }
+
+
+        // sanity check
+
+
         return success;
     }
 

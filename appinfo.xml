@@ -146,40 +146,6 @@
         </class>
     </classes>
 
-    <properties>
-        <!--
-            An exception is certain, if these standard settings are missing.
-        -->
-        <property key="animation" value="true"/>
-        <property key="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-        <property key="mainhost" value="false"/>
-        <property key="station" value="1"/>
-        <property key="dailyplan_pagebreak_after_element_no" value="17"/>
-        <property key="cash_pagebreak_after_element_no" value="30"/>
-        <property key="bhp_max_minutes_to_withdraw" value="30"/>
-        <property key="dfn_max_minutes_to_withdraw" value="30"/>
-        <property key="bhp_max_minutes_to_withdraw" value="30"/>
-        <property key="dfn_max_minutes_to_withdraw" value="30"/>
-        <property key="VERY_EARLY_FGSHIFT" value="FFECF5"/>
-        <property key="VERY_EARLY_BGSHIFT" value="FF62B0"/>
-        <property key="VERY_EARLY_FGBHP" value="FF62B0"/>
-        <property key="VERY_EARLY_BGBHP" value="FFC8E3"/>
-        <property key="EARLY_FGSHIFT" value="ECF4FF"/>
-        <property key="EARLY_BGSHIFT" value="62A9FF"/>
-        <property key="EARLY_FGBHP" value="62A9FF"/>
-        <property key="EARLY_BGBHP" value="D0E6FF"/>
-        <property key="LATE_FGSHIFT" value="F3F8F4"/>
-        <property key="LATE_BGSHIFT" value="59955C"/>
-        <property key="LATE_FGBHP" value="59955C"/>
-        <property key="LATE_BGBHP" value="DBEADC"/>
-        <property key="VERY_LATE_FGSHIFT" value="FFE3FF"/>
-        <property key="VERY_LATE_BGSHIFT" value="990099"/>
-        <property key="VERY_LATE_FGBHP" value="990099"/>
-        <property key="VERY_LATE_BGBHP" value="FFA8FF"/>
-        <property key="ON_DEMAND_FGSHIFT" value="F5F5E2"/>
-        <property key="ON_DEMAND_BGSHIFT" value="D1D17A"/>
-        <property key="ON_DEMAND_FGBHP" value="D1D17A"/>
-        <property key="ON_DEMAND_BGBHP" value="EEEECE"/>
-    </properties>
+
 
 </app>

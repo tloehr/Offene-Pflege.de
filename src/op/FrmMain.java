@@ -788,11 +788,7 @@ public class FrmMain extends JFrame {
             JideButton button = GUITools.createHyperlinkButton("opde.mainframe.printdailyplan", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
-                        PrescriptionTools.printDailyPlan(station, "html");
-                    } else {
-                        PrescriptionTools.printDailyPlan(station, "pdf");
-                    }
+                    PrescriptionTools.printDailyPlan(station);
                 }
             });
             button.setBackground(Color.WHITE);

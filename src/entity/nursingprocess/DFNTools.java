@@ -483,7 +483,7 @@ public class DFNTools {
      * @return
      */
     public static boolean isChangeable(DFN dfn) {
-        int DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
+        int DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.DFN_MAX_MINUTES_TO_WITHDRAW));
         boolean residentAbsent = dfn.getResident().isActive() && ResInfoTools.absentSince(dfn.getResident()) != null;
 
         return !residentAbsent && dfn.getResident().isActive() &&

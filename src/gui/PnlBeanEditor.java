@@ -124,11 +124,9 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
 
-                    if (ignoreListener) return;
 //                    boolean accepted = false;
 
                     JPanel innerPanel = new JPanel();
-                    innerPanel.setName("innerPanel");
                     innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.LINE_AXIS));
                     final JLabel lblOK = new JLabel(SYSConst.icon16apply);
 
@@ -150,6 +148,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     });
 
                     txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
+                        if (ignoreListener) return;
+
                         if (saveMode == SAVE_MODE_IMMEDIATE)
                             reload();
 
@@ -226,7 +226,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         } catch (SQLIntegrityConstraintViolationException e) {
                             OPDE.warn(logger, e);
                             lblOK.setIcon(SYSConst.icon16cancel);
-                            lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_bold(e.getMessage())));
+                            lblOK.setToolTipText(SYSTools.toHTMLForScreen("error.sql.integrity"));
                             GUITools.flashBackground(txt, SYSConst.orangered, Color.white, 2);
                         }
                     }));
@@ -236,6 +236,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     innerPanel.setOpaque(false);
 
                     comp = innerPanel;
+                    comp.setName("innerPanel");
+                    txt.setName(field.getName());
                 } else if (editorComponent.component()[0].equalsIgnoreCase("combobox")) {
 
                     // this is the default ItemListener, if there is no renderer defined
@@ -305,6 +307,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     if (renderer != null) combobox.setRenderer(renderer);
 
                     comp = combobox;
+                    comp.setName(field.getName());
                 } else if (editorComponent.component()[0].equalsIgnoreCase("onoffswitch")) {
                     String yesText = "misc.msg.yes";
                     String noText = "misc.msg.no";
@@ -314,7 +317,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     }
 
                     comp = new YesNoToggleButton(yesText, noText, (boolean) PropertyUtils.getProperty(data, field.getName()));
-
+                    comp.setName(field.getName());
                     ((YesNoToggleButton) comp).addItemListener(e -> {
                         if (ignoreListener) return;
                         if (saveMode == SAVE_MODE_IMMEDIATE)
@@ -357,7 +360,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     cp.setContentPane(clr);
 
                     comp = cp;
-
+                    comp.setName(field.getName());
                 } else {
                     OPDE.fatal(logger, new IllegalStateException("invalid component name in EditorComponent Annotation"));
                 }
@@ -374,7 +377,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 SYSTools.setXEnabled(comp, editorComponent.readonly().equals("false"));
 //                comp.setEnabled();
-                comp.setName(field.getName());
                 comp.setToolTipText(editorComponent.tooltip().isEmpty() ? null : SYSTools.xx(editorComponent.tooltip()));
                 componentSet.add(comp);
 
@@ -469,19 +471,13 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
     @Override
     public void refreshDisplay() {
-//        logger.debug(data.toString());
-
         ignoreListener = true;
-
-
-        //grrrrrr: geht immer noch nicht. Dran bleiben.
-
         for (Component comp : componentSet) {
             if (comp instanceof JPanel && comp.getName().equals("innerPanel")) {  // textcomponents are embedded in a JPanel
                 for (Component innerComp : ((JPanel) comp).getComponents()) {
                     if (innerComp instanceof JTextComponent) {
                         try {
-                            ((JTextComponent) innerComp).setText(PropertyUtils.getProperty(data, comp.getName()).toString());
+                            ((JTextComponent) innerComp).setText(PropertyUtils.getProperty(data, innerComp.getName()).toString());
                         } catch (IllegalAccessException e) {
                             OPDE.error(logger, e);
                         } catch (InvocationTargetException e) {

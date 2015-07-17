@@ -10,16 +10,16 @@ import java.util.Properties;
 /**
  * Created by tloehr on 02.07.15.
  */
-public class FTPConfigBean {
+public class DatabaseConnectionBean {
 
     @Size(min = 1, max = 200, message = "msg.string.length.error")
-    @EditorComponent(label = "opde.settings.ftp.host", component = {"textfield"})
+    @EditorComponent(label = "opde.settings.db.host", component = {"textfield"})
     String host;
     @Size(min = 1, max = 200, message = "msg.string.length.error")
-    @EditorComponent(label = "opde.settings.ftp.port", parserClass = "gui.parser.IntegerParser", component = {"textfield"})
+    @EditorComponent(label = "opde.settings.db.port", parserClass = "gui.parser.IntegerParser", component = {"textfield"})
     String port;
     @Size(min = 1, max = 200, message = "msg.string.length.error")
-    @EditorComponent(label = "opde.settings.ftp.user", component = {"textfield"})
+    @EditorComponent(label = "misc.msg.Users", component = {"textfield"})
     String user;
     @Size(min = 0, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "misc.msg.password", component = {"textfield"})
@@ -28,7 +28,7 @@ public class FTPConfigBean {
     @EditorComponent(label = "opde.settings.ftp.wd", component = {"textfield"})
     String workingdir;
 
-    public FTPConfigBean(Properties preset) {
+    public DatabaseConnectionBean(Properties preset) {
         host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_HOST));
         port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PORT), "20");
         user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_USER));

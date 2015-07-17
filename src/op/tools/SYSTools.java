@@ -37,7 +37,6 @@ import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayMessage;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -585,7 +584,7 @@ public class SYSTools {
         if (!moduleName.isEmpty()) {
             moduleName = ", " + moduleName;
         }
-        return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion();// + (OPDE.isDebug() ? " !! DEBUG !!" : "");
+        return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion() + " [" + OPDE.getAppInfo().getBuildnum() + "]";
     }
 
     public static void expandAll(JTree tree) {

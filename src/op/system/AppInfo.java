@@ -30,7 +30,7 @@ import java.util.*;
  * aus der Datei appinfo.xml einzulesen und während der Laufzeit
  * bereit zu halten. Die xml Datei befindet sich im JAR Archiv und wird
  * nur währen der Entwicklungsphase bearbeitet.
- * <p/>
+ * <p>
  * Diese Klasse implementiert ein Sicherheitskonzept für OPDE. Zu jeder Klasse
  * können 11 Rechte definiert werden, die dem jeweiligen Benutzer gewährt
  * oder verweigert werden.
@@ -38,7 +38,7 @@ import java.util.*;
  * innerhalb der Applikation in besagter xml Datei festgelegt.
  * Da diese Informationen spezifisch für eine Programmversion sind
  * sind sie hier als "quasi Konstanten" definiert werden.
- * <p/>
+ * <p>
  * Außerdem
  *
  * @author tloehr
@@ -99,7 +99,7 @@ public class AppInfo {
             in2.close();
 
             progname = appinfo.getProperty("program.PROGNAME");
-            version = appinfo.getProperty("program.VERSION");
+            version = appinfo.getProperty("program.MAJOR") + "." + appinfo.getProperty("program.MINOR") + "." + appinfo.getProperty("program.RELEASE");
             dbversion = Integer.parseInt(appinfo.getProperty("program.DBVERSION"));
             build = Integer.parseInt(appinfo.getProperty("program.BUILDNUM"));
 //            updateCheckUrl = appinfo.getProperty("program.UPDATECHECKURL");
@@ -138,7 +138,6 @@ public class AppInfo {
      * Die DB Tabelle "ACL" enthält zuordnungen der jeweiligen ACLs zu Gruppen. Anhand dieser Einträge wird ermittelt, ob
      * eine Operation erlaubt ist oder nicht. Natürlich darf ein Admin immer alles.
      *
-     *
      * @param acl
      * @param internalClassID - Interne Klassenname, wie in appinfo.properties vereinbart. Nicht zu verwechseln mit den Java Klassennamen.
      * @return
@@ -158,7 +157,7 @@ public class AppInfo {
                 ArrayList<SYSGROUPS2ACL> listGROUPS = new ArrayList<SYSGROUPS2ACL>(query.getResultList());
 
                 ArrayList<Acl> listAllowed = new ArrayList<Acl>();
-                for (SYSGROUPS2ACL sgAcl : listGROUPS){
+                for (SYSGROUPS2ACL sgAcl : listGROUPS) {
                     listAllowed.addAll(sgAcl.getAclCollection());
                 }
 
@@ -281,9 +280,9 @@ public class AppInfo {
         return dbversion;
     }
 
-    public String getSignature(){
+    public String getSignature() {
         return (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "") + "; " + DateFormat.getDateTimeInstance().format(new Date())
-                            + "; " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                + "; " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
     }
 
 //    public String getUpdateCheckUrl() {
