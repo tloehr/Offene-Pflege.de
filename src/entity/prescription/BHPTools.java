@@ -34,27 +34,25 @@ public class BHPTools {
     public static final byte STATE_REFUSED = 2;
     public static final byte STATE_REFUSED_DISCARDED = 3;
 
-    public static final byte SHIFT_OUTCOMES = -2;
-    public static final byte SHIFT_ON_DEMAND = -1;
-    public static final byte SHIFT_VERY_EARLY = 0;
-    public static final byte SHIFT_EARLY = 1;
-    public static final byte SHIFT_LATE = 2;
-    public static final byte SHIFT_VERY_LATE = 3;
 
-    public static final Byte[] SHIFTS = new Byte[]{SHIFT_VERY_EARLY, SHIFT_EARLY, SHIFT_LATE, SHIFT_VERY_LATE};
 
-    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
-    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.bhp.shift.veryearly", "nursingrecords.bhp.shift.early", "nursingrecords.bhp.shift.late", "nursingrecords.bhp.shift.verylate"};
-    public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
-    public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
 
-    public static final byte BYTE_TIMEOFDAY = 0;
-    public static final byte BYTE_EARLY_IN_THE_MORNING = 1;
-    public static final byte BYTE_MORNING = 2;
-    public static final byte BYTE_NOON = 3;
-    public static final byte BYTE_AFTERNOON = 4;
-    public static final byte BYTE_EVENING = 5;
-    public static final byte BYTE_LATE_AT_NIGHT = 6;
+
+//    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
+//    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.bhp.shift.veryearly", "nursingrecords.bhp.shift.early", "nursingrecords.bhp.shift.late", "nursingrecords.bhp.shift.verylate"};
+//    public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
+//    public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
+//
+//    public static final byte BYTE_TIMEOFDAY = 0;
+//    public static final byte BYTE_EARLY_IN_THE_MORNING = 1;
+//    public static final byte BYTE_MORNING = 2;
+//    public static final byte BYTE_NOON = 3;
+//    public static final byte BYTE_AFTERNOON = 4;
+//    public static final byte BYTE_EVENING = 5;
+//    public static final byte BYTE_LATE_AT_NIGHT = 6;
+
+
+
 
     public static final String UIDPREFIX = "__bhp";
 
@@ -308,37 +306,37 @@ public class BHPTools {
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
                 // abgelaufenen Zeitpunkten arbeitet.
                 // Bei ganzerTag=true werden all diese booleans zu true und damit neutralisiert.
-                boolean erstAbFM = wholeday || aktuelleZeit == BYTE_EARLY_IN_THE_MORNING;
-                boolean erstAbMO = wholeday || erstAbFM || aktuelleZeit == BYTE_MORNING;
-                boolean erstAbMI = wholeday || erstAbMO || aktuelleZeit == BYTE_NOON;
-                boolean erstAbNM = wholeday || erstAbMI || aktuelleZeit == BYTE_AFTERNOON;
-                boolean erstAbAB = wholeday || erstAbNM || aktuelleZeit == BYTE_EVENING;
-                boolean erstAbNA = wholeday || erstAbAB || aktuelleZeit == BYTE_LATE_AT_NIGHT;
+                boolean erstAbFM = wholeday || aktuelleZeit == SYSCalendar.BYTE_EARLY_IN_THE_MORNING;
+                boolean erstAbMO = wholeday || erstAbFM || aktuelleZeit == SYSCalendar.BYTE_MORNING;
+                boolean erstAbMI = wholeday || erstAbMO || aktuelleZeit == SYSCalendar.BYTE_NOON;
+                boolean erstAbNM = wholeday || erstAbMI || aktuelleZeit == SYSCalendar.BYTE_AFTERNOON;
+                boolean erstAbAB = wholeday || erstAbNM || aktuelleZeit == SYSCalendar.BYTE_EVENING;
+                boolean erstAbNA = wholeday || erstAbAB || aktuelleZeit == SYSCalendar.BYTE_LATE_AT_NIGHT;
                 boolean uhrzeitOK = wholeday || (pSchedule.getUhrzeit() != null && DateTimeComparator.getTimeOnlyInstance().compare(pSchedule.getUhrzeit(), new DateTime(now)) > 0);
 
                 if (treffer) {
                     if (erstAbFM && pSchedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_EARLY_IN_THE_MORNING, pSchedule.getNachtMo()));
+                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_EARLY_IN_THE_MORNING, pSchedule.getNachtMo()));
                         numbhp++;
                     }
                     if (erstAbMO && pSchedule.getMorgens().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_MORNING, pSchedule.getMorgens()));
+                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_MORNING, pSchedule.getMorgens()));
                         numbhp++;
                     }
                     if (erstAbMI && pSchedule.getMittags().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_NOON, pSchedule.getMittags()));
+                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_NOON, pSchedule.getMittags()));
                         numbhp++;
                     }
                     if (erstAbNM && pSchedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_AFTERNOON, pSchedule.getNachmittags()));
+                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_AFTERNOON, pSchedule.getNachmittags()));
                         numbhp++;
                     }
                     if (erstAbAB && pSchedule.getAbends().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_EVENING, pSchedule.getAbends()));
+                        em.merge(new BHP(pSchedule, targetdate.toDate(),SYSCalendar.BYTE_EVENING, pSchedule.getAbends()));
                         numbhp++;
                     }
                     if (erstAbNA && pSchedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_LATE_AT_NIGHT, pSchedule.getNachtAb()));
+                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_LATE_AT_NIGHT, pSchedule.getNachtAb()));
                         numbhp++;
                     }
                     if (uhrzeitOK && pSchedule.getUhrzeit() != null) {
@@ -416,7 +414,7 @@ public class BHPTools {
                         BHP bhp = new BHP(schedule);
                         bhp.setIst(now);
                         bhp.setSoll(date);
-                        bhp.setSollZeit(BYTE_TIMEOFDAY);
+                        bhp.setSollZeit(SYSCalendar.BYTE_TIMEOFDAY);
                         bhp.setDosis(schedule.getMaxEDosis());
                         bhp.setState(BHPTools.STATE_OPEN);
                         listBHP4ThisPrescription.add(bhp);
@@ -653,10 +651,10 @@ public class BHPTools {
     public static String getScheduleText(BHP bhp, String prefix, String postfix) {
         String text = "";
         if (!bhp.isOnDemand()) {
-            if (bhp.getSollZeit() == BYTE_TIMEOFDAY) {
+            if (bhp.getSollZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
                 text += "<font color=\"blue\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short") + "</font>";
             } else {
-                String[] msg = GUITools.getLocalizedMessages(TIMEIDTEXTLONG);
+                String[] msg = GUITools.getLocalizedMessages(SYSCalendar.TIMEIDTEXTLONG);
                 text += msg[bhp.getSollZeit()];
             }
         } else {
@@ -766,7 +764,7 @@ public class BHPTools {
                 } else if (b1.isOutcomeText()) {
                     result += SYSConst.html_h2("nursingrecords.bhp.outcome");
                 } else {
-                    result += SYSConst.html_h2(SHIFT_TEXT[b1.getShift()]);
+                    result += SYSConst.html_h2(SYSCalendar.SHIFT_TEXT[b1.getShift()]);
                 }
             }
 

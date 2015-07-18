@@ -6,6 +6,7 @@
 package entity.building;
 
 import entity.EntityTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.SYSTools;
 
@@ -37,7 +38,7 @@ public class StationTools {
      * @return
      */
     public static Station getStationForThisHost() {
-        long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
+        long statid = OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_STATION) ? Long.parseLong(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_STATION)) : 1l;
         return EntityTools.find(Station.class, statid);
     }
 

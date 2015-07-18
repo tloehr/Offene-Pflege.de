@@ -34,32 +34,6 @@ public class DFNTools {
     public static final byte STATE_DONE = 1;
     public static final byte STATE_REFUSED = 2;
 
-    public static final byte SHIFT_ON_DEMAND = -1;
-    public static final byte SHIFT_VERY_EARLY = 0;
-    public static final byte SHIFT_EARLY = 1;
-    public static final byte SHIFT_LATE = 2;
-    public static final byte SHIFT_VERY_LATE = 3;
-
-    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
-    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.dfn.shift.veryearly", "nursingrecords.dfn.shift.early", "nursingrecords.dfn.shift.late", "nursingrecords.dfn.shift.verylate"};
-    public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
-    public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
-
-    public static final byte BYTE_TIMEOFDAY = 0;
-    public static final byte BYTE_EARLY_IN_THE_MORNING = 1;
-    public static final byte BYTE_MORNING = 2;
-    public static final byte BYTE_NOON = 3;
-    public static final byte BYTE_AFTERNOON = 4;
-    public static final byte BYTE_EVENING = 5;
-    public static final byte BYTE_LATE_AT_NIGHT = 6;
-
-    public static final String STRING_TIMEOFDAY = "UZ";
-    public static final String STRING_EARLY_IN_THE_MORNING = "FM";
-    public static final String STRING_MORNING = "MO";
-    public static final String STRING_NOON = "MI";
-    public static final String STRING_AFTERNOON = "NM";
-    public static final String STRING_EVENING = "AB";
-    public static final String STRING_LATE_AT_NIGHT = "NA";
 
     /**
      * Diese Methode erzeugt den Tagesplan für die Behandlungspflegen. Dabei werden alle aktiven Verordnungen geprüft, ermittelt ob sie am betreffenden Stichtag auch "dran" sind und dann
@@ -241,12 +215,12 @@ public class DFNTools {
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
                 // abgelaufenen Zeitpunkten arbeitet.
                 // Bei ganzerTag=true werden all diese booleans zu true und damit neutralisiert.
-                boolean erstAbFM = wholeday || aktuelleZeit == BYTE_EARLY_IN_THE_MORNING;
-                boolean erstAbMO = wholeday || erstAbFM || aktuelleZeit == BYTE_MORNING;
-                boolean erstAbMI = wholeday || erstAbMO || aktuelleZeit == BYTE_NOON;
-                boolean erstAbNM = wholeday || erstAbMI || aktuelleZeit == BYTE_AFTERNOON;
-                boolean erstAbAB = wholeday || erstAbNM || aktuelleZeit == BYTE_EVENING;
-                boolean erstAbNA = wholeday || erstAbAB || aktuelleZeit == BYTE_LATE_AT_NIGHT;
+                boolean erstAbFM = wholeday || aktuelleZeit == SYSCalendar.BYTE_EARLY_IN_THE_MORNING;
+                boolean erstAbMO = wholeday || erstAbFM || aktuelleZeit == SYSCalendar.BYTE_MORNING;
+                boolean erstAbMI = wholeday || erstAbMO || aktuelleZeit == SYSCalendar.BYTE_NOON;
+                boolean erstAbNM = wholeday || erstAbMI || aktuelleZeit == SYSCalendar.BYTE_AFTERNOON;
+                boolean erstAbAB = wholeday || erstAbNM || aktuelleZeit == SYSCalendar.BYTE_EVENING;
+                boolean erstAbNA = wholeday || erstAbAB || aktuelleZeit == SYSCalendar.BYTE_LATE_AT_NIGHT;
                 boolean uhrzeitOK = wholeday || (termin.getUhrzeit() != null && DateTimeComparator.getTimeOnlyInstance().compare(termin.getUhrzeit(), new DateTime(now)) > 0);
 
 
@@ -254,42 +228,42 @@ public class DFNTools {
                     if (erstAbFM && termin.getNachtMo() > 0) {
 //                        OPDE.debug("SYSConst.FM, " + termin.getNachtMo());
                         for (int dfncount = 1; dfncount <= termin.getNachtMo(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), BYTE_EARLY_IN_THE_MORNING));
+                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_EARLY_IN_THE_MORNING));
                             numdfn++;
                         }
                     }
                     if (erstAbMO && termin.getMorgens() > 0) {
 //                        OPDE.debug("SYSConst.MO, " + termin.getMorgens());
                         for (int dfncount = 1; dfncount <= termin.getMorgens(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), BYTE_MORNING));
+                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_MORNING));
                             numdfn++;
                         }
                     }
                     if (erstAbMI && termin.getMittags() > 0) {
 //                        OPDE.debug("SYSConst.MI, " + termin.getMittags());
                         for (int dfncount = 1; dfncount <= termin.getMittags(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), BYTE_NOON));
+                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_NOON));
                             numdfn++;
                         }
                     }
                     if (erstAbNM && termin.getNachmittags() > 0) {
 //                        OPDE.debug("SYSConst.NM, " + termin.getNachmittags());
                         for (int dfncount = 1; dfncount <= termin.getNachmittags(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), BYTE_AFTERNOON));
+                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_AFTERNOON));
                             numdfn++;
                         }
                     }
                     if (erstAbAB && termin.getAbends() > 0) {
 //                        OPDE.debug("SYSConst.AB, " + termin.getAbends());
                         for (int dfncount = 1; dfncount <= termin.getAbends(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), BYTE_EVENING));
+                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_EVENING));
                             numdfn++;
                         }
                     }
                     if (erstAbNA && termin.getNachtAb() > 0) {
 //                        OPDE.debug("SYSConst.NA, " + termin.getNachtAb());
                         for (int dfncount = 1; dfncount <= termin.getNachtAb(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), BYTE_LATE_AT_NIGHT));
+                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_LATE_AT_NIGHT));
                             numdfn++;
                         }
                     }
@@ -452,10 +426,10 @@ public class DFNTools {
     public static String getScheduleText(DFN dfn, String prefix, String postfix) {
         String text = "";
         if (!dfn.isOnDemand()) {
-            if (dfn.getSollZeit() == BYTE_TIMEOFDAY) {
+            if (dfn.getSollZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
                 text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll());
             } else {
-                String[] msg = GUITools.getLocalizedMessages(TIMEIDTEXTLONG);
+                String[] msg = GUITools.getLocalizedMessages(SYSCalendar.TIMEIDTEXTLONG);
                 text += msg[dfn.getsZeit()];
             }
         } else {
@@ -565,7 +539,7 @@ public class DFNTools {
         if (!list.isEmpty()) {
 
             DFN d1 = list.get(0);
-            result += SYSConst.html_h2(d1.isOnDemand() ? "nursingrecords.dfn.ondemand" : SHIFT_TEXT[d1.getShift()]);
+            result += SYSConst.html_h2(d1.isOnDemand() ? "nursingrecords.dfn.ondemand" : SYSCalendar.SHIFT_TEXT[d1.getShift()]);
 
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +

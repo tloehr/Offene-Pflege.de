@@ -245,9 +245,9 @@ public class DFN implements Serializable, Comparable<DFN> {
 
     public Byte getShift() {
         if (isOnDemand()) {
-            return DFNTools.SHIFT_ON_DEMAND;
+            return SYSCalendar.SHIFT_ON_DEMAND;
         }
-        if (sZeit == DFNTools.BYTE_TIMEOFDAY) {
+        if (sZeit == SYSCalendar.BYTE_TIMEOFDAY) {
             return SYSCalendar.whatShiftIs(this.soll);
         }
         return SYSCalendar.whatShiftIs(this.sZeit);
@@ -332,21 +332,6 @@ public class DFN implements Serializable, Comparable<DFN> {
         if (result == 0 && this.nursingProcess != null) {
             result = this.nursingProcess.getTopic().compareTo(other.getNursingProcess().getTopic());
         }
-        //
-//        if (result == 0 && this.nursingProcess != null) {
-//            result = new Long(this.nursingProcess.getID()).compareTo(new Long(other.getNursingProcess().getID()));
-//        }
-////        if (result == 0) {
-//            if (this.getNursingProcess() != null){
-//                result = dfnid.compareTo(new Long(getNursingProcess().getID()));
-//            }
-//        }
-//        if (result == 0) {
-//            result = sZeit.compareTo(other.getSollZeit());
-//        }
-//        if (result == 0 && sZeit == DFNTools.BYTE_TIMEOFDAY) {
-//            result = soll.compareTo(other.getSoll());
-//        }
         // then by the name of the intervention
         if (result == 0) {
             result = intervention.getBezeichnung().compareTo(other.getIntervention().getBezeichnung());

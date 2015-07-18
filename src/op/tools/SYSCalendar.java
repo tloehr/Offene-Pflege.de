@@ -27,8 +27,7 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
-import entity.nursingprocess.DFNTools;
-import entity.prescription.BHPTools;
+import entity.system.SYSPropsTools;
 import gui.GUITools;
 import io.lamma.LammaConst;
 import io.lamma.Month;
@@ -52,6 +51,37 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SYSCalendar {
+
+    // Both for DFN and BHP
+    public static final byte SHIFT_OUTCOMES = -2;
+    public static final byte SHIFT_ON_DEMAND = -1;
+    public static final byte SHIFT_VERY_EARLY = 0;
+    public static final byte SHIFT_EARLY = 1;
+    public static final byte SHIFT_LATE = 2;
+    public static final byte SHIFT_VERY_LATE = 3;
+
+    public static final Byte[] SHIFTS = new Byte[]{SHIFT_VERY_EARLY, SHIFT_EARLY, SHIFT_LATE, SHIFT_VERY_LATE};
+
+    public static final byte BYTE_TIMEOFDAY = 0;
+    public static final byte BYTE_EARLY_IN_THE_MORNING = 1;
+    public static final byte BYTE_MORNING = 2;
+    public static final byte BYTE_NOON = 3;
+    public static final byte BYTE_AFTERNOON = 4;
+    public static final byte BYTE_EVENING = 5;
+    public static final byte BYTE_LATE_AT_NIGHT = 6;
+
+    public static final String STRING_TIMEOFDAY = "UZ";
+    public static final String STRING_EARLY_IN_THE_MORNING = "FM";
+    public static final String STRING_MORNING = "MO";
+    public static final String STRING_NOON = "MI";
+    public static final String STRING_AFTERNOON = "NM";
+    public static final String STRING_EVENING = "AB";
+    public static final String STRING_LATE_AT_NIGHT = "NA";
+
+    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
+    public static final String[] SHIFT_TEXT = new String[]{"msg.shift.veryearly", "msg.shift.early", "msg.shift.late", "msg.shift.verylate"};
+    public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
+    public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
 
 
     // the beginning null makes it compatible with the joda int constants.
@@ -452,14 +482,14 @@ public class SYSCalendar {
 
     public static byte whatShiftIs(byte timeID) {
         byte shift;
-        if (DFNTools.BYTE_EARLY_IN_THE_MORNING <= timeID && timeID < DFNTools.BYTE_MORNING) {
-            shift = DFNTools.SHIFT_VERY_EARLY;
-        } else if (DFNTools.BYTE_MORNING <= timeID && timeID < DFNTools.BYTE_AFTERNOON) {
-            shift = DFNTools.SHIFT_EARLY;
-        } else if (DFNTools.BYTE_AFTERNOON <= timeID && timeID < DFNTools.BYTE_LATE_AT_NIGHT) {
-            shift = DFNTools.SHIFT_LATE;
+        if (BYTE_EARLY_IN_THE_MORNING <= timeID && timeID < BYTE_MORNING) {
+            shift = SHIFT_VERY_EARLY;
+        } else if (BYTE_MORNING <= timeID && timeID < BYTE_AFTERNOON) {
+            shift = SHIFT_EARLY;
+        } else if (BYTE_AFTERNOON <= timeID && timeID < BYTE_LATE_AT_NIGHT) {
+            shift = SHIFT_LATE;
         } else {
-            shift = DFNTools.SHIFT_VERY_LATE;
+            shift = SHIFT_VERY_LATE;
         }
         return shift;
     }
@@ -482,12 +512,12 @@ public class SYSCalendar {
 
         DateTimeFormatter parser = DateTimeFormat.forPattern("HH:mm");
 
-        DateTime early_in_the_morning = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_EARLY_IN_THE_MORNING));
-        DateTime morning = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_MORNING));
-        DateTime noon = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_NOON));
-        DateTime afternoon = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_AFTERNOON));
-        DateTime evening = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_EVENING));
-        DateTime late_at_night = parser.parseDateTime(OPDE.getProps().getProperty(DFNTools.STRING_LATE_AT_NIGHT));
+        DateTime early_in_the_morning = parser.parseDateTime(OPDE.getProps().getProperty(STRING_EARLY_IN_THE_MORNING));
+        DateTime morning = parser.parseDateTime(OPDE.getProps().getProperty(STRING_MORNING));
+        DateTime noon = parser.parseDateTime(OPDE.getProps().getProperty(STRING_NOON));
+        DateTime afternoon = parser.parseDateTime(OPDE.getProps().getProperty(STRING_AFTERNOON));
+        DateTime evening = parser.parseDateTime(OPDE.getProps().getProperty(STRING_EVENING));
+        DateTime late_at_night = parser.parseDateTime(OPDE.getProps().getProperty(STRING_LATE_AT_NIGHT));
 
         Period period_early_in_the_morning = new Period(early_in_the_morning.getHourOfDay(), early_in_the_morning.getMinuteOfHour(), early_in_the_morning.getSecondOfMinute(), early_in_the_morning.getMillisOfSecond());
         Period period_morning = new Period(morning.getHourOfDay(), morning.getMinuteOfHour(), morning.getSecondOfMinute(), morning.getMillisOfSecond());
@@ -505,17 +535,17 @@ public class SYSCalendar {
         DateTime lan = new DateMidnight(date).toDateTime().plus(period_late_at_night);
 
         if (eitm.compareTo(ref) <= 0 && ref.compareTo(m) < 0) {
-            timeid = DFNTools.BYTE_EARLY_IN_THE_MORNING;
+            timeid = BYTE_EARLY_IN_THE_MORNING;
         } else if (m.compareTo(ref) <= 0 && ref.compareTo(n) < 0) {
-            timeid = DFNTools.BYTE_MORNING;
+            timeid = BYTE_MORNING;
         } else if (n.compareTo(ref) <= 0 && ref.compareTo(a) < 0) {
-            timeid = DFNTools.BYTE_NOON;
+            timeid = BYTE_NOON;
         } else if (a.compareTo(ref) <= 0 && ref.compareTo(e) < 0) {
-            timeid = DFNTools.BYTE_AFTERNOON;
+            timeid = BYTE_AFTERNOON;
         } else if (e.compareTo(ref) <= 0 && ref.compareTo(lan) < 0) {
-            timeid = DFNTools.BYTE_EVENING;
+            timeid = BYTE_EVENING;
         } else {
-            timeid = DFNTools.BYTE_LATE_AT_NIGHT;
+            timeid = BYTE_LATE_AT_NIGHT;
         }
         return timeid;
     }
@@ -900,7 +930,6 @@ public class SYSCalendar {
     }
 
 
-
     /**
      * Nimmt den aktuellen Zeitpunkt, setzt die Zeit auf 23:59:59 und gibt das Ergebnis zurück.
      *
@@ -943,8 +972,6 @@ public class SYSCalendar {
     }
 
 
-
-
 //    /**
 //     * nimmt das übergebene Datum und setzt die Uhrzeitkomponente auf 12:00:00
 //     *
@@ -963,8 +990,8 @@ public class SYSCalendar {
 
 
     public static DateTime midOfDay() {
-              return midOfDay(new LocalDate());
-          }
+        return midOfDay(new LocalDate());
+    }
 
     public static DateTime midOfDay(LocalDate d) {
         DateTime dt = d.toDateTimeAtCurrentTime();
@@ -1130,24 +1157,71 @@ public class SYSCalendar {
         return timemenu;
     }
 
+
+    public static Color getFGItem(Byte shift) {
+        if (shift == SHIFT_ON_DEMAND) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_ONDEMAND_FGITEM));
+        } else if (shift == SHIFT_VERY_EARLY) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_EARLY_FGITEM));
+        } else if (shift == SHIFT_EARLY) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_EARLY_FGITEM));
+        } else if (shift == SHIFT_LATE) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_LATE_FGITEM));
+        } else if (shift == SHIFT_VERY_LATE) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_LATE_FGITEM));
+        }
+        return null;
+    }
+
+    public static Color getBGItem(Byte shift) {
+        if (shift == SHIFT_ON_DEMAND) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_ONDEMAND_BGITEM));
+        } else if (shift == SHIFT_VERY_EARLY) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_EARLY_BGITEM));
+        } else if (shift == SHIFT_EARLY) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_EARLY_BGITEM));
+        } else if (shift == SHIFT_LATE) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_LATE_BGITEM));
+        } else if (shift == SHIFT_VERY_LATE) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_LATE_BGITEM));
+        }
+
+        return null;
+    }
+
     public static Color getFGSHIFT(Byte shift) {
-        if (shift == BHPTools.SHIFT_ON_DEMAND) {
-            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGSHIFT"));
+        if (shift == SHIFT_ON_DEMAND) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_ONDEMAND_FGSHIFT));
+        } else if (shift == SHIFT_OUTCOMES) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_OUTCOME_FGSHIFT));
+        } else if (shift == SHIFT_VERY_EARLY) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_EARLY_FGSHIFT));
+        } else if (shift == SHIFT_EARLY) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_EARLY_FGSHIFT));
+        } else if (shift == SHIFT_LATE) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_LATE_FGSHIFT));
+        } else if (shift == SHIFT_VERY_LATE) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_LATE_FGSHIFT));
         }
-        if (shift == BHPTools.SHIFT_OUTCOMES) {
-            return Color.LIGHT_GRAY;
-        }
-        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_FGSHIFT"));
+        return null;
     }
 
     public static Color getBGSHIFT(Byte shift) {
-        if (shift == BHPTools.SHIFT_ON_DEMAND) {
-            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGSHIFT"));
+        if (shift == SHIFT_ON_DEMAND) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_ONDEMAND_BGSHIFT));
+        } else if (shift == SHIFT_OUTCOMES) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_OUTCOME_BGSHIFT));
+        } else if (shift == SHIFT_VERY_EARLY) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_EARLY_BGSHIFT));
+        } else if (shift == SHIFT_EARLY) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_EARLY_BGSHIFT));
+        } else if (shift == SHIFT_LATE) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_LATE_BGSHIFT));
+        } else if (shift == SHIFT_VERY_LATE) {
+            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_LATE_BGSHIFT));
         }
-        if (shift == BHPTools.SHIFT_OUTCOMES) {
-            return Color.DARK_GRAY;
-        }
-        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_BGSHIFT"));
+
+        return null;
     }
 
     public static DateTime eod(DateTime date) {

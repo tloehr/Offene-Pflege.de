@@ -45,7 +45,7 @@ public class HandoversTools {
     }
 
     private static String getHTMLColor(Handovers bericht) {
-        return OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bericht.getPit())] + "_FGBHP");
+        return OPDE.getProps().getProperty(SYSCalendar.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bericht.getPit())] + "_FGBHP");
     }
 
 
@@ -219,10 +219,10 @@ public class HandoversTools {
                     progress++;
                     if (!bhpStats.containsKey(bhp.getResident())) {
                         bhpStats.put(bhp.getResident(), new HashMap<Byte, Long>());
-                        bhpStats.get(bhp.getResident()).put(BHPTools.SHIFT_VERY_EARLY, 0l);
-                        bhpStats.get(bhp.getResident()).put(BHPTools.SHIFT_EARLY, 0l);
-                        bhpStats.get(bhp.getResident()).put(BHPTools.SHIFT_LATE, 0l);
-                        bhpStats.get(bhp.getResident()).put(BHPTools.SHIFT_VERY_LATE, 0l);
+                        bhpStats.get(bhp.getResident()).put(SYSCalendar.SHIFT_VERY_EARLY, 0l);
+                        bhpStats.get(bhp.getResident()).put(SYSCalendar.SHIFT_EARLY, 0l);
+                        bhpStats.get(bhp.getResident()).put(SYSCalendar.SHIFT_LATE, 0l);
+                        bhpStats.get(bhp.getResident()).put(SYSCalendar.SHIFT_VERY_LATE, 0l);
                     }
                     long l = bhpStats.get(bhp.getResident()).get(bhp.getShift());
                     bhpStats.get(bhp.getResident()).put(bhp.getShift(), l + 1);
@@ -240,9 +240,9 @@ public class HandoversTools {
 
                         html += "<ul>";
                         int i = 0;
-                        for (Byte shift : BHPTools.SHIFTS) {
+                        for (Byte shift : SYSCalendar.SHIFTS) {
                             if (bhpStats.get(resident).get(shift) > 0l) {
-                                html += "<li>" + SYSTools.xx(BHPTools.SHIFT_TEXT[i]) + ": " + bhpStats.get(resident).get(shift) + "</li>";
+                                html += "<li>" + SYSTools.xx(SYSCalendar.SHIFT_TEXT[i]) + ": " + bhpStats.get(resident).get(shift) + "</li>";
                             }
                             i++;
                         }

@@ -18,6 +18,7 @@ public abstract class DefaultPanel extends CleanablePanel {
         thisPanel = this;
         setLayout(new CardLayout());
         mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
         dialogPanel = new JPanel();
         add(mainPanel, "main");
         add(dialogPanel, "dialog");

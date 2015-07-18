@@ -68,7 +68,7 @@ public class ResValueTools {
             if (bwert.isReplaced() || bwert.isDeleted()) {
                 color = SYSConst.html_lightslategrey;
             } else {
-                color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bwert.getPit())] + "_FGBHP");
+                color = OPDE.getProps().getProperty(SYSCalendar.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bwert.getPit())] + "_FGBHP");
             }
         }
         String result = sdf.format(bwert.getPit()) + "; " + bwert.getUser().getFullname();
@@ -200,7 +200,7 @@ public class ResValueTools {
                 if (wert.isReplaced() || wert.isDeleted()) {
                     color = SYSConst.html_lightslategrey;
                 } else {
-                    color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(wert.getPit())] + "_FGBHP");
+                    color = OPDE.getProps().getProperty(SYSCalendar.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(wert.getPit())] + "_FGBHP");
                 }
             }
             result = "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>" + SYSTools.xx("misc.msg.comment") + ":</b> " + wert.getText() + "</font>";

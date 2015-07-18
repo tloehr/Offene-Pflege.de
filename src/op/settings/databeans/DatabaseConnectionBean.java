@@ -2,9 +2,15 @@ package op.settings.databeans;
 
 import entity.system.SYSPropsTools;
 import gui.interfaces.EditorComponent;
+import op.OPDE;
 import op.tools.SYSTools;
+import org.apache.log4j.Logger;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.validation.constraints.Size;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
@@ -12,28 +18,45 @@ import java.util.Properties;
  */
 public class DatabaseConnectionBean {
 
-    @Size(min = 1, max = 200, message = "msg.string.length.error")
+    @NotEmpty
+    @Size(min = 1, max = 30, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.db.host", component = {"textfield"})
     String host;
-    @Size(min = 1, max = 200, message = "msg.string.length.error")
+    @NotEmpty
+    @Size(min = 1, max = 30, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.db.port", parserClass = "gui.parser.IntegerParser", component = {"textfield"})
     String port;
-    @Size(min = 1, max = 200, message = "msg.string.length.error")
+    @NotEmpty
+    @Size(min = 1, max = 30, message = "msg.string.length.error")
     @EditorComponent(label = "misc.msg.Users", component = {"textfield"})
     String user;
-    @Size(min = 0, max = 200, message = "msg.string.length.error")
+    @Size(min = 0, max = 30, message = "msg.string.length.error")
     @EditorComponent(label = "misc.msg.password", component = {"textfield"})
     String password;
-    @Size(min = 0, max = 200, message = "msg.string.length.error")
-    @EditorComponent(label = "opde.settings.ftp.wd", component = {"textfield"})
-    String workingdir;
+    @NotEmpty
+    @Size(min = 1, max = 30, message = "msg.string.length.error")
+    @EditorComponent(label = "opde.settings.db.catalog", component = {"textfield"})
+    String catalog;
 
     public DatabaseConnectionBean(Properties preset) {
-        host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_HOST));
-        port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PORT), "20");
-        user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_USER));
-        password = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
-        workingdir = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_WD, "/"));
+
+        Logger logger = Logger.getLogger(getClass());
+
+        host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_HOST));
+        port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
+        user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_USER), "opdeuser");
+
+
+        try {
+            password = OPDE.getDesEncrypter().decrypt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
+        } catch (BadPaddingException e) {
+            password = "";
+        } catch (Exception e) {
+            OPDE.fatal(logger, e);
+        }
+
+        catalog = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
+
     }
 
     public String getHost() {
@@ -68,21 +91,23 @@ public class DatabaseConnectionBean {
         this.password = password;
     }
 
-    public String getWorkingdir() {
-        return workingdir;
+    public String getCatalog() {
+        return catalog;
     }
 
-    public void setWorkingdir(String workingdir) {
-        this.workingdir = workingdir;
+    public void setCatalog(String catalog) {
+        this.catalog = catalog;
     }
 
-    public Properties toProperties(Properties myFTPProps) {
-        myFTPProps.put(SYSPropsTools.KEY_FTP_HOST, host.trim());
-        myFTPProps.put(SYSPropsTools.KEY_FTP_PORT, port.trim());
-        myFTPProps.put(SYSPropsTools.KEY_FTP_USER, user.trim());
-        myFTPProps.put(SYSPropsTools.KEY_FTP_PASSWORD, password.trim());
-        myFTPProps.put(SYSPropsTools.KEY_FTP_WD, workingdir.trim());
-        return myFTPProps;
+    public Properties toProperties(Properties myProps) throws UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException {
+
+        myProps.put(SYSPropsTools.KEY_JDBC_HOST, host.trim());
+        myProps.put(SYSPropsTools.KEY_JDBC_PORT, port.trim());
+        myProps.put(SYSPropsTools.KEY_JDBC_USER, user.trim());
+        myProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(password.trim()));
+        myProps.put(SYSPropsTools.KEY_JDBC_CATALOG, catalog.trim());
+        myProps.put(SYSPropsTools.KEY_JDBC_URL, "jdbc:mysql://" + host.trim() + ":" + port.trim() + "/" + catalog.trim());
+        return myProps;
     }
 
 }

@@ -345,7 +345,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         BigDecimal bd = BigDecimal.ZERO;
         if (uhrzeit != null) {
             byte timecode = SYSCalendar.whatTimeIDIs(uhrzeit);
-            if (timecode >= BHPTools.BYTE_EARLY_IN_THE_MORNING && timecode <= BHPTools.BYTE_MORNING) {
+            if (timecode >= SYSCalendar.BYTE_EARLY_IN_THE_MORNING && timecode <= SYSCalendar.BYTE_MORNING) {
                 bd = uhrzeitDosis;
             }
         } else {
@@ -359,7 +359,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         BigDecimal bd = BigDecimal.ZERO;
         if (uhrzeit != null) {
             byte timecode = SYSCalendar.whatTimeIDIs(uhrzeit);
-            if (timecode >= BHPTools.BYTE_NOON && timecode <= BHPTools.BYTE_AFTERNOON) {
+            if (timecode >= SYSCalendar.BYTE_NOON && timecode <= SYSCalendar.BYTE_AFTERNOON) {
                 bd = uhrzeitDosis;
             }
         } else {
@@ -374,7 +374,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         BigDecimal bd = BigDecimal.ZERO;
         if (uhrzeit != null) {
             byte timecode = SYSCalendar.whatTimeIDIs(uhrzeit);
-            if (timecode >= BHPTools.BYTE_EVENING && timecode <= BHPTools.BYTE_LATE_AT_NIGHT) {
+            if (timecode >= SYSCalendar.BYTE_EVENING && timecode <= SYSCalendar.BYTE_LATE_AT_NIGHT) {
                 bd = uhrzeitDosis;
             }
         } else {

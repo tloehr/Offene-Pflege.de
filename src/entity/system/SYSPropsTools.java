@@ -33,7 +33,7 @@ public class SYSPropsTools {
     public static final String KEY_LOGICAL_PRINTER = "printer.logical.name";
     public static final String KEY_MEDSTOCK_LABEL = "printer.medstock.label.name";
 
-//    public static final String KEY_COUNTRY = "country";
+    //    public static final String KEY_COUNTRY = "country";
     public static final String KEY_MAIL_HOST = "mail.smtp.host";
     public static final String KEY_MAIL_SPAMFILTER_KEY = "mail.spamfilter.key";
     public static final String KEY_MAIL_TESTKEY = "mail.testkey";
@@ -56,9 +56,46 @@ public class SYSPropsTools {
     public static final String KEY_FTP_PORT = "FTPPort";
     public static final String KEY_FTP_IS_WORKING = "FTPIsWorking";
 
+
+    public static final String KEY_JDBC_HOST = "javax.persistence.jdbc.host";
+    public static final String KEY_JDBC_PORT = "javax.persistence.jdbc.port";
+    public static final String KEY_JDBC_CATALOG = "javax.persistence.jdbc.catalog";
+    public static final String KEY_JDBC_USER = "javax.persistence.jdbc.user";
+    public static final String KEY_JDBC_DRIVER = "javax.persistence.jdbc.driver";
+    public static final String KEY_JDBC_PASSWORD = "javax.persistence.jdbc.password";
+    public static final String KEY_JDBC_URL = "javax.persistence.jdbc.url";
+
     public static final String KEY_CALC_MEDI_UPR1 = "calc.medi.upr1";
     public static final String KEY_CALC_MEDI_OTHER = "calc.medi.other"; // yet unused
     public static final String KEY_MAINTENANCE_MODE = "system.maintenance.mode";
+
+
+    public static final String KEY_VERY_EARLY_FGSHIFT = "VERY_EARLY_FGSHIFT";
+    public static final String KEY_VERY_EARLY_BGSHIFT = "VERY_EARLY_BGSHIFT";
+    public static final String KEY_VERY_EARLY_FGITEM = "VERY_EARLY_FGITEM";
+    public static final String KEY_VERY_EARLY_BGITEM = "VERY_EARLY_BGITEM";
+    public static final String KEY_EARLY_FGSHIFT = "EARLY_FGSHIFT";
+    public static final String KEY_EARLY_BGSHIFT = "EARLY_BGSHIFT";
+    public static final String KEY_EARLY_FGITEM = "EARLY_FGITEM";
+    public static final String KEY_EARLY_BGITEM = "EARLY_BGITEM";
+    public static final String KEY_LATE_FGSHIFT = "LATE_FGSHIFT";
+    public static final String KEY_LATE_BGSHIFT = "LATE_BGSHIFT";
+    public static final String KEY_LATE_FGITEM = "LATE_FGITEM";
+    public static final String KEY_LATE_BGITEM = "LATE_BGITEM";
+    public static final String KEY_VERY_LATE_FGSHIFT = "VERY_LATE_FGSHIFT";
+    public static final String KEY_VERY_LATE_BGSHIFT = "VERY_LATE_BGSHIFT";
+    public static final String KEY_VERY_LATE_FGITEM = "VERY_LATE_FGITEM";
+    public static final String KEY_VERY_LATE_BGITEM = "VERY_LATE_BGITEM";
+    public static final String KEY_ONDEMAND_FGSHIFT = "ONDEMAND_FGSHIFT";
+    public static final String KEY_ONDEMAND_BGSHIFT = "ONDEMAND_BGSHIFT";
+    public static final String KEY_ONDEMAND_FGITEM = "ONDEMAND_FGITEM";
+    public static final String KEY_ONDEMAND_BGITEM = "ONDEMAND_BGITEM";
+    public static final String KEY_OUTCOME_FGSHIFT = "OUTCOME_FGSHIFT";
+    public static final String KEY_OUTCOME_BGSHIFT = "OUTCOME_BGSHIFT";
+
+    // not used
+//    public static final String KEY_OUTCOME_FGITEM = "OUTCOME_FGITEM";
+//    public static final String KEY_OUTCOME_BGITEM = "OUTCOME_BGITEM";
 
     //should be useless in future
     public static final String LOCAL_KEY_CIPHER_NIC = "cipher.nic.id";

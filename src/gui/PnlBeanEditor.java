@@ -11,6 +11,7 @@ import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -39,6 +40,7 @@ import java.util.HashSet;
  */
 public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private final Class<T> clazz;
+    private Closure cancelCallback;
     //    private JPanel customPanel;
     //    private final String[][] fields;
     private boolean ignoreListener = false;
@@ -53,6 +55,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz, int saveMode)
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super(dataProvider);
+        cancelCallback = null;
         this.clazz = clazz;
         setOpaque(false);
 
@@ -66,6 +69,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz)
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         this(dataProvider, clazz, SAVE_MODE_CUSTOM);
+    }
+
+    public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz, Closure cancelCallback)
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        this(dataProvider, clazz, SAVE_MODE_OK_CANCEL);
+        this.cancelCallback = cancelCallback;
     }
 
     public void setCustomPanel(JPanel customPanel) {
@@ -414,8 +423,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
         JButton btnCancel = new JButton(SYSConst.icon22cancel);
         btnCancel.addActionListener(e -> {
-            reload();
-            refreshDisplay();
+            if (cancelCallback == null) {
+                reload();
+                refreshDisplay();
+            } else {
+                cancelCallback.execute(null);
+            }
             // revert to old bean state
         });
 

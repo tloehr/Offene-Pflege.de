@@ -98,7 +98,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.soll = targetTime.toDate();
         this.version = 0l;
         this.nanotime = System.nanoTime();
-        this.sZeit = BHPTools.BYTE_TIMEOFDAY;
+        this.sZeit = SYSCalendar.BYTE_TIMEOFDAY;
         this.dosis = BigDecimal.ONE.negate();
         this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
@@ -240,25 +240,25 @@ public class BHP implements Serializable, Comparable<BHP> {
 //        return "#" + OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP");
 //    }
 
-    public Color getFG() {
-        if (isOnDemand() && !isOutcomeText()) {
-            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
-        }
-        if (isOutcomeText()) {
-            return Color.WHITE;
-        }
-        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
-    }
-
-    public Color getBG() {
-        if (isOnDemand() && !isOutcomeText()) {
-            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
-        }
-        if (isOutcomeText()) {
-            return Color.LIGHT_GRAY;
-        }
-        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
-    }
+//    public Color getFG() {
+//        if (isOnDemand() && !isOutcomeText()) {
+//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+//        }
+//        if (isOutcomeText()) {
+//            return Color.WHITE;
+//        }
+//        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
+//    }
+//
+//    public Color getBG() {
+//        if (isOnDemand() && !isOutcomeText()) {
+//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+//        }
+//        if (isOutcomeText()) {
+//            return Color.LIGHT_GRAY;
+//        }
+//        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
+//    }
 
     public void setDosis(BigDecimal dosis) {
         this.dosis = dosis;
@@ -351,12 +351,12 @@ public class BHP implements Serializable, Comparable<BHP> {
 
     public Byte getShift() {
         if (isOnDemand()) {
-            return BHPTools.SHIFT_ON_DEMAND;
+            return SYSCalendar.SHIFT_ON_DEMAND;
         }
         if (isOutcomeText()) {
-            return BHPTools.SHIFT_OUTCOMES;
+            return SYSCalendar.SHIFT_OUTCOMES;
         }
-        if (sZeit == BHPTools.BYTE_TIMEOFDAY) {
+        if (sZeit == SYSCalendar.BYTE_TIMEOFDAY) {
             return SYSCalendar.whatShiftIs(this.soll);
         }
         return SYSCalendar.whatShiftIs(this.sZeit);

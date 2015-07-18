@@ -1,9 +1,6 @@
-package securetoken;
+package op.tools;
 
 import org.apache.commons.lang3.SystemUtils;
-import securetoken.impl.Hardware4Mac;
-import securetoken.impl.Hardware4Nix;
-import securetoken.impl.Hardware4Win;
 
 
 public class Hardware {

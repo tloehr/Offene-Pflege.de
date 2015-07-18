@@ -53,6 +53,12 @@ public class DisplayManager extends Thread {
 
 //    private DateFormat df;
 
+
+    public DisplayManager() {
+        this.timeoutAction = null;
+        this.pbTimeout = null;
+    }
+
     /**
      * Creates a new instance of HeapStat
      */
@@ -254,10 +260,12 @@ public class DisplayManager extends Thread {
     }
 
     public void addSubMessage(DisplayMessage msg) {
+        if (messageQ == null) return;
         messageQ.add(msg);
     }
 
     public void clearSubMessages() {
+        if (messageQ == null) return;
         messageQ.clear();
         processSubMessage();
     }

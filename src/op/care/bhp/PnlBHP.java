@@ -215,21 +215,21 @@ public class PnlBHP extends NursingRecordsPanel {
                                 mapShift2BHP.get(bhp.getShift()).add(bhp);
                             }
 
-                            if (!mapShift2BHP.containsKey(BHPTools.SHIFT_ON_DEMAND)) {
-                                mapShift2BHP.put(BHPTools.SHIFT_ON_DEMAND, new ArrayList<BHP>());
+                            if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_ON_DEMAND)) {
+                                mapShift2BHP.put(SYSCalendar.SHIFT_ON_DEMAND, new ArrayList<BHP>());
                             }
-                            mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
-                            if (!mapShift2BHP.containsKey(BHPTools.SHIFT_OUTCOMES)) {
-                                mapShift2BHP.put(BHPTools.SHIFT_OUTCOMES, new ArrayList<BHP>());
+                            mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
+                            if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_OUTCOMES)) {
+                                mapShift2BHP.put(SYSCalendar.SHIFT_OUTCOMES, new ArrayList<BHP>());
                             }
-                            mapShift2BHP.get(BHPTools.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
+                            mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
                         }
 
                         synchronized (mapShift2Pane) {
-                            for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_OUTCOMES, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+                            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                                 mapShift2Pane.put(shift, createCP4(shift));
                                 try {
-                                    mapShift2Pane.get(shift).setCollapsed(shift == BHPTools.SHIFT_ON_DEMAND || shift == BHPTools.SHIFT_OUTCOMES || shift != SYSCalendar.whatShiftIs(new Date()));
+                                    mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift == SYSCalendar.SHIFT_OUTCOMES || shift != SYSCalendar.whatShiftIs(new Date()));
                                 } catch (PropertyVetoException e) {
                                     OPDE.debug(e);
                                 }
@@ -277,19 +277,19 @@ public class PnlBHP extends NursingRecordsPanel {
                 mapShift2BHP.get(bhp.getShift()).add(bhp);
             }
 
-            if (!mapShift2BHP.containsKey(BHPTools.SHIFT_ON_DEMAND)) {
-                mapShift2BHP.put(BHPTools.SHIFT_ON_DEMAND, new ArrayList<BHP>());
+            if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_ON_DEMAND)) {
+                mapShift2BHP.put(SYSCalendar.SHIFT_ON_DEMAND, new ArrayList<BHP>());
             }
-            mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
-            if (!mapShift2BHP.containsKey(BHPTools.SHIFT_OUTCOMES)) {
-                mapShift2BHP.put(BHPTools.SHIFT_OUTCOMES, new ArrayList<BHP>());
+            mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
+            if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_OUTCOMES)) {
+                mapShift2BHP.put(SYSCalendar.SHIFT_OUTCOMES, new ArrayList<BHP>());
             }
-            mapShift2BHP.get(BHPTools.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
+            mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
 
-            for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_OUTCOMES, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                 mapShift2Pane.put(shift, createCP4(shift));
                 try {
-                    mapShift2Pane.get(shift).setCollapsed(shift == BHPTools.SHIFT_ON_DEMAND || shift == BHPTools.SHIFT_OUTCOMES || shift != SYSCalendar.whatShiftIs(new Date()));
+                    mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift == SYSCalendar.SHIFT_OUTCOMES || shift != SYSCalendar.whatShiftIs(new Date()));
                 } catch (PropertyVetoException e) {
                     OPDE.debug(e);
                 }
@@ -305,17 +305,17 @@ public class PnlBHP extends NursingRecordsPanel {
         synchronized (mapShift2Pane) {
             cpBHP.removeAll();
             cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
-            for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_OUTCOMES, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                 cpBHP.add(mapShift2Pane.get(shift));
 
                 if (resetCollapseState) {
                     try {
 
                         LocalDate day = new LocalDate(jdcDatum.getDate());
-                        if (shift == BHPTools.SHIFT_ON_DEMAND) {
-                            mapShift2Pane.get(BHPTools.SHIFT_ON_DEMAND).setCollapsed(!BHPTools.isOnDemandBHPs(resident, day));
-                        } else if (shift == BHPTools.SHIFT_OUTCOMES) {
-                            mapShift2Pane.get(BHPTools.SHIFT_OUTCOMES).setCollapsed(BHPTools.getOutcomeBHPs(resident, day).isEmpty());
+                        if (shift == SYSCalendar.SHIFT_ON_DEMAND) {
+                            mapShift2Pane.get(SYSCalendar.SHIFT_ON_DEMAND).setCollapsed(!BHPTools.isOnDemandBHPs(resident, day));
+                        } else if (shift == SYSCalendar.SHIFT_OUTCOMES) {
+                            mapShift2Pane.get(SYSCalendar.SHIFT_OUTCOMES).setCollapsed(BHPTools.getOutcomeBHPs(resident, day).isEmpty());
                         } else {
                             mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
                         }
@@ -331,9 +331,9 @@ public class PnlBHP extends NursingRecordsPanel {
     }
 
     private CollapsiblePane createCP4(Byte shift) {
-        if (shift == BHPTools.SHIFT_ON_DEMAND) {
+        if (shift == SYSCalendar.SHIFT_ON_DEMAND) {
             return createCP4OnDemand();
-        } else if (shift == BHPTools.SHIFT_OUTCOMES) {
+        } else if (shift == SYSCalendar.SHIFT_OUTCOMES) {
             return createCP4Outcome();
         } else {
             return createCP4Shift(shift);
@@ -353,18 +353,18 @@ public class PnlBHP extends NursingRecordsPanel {
 
         final CollapsiblePane mainPane = new CollapsiblePane(title);
         mainPane.setSlidingDirection(SwingConstants.SOUTH);
-        mainPane.setBackground(SYSCalendar.getBGSHIFT(BHPTools.SHIFT_OUTCOMES));
-        mainPane.setForeground(SYSCalendar.getFGSHIFT(BHPTools.SHIFT_OUTCOMES));
+        mainPane.setBackground(SYSCalendar.getBGSHIFT(SYSCalendar.SHIFT_OUTCOMES));
+        mainPane.setForeground(SYSCalendar.getFGSHIFT(SYSCalendar.SHIFT_OUTCOMES));
         mainPane.setLayout(new VerticalLayout());
         mainPane.setOpaque(false);
 
-        if (!mapShift2BHP.get(BHPTools.SHIFT_OUTCOMES).isEmpty()) {
+        if (!mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).isEmpty()) {
 //            Prescription currentPrescription = null;
 //            CollapsiblePane sitPane = null;
 //            JPanel sitPanel = null;
 //            JPanel panel = new JPanel();
 //            panel.setLayout(new VerticalLayout());
-            for (BHP bhp : mapShift2BHP.get(BHPTools.SHIFT_OUTCOMES)) {
+            for (BHP bhp : mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES)) {
 
                 mapBHP2Pane.put(bhp, createCP4(bhp));
                 mainPane.add(mapBHP2Pane.get(bhp));
@@ -388,21 +388,21 @@ public class PnlBHP extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|  \___/|_| |_|____/ \___|_| |_| |_|\__,_|_| |_|\__,_|
          *
          */
-        String title = "<html><font size=+1><b>" + SYSTools.xx("nursingrecords.bhp.ondemand") + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + SYSTools.xx("msg.shift.ondemand") + "</b></font></html>";
 
         final CollapsiblePane mainPane = new CollapsiblePane(title);
         mainPane.setSlidingDirection(SwingConstants.SOUTH);
-        mainPane.setBackground(SYSCalendar.getBGSHIFT(BHPTools.SHIFT_ON_DEMAND));
-        mainPane.setForeground(SYSCalendar.getFGSHIFT(BHPTools.SHIFT_ON_DEMAND));
+        mainPane.setBackground(SYSCalendar.getBGSHIFT(SYSCalendar.SHIFT_ON_DEMAND));
+        mainPane.setForeground(SYSCalendar.getFGSHIFT(SYSCalendar.SHIFT_ON_DEMAND));
         mainPane.setOpaque(false);
 
-        if (!mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).isEmpty()) {
+        if (!mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).isEmpty()) {
             Prescription currentPrescription = null;
             CollapsiblePane sitPane = null;
             JPanel sitPanel = null;
             JPanel sitOuterPanel = new JPanel();
             sitOuterPanel.setLayout(new VerticalLayout());
-            for (BHP bhp : mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND)) {
+            for (BHP bhp : mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND)) {
                 if (currentPrescription == null || bhp.getPrescription().getID() != currentPrescription.getID()) {
                     if (currentPrescription != null) {
                         sitPane.setContentPane(sitPanel);
@@ -411,10 +411,10 @@ public class PnlBHP extends NursingRecordsPanel {
                     currentPrescription = bhp.getPrescription();
                     sitPanel = new JPanel();
                     sitPanel.setLayout(new VerticalLayout());
-                    sitPanel.setBackground(bhp.getBG());
+                    sitPanel.setBackground(SYSCalendar.getBGItem(bhp.getShift()));
                     sitPane = new CollapsiblePane(SYSTools.toHTMLForScreen("<b>" + currentPrescription.getSituation().getText()) + "</b>");
                     sitPane.setSlidingDirection(SwingConstants.SOUTH);
-                    sitPane.setBackground(ColorUtils.getDerivedColor(SYSCalendar.getBGSHIFT(BHPTools.SHIFT_ON_DEMAND), 0.4f)); // a little darker
+                    sitPane.setBackground(ColorUtils.getDerivedColor(SYSCalendar.getBGSHIFT(SYSCalendar.SHIFT_ON_DEMAND), 0.4f)); // a little darker
                     sitPane.setForeground(Color.BLACK);
                     sitPane.setOpaque(false);
                 }
@@ -444,7 +444,7 @@ public class PnlBHP extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
          *
          */
-        String title = "<html><font size=+1><b>" + GUITools.getLocalizedMessages(BHPTools.SHIFT_TEXT)[shift] + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + GUITools.getLocalizedMessages(SYSCalendar.SHIFT_TEXT)[shift] + "</b></font></html>";
 
         final CollapsiblePane prPane = new CollapsiblePane(title);
         prPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -457,7 +457,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
         if (mapShift2BHP.containsKey(shift)) {
 
-            if (shift == BHPTools.SHIFT_EARLY) {
+            if (shift == SYSCalendar.SHIFT_EARLY) {
 
                 final CollapsiblePane morning = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.morning.long") + "</font></html>", null);
                 morning.setSlidingDirection(SwingConstants.SOUTH);
@@ -487,11 +487,11 @@ public class PnlBHP extends NursingRecordsPanel {
                 clock.setContentPane(pnlClock);
 
                 for (BHP bhp : mapShift2BHP.get(shift)) {
-                    prPanel.setBackground(bhp.getBG());
+                    prPanel.setBackground(SYSCalendar.getBGItem(bhp.getShift()));
                     mapBHP2Pane.put(bhp, createCP4(bhp));
-                    if (bhp.getSollZeit() == BHPTools.BYTE_MORNING) {
+                    if (bhp.getSollZeit() == SYSCalendar.BYTE_MORNING) {
                         pnlMorning.add(mapBHP2Pane.get(bhp));
-                    } else if (bhp.getSollZeit() == BHPTools.BYTE_NOON) {
+                    } else if (bhp.getSollZeit() == SYSCalendar.BYTE_NOON) {
                         pnlNoon.add(mapBHP2Pane.get(bhp));
                     } else {
                         pnlClock.add(mapBHP2Pane.get(bhp));
@@ -508,7 +508,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     prPanel.add(noon);
                 }
 
-            } else if (shift == BHPTools.SHIFT_LATE) {
+            } else if (shift == SYSCalendar.SHIFT_LATE) {
                 final CollapsiblePane afternoon = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.afternoon.long") + "</font></html>", null);
                 afternoon.setSlidingDirection(SwingConstants.SOUTH);
                 afternoon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
@@ -537,11 +537,11 @@ public class PnlBHP extends NursingRecordsPanel {
                 clock.setContentPane(pnlClock);
 
                 for (BHP bhp : mapShift2BHP.get(shift)) {
-                    prPanel.setBackground(bhp.getBG());
+                    prPanel.setBackground(SYSCalendar.getBGItem(bhp.getShift()));
                     mapBHP2Pane.put(bhp, createCP4(bhp));
-                    if (bhp.getSollZeit() == BHPTools.BYTE_AFTERNOON) {
+                    if (bhp.getSollZeit() == SYSCalendar.BYTE_AFTERNOON) {
                         pnlAfternoon.add(mapBHP2Pane.get(bhp));
-                    } else if (bhp.getSollZeit() == BHPTools.BYTE_EVENING) {
+                    } else if (bhp.getSollZeit() == SYSCalendar.BYTE_EVENING) {
                         pnlEvening.add(mapBHP2Pane.get(bhp));
                     } else {
                         pnlClock.add(mapBHP2Pane.get(bhp));
@@ -559,7 +559,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 }
             } else {
                 for (BHP bhp : mapShift2BHP.get(shift)) {
-                    prPanel.setBackground(bhp.getBG());
+                    prPanel.setBackground(SYSCalendar.getBGItem(bhp.getShift()));
                     mapBHP2Pane.put(bhp, createCP4(bhp));
                     prPanel.add(mapBHP2Pane.get(bhp));
                 }
@@ -678,7 +678,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         // add outcome check BHP if necessary
                         if (!myBHP.isOutcomeText() && myBHP.getPrescriptionSchedule().getCheckAfterHours() != null) {
                             outcomeBHP = em.merge(new BHP(myBHP));
-                            mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).add(outcomeBHP);
+                            mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).add(outcomeBHP);
                         }
 
                         em.getTransaction().commit();
@@ -697,7 +697,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 // Fix the other BHPs on demand. If not, you will get locking exceptions,
                                 // we FORCED INCREMENTED LOCKS on the Schedule and the Prescription.
                                 ArrayList<BHP> changeList = new ArrayList<BHP>();
-                                for (BHP bhp : mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND)) {
+                                for (BHP bhp : mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND)) {
                                     if (bhp.getPrescription().getID() == myBHP.getPrescription().getID() && bhp.getBHPid() != myBHP.getBHPid()) {
                                         bhp.setPrescription(myBHP.getPrescription());
                                         bhp.setPrescriptionSchedule(myBHP.getPrescriptionSchedule());
@@ -1281,8 +1281,8 @@ public class PnlBHP extends NursingRecordsPanel {
         contentPane.setEditable(false);
         contentPane.setContentType("text/html");
         bhpPane.setContentPane(contentPane);
-        bhpPane.setBackground(bhp.getBG());
-        bhpPane.setForeground(bhp.getFG());
+        bhpPane.setBackground(SYSCalendar.getBGItem(bhp.getShift()));
+        bhpPane.setForeground(SYSCalendar.getFGItem(bhp.getShift()));
 
         try {
             bhpPane.setCollapsed(true);
@@ -1492,7 +1492,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     html += "<h1 id=\"fonth1\" >" + ResidentTools.getFullName(resident) + "</h1>";
                     html += SYSConst.html_h2(SYSTools.xx("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDatum.getDate())));
 
-                    for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_OUTCOMES, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+                    for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                         if (mapShift2BHP.containsKey(shift)) {
                             html += BHPTools.getBHPsAsHTMLtable(mapShift2BHP.get(shift), true);
                         }

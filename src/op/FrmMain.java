@@ -126,8 +126,6 @@ public class FrmMain extends JFrame {
             pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
         }
 
-
-//        pbTimeout.setToolTipText(SYSTools.xx("opde.mainframe.pbTimeout.tooltip"));
         // for the timeout function
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
             @Override

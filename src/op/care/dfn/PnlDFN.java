@@ -109,7 +109,7 @@ public class PnlDFN extends NursingRecordsPanel {
     private void initPanel() {
         mapShift2Pane = Collections.synchronizedMap(new HashMap<Byte, CollapsiblePane>());
         mapShift2DFN = Collections.synchronizedMap(new HashMap<Byte, ArrayList<DFN>>());
-        for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
+        for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
             mapShift2DFN.put(shift, new ArrayList<DFN>());
         }
         mapDFN2Pane = Collections.synchronizedMap(new HashMap<DFN, CollapsiblePane>());
@@ -207,12 +207,12 @@ public class PnlDFN extends NursingRecordsPanel {
 
 
                     // now build the CollapsiblePanes
-                    for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
+                    for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                         CollapsiblePane cp = createCP4(shift);
                         synchronized (mapShift2Pane) {
                             mapShift2Pane.put(shift, cp);
                             try {
-                                mapShift2Pane.get(shift).setCollapsed(shift == DFNTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
+                                mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
                             } catch (PropertyVetoException e) {
                                 OPDE.debug(e);
                             }
@@ -245,7 +245,7 @@ public class PnlDFN extends NursingRecordsPanel {
         cpDFN.removeAll();
         cpDFN.setLayout(new JideBoxLayout(cpDFN, JideBoxLayout.Y_AXIS));
 
-        for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
+        for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
 
             boolean isEmpty = true;
             synchronized (mapShift2DFN) {
@@ -263,7 +263,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 cpDFN.add(mapShift2Pane.get(shift));
                 if (resetCollapseState) {
                     try {
-                        mapShift2Pane.get(shift).setCollapsed(shift != DFNTools.SHIFT_ON_DEMAND && shift != SYSCalendar.whatShiftIs(new Date()));
+                        mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.SHIFT_ON_DEMAND && shift != SYSCalendar.whatShiftIs(new Date()));
                     } catch (PropertyVetoException e) {
                         OPDE.debug(e);
                     }
@@ -275,7 +275,7 @@ public class PnlDFN extends NursingRecordsPanel {
     }
 
     private CollapsiblePane createCP4Shift(Byte shift) {
-        String title = "<html><font size=+1><b>" + GUITools.getLocalizedMessages(DFNTools.SHIFT_TEXT)[shift] + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + GUITools.getLocalizedMessages(SYSCalendar.SHIFT_TEXT)[shift] + "</b></font></html>";
         final CollapsiblePane mainPane = new CollapsiblePane(title);
         mainPane.setSlidingDirection(SwingConstants.SOUTH);
         mainPane.setBackground(SYSCalendar.getBGSHIFT(shift));
@@ -291,7 +291,7 @@ public class PnlDFN extends NursingRecordsPanel {
         }
 
         if (containsKey) {
-            if (shift == DFNTools.SHIFT_EARLY) {
+            if (shift == SYSCalendar.SHIFT_EARLY) {
 
                 final CollapsiblePane morning = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.morning.long") + "</font></html>", null);
                 morning.setSlidingDirection(SwingConstants.SOUTH);
@@ -326,13 +326,13 @@ public class PnlDFN extends NursingRecordsPanel {
                 }
 
                 for (DFN dfn : listDFN) {
-                    npPanel.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
+                    npPanel.setBackground(SYSCalendar.getBGItem(dfn.getShift()));
                     CollapsiblePane cp1 = createCP4(dfn);
                     synchronized (mapDFN2Pane) {
                         mapDFN2Pane.put(dfn, cp1);
-                        if (dfn.getSollZeit() == DFNTools.BYTE_MORNING) {
+                        if (dfn.getSollZeit() == SYSCalendar.BYTE_MORNING) {
                             pnlMorning.add(mapDFN2Pane.get(dfn));
-                        } else if (dfn.getSollZeit() == DFNTools.BYTE_NOON) {
+                        } else if (dfn.getSollZeit() == SYSCalendar.BYTE_NOON) {
                             pnlNoon.add(mapDFN2Pane.get(dfn));
                         } else {
                             pnlClock.add(mapDFN2Pane.get(dfn));
@@ -350,7 +350,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     npPanel.add(noon);
                 }
 
-            } else if (shift == DFNTools.SHIFT_LATE) {
+            } else if (shift == SYSCalendar.SHIFT_LATE) {
                 final CollapsiblePane afternoon = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.afternoon.long") + "</font></html>", null);
                 afternoon.setSlidingDirection(SwingConstants.SOUTH);
                 afternoon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
@@ -384,13 +384,13 @@ public class PnlDFN extends NursingRecordsPanel {
                 }
 
                 for (DFN dfn : listDFN) {
-                    npPanel.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
+                    npPanel.setBackground(SYSCalendar.getBGItem(dfn.getShift()));
                     CollapsiblePane cp1 = createCP4(dfn);
                     synchronized (mapDFN2Pane) {
                         mapDFN2Pane.put(dfn, cp1);
-                        if (dfn.getSollZeit() == DFNTools.BYTE_AFTERNOON) {
+                        if (dfn.getSollZeit() == SYSCalendar.BYTE_AFTERNOON) {
                             pnlAfternoon.add(mapDFN2Pane.get(dfn));
-                        } else if (dfn.getSollZeit() == DFNTools.BYTE_EVENING) {
+                        } else if (dfn.getSollZeit() == SYSCalendar.BYTE_EVENING) {
                             pnlEvening.add(mapDFN2Pane.get(dfn));
                         } else {
                             pnlClock.add(mapDFN2Pane.get(dfn));
@@ -415,7 +415,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     listDFN = mapShift2DFN.get(shift);
                 }
                 for (DFN dfn : listDFN) {
-                    npPanel.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
+                    npPanel.setBackground(SYSCalendar.getBGItem(dfn.getShift()));
                     CollapsiblePane cp1 = createCP4(dfn);
                     synchronized (mapDFN2Pane) {
                         mapDFN2Pane.put(dfn, cp1);
@@ -435,7 +435,7 @@ public class PnlDFN extends NursingRecordsPanel {
     }
 
     private CollapsiblePane createCP4(Byte shift) {
-        if (shift == DFNTools.SHIFT_ON_DEMAND) {
+        if (shift == SYSCalendar.SHIFT_ON_DEMAND) {
             return createCP4OnDemand();
         } else {
             return createCP4Shift(shift);
@@ -451,12 +451,12 @@ public class PnlDFN extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
          *
          */
-        String title = "<html><font size=+1><b>" + SYSTools.xx("nursingrecords.dfn.ondemand") + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + SYSTools.xx("msg.shift.ondemand") + "</b></font></html>";
 
         final CollapsiblePane npPane = new CollapsiblePane(title);
         npPane.setSlidingDirection(SwingConstants.SOUTH);
-        npPane.setBackground(SYSCalendar.getBGSHIFT(DFNTools.SHIFT_ON_DEMAND));
-        npPane.setForeground(SYSCalendar.getFGSHIFT(DFNTools.SHIFT_ON_DEMAND));
+        npPane.setBackground(SYSCalendar.getBGSHIFT(SYSCalendar.SHIFT_ON_DEMAND));
+        npPane.setForeground(SYSCalendar.getFGSHIFT(SYSCalendar.SHIFT_ON_DEMAND));
         npPane.setOpaque(false);
 
         JPanel npPanel = new JPanel();
@@ -464,12 +464,12 @@ public class PnlDFN extends NursingRecordsPanel {
 
         ArrayList<DFN> list = null;
         synchronized (mapShift2DFN) {
-            list = mapShift2DFN.containsKey(DFNTools.SHIFT_ON_DEMAND) ? mapShift2DFN.get(DFNTools.SHIFT_ON_DEMAND) : null;
+            list = mapShift2DFN.containsKey(SYSCalendar.SHIFT_ON_DEMAND) ? mapShift2DFN.get(SYSCalendar.SHIFT_ON_DEMAND) : null;
         }
 
         if (list != null && !list.isEmpty()) {
             for (DFN dfn : list) {
-                npPanel.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
+                npPanel.setBackground(SYSCalendar.getBGItem(dfn.getShift()));
                 CollapsiblePane cp = createCP4(dfn);
                 synchronized (mapDFN2Pane) {
                     mapDFN2Pane.put(dfn, cp);
@@ -911,8 +911,8 @@ public class PnlDFN extends NursingRecordsPanel {
 
         dfnPane.setTitleLabelComponent(cptitle.getMain());
 
-        dfnPane.setBackground(SYSCalendar.getBGSHIFT(dfn.getShift()));
-        dfnPane.setForeground(SYSCalendar.getFGSHIFT(dfn.getShift()));
+        dfnPane.setBackground(SYSCalendar.getBGItem(dfn.getShift()));
+        dfnPane.setForeground(SYSCalendar.getFGItem(dfn.getShift()));
         try {
             dfnPane.setCollapsed(true);
         } catch (PropertyVetoException e) {
@@ -1128,14 +1128,14 @@ public class PnlDFN extends NursingRecordsPanel {
 
                                     em.getTransaction().commit();
 
-                                    CollapsiblePane cp2 = createCP4(DFNTools.SHIFT_ON_DEMAND);
+                                    CollapsiblePane cp2 = createCP4(SYSCalendar.SHIFT_ON_DEMAND);
                                     synchronized (mapShift2Pane) {
-                                        mapShift2Pane.put(DFNTools.SHIFT_ON_DEMAND, cp2);
+                                        mapShift2Pane.put(SYSCalendar.SHIFT_ON_DEMAND, cp2);
                                     }
                                     buildPanel(false);
                                     try {
                                         synchronized (mapShift2Pane) {
-                                            mapShift2Pane.get(DFNTools.SHIFT_ON_DEMAND).setCollapsed(false);
+                                            mapShift2Pane.get(SYSCalendar.SHIFT_ON_DEMAND).setCollapsed(false);
                                         }
                                     } catch (PropertyVetoException e) {
                                         OPDE.debug(e);
@@ -1184,7 +1184,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     html += "<h1 id=\"fonth1\" >" + ResidentTools.getFullName(resident) + "</h1>";
                     html += SYSConst.html_h2(SYSTools.xx("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDate.getDate())));
 
-                    for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
+                    for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                         html += DFNTools.getDFNsAsHTMLtable(mapShift2DFN.get(shift));
                     }
                 }
