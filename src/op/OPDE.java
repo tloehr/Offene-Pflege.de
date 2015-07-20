@@ -27,12 +27,13 @@ package op;
 
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
+import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
 import gui.GUITools;
-import op.settings.basicsetup.PnlDBConnection;
+import op.settings.basicsetup.FrmDBConnection;
 import op.system.AppInfo;
 import op.system.EMailSystem;
 import op.system.LogicalPrinters;
@@ -40,6 +41,7 @@ import op.threads.DisplayManager;
 import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -53,8 +55,10 @@ import javax.swing.*;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import java.awt.*;
-import java.io.*;
-import java.sql.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
@@ -70,6 +74,8 @@ public class OPDE {
 
     public static final int DEFAULT_SCREEN_RESFRESH_MILLIS = 50;
     public static final int DEFAULT_DOCUMENT_LISTENER_REACTION_TIME_IN_MILLIS = 500;
+
+
 
     private static long uptime;
     public static ResourceBundle lang;
@@ -95,7 +101,7 @@ public class OPDE {
     protected static boolean debug;
     protected static boolean training;
     protected static boolean experimental;
-    protected static String opwd = "";
+    //    protected static String oldopwd = "";
     protected static String css = "";
 
     private static int DEFAULT_TIMEOUT = 30;
@@ -116,7 +122,7 @@ public class OPDE {
      * @return Das Arbeitsverzeichnis für OPDE.
      */
     public static String getOPWD() {
-        return opwd;
+        return Hardware.getAppDataPath();
     }
 
     public static long getUPTime() {
@@ -135,7 +141,7 @@ public class OPDE {
     }
 
     public static String getOPCache() {
-        return opwd + sep + AppInfo.dirCache;
+        return getOPWD() + sep + AppInfo.dirCache;
     }
 
     public static LogicalPrinters getLogicalPrinters() {
@@ -320,7 +326,7 @@ public class OPDE {
 
     public static void saveLocalProps() {
         try {
-            FileOutputStream out = new FileOutputStream(new File(opwd + sep + AppInfo.fileConfig));
+            FileOutputStream out = new FileOutputStream(new File(getOPWD() + sep + AppInfo.fileConfig));
             localProps.store(out, "Settings Offene-Pflege.de");
             out.close();
         } catch (Exception ex) {
@@ -501,15 +507,18 @@ public class OPDE {
         }
 
 
-        String homedir = System.getProperty("user.home");
-        // alternatice working dir
-        if (cl.hasOption("w")) {
-            File dir = new File(cl.getOptionValue("w"));
-            if (dir.exists() && dir.isDirectory()) {
-                homedir = dir.getAbsolutePath();
-            }
-        }
-        opwd = homedir + sep + AppInfo.dirBase;
+//        String homedir = System.getProperty("user.home");
+//        // alternatice working dir
+//        if (cl.hasOption("w")) {
+//            File dir = new File(cl.getOptionValue("w"));
+//            if (dir.exists() && dir.isDirectory()) {
+//                homedir = dir.getAbsolutePath();
+//            }
+//        }
+
+        // old style oldopwd
+//        oldopwd = homedir + sep + AppInfo.dirBase;
+//        oldopwd = homedir + sep + AppInfo.dirBase;
 
         /***
          *                                                                ___
@@ -545,14 +554,11 @@ public class OPDE {
          *     |_|\___/ \__,_|\__,_| |_|\___/ \___\__,_|_| | .__/|_|  \___/| .__/ \___|_|   \__|_|\___||___/
          *                                                 |_|             |_|
          */
-        if (loadLocalProperties()) {
 
-//            try {
-//                FileAppender fileAppender = new FileAppender(layout, , true);
-//                logger.addAppender(fileAppender);
-//            } catch (IOException ex) {
-//                fatal(ex);
-//            }
+        try {
+
+            loadLocalProperties();
+
 
             animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
 
@@ -600,46 +606,27 @@ public class OPDE {
              *      \__,_|_.__/ \_/ \___|_|  |___/_|\___/|_| |_|  \___\___/|_| |_| |_| .__/ \__,_|\__|_|_.__/|_|\___|  (_) 
              *                                                                       |_|                                   
              */
-            url = cl.hasOption("j") ? cl.getOptionValue("j") : SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_URL));
+            // second test. is the database sane ?
+            url = cl.hasOption("j") ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
 
             String clearpassword = null;
-            try {
-                clearpassword = desEncrypter.decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-            } catch (IOException io) {
-                fatal(io);
-            } catch (BadPaddingException bpe) { // wrong password
-                logger.warn(bpe);
-            } catch (IllegalBlockSizeException ibse) {
-                fatal(ibse);
-            }
+//            try {
+//                clearpassword = desEncrypter.decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
+//            } catch (IOException io) {
+//                fatal(io);
+//            } catch (BadPaddingException bpe) { // wrong password
+//                logger.warn(bpe);
+//            } catch (IllegalBlockSizeException ibse) {
+//                fatal(ibse);
+//            }
 
 
-            if (clearpassword == null) { // if this fails, a new password may be entered. the programm stops afterwards
-                JFrame frame = new JFrame();
-                frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
-                frame.getContentPane().add(new PnlDBConnection());
-                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                frame.pack();
-                frame.setVisible(true);
+            FrmDBConnection frmDBConnection = new FrmDBConnection();
+                            frmDBConnection.setVisible(true);
+
+            if (!frmDBConnection.isDatabaseOK()) {
+                frmDBConnection.setVisible(true);
             } else {
-
-                try {
-
-                    Connection jdbcConnection = DriverManager.getConnection(url, SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_USER)), clearpassword);
-                    if (appInfo.getDbversion() != getDBVersion(jdbcConnection)) {
-                        SYSFilesTools.print(SYSTools.xx("cant.start.with.version.mismatch"), false);
-                        System.exit(1);
-                    }
-                    jdbcConnection.close();
-
-                } catch (SQLException sqe) {
-                    JFrame frame = new JFrame();
-                                    frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
-                                    frame.getContentPane().add(new PnlDBConnection());
-                                    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                                    frame.pack();
-                                    frame.setVisible(true);
-                }
 
 
                 /***
@@ -808,7 +795,7 @@ public class OPDE {
                 setStandardFont();
 
                 try {
-                    css = SYSTools.readFileAsString(opwd + sep + AppInfo.dirTemplates + sep + AppInfo.fileStandardCSS);
+                    css = SYSTools.readFileAsString(getOPWD() + sep + AppInfo.dirTemplates + sep + AppInfo.fileStandardCSS);
                 } catch (IOException ie) {
                     css = "";
                 }
@@ -844,14 +831,13 @@ public class OPDE {
 
                 mainframe.setVisible(true);
             }
+        } catch (IOException ioe) {
+            fatal(ioe);
         }
     }
 
 
     public static DisplayManager getDisplayManager() {
-        if (mainframe == null) {
-            return new DisplayManager();
-        }
         return mainframe.getDisplayManager();
     }
 
@@ -863,68 +849,71 @@ public class OPDE {
         return mainframe;
     }
 
-    private static boolean loadLocalProperties() {
-        boolean success = false;
+    private static void loadLocalProperties() throws IOException {
 
 
-        try {
-            File configFile = new File(opwd + sep + AppInfo.fileConfig);
+        File configFile = new File(Hardware.getAppDataPath() + sep + AppInfo.fileConfig);
+        debug("configFile:" + configFile);
 
-            // make sure the file exists
-            configFile.createNewFile();
+        // make sure the file exists
+        if (!configFile.exists()) { // path didnt exist yet.
 
-            // make sure the minimum requirements for the configs are present. this will be overwritten by any contents in the actual configFile.
-            // missing these settings will most definitely cause exceptions
-            localProps.put(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW, "30");
-            localProps.put(SYSPropsTools.DFN_MAX_MINUTES_TO_WITHDRAW, "30");
-            localProps.put(SYSPropsTools.KEY_CASH_PAGEBREAK, "30");
-            localProps.put(SYSPropsTools.KEY_STATION, "1");
-            localProps.put(SYSPropsTools.KEY_VERY_EARLY_FGSHIFT, "FFECF5");
-            localProps.put(SYSPropsTools.KEY_VERY_EARLY_BGSHIFT, "FF62B0");
-            localProps.put(SYSPropsTools.KEY_VERY_EARLY_FGITEM, "FF62B0");
-            localProps.put(SYSPropsTools.KEY_VERY_EARLY_BGITEM, "FFC8E3");
-            localProps.put(SYSPropsTools.KEY_EARLY_FGSHIFT, "ECF4FF");
-            localProps.put(SYSPropsTools.KEY_EARLY_BGSHIFT, "62A9FF");
-            localProps.put(SYSPropsTools.KEY_EARLY_FGITEM, "62A9FF");
-            localProps.put(SYSPropsTools.KEY_EARLY_BGITEM, "D0E6FF");
-            localProps.put(SYSPropsTools.KEY_LATE_FGSHIFT, "F3F8F4");
-            localProps.put(SYSPropsTools.KEY_LATE_BGSHIFT, "59955C");
-            localProps.put(SYSPropsTools.KEY_LATE_FGITEM, "59955C");
-            localProps.put(SYSPropsTools.KEY_LATE_BGITEM, "DBEADC");
-            localProps.put(SYSPropsTools.KEY_VERY_LATE_FGSHIFT, "FFE3FF");
-            localProps.put(SYSPropsTools.KEY_VERY_LATE_BGSHIFT, "990099");
-            localProps.put(SYSPropsTools.KEY_VERY_LATE_FGITEM, "990099");
-            localProps.put(SYSPropsTools.KEY_VERY_LATE_BGITEM, "FFA8FF");
-            localProps.put(SYSPropsTools.KEY_ONDEMAND_FGSHIFT, "F5F5E2");
-            localProps.put(SYSPropsTools.KEY_ONDEMAND_BGSHIFT, "D1D17A");
-            localProps.put(SYSPropsTools.KEY_ONDEMAND_FGITEM, "D1D17A");
-            localProps.put(SYSPropsTools.KEY_ONDEMAND_BGITEM, "EEEECE");
-            localProps.put(SYSPropsTools.KEY_OUTCOME_FGSHIFT, GUITools.toHexString(Color.LIGHT_GRAY));
-            localProps.put(SYSPropsTools.KEY_OUTCOME_BGSHIFT, GUITools.toHexString(Color.DARK_GRAY));
+            debug("configFile: missing");
 
+            // is there an old opde.cfg ?
+            // then we should copy it over
+            String oldopwd = System.getProperty("user.home") + sep + AppInfo.dirBase;
+            File oldConfigFile = new File(oldopwd + sep + AppInfo.fileConfig);
 
-            FileInputStream in = new FileInputStream(configFile);
-            Properties p = new Properties();
-            p.load(in);
-            localProps.putAll(p);
-            p.clear();
-
-            in.close();
-
-            success = true;
-        } catch (FileNotFoundException ex) {
-            fatal(new Throwable(SYSTools.xx("misc.msg.installation.error")));
-        } catch (SecurityException se) {
-            fatal(new Throwable(SYSTools.xx("misc.msg.file.security.error")));
-        } catch (IOException ex) {
-            fatal(ex);
+            if (oldConfigFile.exists()) {
+                debug("oldConfigFile found:" + oldConfigFile);
+                FileUtils.copyFile(oldConfigFile, configFile);
+                debug("copying over and renaming the old one");
+                FileUtils.moveFile(oldConfigFile, new File(oldopwd + sep + AppInfo.fileConfig + ".old"));
+            }
         }
 
+        configFile.createNewFile();
 
-        // sanity check
+
+        // make sure the minimum requirements for the configs are present. this will be overwritten by any contents in the actual configFile.
+        // missing these settings will most definitely cause exceptions
+        localProps.put(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW, "30");
+        localProps.put(SYSPropsTools.DFN_MAX_MINUTES_TO_WITHDRAW, "30");
+        localProps.put(SYSPropsTools.KEY_CASH_PAGEBREAK, "30");
+        localProps.put(SYSPropsTools.KEY_STATION, "1");
+        localProps.put(SYSPropsTools.KEY_VERY_EARLY_FGSHIFT, "FFECF5");
+        localProps.put(SYSPropsTools.KEY_VERY_EARLY_BGSHIFT, "FF62B0");
+        localProps.put(SYSPropsTools.KEY_VERY_EARLY_FGITEM, "FF62B0");
+        localProps.put(SYSPropsTools.KEY_VERY_EARLY_BGITEM, "FFC8E3");
+        localProps.put(SYSPropsTools.KEY_EARLY_FGSHIFT, "ECF4FF");
+        localProps.put(SYSPropsTools.KEY_EARLY_BGSHIFT, "62A9FF");
+        localProps.put(SYSPropsTools.KEY_EARLY_FGITEM, "62A9FF");
+        localProps.put(SYSPropsTools.KEY_EARLY_BGITEM, "D0E6FF");
+        localProps.put(SYSPropsTools.KEY_LATE_FGSHIFT, "F3F8F4");
+        localProps.put(SYSPropsTools.KEY_LATE_BGSHIFT, "59955C");
+        localProps.put(SYSPropsTools.KEY_LATE_FGITEM, "59955C");
+        localProps.put(SYSPropsTools.KEY_LATE_BGITEM, "DBEADC");
+        localProps.put(SYSPropsTools.KEY_VERY_LATE_FGSHIFT, "FFE3FF");
+        localProps.put(SYSPropsTools.KEY_VERY_LATE_BGSHIFT, "990099");
+        localProps.put(SYSPropsTools.KEY_VERY_LATE_FGITEM, "990099");
+        localProps.put(SYSPropsTools.KEY_VERY_LATE_BGITEM, "FFA8FF");
+        localProps.put(SYSPropsTools.KEY_ONDEMAND_FGSHIFT, "F5F5E2");
+        localProps.put(SYSPropsTools.KEY_ONDEMAND_BGSHIFT, "D1D17A");
+        localProps.put(SYSPropsTools.KEY_ONDEMAND_FGITEM, "D1D17A");
+        localProps.put(SYSPropsTools.KEY_ONDEMAND_BGITEM, "EEEECE");
+        localProps.put(SYSPropsTools.KEY_OUTCOME_FGSHIFT, GUITools.toHexString(Color.LIGHT_GRAY));
+        localProps.put(SYSPropsTools.KEY_OUTCOME_BGSHIFT, GUITools.toHexString(Color.DARK_GRAY));
 
 
-        return success;
+        FileInputStream in = new FileInputStream(configFile);
+        Properties p = new Properties();
+        p.load(in);
+        localProps.putAll(p);
+        p.clear();
+
+        in.close();
+
     }
 
     public static boolean isAdmin() {
@@ -965,22 +954,5 @@ public class OPDE {
         UIManager.put("Tree.font", SYSConst.ARIAL14);
     }
 
-    public static int getDBVersion(Connection jdbcConnection) {
-        int version = -1;
-        try {
-            String query = " SELECT p.V FROM sysprops p WHERE p.K = ? ";
-            PreparedStatement stmt = jdbcConnection.prepareStatement(query);
-            stmt.setString(1, "dbstructure");
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.first()) {
-                String v = rs.getString("V");
-                version = Integer.parseInt(v);
-            }
-
-        } catch (SQLException e) {
-            fatal(e);
-        }
-        return version;
-    }
 }

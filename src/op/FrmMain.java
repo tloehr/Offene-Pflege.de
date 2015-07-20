@@ -267,7 +267,7 @@ public class FrmMain extends JFrame {
         if (OPDE.getLogin() != null) {
             logout();
         }
-        // Delete the pidfile if present
+        //todo: remove after install4j
         FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
         System.exit(0);
     }
@@ -954,6 +954,7 @@ public class FrmMain extends JFrame {
                 if (o != null) {
                     afterLogin();
                 } else {
+                    //todo: remove after install4j
                     FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
                     System.exit(0);
                 }

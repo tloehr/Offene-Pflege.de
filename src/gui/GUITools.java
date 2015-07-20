@@ -82,7 +82,7 @@ public class GUITools {
             prefix = "pnl2png";
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        exportToPNG(pnl, new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + prefix + "_" + sdf.format(new Date()) + ".png"));
+        exportToPNG(pnl, new File(OPDE.getOPCache() + File.separator + prefix + "_" + sdf.format(new Date()) + ".png"));
     }
 
 

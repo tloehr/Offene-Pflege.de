@@ -100,14 +100,13 @@ public class DatabaseConnectionBean {
     }
 
     public Properties toProperties(Properties myProps) throws UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException {
-
         myProps.put(SYSPropsTools.KEY_JDBC_HOST, host.trim());
         myProps.put(SYSPropsTools.KEY_JDBC_PORT, port.trim());
         myProps.put(SYSPropsTools.KEY_JDBC_USER, user.trim());
         myProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(password.trim()));
         myProps.put(SYSPropsTools.KEY_JDBC_CATALOG, catalog.trim());
-        myProps.put(SYSPropsTools.KEY_JDBC_URL, "jdbc:mysql://" + host.trim() + ":" + port.trim() + "/" + catalog.trim());
         return myProps;
     }
+
 
 }

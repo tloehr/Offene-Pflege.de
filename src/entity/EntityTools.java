@@ -4,6 +4,7 @@ import gui.GUITools;
 import gui.interfaces.NotRemovableUnlessEmpty;
 import op.OPDE;
 import op.threads.DisplayManager;
+import op.tools.SYSTools;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
 
@@ -11,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import java.lang.reflect.Field;
+import java.sql.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -214,6 +216,41 @@ public class EntityTools {
         return GUITools.createStringListFrom(mayBeDeleted);
     }
 
+
+//    public static boolean isDatabaseConnectionOK() {
+////        if (password == null) return false;
+//        boolean result = true;
+//
+//        try {
+//            Connection jdbcConnection = DriverManager.getConnection(url, user, password);
+//            result = OPDE.getAppInfo().getDbversion() == getNeededDBVersion(jdbcConnection);
+//            jdbcConnection.close();
+//        } catch (SQLException sqe) {
+//            result = false;
+//        }
+//
+//        return result;
+//    }
+
+    public static int getNeededDBVersion(Connection jdbcConnection) throws SQLException {
+        int version = -1;
+
+        String query = " SELECT p.V FROM sysprops p WHERE p.K = ? ";
+        PreparedStatement stmt = jdbcConnection.prepareStatement(query);
+        stmt.setString(1, "dbstructure");
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.first()) {
+            String v = rs.getString("V");
+            version = Integer.parseInt(v);
+        }
+
+        return version;
+    }
+
+    public static String getJDBCUrl(String host, String port, String catalog){
+            return  "jdbc:mysql://" + SYSTools.catchNull(host) + ":" + SYSTools.catchNull(port) + "/" + SYSTools.catchNull(catalog);
+        }
 
 //    public static boolean setupDB(Connection jdbcConnection, String catalog) {
 //           boolean ok = false;

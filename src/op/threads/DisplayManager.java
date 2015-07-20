@@ -260,12 +260,10 @@ public class DisplayManager extends Thread {
     }
 
     public void addSubMessage(DisplayMessage msg) {
-        if (messageQ == null) return;
         messageQ.add(msg);
     }
 
     public void clearSubMessages() {
-        if (messageQ == null) return;
         messageQ.clear();
         processSubMessage();
     }
