@@ -19,23 +19,14 @@ import java.util.Properties;
 public class DatabaseConnectionBean {
 
     @NotEmpty
-    @Size(min = 1, max = 30, message = "msg.string.length.error")
-    @EditorComponent(label = "opde.settings.db.host", component = {"textfield"})
     String host;
     @NotEmpty
-    @Size(min = 1, max = 30, message = "msg.string.length.error")
-    @EditorComponent(label = "opde.settings.db.port", parserClass = "gui.parser.IntegerParser", component = {"textfield"})
     String port;
     @NotEmpty
-    @Size(min = 1, max = 30, message = "msg.string.length.error")
-    @EditorComponent(label = "misc.msg.Users", component = {"textfield"})
     String user;
-    @Size(min = 0, max = 30, message = "msg.string.length.error")
-    @EditorComponent(label = "misc.msg.password", component = {"textfield"})
+    @NotEmpty
     String password;
     @NotEmpty
-    @Size(min = 1, max = 30, message = "msg.string.length.error")
-    @EditorComponent(label = "opde.settings.db.catalog", component = {"textfield"})
     String catalog;
 
     public DatabaseConnectionBean(Properties preset) {
@@ -98,6 +89,8 @@ public class DatabaseConnectionBean {
     public void setCatalog(String catalog) {
         this.catalog = catalog;
     }
+
+
 
     public Properties toProperties(Properties myProps) throws UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException {
         myProps.put(SYSPropsTools.KEY_JDBC_HOST, host.trim());

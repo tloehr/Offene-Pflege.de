@@ -217,20 +217,6 @@ public class EntityTools {
     }
 
 
-//    public static boolean isDatabaseConnectionOK() {
-////        if (password == null) return false;
-//        boolean result = true;
-//
-//        try {
-//            Connection jdbcConnection = DriverManager.getConnection(url, user, password);
-//            result = OPDE.getAppInfo().getDbversion() == getNeededDBVersion(jdbcConnection);
-//            jdbcConnection.close();
-//        } catch (SQLException sqe) {
-//            result = false;
-//        }
-//
-//        return result;
-//    }
 
     public static int getNeededDBVersion(Connection jdbcConnection) throws SQLException {
         int version = -1;

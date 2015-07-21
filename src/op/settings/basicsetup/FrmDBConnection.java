@@ -12,10 +12,13 @@ import entity.EntityTools;
 import op.OPDE;
 import op.settings.databeans.DatabaseConnectionBean;
 import op.tools.SYSTools;
+import org.apache.log4j.Logger;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.swing.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -23,25 +26,34 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Properties;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * @author Torsten Löhr
  */
 public class FrmDBConnection extends JFrame {
 
-    boolean db_reachable = false;
-    boolean db_data_present = false;
-    boolean db_version_ok = false;
-    boolean db_password_readable = false;
-    boolean db_password_credentials_correct = false;
+    private boolean db_parameters_complete = false;
+    private boolean db_server_pingable = false;
+    private boolean db_server_connected = false;
+    private boolean db_data_present = false;
+    private boolean db_version_ok = false;
+    private boolean db_password_readable = false;
+    private boolean db_password_credentials_correct = false;
 
-    DatabaseConnectionBean dbcb;
+
+    private DatabaseConnectionBean dbcb;
     private String clearpassword;
+    private Logger logger;
+
+    private ArrayList<String> stuffThatAnnoysMe;
 
     public FrmDBConnection() {
-        this.clearpassword = clearpassword;
-
+        logger = Logger.getLogger(getClass());
+        stuffThatAnnoysMe = new ArrayList<>();
         dbcb = new DatabaseConnectionBean(OPDE.getLocalProps());
         initComponents();
         initFrame();
@@ -51,11 +63,40 @@ public class FrmDBConnection extends JFrame {
     }
 
 
-    public boolean isDatabaseOK(){
+    public boolean isDatabaseOK() {
         return false;
     }
 
+    /**
+     * this method checks the availability of the database connection in stages.
+     * <p>
+     * <ol>
+     * <li>Checks if all the necessary parameters are at least entered. So that every field is not empty.</li>
+     * </ol>
+     */
     private void getReasonToBeHere() {
+
+        db_parameters_complete = false;
+        db_server_pingable = false;
+        db_server_connected = false;
+        db_data_present = false;
+        db_version_ok = false;
+        db_password_readable = false;
+        db_password_credentials_correct = false;
+
+        // 1. All parameters entered ?
+        Validator validator = OPDE.getValidatorFactory().getValidator();
+        Set<ConstraintViolation<DatabaseConnectionBean>> constraintViolations = validator.validate(dbcb);
+        db_parameters_complete = constraintViolations.isEmpty();
+        constraintViolations.forEach(new Consumer<ConstraintViolation<DatabaseConnectionBean>>() {
+            @Override
+            public void accept(ConstraintViolation<DatabaseConnectionBean> databaseConnectionBeanConstraintViolation) {
+                stuffThatAnnoysMe.add(databaseConnectionBeanConstraintViolation.getPropertyPath().toString() + ": " + databaseConnectionBeanConstraintViolation.getMessage());
+            }
+        });
+
+        if (!db_parameters_complete) return;
+
         try {
             Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(dbcb.getHost(), dbcb.getPort(), dbcb.getCatalog()), dbcb.toProperties(new Properties()));
             db_password_readable = true;
@@ -64,7 +105,7 @@ public class FrmDBConnection extends JFrame {
             db_version_ok = OPDE.getAppInfo().getDbversion() == EntityTools.getNeededDBVersion(jdbcConnection);
         } catch (SQLException e) {
 
-            if (e.getMessage().startsWith("Access denied for user")){
+            if (e.getMessage().startsWith("Access denied for user")) {
                 db_password_credentials_correct = false;
             }
 
@@ -80,14 +121,32 @@ public class FrmDBConnection extends JFrame {
 
     }
 
+
+    public static boolean isDatabaseConnectionOK() {
+
+
+//        if (password == null) return false;
+        boolean result = true;
+
+        try {
+            Connection jdbcConnection = DriverManager.getConnection(url, user, password);
+            result = OPDE.getAppInfo().getDbversion() == getNeededDBVersion(jdbcConnection);
+            jdbcConnection.close();
+        } catch (SQLException sqe) {
+            result = false;
+        }
+
+        return result;
+    }
+
     private void initFrame() {
-
-
         lblServer.setText(SYSTools.xx("opde.settings.db.host"));
         lblPort.setText(SYSTools.xx("opde.settings.db.port"));
         lblCat.setText(SYSTools.xx("opde.settings.db.catalog"));
         lblUser.setText(SYSTools.xx("opde.settings.db.user"));
         lblPassword.setText(SYSTools.xx("opde.settings.db.password"));
+
+        txtServer
     }
 
     private void btnCheckDBActionPerformed(ActionEvent e) {
@@ -167,8 +226,8 @@ public class FrmDBConnection extends JFrame {
             {
                 pnlDB.setBackground(new Color(238, 238, 238));
                 pnlDB.setLayout(new FormLayout(
-                        "default, $lcgap, default, $ugap, default:grow, $lcgap, pref, $lcgap, default",
-                        "$ugap, 11*(default, $lgap), default, $rgap, 2*(default, $lgap), fill:default:grow, default"));
+                    "default, $lcgap, default, $ugap, default:grow, $lcgap, pref, $lcgap, default",
+                    "$ugap, 11*(default, $lgap), default, $rgap, 2*(default, $lgap), fill:default:grow, default"));
 
                 //---- lblCommon ----
                 lblCommon.setText("Allgemeine Datenbank Verbindungsinformationen");

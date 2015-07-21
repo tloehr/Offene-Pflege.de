@@ -60,6 +60,8 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -593,6 +595,29 @@ public class SYSTools {
             tree.expandRow(row);
             row++;
         }
+    }
+
+    /**
+     * taken from: http://www.torsten-horn.de/techdocs/java-net.htm#SimplePing
+     *
+     * @param sHost
+     * @param sPort
+     * @return
+     */
+    public static String ping(String sHost, String sPort) throws IOException {
+        String result = null;
+
+        InetAddress host = InetAddress.getByName(sHost);
+        int port = !catchNull(sPort).isEmpty() ? Integer.parseInt(sPort) : 80;
+        long tm = System.nanoTime();
+        Socket so = new Socket(host, port);
+        so.close();
+        tm = (System.nanoTime() - tm) / 1000000L;
+        result = "Connection ok (port " + port + ", time = " + tm + " ms). \n" +
+                "Host Address = " + host.getHostAddress() + "\n" +
+                "Host Name    = " + host.getHostName();
+
+        return result;
     }
 
 
