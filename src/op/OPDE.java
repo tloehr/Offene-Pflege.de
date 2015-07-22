@@ -33,7 +33,7 @@ import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
 import gui.GUITools;
-import op.settings.basicsetup.FrmDBConnection;
+import op.settings.basicsetup.InitWizard;
 import op.system.AppInfo;
 import op.system.EMailSystem;
 import op.system.LogicalPrinters;
@@ -46,8 +46,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -55,6 +53,8 @@ import javax.swing.*;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -74,7 +74,6 @@ public class OPDE {
 
     public static final int DEFAULT_SCREEN_RESFRESH_MILLIS = 50;
     public static final int DEFAULT_DOCUMENT_LISTENER_REACTION_TIME_IN_MILLIS = 500;
-
 
 
     private static long uptime;
@@ -107,7 +106,7 @@ public class OPDE {
     private static int DEFAULT_TIMEOUT = 30;
 
     //    protected static boolean FTPisWORKING = false;
-    public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
+//    public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
     protected static boolean updateAvailable = false;
 
     public static String getUpdateDescriptionURL() {
@@ -425,17 +424,10 @@ public class OPDE {
 
         localProps = new SortedProperties();
         props = new Properties();
-
-
-        /***
-         *                         _      _               ___        __
-         *      _ __ ___  __ _  __| |    / \   _ __  _ __|_ _|_ __  / _| ___
-         *     | '__/ _ \/ _` |/ _` |   / _ \ | '_ \| '_ \| || '_ \| |_ / _ \
-         *     | | |  __/ (_| | (_| |  / ___ \| |_) | |_) | || | | |  _| (_) |
-         *     |_|  \___|\__,_|\__,_| /_/   \_\ .__/| .__/___|_| |_|_|  \___/
-         *                                    |_|   |_|
-         */
         appInfo = new AppInfo();
+        // JideSoft
+        Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
+        WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
 
         /***
          *       ____                                          _   _     _               ___        _   _
@@ -453,8 +445,8 @@ public class OPDE {
 //        opts.addOption("w", "workingdir", true, "Damit kannst Du ein anderes Arbeitsverzeichnis setzen. Wenn Du diese Option weglässt, dann ist das Dein Benutzerverzeichnis: " + System.getProperty("user.home"));
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
 //        opts.addOption("t", "training", false, "Wird für Einarbeitungsversionen benötigt. Färbt die Oberfläche anders ein und zeigt eine Warnmeldung nach jeder Anmeldung.");
-        Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(SYSTools.xx("cmdline.ftpserver")).create("f");
-        opts.addOption(optFTPserver);
+//        Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(SYSTools.xx("cmdline.ftpserver")).create("f");
+//        opts.addOption(optFTPserver);
 //        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
 
         Option notification = OptionBuilder.withLongOpt("notification").hasOptionalArg().withDescription("Schickt allen festgelegten Empfängern die jeweilige Benachrichtungs-Mail.").create("n");
@@ -494,10 +486,10 @@ public class OPDE {
             System.exit(0);
         }
 
-        // Alternative FTP-Server
-        if (cl.hasOption("f")) {
-            UPDATE_FTPSERVER = cl.getOptionValue("f");
-        }
+//        // Alternative FTP-Server
+//        if (cl.hasOption("f")) {
+//            UPDATE_FTPSERVER = cl.getOptionValue("f");
+//        }
 
 
         if (cl.hasOption("h")) {
@@ -559,6 +551,11 @@ public class OPDE {
 
             loadLocalProperties();
 
+            try {
+                css = SYSTools.readFileAsString(getOPWD() + sep + AppInfo.dirTemplates + sep + AppInfo.fileStandardCSS);
+            } catch (IOException ie) {
+                css = "";
+            }
 
             animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
 
@@ -607,25 +604,20 @@ public class OPDE {
              *                                                                       |_|                                   
              */
             // second test. is the database sane ?
-            url = cl.hasOption("j") ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
-
-            String clearpassword = null;
-//            try {
-//                clearpassword = desEncrypter.decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-//            } catch (IOException io) {
-//                fatal(io);
-//            } catch (BadPaddingException bpe) { // wrong password
-//                logger.warn(bpe);
-//            } catch (IllegalBlockSizeException ibse) {
-//                fatal(ibse);
-//            }
 
 
-            FrmDBConnection frmDBConnection = new FrmDBConnection();
-                            frmDBConnection.setVisible(true);
+            InitWizard initWizard = new InitWizard();
 
-            if (!frmDBConnection.isDatabaseOK()) {
-                frmDBConnection.setVisible(true);
+            if (!initWizard.isDatabaseOK()) {
+                initWizard.setSize(new Dimension(800, 550));
+                SYSTools.center(initWizard);
+                initWizard.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                initWizard.setVisible(true);
             } else {
 
 
@@ -641,7 +633,7 @@ public class OPDE {
                 jpaProps.put(SYSPropsTools.KEY_JDBC_USER, localProps.getProperty("javax.persistence.jdbc.user"));
 
                 try {
-                    jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, clearpassword);
+                    jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, "");
                 } catch (Exception e) {
                     if (Desktop.isDesktopSupported()) {
                         JOptionPane.showMessageDialog(null, SYSTools.xx("misc.msg.decryption.failure"), appInfo.getProgname(), JOptionPane.ERROR_MESSAGE);
@@ -652,6 +644,8 @@ public class OPDE {
                 }
 
                 jpaProps.put(SYSPropsTools.KEY_JDBC_DRIVER, "com.mysql.jdbc.Driver");
+
+                url = cl.hasOption("j") ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
                 jpaProps.put(SYSPropsTools.KEY_JDBC_URL, url);
 
 
@@ -794,15 +788,7 @@ public class OPDE {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
                 setStandardFont();
 
-                try {
-                    css = SYSTools.readFileAsString(getOPWD() + sep + AppInfo.dirTemplates + sep + AppInfo.fileStandardCSS);
-                } catch (IOException ie) {
-                    css = "";
-                }
 
-                // JideSoft
-                Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
-                WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
                 // JideSoft
 
                 /***
@@ -853,12 +839,12 @@ public class OPDE {
 
 
         File configFile = new File(Hardware.getAppDataPath() + sep + AppInfo.fileConfig);
-        debug("configFile:" + configFile);
+        info("configFile:" + configFile);
 
         // make sure the file exists
         if (!configFile.exists()) { // path didnt exist yet.
 
-            debug("configFile: missing");
+            info("configFile: missing");
 
             // is there an old opde.cfg ?
             // then we should copy it over
@@ -866,10 +852,11 @@ public class OPDE {
             File oldConfigFile = new File(oldopwd + sep + AppInfo.fileConfig);
 
             if (oldConfigFile.exists()) {
-                debug("oldConfigFile found:" + oldConfigFile);
+                info("oldConfigFile found:" + oldConfigFile);
                 FileUtils.copyFile(oldConfigFile, configFile);
-                debug("copying over and renaming the old one");
-                FileUtils.moveFile(oldConfigFile, new File(oldopwd + sep + AppInfo.fileConfig + ".old"));
+                info("copying over and renaming the old one");
+                FileUtils.copyFile(oldConfigFile, new File(oldopwd + sep + AppInfo.fileConfig + ".old"));
+                FileUtils.deleteQuietly(oldConfigFile);
             }
         }
 

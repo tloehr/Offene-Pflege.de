@@ -26,9 +26,6 @@
  */
 package op.tools;
 
-import com.enterprisedt.net.ftp.FTPConnectMode;
-import com.enterprisedt.net.ftp.FTPException;
-import com.enterprisedt.net.ftp.FileTransferClient;
 import com.jidesoft.swing.JideSplitPane;
 import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
@@ -36,7 +33,6 @@ import entity.system.Users;
 import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayMessage;
-import org.apache.commons.io.FileUtils;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -61,6 +57,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -604,13 +601,14 @@ public class SYSTools {
      * @param sPort
      * @return
      */
-    public static String ping(String sHost, String sPort) throws IOException {
+    public static String socketping(String sHost, String sPort) throws IOException {
         String result = null;
 
         InetAddress host = InetAddress.getByName(sHost);
         int port = !catchNull(sPort).isEmpty() ? Integer.parseInt(sPort) : 80;
         long tm = System.nanoTime();
-        Socket so = new Socket(host, port);
+        Socket so = new Socket();
+        so.connect(new InetSocketAddress(host, port), 5000);
         so.close();
         tm = (System.nanoTime() - tm) / 1000000L;
         result = "Connection ok (port " + port + ", time = " + tm + " ms). \n" +
@@ -1424,9 +1422,13 @@ public class SYSTools {
         }
     }
 
-    /*
-         * http://exampledepot.com/egs/javax.swing.table/PackCol.html
-         */
+    /**
+     * http://exampledepot.com/egs/javax.swing.table/PackCol.html
+     *
+     * @param table
+     * @param vColIndex
+     * @param margin
+     */
     public static void packColumn(JTable table, int vColIndex, int margin) {
         TableModel model = table.getModel();
         DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
@@ -1457,53 +1459,53 @@ public class SYSTools {
         OPDE.debug("packColumn/3: col=" + vColIndex + "  width=" + width);
     }
 
-    public static void checkForSoftwareupdates() {
-//        final String FTPServer = "ftp.offene-pflege.de";
-        final int FTPPort = 21;
-        final String FTPUser = "anonymous";
-        final String FTPPassword = Integer.toString(OPDE.getAppInfo().getBuildnum());
-        final String FTPWorkingDirectory = "/pub/opde";
-        final String FILENAME = "buildnum";
-
-        int remoteBuildnum = -1;
-        String descriptionURL = "";
-        int mybuildnum = OPDE.getAppInfo().getBuildnum();
-        FileTransferClient ftp = null;
-        try {
-            File target = File.createTempFile("opde", ".txt");
-            target.deleteOnExit();
-            ftp = new FileTransferClient();
-
-            ftp.setRemoteHost(OPDE.UPDATE_FTPSERVER);
-            ftp.setUserName(FTPUser);
-            ftp.setPassword(FTPPassword);
-            ftp.setRemotePort(FTPPort);
-            ftp.setTimeout(5000);
-            ftp.connect();
-            ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
-            ftp.changeDirectory(FTPWorkingDirectory);
-            ftp.downloadFile(target.getPath(), FILENAME);
-
-            String strRemoteBuildnum = FileUtils.readLines(target).get(0);
-            remoteBuildnum = Integer.parseInt(strRemoteBuildnum);
-
-            descriptionURL = FileUtils.readLines(target).get(1);
-
-            ftp.disconnect();
-        } catch (Exception e) {
-            if (ftp != null && ftp.isConnected()) {
-                try {
-                    ftp.disconnect();
-                } catch (FTPException e1) {
-                    OPDE.error(e1);
-                } catch (IOException e1) {
-                    OPDE.error(e1);
-                }
-            }
-            OPDE.warn(e);
-        }
-
-        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum, descriptionURL);
-    }
+//    public static void checkForSoftwareupdates() {
+////        final String FTPServer = "ftp.offene-pflege.de";
+//        final int FTPPort = 21;
+//        final String FTPUser = "anonymous";
+//        final String FTPPassword = Integer.toString(OPDE.getAppInfo().getBuildnum());
+//        final String FTPWorkingDirectory = "/pub/opde";
+//        final String FILENAME = "buildnum";
+//
+//        int remoteBuildnum = -1;
+//        String descriptionURL = "";
+//        int mybuildnum = OPDE.getAppInfo().getBuildnum();
+//        FileTransferClient ftp = null;
+//        try {
+//            File target = File.createTempFile("opde", ".txt");
+//            target.deleteOnExit();
+//            ftp = new FileTransferClient();
+//
+//            ftp.setRemoteHost(OPDE.UPDATE_FTPSERVER);
+//            ftp.setUserName(FTPUser);
+//            ftp.setPassword(FTPPassword);
+//            ftp.setRemotePort(FTPPort);
+//            ftp.setTimeout(5000);
+//            ftp.connect();
+//            ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
+//            ftp.changeDirectory(FTPWorkingDirectory);
+//            ftp.downloadFile(target.getPath(), FILENAME);
+//
+//            String strRemoteBuildnum = FileUtils.readLines(target).get(0);
+//            remoteBuildnum = Integer.parseInt(strRemoteBuildnum);
+//
+//            descriptionURL = FileUtils.readLines(target).get(1);
+//
+//            ftp.disconnect();
+//        } catch (Exception e) {
+//            if (ftp != null && ftp.isConnected()) {
+//                try {
+//                    ftp.disconnect();
+//                } catch (FTPException e1) {
+//                    OPDE.error(e1);
+//                } catch (IOException e1) {
+//                    OPDE.error(e1);
+//                }
+//            }
+//            OPDE.warn(e);
+//        }
+//
+//        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum, descriptionURL);
+//    }
 
 }

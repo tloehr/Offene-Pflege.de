@@ -2,6 +2,7 @@ package op.settings.basicsetup;
 
 import com.jidesoft.dialog.*;
 import com.jidesoft.wizard.*;
+import entity.EntityTools;
 import entity.building.Rooms;
 import entity.building.Station;
 import entity.info.*;
@@ -15,20 +16,31 @@ import op.residents.bwassistant.PnlBV;
 import op.residents.bwassistant.PnlBWBasisInfo;
 import op.residents.bwassistant.PnlGP;
 import op.residents.bwassistant.PnlHAUF;
+import op.settings.databeans.DatabaseConnectionBean;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.javatuples.Triplet;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,66 +49,96 @@ import java.util.Properties;
  * Time: 10:05
  * To change this template use File | Settings | File Templates.
  */
-public class InitWizard {
+public class InitWizard extends WizardDialog {
+
+    // state analysis
+    enum DB_VERSION {
+        UNKNOWN, TOO_LOW, PERFECT, TOO_HIGH
+    }
+
+    private DB_VERSION db_version;
+    private boolean db_parameters_complete;
+    private boolean db_server_pingable;
+    private boolean db_server_connected;
+    private boolean db_catalog_exists;
+    private boolean db_password_readable;
+    private boolean db_password_credentials_correct;
 
 
+    private DatabaseConnectionBean dbcb;
+    private String clearpassword;
+    private Logger logger;
+    private String pingResult = "";
 
-    private WizardDialog wizard;
+    private ArrayList<String> stuffThatAnnoysMe;
+
+
     private Resident resident;
-    private Closure finishAction;
+
     private ResInfo resinfo_hauf, resinfo_room;
 
-    public InitWizard(Closure finishAction) {
-        this.finishAction = finishAction;
+    public InitWizard() {
+        super(new JFrame(), false);
 
-        createWizard();
+        logger = Logger.getLogger(getClass());
+        stuffThatAnnoysMe = new ArrayList<>();
+        dbcb = new DatabaseConnectionBean(OPDE.getLocalProps());
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+        analyzeSituation();
+
+        // if there is nothing to do, DO NOTHING
+        if (!isDatabaseOK()) {
+            createWizard();
+        }
+    }
+
+    public boolean isDatabaseOK() {
+        return db_version == DB_VERSION.PERFECT; // if thats true, EVERYTHING is true;
     }
 
     private void createWizard() {
-        wizard = new WizardDialog(new JFrame(), false);
         PageList model = new PageList();
 
-        AbstractWizardPage page1 = new WelcomePage(SYSTools.xx("opde.admin.bw.wizard.page1.title"), SYSTools.xx("opde.admin.bw.wizard.page1.description"));
-        AbstractWizardPage page2 = new BasisInfoPage(SYSTools.xx("opde.admin.bw.wizard.page2.title"), SYSTools.xx("opde.admin.bw.wizard.page2.description"));
-        AbstractWizardPage page3 = new PNPage(SYSTools.xx("opde.admin.bw.wizard.page3.title"), SYSTools.xx("opde.admin.bw.wizard.page3.description"));
-        AbstractWizardPage page4 = new GPPage(SYSTools.xx("opde.admin.bw.wizard.page4.title"), SYSTools.xx("opde.admin.bw.wizard.page4.description"));
-//        AbstractWizardPage page5 = new LCPage(SYSTools.xx(PnlLC.internalClassID + ".title"), SYSTools.xx(PnlLC.internalClassID + ".description"));
-        AbstractWizardPage page6 = new HaufPage(SYSTools.xx("opde.admin.bw.wizard.page6.title"), SYSTools.xx("opde.admin.bw.wizard.page6.description"));
-        AbstractWizardPage page7 = new CompletionPage(SYSTools.xx("opde.admin.bw.wizard.page7.title"), SYSTools.xx("opde.admin.bw.wizard.page7.description"));
+        AbstractWizardPage page1 = new WelcomePage(SYSTools.xx("opde.initwizard.page1.title"), SYSTools.xx("opde.initwizard.page1.description"));
+//        AbstractWizardPage page2 = new BasisInfoPage(SYSTools.xx("opde.admin.bw.wizard.page2.title"), SYSTools.xx("opde.admin.bw.wizard.page2.description"));
+//        AbstractWizardPage page3 = new PNPage(SYSTools.xx("opde.admin.bw.wizard.page3.title"), SYSTools.xx("opde.admin.bw.wizard.page3.description"));
+//        AbstractWizardPage page4 = new GPPage(SYSTools.xx("opde.admin.bw.wizard.page4.title"), SYSTools.xx("opde.admin.bw.wizard.page4.description"));
+////        AbstractWizardPage page5 = new LCPage(SYSTools.xx(PnlLC.internalClassID + ".title"), SYSTools.xx(PnlLC.internalClassID + ".description"));
+//        AbstractWizardPage page6 = new HaufPage(SYSTools.xx("opde.admin.bw.wizard.page6.title"), SYSTools.xx("opde.admin.bw.wizard.page6.description"));
+//        AbstractWizardPage page7 = new CompletionPage(SYSTools.xx("opde.admin.bw.wizard.page7.title"), SYSTools.xx("opde.admin.bw.wizard.page7.description"));
 
         model.append(page1);
-        model.append(page2);
-        model.append(page3);
-        model.append(page4);
-//        model.append(page5);
-        model.append(page6);
-        model.append(page7);
+//        model.append(page2);
+//        model.append(page3);
+//        model.append(page4);
+////        model.append(page5);
+//        model.append(page6);
+//        model.append(page7);
 
-        wizard.setPageList(model);
+        setPageList(model);
 
-        wizard.setFinishAction(new AbstractAction("Finish") {
+        setFinishAction(new AbstractAction("Finish") {
             public void actionPerformed(ActionEvent e) {
-                if (wizard.closeCurrentPage(wizard.getButtonPanel().getButtonByName(ButtonNames.FINISH))) {
-                    save();
-                }
+//                if (wizard.closeCurrentPage(wizard.getButtonPanel().getButtonByName(ButtonNames.FINISH))) {
+//                    save();
+//                }
             }
         });
 
-        wizard.setCancelAction(new AbstractAction("Cancel") {
+        setCancelAction(new AbstractAction("Cancel") {
             public void actionPerformed(ActionEvent e) {
-                if (wizard.closeCurrentPage(wizard.getButtonPanel().getButtonByName(ButtonNames.FINISH))) {
-                    finishAction.execute(null);
-                }
+                dispose();
             }
         });
-        ((JPanel) wizard.getContentPane()).setBorder(new LineBorder(Color.BLACK, 1));
-        wizard.pack();
+        ((JPanel) getContentPane()).setBorder(new LineBorder(Color.BLACK, 1));
+        pack();
     }
 
 
-    public WizardDialog getWizard() {
-        return wizard;
-    }
+//    public WizardDialog getWizard() {
+//        return wizard;
+//    }
 
     private void save() {
         EntityManager em = OPDE.createEM();
@@ -117,7 +159,7 @@ public class InitWizard {
 
             em.getTransaction().commit();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
-            finishAction.execute(resident);
+
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -132,6 +174,7 @@ public class InitWizard {
 
         public WelcomePage(String title, String description) {
             super(title, description);
+
         }
 
         @Override
@@ -142,9 +185,8 @@ public class InitWizard {
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
-            txt.setText("<html><font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" +
-                    SYSTools.xx("opde.admin.bw.wizard.page1.welcome") +
-                    "</font></html>");
+            txt.setText(SYSTools.toHTML("opde.initwizard.page1.welcome"));
+
 
             addComponent(txt, true);
             addSpace();
@@ -444,6 +486,73 @@ public class InitWizard {
 
             result += "<p>" + SYSTools.xx("opde.admin.bw.wizard.page7.summaryline3") + "</p>";
             return result;
+        }
+
+
+    }
+
+
+    /**
+     * this method checks the availability of the database connection in stages.
+     * it sets the 7 boolean in order to describe
+     */
+    private void analyzeSituation() {
+
+        // we consider the worst case first.
+        db_version = DB_VERSION.UNKNOWN;
+        db_parameters_complete = false;
+        db_server_pingable = false;
+        db_server_connected = false;
+        db_catalog_exists = false;
+        db_password_readable = false;
+        db_password_credentials_correct = false;
+
+        // 1. All parameters entered ?
+        Validator validator = OPDE.getValidatorFactory().getValidator();
+        Set<ConstraintViolation<DatabaseConnectionBean>> constraintViolations = validator.validate(dbcb);
+        db_parameters_complete = constraintViolations.isEmpty();
+        constraintViolations.forEach(new Consumer<ConstraintViolation<DatabaseConnectionBean>>() {
+            @Override
+            public void accept(ConstraintViolation<DatabaseConnectionBean> databaseConnectionBeanConstraintViolation) {
+                stuffThatAnnoysMe.add(databaseConnectionBeanConstraintViolation.getPropertyPath().toString() + ": " + databaseConnectionBeanConstraintViolation.getMessage());
+            }
+        });
+        if (!db_parameters_complete) return;
+
+        db_password_readable = true; // we would have not made it here otherwise
+
+        try {
+            pingResult = SYSTools.socketping(dbcb.getHost(), dbcb.getPort().toString());
+            db_server_pingable = true;
+        } catch (IOException e) {
+            pingResult = e.getMessage();
+            stuffThatAnnoysMe.add(pingResult);
+        }
+        if (!db_server_pingable) return;
+
+        try {
+            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(dbcb.getHost(), dbcb.getPort().toString(), null), dbcb.getUser(), dbcb.getPassword());
+            db_password_credentials_correct = true;
+            db_server_connected = true;
+
+            jdbcConnection.setCatalog(dbcb.getCatalog());
+            db_catalog_exists = true;
+
+            int currentVersion = OPDE.getAppInfo().getDbversion();
+            int neededVersion = EntityTools.getNeededDBVersion(jdbcConnection);
+
+            if (currentVersion == -1) db_version = DB_VERSION.UNKNOWN; // tables SYSProps is messed up
+            else if (currentVersion < neededVersion) db_version = DB_VERSION.TOO_LOW;
+            else if (currentVersion > neededVersion) db_version = DB_VERSION.TOO_HIGH;
+            else db_version = DB_VERSION.PERFECT;
+
+            jdbcConnection.close();
+        } catch (SQLException e) {
+            if (e.getMessage().startsWith("Access denied for user")) {
+                db_password_credentials_correct = false;
+            }
+            db_version = DB_VERSION.UNKNOWN;
+            stuffThatAnnoysMe.add(e.getMessage());
         }
 
 

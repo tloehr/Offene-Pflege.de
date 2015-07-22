@@ -20,6 +20,8 @@ import java.util.Properties;
  */
 public class SYSPropsTools {
 
+    // unused keys
+    public static final String KEY_HOSTKEY = "hostkey";
 
     // vital parameters. needs to be present
     public static final String KEY_CASH_PAGEBREAK = "cash_pagebreak_after_element_no";

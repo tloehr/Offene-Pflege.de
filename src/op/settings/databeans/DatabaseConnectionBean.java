@@ -1,17 +1,17 @@
 package op.settings.databeans;
 
 import entity.system.SYSPropsTools;
-import gui.interfaces.EditorComponent;
 import op.OPDE;
+import op.tools.DesEncrypter;
 import op.tools.SYSTools;
 import org.apache.log4j.Logger;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
-import javax.validation.constraints.Size;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  * Created by tloehr on 02.07.15.
@@ -20,8 +20,7 @@ public class DatabaseConnectionBean {
 
     @NotEmpty
     String host;
-    @NotEmpty
-    String port;
+    Integer port;
     @NotEmpty
     String user;
     @NotEmpty
@@ -34,9 +33,23 @@ public class DatabaseConnectionBean {
         Logger logger = Logger.getLogger(getClass());
 
         host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_HOST));
-        port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
-        user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_USER), "opdeuser");
+        port = Integer.parseInt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306"));
+        catalog = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
 
+        if (host.isEmpty() || catalog.isEmpty()) {
+            // if the is an old URL in the config file, try to parse it
+            String url = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_URL));
+            if (url.length() >= 13) { // to trim "jdbc:mysql://"
+                StringTokenizer st = new StringTokenizer(url.substring(13, url.length()), ":/");
+                if (st.countTokens() == 3) {
+                    host = st.nextToken();
+                    port = Integer.parseInt(st.nextToken());
+                    catalog = st.nextToken();
+                }
+            }
+
+        }
+        user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_USER), "opdeuser");
 
         try {
             password = OPDE.getDesEncrypter().decrypt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
@@ -46,7 +59,19 @@ public class DatabaseConnectionBean {
             OPDE.fatal(logger, e);
         }
 
-        catalog = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
+        // could still be encoded with the old algorithm. trying.
+        if (password.isEmpty()) {
+            DesEncrypter oldDesEncrypter = new DesEncrypter(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_HOSTKEY)));
+
+            try {
+                password = oldDesEncrypter.decrypt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
+            } catch (BadPaddingException e) {
+                password = "";
+            } catch (Exception e) {
+                OPDE.fatal(logger, e);
+            }
+        }
+
 
     }
 
@@ -58,11 +83,11 @@ public class DatabaseConnectionBean {
         this.host = host;
     }
 
-    public String getPort() {
+    public Integer getPort() {
         return port;
     }
 
-    public void setPort(String port) {
+    public void setPort(Integer port) {
         this.port = port;
     }
 
@@ -91,10 +116,9 @@ public class DatabaseConnectionBean {
     }
 
 
-
     public Properties toProperties(Properties myProps) throws UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException {
         myProps.put(SYSPropsTools.KEY_JDBC_HOST, host.trim());
-        myProps.put(SYSPropsTools.KEY_JDBC_PORT, port.trim());
+        myProps.put(SYSPropsTools.KEY_JDBC_PORT, port.toString());
         myProps.put(SYSPropsTools.KEY_JDBC_USER, user.trim());
         myProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(password.trim()));
         myProps.put(SYSPropsTools.KEY_JDBC_CATALOG, catalog.trim());

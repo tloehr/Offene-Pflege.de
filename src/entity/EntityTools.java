@@ -235,7 +235,7 @@ public class EntityTools {
     }
 
     public static String getJDBCUrl(String host, String port, String catalog){
-            return  "jdbc:mysql://" + SYSTools.catchNull(host) + ":" + SYSTools.catchNull(port) + "/" + SYSTools.catchNull(catalog);
+            return  "jdbc:mysql://" + SYSTools.catchNull(host) + ":" + SYSTools.catchNull(port) + (SYSTools.catchNull(catalog).isEmpty() ? "" : "/" + SYSTools.catchNull(catalog));
         }
 
 //    public static boolean setupDB(Connection jdbcConnection, String catalog) {
