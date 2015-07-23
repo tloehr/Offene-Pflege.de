@@ -5,249 +5,85 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 			name: "this"
-			add( new FormContainer( "com.jidesoft.swing.JideTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
-				name: "pnlMain"
-				"tabPlacement": 2
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
-					name: "pnlWelcome"
-					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-						name: "scrollPane2"
-						add( new FormComponent( "javax.swing.JTextPane" ) {
-							name: "txtDBTest2"
-							"background": &SwingColor0 new com.jformdesigner.model.SwingColor( "Button.background" )
-							"editable": false
-							"contentType": "text/html"
-						} )
-					} )
-				}, new FormLayoutConstraints( null ) {
-					"title": "text"
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+				"$columnSpecs": "default, unrelgap, default:grow"
+				"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default"
+			} ) {
+				name: "pnlDB"
+				"background": new java.awt.Color( 238, 238, 238, 255 )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblServer"
+					"text": "Server"
+					"horizontalAlignment": 4
+					"font": &Font0 new java.awt.Font( "Arial", 0, 16 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtServer"
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
 				} )
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "default, labelcompgap, default, unrelgap, default:grow, labelcompgap, pref, labelcompgap, default"
-					"$rowSpecs": "unrelgap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, relgap, default, linegap, default, linegap, fill:default:grow, default"
-				} ) {
-					name: "pnlDB"
-					"background": new java.awt.Color( 238, 238, 238, 255 )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblCommon"
-						"text": "Allgemeine Datenbank Verbindungsinformationen"
-						"font": &Font0 new java.awt.Font( "Arial", 1, 22 )
-						"horizontalAlignment": 0
-						"foreground": new java.awt.Color( 51, 51, 255, 255 )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridWidth": 3
-						"gridY": 2
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblServer"
-						"text": "Server"
-						"horizontalAlignment": 4
-						"font": &Font1 new java.awt.Font( "Arial", 0, 16 )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 4
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtServer"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 5
-						"gridY": 4
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblPort"
-						"text": "Port"
-						"horizontalAlignment": 4
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 6
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtPort"
-						"text": "3306"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 5
-						"gridY": 6
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblCat"
-						"text": "Katalog"
-						"horizontalAlignment": 4
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 8
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtCatalog"
-						"text": "opde"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 5
-						"gridY": 8
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblUser"
-						"text": "Benutzer"
-						"horizontalAlignment": 4
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 10
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtUser"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 5
-						"gridY": 10
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btn1"
-						"text": "1. Verbindung prüfen"
-						"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"font": new java.awt.Font( "Arial", 0, 22 )
-						"horizontalAlignment": 2
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCheckDBActionPerformed", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 22
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btn2"
-						"text": "2. Datenbank sperren"
-						"enabled": false
-						"selectedIcon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"font": new java.awt.Font( "Arial", 0, 22 )
-						"horizontalAlignment": 2
-						addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "btnLockServerItemStateChanged", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 24
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btn3"
-						"text": "3. Schema aktualisieren"
-						"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"enabled": false
-						"font": new java.awt.Font( "Arial", 0, 22 )
-						"horizontalAlignment": 2
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnFixDBActionPerformed", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 26
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "btn4"
-						"text": "4. Datenbank freigeben"
-						"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"enabled": false
-						"font": new java.awt.Font( "Arial", 0, 22 )
-						"horizontalAlignment": 2
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCreateDBActionPerformed", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 28
-					} )
-					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-						name: "scrollPane1"
-						add( new FormComponent( "javax.swing.JTextPane" ) {
-							name: "txtDBTest"
-							"background": #SwingColor0
-							"editable": false
-							"contentType": "text/html"
-						} )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 22
-						"gridX": 5
-						"insets": new java.awt.Insets( 5, 5, 5, 5 )
-						"gridWidth": 2
-						"gridHeight": 9
-					} )
-					add( new FormComponent( "javax.swing.JProgressBar" ) {
-						name: "pbSQL"
-						"orientation": 1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 7
-						"gridHeight": 27
-						"gridY": 4
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblPassword"
-						"text": "Passwort"
-						"horizontalAlignment": 4
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 12
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JPasswordField" ) {
-						name: "txtPW"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 5
-						"gridY": 12
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblInstall"
-						"text": "Nur bei Neu-Installation nötig"
-						"font": #Font0
-						"horizontalAlignment": 0
-						"foreground": new java.awt.Color( 255, 0, 0, 255 )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 14
-						"gridWidth": 3
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblUser2"
-						"text": "Benutzer"
-						"horizontalAlignment": 4
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 16
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JTextField" ) {
-						name: "txtUser2"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 5
-						"gridY": 16
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblPassword2"
-						"text": "Passwort"
-						"horizontalAlignment": 4
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 18
-						"gridX": 3
-					} )
-					add( new FormComponent( "javax.swing.JPasswordField" ) {
-						name: "txtPW2"
-						"font": #Font1
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 5
-						"gridY": 18
-					} )
-					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "lblOperations"
-						"text": "Datenbank Operationen"
-						"font": #Font0
-						"horizontalAlignment": 0
-						"foreground": new java.awt.Color( 0, 102, 102, 255 )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 20
-						"gridX": 3
-						"gridWidth": 3
-					} )
-				}, new FormLayoutConstraints( null ) {
-					"title": "pnlDB"
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblPort"
+					"text": "Port"
+					"horizontalAlignment": 4
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 3
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtPort"
+					"text": "3306"
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 3
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblCat"
+					"text": "Katalog"
+					"horizontalAlignment": 4
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 5
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtCatalog"
+					"text": "opde"
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 5
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblUser"
+					"text": "Benutzer"
+					"horizontalAlignment": 4
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 7
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtUser"
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 7
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblPassword"
+					"text": "Passwort"
+					"horizontalAlignment": 4
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 9
+				} )
+				add( new FormComponent( "javax.swing.JPasswordField" ) {
+					name: "txtPW"
+					"font": #Font0
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 9
 				} )
 			} )
 		}, new FormLayoutConstraints( null ) {

@@ -1,15 +1,18 @@
 package op.settings.basicsetup;
 
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.dialog.*;
-import com.jidesoft.wizard.*;
+import com.jidesoft.wizard.AbstractWizardPage;
+import com.jidesoft.wizard.CompletionWizardPage;
+import com.jidesoft.wizard.DefaultWizardPage;
+import com.jidesoft.wizard.WizardDialog;
 import entity.EntityTools;
 import entity.building.Rooms;
 import entity.building.Station;
 import entity.info.*;
 import entity.prescription.GP;
 import entity.prescription.GPTools;
-import entity.system.Unique;
-import entity.system.UniqueTools;
 import entity.system.Users;
 import op.OPDE;
 import op.residents.bwassistant.PnlBV;
@@ -17,14 +20,12 @@ import op.residents.bwassistant.PnlBWBasisInfo;
 import op.residents.bwassistant.PnlGP;
 import op.residents.bwassistant.PnlHAUF;
 import op.settings.databeans.DatabaseConnectionBean;
-import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.log4j.Logger;
 import org.javatuples.Triplet;
 
-import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.validation.ConstraintViolation;
@@ -64,16 +65,13 @@ public class InitWizard extends WizardDialog {
     private boolean db_password_readable;
     private boolean db_password_credentials_correct;
 
-
+    private Resident resident;
     private DatabaseConnectionBean dbcb;
     private String clearpassword;
     private Logger logger;
     private String pingResult = "";
 
     private ArrayList<String> stuffThatAnnoysMe;
-
-
-    private Resident resident;
 
     private ResInfo resinfo_hauf, resinfo_room;
 
@@ -84,6 +82,7 @@ public class InitWizard extends WizardDialog {
         stuffThatAnnoysMe = new ArrayList<>();
         dbcb = new DatabaseConnectionBean(OPDE.getLocalProps());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
 
         analyzeSituation();
 
@@ -101,6 +100,14 @@ public class InitWizard extends WizardDialog {
         PageList model = new PageList();
 
         AbstractWizardPage page1 = new WelcomePage(SYSTools.xx("opde.initwizard.page1.title"), SYSTools.xx("opde.initwizard.page1.description"));
+        AbstractWizardPage page2 = new ComplainPage(SYSTools.xx("opde.initwizard.page2.title"), SYSTools.xx("opde.initwizard.page2.description"));
+        AbstractWizardPage page3 = new ConnectionPage(SYSTools.xx("opde.initwizard.page3.title"), SYSTools.xx("opde.initwizard.page3.description"));
+
+        // all these situations cause the paramters to be checked or entered
+        if (!db_parameters_complete || !db_server_pingable || !db_password_readable || !db_server_connected || !db_catalog_exists) {
+
+        }
+
 //        AbstractWizardPage page2 = new BasisInfoPage(SYSTools.xx("opde.admin.bw.wizard.page2.title"), SYSTools.xx("opde.admin.bw.wizard.page2.description"));
 //        AbstractWizardPage page3 = new PNPage(SYSTools.xx("opde.admin.bw.wizard.page3.title"), SYSTools.xx("opde.admin.bw.wizard.page3.description"));
 //        AbstractWizardPage page4 = new GPPage(SYSTools.xx("opde.admin.bw.wizard.page4.title"), SYSTools.xx("opde.admin.bw.wizard.page4.description"));
@@ -109,8 +116,8 @@ public class InitWizard extends WizardDialog {
 //        AbstractWizardPage page7 = new CompletionPage(SYSTools.xx("opde.admin.bw.wizard.page7.title"), SYSTools.xx("opde.admin.bw.wizard.page7.description"));
 
         model.append(page1);
-//        model.append(page2);
-//        model.append(page3);
+        model.append(page2);
+        model.append(page3);
 //        model.append(page4);
 ////        model.append(page5);
 //        model.append(page6);
@@ -131,6 +138,7 @@ public class InitWizard extends WizardDialog {
                 dispose();
             }
         });
+
         ((JPanel) getContentPane()).setBorder(new LineBorder(Color.BLACK, 1));
         pack();
     }
@@ -140,37 +148,37 @@ public class InitWizard extends WizardDialog {
 //        return wizard;
 //    }
 
-    private void save() {
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
+//    private void save() {
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            em.getTransaction().begin();
+//
+//
+//            String prefix = resident.getName().substring(0, 1) + resident.getFirstname().substring(0, 1);
+//            prefix = prefix.toUpperCase();
+//
+//            Unique unique = UniqueTools.getNewUID(em, prefix);
+//            String bwkennung = prefix + unique.getUid();
+//            resident.setRID(bwkennung);
+//
+//            resident = em.merge(resident);
+//            resinfo_hauf = em.merge(resinfo_hauf);
+//            if (resinfo_room != null) em.merge(resinfo_room);
+//
+//            em.getTransaction().commit();
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
+//
+//        } catch (Exception e) {
+//            if (em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            OPDE.fatal(e);
+//        } finally {
+//            em.close();
+//        }
+//    }
 
-
-            String prefix = resident.getName().substring(0, 1) + resident.getFirstname().substring(0, 1);
-            prefix = prefix.toUpperCase();
-
-            Unique unique = UniqueTools.getNewUID(em, prefix);
-            String bwkennung = prefix + unique.getUid();
-            resident.setRID(bwkennung);
-
-            resident = em.merge(resident);
-            resinfo_hauf = em.merge(resinfo_hauf);
-            if (resinfo_room != null) em.merge(resinfo_room);
-
-            em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
-
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-    }
-
-    private class WelcomePage extends WelcomeWizardPage {
+    private class WelcomePage extends DefaultWizardPage {
 
         public WelcomePage(String title, String description) {
             super(title, description);
@@ -185,8 +193,10 @@ public class InitWizard extends WizardDialog {
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
-            txt.setText(SYSTools.toHTML("opde.initwizard.page1.welcome"));
 
+            String situation = situation2html();
+
+            txt.setText(SYSTools.toHTML("opde.initwizard.page1.welcome"));
 
             addComponent(txt, true);
             addSpace();
@@ -200,52 +210,172 @@ public class InitWizard extends WizardDialog {
 
         @Override
         public void setupWizardButtons() {
-            super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.BACK, SYSTools.xx("opde.wizards.buttontext.back"));
             fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, SYSTools.xx("opde.wizards.buttontext.next"));
             fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.FINISH, SYSTools.xx("opde.wizards.buttontext.finish"));
             fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.CANCEL, SYSTools.xx("opde.wizards.buttontext.cancel"));
 
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
-            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
+            fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.CANCEL);
         }
     }
 
-    private class BasisInfoPage extends DefaultWizardPage {
-//        boolean alreadyexecute = false;
 
-        public BasisInfoPage(String title, String description) {
+    private class ComplainPage extends DefaultWizardPage {
+
+        public ComplainPage(String title, String description) {
             super(title, description);
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
-                    setupWizardButtons();
-                }
-            });
-        }
 
-        @Override
-        public void setupWizardButtons() {
-            super.setupWizardButtons();
-
-            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(resident == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
-            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(new PnlBWBasisInfo(new Closure() {
-                @Override
-                public void execute(Object o) {
-                    resident = (Resident) o;
-                    setupWizardButtons();
-                }
-            }), true);
+
+            JTextPane txt = new JTextPane();
+            txt.setEditable(false);
+            txt.setContentType("text/html");
+            txt.setOpaque(false);
+
+            String situation = situation2html();
+
+            txt.setText(SYSTools.toHTML(situation));
+
+            addComponent(txt, true);
+            addSpace();
+        }
+
+        //        @Override
+        //        public Image getGraphic() {
+        //            return getLeftGraphic("/artwork/aspecton1.png");
+        //        }
+
+        @Override
+        public void setupWizardButtons() {
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.BACK, SYSTools.xx("opde.wizards.buttontext.back"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, SYSTools.xx("opde.wizards.buttontext.next"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.FINISH, SYSTools.xx("opde.wizards.buttontext.finish"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.CANCEL, SYSTools.xx("opde.wizards.buttontext.cancel"));
+
+
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.CANCEL);
+        }
+    }
+
+    private class ConnectionPage extends DefaultWizardPage {
+        private JPanel pnlDB;
+        private JLabel lblServer;
+        private JTextField txtServer;
+        private JLabel lblPort;
+        private JTextField txtPort;
+        private JLabel lblCat;
+        private JTextField txtCatalog;
+        private JLabel lblUser;
+        private JTextField txtUser;
+        private JLabel lblPassword;
+        private JPasswordField txtPW;
+
+
+        public ConnectionPage(String title, String description) {
+            super(title, description);
+
+//            pack();
+//            setLocationRelativeTo(getOwner());
+
+        }
+
+        @Override
+        public void setupWizardButtons() {
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
+            fireButtonEvent(db_server_pingable && db_server_connected && db_catalog_exists ? ButtonEvent.ENABLE_BUTTON : ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.CANCEL);
+        }
+
+        @Override
+        protected void initContentPane() {
+            super.initContentPane();
+            pnlDB = new JPanel();
+                       lblServer = new JLabel();
+                       txtServer = new JTextField();
+                       lblPort = new JLabel();
+                       txtPort = new JTextField();
+                       lblCat = new JLabel();
+                       txtCatalog = new JTextField();
+                       lblUser = new JLabel();
+                       txtUser = new JTextField();
+                       lblPassword = new JLabel();
+                       txtPW = new JPasswordField();
+
+                       //======== this ========
+
+                       setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
+                       //======== pnlDB ========
+                       {
+                           pnlDB.setBackground(new Color(238, 238, 238));
+                           pnlDB.setLayout(new FormLayout(
+                                   "default, $ugap, default:grow",
+                                   "4*(default, $lgap), default"));
+
+                           //---- lblServer ----
+                           lblServer.setText("Server");
+                           lblServer.setHorizontalAlignment(SwingConstants.RIGHT);
+                           lblServer.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(lblServer, CC.xy(1, 1));
+
+                           //---- txtServer ----
+                           txtServer.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(txtServer, CC.xy(3, 1));
+
+                           //---- lblPort ----
+                           lblPort.setText("Port");
+                           lblPort.setHorizontalAlignment(SwingConstants.RIGHT);
+                           lblPort.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(lblPort, CC.xy(1, 3));
+
+                           //---- txtPort ----
+                           txtPort.setText("3306");
+                           txtPort.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(txtPort, CC.xy(3, 3));
+
+                           //---- lblCat ----
+                           lblCat.setText("Katalog");
+                           lblCat.setHorizontalAlignment(SwingConstants.RIGHT);
+                           lblCat.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(lblCat, CC.xy(1, 5));
+
+                           //---- txtCatalog ----
+                           txtCatalog.setText("opde");
+                           txtCatalog.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(txtCatalog, CC.xy(3, 5));
+
+                           //---- lblUser ----
+                           lblUser.setText("Benutzer");
+                           lblUser.setHorizontalAlignment(SwingConstants.RIGHT);
+                           lblUser.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(lblUser, CC.xy(1, 7));
+
+                           //---- txtUser ----
+                           txtUser.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(txtUser, CC.xy(3, 7));
+
+                           //---- lblPassword ----
+                           lblPassword.setText("Passwort");
+                           lblPassword.setHorizontalAlignment(SwingConstants.RIGHT);
+                           lblPassword.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(lblPassword, CC.xy(1, 9));
+
+                           //---- txtPW ----
+                           txtPW.setFont(new Font("Arial", Font.PLAIN, 16));
+                           pnlDB.add(txtPW, CC.xy(3, 9));
+                       }
+                       addComponent(pnlDB);
         }
 
 
@@ -491,6 +621,28 @@ public class InitWizard extends WizardDialog {
 
     }
 
+    private String situation2html() {
+        String html = "";
+
+        html += db_parameters_complete ? "" : SYSConst.html_li("opde.initwizard.not.db_parameters_complete");
+        html += db_server_pingable ? "" : SYSConst.html_li("opde.initwizard.not.db_server_pingable");
+        html += db_server_connected ? "" : SYSConst.html_li("opde.initwizard.not.db_server_connected");
+        html += db_catalog_exists ? "" : SYSConst.html_li("opde.initwizard.not.db_catalog_exists");
+        html += db_password_readable ? "" : SYSConst.html_li("opde.initwizard.not.db_password_readable");
+        html += db_password_credentials_correct ? "" : SYSConst.html_li("opde.initwizard.not.db_password_credentials_correct");
+
+        if (db_version == DB_VERSION.UNKNOWN) html += SYSConst.html_li("opde.initwizard.db_version_unknown");
+        else if (db_version == DB_VERSION.TOO_LOW) html += SYSConst.html_li("opde.initwizard.db_version_too_low");
+        else if (db_version == DB_VERSION.TOO_HIGH) html += SYSConst.html_li("opde.initwizard.db_version_too_high");
+
+
+        if (!html.isEmpty()) {
+            html = SYSConst.html_ul(html);
+        }
+
+        return html;
+    }
+
 
     /**
      * this method checks the availability of the database connection in stages.
@@ -538,8 +690,8 @@ public class InitWizard extends WizardDialog {
             jdbcConnection.setCatalog(dbcb.getCatalog());
             db_catalog_exists = true;
 
-            int currentVersion = OPDE.getAppInfo().getDbversion();
-            int neededVersion = EntityTools.getNeededDBVersion(jdbcConnection);
+            int neededVersion = OPDE.getAppInfo().getDbversion();
+            int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
 
             if (currentVersion == -1) db_version = DB_VERSION.UNKNOWN; // tables SYSProps is messed up
             else if (currentVersion < neededVersion) db_version = DB_VERSION.TOO_LOW;

@@ -218,7 +218,7 @@ public class EntityTools {
 
 
 
-    public static int getNeededDBVersion(Connection jdbcConnection) throws SQLException {
+    public static int getDatabaseSchemaVersion(Connection jdbcConnection) throws SQLException {
         int version = -1;
 
         String query = " SELECT p.V FROM sysprops p WHERE p.K = ? ";
