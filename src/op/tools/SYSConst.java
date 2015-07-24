@@ -631,6 +631,8 @@ public class SYSConst {
     public static final Icon icon22ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledgreen.png"));
     public static final Icon icon22ledGreenOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkgreen.png"));
     public static final Icon icon16ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/ledgreen.png"));
+    public static final Icon icon16ledRedOn = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/ledred.png"));
+    public static final Icon icon16ledYellowOn = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/ledyellow.png"));
     public static final Icon icon163ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/3ledlightgreen.png"));
     public static final Icon icon16ledGreenOff = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/leddarkgreen.png"));
     public static final Icon icon22ledOrangeOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledorange.png"));
