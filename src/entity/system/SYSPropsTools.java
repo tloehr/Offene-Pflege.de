@@ -58,6 +58,7 @@ public class SYSPropsTools {
     public static final String KEY_FTP_PORT = "FTPPort";
     public static final String KEY_FTP_IS_WORKING = "FTPIsWorking";
 
+    public static final String KEY_DB_VERSION = "dbstructure";
 
     public static final String KEY_JDBC_HOST = "javax.persistence.jdbc.host";
     public static final String KEY_JDBC_PORT = "javax.persistence.jdbc.port";

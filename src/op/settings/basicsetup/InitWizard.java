@@ -272,26 +272,6 @@ public class InitWizard extends WizardDialog {
             txtCatalog = new JTextField();
             txtUser = new JTextField();
 
-            String password = "";
-            try {
-                password = OPDE.getDesEncrypter().decrypt(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-            } catch (BadPaddingException e) {
-                password = "";
-            } catch (Exception e) {
-                OPDE.fatal(logger, e);
-            }
-            // could still be encoded with the old algorithm. trying.
-            if (password.isEmpty()) {
-                DesEncrypter oldDesEncrypter = new DesEncrypter(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_HOSTKEY)));
-                try {
-                    password = oldDesEncrypter.decrypt(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-                } catch (BadPaddingException e) {
-                    password = "";
-                } catch (Exception e) {
-                    OPDE.fatal(logger, e);
-                }
-            }
-
             txtPassword = new JTextField();
 
             lblPassword = new JLabel();
@@ -630,7 +610,7 @@ public class InitWizard extends WizardDialog {
                 txtServer.getDocument().insertString(0, server, null);
                 txtPort.getDocument().insertString(0, sPort, null);
                 txtUser.getDocument().insertString(0, user, null);
-                txtPassword.getDocument().insertString(0, password, null);
+                txtPassword.getDocument().insertString(0, OPDE.decryptJDBCPasswort(), null);
                 txtCatalog.getDocument().insertString(0, catalog, null);
 
 //                port = Integer.parseInt(txtPort.getText());

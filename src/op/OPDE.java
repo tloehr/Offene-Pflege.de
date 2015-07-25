@@ -46,9 +46,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import javax.crypto.BadPaddingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.swing.*;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
@@ -59,6 +61,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
@@ -596,20 +599,201 @@ public class OPDE {
 
 
             /***
-             *          _ _                       _                                               _   _ _     _        ___ 
-             *       __| | |____   _____ _ __ ___(_) ___  _ __     ___ ___  _ __ ___  _ __   __ _| |_(_) |__ | | ___  |__ \
-             *      / _` | '_ \ \ / / _ \ '__/ __| |/ _ \| '_ \   / __/ _ \| '_ ` _ \| '_ \ / _` | __| | '_ \| |/ _ \   / /
-             *     | (_| | |_) \ V /  __/ |  \__ \ | (_) | | | | | (_| (_) | | | | | | |_) | (_| | |_| | |_) | |  __/  |_| 
-             *      \__,_|_.__/ \_/ \___|_|  |___/_|\___/|_| |_|  \___\___/|_| |_| |_| .__/ \__,_|\__|_|_.__/|_|\___|  (_) 
-             *                                                                       |_|                                   
+             *          _ ____   _      ____        _        _
+             *         | |  _ \ / \    |  _ \  __ _| |_ __ _| |__   __ _ ___  ___
+             *      _  | | |_) / _ \   | | | |/ _` | __/ _` | '_ \ / _` / __|/ _ \
+             *     | |_| |  __/ ___ \  | |_| | (_| | || (_| | |_) | (_| \__ \  __/
+             *      \___/|_| /_/   \_\ |____/ \__,_|\__\__,_|_.__/ \__,_|___/\___|
+             *
              */
-            // second test. is the database sane ?
+            Properties jpaProps = new Properties();
+            jpaProps.putAll(localProps);
+
+            url = cl.hasOption("j") ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
+            jpaProps.put(SYSPropsTools.KEY_JDBC_URL, url);
+            jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, decryptJDBCPasswort());
+
+            //            if (cl.hasOption("d") || cl.hasOption("d")) {  // not for BHP or DFN
+            //                jpaProps.put("eclipselink.cache.shared.default", "false");
+            //            } else {
+            //                jpaProps.put("eclipselink.cache.shared.default", "true");
+            //            }
+
+            jpaProps.put("eclipselink.cache.shared.default", "false");
+            jpaProps.put("eclipselink.session.customizer", "entity.JPAEclipseLinkSessionCustomizer");
+            emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
+
+            EntityManager em1 = emf.createEntityManager();
+
+            int neededVersion = OPDE.getAppInfo().getDbversion();
+            int currentVersion = SYSPropsTools.getInteger(SYSPropsTools.KEY_DB_VERSION);
+
+            if (neededVersion != currentVersion) throw new PersistenceException("opde database scheme version mismatch");
+
+            em1.close();
 
 
-            InitWizard initWizard = new InitWizard();
+            /***
+             *     __     __            _
+             *     \ \   / /__ _ __ ___(_) ___  _ __
+             *      \ \ / / _ \ '__/ __| |/ _ \| '_ \
+             *       \ V /  __/ |  \__ \ | (_) | | | |
+             *        \_/ \___|_|  |___/_|\___/|_| |_|
+             *
+             */
+            String header = SYSTools.getWindowTitle("");
+            if (cl.hasOption("v")) {
+                System.out.println(header);
+                System.out.println(footer);
+                System.exit(0);
+            }
 
-            if (!initWizard.isDatabaseOK()) {
-                initWizard.setSize(new Dimension(800, 550));
+
+            /***
+             *       ____                           _         ____  _____ _   _
+             *      / ___| ___ _ __   ___ _ __ __ _| |_ ___  |  _ \|  ___| \ | |___
+             *     | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \ | | | | |_  |  \| / __|
+             *     | |_| |  __/ | | |  __/ | | (_| | ||  __/ | |_| |  _| | |\  \__ \
+             *      \____|\___|_| |_|\___|_|  \__,_|\__\___| |____/|_|   |_| \_|___/
+             *
+             */
+            if (cl.hasOption("d")) {
+                EntityManager em = OPDE.createEM();
+
+                try {
+                    em.getTransaction().begin();
+                    Users rootUser = em.find(Users.class, "admin");
+
+                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
+                    OPDE.setLogin(rootLogin);
+                    initProps();
+
+                    // create the new DFNs
+                    DFNTools.generate(em);
+                    // move over the floating ones that have not yet been clicked to the current day
+                    DFNTools.moveFloating(em);
+
+                    em.getTransaction().commit();
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    fatal(ex);
+                } finally {
+                    em.close();
+                }
+                System.exit(0);
+            }
+
+            /***
+             *       ____                           _         ____  _   _ ____
+             *      / ___| ___ _ __   ___ _ __ __ _| |_ ___  | __ )| | | |  _ \ ___
+             *     | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \ |  _ \| |_| | |_) / __|
+             *     | |_| |  __/ | | |  __/ | | (_| | ||  __/ | |_) |  _  |  __/\__ \
+             *      \____|\___|_| |_|\___|_|  \__,_|\__\___| |____/|_| |_|_|   |___/
+             *
+             */
+            if (cl.hasOption("b")) {
+
+                EntityManager em = OPDE.createEM();
+
+                try {
+                    em.getTransaction().begin();
+                    Users rootUser = em.find(Users.class, "admin");
+
+                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
+                    OPDE.setLogin(rootLogin);
+                    initProps();
+
+                    BHPTools.generate(em);
+
+                    em.getTransaction().commit();
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    fatal(ex);
+                } finally {
+                    em.close();
+                }
+                System.exit(0);
+            }
+
+
+            /***
+             *      _   _       _   _  __ _           _   _
+             *     | \ | | ___ | |_(_)/ _(_) ___ __ _| |_(_) ___  _ __
+             *     |  \| |/ _ \| __| | |_| |/ __/ _` | __| |/ _ \| '_ \
+             *     | |\  | (_) | |_| |  _| | (_| (_| | |_| | (_) | | | |
+             *     |_| \_|\___/ \__|_|_| |_|\___\__,_|\__|_|\___/|_| |_|
+             *
+             */
+            if (cl.hasOption("n")) {
+
+                EntityManager em = OPDE.createEM();
+
+                try {
+                    em.getTransaction().begin();
+                    Users rootUser = em.find(Users.class, "admin");
+
+                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
+                    OPDE.setLogin(rootLogin);
+                    initProps();
+
+                    EMailSystem.notify(cl.getOptionValue("n"));
+
+                    em.getTransaction().commit();
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    fatal(ex);
+                } finally {
+                    em.close();
+                }
+                System.exit(0);
+            }
+
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            setStandardFont();
+
+
+            // JideSoft
+
+            /***
+             *      _____               __  __       _        ____
+             *     |  ___| __ _ __ ___ |  \/  | __ _(_)_ __  / /\ \
+             *     | |_ | '__| '_ ` _ \| |\/| |/ _` | | '_ \| |  | |
+             *     |  _|| |  | | | | | | |  | | (_| | | | | | |  | |
+             *     |_|  |_|  |_| |_| |_|_|  |_|\__,_|_|_| |_| |  | |
+             *                                               \_\/_/
+             */
+
+
+            //        JFrame frm = new JFrame();
+            //            frm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            //            frm.setLayout(new FlowLayout());
+            //
+            //                    frm.getContentPane().add(new PnlBodyScheme(new Properties()));
+            //
+            //                    frm.setVisible(true);
+
+            //            SYSTools.checkForSoftwareupdates();
+
+
+            mainframe = new FrmMain();
+
+
+            mainframe.setVisible(true);
+
+        } catch (Exception ioe) {
+
+            // trouble with the setup ?
+            // start the init wizard
+            if (ioe instanceof SQLException || ioe instanceof PersistenceException) {
+                logger.warn(ioe);
+                InitWizard initWizard = new InitWizard();
+//                initWizard.setSize(new Dimension(800, 550));
                 SYSTools.center(initWizard);
                 initWizard.addWindowListener(new WindowAdapter() {
                     @Override
@@ -619,206 +803,9 @@ public class OPDE {
                 });
                 initWizard.setVisible(true);
             } else {
-
-
-                /***
-                 *          _ ____   _      ____        _        _
-                 *         | |  _ \ / \    |  _ \  __ _| |_ __ _| |__   __ _ ___  ___
-                 *      _  | | |_) / _ \   | | | |/ _` | __/ _` | '_ \ / _` / __|/ _ \
-                 *     | |_| |  __/ ___ \  | |_| | (_| | || (_| | |_) | (_| \__ \  __/
-                 *      \___/|_| /_/   \_\ |____/ \__,_|\__\__,_|_.__/ \__,_|___/\___|
-                 *
-                 */
-                Properties jpaProps = new Properties();
-                jpaProps.put(SYSPropsTools.KEY_JDBC_USER, localProps.getProperty("javax.persistence.jdbc.user"));
-
-                try {
-                    jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, "");
-                } catch (Exception e) {
-                    if (Desktop.isDesktopSupported()) {
-                        JOptionPane.showMessageDialog(null, SYSTools.xx("misc.msg.decryption.failure"), appInfo.getProgname(), JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        OPDE.fatal(e);
-                    }
-                    System.exit(1);
-                }
-
-                jpaProps.put(SYSPropsTools.KEY_JDBC_DRIVER, "com.mysql.jdbc.Driver");
-
-                url = cl.hasOption("j") ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
-                jpaProps.put(SYSPropsTools.KEY_JDBC_URL, url);
-
-
-                //            if (cl.hasOption("d") || cl.hasOption("d")) {  // not for BHP or DFN
-                //                jpaProps.put("eclipselink.cache.shared.default", "false");
-                //            } else {
-                //                jpaProps.put("eclipselink.cache.shared.default", "true");
-                //            }
-
-                jpaProps.put("eclipselink.cache.shared.default", "false");
-                jpaProps.put("eclipselink.session.customizer", "entity.JPAEclipseLinkSessionCustomizer");
-                emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
-
-
-                /***
-                 *     __     __            _
-                 *     \ \   / /__ _ __ ___(_) ___  _ __
-                 *      \ \ / / _ \ '__/ __| |/ _ \| '_ \
-                 *       \ V /  __/ |  \__ \ | (_) | | | |
-                 *        \_/ \___|_|  |___/_|\___/|_| |_|
-                 *
-                 */
-                String header = SYSTools.getWindowTitle("");
-                if (cl.hasOption("v")) {
-                    System.out.println(header);
-                    System.out.println(footer);
-                    System.exit(0);
-                }
-
-
-                /***
-                 *       ____                           _         ____  _____ _   _
-                 *      / ___| ___ _ __   ___ _ __ __ _| |_ ___  |  _ \|  ___| \ | |___
-                 *     | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \ | | | | |_  |  \| / __|
-                 *     | |_| |  __/ | | |  __/ | | (_| | ||  __/ | |_| |  _| | |\  \__ \
-                 *      \____|\___|_| |_|\___|_|  \__,_|\__\___| |____/|_|   |_| \_|___/
-                 *
-                 */
-                if (cl.hasOption("d")) {
-                    EntityManager em = OPDE.createEM();
-
-                    try {
-                        em.getTransaction().begin();
-                        Users rootUser = em.find(Users.class, "admin");
-
-                        SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
-                        OPDE.setLogin(rootLogin);
-                        initProps();
-
-                        // create the new DFNs
-                        DFNTools.generate(em);
-                        // move over the floating ones that have not yet been clicked to the current day
-                        DFNTools.moveFloating(em);
-
-                        em.getTransaction().commit();
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        fatal(ex);
-                    } finally {
-                        em.close();
-                    }
-                    System.exit(0);
-                }
-
-                /***
-                 *       ____                           _         ____  _   _ ____
-                 *      / ___| ___ _ __   ___ _ __ __ _| |_ ___  | __ )| | | |  _ \ ___
-                 *     | |  _ / _ \ '_ \ / _ \ '__/ _` | __/ _ \ |  _ \| |_| | |_) / __|
-                 *     | |_| |  __/ | | |  __/ | | (_| | ||  __/ | |_) |  _  |  __/\__ \
-                 *      \____|\___|_| |_|\___|_|  \__,_|\__\___| |____/|_| |_|_|   |___/
-                 *
-                 */
-                if (cl.hasOption("b")) {
-
-                    EntityManager em = OPDE.createEM();
-
-                    try {
-                        em.getTransaction().begin();
-                        Users rootUser = em.find(Users.class, "admin");
-
-                        SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
-                        OPDE.setLogin(rootLogin);
-                        initProps();
-
-                        BHPTools.generate(em);
-
-                        em.getTransaction().commit();
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        fatal(ex);
-                    } finally {
-                        em.close();
-                    }
-                    System.exit(0);
-                }
-
-
-                /***
-                 *      _   _       _   _  __ _           _   _
-                 *     | \ | | ___ | |_(_)/ _(_) ___ __ _| |_(_) ___  _ __
-                 *     |  \| |/ _ \| __| | |_| |/ __/ _` | __| |/ _ \| '_ \
-                 *     | |\  | (_) | |_| |  _| | (_| (_| | |_| | (_) | | | |
-                 *     |_| \_|\___/ \__|_|_| |_|\___\__,_|\__|_|\___/|_| |_|
-                 *
-                 */
-                if (cl.hasOption("n")) {
-
-                    EntityManager em = OPDE.createEM();
-
-                    try {
-                        em.getTransaction().begin();
-                        Users rootUser = em.find(Users.class, "admin");
-
-                        SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
-                        OPDE.setLogin(rootLogin);
-                        initProps();
-
-                        EMailSystem.notify(cl.getOptionValue("n"));
-
-                        em.getTransaction().commit();
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        fatal(ex);
-                    } finally {
-                        em.close();
-                    }
-                    System.exit(0);
-                }
-
-                // to speed things later. The first connection loads the while JPA system.
-                EntityManager em1 = createEM();
-                em1.close();
-
-                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                setStandardFont();
-
-
-                // JideSoft
-
-                /***
-                 *      _____               __  __       _        ____
-                 *     |  ___| __ _ __ ___ |  \/  | __ _(_)_ __  / /\ \
-                 *     | |_ | '__| '_ ` _ \| |\/| |/ _` | | '_ \| |  | |
-                 *     |  _|| |  | | | | | | |  | | (_| | | | | | |  | |
-                 *     |_|  |_|  |_| |_| |_|_|  |_|\__,_|_|_| |_| |  | |
-                 *                                               \_\/_/
-                 */
-
-
-                //        JFrame frm = new JFrame();
-                //            frm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                //            frm.setLayout(new FlowLayout());
-                //
-                //                    frm.getContentPane().add(new PnlBodyScheme(new Properties()));
-                //
-                //                    frm.setVisible(true);
-
-                //            SYSTools.checkForSoftwareupdates();
-
-
-                mainframe = new FrmMain();
-
-
-                mainframe.setVisible(true);
+                logger.fatal(ioe);
+                System.exit(0);
             }
-        } catch (IOException ioe) {
-            fatal(ioe);
         }
     }
 
@@ -901,6 +888,29 @@ public class OPDE {
 
         in.close();
 
+    }
+
+    public static String decryptJDBCPasswort() {
+        String password = "";
+        try {
+            password = OPDE.getDesEncrypter().decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
+        } catch (BadPaddingException e) {
+            password = "";
+        } catch (Exception e) {
+            OPDE.fatal(logger, e);
+        }
+        // could still be encoded with the old algorithm. trying.
+        if (password.isEmpty()) {
+            DesEncrypter oldDesEncrypter = new DesEncrypter(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_HOSTKEY)));
+            try {
+                password = oldDesEncrypter.decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
+            } catch (BadPaddingException e) {
+                password = "";
+            } catch (Exception e) {
+                OPDE.fatal(logger, e);
+            }
+        }
+        return password;
     }
 
     public static boolean isAdmin() {

@@ -1,5 +1,6 @@
 package entity;
 
+import entity.system.SYSPropsTools;
 import gui.GUITools;
 import gui.interfaces.NotRemovableUnlessEmpty;
 import op.OPDE;
@@ -223,7 +224,7 @@ public class EntityTools {
 
         String query = " SELECT p.V FROM sysprops p WHERE p.K = ? ";
         PreparedStatement stmt = jdbcConnection.prepareStatement(query);
-        stmt.setString(1, "dbstructure");
+        stmt.setString(1, SYSPropsTools.KEY_DB_VERSION);
         ResultSet rs = stmt.executeQuery();
 
         if (rs.first()) {
