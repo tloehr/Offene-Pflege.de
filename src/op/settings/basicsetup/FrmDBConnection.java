@@ -180,6 +180,9 @@ public class FrmDBConnection extends JFrame {
         txtUser = new JTextField();
         lblPassword = new JLabel();
         txtPW = new JPasswordField();
+        scrollPane1 = new JScrollPane();
+        textPane1 = new JTextPane();
+        label1 = new JLabel();
 
         //======== this ========
         Container contentPane = getContentPane();
@@ -190,7 +193,7 @@ public class FrmDBConnection extends JFrame {
             pnlDB.setBackground(new Color(238, 238, 238));
             pnlDB.setLayout(new FormLayout(
                 "default, $ugap, default:grow",
-                "4*(default, $lgap), default"));
+                "5*(default, $lgap), fill:133dlu, $lgap, default"));
 
             //---- lblServer ----
             lblServer.setText("Server");
@@ -243,6 +246,19 @@ public class FrmDBConnection extends JFrame {
             //---- txtPW ----
             txtPW.setFont(new Font("Arial", Font.PLAIN, 16));
             pnlDB.add(txtPW, CC.xy(3, 9));
+
+            //======== scrollPane1 ========
+            {
+
+                //---- textPane1 ----
+                textPane1.setContentType("text/html");
+                scrollPane1.setViewportView(textPane1);
+            }
+            pnlDB.add(scrollPane1, CC.xy(3, 11));
+
+            //---- label1 ----
+            label1.setText("text");
+            pnlDB.add(label1, CC.xywh(1, 13, 3, 1));
         }
         contentPane.add(pnlDB);
         pack();
@@ -262,5 +278,8 @@ public class FrmDBConnection extends JFrame {
     private JTextField txtUser;
     private JLabel lblPassword;
     private JPasswordField txtPW;
+    private JScrollPane scrollPane1;
+    private JTextPane textPane1;
+    private JLabel label1;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

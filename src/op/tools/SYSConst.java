@@ -581,6 +581,9 @@ public class SYSConst {
     public static final Icon icon22residentDied = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-died.png"));
     public static final Icon icon22residentGone = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-gone.png"));
 
+    public static final Icon icon22createDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_add.png"));
+    public static final Icon icon22updateDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_comit.png"));
+
     public static final Icon icon16residentAbsent = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-absent.png"));
     public static final Icon icon16residentDied = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-died.png"));
     public static final Icon icon16residentGone = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-gone.png"));

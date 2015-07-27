@@ -7,7 +7,7 @@ new FormModel {
 			name: "this"
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 				"$columnSpecs": "default, unrelgap, default:grow"
-				"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default"
+				"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:133dlu, linegap, default"
 			} ) {
 				name: "pnlDB"
 				"background": new java.awt.Color( 238, 238, 238, 255 )
@@ -84,6 +84,23 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 3
 					"gridY": 9
+				} )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "scrollPane1"
+					add( new FormComponent( "javax.swing.JTextPane" ) {
+						name: "textPane1"
+						"contentType": "text/html"
+					} )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 11
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label1"
+					"text": "text"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 13
+					"gridWidth": 3
 				} )
 			} )
 		}, new FormLayoutConstraints( null ) {
