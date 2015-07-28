@@ -17,7 +17,6 @@ import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.MediaSizeName;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,20 +62,20 @@ public class LogicalPrinters {
         initTags();
         printers = new ArrayList<LogicalPrinter>();
         mapName2LogicalPrinter = new HashMap<String, LogicalPrinter>();
-        File configfile = new File(OPDE.getOPWD() + System.getProperty("file.separator") + AppInfo.dirTemplates + System.getProperty("file.separator") + AppInfo.filePrinters);
-        if (configfile.exists()) {
-            try {
-                XMLReader parser = XMLReaderFactory.createXMLReader();
-                InputSource is = new InputSource(new FileInputStream(configfile));
-                XMLHandler xml = new XMLHandler();
-                parser.setContentHandler(xml);
-                parser.parse(is);
-            } catch (SAXException sAXException) {
-                OPDE.fatal(sAXException);
-            } catch (IOException iOException) {
-                OPDE.fatal(iOException);
-            }
+//        File configfile = AppInfo.getTemplate(AppInfo.filePrinters);
+
+        try {
+            XMLReader parser = XMLReaderFactory.createXMLReader();
+            InputSource is = new InputSource(new FileInputStream(AppInfo.getTemplate(AppInfo.filePrinters)));
+            XMLHandler xml = new XMLHandler();
+            parser.setContentHandler(xml);
+            parser.parse(is);
+        } catch (SAXException sAXException) {
+            OPDE.fatal(sAXException);
+        } catch (IOException iOException) {
+            OPDE.fatal(iOException);
         }
+
     }
 
     private class XMLHandler extends DefaultHandler {

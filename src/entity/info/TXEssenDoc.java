@@ -12,6 +12,7 @@ import entity.values.ResValueTools;
 import entity.values.ResValueTypesTools;
 import op.OPDE;
 import op.care.info.PnlBodyScheme;
+import op.system.AppInfo;
 import op.system.PDF;
 import op.threads.DisplayMessage;
 import op.tools.Pair;
@@ -144,7 +145,7 @@ public class TXEssenDoc {
     private File createDocPSYCH() throws Exception {
         File outfilePSYCH = File.createTempFile("TXE", ".pdf"); //new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.PSYCH_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
         outfilePSYCH.deleteOnExit();
-        PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEPSYCH), new FileOutputStream(outfilePSYCH));
+        PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEPSYCH).getAbsolutePath()), new FileOutputStream(outfilePSYCH));
         createContent4PSYCH();
 
         AcroFields form = stamper.getAcroFields();
@@ -159,7 +160,7 @@ public class TXEssenDoc {
     private File createDocMRE() throws Exception {
         File outfileMRE = File.createTempFile("TXE", ".pdf"); //new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.MRE_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
         outfileMRE.deleteOnExit();
-        PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEMRE), new FileOutputStream(outfileMRE));
+        PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEMRE).getAbsolutePath()), new FileOutputStream(outfileMRE));
         createContent4MRE();
 
         AcroFields form = stamper.getAcroFields();
@@ -174,7 +175,7 @@ public class TXEssenDoc {
     private File createDoc1() throws Exception {
         File outfile1 = File.createTempFile("TXE", ".pdf");//new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX1_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
         outfile1.deleteOnExit();
-        PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEDOC1), new FileOutputStream(outfile1));
+        PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEDOC1).getAbsolutePath()), new FileOutputStream(outfile1));
 
         progress++;
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));

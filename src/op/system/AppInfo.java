@@ -7,6 +7,7 @@ package op.system;
 import entity.system.Acl;
 import entity.system.SYSGROUPS2ACL;
 import op.OPDE;
+import op.tools.Hardware;
 import op.tools.SYSTools;
 import op.tools.SortedProperties;
 import org.xml.sax.Attributes;
@@ -19,6 +20,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -53,7 +55,8 @@ public class AppInfo {
     public static final String dirCache = "cache";
     public static final String dirArtwork = "artwork";
     public static final String dirTemplates = "templates";
-    public static final String dirJar = "jar";
+
+//    public static final String dirJar = "jar";
     public static final String dirArtwork16 = "16x16";
     public static final String dirArtwork22 = "22x22";
     public static final String dirArtwork48 = "48x48";
@@ -275,6 +278,17 @@ public class AppInfo {
         }
 
     }
+
+
+    public static File getTemplate(String templateName) throws IOException {
+           String userTemplatePath = OPDE.getOPWD() + File.separator + dirTemplates + File.separator + templateName;
+           String systemTemplatePath = Hardware.getProgrammPath() + File.separator + dirTemplates + File.separator + templateName;
+
+           File user = new File(userTemplatePath);
+           File sys = new File(systemTemplatePath);
+
+           return user.exists() ? user : sys;
+       }
 
     public int getDbversion() {
         return dbversion;

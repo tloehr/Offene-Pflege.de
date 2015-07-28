@@ -1340,7 +1340,7 @@ public class SYSTools {
         String html;
 
         try {
-            html = SYSTools.readFileAsString(OPDE.getOPWD() + SYSConst.sep + AppInfo.dirTemplates + SYSConst.sep + AppInfo.fileNewuser);
+            html = SYSTools.readFileAsString(AppInfo.getTemplate(AppInfo.fileNewuser).getAbsolutePath());
         } catch (IOException ie) {
             html = "<body>"
                     + "<h1>Access to Offene-Pflege.de (OPDE)</h1>"

@@ -36,4 +36,19 @@ public class Hardware {
         }
         return null;
     }
+
+
+    public static final String getProgrammPath() {
+        final String sep = System.getProperty("file.separator");
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return System.getenv("ProgramFiles") + sep + "Offene-Pflege.de";
+        }
+        if (SystemUtils.IS_OS_LINUX) {
+            return "/usr/local/opde";
+        }
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            return "/Applications/Offene-Pflege.de.app/Contents/Resources";
+        }
+        return null;
+    }
 }

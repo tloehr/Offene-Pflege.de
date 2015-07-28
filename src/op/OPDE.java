@@ -43,9 +43,9 @@ import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import scala.App;
 
 import javax.crypto.BadPaddingException;
 import javax.persistence.EntityManager;
@@ -92,8 +92,8 @@ public class OPDE {
     private final static Logger logger = Logger.getRootLogger();
     public static HashMap[] anonymize = null;
 
-    public static String SUBDIR_TEMPLATES = "templates";
-    public static String SUBDIR_CACHE = "cache";
+
+//    public static String SUBDIR_CACHE = "cache";
 
     protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
@@ -556,7 +556,7 @@ public class OPDE {
             loadLocalProperties();
 
             try {
-                css = SYSTools.readFileAsString(getOPWD() + sep + AppInfo.dirTemplates + sep + AppInfo.fileStandardCSS);
+                css = SYSTools.readFileAsString(AppInfo.getTemplate(AppInfo.fileStandardCSS).getAbsolutePath());
             } catch (IOException ie) {
                 css = "";
             }
@@ -629,7 +629,8 @@ public class OPDE {
             int neededVersion = OPDE.getAppInfo().getDbversion();
             int currentVersion = SYSPropsTools.getInteger(SYSPropsTools.KEY_DB_VERSION);
 
-            if (neededVersion != currentVersion) throw new PersistenceException("opde database scheme version mismatch");
+            if (neededVersion != currentVersion)
+                throw new PersistenceException("opde database scheme version mismatch");
 
             em1.close();
 
@@ -951,6 +952,9 @@ public class OPDE {
         UIManager.put("ToolTip.font", SYSConst.ARIAL14);
         UIManager.put("Tree.font", SYSConst.ARIAL14);
     }
+
+
+
 
 
 }
