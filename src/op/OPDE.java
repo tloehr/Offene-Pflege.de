@@ -143,9 +143,7 @@ public class OPDE {
         }
     }
 
-    public static String getOPCache() {
-        return getOPWD() + sep + AppInfo.dirCache;
-    }
+
 
     public static LogicalPrinters getLogicalPrinters() {
         return printers;

@@ -5,6 +5,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
 import entity.info.*;
 import op.OPDE;
+import op.system.AppInfo;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
 import op.tools.PopupPanel;
@@ -82,7 +83,7 @@ public class GUITools {
             prefix = "pnl2png";
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        exportToPNG(pnl, new File(OPDE.getOPCache() + File.separator + prefix + "_" + sdf.format(new Date()) + ".png"));
+        exportToPNG(pnl, new File(AppInfo.getOPCache() + File.separator + prefix + "_" + sdf.format(new Date()) + ".png"));
     }
 
 

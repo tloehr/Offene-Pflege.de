@@ -54,9 +54,9 @@ public class AppInfo {
 
     public static final String dirCache = "cache";
     public static final String dirArtwork = "artwork";
-    public static final String dirTemplates = "templates";
+    private static final String dirTemplates = "templates";
 
-//    public static final String dirJar = "jar";
+    //    public static final String dirJar = "jar";
     public static final String dirArtwork16 = "16x16";
     public static final String dirArtwork22 = "22x22";
     public static final String dirArtwork48 = "48x48";
@@ -281,14 +281,19 @@ public class AppInfo {
 
 
     public static File getTemplate(String templateName) throws IOException {
-           String userTemplatePath = OPDE.getOPWD() + File.separator + dirTemplates + File.separator + templateName;
-           String systemTemplatePath = Hardware.getProgrammPath() + File.separator + dirTemplates + File.separator + templateName;
+        String userTemplatePath = Hardware.getAppDataPath() + File.separator + dirTemplates + File.separator + templateName;
+        String systemTemplatePath = Hardware.getProgrammPath() + File.separator + dirTemplates + File.separator + templateName;
 
-           File user = new File(userTemplatePath);
-           File sys = new File(systemTemplatePath);
+        File user = new File(userTemplatePath);
+        File sys = new File(systemTemplatePath);
 
-           return user.exists() ? user : sys;
-       }
+        return user.exists() ? user : sys;
+    }
+
+
+    public static String getOPCache() {
+        return Hardware.getAppDataPath() + File.separator + AppInfo.dirCache;
+    }
 
     public int getDbversion() {
         return dbversion;

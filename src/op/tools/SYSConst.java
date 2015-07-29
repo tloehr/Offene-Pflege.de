@@ -80,22 +80,22 @@ public class SYSConst {
     public static Color sun3 = new Color(153, 153, 204);
 
     // remember to add these to the installation process
-    public static String html_22x22_StopSign = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/stop.png\" border=\"0\">";
-    public static String html_22x22_Eraser = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/eraser.png\" border=\"0\">";
-    public static String html_22x22_Edited = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/edited.png\" border=\"0\">";
-    public static String html_22x22_Annotate = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/comment2.png\" border=\"0\">";
-    public static String html_48x48_biohazard = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/biohazard.png\" border=\"0\">";
-    public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/warning.png\" border=\"0\">";
-    public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/diabetes.png\" border=\"0\">";
-    public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
-    public static String html_22x22_tagPurple = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/tag_purple.png\" border=\"0\">";
-    public static String html_16x16_Eraser = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/eraser.png\" border=\"0\">";
-    public static String html_16x16_Edited = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/edited.png\" border=\"0\">";
-    public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
-    public static String html_16x16_Annotate = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/comment2.png\" border=\"0\">";
-    public static String html_16x16_apply = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/apply.png\" border=\"0\">";
-    public static String html_16x16_cancel = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/cancel.png\" border=\"0\">";
-    public static String html_16x16_empty = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/empty.png\" border=\"0\">";
+    public static String html_22x22_StopSign = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/stop.png\" border=\"0\">";
+    public static String html_22x22_Eraser = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/eraser.png\" border=\"0\">";
+    public static String html_22x22_Edited = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/edited.png\" border=\"0\">";
+    public static String html_22x22_Annotate = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/comment2.png\" border=\"0\">";
+    public static String html_48x48_biohazard = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/biohazard.png\" border=\"0\">";
+    public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/warning.png\" border=\"0\">";
+    public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/diabetes.png\" border=\"0\">";
+    public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
+    public static String html_22x22_tagPurple = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/tag_purple.png\" border=\"0\">";
+    public static String html_16x16_Eraser = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/eraser.png\" border=\"0\">";
+    public static String html_16x16_Edited = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/edited.png\" border=\"0\">";
+    public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
+    public static String html_16x16_Annotate = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/comment2.png\" border=\"0\">";
+    public static String html_16x16_apply = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/apply.png\" border=\"0\">";
+    public static String html_16x16_cancel = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/cancel.png\" border=\"0\">";
+    public static String html_16x16_empty = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/empty.png\" border=\"0\">";
 
     public static String html_16x16_tagPurple_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/tag_purple.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Eraser_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/eraser.png").toString() + "\" border=\"0\">";
@@ -104,7 +104,7 @@ public class SYSConst {
     public static String html_16x16_Annotate_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/comment2.png").toString() + "\" border=\"0\">";
 
     public static Image getPDF_16x16_tagPurple() throws BadElementException, IOException {
-        return Image.getInstance(OPDE.getOPWD() + sep + AppInfo.dirArtwork + sep + AppInfo.dirArtwork16 + sep + "tag_purple.png");
+        return Image.getInstance(Hardware.getAppDataPath() + sep + AppInfo.dirArtwork + sep + AppInfo.dirArtwork16 + sep + "tag_purple.png");
     }
 
     String p = getClass().getResource("artwork/16x16/tag_purple.png").toString();
@@ -487,6 +487,7 @@ public class SYSConst {
 
     //    public static final Icon icon16bysecond = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/bysecond.png"));
     public static final Icon icon16exec = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/exec.png"));
+    public static final Icon icon22exec = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/exec.png"));
     //    public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
     public static final Icon icon16redStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/redstar.png"));
     public static final Icon icon16greenStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/greenstar.png"));
@@ -582,7 +583,8 @@ public class SYSConst {
     public static final Icon icon22residentGone = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-gone.png"));
 
     public static final Icon icon22createDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_add.png"));
-    public static final Icon icon22updateDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_comit.png"));
+    public static final Icon icon22commitDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_comit.png"));
+    public static final Icon icon22updateDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_update.png"));
 
     public static final Icon icon16residentAbsent = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-absent.png"));
     public static final Icon icon16residentDied = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-died.png"));

@@ -42,6 +42,7 @@ import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
+import op.system.AppInfo;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
@@ -324,15 +325,15 @@ public class SYSFilesTools {
 
             String sep = System.getProperties().getProperty("file.separator"); // Fileseparator
 
-            target = new File(OPDE.getOPCache() + sep + sysfile.getFilename());
+            target = new File(AppInfo.getOPCache() + sep + sysfile.getFilename());
             // File present in cache directory ?
             if (!target.exists() || !SYSTools.getMD5Checksum(target).equals(sysfile.getMd5())) {
                 OPDE.info(SYSTools.xx("misc.msg.download") + ": " + OPDE.getProps().getProperty("FTPServer") + "://" + OPDE.getProps().getProperty("FTPWorkingDirectory") + "/" + sysfile.getFilename());
                 FileUtils.deleteQuietly(target);
 
                 ftp.setEventListener(eventListener);
-                ftp.downloadFile(OPDE.getOPCache() + sep + sysfile.getFilename(), sysfile.getRemoteFilename());
-                target = new File(OPDE.getOPCache() + sep + sysfile.getFilename());
+                ftp.downloadFile(AppInfo.getOPCache() + sep + sysfile.getFilename(), sysfile.getRemoteFilename());
+                target = new File(AppInfo.getOPCache() + sep + sysfile.getFilename());
                 target.setLastModified(sysfile.getFiledate().getTime());
             }
 
