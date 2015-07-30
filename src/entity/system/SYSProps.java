@@ -4,11 +4,11 @@
  */
 package entity.system;
 
-import java.io.Serializable;
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- *
  * @author tloehr
  */
 @Entity
@@ -26,6 +26,10 @@ public class SYSProps implements Serializable {
     @Basic(optional = false)
     @Column(name = "V")
     private String value;
+    @Basic(optional = false)
+    @Column(name = "lastchange")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastchange;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
@@ -45,12 +49,14 @@ public class SYSProps implements Serializable {
         this.key = key;
         this.value = value;
         this.user = null;
+        this.lastchange = new Date();
     }
 
     public SYSProps(String key, String value, Users user) {
         this.key = key;
         this.value = value;
         this.user = user;
+        this.lastchange = new Date();
     }
 
     public Long getSyspid() {
@@ -66,6 +72,7 @@ public class SYSProps implements Serializable {
     }
 
     public void setKey(String key) {
+        this.lastchange = new Date();
         this.key = key;
     }
 
@@ -74,7 +81,16 @@ public class SYSProps implements Serializable {
     }
 
     public void setValue(String value) {
+        this.lastchange = new Date();
         this.value = value;
+    }
+
+    public Date getLastchange() {
+        return lastchange;
+    }
+
+    public void setLastchange(Date lastchange) {
+        this.lastchange = lastchange;
     }
 
     @Override

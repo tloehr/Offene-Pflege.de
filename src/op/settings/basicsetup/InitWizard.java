@@ -34,7 +34,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +42,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.Timer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -67,7 +67,7 @@ public class InitWizard extends WizardDialog {
     private boolean db_credentials_correct;
 
     private int port = 3306;
-
+    private final int WAIT_SECONDS_BEFORE_UPDATE = 60;
 
     private Resident resident;
     //    private DatabaseConnectionBean dbcb;
@@ -812,6 +812,9 @@ public class InitWizard extends WizardDialog {
         JButton btnSearchMysqlDump;
         JButton btnDBBackup;
         JButton btnOpenBackupDir;
+        JButton btnLockDB;
+        JButton btnUnLockDB;
+        JButton btnUpdateDB;
         JLabel lblRoot;
         JLabel lblPassword;
         JLabel lblMysqldump;
@@ -819,6 +822,9 @@ public class InitWizard extends WizardDialog {
         JTextField txtPassword;
         JTextArea txtComments;
         JScrollPane vertical;
+        Logger myLogger = Logger.getLogger(getClass());
+        Timer timer;
+
 
         public UpdateDB(String title, String description) {
             super(title, description);
@@ -851,15 +857,43 @@ public class InitWizard extends WizardDialog {
             txtComments = new JTextArea();
             lblMysqldump = new JLabel();
 
+            myLogger.addAppender(new StatusMessageAppender(txtComments));
+
             txtComments.setWrapStyleWord(true);
             txtComments.setLineWrap(true);
             txtComments.setEditable(false);
             vertical = new JScrollPane(txtComments);
 
-            txtComments.append(SYSTools.xx("opde.initwizard.current.mysqldump") + ": " + mysqldump + "\n");
-            txtComments.append(SYSTools.xx("opde.initwizard.update.target") + ": " + EntityTools.getJDBCUrl(server, sPort, catalog) + "\n");
+            myLogger.info(SYSTools.xx("opde.initwizard.page.update.current.mysqldump") + ": " + mysqldump);
+            myLogger.info(SYSTools.xx("opde.initwizard.page.update.target") + ": " + EntityTools.getJDBCUrl(server, sPort, catalog));
 
-            btnDBBackup = new JButton(SYSTools.xx("opde.initwizard.update.backupdb"));
+            btnLockDB = new JButton(SYSConst.icon22locked);
+            btnLockDB.addActionListener(e -> {
+                try {
+                    lockServer();
+                } catch (SQLException e1) {
+                    myLogger.error(e1);
+                }
+            });
+
+            btnUnLockDB = new JButton(SYSConst.icon22unlocked);
+            btnUnLockDB.addActionListener(e2 -> {
+                try {
+                    unlockServer();
+                } catch (SQLException e1) {
+                    myLogger.error(e1);
+                }
+            });
+
+            //todo: check for lock
+
+            btnUpdateDB = new JButton(SYSTools.xx("opde.initwizard.page.update.lock.first"), SYSConst.icon22updateDB);
+            btnUpdateDB.setFont(new Font("Arial", Font.PLAIN, 16));
+            btnUpdateDB.addActionListener(al -> {
+            });
+
+            btnDBBackup = new JButton(SYSTools.xx("opde.initwizard.page.update.backupdb"));
+            btnDBBackup.setFont(new Font("Arial", Font.PLAIN, 16));
             btnDBBackup.addActionListener(e -> {
                 SwingWorker worker = new SwingWorker() {
                     String sBackupFile = System.getProperty("java.io.tmpdir") + File.separator + catalog + "-backup-" + System.currentTimeMillis() + ".dump";
@@ -895,9 +929,14 @@ public class InitWizard extends WizardDialog {
 
                             @Override
                             public void write(int b) throws IOException {
-//                                logger.debug(new Character((char) b).toString());
-                                txtComments.append(new Character((char) b).toString());
-                                vertical.getVerticalScrollBar().setValue(vertical.getVerticalScrollBar().getMaximum());
+                                string.append((char) b);
+                            }
+
+                            @Override
+                            public void flush() throws IOException {
+                                super.flush();
+                                myLogger.info(string);
+                                string = new StringBuilder();
                             }
                         };
                         executor.setStreamHandler(new PumpStreamHandler(output));
@@ -907,9 +946,8 @@ public class InitWizard extends WizardDialog {
                     @Override
                     protected void done() {
                         try {
-                            txtComments.append("Exitvalue: " + get() + "\n");
-                            txtComments.append(SYSTools.xx("opde.initwizard.update.backupdb.targetfile") + ": " + sBackupFile + "\n");
-                            vertical.getVerticalScrollBar().setValue(vertical.getVerticalScrollBar().getMaximum());
+                            myLogger.info("Exitvalue: " + get());
+                            myLogger.info(SYSTools.xx("opde.initwizard.page.update.backupdb.targetfile") + ": " + sBackupFile);
                         } catch (Exception e1) {
                             OPDE.fatal(e1);
                         } finally {
@@ -918,7 +956,6 @@ public class InitWizard extends WizardDialog {
                             btnDBBackup.setEnabled(true);
                             btnSearchMysqlDump.setEnabled(true);
                             setupWizardButtons();
-
                         }
                         super.done();
                     }
@@ -926,17 +963,15 @@ public class InitWizard extends WizardDialog {
                 worker.execute();
             });
 
-            btnSearchMysqlDump = GUITools.getTinyButton("opde.initwizard.update.search.mysqldump", SYSConst.icon22exec);
+            btnSearchMysqlDump = GUITools.getTinyButton("opde.initwizard.page.update.search.mysqldump", SYSConst.icon22exec);
             btnSearchMysqlDump.addActionListener(e -> {
                 final JidePopup popup = new JidePopup();
                 final FileChooserPanel fcp = new FileChooserPanel(mysqldump);
                 fcp.addItemListener(e1 -> {
                     if (e1.getStateChange() == ItemEvent.SELECTED) {
                         mysqldump = e1.getItem().toString();
-                        txtComments.append(SYSTools.xx("opde.initwizard.current.mysqldump") + ": " + mysqldump + "\n");
-                        vertical.getVerticalScrollBar().setValue(vertical.getVerticalScrollBar().getMaximum());
                         lblMysqldump.setText(mysqldump);
-                        logger.info(SYSTools.xx("opde.initwizard.current.mysqldump") + ": " + mysqldump);
+                        myLogger.info(SYSTools.xx("opde.initwizard.page.update.current.mysqldump") + ": " + mysqldump);
                     }
                     popup.hidePopup();
                 });
@@ -956,17 +991,13 @@ public class InitWizard extends WizardDialog {
             });
 
             btnOpenBackupDir = new JButton("open backup dir");
-            btnOpenBackupDir.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        if (Desktop.isDesktopSupported()) {
-                            Desktop.getDesktop().open(new File(System.getProperty("java.io.tmpdir")));
-                        }
-                    } catch (IOException ioe) {
-                        txtComments.append(ioe.getMessage());
-                        vertical.getVerticalScrollBar().setValue(vertical.getVerticalScrollBar().getMaximum());
+            btnOpenBackupDir.addActionListener(e -> {
+                try {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(new File(System.getProperty("java.io.tmpdir")));
                     }
+                } catch (IOException ioe) {
+                    myLogger.error(ioe.getMessage());
                 }
             });
 
@@ -977,7 +1008,7 @@ public class InitWizard extends WizardDialog {
 
                 pnlMain.setLayout(new FormLayout(
                         "default, $ugap, default:grow, $ugap, default",
-                        "5*(default, $lgap), fill:default:grow, $lgap, default"));
+                        "7*(default, $lgap), fill:default:grow, $lgap, default"));
 
                 //---- lblServer ----
                 lblRoot.setText(SYSTools.xx("opde.initwizard.root.user"));
@@ -1007,13 +1038,23 @@ public class InitWizard extends WizardDialog {
                 buttonLine1.setLayout(new BoxLayout(buttonLine1, BoxLayout.LINE_AXIS));
                 buttonLine1.add(btnDBBackup);
                 buttonLine1.add(btnSearchMysqlDump);
+                buttonLine1.add(Box.createHorizontalStrut(5));
                 buttonLine1.add(lblMysqldump);
                 buttonLine1.add(btnOpenBackupDir);
 
-                pnlMain.add(buttonLine1, CC.xyw(1, 7, 5));
-//                pnlMain.add(btnDBBackup, CC.xyw(1, 9, 5));
+                JPanel buttonLine2 = new JPanel();
+                buttonLine2.setLayout(new BoxLayout(buttonLine2, BoxLayout.LINE_AXIS));
+                buttonLine2.add(btnLockDB);
+                buttonLine2.add(Box.createHorizontalStrut(5));
+                buttonLine2.add(btnUpdateDB);
+                buttonLine2.add(Box.createHorizontalStrut(5));
+                buttonLine2.add(btnUnLockDB);
 
-                pnlMain.add(vertical, CC.xyw(1, 11, 5, CC.DEFAULT, CC.FILL));
+
+                pnlMain.add(buttonLine1, CC.xyw(1, 7, 5));
+                pnlMain.add(buttonLine2, CC.xyw(1, 9, 5));
+
+                pnlMain.add(vertical, CC.xyw(1, 15, 5, CC.DEFAULT, CC.FILL));
 
             }
             addComponent(pnlMain);
@@ -1027,6 +1068,64 @@ public class InitWizard extends WizardDialog {
 
             addComponent(pnlMain, true);
         }
+
+        private void lockServer() throws SQLException {
+            String server = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
+            String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
+            String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
+
+            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtUser.getText().trim(), txtPassword.getText().trim());
+            if (!EntityTools.isServerLocked(jdbcConnection)) {
+                EntityTools.setServerLocked(jdbcConnection, true);
+                jdbcConnection.close();
+                myLogger.info(SYSTools.xx("opde.initwizard.page.update.server.locked"));
+
+                if (timer == null) {
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        int seconds = WAIT_SECONDS_BEFORE_UPDATE;
+
+                        @Override
+                        public void run() {
+                            btnUpdateDB.setText(SYSTools.xx("misc.msg.wait") + " (" + seconds + " " + SYSTools.xx("misc.msg.seconds") + ")");
+                            seconds--;
+                            if (seconds < 0) cancel();
+                        }
+
+                        @Override
+                        public boolean cancel() {
+                            btnUpdateDB.setText(SYSTools.xx("opde.initwizard.page.update.updatedb"));
+                            return super.cancel();
+                        }
+                    }, 0, 1000);
+                }
+
+            } else {
+                myLogger.warn(SYSTools.xx("opde.initwizard.page.update.server.was.already.locked"));
+            }
+        }
+
+        private void unlockServer() throws SQLException {
+            String server = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
+            String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
+            String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
+
+            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtUser.getText().trim(), txtPassword.getText().trim());
+            if (EntityTools.isServerLocked(jdbcConnection)) {
+                EntityTools.setServerLocked(jdbcConnection, false);
+                jdbcConnection.close();
+                myLogger.info(SYSTools.xx("opde.initwizard.page.update.server.unlocked"));
+
+                if (timer != null) {
+                    btnUpdateDB.setText(SYSTools.xx("opde.initwizard.page.update.lock.first"));
+                    timer.cancel();
+                    timer = null;
+                }
+            } else {
+                myLogger.warn(SYSTools.xx("opde.initwizard.page.update.server.was.already.unlocked"));
+            }
+        }
+
     }
 
     private class CreateDBPage extends DefaultWizardPage {
@@ -1127,9 +1226,14 @@ public class InitWizard extends WizardDialog {
 
         protected void append(LoggingEvent event) {
             if (event.getLevel().isGreaterOrEqual(Logger.getRootLogger().getLevel())) {
-                jTextA.append(defaultPatternLayout.format(event));
-                JScrollPane scrl = (JScrollPane) jTextA.getParent().getParent();
-                scrl.getVerticalScrollBar().setValue(scrl.getVerticalScrollBar().getMaximum());
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        jTextA.append(defaultPatternLayout.format(event));
+                        JScrollPane scrl = (JScrollPane) jTextA.getParent().getParent();
+                        scrl.getVerticalScrollBar().setValue(scrl.getVerticalScrollBar().getMaximum());
+                    }
+                });
             }
         }
 

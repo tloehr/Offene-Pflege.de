@@ -665,6 +665,8 @@ public class SYSConst {
     public static final Icon icon16biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/biohazard.png"));
     public static final Icon icon22biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/biohazard.png"));
     public static final Icon icon48biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/biohazard.png"));
+    public static final Icon icon22locked = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/encrypted.png"));
+    public static final Icon icon22unlocked = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/decrypted.png"));
     public static final Icon icon48edit = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/edit3.png"));
     public static final Icon icon22popup = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/popup.png"));
     public static final Icon icon22diabetes = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/diabetes.png"));

@@ -13,7 +13,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import java.lang.reflect.Field;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -218,7 +221,6 @@ public class EntityTools {
     }
 
 
-
     public static int getDatabaseSchemaVersion(Connection jdbcConnection) throws SQLException {
         int version = -1;
 
@@ -235,9 +237,50 @@ public class EntityTools {
         return version;
     }
 
-    public static String getJDBCUrl(String host, String port, String catalog){
-            return  "jdbc:mysql://" + SYSTools.catchNull(host) + ":" + SYSTools.catchNull(port) + (SYSTools.catchNull(catalog).isEmpty() ? "" : "/" + SYSTools.catchNull(catalog));
+    public static String getJDBCUrl(String host, String port, String catalog) {
+        return "jdbc:mysql://" + SYSTools.catchNull(host) + ":" + SYSTools.catchNull(port) + (SYSTools.catchNull(catalog).isEmpty() ? "" : "/" + SYSTools.catchNull(catalog));
+    }
+
+
+    /**
+     * kind of locks the database and makes the other possibly client logout from OPDE.
+     * they can't login until this lock has been removed again.
+     *
+     * @param jdbcConnection
+     * @param locked
+     * @throws SQLException
+     */
+    public static void setServerLocked(Connection jdbcConnection, boolean locked) throws SQLException {
+        String query = " UPDATE sysprops p SET p.V = ? WHERE p.K = ? ";
+        PreparedStatement stmt = jdbcConnection.prepareStatement(query);
+        stmt.setString(1, Boolean.toString(locked).toLowerCase());
+        stmt.setString(2, SYSPropsTools.KEY_MAINTENANCE_MODE);
+        int result = stmt.executeUpdate();
+        stmt.close();
+
+        // just in case the appropriate record does not yet exist.
+        if (result == 0) {
+            query = " INSERT INTO sysprops (K, V) VALUES (?, ?) ";
+            stmt = jdbcConnection.prepareStatement(query);
+            stmt.setString(1, SYSPropsTools.KEY_MAINTENANCE_MODE);
+            stmt.setString(2, Boolean.toString(locked).toLowerCase());
+            stmt.executeUpdate();
+            stmt.close();
         }
+    }
+
+    public static boolean isServerLocked(Connection jdbcConnection) throws SQLException {
+        String query = " SELECT * FROM sysprops p WHERE p.K = ? AND p.v = 'true' ";
+        PreparedStatement stmt = jdbcConnection.prepareStatement(query);
+        stmt.setString(1, SYSPropsTools.KEY_MAINTENANCE_MODE);
+        ResultSet rs = stmt.executeQuery();
+        rs.last();
+        int result = rs.getRow();
+        rs.close();
+        stmt.close();
+        return result > 0;
+    }
+
 
 //    public static boolean setupDB(Connection jdbcConnection, String catalog) {
 //           boolean ok = false;

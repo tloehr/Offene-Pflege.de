@@ -104,6 +104,7 @@ public class SYSPropsTools {
     //should be useless in future
     public static final String LOCAL_KEY_CIPHER_NIC = "cipher.nic.id";
 
+
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
 
