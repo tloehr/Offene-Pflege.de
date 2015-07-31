@@ -53,6 +53,7 @@ public class AppInfo {
     public static final String fileStandardCSS = "standard.css";
 
     public static final String dirCache = "cache";
+    public static final String dirSql = "mysql";
     public static final String dirArtwork = "artwork";
     private static final String dirTemplates = "templates";
 
@@ -290,9 +291,17 @@ public class AppInfo {
         return user.exists() ? user : sys;
     }
 
+    public static String getSQLUpgradePath() {
+        return Hardware.getProgrammPath() + File.separator + dirSql;
+    }
+
+    public static File getSQLUpdateScript(int startVersion) {
+        return new File(getSQLUpgradePath() + File.separator + startVersion + "to" + (startVersion + 1) + ".sql");
+    }
+
 
     public static String getOPCache() {
-        return Hardware.getAppDataPath() + File.separator + AppInfo.dirCache;
+        return Hardware.getAppDataPath() + File.separator + dirCache;
     }
 
     public int getDbversion() {

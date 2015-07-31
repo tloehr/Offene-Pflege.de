@@ -18,15 +18,19 @@ import entity.system.SYSPropsTools;
 import gui.GUITools;
 import gui.events.RelaxedDocumentListener;
 import op.OPDE;
+import op.system.AppInfo;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -38,11 +42,13 @@ import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.Timer;
+import java.util.function.Consumer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -72,7 +78,7 @@ public class InitWizard extends WizardDialog {
     private Resident resident;
     //    private DatabaseConnectionBean dbcb;
     private String clearpassword;
-    private Logger logger;
+
     private String pingResult = "";
 
     private ArrayList<String> stuffThatAnnoysMe;
@@ -84,6 +90,8 @@ public class InitWizard extends WizardDialog {
     private AbstractWizardPage pageCompletion;
 
     private String mysqldump = SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_MYSQLDUMP_EXEC), "/usr/local/mysql/bin/mysqldump");
+    private boolean aBackupHasBeenCreated = false;
+    private boolean databaseIsLocked = false;
 
     // this Map contains the current entries of the user during the lifetime of the wizard
     // after succesful completion the settings are copied over to the OPDE.localProperties and
@@ -97,7 +105,7 @@ public class InitWizard extends WizardDialog {
         setResizable(true);
 
         jdbcProps = new Properties();
-        logger = Logger.getLogger(getClass());
+//        logger = Logger.getLogger(getClass());
         stuffThatAnnoysMe = new ArrayList<>();
 //        dbcb = new DatabaseConnectionBean(OPDE.getLocalProps());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -111,82 +119,6 @@ public class InitWizard extends WizardDialog {
 
     }
 
-//    public void upgradeDatabase(Connection jdbcConnection) throws SQLException {
-//
-//        int neededVersion = OPDE.getAppInfo().getDbversion();
-//        int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
-//
-//
-//
-//        final StringBuilder txt = new StringBuilder();
-//        txt.append(Main.lang.getString("tab.dbconnection.db.versionupgrade.progress") + "\n");
-//
-//        int maxProgress = 0;
-//        for (int dbversion = currentDBVersion + 1; dbversion <= latestRevision.getDbstructure(); dbversion++) {
-//            maxProgress += ufp.getMapVersion2UpgradeList().get(dbversion).size();
-//        }
-//        pbSQL.setMaximum(maxProgress);
-//        pbSQL.setMinimum(0);
-//
-//        SwingWorker worker = new SwingWorker() {
-//            @Override
-//            protected Object doInBackground() throws Exception {
-//                int progress = 0;
-//                PreparedStatement stmt;
-//
-//                btnFixDB.setEnabled(false);
-//                btnLockServer.setEnabled(false);
-//
-//                try {
-//                    for (int dbversion = currentDBVersion + 1; dbversion <= latestRevision.getDbstructure(); dbversion++) {
-//                        if (ufp.getMapVersion2UpgradeList().containsKey(dbversion)) {
-//                            txt.append(dbversion - 1 + " >> " + dbversion + "\n");
-//                            for (String upgradeTableCommand : ufp.getMapVersion2UpgradeList().get(dbversion)) {
-//                                pbSQL.setValue(progress);
-//                                progress++;
-//                                txt.append(upgradeTableCommand + "\n");
-//                                Main.logger.debug(upgradeTableCommand);
-//                                stmt = jdbcConnection.prepareStatement(upgradeTableCommand);
-//                                int result = stmt.executeUpdate();
-//                                txt.append(Main.lang.getString("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + Main.lang.getString("tab.dbconnection.db.rows.affected")) + "\n");
-//                                txtDBTest.setText(txt.toString());
-//                                scrollPane1.getVerticalScrollBar().setValue(scrollPane1.getVerticalScrollBar().getMaximum());
-//                            }
-//                            SYSTools.setDBVersion(jdbcConnection, dbversion);
-//                            txt.append("\n\n");
-//                            txtDBTest.setText(txt.toString());
-//                            scrollPane1.getVerticalScrollBar().setValue(scrollPane1.getVerticalScrollBar().getMaximum());
-//                        }
-//                    }
-//                } catch (Exception ex) {
-//                    Main.fatal(ex);
-//                }
-//
-//                return null;
-//            }
-//
-//            @Override
-//            protected void done() {
-//                super.done();
-//                txt.append(Main.lang.getString("tab.dbconnection.db.versionupgrade.complete"));
-//
-//                btnLockServer.setEnabled(true);
-//                btnLockServer.setSelected(false);
-//
-//                JTextArea textArea = new JTextArea(txt + "\n" + Main.lang.getString("misc.msg.restart.required"));
-//                JScrollPane scrollPane = new JScrollPane(textArea);
-//                textArea.setLineWrap(true);
-//                textArea.setWrapStyleWord(true);
-//                scrollPane.setPreferredSize(new Dimension(500, 500));
-//
-//                JOptionPane.showMessageDialog(null, scrollPane, SYSTools.getAppTitle(), JOptionPane.INFORMATION_MESSAGE, SYSTools.icon64opde);
-//                System.exit(0);
-//            }
-//        };
-//
-//        worker.execute();
-//
-//    }
 
     private void createWizard() {
 
@@ -229,7 +161,7 @@ public class InitWizard extends WizardDialog {
             public void actionPerformed(ActionEvent e) {
                 if (getCurrentPage() instanceof ConnectionPage) {
                     if (((ConnectionPage) getCurrentPage()).isDocumentEventsStillProcessing()) {
-                        logger.debug("Nö du");
+                        OPDE.debug("Nö du");
                         return;
                     }
                 }
@@ -259,10 +191,6 @@ public class InitWizard extends WizardDialog {
         setSize(new Dimension(1000, 650));
     }
 
-
-//    public WizardDialog getWizard() {
-//        return wizard;
-//    }
 
 //    private void save() {
 //        EntityManager em = OPDE.createEM();
@@ -741,9 +669,8 @@ public class InitWizard extends WizardDialog {
                 pnlDB.add(lblCatState, CC.xy(5, 9));
 
                 pnlDB.add(new JScrollPane(txtComments), CC.xyw(1, 11, 5, CC.DEFAULT, CC.FILL));
-
             }
-            addComponent(pnlDB);
+            addComponent(pnlDB, true);
 
 
             try {
@@ -822,7 +749,7 @@ public class InitWizard extends WizardDialog {
         JTextField txtPassword;
         JTextArea txtComments;
         JScrollPane vertical;
-        Logger myLogger = Logger.getLogger(getClass());
+        Logger logger = Logger.getLogger(getClass());
         Timer timer;
 
 
@@ -857,22 +784,22 @@ public class InitWizard extends WizardDialog {
             txtComments = new JTextArea();
             lblMysqldump = new JLabel();
 
-            myLogger.addAppender(new StatusMessageAppender(txtComments));
+            logger.addAppender(new StatusMessageAppender(txtComments));
 
             txtComments.setWrapStyleWord(true);
             txtComments.setLineWrap(true);
             txtComments.setEditable(false);
             vertical = new JScrollPane(txtComments);
 
-            myLogger.info(SYSTools.xx("opde.initwizard.page.update.current.mysqldump") + ": " + mysqldump);
-            myLogger.info(SYSTools.xx("opde.initwizard.page.update.target") + ": " + EntityTools.getJDBCUrl(server, sPort, catalog));
+            logger.info(SYSTools.xx("opde.initwizard.page.update.current.mysqldump") + ": " + mysqldump);
+            logger.info(SYSTools.xx("opde.initwizard.page.update.target") + ": " + EntityTools.getJDBCUrl(server, sPort, catalog));
 
             btnLockDB = new JButton(SYSConst.icon22locked);
             btnLockDB.addActionListener(e -> {
                 try {
                     lockServer();
                 } catch (SQLException e1) {
-                    myLogger.error(e1);
+                    logger.error(e1);
                 }
             });
 
@@ -881,15 +808,62 @@ public class InitWizard extends WizardDialog {
                 try {
                     unlockServer();
                 } catch (SQLException e1) {
-                    myLogger.error(e1);
+                    logger.error(e1);
                 }
             });
 
-            //todo: check for lock
 
-            btnUpdateDB = new JButton(SYSTools.xx("opde.initwizard.page.update.lock.first"), SYSConst.icon22updateDB);
+            btnUpdateDB = new JButton(SYSTools.xx("opde.initwizard.page.update.updatedb"), SYSConst.icon22updateDB);
+            try {
+                Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtUser.getText().trim(), txtPassword.getText().trim());
+                DateTime lockTime = EntityTools.getServerLocktime(jdbcConnection);
+                DateTime waitSecondsFromNow = new DateTime().plusSeconds(WAIT_SECONDS_BEFORE_UPDATE);
+                if (lockTime == null) btnUpdateDB.setText(SYSTools.xx("opde.initwizard.page.update.lock.first"));
+                else if (lockTime.isBefore(waitSecondsFromNow)) {
+                    if (timer != null) {
+                        timer.cancel();
+                        timer = null;
+                    }
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        int seconds = new Period(lockTime, waitSecondsFromNow).getSeconds();
+
+                        @Override
+                        public void run() {
+                            btnUpdateDB.setText(SYSTools.xx("misc.msg.wait") + " (" + seconds + " " + SYSTools.xx("misc.msg.seconds") + ")");
+                            seconds--;
+                            if (seconds < 0) cancel();
+                        }
+
+                        @Override
+                        public boolean cancel() {
+                            btnUpdateDB.setText(SYSTools.xx("opde.initwizard.page.update.updatedb"));
+                            return super.cancel();
+                        }
+                    }, 0, 1000);
+                }
+                jdbcConnection.close();
+            } catch (SQLException e) {
+                logger.error(e);
+            }
+
             btnUpdateDB.setFont(new Font("Arial", Font.PLAIN, 16));
             btnUpdateDB.addActionListener(al -> {
+                if (timer != null) {
+                    logger.warn("misc.msg.wait");
+                    return;
+                }
+                if (!databaseIsLocked) {
+                    logger.warn("opde.initwizard.page.update.lock.first");
+//                    return;
+                }
+                try {
+                    upgradeDatabase();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             });
 
             btnDBBackup = new JButton(SYSTools.xx("opde.initwizard.page.update.backupdb"));
@@ -910,7 +884,6 @@ public class InitWizard extends WizardDialog {
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.CANCEL);
 
-
                         Map map = new HashMap();
 
                         map.put("host", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
@@ -929,14 +902,13 @@ public class InitWizard extends WizardDialog {
 
                             @Override
                             public void write(int b) throws IOException {
-                                string.append((char) b);
-                            }
-
-                            @Override
-                            public void flush() throws IOException {
-                                super.flush();
-                                myLogger.info(string);
-                                string = new StringBuilder();
+                                String str = Character.toString((char) b);
+                                if (str.equals(System.lineSeparator())) {
+                                    logger.info(string);
+                                    string = new StringBuilder();
+                                } else {
+                                    string.append(str);
+                                }
                             }
                         };
                         executor.setStreamHandler(new PumpStreamHandler(output));
@@ -946,10 +918,13 @@ public class InitWizard extends WizardDialog {
                     @Override
                     protected void done() {
                         try {
-                            myLogger.info("Exitvalue: " + get());
-                            myLogger.info(SYSTools.xx("opde.initwizard.page.update.backupdb.targetfile") + ": " + sBackupFile);
+                            int exitValue = (int) get();
+                            logger.info("Exitvalue: " + exitValue);
+                            logger.info(SYSTools.xx("opde.initwizard.page.update.backupdb.targetfile") + ": " + sBackupFile);
+                            aBackupHasBeenCreated |= exitValue == 0; // one succesful is enough
                         } catch (Exception e1) {
-                            OPDE.fatal(e1);
+                            logger.error(e1);
+                            aBackupHasBeenCreated = false;
                         } finally {
                             txtUser.setEnabled(true);
                             txtPassword.setEnabled(true);
@@ -971,7 +946,7 @@ public class InitWizard extends WizardDialog {
                     if (e1.getStateChange() == ItemEvent.SELECTED) {
                         mysqldump = e1.getItem().toString();
                         lblMysqldump.setText(mysqldump);
-                        myLogger.info(SYSTools.xx("opde.initwizard.page.update.current.mysqldump") + ": " + mysqldump);
+                        logger.info(SYSTools.xx("opde.initwizard.page.update.current.mysqldump") + ": " + mysqldump);
                     }
                     popup.hidePopup();
                 });
@@ -997,7 +972,7 @@ public class InitWizard extends WizardDialog {
                         Desktop.getDesktop().open(new File(System.getProperty("java.io.tmpdir")));
                     }
                 } catch (IOException ioe) {
-                    myLogger.error(ioe.getMessage());
+                    logger.error(ioe.getMessage());
                 }
             });
 
@@ -1057,14 +1032,6 @@ public class InitWizard extends WizardDialog {
                 pnlMain.add(vertical, CC.xyw(1, 15, 5, CC.DEFAULT, CC.FILL));
 
             }
-            addComponent(pnlMain);
-
-
-//            pnlMain.add(new JButton("Datenbank sperren"));
-
-//            pnlMain.add(new JButton("Datenbank sichern"));
-//            pnlMain.add(new JButton("Datenbank-Schema aktualisieren"));
-//            pnlMain.add(new JButton("Datenbank freigeben"));
 
             addComponent(pnlMain, true);
         }
@@ -1078,7 +1045,7 @@ public class InitWizard extends WizardDialog {
             if (!EntityTools.isServerLocked(jdbcConnection)) {
                 EntityTools.setServerLocked(jdbcConnection, true);
                 jdbcConnection.close();
-                myLogger.info(SYSTools.xx("opde.initwizard.page.update.server.locked"));
+                logger.info(SYSTools.xx("opde.initwizard.page.update.server.locked"));
 
                 if (timer == null) {
                     timer = new Timer();
@@ -1101,7 +1068,7 @@ public class InitWizard extends WizardDialog {
                 }
 
             } else {
-                myLogger.warn(SYSTools.xx("opde.initwizard.page.update.server.was.already.locked"));
+                logger.warn(SYSTools.xx("opde.initwizard.page.update.server.was.already.locked"));
             }
         }
 
@@ -1114,7 +1081,7 @@ public class InitWizard extends WizardDialog {
             if (EntityTools.isServerLocked(jdbcConnection)) {
                 EntityTools.setServerLocked(jdbcConnection, false);
                 jdbcConnection.close();
-                myLogger.info(SYSTools.xx("opde.initwizard.page.update.server.unlocked"));
+                logger.info(SYSTools.xx("opde.initwizard.page.update.server.unlocked"));
 
                 if (timer != null) {
                     btnUpdateDB.setText(SYSTools.xx("opde.initwizard.page.update.lock.first"));
@@ -1122,10 +1089,241 @@ public class InitWizard extends WizardDialog {
                     timer = null;
                 }
             } else {
-                myLogger.warn(SYSTools.xx("opde.initwizard.page.update.server.was.already.unlocked"));
+                logger.warn(SYSTools.xx("opde.initwizard.page.update.server.was.already.unlocked"));
             }
         }
 
+
+        private void upgradeDatabase() throws SQLException, IOException {
+
+            int neededVersion = 7;//OPDE.getAppInfo().getDbversion();
+            int currentVersion = 2;//EntityTools.getDatabaseSchemaVersion(jdbcConnection);
+
+//            final StringBuilder sql = new StringBuilder();
+
+
+            // TODO: Das klappt nicht
+
+//            ArrayList<File> upgradeProcessList = new ArrayList<>();
+            ArrayList<ArrayList<StrBuilder>> sqlToNewestVersion = new ArrayList<>();
+
+            for (int startVersion = currentVersion; startVersion < neededVersion; startVersion++) {
+                ArrayList<StrBuilder> sqlToNextVersion = new ArrayList<>();
+                File sqlUpdate = AppInfo.getSQLUpdateScript(startVersion);
+                final StrBuilder sql = new StrBuilder();
+
+                Files.lines(sqlUpdate.toPath()).forEach(s -> {
+                    String trimmed = s.trim();
+                    if (trimmed.startsWith("--")) return;
+                    sql.append(trimmed);
+                    if (trimmed.endsWith(";")) {
+                        sqlToNextVersion.add(sql);
+                        sql.clear();
+//                        sql.delete(0, sql.length());
+                    }
+                });
+                sqlToNewestVersion.add(sqlToNextVersion);
+            }
+
+
+            sqlToNewestVersion.forEach(new Consumer<ArrayList<StrBuilder>>() {
+                @Override
+                public void accept(ArrayList<StrBuilder> stringBuilders) {
+                    stringBuilders.forEach(new Consumer<StrBuilder>() {
+                        @Override
+                        public void accept(StrBuilder stringBuilder) {
+                            logger.info(stringBuilder.toString());
+                            logger.info("===================================");
+                        }
+                    });
+                }
+            });
+
+
+//            pbSQL.setMaximum(maxProgress);
+//            pbSQL.setMinimum(0);
+//
+//            SwingWorker worker = new SwingWorker() {
+//                @Override
+//                protected Object doInBackground() throws Exception {
+//                    int progress = 0;
+//                    PreparedStatement stmt;
+//
+//                    btnFixDB.setEnabled(false);
+//                    btnLockServer.setEnabled(false);
+//
+//                    try {
+//                        for (int dbversion = currentDBVersion + 1; dbversion <= latestRevision.getDbstructure(); dbversion++) {
+//                            if (ufp.getMapVersion2UpgradeList().containsKey(dbversion)) {
+//                                txt.append(dbversion - 1 + " >> " + dbversion + "\n");
+//                                for (String upgradeTableCommand : ufp.getMapVersion2UpgradeList().get(dbversion)) {
+//                                    pbSQL.setValue(progress);
+//                                    progress++;
+//                                    txt.append(upgradeTableCommand + "\n");
+//                                    Main.logger.debug(upgradeTableCommand);
+//                                    stmt = jdbcConnection.prepareStatement(upgradeTableCommand);
+//                                    int result = stmt.executeUpdate();
+//                                    txt.append(Main.lang.getString("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + Main.lang.getString("tab.dbconnection.db.rows.affected")) + "\n");
+//                                    txtDBTest.setText(txt.toString());
+//                                    scrollPane1.getVerticalScrollBar().setValue(scrollPane1.getVerticalScrollBar().getMaximum());
+//                                }
+//                                SYSTools.setDBVersion(jdbcConnection, dbversion);
+//                                txt.append("\n\n");
+//                                txtDBTest.setText(txt.toString());
+//                                scrollPane1.getVerticalScrollBar().setValue(scrollPane1.getVerticalScrollBar().getMaximum());
+//                            }
+//                        }
+//                    } catch (Exception ex) {
+//                        Main.fatal(ex);
+//                    }
+//
+//                    return null;
+//                }
+//
+//                @Override
+//                protected void done() {
+//                    super.done();
+//                    txt.append(Main.lang.getString("tab.dbconnection.db.versionupgrade.complete"));
+//
+//                    btnLockServer.setEnabled(true);
+//                    btnLockServer.setSelected(false);
+//
+//                    JTextArea textArea = new JTextArea(txt + "\n" + Main.lang.getString("misc.msg.restart.required"));
+//                    JScrollPane scrollPane = new JScrollPane(textArea);
+//                    textArea.setLineWrap(true);
+//                    textArea.setWrapStyleWord(true);
+//                    scrollPane.setPreferredSize(new Dimension(500, 500));
+//
+//                    JOptionPane.showMessageDialog(null, scrollPane, SYSTools.getAppTitle(), JOptionPane.INFORMATION_MESSAGE, SYSTools.icon64opde);
+//                    System.exit(0);
+//                }
+//            };
+//
+//            worker.execute();
+//
+//        }
+
+        }
+
+
+//    private String situation2html() {
+//        String html = "";
+//
+//        html += db_parameters_complete ? "" : SYSConst.html_li("opde.initwizard.not.db_parameters_complete");
+//        html += db_server_pingable ? "" : SYSConst.html_li("opde.initwizard.not.db_server_pingable");
+//        html += db_server_connected ? "" : SYSConst.html_li("opde.initwizard.not.db_server_connected");
+//        html += db_catalog_exists ? "" : SYSConst.html_li("opde.initwizard.not.db_catalog_exists");
+//        html += db_password_readable ? "" : SYSConst.html_li("opde.initwizard.not.db_password_readable");
+//        html += db_credentials_correct ? "" : SYSConst.html_li("opde.initwizard.not.db_credentials_correct");
+//
+//        if (db_version == DB_VERSION.UNKNOWN) html += SYSConst.html_li("opde.initwizard.db_version_unknown");
+//        else if (db_version == DB_VERSION.TOO_LOW) html += SYSConst.html_li("opde.initwizard.db_version_too_low");
+//        else if (db_version == DB_VERSION.TOO_HIGH) html += SYSConst.html_li("opde.initwizard.db_version_too_high");
+//
+//
+//        if (!html.isEmpty()) {
+//            html = SYSConst.html_ul(html);
+//        }
+//
+//        return html;
+//    }
+
+
+        /**
+         * this method checks the availability of the database connection in stages.
+         * it sets the 7 boolean in order to describe
+         */
+//    private void analyzeSituation() {
+//
+//        // we consider the worst case first.
+//        db_version = DB_VERSION.UNKNOWN;
+//        db_parameters_complete = false;
+//        db_server_pingable = false;
+//        db_server_connected = false;
+//        db_catalog_exists = false;
+//        db_password_readable = false;
+//        db_credentials_correct = false;
+//
+//        // 1. All parameters entered ?
+//        Validator validator = OPDE.getValidatorFactory().getValidator();
+//        Set<ConstraintViolation<DatabaseConnectionBean>> constraintViolations = validator.validate(dbcb);
+//        db_parameters_complete = constraintViolations.isEmpty();
+//        constraintViolations.forEach(new Consumer<ConstraintViolation<DatabaseConnectionBean>>() {
+//            @Override
+//            public void accept(ConstraintViolation<DatabaseConnectionBean> databaseConnectionBeanConstraintViolation) {
+//                stuffThatAnnoysMe.add(databaseConnectionBeanConstraintViolation.getPropertyPath().toString() + ": " + databaseConnectionBeanConstraintViolation.getMessage());
+//            }
+//        });
+//        if (!db_parameters_complete) return;
+//
+//        db_password_readable = true; // we would have not made it here otherwise
+//
+//        try {
+//            pingResult = SYSTools.socketping(dbcb.getHost(), dbcb.getPort().toString());
+//            db_server_pingable = true;
+//        } catch (IOException e) {
+//            pingResult = e.getMessage();
+//            stuffThatAnnoysMe.add(pingResult);
+//        }
+//        if (!db_server_pingable) return;
+//
+//        try {
+//            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(dbcb.getHost(), dbcb.getPort().toString(), null), dbcb.getUser(), dbcb.getPassword());
+//            db_credentials_correct = true;
+//            db_server_connected = true;
+//
+//            jdbcConnection.setCatalog(dbcb.getCatalog());
+//            db_catalog_exists = true;
+//
+//            int neededVersion = OPDE.getAppInfo().getDbversion();
+//            int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
+//
+//            if (currentVersion == -1) db_version = DB_VERSION.UNKNOWN; // tables SYSProps is messed up
+//            else if (currentVersion < neededVersion) db_version = DB_VERSION.TOO_LOW;
+//            else if (currentVersion > neededVersion) db_version = DB_VERSION.TOO_HIGH;
+//            else db_version = DB_VERSION.PERFECT;
+//
+//            jdbcConnection.close();
+//        } catch (SQLException e) {
+//            if (e.getMessage().startsWith("Access denied for user")) {
+//                db_credentials_correct = false;
+//            }
+//            db_version = DB_VERSION.UNKNOWN;
+//            stuffThatAnnoysMe.add(e.getMessage());
+//        }
+//
+//
+//    }
+
+
+    }
+
+    private class StatusMessageAppender extends AppenderSkeleton {
+        private final JTextArea jTextA;
+        private PatternLayout defaultPatternLayout = new PatternLayout("%d{ISO8601} %-5p: %m%n");
+
+        public StatusMessageAppender(JTextArea jTextA) {
+            this.jTextA = jTextA;
+
+        }
+
+        protected void append(LoggingEvent event) {
+            if (event.getLevel().isGreaterOrEqual(Logger.getRootLogger().getLevel())) {
+                SwingUtilities.invokeLater(() -> {
+                    jTextA.append(defaultPatternLayout.format(event));
+                    JScrollPane scrl = (JScrollPane) jTextA.getParent().getParent();
+                    scrl.getVerticalScrollBar().setValue(scrl.getVerticalScrollBar().getMaximum());
+                });
+            }
+        }
+
+        public void close() {
+        }
+
+        @Override
+        public boolean requiresLayout() {
+            return true;
+        }
     }
 
     private class CreateDBPage extends DefaultWizardPage {
@@ -1193,148 +1391,24 @@ public class InitWizard extends WizardDialog {
 
         private String check() {
             String result = "<b>" + SYSTools.xx("opde.admin.bw.wizard.page7.summaryline1") + "</b><br/>";
-//            result += SYSTools.xx("opde.admin.bw.wizard.page7.summaryline2") + "<br/>";
-//            result += "<ul>";
-//            result += "<li>" + ResidentTools.getFullName(resident) + "</li>";
-//            result += "<li>" + SYSTools.xx("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDOB()) + "</li>";
-//            result += "<li>" + SYSTools.xx("misc.msg.primaryNurse") + ": " + (resident.getPN1() == null ? SYSTools.xx("misc.msg.noentryyet") : resident.getPN1().getFullname()) + "</li>";
-//            result += "<li>" + SYSTools.xx("misc.msg.gp") + ": " + GPTools.getFullName(resident.getGP()) + "</li>";
-////            result += "<li>" + SYSTools.xx("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
-//
-////            result += "<li>" + SYSTools.xx("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(resinfo_hauf.getFrom()) + "</li>";
-////            result += "<li>" + SYSTools.xx("misc.msg.room") + ": " + (resinfo_room == null ? SYSTools.xx("misc.msg.noentryyet") : resinfo_room.toString()) + "</li>";
-//            result += "<li>" + SYSTools.xx("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";
-//
-//            result += "</ul>";
-//
-//            result += "<p>" + SYSTools.xx("opde.admin.bw.wizard.page7.summaryline3") + "</p>";
+            //            result += SYSTools.xx("opde.admin.bw.wizard.page7.summaryline2") + "<br/>";
+            //            result += "<ul>";
+            //            result += "<li>" + ResidentTools.getFullName(resident) + "</li>";
+            //            result += "<li>" + SYSTools.xx("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDOB()) + "</li>";
+            //            result += "<li>" + SYSTools.xx("misc.msg.primaryNurse") + ": " + (resident.getPN1() == null ? SYSTools.xx("misc.msg.noentryyet") : resident.getPN1().getFullname()) + "</li>";
+            //            result += "<li>" + SYSTools.xx("misc.msg.gp") + ": " + GPTools.getFullName(resident.getGP()) + "</li>";
+            ////            result += "<li>" + SYSTools.xx("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
+            //
+            ////            result += "<li>" + SYSTools.xx("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(resinfo_hauf.getFrom()) + "</li>";
+            ////            result += "<li>" + SYSTools.xx("misc.msg.room") + ": " + (resinfo_room == null ? SYSTools.xx("misc.msg.noentryyet") : resinfo_room.toString()) + "</li>";
+            //            result += "<li>" + SYSTools.xx("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";
+            //
+            //            result += "</ul>";
+            //
+            //            result += "<p>" + SYSTools.xx("opde.admin.bw.wizard.page7.summaryline3") + "</p>";
             return result;
         }
 
 
     }
-
-
-    private class StatusMessageAppender extends AppenderSkeleton {
-        private final JTextArea jTextA;
-        private PatternLayout defaultPatternLayout = new PatternLayout("%d{ISO8601} %-5p: %m%n");
-
-        public StatusMessageAppender(JTextArea jTextA) {
-            this.jTextA = jTextA;
-
-        }
-
-        protected void append(LoggingEvent event) {
-            if (event.getLevel().isGreaterOrEqual(Logger.getRootLogger().getLevel())) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        jTextA.append(defaultPatternLayout.format(event));
-                        JScrollPane scrl = (JScrollPane) jTextA.getParent().getParent();
-                        scrl.getVerticalScrollBar().setValue(scrl.getVerticalScrollBar().getMaximum());
-                    }
-                });
-            }
-        }
-
-        public void close() {
-        }
-
-        @Override
-        public boolean requiresLayout() {
-            return true;
-        }
-    }
-
-
-//    private String situation2html() {
-//        String html = "";
-//
-//        html += db_parameters_complete ? "" : SYSConst.html_li("opde.initwizard.not.db_parameters_complete");
-//        html += db_server_pingable ? "" : SYSConst.html_li("opde.initwizard.not.db_server_pingable");
-//        html += db_server_connected ? "" : SYSConst.html_li("opde.initwizard.not.db_server_connected");
-//        html += db_catalog_exists ? "" : SYSConst.html_li("opde.initwizard.not.db_catalog_exists");
-//        html += db_password_readable ? "" : SYSConst.html_li("opde.initwizard.not.db_password_readable");
-//        html += db_credentials_correct ? "" : SYSConst.html_li("opde.initwizard.not.db_credentials_correct");
-//
-//        if (db_version == DB_VERSION.UNKNOWN) html += SYSConst.html_li("opde.initwizard.db_version_unknown");
-//        else if (db_version == DB_VERSION.TOO_LOW) html += SYSConst.html_li("opde.initwizard.db_version_too_low");
-//        else if (db_version == DB_VERSION.TOO_HIGH) html += SYSConst.html_li("opde.initwizard.db_version_too_high");
-//
-//
-//        if (!html.isEmpty()) {
-//            html = SYSConst.html_ul(html);
-//        }
-//
-//        return html;
-//    }
-
-
-    /**
-     * this method checks the availability of the database connection in stages.
-     * it sets the 7 boolean in order to describe
-     */
-//    private void analyzeSituation() {
-//
-//        // we consider the worst case first.
-//        db_version = DB_VERSION.UNKNOWN;
-//        db_parameters_complete = false;
-//        db_server_pingable = false;
-//        db_server_connected = false;
-//        db_catalog_exists = false;
-//        db_password_readable = false;
-//        db_credentials_correct = false;
-//
-//        // 1. All parameters entered ?
-//        Validator validator = OPDE.getValidatorFactory().getValidator();
-//        Set<ConstraintViolation<DatabaseConnectionBean>> constraintViolations = validator.validate(dbcb);
-//        db_parameters_complete = constraintViolations.isEmpty();
-//        constraintViolations.forEach(new Consumer<ConstraintViolation<DatabaseConnectionBean>>() {
-//            @Override
-//            public void accept(ConstraintViolation<DatabaseConnectionBean> databaseConnectionBeanConstraintViolation) {
-//                stuffThatAnnoysMe.add(databaseConnectionBeanConstraintViolation.getPropertyPath().toString() + ": " + databaseConnectionBeanConstraintViolation.getMessage());
-//            }
-//        });
-//        if (!db_parameters_complete) return;
-//
-//        db_password_readable = true; // we would have not made it here otherwise
-//
-//        try {
-//            pingResult = SYSTools.socketping(dbcb.getHost(), dbcb.getPort().toString());
-//            db_server_pingable = true;
-//        } catch (IOException e) {
-//            pingResult = e.getMessage();
-//            stuffThatAnnoysMe.add(pingResult);
-//        }
-//        if (!db_server_pingable) return;
-//
-//        try {
-//            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(dbcb.getHost(), dbcb.getPort().toString(), null), dbcb.getUser(), dbcb.getPassword());
-//            db_credentials_correct = true;
-//            db_server_connected = true;
-//
-//            jdbcConnection.setCatalog(dbcb.getCatalog());
-//            db_catalog_exists = true;
-//
-//            int neededVersion = OPDE.getAppInfo().getDbversion();
-//            int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
-//
-//            if (currentVersion == -1) db_version = DB_VERSION.UNKNOWN; // tables SYSProps is messed up
-//            else if (currentVersion < neededVersion) db_version = DB_VERSION.TOO_LOW;
-//            else if (currentVersion > neededVersion) db_version = DB_VERSION.TOO_HIGH;
-//            else db_version = DB_VERSION.PERFECT;
-//
-//            jdbcConnection.close();
-//        } catch (SQLException e) {
-//            if (e.getMessage().startsWith("Access denied for user")) {
-//                db_credentials_correct = false;
-//            }
-//            db_version = DB_VERSION.UNKNOWN;
-//            stuffThatAnnoysMe.add(e.getMessage());
-//        }
-//
-//
-//    }
-
-
 }

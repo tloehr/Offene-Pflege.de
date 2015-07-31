@@ -8,6 +8,7 @@ import op.threads.DisplayManager;
 import op.tools.SYSTools;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -17,10 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -269,16 +267,30 @@ public class EntityTools {
         }
     }
 
-    public static boolean isServerLocked(Connection jdbcConnection) throws SQLException {
+
+    public static DateTime getServerLocktime(Connection jdbcConnection) throws SQLException {
+        DateTime dt = null;
         String query = " SELECT * FROM sysprops p WHERE p.K = ? AND p.v = 'true' ";
         PreparedStatement stmt = jdbcConnection.prepareStatement(query);
         stmt.setString(1, SYSPropsTools.KEY_MAINTENANCE_MODE);
         ResultSet rs = stmt.executeQuery();
-        rs.last();
-        int result = rs.getRow();
+        rs.first();
+        if (!rs.isBeforeFirst()){
+            // to make sure, shema trouble is occuring
+            if (rs.getMetaData().getColumnCount() == 5){
+                dt = new DateTime(rs.getDate(5).getTime());
+            } else {
+                dt = new DateTime().minusMinutes(2);
+            }
+
+        }
         rs.close();
         stmt.close();
-        return result > 0;
+        return dt;
+    }
+
+    public static boolean isServerLocked(Connection jdbcConnection) throws SQLException {
+        return getServerLocktime(jdbcConnection) != null;
     }
 
 
