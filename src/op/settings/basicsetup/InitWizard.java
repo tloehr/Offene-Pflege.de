@@ -24,7 +24,6 @@ import op.tools.SYSTools;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -45,10 +44,10 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.Timer;
-import java.util.function.Consumer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -775,7 +774,7 @@ public class InitWizard extends WizardDialog {
             String server = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
             String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
             String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
-
+            String root = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_ROOTUSER), "root");
 
             lblRoot = new JLabel();
             lblPassword = new JLabel();
@@ -858,11 +857,13 @@ public class InitWizard extends WizardDialog {
 //                    return;
                 }
                 try {
-                    upgradeDatabase();
+                    Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtUser.getText().trim(), txtPassword.getText().trim());
+                    upgradeDatabase(jdbcConnection);
+                    jdbcConnection.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             });
 
@@ -993,6 +994,7 @@ public class InitWizard extends WizardDialog {
 
                 //---- txtServer ----
                 txtUser.setFont(new Font("Arial", Font.PLAIN, 16));
+                txtUser.setText(root);
                 pnlMain.add(txtUser, CC.xy(3, 1));
 
                 //---- lblPort ----
@@ -1094,114 +1096,45 @@ public class InitWizard extends WizardDialog {
         }
 
 
-        private void upgradeDatabase() throws SQLException, IOException {
+        private void upgradeDatabase(Connection jdbcConnection) throws SQLException, IOException {
 
-            int neededVersion = 7;//OPDE.getAppInfo().getDbversion();
-            int currentVersion = 2;//EntityTools.getDatabaseSchemaVersion(jdbcConnection);
+            int neededVersion = 8;//OPDE.getAppInfo().getDbversion();
+            int currentVersion = 7;//EntityTools.getDatabaseSchemaVersion(jdbcConnection);
 
-//            final StringBuilder sql = new StringBuilder();
-
-
-            // TODO: Das klappt nicht
-
-//            ArrayList<File> upgradeProcessList = new ArrayList<>();
-            ArrayList<ArrayList<StrBuilder>> sqlToNewestVersion = new ArrayList<>();
+            ArrayList<ArrayList<String>> sqlToNewestVersion = new ArrayList<>();
+            String currentSQLCommand = "";
 
             for (int startVersion = currentVersion; startVersion < neededVersion; startVersion++) {
-                ArrayList<StrBuilder> sqlToNextVersion = new ArrayList<>();
+                ArrayList<String> sqlToNextVersion = new ArrayList<>();
                 File sqlUpdate = AppInfo.getSQLUpdateScript(startVersion);
-                final StrBuilder sql = new StrBuilder();
 
-                Files.lines(sqlUpdate.toPath()).forEach(s -> {
-                    String trimmed = s.trim();
-                    if (trimmed.startsWith("--")) return;
-                    sql.append(trimmed);
-                    if (trimmed.endsWith(";")) {
-                        sqlToNextVersion.add(sql);
-                        sql.clear();
-//                        sql.delete(0, sql.length());
+                Iterator it = Files.lines(sqlUpdate.toPath()).iterator();
+                while (it.hasNext()) {
+                    String line = it.next().toString().trim();
+                    if (!line.startsWith("--")) {
+                        currentSQLCommand += line;
+                        if (currentSQLCommand.endsWith(";")) {
+                            sqlToNextVersion.add(currentSQLCommand);
+                            currentSQLCommand = "";
+                        }
                     }
-                });
+                }
                 sqlToNewestVersion.add(sqlToNextVersion);
             }
 
 
-            sqlToNewestVersion.forEach(new Consumer<ArrayList<StrBuilder>>() {
-                @Override
-                public void accept(ArrayList<StrBuilder> stringBuilders) {
-                    stringBuilders.forEach(new Consumer<StrBuilder>() {
-                        @Override
-                        public void accept(StrBuilder stringBuilder) {
-                            logger.info(stringBuilder.toString());
-                            logger.info("===================================");
-                        }
-                    });
+            //TODO: hier gehts weiter
+
+            for (ArrayList<String> sqlList : sqlToNewestVersion) {
+                for (String sql : sqlList) {
+                    PreparedStatement stmt = jdbcConnection.prepareStatement(sql);
+                    int result = stmt.executeUpdate();
+                    logger.info(SYSTools.xx("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + SYSTools.xx("opde.initwizard.page.update.updatedb.rows.affected")) + "\n");
+                    logger.info(sql.toString());
+                    stmt.close();
                 }
-            });
+            }
 
-
-//            pbSQL.setMaximum(maxProgress);
-//            pbSQL.setMinimum(0);
-//
-//            SwingWorker worker = new SwingWorker() {
-//                @Override
-//                protected Object doInBackground() throws Exception {
-//                    int progress = 0;
-//                    PreparedStatement stmt;
-//
-//                    btnFixDB.setEnabled(false);
-//                    btnLockServer.setEnabled(false);
-//
-//                    try {
-//                        for (int dbversion = currentDBVersion + 1; dbversion <= latestRevision.getDbstructure(); dbversion++) {
-//                            if (ufp.getMapVersion2UpgradeList().containsKey(dbversion)) {
-//                                txt.append(dbversion - 1 + " >> " + dbversion + "\n");
-//                                for (String upgradeTableCommand : ufp.getMapVersion2UpgradeList().get(dbversion)) {
-//                                    pbSQL.setValue(progress);
-//                                    progress++;
-//                                    txt.append(upgradeTableCommand + "\n");
-//                                    Main.logger.debug(upgradeTableCommand);
-//                                    stmt = jdbcConnection.prepareStatement(upgradeTableCommand);
-//                                    int result = stmt.executeUpdate();
-//                                    txt.append(Main.lang.getString("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + Main.lang.getString("tab.dbconnection.db.rows.affected")) + "\n");
-//                                    txtDBTest.setText(txt.toString());
-//                                    scrollPane1.getVerticalScrollBar().setValue(scrollPane1.getVerticalScrollBar().getMaximum());
-//                                }
-//                                SYSTools.setDBVersion(jdbcConnection, dbversion);
-//                                txt.append("\n\n");
-//                                txtDBTest.setText(txt.toString());
-//                                scrollPane1.getVerticalScrollBar().setValue(scrollPane1.getVerticalScrollBar().getMaximum());
-//                            }
-//                        }
-//                    } catch (Exception ex) {
-//                        Main.fatal(ex);
-//                    }
-//
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void done() {
-//                    super.done();
-//                    txt.append(Main.lang.getString("tab.dbconnection.db.versionupgrade.complete"));
-//
-//                    btnLockServer.setEnabled(true);
-//                    btnLockServer.setSelected(false);
-//
-//                    JTextArea textArea = new JTextArea(txt + "\n" + Main.lang.getString("misc.msg.restart.required"));
-//                    JScrollPane scrollPane = new JScrollPane(textArea);
-//                    textArea.setLineWrap(true);
-//                    textArea.setWrapStyleWord(true);
-//                    scrollPane.setPreferredSize(new Dimension(500, 500));
-//
-//                    JOptionPane.showMessageDialog(null, scrollPane, SYSTools.getAppTitle(), JOptionPane.INFORMATION_MESSAGE, SYSTools.icon64opde);
-//                    System.exit(0);
-//                }
-//            };
-//
-//            worker.execute();
-//
-//        }
 
         }
 
