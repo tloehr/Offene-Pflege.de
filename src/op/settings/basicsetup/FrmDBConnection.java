@@ -233,7 +233,7 @@ public class FrmDBConnection extends JFrame {
             lblUser.setFont(new Font("Arial", Font.PLAIN, 16));
             pnlDB.add(lblUser, CC.xy(1, 7));
 
-            //---- txtUser ----
+            //---- txtAdmin ----
             txtUser.setFont(new Font("Arial", Font.PLAIN, 16));
             pnlDB.add(txtUser, CC.xy(3, 7));
 

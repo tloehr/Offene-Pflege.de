@@ -22,7 +22,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Style;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -395,6 +397,7 @@ public class GUITools {
         return dropPanel;
     }
 
+
     public static void setResidentDisplay(Resident resident) {
         OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident), SYSTools.toHTML(ResInfoTools.getTXReportHeader(resident, false)));
         // result += getTXReportHeader(resident, withlongheader);
@@ -416,6 +419,23 @@ public class GUITools {
             OPDE.getDisplayManager().setIconGone();
         }
         OPDE.getDisplayManager().clearSubMessages();
+    }
+
+    public static void appendText(String text, JTextPane txt, Style style) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                txt.getStyledDocument().insertString(txt.getStyledDocument().getLength(), SYSTools.xx(text), style);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+
+            if (txt.getParent().getParent() instanceof JScrollPane) {
+                JScrollPane scrl = (JScrollPane) txt.getParent().getParent();
+                scrl.getVerticalScrollBar().setValue(scrl.getVerticalScrollBar().getMaximum());
+            }
+            txt.revalidate();
+            txt.repaint();
+        });
     }
 
     public static String[] getLocalizedMessages(String[] languagekeys) {
@@ -510,6 +530,7 @@ public class GUITools {
      * scrolls the given scrollpane to show the component within the surrounding container.
      * <b>IMPORTANT: always validate() the container b4 using this method. otherwise the frigging
      * scrollpane won't budge.</b>
+     *
      * @param jsp
      * @param component
      * @param container
@@ -613,35 +634,35 @@ public class GUITools {
     }
 
     public static void flashBackground(final JComponent component, final Color flashcolor, final Color originalColor, int repeatTimes) {
-            if (component == null)
-                return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
+        if (component == null)
+            return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
 //            final Color originalColor = component.getBackground();
-            final TimingSource ts = new SwingTimerTimingSource();
-            final boolean wasOpaque = component.isOpaque();
-            Animator.setDefaultTimingSource(ts);
-            ts.init();
-            component.setOpaque(true);
-            Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(repeatTimes).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
-                @Override
-                public void begin(Animator source) {
-                }
+        final TimingSource ts = new SwingTimerTimingSource();
+        final boolean wasOpaque = component.isOpaque();
+        Animator.setDefaultTimingSource(ts);
+        ts.init();
+        component.setOpaque(true);
+        Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(repeatTimes).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+            @Override
+            public void begin(Animator source) {
+            }
 
-                @Override
-                public void timingEvent(Animator animator, final double fraction) {
-                    SwingUtilities.invokeLater(() -> {
-                        component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
-                        component.repaint();
-                    });
-                }
-
-                @Override
-                public void end(Animator source) {
-                    component.setOpaque(wasOpaque);
+            @Override
+            public void timingEvent(Animator animator, final double fraction) {
+                SwingUtilities.invokeLater(() -> {
+                    component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
                     component.repaint();
-                }
-            }).build();
-            animator.start();
-        }
+                });
+            }
+
+            @Override
+            public void end(Animator source) {
+                component.setOpaque(wasOpaque);
+                component.repaint();
+            }
+        }).build();
+        animator.start();
+    }
 
     public static void flashIcon(final AbstractButton btn, final Icon icon) {
         flashIcon(btn, icon, 2);

@@ -688,6 +688,8 @@ public class FileDrop {
      * <p/>
      * <p>I'm releasing this code into the Public Domain. Enjoy.</p>
      *
+     * http://iharder.sourceforge.net/current/java/filedrop/
+     *
      * @author Robert Harder
      * @author rob@iharder.net
      * @version 1.2

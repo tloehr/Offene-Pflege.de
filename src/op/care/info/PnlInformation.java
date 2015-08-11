@@ -64,9 +64,6 @@ import java.util.List;
  */
 public class PnlInformation extends NursingRecordsPanel {
 
-
-
-
     private Resident resident;
     private JScrollPane jspSearch;
     private final PnlCare pnlCare;

@@ -27,6 +27,7 @@
 package op.tools;
 
 import com.jidesoft.swing.JideSplitPane;
+import com.sun.istack.internal.Nullable;
 import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
@@ -1403,17 +1404,18 @@ public class SYSTools {
      * @param message
      * @return replaced message or the original message if there is no appropriate language key.
      */
-    public static String xx(String message) {
+    public static String xx(String message, @Nullable Object... args) {
         if (message == null || message.isEmpty()) return "";
 
         String title = message;
         try {
-            title = OPDE.lang.getString(message);
+            title = String.format(OPDE.lang.getString(message), args);
         } catch (Exception e) {
             // ok, its not a langbundle key
         }
         return title;
     }
+
 
 
     public static void packTable(JTable table, int margin) {
