@@ -45,7 +45,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import scala.App;
 
 import javax.crypto.BadPaddingException;
 import javax.persistence.EntityManager;
@@ -142,7 +141,6 @@ public class OPDE {
             updateDescriptionURL = url;
         }
     }
-
 
 
     public static LogicalPrinters getLogicalPrinters() {
@@ -263,13 +261,13 @@ public class OPDE {
                 em.close();
             }
             e.printStackTrace();
+        }
 
-            String html = SYSTools.getThrowableAsHTML(e);
-            File temp = SYSFilesTools.print(html, false);
+        String html = SYSTools.getThrowableAsHTML(e);
+        File temp = SYSFilesTools.print(html, false);
 
-            if (!isDebug()) {
-                EMailSystem.sendErrorMail(e.getMessage(), temp);
-            }
+        if (!isDebug()) {
+            EMailSystem.sendErrorMail(e.getMessage(), temp);
         }
 
         System.exit(1);
@@ -950,9 +948,6 @@ public class OPDE {
         UIManager.put("ToolTip.font", SYSConst.ARIAL14);
         UIManager.put("Tree.font", SYSConst.ARIAL14);
     }
-
-
-
 
 
 }

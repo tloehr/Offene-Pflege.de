@@ -16,6 +16,7 @@ import entity.EntityTools;
 import entity.system.SYSPropsTools;
 import gui.GUITools;
 import gui.events.RelaxedDocumentListener;
+import gui.interfaces.YesNoToggleButton;
 import op.OPDE;
 import op.system.AppInfo;
 import op.tools.SYSConst;
@@ -23,6 +24,7 @@ import op.tools.SYSTools;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -34,7 +36,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -42,8 +43,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -60,6 +63,7 @@ public class InitWizard extends WizardDialog {
     enum DB_VERSION {
         UNKNOWN, TOO_LOW, PERFECT, TOO_HIGH
     }
+
 
     private DB_VERSION db_version;
     //    private boolean db_parameters_complete;
@@ -284,7 +288,7 @@ public class InitWizard extends WizardDialog {
         private RelaxedDocumentListener passwordListener;
         private RelaxedDocumentListener catalogListener;
 
-        private JTextPane txtComments;
+        private JTextArea txtComments;
 
         public ConnectionPage(String title, String description) {
             super(title, description);
@@ -298,8 +302,8 @@ public class InitWizard extends WizardDialog {
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
                     serverListener.check(null);
-                    userListener.check(null);
-                    catalogListener.check(null);
+//                    userListener.check(null);
+//                    catalogListener.check(null);
                 }
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_HOST, txtServer.getText().trim());
@@ -350,9 +354,9 @@ public class InitWizard extends WizardDialog {
             lblPasswordState = new JLabel(SYSTools.xx("cant.check.yet"), SYSConst.icon16ledYellowOn, SwingConstants.LEADING);
             lblCatState = new JLabel(SYSTools.xx("cant.check.yet"), SYSConst.icon16ledYellowOn, SwingConstants.LEADING);
 
-            txtComments = new JTextPane();
-//            txtComments.setWrapStyleWord(true);
-//            txtComments.setLineWrap(true);
+            txtComments = new JTextArea();
+            txtComments.setWrapStyleWord(true);
+            txtComments.setLineWrap(true);
             txtComments.setEditable(false);
 
             serverListener = new RelaxedDocumentListener(documentEvent -> {
@@ -399,8 +403,6 @@ public class InitWizard extends WizardDialog {
                     portListener.check(null);
                 }
 
-            }, documentEvent -> {
-                setPagesEnabled();
             });
             portListener = new RelaxedDocumentListener(documentEvent -> {
                 fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
@@ -747,11 +749,12 @@ public class InitWizard extends WizardDialog {
         JLabel lblMysqldump;
         JTextField txtAdmin;
         JTextField txtPassword;
-        JTextPane txtComments;
+        JTextArea txtComments;
         JScrollPane vertical;
+        JProgressBar pbProgress;
+        SwingWorker worker;
+
         Logger logger = Logger.getLogger(getClass());
-        //        Timer timer;
-        Style h1Style, h2Style, h3Style;
 
 
         public UpdateDB(String title, String description) {
@@ -763,7 +766,7 @@ public class InitWizard extends WizardDialog {
         public void setupWizardButtons() {
             super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.CANCEL);
         }
@@ -782,37 +785,43 @@ public class InitWizard extends WizardDialog {
             lblPassword = new JLabel();
             txtAdmin = new JTextField();
             txtPassword = new JTextField();
-            txtComments = new JTextPane();
+            txtComments = new JTextArea();
+            txtComments.setWrapStyleWord(true);
+            txtComments.setLineWrap(true);
+            txtComments.setEditable(false);
             lblMysqldump = new JLabel();
+            pbProgress = new JProgressBar();
 
             txtAdmin.getDocument().addDocumentListener(new RelaxedDocumentListener(var1 -> {
                 jdbcProps.put(SYSPropsTools.KEY_JDBC_ROOTUSER, txtAdmin.getText().trim().isEmpty() ? "root" : txtAdmin.getText().trim());
             }));
 
             logger.addAppender(new StatusMessageAppender(txtComments));
-            h1Style = txtComments.addStyle("h1Style", null);
-            StyleConstants.setForeground(h1Style, Color.blue);
-            StyleConstants.setBold(h1Style, true);
-            StyleConstants.setFontSize(h1Style, 24);
-
-            h2Style = txtComments.addStyle("h2Style", null);
-            StyleConstants.setForeground(h2Style, SYSConst.mediumpurple4);
-            StyleConstants.setBold(h2Style, true);
-            StyleConstants.setFontSize(h2Style, 20);
-
-            h3Style = txtComments.addStyle("h3Style", null);
-            StyleConstants.setForeground(h3Style, SYSConst.salmon4);
-            StyleConstants.setBold(h3Style, true);
-            StyleConstants.setFontSize(h3Style, 16);
+//            h1Style = txtComments.addStyle("h1Style", null);
+//            StyleConstants.setForeground(h1Style, Color.blue);
+//            StyleConstants.setBold(h1Style, true);
+//            StyleConstants.setFontSize(h1Style, 24);
+//
+//            h2Style = txtComments.addStyle("h2Style", null);
+//            StyleConstants.setForeground(h2Style, SYSConst.mediumpurple4);
+//            StyleConstants.setBold(h2Style, true);
+//            StyleConstants.setFontSize(h2Style, 20);
+//
+//            h3Style = txtComments.addStyle("h3Style", null);
+//            StyleConstants.setForeground(h3Style, SYSConst.salmon4);
+//            StyleConstants.setBold(h3Style, true);
+//            StyleConstants.setFontSize(h3Style, 16);
 
             txtComments.setEditable(false);
             vertical = new JScrollPane(txtComments);
 
             logger.info(SYSTools.xx("opde.initwizard.page.update.current.mysqldump") + ": " + jdbcProps.getProperty(SYSPropsTools.KEY_MYSQLDUMP_EXEC));
             logger.info(SYSTools.xx("opde.initwizard.page.update.target") + ": " + EntityTools.getJDBCUrl(server, sPort, catalog));
+            logger.info(SYSTools.xx("opde.initwizard.page.update.always.backup.first"));
 
             btnLockDB = new JButton(SYSConst.icon22locked);
             btnLockDB.addActionListener(e -> {
+                if (worker != null && !worker.isDone()) return;
                 try {
                     lockServer();
                 } catch (SQLException e1) {
@@ -822,6 +831,7 @@ public class InitWizard extends WizardDialog {
 
             btnUnLockDB = new JButton(SYSConst.icon22unlocked);
             btnUnLockDB.addActionListener(e2 -> {
+                if (worker != null && !worker.isDone()) return;
                 try {
                     unlockServer();
                 } catch (SQLException e1) {
@@ -832,21 +842,15 @@ public class InitWizard extends WizardDialog {
             btnUpdateDB = new JButton(SYSTools.xx("opde.initwizard.page.update.updatedb"), SYSConst.icon22updateDB);
             btnUpdateDB.setFont(new Font("Arial", Font.PLAIN, 16));
             btnUpdateDB.addActionListener(al -> {
-                try {
-                    Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtAdmin.getText().trim(), txtPassword.getText().trim());
-                    upgradeDatabase(jdbcConnection);
-                    jdbcConnection.close();
-                    setCurrentPage(SYSTools.xx("opde.initwizard.page.summary.title"));
-                } catch (SQLException e) {
-                    logger.error(e);
-                } catch (IOException e) {
-                    logger.error(e);
-                }
+                if (worker != null && !worker.isDone()) return;
+                fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
+                upgradeDatabase(EntityTools.getJDBCUrl(server, sPort, catalog));
             });
 
             btnDBBackup = new JButton(SYSTools.xx("opde.initwizard.page.update.backupdb"));
             btnDBBackup.setFont(new Font("Arial", Font.PLAIN, 16));
             btnDBBackup.addActionListener(e -> {
+                if (worker != null && !worker.isDone()) return;
                 SwingWorker worker = new SwingWorker() {
                     String sBackupFile = System.getProperty("java.io.tmpdir") + File.separator + catalog + "-backup-" + System.currentTimeMillis() + ".dump";
 
@@ -917,6 +921,7 @@ public class InitWizard extends WizardDialog {
 
             btnSearchMysqlDump = GUITools.getTinyButton("opde.initwizard.page.update.search.mysqldump", SYSConst.icon22exec);
             btnSearchMysqlDump.addActionListener(e -> {
+                if (worker != null && !worker.isDone()) return;
                 final JidePopup popup = new JidePopup();
                 final FileChooserPanel fcp = new FileChooserPanel(jdbcProps.getProperty(SYSPropsTools.KEY_MYSQLDUMP_EXEC));
                 fcp.addItemListener(e1 -> {
@@ -944,6 +949,7 @@ public class InitWizard extends WizardDialog {
 
             btnOpenBackupDir = new JButton("open backup dir");
             btnOpenBackupDir.addActionListener(e -> {
+                if (worker != null && !worker.isDone()) return;
                 try {
                     if (Desktop.isDesktopSupported()) {
                         Desktop.getDesktop().open(new File(System.getProperty("java.io.tmpdir")));
@@ -1006,7 +1012,7 @@ public class InitWizard extends WizardDialog {
 
                 pnlMain.add(buttonLine1, CC.xyw(1, 7, 5));
                 pnlMain.add(buttonLine2, CC.xyw(1, 9, 5));
-
+                pnlMain.add(pbProgress, CC.xyw(1, 11, 5));
                 pnlMain.add(vertical, CC.xyw(1, 15, 5, CC.DEFAULT, CC.FILL));
 
             }
@@ -1047,54 +1053,98 @@ public class InitWizard extends WizardDialog {
         }
 
 
-        private void upgradeDatabase(Connection jdbcConnection) throws SQLException, IOException {
-            if (!EntityTools.isServerLocked(jdbcConnection)) {
-                logger.error(SYSTools.xx("opde.initwizard.page.update.lock.first"));
-                return;
-            }
+        private void upgradeDatabase(String jdbcurl) {
+            worker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
 
-            int neededVersion = 8;//OPDE.getAppInfo().getDbversion();
-            int currentVersion = 7;//EntityTools.getDatabaseSchemaVersion(jdbcConnection);
+                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
+                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
+                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
+                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.CANCEL);
 
+                    Connection jdbcConnection = DriverManager.getConnection(jdbcurl, txtAdmin.getText().trim(), txtPassword.getText().trim());
 
-            HashMap<Integer, ArrayList<String>> mapToNewestVersion = new HashMap<>();
+                    if (!EntityTools.isServerLocked(jdbcConnection)) {
+                        throw new SQLException(SYSTools.xx("opde.initwizard.page.update.lock.first"));
+                    }
 
-//            ArrayList<ArrayList<String>> sqlToNewestVersion = new ArrayList<>();
-            String currentSQLCommand = "";
+                    int neededVersion = OPDE.getAppInfo().getDbversion();
+                    int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
 
+                    HashMap<Integer, ArrayList<String>> mapToNewestVersion = new HashMap<>();
 
-            for (int startVersion = currentVersion; startVersion < neededVersion; startVersion++) {
-                ArrayList<String> sqlToNextVersion = new ArrayList<>();
-                File sqlUpdate = AppInfo.getSQLUpdateScript(startVersion);
+                    String currentSQLCommand = "";
+                    for (int startVersion = currentVersion; startVersion < neededVersion; startVersion++) {
+                        ArrayList<String> sqlToNextVersion = new ArrayList<>();
+                        File sqlUpdate = AppInfo.getSQLUpdateScript(startVersion);
 
-                Iterator it = Files.lines(sqlUpdate.toPath()).iterator();
-                while (it.hasNext()) {
-                    String line = it.next().toString().trim();
-                    if (!line.startsWith("--")) {
-                        currentSQLCommand += line;
-                        if (currentSQLCommand.endsWith(";")) {
-                            sqlToNextVersion.add(currentSQLCommand);
-                            currentSQLCommand = "";
+                        Iterator it = Files.lines(sqlUpdate.toPath()).iterator();
+                        while (it.hasNext()) {
+                            String line = it.next().toString().trim();
+                            if (!line.startsWith("--")) {
+                                currentSQLCommand += line;
+                                if (currentSQLCommand.endsWith(";")) {
+                                    sqlToNextVersion.add(currentSQLCommand);
+                                    currentSQLCommand = "";
+                                }
+                            }
+                        }
+                        mapToNewestVersion.put(startVersion, sqlToNextVersion);
+                    }
+
+                    // for progressbar
+                    int min = 0;
+                    int max = 0;
+                    int progress = 0;
+                    for (int startVersion = currentVersion; startVersion < neededVersion; startVersion++) {
+                        max += mapToNewestVersion.get(startVersion).size();
+                    }
+                    pbProgress.setMinimum(min);
+                    pbProgress.setMaximum(max);
+                    pbProgress.setStringPainted(true);
+
+                    for (int startVersion = currentVersion; startVersion < neededVersion; startVersion++) {
+//                        GUITools.appendText(SYSTools.xx("opde.initwizard.page.update.updating.version", startVersion, startVersion + 1), txtComments, h1Style);
+                        summary.add(SYSTools.xx("opde.initwizard.page.update.updating.version", startVersion, startVersion + 1));
+                        pbProgress.setString(SYSTools.xx("opde.initwizard.page.update.updating.version", startVersion, startVersion + 1));
+                        logger.info(SYSTools.xx("opde.initwizard.page.update.updating.version", startVersion, startVersion + 1));
+                        for (String sql : mapToNewestVersion.get(startVersion)) {
+                            progress++;
+                            final int p = progress;
+                            SwingUtilities.invokeLater(() -> pbProgress.setValue(p));
+                            logger.info(sql.toString());
+                            try {
+                                PreparedStatement stmt = jdbcConnection.prepareStatement(sql);
+                                int result = stmt.executeUpdate();
+                                logger.info(SYSTools.xx("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + SYSTools.xx("opde.initwizard.page.update.updatedb.rows.affected")));
+                                stmt.close();
+                            } catch (SQLException sqle) {
+                                OPDE.fatal(sqle);
+                            }
                         }
                     }
-                }
-                mapToNewestVersion.put(startVersion, sqlToNextVersion);
-            }
 
-            for (int startVersion = currentVersion; startVersion < neededVersion; startVersion++) {
-                GUITools.appendText(SYSTools.xx("opde.initwizard.page.update.updating.version", startVersion, startVersion + 1), txtComments, h1Style);
-                summary.add(SYSTools.xx("opde.initwizard.page.update.updating.version", startVersion, startVersion + 1));
-                for (String sql : mapToNewestVersion.get(startVersion)) {
-                    logger.info(sql.toString());
-//                    PreparedStatement stmt = jdbcConnection.prepareStatement(sql);
-//                    int result = stmt.executeUpdate();
-//                    logger.info(SYSTools.xx("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + SYSTools.xx("opde.initwizard.page.update.updatedb.rows.affected")) + "\n");
-//                    logger.info("=============");
-//                    stmt.close();
+                    EntityTools.setServerLocked(jdbcConnection, false);
+                    summary.add(SYSTools.xx("opde.initwizard.page.update.server.unlocked"));
+                    jdbcConnection.close();
+                    return null;
                 }
-                EntityTools.setServerLocked(jdbcConnection, false);
-                summary.add(SYSTools.xx("opde.initwizard.page.update.server.unlocked"));
-            }
+
+                @Override
+                protected void done() {
+                    super.done();
+                    try {
+                        get();
+                        setCurrentPage(SYSTools.xx("opde.initwizard.page.summary.title"));
+                    } catch (Exception e) {
+                        logger.error(e);
+                    } finally {
+                        worker = null;
+                    }
+                }
+            };
+            worker.execute();
         }
 
 
@@ -1192,21 +1242,25 @@ public class InitWizard extends WizardDialog {
 
 
     private class StatusMessageAppender extends AppenderSkeleton {
-        private final JTextPane jTextA;
+        private final JTextArea jTextA;
         private PatternLayout defaultPatternLayout = new PatternLayout("%d{ISO8601} %-5p: %m%n");
         private Style errorStyle, warnStyle;
 
-        public StatusMessageAppender(JTextPane jTextA) {
+        public StatusMessageAppender(JTextArea jTextA) {
             this.jTextA = jTextA;
-            errorStyle = jTextA.addStyle("errorStyle", null);
-            warnStyle = jTextA.addStyle("warnStyle", null);
-            StyleConstants.setForeground(errorStyle, Color.red);
-            StyleConstants.setForeground(warnStyle, SYSConst.darkorange);
+//            errorStyle = jTextA.addStyle("errorStyle", null);
+//            warnStyle = jTextA.addStyle("warnStyle", null);
+//            StyleConstants.setForeground(errorStyle, Color.red);
+//            StyleConstants.setForeground(warnStyle, SYSConst.darkorange);
         }
 
         protected void append(LoggingEvent event) {
             if (event.getLevel().isGreaterOrEqual(Logger.getRootLogger().getLevel())) {
-                GUITools.appendText(defaultPatternLayout.format(event), jTextA, getCurrentStyle(event.getLevel()));
+                jTextA.append(defaultPatternLayout.format(event));
+                JScrollPane scrl = (JScrollPane) jTextA.getParent().getParent();
+                scrl.getVerticalScrollBar().setValue(scrl.getVerticalScrollBar().getMaximum());
+
+//                GUITools.appendText(defaultPatternLayout.format(event), jTextA, getCurrentStyle(event.getLevel()));
             }
         }
 
@@ -1229,11 +1283,30 @@ public class InitWizard extends WizardDialog {
 
     private class CreateDBPage extends DefaultWizardPage {
 
-        //        private boolean alreadyexecute = false;
+        JButton btnCreateDB;
+        JLabel lblRoot;
+        JLabel lblPassword;
+
+        JTextField txtAdmin;
+        JTextField txtPassword;
+        JTextArea txtComments;
+        JScrollPane vertical;
+        JProgressBar pbProgress;
+        SwingWorker worker;
+        Logger logger = Logger.getLogger(getClass());
 
         public CreateDBPage(String title, String description) {
             super(title, description);
             setupWizardButtons();
+
+            addPageListener(pageEvent -> {
+                if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+
+                }
+                if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
+
+                }
+            });
         }
 
         @Override
@@ -1250,11 +1323,201 @@ public class InitWizard extends WizardDialog {
             JPanel pnlMain = new JPanel();
             pnlMain.setLayout(new BoxLayout(pnlMain, BoxLayout.PAGE_AXIS));
 
-            pnlMain.add(new JTextField());
-            pnlMain.add(new JTextField());
-            pnlMain.add(new JButton("Datenbank erstellen"));
+            String server = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
+            String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
+            String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
+            String root = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_ROOTUSER), "root");
+
+
+            lblRoot = new JLabel();
+            lblPassword = new JLabel();
+            txtAdmin = new JTextField();
+            txtPassword = new JTextField();
+            txtComments = new JTextArea();
+            txtComments.setWrapStyleWord(true);
+            txtComments.setLineWrap(true);
+            txtComments.setEditable(false);
+            pbProgress = new JProgressBar();
+
+            txtAdmin.getDocument().addDocumentListener(new RelaxedDocumentListener(var1 -> {
+                jdbcProps.put(SYSPropsTools.KEY_JDBC_ROOTUSER, txtAdmin.getText().trim().isEmpty() ? "root" : txtAdmin.getText().trim());
+            }));
+
+            logger.addAppender(new StatusMessageAppender(txtComments));
+
+            txtComments.setEditable(false);
+            vertical = new JScrollPane(txtComments);
+
+            btnCreateDB = new JButton(SYSTools.xx("opde.initwizard.page.update.createdb"), SYSConst.icon22createDB);
+            btnCreateDB.setFont(new Font("Arial", Font.PLAIN, 16));
+            btnCreateDB.addActionListener(al -> {
+                if (worker != null && !worker.isDone()) return;
+                fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
+                createDB(EntityTools.getJDBCUrl(server, sPort, catalog), catalog);
+            });
+
+
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            //======== pnlDB ========
+            {
+
+                pnlMain.setLayout(new FormLayout(
+                        "default, $ugap, default:grow, $ugap, default",
+                        "6*(default, $lgap), fill:default:grow, $lgap, default"));
+
+                //---- lblServer ----
+                lblRoot.setText(SYSTools.xx("opde.initwizard.root.user"));
+                lblRoot.setHorizontalAlignment(SwingConstants.RIGHT);
+                lblRoot.setFont(new Font("Arial", Font.PLAIN, 16));
+                pnlMain.add(lblRoot, CC.xy(1, 1));
+
+                //---- txtServer ----
+                txtAdmin.setFont(new Font("Arial", Font.PLAIN, 16));
+                txtAdmin.setText(root);
+                pnlMain.add(txtAdmin, CC.xy(3, 1));
+
+                //---- lblPort ----
+                lblPassword.setText(SYSTools.xx("opde.initwizard.root.password"));
+                lblPassword.setHorizontalAlignment(SwingConstants.RIGHT);
+                lblPassword.setFont(new Font("Arial", Font.PLAIN, 16));
+                pnlMain.add(lblPassword, CC.xy(1, 3));
+
+                //---- txtPort ----
+                txtPassword.setFont(new Font("Arial", Font.PLAIN, 16));
+                pnlMain.add(txtPassword, CC.xy(3, 3));
+
+                pnlMain.add(btnCreateDB, CC.xyw(1, 7, 5));
+
+                pnlMain.add(pbProgress, CC.xyw(1, 9, 5));
+                pnlMain.add(new YesNoToggleButton(), CC.xyw(1, 11, 5));
+                pnlMain.add(vertical, CC.xyw(1, 13, 5, CC.DEFAULT, CC.FILL));
+
+            }
 
             addComponent(pnlMain, true);
+        }
+
+        protected void createDB(String jdbcurl, String catalog) {
+
+
+            worker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+
+
+                    String dbser = jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_USER);
+                    String generatedPassword4DBUser = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
+                    String generatedPassword4AdminUser = RandomStringUtils.random(6, 0, 0, true, true, null, new SecureRandom());
+                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, generatedPassword4DBUser);
+
+
+                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
+                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
+                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
+                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.CANCEL);
+
+                    Connection jdbcConnection = DriverManager.getConnection(jdbcurl, txtAdmin.getText().trim(), txtPassword.getText().trim());
+
+
+                    HashMap<File, ArrayList<String>> mapToNewestVersion = new HashMap<>();
+
+                    File structure = AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion());
+                    File basecontent = AppInfo.getSQLBaseContentScript(OPDE.getAppInfo().getDbversion());
+                    File medcontent = AppInfo.getSQLMedContentScript(OPDE.getAppInfo().getDbversion());
+
+                    mapToNewestVersion.put(structure, new ArrayList<>());
+                    mapToNewestVersion.put(basecontent, new ArrayList<>());
+                    mapToNewestVersion.put(medcontent, new ArrayList<>());
+
+                    ArrayList<File> files = new ArrayList<>();
+                    files.add(structure);
+                    files.add(basecontent);
+
+                    //files.add(medcontent);
+
+                    String currentSQLCommand = "";
+
+                    int max = 0;
+
+                    for (File file : files) {
+                        Iterator it = Files.lines(file.toPath()).iterator();
+                        while (it.hasNext()) {
+                            String line = it.next().toString().trim();
+                            if (!line.startsWith("--")) {
+                                currentSQLCommand += line;
+                                if (currentSQLCommand.endsWith(";")) {
+                                    mapToNewestVersion.get(file).add(currentSQLCommand);
+                                    max++;
+                                    currentSQLCommand = "";
+                                }
+                            }
+                        }
+                    }
+
+                    // for progressbar
+                    int min = 0;
+                    int progress = 0;
+                    pbProgress.setMinimum(min);
+                    pbProgress.setMaximum(max);
+                    pbProgress.setStringPainted(true);
+
+
+                    PreparedStatement stmt;
+
+                    String queryDrop = " DROP SCHEMA IF EXISTS " + catalog;
+                    stmt = jdbcConnection.prepareStatement(queryDrop);
+                    stmt.executeUpdate();
+
+                    String queryCreate = " CREATE SCHEMA " + catalog + " DEFAULT CHARACTER SET utf8";
+                    stmt = jdbcConnection.prepareStatement(queryCreate);
+                    stmt.executeUpdate();
+
+                    String queryGrant1 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                    String queryGrant2 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                    stmt = jdbcConnection.prepareStatement(queryGrant1);
+                    stmt.executeUpdate();
+                    stmt = jdbcConnection.prepareStatement(queryGrant2);
+                    stmt.executeUpdate();
+
+                    jdbcConnection.setCatalog(catalog);
+
+                    // first the base structure
+                    for (String createTableCommand : ufp.getListDatabaseStructure()) {
+
+                        stmt = jdbcConnection.prepareStatement(createTableCommand);
+                        stmt.executeUpdate();
+                    }
+
+                    // Set the password for the OPDE admin user
+                    String queryAdminPW = " UPDATE users SET md5pw = MD5(?) WHERE ukennung = 'admin'";
+                    stmt = jdbcConnection.prepareStatement(queryAdminPW);
+                    stmt.setString(1, generatedPassword4AdminUser);
+                    stmt.executeUpdate();
+                    jdbcConnection.close();
+
+                    SYSTools.printNewInstSummary(server, dbser, generatedPassword4DBUser, generatedPassword4AdminUser, port, catalog);
+
+
+                    jdbcConnection.close();
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    super.done();
+                    try {
+                        get();
+                        setCurrentPage(SYSTools.xx("opde.initwizard.page.summary.title"));
+                    } catch (Exception e) {
+                        logger.error(e);
+                    } finally {
+                        worker = null;
+                    }
+                }
+            };
+            worker.execute();
+
+
         }
     }
 
@@ -1293,8 +1556,8 @@ public class InitWizard extends WizardDialog {
         private String check() {
             String result = SYSConst.html_h2("opde.initwizard.page.completion.summary1");
             String items = "";
-            for (String item : summary){
-                items+= SYSConst.html_li(item);
+            for (String item : summary) {
+                items += SYSConst.html_li(item);
             }
             result += SYSConst.html_ol(items);
             result += SYSConst.html_paragraph("opde.initwizard.page.completion.summary2");

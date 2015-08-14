@@ -291,15 +291,26 @@ public class AppInfo {
         return user.exists() ? user : sys;
     }
 
-    public static String getSQLUpgradePath() {
+    public static String getSQLScriptPath() {
         return "/Users/tloehr/Dropbox/opde/newdb/upgrade";
         //return Hardware.getProgrammPath() + File.separator + dirSql;
     }
 
     public static File getSQLUpdateScript(int startVersion) {
-        return new File(getSQLUpgradePath() + File.separator + startVersion + "to" + (startVersion + 1) + ".sql");
+        return new File(getSQLScriptPath() + File.separator + startVersion + "to" + (startVersion + 1) + ".sql");
     }
 
+    public static File getSQLStructureScript(int version) {
+        return new File(getSQLScriptPath() + File.separator + "structure-" + version + ".sql");
+    }
+
+    public static File getSQLBaseContentScript(int version) {
+        return new File(getSQLScriptPath() + File.separator + "content-base-" + version + ".sql");
+    }
+
+    public static File getSQLMedContentScript(int version) {
+        return new File(getSQLScriptPath() + File.separator + "content-med-" + version + ".sql");
+    }
 
     public static String getOPCache() {
         return Hardware.getAppDataPath() + File.separator + dirCache;

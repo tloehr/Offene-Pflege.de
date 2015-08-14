@@ -73,7 +73,7 @@ public class SYSPropsTools {
     public static final String KEY_CALC_MEDI_UPR1 = "calc.medi.upr1";
     public static final String KEY_CALC_MEDI_OTHER = "calc.medi.other"; // yet unused
     public static final String KEY_MAINTENANCE_MODE = "system.maintenance.mode";
-
+    public static final String KEY_CALC_MEDI_UPR_CORRIDOR = "apv_korridor";
 
     public static final String KEY_VERY_EARLY_FGSHIFT = "VERY_EARLY_FGSHIFT";
     public static final String KEY_VERY_EARLY_BGSHIFT = "VERY_EARLY_BGSHIFT";

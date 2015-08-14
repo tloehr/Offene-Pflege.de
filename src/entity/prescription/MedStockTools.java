@@ -3,6 +3,7 @@ package entity.prescription;
 import entity.building.Station;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
@@ -250,7 +251,7 @@ public class MedStockTools {
                 if (medStock.getUPRDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
                     if (effectiveUPR.compareTo(BigDecimal.ZERO) > 0) { // if this stock was never used the effective UPR must be 0. we must handle this case separately
                         // if the deviation was too high (usually more than 20%), then the new UPR is discarded
-                        BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")));
+                        BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR_CORRIDOR)));
                         BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
                         OPDE.debug("the deviation was: " + deviation + "%");
 
