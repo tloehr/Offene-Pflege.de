@@ -13,10 +13,12 @@ import com.jidesoft.wizard.CompletionWizardPage;
 import com.jidesoft.wizard.DefaultWizardPage;
 import com.jidesoft.wizard.WizardDialog;
 import entity.EntityTools;
+import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import gui.GUITools;
 import gui.events.RelaxedDocumentListener;
 import gui.interfaces.YesNoToggleButton;
+import javafx.scene.control.TextArea;
 import op.OPDE;
 import op.system.AppInfo;
 import op.tools.SYSConst;
@@ -48,6 +50,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -73,7 +76,7 @@ public class InitWizard extends WizardDialog {
     //    private boolean db_password_readable;
     private boolean db_credentials_correct;
 
-    private int port = 3306;
+
     private final int WAIT_SECONDS_BEFORE_UPDATE = 60;
 
 
@@ -149,24 +152,6 @@ public class InitWizard extends WizardDialog {
         setCancelAction(new AbstractAction("Cancel") {
             public void actionPerformed(ActionEvent e) {
                 dispose();
-            }
-        });
-
-        setNextAction(new AbstractAction("Next") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (getCurrentPage() instanceof ConnectionPage) {
-                    if (((ConnectionPage) getCurrentPage()).isDocumentEventsStillProcessing()) {
-                        OPDE.debug("Nö du");
-                        return;
-                    }
-                }
-                int index = model.getPageIndexByFullTitle(getCurrentPage().getFullTitle()) + 1;
-                while (!model.getPage(index).isPageEnabled()) {
-                    index++;
-                }
-
-                setCurrentPage(model.getPage(index).getFullTitle());
             }
         });
 
@@ -275,20 +260,14 @@ public class InitWizard extends WizardDialog {
         private JTextField txtPassword;
         private Logger logger = Logger.getLogger(getClass());
 
-        private JLabel lblServerState;
-        private JLabel lblPortState;
-        private JLabel lblUserState;
-        private JLabel lblPasswordState;
-        private JLabel lblCatState;
-        private JLabel lblTesting;
+        JTextArea txtComment;
 
-        private RelaxedDocumentListener serverListener;
-        private RelaxedDocumentListener portListener;
-        private RelaxedDocumentListener userListener;
-        private RelaxedDocumentListener passwordListener;
-        private RelaxedDocumentListener catalogListener;
+        private JButton btnTestParameters;
+        private JButton btnCreateNewSchema;
+        private JButton btnUpdateSchema;
 
-        private JTextArea txtComments;
+        //        private JTextArea txtComments;
+        private int port = 3306;
 
         public ConnectionPage(String title, String description) {
             super(title, description);
@@ -301,13 +280,19 @@ public class InitWizard extends WizardDialog {
 
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                    serverListener.check(null);
+//                    jfxPanel.setScene(createScene());
+
+//                    SwingUtilities.invokeLater(() -> {
+//                        revalidate();
+//                        repaint();
+//                    });
+//                    btnTestParameters.doClick();
 //                    userListener.check(null);
 //                    catalogListener.check(null);
                 }
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_HOST, txtServer.getText().trim());
-                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PORT, port);
+                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PORT, Integer.toString(port));
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_USER, txtUser.getText().trim());
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, txtPassword.getText().trim());
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_CATALOG, txtCatalog.getText().trim());
@@ -315,11 +300,6 @@ public class InitWizard extends WizardDialog {
             });
 
         }
-
-//        @Override
-//        public void reset() {
-//            super.reset();
-//        }
 
         @Override
         public void setupWizardButtons() {
@@ -329,270 +309,76 @@ public class InitWizard extends WizardDialog {
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.CANCEL);
         }
 
+
+//        private Scene createScene() {
+//
+//            AnchorPane anchorPane = new AnchorPane();
+//
+//            txtArea = new TextArea();
+//
+//            txtArea.setFont(javafx.scene.text.Font.font("sans-serif", 14d));
+//            txtArea.setEditable(false);
+//
+////            scrollPane = new ScrollPane(txtArea);
+//            //Set Layout Constraint
+//            AnchorPane.setTopAnchor(txtArea, 0.0);
+//            AnchorPane.setBottomAnchor(txtArea, 0.0);
+//            AnchorPane.setLeftAnchor(txtArea, 0.0);
+//            AnchorPane.setRightAnchor(txtArea, 0.0);
+//
+//
+//            anchorPane.getChildren().add(txtArea);
+//
+//            return new Scene(anchorPane, javafx.scene.paint.Color.ALICEBLUE);
+//        }
+
         @Override
         protected void initContentPane() {
             super.initContentPane();
             pnlDB = new JPanel();
+//            jfxPanel = new JFXPanel();
+//            jfxPanel.setScene(createScene());
+//
+
+
+            RelaxedDocumentListener dl = new RelaxedDocumentListener(0, o -> {
+                btnUpdateSchema.setEnabled(false);
+                btnCreateNewSchema.setEnabled(false);
+            });
 
             txtServer = new JTextField();
+            txtPassword = new JTextField();
             txtPort = new JTextField();
             txtCatalog = new JTextField();
             txtUser = new JTextField();
+            txtComment = new JTextArea();
 
-            txtPassword = new JTextField();
+            txtServer.getDocument().addDocumentListener(dl);
+            txtPassword.getDocument().addDocumentListener(dl);
+            txtPort.getDocument().addDocumentListener(dl);
+            txtCatalog.getDocument().addDocumentListener(dl);
+            txtUser.getDocument().addDocumentListener(dl);
+            txtComment.getDocument().addDocumentListener(dl);
+
 
             lblPassword = new JLabel();
             lblUser = new JLabel();
             lblServer = new JLabel();
             lblPort = new JLabel();
             lblCat = new JLabel();
-            lblTesting = new JLabel("Testing");
 
-            lblServerState = new JLabel(SYSTools.xx("cant.check.yet"), SYSConst.icon16ledYellowOn, SwingConstants.LEADING);
-            lblPortState = new JLabel(SYSTools.xx("cant.check.yet"), SYSConst.icon16ledYellowOn, SwingConstants.LEADING);
-            lblUserState = new JLabel(SYSTools.xx("cant.check.yet"), SYSConst.icon16ledYellowOn, SwingConstants.LEADING);
-            lblPasswordState = new JLabel(SYSTools.xx("cant.check.yet"), SYSConst.icon16ledYellowOn, SwingConstants.LEADING);
-            lblCatState = new JLabel(SYSTools.xx("cant.check.yet"), SYSConst.icon16ledYellowOn, SwingConstants.LEADING);
+            btnTestParameters = new JButton(SYSTools.xx("opde.initwizard.page.connection.testing"), SYSConst.icon48dbstatus);
+            btnTestParameters.addActionListener(e1 -> testParameters());
+            btnCreateNewSchema = new JButton(SYSTools.xx("opde.initwizard.page.update.createdb"), SYSConst.icon48dbcreate);
+            btnCreateNewSchema.addActionListener(e1 -> setCurrentPage(SYSTools.xx("opde.initwizard.page.createdb.title")));
+            btnCreateNewSchema.setEnabled(false);
+            btnCreateNewSchema.setToolTipText(SYSTools.xx("opde.initwizard.page.connection.testfirst"));
+            btnUpdateSchema = new JButton(SYSTools.xx("opde.initwizard.page.update.updatedb"), SYSConst.icon48dbupdate);
+            btnUpdateSchema.addActionListener(e1 -> setCurrentPage(SYSTools.xx("opde.initwizard.page.upgradedb.title")));
+            btnUpdateSchema.setEnabled(false);
+            btnUpdateSchema.setToolTipText(SYSTools.xx("opde.initwizard.page.connection.testfirst"));
 
-            txtComments = new JTextArea();
-            txtComments.setWrapStyleWord(true);
-            txtComments.setLineWrap(true);
-            txtComments.setEditable(false);
-
-            serverListener = new RelaxedDocumentListener(documentEvent -> {
-                fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
-
-                db_version = DB_VERSION.UNKNOWN;
-                db_server_pingable = false;
-
-
-                if (port < 1 || port > 65535) {
-                    //                    lblPortState.setText("Port muss eine ganze Zahl zwischen 1 und 65535 sein. Standard: 3306");
-                    txtPort.setText("3306");
-                    port = 3306;
-                }
-
-                try {
-                    logger.addAppender(new StatusMessageAppender(txtComments));
-                    logger.info("pinging: " + txtServer.getText() + ":" + port);
-                    pingResult = SYSTools.socketping(txtServer.getText(), Integer.toString(port));
-                    logger.info(pingResult);
-                    SwingUtilities.invokeLater(() -> {
-                        lblServerState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblPortState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblServerState.setIcon(SYSConst.icon16ledGreenOn);
-                        lblPortState.setIcon(SYSConst.icon16ledGreenOn);
-                        revalidate();
-                        repaint();
-                    });
-
-                    db_server_pingable = true;
-
-                } catch (IOException e) {
-                    SwingUtilities.invokeLater(() -> {
-                        logger.error(e);
-                        lblServerState.setText(SYSTools.xx("error.ping.failed"));
-                        lblPortState.setText(SYSTools.xx("error.ping.failed"));
-                        lblServerState.setIcon(SYSConst.icon16ledRedOn);
-                        lblPortState.setIcon(SYSConst.icon16ledRedOn);
-                        revalidate();
-                        repaint();
-                    });
-
-                } finally {
-                    portListener.check(null);
-                }
-
-            });
-            portListener = new RelaxedDocumentListener(documentEvent -> {
-                fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
-
-                db_version = DB_VERSION.UNKNOWN;
-                db_server_pingable = false;
-
-                try {
-                    port = Integer.parseInt(txtPort.getText().trim());
-                    if (port < 1 || port > 65535) {
-                        txtPort.setText("3306");
-                        return;
-                    }
-                } catch (NumberFormatException nfe) {
-                    txtPort.setText("3306");
-                    return;
-                }
-
-                try {
-                    logger.info("pinging: " + txtServer.getText() + ":" + port);
-                    pingResult = SYSTools.socketping(txtServer.getText(), Integer.toString(port));
-                    logger.info(pingResult);
-                    SwingUtilities.invokeLater(() -> {
-                        lblServerState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblPortState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblServerState.setIcon(SYSConst.icon16ledGreenOn);
-                        lblPortState.setIcon(SYSConst.icon16ledGreenOn);
-                        revalidate();
-                        repaint();
-                    });
-                    db_server_pingable = true;
-                } catch (IOException e) {
-                    SwingUtilities.invokeLater(() -> {
-                        logger.error(e);
-                        lblServerState.setText(SYSTools.xx("error.ping.failed"));
-                        lblPortState.setText(SYSTools.xx("error.ping.failed"));
-                        lblServerState.setIcon(SYSConst.icon16ledRedOn);
-                        lblPortState.setIcon(SYSConst.icon16ledRedOn);
-                        revalidate();
-                        repaint();
-                    });
-                } finally {
-                    userListener.check(null);
-                }
-            });
-            userListener = new RelaxedDocumentListener(documentEvent -> {
-                fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
-
-                db_version = DB_VERSION.UNKNOWN;
-
-                db_credentials_correct = false;
-
-                try {
-                    Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(txtServer.getText().trim(), Integer.toString(port), null), txtUser.getText(), txtPassword.getText());
-                    logger.info("jdbc.connection.ok");
-                    db_credentials_correct = true;
-                    SwingUtilities.invokeLater(() -> {
-                        lblUserState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblPasswordState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblUserState.setIcon(SYSConst.icon16ledGreenOn);
-                        lblPasswordState.setIcon(SYSConst.icon16ledGreenOn);
-                        revalidate();
-                        repaint();
-                    });
-                    jdbcConnection.close();
-                    db_dbms_reachable = true;
-                } catch (SQLException e) {
-                    logger.error(e);
-                    db_credentials_correct = false;
-                    db_dbms_reachable = !(e instanceof com.mysql.jdbc.exceptions.jdbc4.CommunicationsException && e.getCause() instanceof java.net.SocketTimeoutException);
-                    SwingUtilities.invokeLater(() -> {
-                        lblUserState.setText(SYSTools.xx("error.ping.failed"));
-                        lblPasswordState.setText(SYSTools.xx("error.ping.failed"));
-                        lblUserState.setIcon(SYSConst.icon16ledRedOn);
-                        lblPasswordState.setIcon(SYSConst.icon16ledRedOn);
-                        revalidate();
-                        repaint();
-                    });
-                } finally {
-                    passwordListener.check(null);
-                }
-
-            });
-            passwordListener = new RelaxedDocumentListener(documentEvent -> {
-                fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
-
-
-                db_version = DB_VERSION.UNKNOWN;
-
-                db_credentials_correct = false;
-
-                try {
-                    Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(txtServer.getText().trim(), Integer.toString(port), null), txtUser.getText(), txtPassword.getText());
-                    logger.info("jdbc.connection.ok");
-                    db_credentials_correct = true;
-                    SwingUtilities.invokeLater(() -> {
-                        lblUserState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblPasswordState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblUserState.setIcon(SYSConst.icon16ledGreenOn);
-                        lblPasswordState.setIcon(SYSConst.icon16ledGreenOn);
-                        revalidate();
-                        repaint();
-                    });
-                    jdbcConnection.close();
-                    db_dbms_reachable = true;
-                } catch (SQLException e) {
-                    logger.error(e);
-                    db_credentials_correct = false;
-                    db_dbms_reachable = !(e instanceof com.mysql.jdbc.exceptions.jdbc4.CommunicationsException && e.getCause() instanceof java.net.SocketTimeoutException);
-                    SwingUtilities.invokeLater(() -> {
-                        lblUserState.setText(SYSTools.xx("error.ping.failed"));
-                        lblPasswordState.setText(SYSTools.xx("error.ping.failed"));
-                        lblUserState.setIcon(SYSConst.icon16ledRedOn);
-                        lblPasswordState.setIcon(SYSConst.icon16ledRedOn);
-                        revalidate();
-                        repaint();
-                    });
-                } finally {
-                    catalogListener.check(null);
-
-                }
-
-            });
-            catalogListener = new RelaxedDocumentListener(documentEvent -> {
-                fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
-                db_version = DB_VERSION.UNKNOWN;
-//                if (!db_credentials_correct) {
-//                    SwingUtilities.invokeLater(() -> {
-//                        lblCatState.setText(SYSTools.xx("cant.check.yet"));
-//                        lblCatState.setIcon(SYSConst.icon16ledYellowOn);
-//                        lblCatState.setToolTipText(null);
-//                        revalidate();
-//                        repaint();
-//                    });
-//                    return;
-//                }
-
-                try {
-                    Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(txtServer.getText().trim(), Integer.toString(port), txtCatalog.getText().trim()), txtUser.getText(), txtPassword.getText());
-                    logger.info("jdbc.connection.ok");
-                    db_catalog_exists = true;
-
-                    int neededVersion = OPDE.getAppInfo().getDbversion();
-                    int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
-
-                    if (currentVersion == -1) db_version = DB_VERSION.UNKNOWN; // tables SYSProps is messed up
-                    else if (currentVersion < neededVersion) db_version = DB_VERSION.TOO_LOW;
-                    else if (currentVersion > neededVersion) db_version = DB_VERSION.TOO_HIGH;
-                    else db_version = DB_VERSION.PERFECT;
-
-                    if (db_version != DB_VERSION.PERFECT) {
-                        String message = "";
-                        if (db_version == DB_VERSION.UNKNOWN) message = "opde.initwizard.db_version_unknown";
-                        else if (db_version == DB_VERSION.TOO_HIGH) message = "opde.initwizard.db_version_too_high";
-                        else message = "opde.initwizard.db_version_too_low";
-
-                        throw new SQLException(SYSTools.xx(message));
-                    }
-
-                    SwingUtilities.invokeLater(() -> {
-                        lblCatState.setText(SYSTools.xx("misc.msg.ok"));
-                        lblCatState.setIcon(SYSConst.icon16ledGreenOn);
-                        revalidate();
-                        repaint();
-                    });
-                    jdbcConnection.close();
-
-                } catch (SQLException e) {
-                    logger.error(e);
-//                    db_credentials_correct = false;
-
-                    SwingUtilities.invokeLater(() -> {
-                        lblCatState.setText(SYSTools.xx("error.db.connection.failed"));
-                        lblCatState.setToolTipText(SYSTools.xx(e.getMessage()));
-                        lblCatState.setIcon(SYSConst.icon16ledRedOn);
-                        revalidate();
-                        repaint();
-                    });
-                } finally {
-                    setPagesEnabled();
-                }
-
-            });
-
-            txtServer.getDocument().addDocumentListener(serverListener);
-            txtPort.getDocument().addDocumentListener(portListener);
-            txtUser.getDocument().addDocumentListener(userListener);
-            txtPassword.getDocument().addDocumentListener(passwordListener);
-            txtCatalog.getDocument().addDocumentListener(catalogListener);
-
+            logger.addAppender(new StatusMessageAppender(txtComment));
 
             //======== this ========
 
@@ -603,7 +389,7 @@ public class InitWizard extends WizardDialog {
                 pnlDB.setBackground(new Color(238, 238, 238));
                 pnlDB.setLayout(new FormLayout(
                         "default, $ugap, default:grow, $ugap, default",
-                        "5*(default, $lgap), fill:default:grow, $lgap, default"));
+                        "7*(default, $lgap), fill:default:grow, $lgap, default"));
 
                 //---- lblServer ----
                 lblServer.setText("Server");
@@ -614,7 +400,7 @@ public class InitWizard extends WizardDialog {
                 //---- txtServer ----
                 txtServer.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlDB.add(txtServer, CC.xy(3, 1));
-                pnlDB.add(lblServerState, CC.xy(5, 1));
+
 
                 //---- lblPort ----
                 lblPort.setText("Port");
@@ -625,7 +411,7 @@ public class InitWizard extends WizardDialog {
                 //---- txtPort ----
                 txtPort.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlDB.add(txtPort, CC.xy(3, 3));
-                pnlDB.add(lblPortState, CC.xy(5, 3));
+
 
                 //---- lblUser ----
                 lblUser.setText("Benutzer");
@@ -636,7 +422,7 @@ public class InitWizard extends WizardDialog {
                 //---- txtAdmin ----
                 txtUser.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlDB.add(txtUser, CC.xy(3, 5));
-                pnlDB.add(lblUserState, CC.xy(5, 5));
+
 
                 //---- lblPassword ----
                 lblPassword.setText("Passwort");
@@ -647,7 +433,7 @@ public class InitWizard extends WizardDialog {
                 //---- txtPassword ----
                 txtPassword.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlDB.add(txtPassword, CC.xy(3, 7));
-                pnlDB.add(lblPasswordState, CC.xy(5, 7));
+
 
                 //---- lblCat ----
                 lblCat.setText("Katalog");
@@ -658,9 +444,26 @@ public class InitWizard extends WizardDialog {
                 //---- txtCatalog ----
                 txtCatalog.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlDB.add(txtCatalog, CC.xy(3, 9));
-                pnlDB.add(lblCatState, CC.xy(5, 9));
 
-                pnlDB.add(new JScrollPane(txtComments), CC.xyw(1, 11, 5, CC.DEFAULT, CC.FILL));
+
+                pnlDB.add(btnTestParameters, CC.xyw(1, 11, 3));
+
+
+                btnTestParameters.setFont(new Font("Arial", Font.PLAIN, 20));
+                btnCreateNewSchema.setFont(new Font("Arial", Font.PLAIN, 20));
+                btnUpdateSchema.setFont(new Font("Arial", Font.PLAIN, 20));
+
+                JPanel buttonLine2 = new JPanel();
+                buttonLine2.setLayout(new BoxLayout(buttonLine2, BoxLayout.LINE_AXIS));
+                buttonLine2.add(btnCreateNewSchema);
+//                buttonLine2.add(Box.createHorizontalStrut(5));
+                buttonLine2.add(btnUpdateSchema);
+
+
+                pnlDB.add(buttonLine2, CC.xyw(1, 13, 3));
+
+
+                pnlDB.add(new JScrollPane(txtComment), CC.xyw(1, 15, 3, CC.DEFAULT, CC.FILL));
             }
             addComponent(pnlDB, true);
 
@@ -690,18 +493,6 @@ public class InitWizard extends WizardDialog {
                 txtPassword.getDocument().insertString(0, OPDE.decryptJDBCPasswort(), null);
                 txtCatalog.getDocument().insertString(0, catalog, null);
 
-                // test stuff
-//                Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtAdmin.getText().trim(), txtPassword.getText().trim());
-//                String sql = "INSERT INTO `opde`.`resinfo` (`AnUKennung`, `AbUKennung`, `BWKennung`, `BWINFTYP`, `Von`, `Bis`, `Bemerkung`, `Properties`, `HTML`, `version`, `resvalueid`, `prescriptionid`) VALUES('tloehr',NULL,'KJ1','ROOM1','2015-04-01 16:09:37','9999-12-31 23:59:59','','#[ROOM1] BewohnerInnen-Zimmer\\n#Thu Mar 26 16:09:40 CET 2015\\nroom.id=29\\nroom.text=Zimmer 22, Etage\\: 2, Seniorenheim Wiedenhof\\n','<ul></ul>','1',NULL,NULL);";
-//                PreparedStatement stmt = jdbcConnection.prepareStatement(sql);
-//                int result = stmt.executeUpdate();
-//                logger.info(SYSTools.xx("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + SYSTools.xx("opde.initwizard.page.update.updatedb.rows.affected")) + "\n");
-//                logger.info(sql.toString());
-//                stmt.close();
-//                System.exit(0);
-
-//                port = Integer.parseInt(txtPort.getText());
-
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
@@ -710,30 +501,79 @@ public class InitWizard extends WizardDialog {
         }
 
 
-        // db_server_pingable == false  -> kein next
-        // db_server_pingable == true && db_server_connected == false  -> PAGE_CREATE_DB
-        // db_server_pingable == true && db_server_connected == true && db_version == PERFECT  -> PAGE_COMPLETION, Success, Store localprops, quit
-        // db_server_pingable == true && db_server_connected == true && db_version == TOO_LOW  -> PAGE_UPDATE_DB
-        // db_server_pingable == true && db_server_connected == true && db_version == TOO_HIGH  -> PAGE_COMPLETION, Fail, Update the software, quit
+        private void testParameters() {
+
+            db_server_pingable = false;
+            db_dbms_reachable = false;
+            db_version = DB_VERSION.UNKNOWN;
+            db_credentials_correct = false;
+
+            try {
+                port = Integer.parseInt(txtPort.getText().trim());
+                if (port < 1 || port > 65535) {
+                    port = 3306;
+                }
+            } catch (NumberFormatException nfe) {
+                port = 3306;
+            }
 
 
-        private void setPagesEnabled() {
-            logger.debug("db_version: " + db_version);
-            logger.debug("db_server_pingable: " + db_server_pingable);
-            logger.debug("db_dbms_reachable: " + db_dbms_reachable);
-            fireButtonEvent(db_server_pingable && db_dbms_reachable ? ButtonEvent.ENABLE_BUTTON : ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
-            pageCreateDB.setPageEnabled(db_version == DB_VERSION.UNKNOWN);
-            pageUpgradeDB.setPageEnabled(db_version == DB_VERSION.TOO_LOW);
-            fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
-            fireButtonEvent((db_version == DB_VERSION.UNKNOWN || db_version == DB_VERSION.TOO_LOW ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON), ButtonNames.FINISH);
+
+            try {
+                // Server Connection
+
+                logger.info("pinging: " + txtServer.getText() + ":" + port);
+                pingResult = SYSTools.socketping(txtServer.getText(), Integer.toString(port));
+                logger.info(pingResult);
+
+                db_server_pingable = true;
+
+                // Credentials
+                Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(txtServer.getText().trim(), Integer.toString(port), null), txtUser.getText(), txtPassword.getText());
+                logger.info("jdbc.connection.ok");
+                db_credentials_correct = true;
+
+                db_dbms_reachable = true;
+
+                jdbcConnection.setCatalog(txtCatalog.getText().trim());
+                // catalog and schema version
+                int neededVersion = OPDE.getAppInfo().getDbversion();
+                int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
+
+                if (currentVersion == -1) db_version = DB_VERSION.UNKNOWN; // tables SYSProps is messed up
+                else if (currentVersion < neededVersion) db_version = DB_VERSION.TOO_LOW;
+                else if (currentVersion > neededVersion) db_version = DB_VERSION.TOO_HIGH;
+                else db_version = DB_VERSION.PERFECT;
+
+                if (db_version != DB_VERSION.PERFECT) {
+                    String message = "";
+                    if (db_version == DB_VERSION.UNKNOWN) message = "opde.initwizard.db_version_unknown";
+                    else if (db_version == DB_VERSION.TOO_HIGH) message = "opde.initwizard.db_version_too_high";
+                    else message = "opde.initwizard.db_version_too_low";
+
+                    throw new SQLException(SYSTools.xx(message));
+                }
+
+
+                jdbcConnection.close();
+
+
+            } catch (IOException e) {
+                logger.error(e);
+            } catch (SQLException e) {
+                logger.error(e);
+            } catch (Exception e) {
+                OPDE.fatal(logger, e);
+            } finally {
+                logger.debug("db_version: " + db_version);
+                logger.debug("db_server_pingable: " + db_server_pingable);
+                logger.debug("db_dbms_reachable: " + db_dbms_reachable);
+                fireButtonEvent((db_version == DB_VERSION.PERFECT ? ButtonEvent.ENABLE_BUTTON : ButtonEvent.DISABLE_BUTTON), ButtonNames.FINISH);
+                btnCreateNewSchema.setEnabled(db_dbms_reachable);
+                btnUpdateSchema.setEnabled(db_version == DB_VERSION.TOO_LOW);
+            }
         }
 
-
-        public boolean isDocumentEventsStillProcessing() {
-            boolean b = serverListener.isListenerActive() || portListener.isListenerActive() || userListener.isListenerActive() || passwordListener.isListenerActive() || catalogListener.isListenerActive();
-            logger.debug("isDocumentEventsStillProcessing: " + b);
-            return b;
-        }
     }
 
 
@@ -1241,6 +1081,43 @@ public class InitWizard extends WizardDialog {
     }
 
 
+//    private class FXStatusMessageAppender extends AppenderSkeleton {
+//        private final TextArea jTextA;
+//        private PatternLayout defaultPatternLayout = new PatternLayout("%d{ISO8601} %-5p: %m%n");
+//        private Style errorStyle, warnStyle;
+//
+//        public FXStatusMessageAppender(TextArea jTextA) {
+//            this.jTextA = jTextA;
+//            //            errorStyle = jTextA.addStyle("errorStyle", null);
+//            //            warnStyle = jTextA.addStyle("warnStyle", null);
+//            //            StyleConstants.setForeground(errorStyle, Color.red);
+//            //            StyleConstants.setForeground(warnStyle, SYSConst.darkorange);
+//        }
+//
+//        protected void append(LoggingEvent event) {
+//            if (event.getLevel().isGreaterOrEqual(Logger.getRootLogger().getLevel())) {
+//                jTextA.appendText(defaultPatternLayout.format(event));
+//            }
+//        }
+//
+//        private Style getCurrentStyle(Level level) {
+//            if (level.equals(Level.ERROR))
+//                return errorStyle;
+//            if (level.equals(Level.WARN))
+//                return warnStyle;
+//            return null;
+//        }
+//
+//        public void close() {
+//        }
+//
+//        @Override
+//        public boolean requiresLayout() {
+//            return true;
+//        }
+//    }
+
+
     private class StatusMessageAppender extends AppenderSkeleton {
         private final JTextArea jTextA;
         private PatternLayout defaultPatternLayout = new PatternLayout("%d{ISO8601} %-5p: %m%n");
@@ -1313,7 +1190,7 @@ public class InitWizard extends WizardDialog {
         public void setupWizardButtons() {
             super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.CANCEL);
         }
@@ -1327,7 +1204,6 @@ public class InitWizard extends WizardDialog {
             String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
             String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
             String root = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_ROOTUSER), "root");
-
 
             lblRoot = new JLabel();
             lblPassword = new JLabel();
@@ -1405,7 +1281,9 @@ public class InitWizard extends WizardDialog {
                 protected Object doInBackground() throws Exception {
 
 
-                    String dbser = jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_USER);
+                    String server = jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST);
+                    String port = jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT);
+                    String dbuser = jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_USER);
                     String generatedPassword4DBUser = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
                     String generatedPassword4AdminUser = RandomStringUtils.random(6, 0, 0, true, true, null, new SecureRandom());
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, generatedPassword4DBUser);
@@ -1420,6 +1298,7 @@ public class InitWizard extends WizardDialog {
 
 
                     HashMap<File, ArrayList<String>> mapToNewestVersion = new HashMap<>();
+                    HashMap<File, String> mapWithMessages = new HashMap<>();
 
                     File structure = AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion());
                     File basecontent = AppInfo.getSQLBaseContentScript(OPDE.getAppInfo().getDbversion());
@@ -1428,6 +1307,8 @@ public class InitWizard extends WizardDialog {
                     mapToNewestVersion.put(structure, new ArrayList<>());
                     mapToNewestVersion.put(basecontent, new ArrayList<>());
                     mapToNewestVersion.put(medcontent, new ArrayList<>());
+
+                    mapWithMessages.put(structure, );
 
                     ArrayList<File> files = new ArrayList<>();
                     files.add(structure);
@@ -1461,31 +1342,54 @@ public class InitWizard extends WizardDialog {
                     pbProgress.setMaximum(max);
                     pbProgress.setStringPainted(true);
 
-
                     PreparedStatement stmt;
 
                     String queryDrop = " DROP SCHEMA IF EXISTS " + catalog;
                     stmt = jdbcConnection.prepareStatement(queryDrop);
                     stmt.executeUpdate();
+                    stmt.close();
+                    summary.add(SYSTools.xx("opde.initwizard.summary.createdb.dropschema", catalog));
 
                     String queryCreate = " CREATE SCHEMA " + catalog + " DEFAULT CHARACTER SET utf8";
                     stmt = jdbcConnection.prepareStatement(queryCreate);
                     stmt.executeUpdate();
+                    stmt.close();
+                    summary.add(SYSTools.xx("opde.initwizard.summary.createdb.createschema", catalog));
 
-                    String queryGrant1 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
-                    String queryGrant2 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                    String queryGrant1 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
                     stmt = jdbcConnection.prepareStatement(queryGrant1);
                     stmt.executeUpdate();
+                    stmt.close();
+
+                    String queryGrant2 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
                     stmt = jdbcConnection.prepareStatement(queryGrant2);
                     stmt.executeUpdate();
+                    stmt.close();
+                    summary.add(SYSTools.xx("opde.initwizard.summary.createdb.grant", catalog));
+
 
                     jdbcConnection.setCatalog(catalog);
 
-                    // first the base structure
-                    for (String createTableCommand : ufp.getListDatabaseStructure()) {
+                    for (File file : files) {
 
-                        stmt = jdbcConnection.prepareStatement(createTableCommand);
-                        stmt.executeUpdate();
+                        summary.add(SYSTools.xx("opde.initwizard.page.create.version", AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion())));
+                        logger.info(SYSTools.xx("opde.initwizard.page.create.version", AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion())));
+                        pbProgress.setString(file.getAbsolutePath());
+
+                        for (String sql : mapToNewestVersion.get(file)) {
+                            progress++;
+                            final int p = progress;
+                            SwingUtilities.invokeLater(() -> pbProgress.setValue(p));
+                            logger.info(sql.toString());
+                            try {
+                                stmt = jdbcConnection.prepareStatement(sql);
+                                int result = stmt.executeUpdate();
+                                logger.info(SYSTools.xx("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + SYSTools.xx("opde.initwizard.page.update.updatedb.rows.affected")));
+                                stmt.close();
+                            } catch (SQLException sqle) {
+                                OPDE.fatal(sqle);
+                            }
+                        }
                     }
 
                     // Set the password for the OPDE admin user
@@ -1494,29 +1398,25 @@ public class InitWizard extends WizardDialog {
                     stmt.setString(1, generatedPassword4AdminUser);
                     stmt.executeUpdate();
                     jdbcConnection.close();
+                    summary.add(SYSTools.xx("opde.initwizard.summary.createdb.setpassword.adminuser", catalog));
 
-                    SYSTools.printNewInstSummary(server, dbser, generatedPassword4DBUser, generatedPassword4AdminUser, port, catalog);
-
-
-                    jdbcConnection.close();
-                    return null;
+                    return SYSTools.xx("opde.initwizard.page.create.installation.summary", server, port, catalog, dbuser, generatedPassword4DBUser, generatedPassword4AdminUser, EntityTools.getJDBCUrl(server, port, catalog), DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date()));
                 }
 
                 @Override
                 protected void done() {
                     super.done();
                     try {
-                        get();
+                        SYSFilesTools.print(get().toString(), true);
                         setCurrentPage(SYSTools.xx("opde.initwizard.page.summary.title"));
                     } catch (Exception e) {
-                        logger.error(e);
+                        OPDE.fatal(e);
                     } finally {
                         worker = null;
                     }
                 }
             };
             worker.execute();
-
 
         }
     }

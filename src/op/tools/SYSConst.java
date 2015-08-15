@@ -622,6 +622,9 @@ public class SYSConst {
     public static final Icon icon48userconfig = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/userconfig.png"));
     public static final Icon icon48systemconfig = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/systemconfig.png"));
     //    public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
+    public static final Icon icon48dbstatus = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_status.png"));
+    public static final Icon icon48dbcreate = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_add.png"));
+    public static final Icon icon48dbupdate = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_commit.png"));
     public static final Icon icon22collapse = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/collapse.png"));
     public static final Icon icon22expand = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/expand.png"));
     public static final Icon icon22pdca = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/pdca.png"));
