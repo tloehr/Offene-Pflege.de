@@ -2,6 +2,8 @@ package op.tools;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import java.io.File;
+
 
 public class Hardware {
 
@@ -23,25 +25,37 @@ public class Hardware {
         return null;
     }
 
-    public static final String getAppDataPath() {
-        final String sep = System.getProperty("file.separator");
+    public static final String getLogPath() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            return System.getenv("APPDATA") + sep + "Offene-Pflege.de";
+            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
         }
         if (SystemUtils.IS_OS_LINUX) {
-            return System.getProperty("user.home") + sep + ".opde";
+            return System.getProperty("user.home") + File.separator + ".opde" + File.separator + "logs";
         }
         if (SystemUtils.IS_OS_MAC_OSX) {
-            return System.getProperty("user.home") + sep + "Library" + sep + "Application Support" + sep + "Offene-Pflege.de";
+            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Logs" + File.separator + "Offene-Pflege.de";
+        }
+        return null;
+    }
+
+    public static final String getAppDataPath() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
+        }
+        if (SystemUtils.IS_OS_LINUX) {
+            return System.getProperty("user.home") + File.separator + ".opde";
+        }
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Application Support" + File.separator + "Offene-Pflege.de";
         }
         return null;
     }
 
 
     public static final String getProgrammPath() {
-        final String sep = System.getProperty("file.separator");
+
         if (SystemUtils.IS_OS_WINDOWS) {
-            return System.getenv("ProgramFiles") + sep + "Offene-Pflege.de";
+            return System.getenv("ProgramFiles") + File.separator + "Offene-Pflege.de";
         }
         if (SystemUtils.IS_OS_LINUX) {
             return "/usr/local/opde";

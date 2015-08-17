@@ -50,8 +50,20 @@ public class YesNoToggleButton extends JPanel implements ItemSelectable {
         tbYes.setSelected(selectYes);
         tbNo.setSelected(!selectYes);
 
+        setBorder(BorderFactory.createLineBorder(Color.black));
+
     }
 
+    public boolean isPositiveSelected(){
+        return tbYes.isSelected();
+    }
+
+
+    @Override
+    public void setToolTipText(String text) {
+        tbYes.setToolTipText(text);
+        tbNo.setToolTipText(text);
+    }
 
     @Override
     public Object[] getSelectedObjects() {

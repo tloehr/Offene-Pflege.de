@@ -61,6 +61,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
@@ -88,7 +90,7 @@ public class OPDE {
     protected static Properties props;
     protected static boolean anonym;
     protected static SortedProperties localProps;
-    private final static Logger logger = Logger.getRootLogger();
+    private static Logger logger;
     public static HashMap[] anonymize = null;
 
 
@@ -101,7 +103,7 @@ public class OPDE {
 
     protected static boolean animation = false;
     protected static boolean debug;
-    protected static boolean training;
+    //    protected static boolean training;
     protected static boolean experimental;
     //    protected static String oldopwd = "";
     protected static String css = "";
@@ -325,7 +327,8 @@ public class OPDE {
 
     public static void saveLocalProps() {
         try {
-            FileOutputStream out = new FileOutputStream(new File(getOPWD() + sep + AppInfo.fileConfig));
+            File configFile = new File(Hardware.getAppDataPath() + sep + AppInfo.fileConfig);
+            FileOutputStream out = new FileOutputStream(configFile);
             localProps.store(out, "Settings Offene-Pflege.de");
             out.close();
         } catch (Exception ex) {
@@ -350,9 +353,9 @@ public class OPDE {
         return experimental;
     }
 
-    public static boolean isTraining() {
-        return training;
-    }
+//    public static boolean isTraining() {
+//        return training;
+//    }
 
     public static DesEncrypter getDesEncrypter() {
         return desEncrypter;
@@ -389,6 +392,8 @@ public class OPDE {
          *    '---'           `--`---'     ---`-'
          *
          */
+        System.setProperty("logs", Hardware.getLogPath());
+        logger = Logger.getRootLogger();
         uptime = SYSCalendar.now();
 
 
@@ -444,7 +449,9 @@ public class OPDE {
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
 //        opts.addOption("w", "workingdir", true, "Damit kannst Du ein anderes Arbeitsverzeichnis setzen. Wenn Du diese Option weglässt, dann ist das Dein Benutzerverzeichnis: " + System.getProperty("user.home"));
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
-//        opts.addOption("t", "training", false, "Wird für Einarbeitungsversionen benötigt. Färbt die Oberfläche anders ein und zeigt eine Warnmeldung nach jeder Anmeldung.");
+
+        opts.addOption("t", "setup-database", false, "Erzwingt den Start des Datenbank-Setups. Auch wenn OPDE glaubt, dass das nicht nötig ist.");
+        opts.addOption("c", "enable-cache", false, "Aktiviert den JPA Cache. Standardmässig ist der abgeschaltet. (!! Achtung. Experimentell !!)");
 //        Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(SYSTools.xx("cmdline.ftpserver")).create("f");
 //        opts.addOption(optFTPserver);
 //        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
@@ -462,7 +469,6 @@ public class OPDE {
         opts.addOption(dfnimport);
 
         Option bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
-//        bhpimport.setOptionalArg(true);
         bhpimport.setArgName("Anzahl der Tage (+ oder -) abweichend vom aktuellen Tag für den der Import durchgeführt werden soll. Nur in Ausnahmefällen anzuwenden.");
         opts.addOption(bhpimport);
 
@@ -563,14 +569,6 @@ public class OPDE {
             logger.info(System.getProperty("os.name").toLowerCase());
 
 
-            /***
-             *      _     ____       _                   ___ ___
-             *     (_)___|  _ \  ___| |__  _   _  __ _  |__ \__ \
-             *     | / __| | | |/ _ \ '_ \| | | |/ _` |   / / / /
-             *     | \__ \ |_| |  __/ |_) | |_| | (_| |  |_| |_|
-             *     |_|___/____/ \___|_.__/ \__,_|\__, |  (_) (_)
-             *                                   |___/
-             */
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty("debug")).equalsIgnoreCase("true")) {
                 debug = true;
                 logger.setLevel(Level.DEBUG);
@@ -588,12 +586,9 @@ public class OPDE {
                 experimental = false;
             }
 
-            if (cl.hasOption("t") || SYSTools.catchNull(localProps.getProperty("training")).equalsIgnoreCase("true")) {
-                training = true;
-            } else {
-                training = false;
-            }
 
+            if (cl.hasOption("t"))
+                throw new PersistenceException("user forces the database setup");
 
             /***
              *          _ ____   _      ____        _        _
@@ -610,24 +605,21 @@ public class OPDE {
             jpaProps.put(SYSPropsTools.KEY_JDBC_URL, url);
             jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, decryptJDBCPasswort());
 
-            //            if (cl.hasOption("d") || cl.hasOption("d")) {  // not for BHP or DFN
-            //                jpaProps.put("eclipselink.cache.shared.default", "false");
-            //            } else {
-            //                jpaProps.put("eclipselink.cache.shared.default", "true");
-            //            }
-
-            jpaProps.put("eclipselink.cache.shared.default", "false");
+            // enable JPA cache
+            jpaProps.put("eclipselink.cache.shared.default", cl.hasOption("c") ? "true" : "false");
             jpaProps.put("eclipselink.session.customizer", "entity.JPAEclipseLinkSessionCustomizer");
-            emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
-            EntityManager em1 = emf.createEntityManager();
-
+            Connection jdbcConnection = DriverManager.getConnection(url, jpaProps.getProperty(SYSPropsTools.KEY_JDBC_USER), jpaProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD));
             int neededVersion = OPDE.getAppInfo().getDbversion();
-            int currentVersion = SYSPropsTools.getInteger(SYSPropsTools.KEY_DB_VERSION);
+            int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
+            jdbcConnection.close();
 
             if (neededVersion != currentVersion)
                 throw new PersistenceException("opde database scheme version mismatch");
 
+            emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
+
+            EntityManager em1 = emf.createEntityManager();
             em1.close();
 
 

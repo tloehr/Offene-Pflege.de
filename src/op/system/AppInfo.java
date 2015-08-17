@@ -312,6 +312,10 @@ public class AppInfo {
         return new File(getSQLScriptPath() + File.separator + "content-med-" + version + ".sql");
     }
 
+    public static File getFinallyContentScript(int version) {
+        return new File(getSQLScriptPath() + File.separator + "content-finally-" + version + ".sql");
+    }
+
     public static String getOPCache() {
         return Hardware.getAppDataPath() + File.separator + dirCache;
     }

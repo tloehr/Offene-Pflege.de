@@ -18,7 +18,6 @@ import entity.system.SYSPropsTools;
 import gui.GUITools;
 import gui.events.RelaxedDocumentListener;
 import gui.interfaces.YesNoToggleButton;
-import javafx.scene.control.TextArea;
 import op.OPDE;
 import op.system.AppInfo;
 import op.tools.SYSConst;
@@ -38,6 +37,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -173,36 +173,6 @@ public class InitWizard extends WizardDialog {
     }
 
 
-//    private void save() {
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            em.getTransaction().begin();
-//
-//
-//            String prefix = resident.getName().substring(0, 1) + resident.getFirstname().substring(0, 1);
-//            prefix = prefix.toUpperCase();
-//
-//            Unique unique = UniqueTools.getNewUID(em, prefix);
-//            String bwkennung = prefix + unique.getUid();
-//            resident.setRID(bwkennung);
-//
-//            resident = em.merge(resident);
-//            resinfo_hauf = em.merge(resinfo_hauf);
-//            if (resinfo_room != null) em.merge(resinfo_room);
-//
-//            em.getTransaction().commit();
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
-//
-//        } catch (Exception e) {
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
-//    }
-
     private class WelcomePage extends DefaultWizardPage {
 
         public WelcomePage(String title, String description) {
@@ -225,11 +195,6 @@ public class InitWizard extends WizardDialog {
             addSpace();
             addText(SYSTools.xx("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
         }
-
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/aspecton1.png");
-//        }
 
         @Override
         public void setupWizardButtons() {
@@ -257,10 +222,10 @@ public class InitWizard extends WizardDialog {
         private JLabel lblUser;
         private JTextField txtUser;
         private JLabel lblPassword;
-        private JTextField txtPassword;
+        private JPasswordField txtPassword;
         private Logger logger = Logger.getLogger(getClass());
 
-        JTextArea txtComment;
+        JTextPane txtComment;
 
         private JButton btnTestParameters;
         private JButton btnCreateNewSchema;
@@ -294,7 +259,7 @@ public class InitWizard extends WizardDialog {
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_HOST, txtServer.getText().trim());
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_PORT, Integer.toString(port));
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_USER, txtUser.getText().trim());
-                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, txtPassword.getText().trim());
+                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, new String(txtPassword.getPassword()).trim());
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_CATALOG, txtCatalog.getText().trim());
                 }
             });
@@ -336,10 +301,6 @@ public class InitWizard extends WizardDialog {
         protected void initContentPane() {
             super.initContentPane();
             pnlDB = new JPanel();
-//            jfxPanel = new JFXPanel();
-//            jfxPanel.setScene(createScene());
-//
-
 
             RelaxedDocumentListener dl = new RelaxedDocumentListener(0, o -> {
                 btnUpdateSchema.setEnabled(false);
@@ -347,11 +308,11 @@ public class InitWizard extends WizardDialog {
             });
 
             txtServer = new JTextField();
-            txtPassword = new JTextField();
+            txtPassword = new JPasswordField();
             txtPort = new JTextField();
             txtCatalog = new JTextField();
             txtUser = new JTextField();
-            txtComment = new JTextArea();
+            txtComment = new JTextPane();
 
             txtServer.getDocument().addDocumentListener(dl);
             txtPassword.getDocument().addDocumentListener(dl);
@@ -456,9 +417,7 @@ public class InitWizard extends WizardDialog {
                 JPanel buttonLine2 = new JPanel();
                 buttonLine2.setLayout(new BoxLayout(buttonLine2, BoxLayout.LINE_AXIS));
                 buttonLine2.add(btnCreateNewSchema);
-//                buttonLine2.add(Box.createHorizontalStrut(5));
                 buttonLine2.add(btnUpdateSchema);
-
 
                 pnlDB.add(buttonLine2, CC.xyw(1, 13, 3));
 
@@ -517,20 +476,18 @@ public class InitWizard extends WizardDialog {
                 port = 3306;
             }
 
-
-
             try {
                 // Server Connection
 
-                logger.info("pinging: " + txtServer.getText() + ":" + port);
+                logger.debug("pinging: " + txtServer.getText() + ":" + port);
                 pingResult = SYSTools.socketping(txtServer.getText(), Integer.toString(port));
-                logger.info(pingResult);
+                logger.debug(pingResult);
 
                 db_server_pingable = true;
 
                 // Credentials
-                Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(txtServer.getText().trim(), Integer.toString(port), null), txtUser.getText(), txtPassword.getText());
-                logger.info("jdbc.connection.ok");
+                Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(txtServer.getText().trim(), Integer.toString(port), null), txtUser.getText(), new String(txtPassword.getPassword()).trim());
+                logger.debug("jdbc.connection.ok");
                 db_credentials_correct = true;
 
                 db_dbms_reachable = true;
@@ -569,8 +526,14 @@ public class InitWizard extends WizardDialog {
                 logger.debug("db_server_pingable: " + db_server_pingable);
                 logger.debug("db_dbms_reachable: " + db_dbms_reachable);
                 fireButtonEvent((db_version == DB_VERSION.PERFECT ? ButtonEvent.ENABLE_BUTTON : ButtonEvent.DISABLE_BUTTON), ButtonNames.FINISH);
-                btnCreateNewSchema.setEnabled(db_dbms_reachable);
-                btnUpdateSchema.setEnabled(db_version == DB_VERSION.TOO_LOW);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnCreateNewSchema.setEnabled(db_server_pingable);
+                        btnUpdateSchema.setEnabled(db_version == DB_VERSION.TOO_LOW);
+                    }
+                });
+
             }
         }
 
@@ -588,8 +551,8 @@ public class InitWizard extends WizardDialog {
         JLabel lblPassword;
         JLabel lblMysqldump;
         JTextField txtAdmin;
-        JTextField txtPassword;
-        JTextArea txtComments;
+        JPasswordField txtPassword;
+        JTextPane txtComments;
         JScrollPane vertical;
         JProgressBar pbProgress;
         SwingWorker worker;
@@ -624,10 +587,8 @@ public class InitWizard extends WizardDialog {
             lblRoot = new JLabel();
             lblPassword = new JLabel();
             txtAdmin = new JTextField();
-            txtPassword = new JTextField();
-            txtComments = new JTextArea();
-            txtComments.setWrapStyleWord(true);
-            txtComments.setLineWrap(true);
+            txtPassword = new JPasswordField();
+            txtComments = new JTextPane();
             txtComments.setEditable(false);
             lblMysqldump = new JLabel();
             pbProgress = new JProgressBar();
@@ -710,7 +671,7 @@ public class InitWizard extends WizardDialog {
 
                         map.put("host", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
                         map.put("user", txtAdmin.getText().trim());
-                        map.put("pw", txtPassword.getText().trim());
+                        map.put("pw", new String(txtPassword.getPassword()).trim());
                         map.put("file", sBackupFile);
                         map.put("catalog", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
                         CommandLine cmdLine = CommandLine.parse(jdbcProps.getProperty(SYSPropsTools.KEY_MYSQLDUMP_EXEC) + " -v --opt -h ${host} -u ${user} -p${pw} -r ${file} ${catalog}");
@@ -865,7 +826,7 @@ public class InitWizard extends WizardDialog {
             String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
             String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
 
-            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtAdmin.getText().trim(), txtPassword.getText().trim());
+            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtAdmin.getText().trim(), new String(txtPassword.getPassword()).trim());
             if (!EntityTools.isServerLocked(jdbcConnection)) {
                 EntityTools.setServerLocked(jdbcConnection, true);
                 jdbcConnection.close();
@@ -881,7 +842,7 @@ public class InitWizard extends WizardDialog {
             String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
             String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
 
-            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtAdmin.getText().trim(), txtPassword.getText().trim());
+            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(server, sPort, catalog), txtAdmin.getText().trim(), new String(txtPassword.getPassword()).trim());
             if (EntityTools.isServerLocked(jdbcConnection)) {
                 EntityTools.setServerLocked(jdbcConnection, false);
                 jdbcConnection.close();
@@ -903,7 +864,7 @@ public class InitWizard extends WizardDialog {
                     fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
                     fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.CANCEL);
 
-                    Connection jdbcConnection = DriverManager.getConnection(jdbcurl, txtAdmin.getText().trim(), txtPassword.getText().trim());
+                    Connection jdbcConnection = DriverManager.getConnection(jdbcurl, txtAdmin.getText().trim(), new String(txtPassword.getPassword()).trim());
 
                     if (!EntityTools.isServerLocked(jdbcConnection)) {
                         throw new SQLException(SYSTools.xx("opde.initwizard.page.update.lock.first"));
@@ -987,97 +948,6 @@ public class InitWizard extends WizardDialog {
             worker.execute();
         }
 
-
-//    private String situation2html() {
-//        String html = "";
-//
-//        html += db_parameters_complete ? "" : SYSConst.html_li("opde.initwizard.not.db_parameters_complete");
-//        html += db_server_pingable ? "" : SYSConst.html_li("opde.initwizard.not.db_server_pingable");
-//        html += db_server_connected ? "" : SYSConst.html_li("opde.initwizard.not.db_server_connected");
-//        html += db_catalog_exists ? "" : SYSConst.html_li("opde.initwizard.not.db_catalog_exists");
-//        html += db_password_readable ? "" : SYSConst.html_li("opde.initwizard.not.db_password_readable");
-//        html += db_credentials_correct ? "" : SYSConst.html_li("opde.initwizard.not.db_credentials_correct");
-//
-//        if (db_version == DB_VERSION.UNKNOWN) html += SYSConst.html_li("opde.initwizard.db_version_unknown");
-//        else if (db_version == DB_VERSION.TOO_LOW) html += SYSConst.html_li("opde.initwizard.db_version_too_low");
-//        else if (db_version == DB_VERSION.TOO_HIGH) html += SYSConst.html_li("opde.initwizard.db_version_too_high");
-//
-//
-//        if (!html.isEmpty()) {
-//            html = SYSConst.html_ul(html);
-//        }
-//
-//        return html;
-//    }
-
-
-        /**
-         * this method checks the availability of the database connection in stages.
-         * it sets the 7 boolean in order to describe
-         */
-//    private void analyzeSituation() {
-//
-//        // we consider the worst case first.
-//        db_version = DB_VERSION.UNKNOWN;
-//        db_parameters_complete = false;
-//        db_server_pingable = false;
-//        db_server_connected = false;
-//        db_catalog_exists = false;
-//        db_password_readable = false;
-//        db_credentials_correct = false;
-//
-//        // 1. All parameters entered ?
-//        Validator validator = OPDE.getValidatorFactory().getValidator();
-//        Set<ConstraintViolation<DatabaseConnectionBean>> constraintViolations = validator.validate(dbcb);
-//        db_parameters_complete = constraintViolations.isEmpty();
-//        constraintViolations.forEach(new Consumer<ConstraintViolation<DatabaseConnectionBean>>() {
-//            @Override
-//            public void accept(ConstraintViolation<DatabaseConnectionBean> databaseConnectionBeanConstraintViolation) {
-//                stuffThatAnnoysMe.add(databaseConnectionBeanConstraintViolation.getPropertyPath().toString() + ": " + databaseConnectionBeanConstraintViolation.getMessage());
-//            }
-//        });
-//        if (!db_parameters_complete) return;
-//
-//        db_password_readable = true; // we would have not made it here otherwise
-//
-//        try {
-//            pingResult = SYSTools.socketping(dbcb.getHost(), dbcb.getPort().toString());
-//            db_server_pingable = true;
-//        } catch (IOException e) {
-//            pingResult = e.getMessage();
-//            stuffThatAnnoysMe.add(pingResult);
-//        }
-//        if (!db_server_pingable) return;
-//
-//        try {
-//            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(dbcb.getHost(), dbcb.getPort().toString(), null), dbcb.getUser(), dbcb.getPassword());
-//            db_credentials_correct = true;
-//            db_server_connected = true;
-//
-//            jdbcConnection.setCatalog(dbcb.getCatalog());
-//            db_catalog_exists = true;
-//
-//            int neededVersion = OPDE.getAppInfo().getDbversion();
-//            int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
-//
-//            if (currentVersion == -1) db_version = DB_VERSION.UNKNOWN; // tables SYSProps is messed up
-//            else if (currentVersion < neededVersion) db_version = DB_VERSION.TOO_LOW;
-//            else if (currentVersion > neededVersion) db_version = DB_VERSION.TOO_HIGH;
-//            else db_version = DB_VERSION.PERFECT;
-//
-//            jdbcConnection.close();
-//        } catch (SQLException e) {
-//            if (e.getMessage().startsWith("Access denied for user")) {
-//                db_credentials_correct = false;
-//            }
-//            db_version = DB_VERSION.UNKNOWN;
-//            stuffThatAnnoysMe.add(e.getMessage());
-//        }
-//
-//
-//    }
-
-
     }
 
 
@@ -1119,25 +989,21 @@ public class InitWizard extends WizardDialog {
 
 
     private class StatusMessageAppender extends AppenderSkeleton {
-        private final JTextArea jTextA;
+        private final JTextPane jTextA;
         private PatternLayout defaultPatternLayout = new PatternLayout("%d{ISO8601} %-5p: %m%n");
         private Style errorStyle, warnStyle;
 
-        public StatusMessageAppender(JTextArea jTextA) {
+        public StatusMessageAppender(JTextPane jTextA) {
             this.jTextA = jTextA;
-//            errorStyle = jTextA.addStyle("errorStyle", null);
-//            warnStyle = jTextA.addStyle("warnStyle", null);
-//            StyleConstants.setForeground(errorStyle, Color.red);
-//            StyleConstants.setForeground(warnStyle, SYSConst.darkorange);
+            errorStyle = jTextA.addStyle("errorStyle", null);
+            warnStyle = jTextA.addStyle("warnStyle", null);
+            StyleConstants.setForeground(errorStyle, Color.red);
+            StyleConstants.setForeground(warnStyle, SYSConst.darkorange);
         }
 
         protected void append(LoggingEvent event) {
             if (event.getLevel().isGreaterOrEqual(Logger.getRootLogger().getLevel())) {
-                jTextA.append(defaultPatternLayout.format(event));
-                JScrollPane scrl = (JScrollPane) jTextA.getParent().getParent();
-                scrl.getVerticalScrollBar().setValue(scrl.getVerticalScrollBar().getMaximum());
-
-//                GUITools.appendText(defaultPatternLayout.format(event), jTextA, getCurrentStyle(event.getLevel()));
+                GUITools.appendText(defaultPatternLayout.format(event), jTextA, getCurrentStyle(event.getLevel()));
             }
         }
 
@@ -1165,10 +1031,12 @@ public class InitWizard extends WizardDialog {
         JLabel lblPassword;
 
         JTextField txtAdmin;
-        JTextField txtPassword;
-        JTextArea txtComments;
+        JPasswordField txtPassword;
+        JTextPane txtComments;
         JScrollPane vertical;
         JProgressBar pbProgress;
+        JLabel lblInstallMed;
+        YesNoToggleButton btnInstallMed;
         SwingWorker worker;
         Logger logger = Logger.getLogger(getClass());
 
@@ -1178,7 +1046,10 @@ public class InitWizard extends WizardDialog {
 
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-
+                    String server = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
+                    String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
+                    String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
+                    logger.info(SYSTools.xx("misc.msg.jdbc.url", EntityTools.getJDBCUrl(server, sPort, catalog)));
                 }
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
 
@@ -1208,12 +1079,13 @@ public class InitWizard extends WizardDialog {
             lblRoot = new JLabel();
             lblPassword = new JLabel();
             txtAdmin = new JTextField();
-            txtPassword = new JTextField();
-            txtComments = new JTextArea();
-            txtComments.setWrapStyleWord(true);
-            txtComments.setLineWrap(true);
+            txtPassword = new JPasswordField();
+            txtComments = new JTextPane();
+
             txtComments.setEditable(false);
             pbProgress = new JProgressBar();
+            lblInstallMed = new JLabel();
+            btnInstallMed = new YesNoToggleButton();
 
             txtAdmin.getDocument().addDocumentListener(new RelaxedDocumentListener(var1 -> {
                 jdbcProps.put(SYSPropsTools.KEY_JDBC_ROOTUSER, txtAdmin.getText().trim().isEmpty() ? "root" : txtAdmin.getText().trim());
@@ -1239,34 +1111,38 @@ public class InitWizard extends WizardDialog {
 
                 pnlMain.setLayout(new FormLayout(
                         "default, $ugap, default:grow, $ugap, default",
-                        "6*(default, $lgap), fill:default:grow, $lgap, default"));
+                        "5*(default, $lgap), fill:default:grow, $lgap, default"));
 
-                //---- lblServer ----
                 lblRoot.setText(SYSTools.xx("opde.initwizard.root.user"));
                 lblRoot.setHorizontalAlignment(SwingConstants.RIGHT);
                 lblRoot.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlMain.add(lblRoot, CC.xy(1, 1));
 
-                //---- txtServer ----
                 txtAdmin.setFont(new Font("Arial", Font.PLAIN, 16));
                 txtAdmin.setText(root);
                 pnlMain.add(txtAdmin, CC.xy(3, 1));
 
-                //---- lblPort ----
                 lblPassword.setText(SYSTools.xx("opde.initwizard.root.password"));
                 lblPassword.setHorizontalAlignment(SwingConstants.RIGHT);
                 lblPassword.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlMain.add(lblPassword, CC.xy(1, 3));
 
-                //---- txtPort ----
                 txtPassword.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlMain.add(txtPassword, CC.xy(3, 3));
+
+                lblInstallMed.setText(SYSTools.xx("opde.initwizard.page.create.install.medcontent"));
+                lblInstallMed.setHorizontalAlignment(SwingConstants.RIGHT);
+                lblInstallMed.setFont(new Font("Arial", Font.PLAIN, 16));
+                pnlMain.add(lblInstallMed, CC.xy(1, 5));
+
+                btnInstallMed.setToolTipText(SYSTools.toHTMLForScreen("opde.initwizard.page.create.install.medcontent.tooltip"));
+                pnlMain.add(btnInstallMed, CC.xy(3, 5));
 
                 pnlMain.add(btnCreateDB, CC.xyw(1, 7, 5));
 
                 pnlMain.add(pbProgress, CC.xyw(1, 9, 5));
-                pnlMain.add(new YesNoToggleButton(), CC.xyw(1, 11, 5));
-                pnlMain.add(vertical, CC.xyw(1, 13, 5, CC.DEFAULT, CC.FILL));
+
+                pnlMain.add(vertical, CC.xyw(1, 11, 5, CC.DEFAULT, CC.FILL));
 
             }
 
@@ -1279,138 +1155,150 @@ public class InitWizard extends WizardDialog {
             worker = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
-
-
                     String server = jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST);
                     String port = jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT);
                     String dbuser = jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_USER);
                     String generatedPassword4DBUser = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
                     String generatedPassword4AdminUser = RandomStringUtils.random(6, 0, 0, true, true, null, new SecureRandom());
-                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, generatedPassword4DBUser);
+                    String outcome = "";
+                    try {
+                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(generatedPassword4DBUser));
 
+                        fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
+                        fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
+                        fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
+                        fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.CANCEL);
 
-                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
-                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
-                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
-                    fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.CANCEL);
+                        Connection jdbcConnection = DriverManager.getConnection(jdbcurl, txtAdmin.getText().trim(), new String(txtPassword.getPassword()).trim());
 
-                    Connection jdbcConnection = DriverManager.getConnection(jdbcurl, txtAdmin.getText().trim(), txtPassword.getText().trim());
+                        HashMap<File, ArrayList<String>> mapToNewestVersion = new HashMap<>();
+                        HashMap<File, String> mapWithMessages = new HashMap<>();
 
+                        File structure = AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion());
+                        File basecontent = AppInfo.getSQLBaseContentScript(OPDE.getAppInfo().getDbversion());
+                        File medcontent = AppInfo.getSQLMedContentScript(OPDE.getAppInfo().getDbversion());
+                        File finallyContent = AppInfo.getFinallyContentScript(OPDE.getAppInfo().getDbversion());
 
-                    HashMap<File, ArrayList<String>> mapToNewestVersion = new HashMap<>();
-                    HashMap<File, String> mapWithMessages = new HashMap<>();
+                        mapToNewestVersion.put(structure, new ArrayList<>());
+                        mapToNewestVersion.put(basecontent, new ArrayList<>());
+                        mapToNewestVersion.put(medcontent, new ArrayList<>());
+                        mapToNewestVersion.put(finallyContent, new ArrayList<>());
 
-                    File structure = AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion());
-                    File basecontent = AppInfo.getSQLBaseContentScript(OPDE.getAppInfo().getDbversion());
-                    File medcontent = AppInfo.getSQLMedContentScript(OPDE.getAppInfo().getDbversion());
+                        mapWithMessages.put(structure, SYSTools.xx("opde.initwizard.page.create.version", AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion())));
+                        mapWithMessages.put(basecontent, SYSTools.xx("opde.initwizard.page.create.basecontent"));
+                        mapWithMessages.put(medcontent, SYSTools.xx("opde.initwizard.page.create.medcontent"));
+                        mapWithMessages.put(finallyContent, SYSTools.xx("opde.initwizard.page.create.finallyContent"));
 
-                    mapToNewestVersion.put(structure, new ArrayList<>());
-                    mapToNewestVersion.put(basecontent, new ArrayList<>());
-                    mapToNewestVersion.put(medcontent, new ArrayList<>());
+                        ArrayList<File> files = new ArrayList<>();
+                        files.add(structure);
+                        files.add(basecontent);
+                        if (btnInstallMed.isPositiveSelected() && medcontent.exists())
+                            files.add(medcontent);
+                        if (finallyContent.exists())
+                            files.add(finallyContent);
 
-                    mapWithMessages.put(structure, );
+                        String currentSQLCommand = "";
 
-                    ArrayList<File> files = new ArrayList<>();
-                    files.add(structure);
-                    files.add(basecontent);
+                        int max = 0;
 
-                    //files.add(medcontent);
-
-                    String currentSQLCommand = "";
-
-                    int max = 0;
-
-                    for (File file : files) {
-                        Iterator it = Files.lines(file.toPath()).iterator();
-                        while (it.hasNext()) {
-                            String line = it.next().toString().trim();
-                            if (!line.startsWith("--")) {
-                                currentSQLCommand += line;
-                                if (currentSQLCommand.endsWith(";")) {
-                                    mapToNewestVersion.get(file).add(currentSQLCommand);
-                                    max++;
-                                    currentSQLCommand = "";
+                        for (File file : files) {
+                            Iterator it = Files.lines(file.toPath()).iterator();
+                            while (it.hasNext()) {
+                                String line = it.next().toString().trim();
+                                if (!line.startsWith("--")) {
+                                    currentSQLCommand += line;
+                                    if (currentSQLCommand.endsWith(";")) {
+                                        mapToNewestVersion.get(file).add(currentSQLCommand);
+                                        max++;
+                                        currentSQLCommand = "";
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    // for progressbar
-                    int min = 0;
-                    int progress = 0;
-                    pbProgress.setMinimum(min);
-                    pbProgress.setMaximum(max);
-                    pbProgress.setStringPainted(true);
+                        // for progressbar
+                        int min = 0;
+                        int progress = 0;
+                        pbProgress.setMinimum(min);
+                        pbProgress.setMaximum(max);
+                        pbProgress.setStringPainted(true);
 
-                    PreparedStatement stmt;
+                        PreparedStatement stmt;
 
-                    String queryDrop = " DROP SCHEMA IF EXISTS " + catalog;
-                    stmt = jdbcConnection.prepareStatement(queryDrop);
-                    stmt.executeUpdate();
-                    stmt.close();
-                    summary.add(SYSTools.xx("opde.initwizard.summary.createdb.dropschema", catalog));
+                        String queryDrop = " DROP SCHEMA IF EXISTS " + catalog;
+                        stmt = jdbcConnection.prepareStatement(queryDrop);
+                        stmt.executeUpdate();
+                        stmt.close();
+                        summary.add(SYSTools.xx("opde.initwizard.summary.createdb.dropschema", catalog));
 
-                    String queryCreate = " CREATE SCHEMA " + catalog + " DEFAULT CHARACTER SET utf8";
-                    stmt = jdbcConnection.prepareStatement(queryCreate);
-                    stmt.executeUpdate();
-                    stmt.close();
-                    summary.add(SYSTools.xx("opde.initwizard.summary.createdb.createschema", catalog));
+                        String queryCreate = " CREATE SCHEMA " + catalog + " DEFAULT CHARACTER SET utf8";
+                        stmt = jdbcConnection.prepareStatement(queryCreate);
+                        stmt.executeUpdate();
+                        stmt.close();
+                        summary.add(SYSTools.xx("opde.initwizard.summary.createdb.createschema", catalog));
 
-                    String queryGrant1 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
-                    stmt = jdbcConnection.prepareStatement(queryGrant1);
-                    stmt.executeUpdate();
-                    stmt.close();
+                        String queryGrant1 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        stmt = jdbcConnection.prepareStatement(queryGrant1);
+                        stmt.executeUpdate();
+                        stmt.close();
 
-                    String queryGrant2 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
-                    stmt = jdbcConnection.prepareStatement(queryGrant2);
-                    stmt.executeUpdate();
-                    stmt.close();
-                    summary.add(SYSTools.xx("opde.initwizard.summary.createdb.grant", catalog));
+                        String queryGrant2 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        stmt = jdbcConnection.prepareStatement(queryGrant2);
+                        stmt.executeUpdate();
+                        stmt.close();
+                        summary.add(SYSTools.xx("opde.initwizard.summary.createdb.grant", catalog));
 
 
-                    jdbcConnection.setCatalog(catalog);
+                        jdbcConnection.setCatalog(catalog);
 
-                    for (File file : files) {
+                        for (File file : files) {
 
-                        summary.add(SYSTools.xx("opde.initwizard.page.create.version", AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion())));
-                        logger.info(SYSTools.xx("opde.initwizard.page.create.version", AppInfo.getSQLStructureScript(OPDE.getAppInfo().getDbversion())));
-                        pbProgress.setString(file.getAbsolutePath());
+                            summary.add(mapWithMessages.get(file));
+                            logger.info(mapWithMessages.get(file));
+                            pbProgress.setString(file.getAbsolutePath());
 
-                        for (String sql : mapToNewestVersion.get(file)) {
-                            progress++;
-                            final int p = progress;
-                            SwingUtilities.invokeLater(() -> pbProgress.setValue(p));
-                            logger.info(sql.toString());
-                            try {
+                            for (String sql : mapToNewestVersion.get(file)) {
+                                progress++;
+                                final int p = progress;
+                                SwingUtilities.invokeLater(() -> pbProgress.setValue(p));
+                                logger.info(sql.toString());
+
                                 stmt = jdbcConnection.prepareStatement(sql);
                                 int result = stmt.executeUpdate();
                                 logger.info(SYSTools.xx("misc.msg.result") + " " + (result == 0 ? "OK" : result + " " + SYSTools.xx("opde.initwizard.page.update.updatedb.rows.affected")));
                                 stmt.close();
-                            } catch (SQLException sqle) {
-                                OPDE.fatal(sqle);
+
                             }
                         }
+
+                        // Set the password for the OPDE admin user
+                        String queryAdminPW = " UPDATE users SET md5pw = MD5(?) WHERE ukennung = 'admin'";
+                        stmt = jdbcConnection.prepareStatement(queryAdminPW);
+                        stmt.setString(1, generatedPassword4AdminUser);
+                        stmt.executeUpdate();
+                        jdbcConnection.close();
+                        summary.add(SYSTools.xx("opde.initwizard.summary.createdb.setpassword.adminuser", catalog));
+
+                        outcome = SYSTools.xx("opde.initwizard.page.create.installation.summary", server, port, catalog, dbuser, generatedPassword4DBUser, generatedPassword4AdminUser, EntityTools.getJDBCUrl(server, port, catalog), DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date()));
+                    } catch (SQLException sql) {
+                        logger.error(sql);
                     }
 
-                    // Set the password for the OPDE admin user
-                    String queryAdminPW = " UPDATE users SET md5pw = MD5(?) WHERE ukennung = 'admin'";
-                    stmt = jdbcConnection.prepareStatement(queryAdminPW);
-                    stmt.setString(1, generatedPassword4AdminUser);
-                    stmt.executeUpdate();
-                    jdbcConnection.close();
-                    summary.add(SYSTools.xx("opde.initwizard.summary.createdb.setpassword.adminuser", catalog));
-
-                    return SYSTools.xx("opde.initwizard.page.create.installation.summary", server, port, catalog, dbuser, generatedPassword4DBUser, generatedPassword4AdminUser, EntityTools.getJDBCUrl(server, port, catalog), DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date()));
+                    return outcome;
                 }
 
                 @Override
                 protected void done() {
                     super.done();
                     try {
-                        SYSFilesTools.print(get().toString(), true);
-                        setCurrentPage(SYSTools.xx("opde.initwizard.page.summary.title"));
+                        String result = get().toString();
+                        if (!result.isEmpty()) {
+                            SYSFilesTools.print(result, true);
+                            setCurrentPage(SYSTools.xx("opde.initwizard.page.summary.title"));
+                        }
                     } catch (Exception e) {
-                        OPDE.fatal(e);
+                        logger.fatal(e);
+                        System.exit(1);
                     } finally {
                         worker = null;
                     }
@@ -1426,13 +1314,23 @@ public class InitWizard extends WizardDialog {
         public CompletionPage(String title, String description) {
             super(title, description);
             setupWizardButtons();
-            OPDE.getLocalProps().putAll(jdbcProps);
-            OPDE.saveLocalProps();
+            addPageListener(pageEvent -> {
+                if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+                    OPDE.getLocalProps().putAll(jdbcProps);
+                    OPDE.saveLocalProps();
+                }
+                if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
+
+                }
+            });
+
         }
+
 
         @Override
         protected void initContentPane() {
             super.initContentPane();
+
 
             JTextPane txt = new JTextPane();
             txt.setEditable(false);

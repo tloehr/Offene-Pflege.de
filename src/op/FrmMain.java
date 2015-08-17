@@ -122,9 +122,9 @@ public class FrmMain extends JFrame {
         initComponents();
 
 
-        if (OPDE.isTraining()) {
-            pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
-        }
+//        if (OPDE.isTraining()) {
+//            pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
+//        }
 
         // for the timeout function
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
@@ -386,15 +386,15 @@ public class FrmMain extends JFrame {
         dlgLogin = null;
 
 
-        if (OPDE.isTraining()) {
-            JTextPane txtMessage = new JTextPane();
-            txtMessage.setFont(new Font("Arial", Font.PLAIN, 18));
-            txtMessage.setEditable(false);
-            txtMessage.setContentType("text/html");
-            txtMessage.setText(SYSTools.toHTMLForScreen(SYSTools.xx("opde.general.training.version.message")));
-
-            JOptionPane.showConfirmDialog(this, txtMessage, SYSTools.xx("opde.general.training.version.title"), JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
-        }
+//        if (OPDE.isTraining()) {
+//            JTextPane txtMessage = new JTextPane();
+//            txtMessage.setFont(new Font("Arial", Font.PLAIN, 18));
+//            txtMessage.setEditable(false);
+//            txtMessage.setContentType("text/html");
+//            txtMessage.setText(SYSTools.toHTMLForScreen(SYSTools.xx("opde.general.training.version.message")));
+//
+//            JOptionPane.showConfirmDialog(this, txtMessage, SYSTools.xx("opde.general.training.version.title"), JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+//        }
 
         if (specialities != null) {
             synchronized (specialities) {

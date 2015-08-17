@@ -391,9 +391,9 @@ public class DisplayManager extends Thread {
                 processSubMessage();
                 check4MaintenanceMode();
 
-                if (OPDE.isTraining() && OPDE.getLogin() != null && step % 600 == 0) {
-                    addSubMessage(new DisplayMessage("opde.general.training.version.reminder", DisplayMessage.NORMAL, 3));
-                }
+//                if (OPDE.isTraining() && OPDE.getLogin() != null && step % 600 == 0) {
+//                    addSubMessage(new DisplayMessage("opde.general.training.version.reminder", DisplayMessage.NORMAL, 3));
+//                }
 
                 if (timeoutmins > 0 && step % 120 == 0) {
 //                    pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.in") + " " + timeoutmins + " " + SYSTools.xx("misc.msg.Minute(s)"));
