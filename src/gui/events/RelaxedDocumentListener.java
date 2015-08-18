@@ -16,17 +16,15 @@ public class RelaxedDocumentListener implements DocumentListener {
     private final long reactionDelayInMillis;
     private final GenericClosure<DocumentEvent> handleAction, afterAction;
     private Timer timer;
-    private boolean listenerActive;
+
 
     public RelaxedDocumentListener(long reactionDelayInMillis, GenericClosure<DocumentEvent> handleAction) {
-        this.listenerActive = false;
         this.handleAction = handleAction;
         this.reactionDelayInMillis = reactionDelayInMillis;
         this.afterAction = null;
     }
 
     public RelaxedDocumentListener(long reactionDelayInMillis, GenericClosure<DocumentEvent> handleAction, GenericClosure<DocumentEvent> afterAction) {
-        this.listenerActive = false;
         this.handleAction = handleAction;
         this.reactionDelayInMillis = reactionDelayInMillis;
         this.afterAction = afterAction;
@@ -56,36 +54,37 @@ public class RelaxedDocumentListener implements DocumentListener {
         if (timer != null) {
             timer.cancel();
             timer = null;
-            listenerActive = false;
         }
     }
 
-    public boolean isListenerActive() {
-        return listenerActive;
-    }
 
     public void check(DocumentEvent e) {
         cleanup();
-        timer = new Timer();
 
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    listenerActive = true;
-                    handleAction.execute(e);
-                    listenerActive = false;
-                } catch (Exception e1) {
-                    OPDE.fatal(Logger.getLogger(getClass()), e1);
+        if (reactionDelayInMillis == 0) {
+            try {
+                handleAction.execute(e);
+            } catch (Exception e1) {
+                OPDE.fatal(Logger.getLogger(getClass()), e1);
+            }
+        } else {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        handleAction.execute(e);
+                    } catch (Exception e1) {
+                        OPDE.fatal(Logger.getLogger(getClass()), e1);
+                    }
                 }
-            }
 
-            @Override
-            public boolean cancel() {
-                listenerActive = false;
-                return super.cancel();
-            }
-        }, reactionDelayInMillis);
+                @Override
+                public boolean cancel() {
+                    return super.cancel();
+                }
+            }, reactionDelayInMillis);
+        }
     }
 
 }

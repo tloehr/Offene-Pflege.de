@@ -582,7 +582,7 @@ public class SYSTools {
      */
     public static String getWindowTitle(String moduleName) {
         if (!moduleName.isEmpty()) {
-            moduleName = ", " + moduleName;
+            moduleName = ", " + SYSTools.xx(moduleName);
         }
         return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion() + " [" + OPDE.getAppInfo().getBuildnum() + "]";
     }
