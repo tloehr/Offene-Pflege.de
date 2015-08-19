@@ -377,7 +377,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/32x32/help.png</string> 
+              <string>/artwork/32x32/help_circle_blue.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 

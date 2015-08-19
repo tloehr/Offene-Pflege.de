@@ -257,19 +257,6 @@ public class DFN implements Serializable, Comparable<DFN> {
         return nursingProcess;
     }
 
-//    public Color getFG() {
-//        if (isOnDemand()) {
-//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
-//        }
-//        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
-//    }
-//
-//    public Color getBG() {
-//        if (isOnDemand()) {
-//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
-//        }
-//        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
-//    }
 
     public void setNursingProcess(NursingProcess nursingProcess) {
         this.nursingProcess = nursingProcess;

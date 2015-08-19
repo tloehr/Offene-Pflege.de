@@ -976,7 +976,7 @@ public class GUITools {
      * @param c
      * @return
      */
-    public static String toHexString(Color c) {
+    public static String getHTMLColor(Color c) {
         StringBuilder sb = new StringBuilder("");
 
         if (c.getRed() < 16) sb.append('0');

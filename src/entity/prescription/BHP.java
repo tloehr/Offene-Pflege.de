@@ -233,32 +233,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         return state == BHPTools.STATE_OPEN;
     }
 
-//    public String getFGHTML() {
-//        if (isOnDemand()) {
-//            return "#" + OPDE.getProps().getProperty("ON_DEMAND_FGBHP");
-//        }
-//        return "#" + OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP");
-//    }
-
-//    public Color getFG() {
-//        if (isOnDemand() && !isOutcomeText()) {
-//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
-//        }
-//        if (isOutcomeText()) {
-//            return Color.WHITE;
-//        }
-//        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
-//    }
-//
-//    public Color getBG() {
-//        if (isOnDemand() && !isOutcomeText()) {
-//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
-//        }
-//        if (isOutcomeText()) {
-//            return Color.LIGHT_GRAY;
-//        }
-//        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
-//    }
 
     public void setDosis(BigDecimal dosis) {
         this.dosis = dosis;

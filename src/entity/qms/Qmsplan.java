@@ -90,7 +90,7 @@ public class Qmsplan {
     }
 
     public void setColor(Color newColor) {
-        color = GUITools.toHexString(newColor);
+        color = GUITools.getHTMLColor(newColor);
     }
 
 

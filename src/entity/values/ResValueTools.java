@@ -6,6 +6,7 @@ import entity.building.StationTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
+import gui.GUITools;
 import op.OPDE;
 import op.controlling.PnlControlling;
 import op.tools.Pair;
@@ -68,7 +69,7 @@ public class ResValueTools {
             if (bwert.isReplaced() || bwert.isDeleted()) {
                 color = SYSConst.html_lightslategrey;
             } else {
-                color = OPDE.getProps().getProperty(SYSCalendar.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bwert.getPit())] + "_FGBHP");
+                color = GUITools.getHTMLColor(SYSCalendar.getFGItem(SYSCalendar.whatShiftIs(bwert.getPit())));
             }
         }
         String result = sdf.format(bwert.getPit()) + "; " + bwert.getUser().getFullname();
@@ -200,7 +201,7 @@ public class ResValueTools {
                 if (wert.isReplaced() || wert.isDeleted()) {
                     color = SYSConst.html_lightslategrey;
                 } else {
-                    color = OPDE.getProps().getProperty(SYSCalendar.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(wert.getPit())] + "_FGBHP");
+                    color = GUITools.getHTMLColor(SYSCalendar.getFGItem(SYSCalendar.whatShiftIs(wert.getPit())));
                 }
             }
             result = "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>" + SYSTools.xx("misc.msg.comment") + ":</b> " + wert.getText() + "</font>";

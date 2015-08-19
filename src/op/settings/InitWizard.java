@@ -1,12 +1,9 @@
-package op.settings.basicsetup;
+package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.combobox.FileChooserPanel;
-import com.jidesoft.dialog.ButtonEvent;
-import com.jidesoft.dialog.ButtonNames;
-import com.jidesoft.dialog.PageEvent;
-import com.jidesoft.dialog.PageList;
+import com.jidesoft.dialog.*;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.AbstractWizardPage;
 import com.jidesoft.wizard.CompletionWizardPage;
@@ -44,6 +41,7 @@ import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -75,7 +73,7 @@ public class InitWizard extends WizardDialog {
 
 
     private String pingResult = "";
-    private String adminUser = "root";
+    private String creationResultPage = "";
     private String adminPassword = "";
 
     private AbstractWizardPage pageWelcome;
@@ -95,6 +93,25 @@ public class InitWizard extends WizardDialog {
     private Properties jdbcProps;
     private WizardDialog thisWizard;
 
+    private String helpKey = "opde.initwizard.page.welcome.helpurl";
+
+    @Override
+    public ButtonPanel createButtonPanel() {
+        ButtonPanel pnl = super.createButtonPanel();
+        JButton btnHelp = GUITools.getTinyButton("opde.mainframe.btnHelp.tooltip", SYSConst.icon48help);
+        btnHelp.addActionListener(al -> {
+            try {
+                URI uri = new URI(SYSTools.xx(helpKey));
+                Desktop.getDesktop().browse(uri);
+            } catch (Exception ex) {
+                Logger.getLogger(getClass()).warn(SYSTools.xx("opde.mainframe.noHelpAvailable"));
+            }
+        });
+        pnl.addButton(btnHelp, ButtonPanel.HELP_BUTTON);
+
+        return pnl;
+    }
+
     public InitWizard() {
         super(new JFrame(), false);
         setTitle(SYSTools.getWindowTitle("opde.initwizard.title"));
@@ -108,17 +125,19 @@ public class InitWizard extends WizardDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         DriverManager.setLoginTimeout(2);
         createWizard();
+
+
     }
 
 
     private void createWizard() {
+
 
         pageWelcome = new WelcomePage(SYSTools.xx("opde.initwizard.page.welcome.title"), SYSTools.xx("opde.initwizard.page.welcome.description"));
         pageConnection = new ConnectionPage(SYSTools.xx("opde.initwizard.page.connection.title"), SYSTools.xx("opde.initwizard.page.connection.description"));
         pageSituation = new SituationPage(SYSTools.xx("opde.initwizard.page.situation.title"), SYSTools.xx("opde.initwizard.page.situation.description"));
         pageBackup = new BackupPage(SYSTools.xx("opde.initwizard.page.backup.title"), SYSTools.xx("opde.initwizard.page.backup.description"));
         pageSelection = new SelectionPage(SYSTools.xx("opde.initwizard.page.selection.title"), SYSTools.xx("opde.initwizard.page.selection.description"));
-        ;
         pageCreateDB = new CreateDBPage(SYSTools.xx("opde.initwizard.page.createdb.title"), SYSTools.xx("opde.initwizard.page.createdb.description"));
         pageUpgradeDB = new UpdateDB(SYSTools.xx("opde.initwizard.page.upgradedb.title"), SYSTools.xx("opde.initwizard.page.upgradedb.description"));
         pageCompletion = new CompletionPage(SYSTools.xx("opde.initwizard.page.summary.title"), SYSTools.xx("opde.initwizard.page.summary.description"));
@@ -133,8 +152,6 @@ public class InitWizard extends WizardDialog {
         model.append(pageCreateDB);
         model.append(pageUpgradeDB);
         model.append(pageCompletion);
-
-        pageCreateDB.setPageEnabled(false);
 
         setPageList(model);
 
@@ -163,6 +180,7 @@ public class InitWizard extends WizardDialog {
 
 
         ((JPanel) getContentPane()).setBorder(new LineBorder(Color.BLACK, 1));
+
         pack();
         setSize(new Dimension(1000, 650));
     }
@@ -172,13 +190,16 @@ public class InitWizard extends WizardDialog {
 
         public WelcomePage(String title, String description) {
             super(title, description);
-
+            addPageListener(pageEvent -> {
+                if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+                    helpKey = "opde.initwizard.page.welcome.helpurl";
+                }
+            });
         }
 
         @Override
         protected void initContentPane() {
             super.initContentPane();
-
             JTextPane txt = new JTextPane();
             txt.setEditable(false);
             txt.setContentType("text/html");
@@ -219,7 +240,6 @@ public class InitWizard extends WizardDialog {
         private JLabel lblPassword;
         private JPasswordField txtPassword;
         private Logger logger = Logger.getLogger(getClass());
-
         JTextPane txtComment;
         private JButton btnTestParameters;
 
@@ -235,18 +255,24 @@ public class InitWizard extends WizardDialog {
 
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-
+                    helpKey = "opde.initwizard.page.connection.helpurl";
                 }
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_HOST, txtServer.getText().trim());
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_PORT, Integer.toString(port));
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_USER, txtUser.getText().trim());
-                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, new String(txtPassword.getPassword()).trim());
+                    try {
+                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(new String(txtPassword.getPassword()).trim()));
+                    } catch (Exception e) {
+                        logger.fatal(e);
+                        System.exit(1);
+                    }
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_CATALOG, txtCatalog.getText().trim());
                 }
             });
 
         }
+
 
         @Override
         public void setupWizardButtons() {
@@ -339,7 +365,7 @@ public class InitWizard extends WizardDialog {
 
 
                 //---- lblPassword ----
-                lblPassword.setText(SYSTools.xx("opde.initwizard.db.app.passwort"));
+                lblPassword.setText(SYSTools.xx("opde.initwizard.db.app.password"));
                 lblPassword.setHorizontalAlignment(SwingConstants.RIGHT);
                 lblPassword.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlDB.add(lblPassword, CC.xy(1, 7));
@@ -358,14 +384,8 @@ public class InitWizard extends WizardDialog {
                 //---- txtCatalog ----
                 txtCatalog.setFont(new Font("Arial", Font.PLAIN, 16));
                 pnlDB.add(txtCatalog, CC.xy(3, 9));
-
-
                 pnlDB.add(btnTestParameters, CC.xyw(1, 11, 3));
-
-
                 btnTestParameters.setFont(new Font("Arial", Font.PLAIN, 20));
-
-
                 pnlDB.add(new JScrollPane(txtComment), CC.xyw(1, 15, 3, CC.DEFAULT, CC.FILL));
             }
             addComponent(pnlDB, true);
@@ -508,11 +528,11 @@ public class InitWizard extends WizardDialog {
 
         Logger logger = Logger.getLogger(getClass());
 
-
         public UpdateDB(String title, String description) {
             super(title, description);
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+                    helpKey = "opde.initwizard.page.upgradedb.helpurl";
                     String server = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
                     String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
                     String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
@@ -533,7 +553,6 @@ public class InitWizard extends WizardDialog {
         @Override
         protected void initContentPane() {
             JPanel pnlMain = new JPanel();
-//            pnlMain.setLayout(new BoxLayout(pnlMain, BoxLayout.PAGE_AXIS));
 
             String server = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
             String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
@@ -794,44 +813,6 @@ public class InitWizard extends WizardDialog {
 
     }
 
-
-//    private class FXStatusMessageAppender extends AppenderSkeleton {
-//        private final TextArea jTextA;
-//        private PatternLayout defaultPatternLayout = new PatternLayout("%d{ISO8601} %-5p: %m%n");
-//        private Style errorStyle, warnStyle;
-//
-//        public FXStatusMessageAppender(TextArea jTextA) {
-//            this.jTextA = jTextA;
-//            //            errorStyle = jTextA.addStyle("errorStyle", null);
-//            //            warnStyle = jTextA.addStyle("warnStyle", null);
-//            //            StyleConstants.setForeground(errorStyle, Color.red);
-//            //            StyleConstants.setForeground(warnStyle, SYSConst.darkorange);
-//        }
-//
-//        protected void append(LoggingEvent event) {
-//            if (event.getLevel().isGreaterOrEqual(Logger.getRootLogger().getLevel())) {
-//                jTextA.appendText(defaultPatternLayout.format(event));
-//            }
-//        }
-//
-//        private Style getCurrentStyle(Level level) {
-//            if (level.equals(Level.ERROR))
-//                return errorStyle;
-//            if (level.equals(Level.WARN))
-//                return warnStyle;
-//            return null;
-//        }
-//
-//        public void close() {
-//        }
-//
-//        @Override
-//        public boolean requiresLayout() {
-//            return true;
-//        }
-//    }
-
-
     private class StatusMessageAppender extends AppenderSkeleton {
         private final JTextPane jTextA;
         private PatternLayout defaultPatternLayout = new PatternLayout("%d{ISO8601} %-5p: %m%n");
@@ -890,6 +871,7 @@ public class InitWizard extends WizardDialog {
 
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+                    helpKey = "opde.initwizard.page.createdb.helpurl";
                     String server = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
                     String catalog = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG, "opde"));
                     String sPort = SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306");
@@ -1135,11 +1117,8 @@ public class InitWizard extends WizardDialog {
                 protected void done() {
                     super.done();
                     try {
-                        String result = get().toString();
-                        if (!result.isEmpty()) {
-                            SYSFilesTools.print(result, true);
-                            setCurrentPage(SYSTools.xx("opde.initwizard.page.summary.title"));
-                        }
+                        creationResultPage = get().toString();
+                        logger.info("create complete");
                     } catch (Exception e) {
                         logger.fatal(e);
                         System.exit(1);
@@ -1155,15 +1134,15 @@ public class InitWizard extends WizardDialog {
 
 
     private class SituationPage extends DefaultWizardPage {
+
         public SituationPage(String title, String description) {
             super(title, description);
             setupWizardButtons();
+
+
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-
-                }
-                if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
-
+                    helpKey = "opde.initwizard.page.situation.helpurl";
                 }
             });
 
@@ -1173,6 +1152,7 @@ public class InitWizard extends WizardDialog {
         @Override
         protected void initContentPane() {
             super.initContentPane();
+
 
             JTextPane txt = new JTextPane();
             txt.setEditable(false);
@@ -1200,7 +1180,7 @@ public class InitWizard extends WizardDialog {
                 items += SYSConst.html_li(item);
             }
             result += SYSConst.html_ul(items);
-//            result += SYSConst.html_paragraph("opde.initwizard.page.situation.footer");
+            result += SYSConst.html_paragraph("opde.initwizard.page.situation.footer");
             return result;
         }
 
@@ -1214,22 +1194,19 @@ public class InitWizard extends WizardDialog {
         public SelectionPage(String title, String description) {
             super(title, description);
             setupWizardButtons();
+
+
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-
-                }
-                if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
-
+                    helpKey = "opde.initwizard.page.selection.helpurl";
                 }
             });
-
         }
 
 
         @Override
         protected void initContentPane() {
             super.initContentPane();
-
 
             JPanel pnl = new JPanel();
             pnl.setLayout(new BoxLayout(pnl, BoxLayout.PAGE_AXIS));
@@ -1263,16 +1240,6 @@ public class InitWizard extends WizardDialog {
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.CANCEL);
         }
 
-        private String check() {
-            String result = SYSConst.html_h2("opde.initwizard.page.situation.header");
-            String items = "";
-            for (String item : situation) {
-                items += SYSConst.html_li(item);
-            }
-            result += SYSConst.html_ul(items);
-            //            result += SYSConst.html_paragraph("opde.initwizard.page.situation.footer");
-            return result;
-        }
 
     }
 
@@ -1300,7 +1267,7 @@ public class InitWizard extends WizardDialog {
             setupWizardButtons();
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-
+                    helpKey = "opde.initwizard.page.backup.helpurl";
                 }
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
                     adminPassword = new String(txtPassword.getPassword()).trim();
@@ -1329,7 +1296,6 @@ public class InitWizard extends WizardDialog {
             lblBackupdir = new JLabel();
             txtMysqldump = new JTextField();
             txtBackupdir = new JTextField();
-
 
             logger.addAppender(new StatusMessageAppender(txtComments));
             btnDBBackup = new JButton(SYSTools.xx("opde.initwizard.page.backup.dobackup"), SYSConst.icon48dbupdate);
@@ -1448,7 +1414,7 @@ public class InitWizard extends WizardDialog {
 
             pnlMain.setLayout(new FormLayout(
                     "default, $ugap, default:grow, $ugap, default",
-                    "6*(default, $lgap), fill:default:grow, $lgap, default"));
+                    "7*(default, $lgap), fill:default:grow, $lgap, default"));
 
             //---- lblServer ----
             lblRoot.setText(SYSTools.xx("opde.initwizard.db.root.user"));
@@ -1484,7 +1450,6 @@ public class InitWizard extends WizardDialog {
             txtCatalog.setText(SYSTools.catchNull(jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG), "opde"));
             pnlMain.add(txtCatalog, CC.xy(3, 5));
 
-
             lblMysqldump.setText(SYSTools.xx("opde.initwizard.page.backup.mysqldump"));
             lblMysqldump.setHorizontalAlignment(SwingConstants.RIGHT);
             lblMysqldump.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -1505,7 +1470,8 @@ public class InitWizard extends WizardDialog {
             pnlMain.add(txtBackupdir, CC.xy(3, 9));
             pnlMain.add(btnOpenBackupDir, CC.xy(5, 9));
 
-            pnlMain.add(new JScrollPane(txtComments), CC.xywh(1, 11, 5, 3, CC.DEFAULT, CC.FILL));
+            pnlMain.add(btnDBBackup, CC.xyw(1, 11, 5));
+            pnlMain.add(new JScrollPane(txtComments), CC.xywh(1, 13, 5, 3, CC.DEFAULT, CC.FILL));
 
             addComponent(pnlMain, true);
             addSpace();
@@ -1524,16 +1490,19 @@ public class InitWizard extends WizardDialog {
     }
 
     private class CompletionPage extends CompletionWizardPage {
+
         public CompletionPage(String title, String description) {
             super(title, description);
             setupWizardButtons();
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
+                    helpKey = "opde.initwizard.page.summary.helpurl";
                     OPDE.getLocalProps().putAll(jdbcProps);
                     OPDE.saveLocalProps();
                 }
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSED) {
-
+                    if (!creationResultPage.isEmpty())
+                        SYSFilesTools.print(creationResultPage, true);
                 }
             });
 
@@ -1543,7 +1512,6 @@ public class InitWizard extends WizardDialog {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-
 
             JTextPane txt = new JTextPane();
             txt.setEditable(false);

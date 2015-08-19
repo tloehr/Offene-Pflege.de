@@ -11,11 +11,13 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.*;
+import gui.GUITools;
 import op.OPDE;
 import op.care.med.inventory.PnlInventory;
 import op.care.supervisor.PnlHandover;
 import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
@@ -45,7 +47,7 @@ public class HandoversTools {
     }
 
     private static String getHTMLColor(Handovers bericht) {
-        return OPDE.getProps().getProperty(SYSCalendar.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bericht.getPit())] + "_FGBHP");
+        return GUITools.getHTMLColor(SYSCalendar.getFGItem(SYSCalendar.whatShiftIs(bericht.getPit())));
     }
 
 
@@ -118,19 +120,19 @@ public class HandoversTools {
         return result;
     }
 
-    /**
-     * gibt eine HTML Darstellung des Einrichtungsnamen zurück.
-     *
-     * @return
-     */
-    public static String getHomeAsHTML(Handovers bericht) {
-        String result = "";
-
-        String fonthead = "<font " + getHTMLColor(bericht) + ">";
-        result += bericht.getHome().getName();
-        result = fonthead + result + "</font>";
-        return result;
-    }
+//    /**
+//     * gibt eine HTML Darstellung des Einrichtungsnamen zurück.
+//     *
+//     * @return
+//     */
+//    public static String getHomeAsHTML(Handovers bericht) {
+//        String result = "";
+//
+//        String fonthead = "<font " + getHTMLColor(bericht) + ">";
+//        result += bericht.getHome().getName();
+//        result = fonthead + result + "</font>";
+//        return result;
+//    }
 
     public static void printSupervision(final LocalDate day, final Homes home, final Closure afterAction) {
         SwingWorker worker = new SwingWorker() {

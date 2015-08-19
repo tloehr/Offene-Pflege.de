@@ -29,7 +29,6 @@ package op.tools;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Image;
 import gui.GUITools;
-import op.OPDE;
 import op.system.AppInfo;
 
 import javax.swing.*;
@@ -372,7 +371,7 @@ public class SYSConst {
     public static final String html_div_close = "</div>";
 
     public static final String html_color(Color color, String in) {
-        return "<font color=#" + GUITools.toHexString(color) + ">" + in + "</font>";
+        return "<font color=#" + GUITools.getHTMLColor(color) + ">" + in + "</font>";
     }
 
 //    public static final String html_report_footer = "<hr/>" +
@@ -646,6 +645,8 @@ public class SYSConst {
     public static final Icon icon16ledGreenOff = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/leddarkgreen.png"));
     public static final Icon icon22ledOrangeOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledorange.png"));
     public static final Icon icon22helpMe = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/helpme.png"));
+    public static final Icon icon32help = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/help_circle_blue.png"));
+    public static final Icon icon48help = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/help_circle_blue.png"));
     public static final Icon icon22ledOrangeOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkorange.png"));
     public static final Icon icon22ledPurpleOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledpurple.png"));
     public static final Icon icon22ledPurpleOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkpurple.png"));

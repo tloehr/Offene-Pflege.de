@@ -43,3 +43,4 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- icd10.png based on emblem_library.png (http://findicons.com/icon/93370/emblem_library?id=93370)
 -- timer.png (http://findicons.com/icon/567889/timer?id=569127)
 -- language.png (http://findicons.com/icon/50917/language?id=50982)
+-- help_circle_blue.png (http://findicons.com/icon/69389/help_circle_blue?id=69465)

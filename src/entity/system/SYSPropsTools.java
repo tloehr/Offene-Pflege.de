@@ -29,7 +29,6 @@ public class SYSPropsTools {
     public static final String DFN_MAX_MINUTES_TO_WITHDRAW = "dfn_max_minutes_to_withdraw";
     public static final String KEY_STATION = "station";
 
-
     // Other parameters
     public static final String KEY_PHYSICAL_PRINTER = "printer.physical.name";
     public static final String KEY_LOGICAL_PRINTER = "printer.logical.name";

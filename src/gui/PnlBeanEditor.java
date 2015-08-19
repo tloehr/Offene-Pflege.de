@@ -346,7 +346,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         if (saveMode == SAVE_MODE_IMMEDIATE)
                             reload();
                         try {
-                            PropertyUtils.setProperty(data, field.getName(), GUITools.toHexString(((ColorSelectionModel) e.getSource()).getSelectedColor()));
+                            PropertyUtils.setProperty(data, field.getName(), GUITools.getHTMLColor(((ColorSelectionModel) e.getSource()).getSelectedColor()));
                             DataChangeEvent<T> dce = new DataChangeEvent(thisPanel, data);
                             dce.setTriggersReload(true);
                             if (saveMode == SAVE_MODE_IMMEDIATE)

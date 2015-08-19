@@ -33,7 +33,7 @@ import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
 import gui.GUITools;
-import op.settings.basicsetup.InitWizard;
+import op.settings.InitWizard;
 import op.system.AppInfo;
 import op.system.EMailSystem;
 import op.system.LogicalPrinters;
@@ -47,6 +47,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -839,36 +840,8 @@ public class OPDE {
 
         configFile.createNewFile();
 
-
-        // make sure the minimum requirements for the configs are present. this will be overwritten by any contents in the actual configFile.
-        // missing these settings will most definitely cause exceptions
-        localProps.put(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW, "30");
-        localProps.put(SYSPropsTools.DFN_MAX_MINUTES_TO_WITHDRAW, "30");
-        localProps.put(SYSPropsTools.KEY_CASH_PAGEBREAK, "30");
+        // minimum requirement
         localProps.put(SYSPropsTools.KEY_STATION, "1");
-        localProps.put(SYSPropsTools.KEY_VERY_EARLY_FGSHIFT, "FFECF5");
-        localProps.put(SYSPropsTools.KEY_VERY_EARLY_BGSHIFT, "FF62B0");
-        localProps.put(SYSPropsTools.KEY_VERY_EARLY_FGITEM, "FF62B0");
-        localProps.put(SYSPropsTools.KEY_VERY_EARLY_BGITEM, "FFC8E3");
-        localProps.put(SYSPropsTools.KEY_EARLY_FGSHIFT, "ECF4FF");
-        localProps.put(SYSPropsTools.KEY_EARLY_BGSHIFT, "62A9FF");
-        localProps.put(SYSPropsTools.KEY_EARLY_FGITEM, "62A9FF");
-        localProps.put(SYSPropsTools.KEY_EARLY_BGITEM, "D0E6FF");
-        localProps.put(SYSPropsTools.KEY_LATE_FGSHIFT, "F3F8F4");
-        localProps.put(SYSPropsTools.KEY_LATE_BGSHIFT, "59955C");
-        localProps.put(SYSPropsTools.KEY_LATE_FGITEM, "59955C");
-        localProps.put(SYSPropsTools.KEY_LATE_BGITEM, "DBEADC");
-        localProps.put(SYSPropsTools.KEY_VERY_LATE_FGSHIFT, "FFE3FF");
-        localProps.put(SYSPropsTools.KEY_VERY_LATE_BGSHIFT, "990099");
-        localProps.put(SYSPropsTools.KEY_VERY_LATE_FGITEM, "990099");
-        localProps.put(SYSPropsTools.KEY_VERY_LATE_BGITEM, "FFA8FF");
-        localProps.put(SYSPropsTools.KEY_ONDEMAND_FGSHIFT, "F5F5E2");
-        localProps.put(SYSPropsTools.KEY_ONDEMAND_BGSHIFT, "D1D17A");
-        localProps.put(SYSPropsTools.KEY_ONDEMAND_FGITEM, "D1D17A");
-        localProps.put(SYSPropsTools.KEY_ONDEMAND_BGITEM, "EEEECE");
-        localProps.put(SYSPropsTools.KEY_OUTCOME_FGSHIFT, GUITools.toHexString(Color.LIGHT_GRAY));
-        localProps.put(SYSPropsTools.KEY_OUTCOME_BGSHIFT, GUITools.toHexString(Color.DARK_GRAY));
-
 
         FileInputStream in = new FileInputStream(configFile);
         Properties p = new Properties();
@@ -886,6 +859,8 @@ public class OPDE {
             password = OPDE.getDesEncrypter().decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
         } catch (BadPaddingException e) {
             password = "";
+        } catch (IllegalBlockSizeException e) {
+            password = "";
         } catch (Exception e) {
             OPDE.fatal(logger, e);
         }
@@ -895,6 +870,8 @@ public class OPDE {
             try {
                 password = oldDesEncrypter.decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
             } catch (BadPaddingException e) {
+                password = "";
+            } catch (IllegalBlockSizeException e) {
                 password = "";
             } catch (Exception e) {
                 OPDE.fatal(logger, e);
