@@ -55,6 +55,10 @@ public class DesEncrypter {
     }
 
 
+    /**
+     * this constructor is the old one. will be removed in future.
+     * @param passphrase
+     */
     public DesEncrypter(String passphrase) {
            try {
 

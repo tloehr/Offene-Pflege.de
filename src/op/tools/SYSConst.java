@@ -584,6 +584,11 @@ public class SYSConst {
     public static final Icon icon22createDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_add.png"));
     public static final Icon icon22commitDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_comit.png"));
     public static final Icon icon22updateDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_update.png"));
+    public static final Icon icon48statusDB = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_status.png"));
+    public static final Icon icon48createDB = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_add.png"));
+    public static final Icon icon48updateDB = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_commit.png"));
+
+    public static final Icon icon48getInfo = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/get_info.png"));
 
     public static final Icon icon16residentAbsent = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-absent.png"));
     public static final Icon icon16residentDied = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-died.png"));
@@ -621,10 +626,7 @@ public class SYSConst {
     public static final Icon icon48userconfig = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/userconfig.png"));
     public static final Icon icon48systemconfig = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/systemconfig.png"));
     //    public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
-    public static final Icon icon48dbstatus = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_status.png"));
 
-    public static final Icon icon48dbcreate = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_add.png"));
-    public static final Icon icon48dbupdate = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_commit.png"));
     public static final Icon icon22collapse = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/collapse.png"));
     public static final Icon icon22expand = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/expand.png"));
     public static final Icon icon22pdca = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/pdca.png"));
@@ -672,6 +674,8 @@ public class SYSConst {
     public static final Icon icon48biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/biohazard.png"));
     public static final Icon icon22locked = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/encrypted.png"));
     public static final Icon icon22unlocked = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/decrypted.png"));
+    public static final Icon icon48locked = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/encrypted.png"));
+    public static final Icon icon48unlocked = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/decrypted.png"));
     public static final Icon icon48edit = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/edit3.png"));
     public static final Icon icon22popup = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/popup.png"));
     public static final Icon icon22diabetes = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/diabetes.png"));

@@ -44,3 +44,4 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- timer.png (http://findicons.com/icon/567889/timer?id=569127)
 -- language.png (http://findicons.com/icon/50917/language?id=50982)
 -- help_circle_blue.png (http://findicons.com/icon/69389/help_circle_blue?id=69465)
+-- get_info.png (http://findicons.com/icon/48510/get_info?id=48828)

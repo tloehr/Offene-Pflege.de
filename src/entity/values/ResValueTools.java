@@ -48,7 +48,7 @@ public class ResValueTools {
     public static final BigDecimal ENTIRE_UPPER_EXTREMITY = new BigDecimal(6.5);
 
 
-//    public static final String[] VALUES = new String[]{"UNKNOWN", "RR", "PULSE", "TEMP", "GLUCOSE", "WEIGHT", "HEIGHT", "BREATHING", "QUICK", "STOOL", "VOMIT", "LIQUIDBALANCE"};
+//    public static final String[] VALUES = new String[]{"DBVERSION_UNKNOWN", "RR", "PULSE", "TEMP", "GLUCOSE", "WEIGHT", "HEIGHT", "BREATHING", "QUICK", "STOOL", "VOMIT", "LIQUIDBALANCE"};
 
     //    public static final String[] UNITS = new String[]{"", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
     public static final String RRSYS = "systolisch";

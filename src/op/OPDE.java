@@ -32,7 +32,6 @@ import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
-import gui.GUITools;
 import op.settings.InitWizard;
 import op.system.AppInfo;
 import op.system.EMailSystem;
@@ -55,7 +54,6 @@ import javax.persistence.PersistenceException;
 import javax.swing.*;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
-import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -431,6 +429,7 @@ public class OPDE {
         localProps = new SortedProperties();
         props = new Properties();
         appInfo = new AppInfo();
+
         // JideSoft
         Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
         WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
@@ -493,31 +492,26 @@ public class OPDE {
             System.exit(0);
         }
 
-//        // Alternative FTP-Server
-//        if (cl.hasOption("f")) {
-//            UPDATE_FTPSERVER = cl.getOptionValue("f");
-//        }
-
-
         if (cl.hasOption("h")) {
             HelpFormatter f = new HelpFormatter();
             f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion() + " [" + appInfo.getBuildnum() + "]", opts, footer);
             System.exit(0);
         }
 
-
-//        String homedir = System.getProperty("user.home");
-//        // alternatice working dir
-//        if (cl.hasOption("w")) {
-//            File dir = new File(cl.getOptionValue("w"));
-//            if (dir.exists() && dir.isDirectory()) {
-//                homedir = dir.getAbsolutePath();
-//            }
-//        }
-
-        // old style oldopwd
-//        oldopwd = homedir + sep + AppInfo.dirBase;
-//        oldopwd = homedir + sep + AppInfo.dirBase;
+        /***
+         *     __     __            _
+         *     \ \   / /__ _ __ ___(_) ___  _ __
+         *      \ \ / / _ \ '__/ __| |/ _ \| '_ \
+         *       \ V /  __/ |  \__ \ | (_) | | | |
+         *        \_/ \___|_|  |___/_|\___/|_| |_|
+         *
+         */
+        String header = SYSTools.getWindowTitle("");
+        if (cl.hasOption("v")) {
+            System.out.println(header);
+            System.out.println(footer);
+            System.exit(0);
+        }
 
         /***
          *                                                                ___
@@ -528,7 +522,6 @@ public class OPDE {
          *                              |___/
          */
         if (cl.hasOption("a")) { // anonym Modus
-            //localProps.put("anonym", "true");
             anonym = true;
             anonymize = new HashMap[]{SYSConst.getNachnamenAnonym(), SYSConst.getVornamenFrauAnonym(), SYSConst.getVornamenMannAnonym()};
         } else {
@@ -622,22 +615,6 @@ public class OPDE {
 
             EntityManager em1 = emf.createEntityManager();
             em1.close();
-
-
-            /***
-             *     __     __            _
-             *     \ \   / /__ _ __ ___(_) ___  _ __
-             *      \ \ / / _ \ '__/ __| |/ _ \| '_ \
-             *       \ V /  __/ |  \__ \ | (_) | | | |
-             *        \_/ \___|_|  |___/_|\___/|_| |_|
-             *
-             */
-            String header = SYSTools.getWindowTitle("");
-            if (cl.hasOption("v")) {
-                System.out.println(header);
-                System.out.println(footer);
-                System.exit(0);
-            }
 
 
             /***
@@ -748,9 +725,6 @@ public class OPDE {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             setStandardFont();
 
-
-            // JideSoft
-
             /***
              *      _____               __  __       _        ____
              *     |  ___| __ _ __ ___ |  \/  | __ _(_)_ __  / /\ \
@@ -759,32 +733,20 @@ public class OPDE {
              *     |_|  |_|  |_| |_| |_|_|  |_|\__,_|_|_| |_| |  | |
              *                                               \_\/_/
              */
-
-
-            //        JFrame frm = new JFrame();
-            //            frm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            //            frm.setLayout(new FlowLayout());
-            //
-            //                    frm.getContentPane().add(new PnlBodyScheme(new Properties()));
-            //
-            //                    frm.setVisible(true);
-
-            //            SYSTools.checkForSoftwareupdates();
-
-
             mainframe = new FrmMain();
-
-
             mainframe.setVisible(true);
-
         } catch (Exception ioe) {
+
+            if (cl.hasOption("d") || cl.hasOption("b") || cl.hasOption("n")) {
+                logger.fatal(ioe);
+                System.exit(0);
+            }
 
             // trouble with the setup ?
             // start the init wizard
             if (ioe instanceof SQLException || ioe instanceof PersistenceException) {
                 logger.warn(ioe);
                 InitWizard initWizard = new InitWizard();
-//                initWizard.setSize(new Dimension(800, 550));
                 SYSTools.center(initWizard);
                 initWizard.addWindowListener(new WindowAdapter() {
                     @Override
@@ -865,6 +827,7 @@ public class OPDE {
             OPDE.fatal(logger, e);
         }
         // could still be encoded with the old algorithm. trying.
+        // i moved from the old standard (which was using the NIC as part of the key) to a new one (which is based on some sort of a calculated Machine ID) in 2015.
         if (password.isEmpty()) {
             DesEncrypter oldDesEncrypter = new DesEncrypter(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_HOSTKEY)));
             try {

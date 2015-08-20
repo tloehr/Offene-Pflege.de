@@ -1424,6 +1424,10 @@ public class SYSTools {
         }
     }
 
+    public static String booleanToString(boolean b){
+        return b ? SYSTools.xx("misc.msg.yes") : SYSTools.xx("misc.msg.no");
+    }
+
     /**
      * http://exampledepot.com/egs/javax.swing.table/PackCol.html
      *
