@@ -25,44 +25,53 @@ public class Hardware {
         return null;
     }
 
-    public static final String getLogPath() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
-        }
-        if (SystemUtils.IS_OS_LINUX) {
-            return System.getProperty("user.home") + File.separator + ".opde" + File.separator + "logs";
-        }
-        if (SystemUtils.IS_OS_MAC_OSX) {
-            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Logs" + File.separator + "Offene-Pflege.de";
-        }
-        return null;
-    }
+//    public static final String getLogPath() {
+//
+//        return getAppDataPath()
+//
+//        if (SystemUtils.IS_OS_WINDOWS) {
+//            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
+//        }
+//        if (SystemUtils.IS_OS_LINUX) {
+//            return System.getProperty("user.home") + File.separator + ".opde" + File.separator + "logs";
+//        }
+//        if (SystemUtils.IS_OS_MAC_OSX) {
+//            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Logs" + File.separator + "Offene-Pflege.de";
+//        }
+//        return null;
+//    }
 
     public static final String getAppDataPath() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
-        }
-        if (SystemUtils.IS_OS_LINUX) {
-            return System.getProperty("user.home") + File.separator + ".opde";
-        }
-        if (SystemUtils.IS_OS_MAC_OSX) {
-            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Application Support" + File.separator + "Offene-Pflege.de";
-        }
-        return null;
+
+        return com.install4j.api.launcher.Variables.getInstallerVariable("sys.appdataDir").toString() + File.separator + "Offene-Pflege.de";
+
+
+//        if (SystemUtils.IS_OS_WINDOWS) {
+//            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
+//        }
+//        if (SystemUtils.IS_OS_LINUX) {
+//            return System.getProperty("user.home") + File.separator + ".opde";
+//        }
+//        if (SystemUtils.IS_OS_MAC_OSX) {
+//            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Application Support" + File.separator + "Offene-Pflege.de";
+//        }
+//        return null;
     }
 
 
     public static final String getProgrammPath() {
 
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return System.getenv("ProgramFiles") + File.separator + "Offene-Pflege.de";
-        }
-        if (SystemUtils.IS_OS_LINUX) {
-            return "/usr/local/opde";
-        }
-        if (SystemUtils.IS_OS_MAC_OSX) {
-            return "/Applications/Offene-Pflege.de.app/Contents/Resources";
-        }
-        return null;
+        return com.install4j.api.launcher.Variables.getInstallerVariable("sys.installationDir").toString();
+
+//        if (SystemUtils.IS_OS_WINDOWS) {
+//            return System.getenv("ProgramFiles") + File.separator + "Offene-Pflege.de";
+//        }
+//        if (SystemUtils.IS_OS_LINUX) {
+//            return "/usr/local/opde";
+//        }
+//        if (SystemUtils.IS_OS_MAC_OSX) {
+//            return "/Applications/Offene-Pflege.de.app/Contents/Resources";
+//        }
+//        return null;
     }
 }

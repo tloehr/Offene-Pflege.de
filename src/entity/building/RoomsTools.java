@@ -45,16 +45,16 @@ public class RoomsTools {
         return list;
     }
 
-    public static short getMaxLevel(Homes home) {
+    public static int getMaxLevel(Homes home) {
 
-        short total = 0;
+        Integer total = 0;
         //        int inUse = 0;
 
         try {
             EntityManager em = OPDE.createEM();
             Query query = em.createQuery("SELECT MAX(b.floor.level) FROM Rooms b WHERE b.floor.home = :home ");
             query.setParameter("home", home);
-            total = (short) query.getSingleResult();
+            total = (Integer) query.getSingleResult();
             em.close();
         } catch (NoResultException nre){
             total = 0;
@@ -71,7 +71,7 @@ public class RoomsTools {
 //        int inUse = 0;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.floor.home = :home AND b.level = :level AND b.active = TRUE");
+        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.floor.home = :home AND b.floor.level = :level AND b.active = TRUE");
         query.setParameter("level", level);
         query.setParameter("home", home);
         ArrayList<Rooms> listRooms = new ArrayList(query.getResultList());

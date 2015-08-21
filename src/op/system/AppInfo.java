@@ -292,8 +292,7 @@ public class AppInfo {
     }
 
     public static String getSQLScriptPath() {
-        return "/Users/tloehr/Dropbox/opde/newdb/upgrade";
-        //return Hardware.getProgrammPath() + File.separator + dirSql;
+        return Hardware.getProgrammPath() + File.separator + dirSql;
     }
 
     public static File getSQLUpdateScript(int startVersion) {

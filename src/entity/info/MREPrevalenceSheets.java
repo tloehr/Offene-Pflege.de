@@ -148,7 +148,7 @@ public class MREPrevalenceSheets {
         mapBedsInUse = new HashMap<>();
 
         for (Homes home : HomesTools.getAll()) {
-            short maxLevel = RoomsTools.getMaxLevel(home);
+            int maxLevel = RoomsTools.getMaxLevel(home);
             mapBedsTotal.put(home, new int[maxLevel + 1]);
             mapBedsInUse.put(home, new int[maxLevel + 1]);
 

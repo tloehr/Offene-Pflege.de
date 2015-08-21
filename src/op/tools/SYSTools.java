@@ -620,38 +620,38 @@ public class SYSTools {
     }
 
 
-    public static DefaultListModel cmb2lst(DefaultComboBoxModel dcbm) {
-        DefaultListModel dlm = new DefaultListModel();
-        for (int i = 0; i < dcbm.getSize(); i++) {
-            dlm.addElement(dcbm.getElementAt(i));
-        }
-        return dlm;
-    }
+//    public static DefaultListModel cmb2lst(DefaultComboBoxModel dcbm) {
+//        DefaultListModel dlm = new DefaultListModel();
+//        for (int i = 0; i < dcbm.getSize(); i++) {
+//            dlm.addElement(dcbm.getElementAt(i));
+//        }
+//        return dlm;
+//    }
 
-    public static File[] chooseFile(Component parent, boolean multiselection) {
-        File[] result = null;
-        String cname = parent.getClass().getName();
-        String startdir = System.getProperty("user.home");
-        if (OPDE.getProps().containsKey("DIR." + cname)) {
-            startdir = OPDE.getProps().getProperty("DIR." + cname);
-        }
-        JFileChooser jfc = new JFileChooser(startdir);
-        jfc.setMultiSelectionEnabled(multiselection);
-        int response = jfc.showOpenDialog(parent);
-        if (response == JFileChooser.APPROVE_OPTION) {
-            if (multiselection) {
-                result = jfc.getSelectedFiles();
-            } else {
-                result = new File[]{jfc.getSelectedFile()};
-            }
-
-            //String newPath = result[0].getAbsolutePath();
-            String myPath = result[0].getParent();
-            SYSPropsTools.storeProp("DIR." + cname, myPath, OPDE.getLogin().getUser());
-
-        }
-        return result;
-    }
+//    public static File[] chooseFile(Component parent, boolean multiselection) {
+//        File[] result = null;
+//        String cname = parent.getClass().getName();
+//        String startdir = System.getProperty("user.home");
+//        if (OPDE.getProps().containsKey("DIR." + cname)) {
+//            startdir = OPDE.getProps().getProperty("DIR." + cname);
+//        }
+//        JFileChooser jfc = new JFileChooser(startdir);
+//        jfc.setMultiSelectionEnabled(multiselection);
+//        int response = jfc.showOpenDialog(parent);
+//        if (response == JFileChooser.APPROVE_OPTION) {
+//            if (multiselection) {
+//                result = jfc.getSelectedFiles();
+//            } else {
+//                result = new File[]{jfc.getSelectedFile()};
+//            }
+//
+//            //String newPath = result[0].getAbsolutePath();
+//            String myPath = result[0].getParent();
+//            SYSPropsTools.storeProp("DIR." + cname, myPath, OPDE.getLogin().getUser());
+//
+//        }
+//        return result;
+//    }
 
 
     public static String printDouble(double d) {

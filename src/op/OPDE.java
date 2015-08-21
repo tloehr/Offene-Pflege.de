@@ -63,10 +63,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class OPDE {
     public static final String internalClassID = "opde";
@@ -391,40 +388,16 @@ public class OPDE {
          *    '---'           `--`---'     ---`-'
          *
          */
-        System.setProperty("logs", Hardware.getLogPath());
+
+        System.setProperty("logs", Hardware.getAppDataPath());
         logger = Logger.getRootLogger();
         uptime = SYSCalendar.now();
 
-
-//        arial14 = new Font("Arial", Font.PLAIN, 14);
-//        arial28 = new Font("Arial", Font.PLAIN, 28);
-
-        /***
-         *      _                                               ____                  _ _
-         *     | |    __ _ _ __   __ _ _   _  __ _  __ _  ___  | __ ) _   _ _ __   __| | | ___
-         *     | |   / _` | '_ \ / _` | | | |/ _` |/ _` |/ _ \ |  _ \| | | | '_ \ / _` | |/ _ \
-         *     | |__| (_| | | | | (_| | |_| | (_| | (_| |  __/ | |_) | |_| | | | | (_| | |  __/
-         *     |_____\__,_|_| |_|\__, |\__,_|\__,_|\__, |\___| |____/ \__,_|_| |_|\__,_|_|\___|
-         *                       |___/             |___/
-         */
         lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
         validatorFactory = Validation.buildDefaultValidatorFactory();
         desEncrypter = new DesEncrypter();
 
-        /***
-         *       ____      _       _             _ _                                                        _   _
-         *      / ___|__ _| |_ ___| |__     __ _| | |  _ __ ___   __ _ _   _  ___    _____  _____ ___ _ __ | |_(_) ___  _ __  ___
-         *     | |   / _` | __/ __| '_ \   / _` | | | | '__/ _ \ / _` | | | |/ _ \  / _ \ \/ / __/ _ \ '_ \| __| |/ _ \| '_ \/ __|
-         *     | |__| (_| | || (__| | | | | (_| | | | | | | (_) | (_| | |_| |  __/ |  __/>  < (_|  __/ |_) | |_| | (_) | | | \__ \
-         *      \____\__,_|\__\___|_| |_|  \__,_|_|_| |_|  \___/ \__, |\__,_|\___|  \___/_/\_\___\___| .__/ \__|_|\___/|_| |_|___/
-         *                                                       |___/                               |_|
-         */
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                OPDE.fatal(e);
-            }
-        });
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> OPDE.fatal(e));
 
         localProps = new SortedProperties();
         props = new Properties();
@@ -569,6 +542,10 @@ public class OPDE {
             } else {
                 debug = false;
                 logger.setLevel(Level.INFO);
+            }
+
+            for (Map.Entry<String, Object> obj : com.install4j.api.launcher.Variables.getInstallerVariables().entrySet()) {
+                logger.debug(obj.toString());
             }
 
             Logger.getLogger("org.hibernate").setLevel(Level.OFF);
@@ -788,7 +765,7 @@ public class OPDE {
 
             // is there an old opde.cfg ?
             // then we should copy it over
-            String oldopwd = System.getProperty("user.home") + sep + AppInfo.dirBase;
+            String oldopwd = com.install4j.api.launcher.Variables.getInstallerVariable("sys.userHome") + sep + AppInfo.dirBase;
             File oldConfigFile = new File(oldopwd + sep + AppInfo.fileConfig);
 
             if (oldConfigFile.exists()) {

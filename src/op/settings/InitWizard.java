@@ -1198,7 +1198,7 @@ public class InitWizard extends WizardDialog {
         public void setupWizardButtons() {
             super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(db_version == DB_VERSION.DB_VERSION_TOO_HIGH ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.CANCEL);
         }
@@ -1210,7 +1210,9 @@ public class InitWizard extends WizardDialog {
                 items += SYSConst.html_li(item);
             }
             result += SYSConst.html_ul(items);
-            result += SYSConst.html_paragraph("opde.initwizard.page.situation.footer");
+            if (db_version != DB_VERSION.DB_VERSION_TOO_HIGH)
+                result += SYSConst.html_paragraph("opde.initwizard.page.situation.footer");
+
             return result;
         }
 
