@@ -32,13 +32,11 @@ public class DisplayManager extends Thread {
     private JLabel lblMain;
     private JLabel lblSub;
     private MessageQ messageQ;
+
     // a pair for the text and the value for the progressbar.
     private Pair<String, Integer> progressBarMessage;
     private final Color defaultColor = new Color(105, 80, 69);
     private Icon icondead, iconaway, icongone, iconbiohazard;
-    //    private SwingWorker worker;
-//    private boolean isIndeterminate = false;
-    //    private JPanel pnlIcons;
     private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
     private long step = 0;
     private int lastMinute;
@@ -49,19 +47,11 @@ public class DisplayManager extends Thread {
     private int timeoutmins;
     private final Logger logger = Logger.getLogger(getClass());
 
-//    private int TIMEOUTMINS;
-
-//    private DateFormat df;
-
-
     public DisplayManager() {
         this.timeoutAction = null;
         this.pbTimeout = null;
     }
 
-    /**
-     * Creates a new instance of HeapStat
-     */
     public DisplayManager(JProgressBar p, JLabel lblM, JLabel lblS, JPanel pnlIcons, JProgressBar pbTimeout, Closure timeoutAction) {
         super();
 
@@ -321,17 +311,12 @@ public class DisplayManager extends Thread {
     }
 
     private void processProgressBar() {
-//        synchronized (progressBarMessage) {
         if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond().intValue() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
             if (progressBarMessage.getSecond().intValue() < 0) {
                 if (currentAnimationFrameForReload == -1) {
                     currentAnimationFrameForReload = 0;
                 }
             }
-
-//            else {
-//                            currentAnimationFrameForReload = -1;
-//                        }
 
             if (progressBarMessage.getSecond().intValue() >= 0) {
                 jp.setValue(progressBarMessage.getSecond());
@@ -353,8 +338,6 @@ public class DisplayManager extends Thread {
             currentAnimationFrameForReload = -1;
             pbIsInUse = false;
         }
-//        }
-
     }
 
     public void touch() {
@@ -391,13 +374,7 @@ public class DisplayManager extends Thread {
                 processSubMessage();
                 check4MaintenanceMode();
 
-//                if (OPDE.isTraining() && OPDE.getLogin() != null && step % 600 == 0) {
-//                    addSubMessage(new DisplayMessage("opde.general.training.version.reminder", DisplayMessage.NORMAL, 3));
-//                }
-
                 if (timeoutmins > 0 && step % 120 == 0) {
-//                    pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.in") + " " + timeoutmins + " " + SYSTools.xx("misc.msg.Minute(s)"));
-                    // Timeout functions
                     if (OPDE.getLogin() != null) {
                         long timeoutPeriodInMillis = timeoutmins * 60 * 1000;
                         long millisOfTimeout = lastoperation + timeoutPeriodInMillis;

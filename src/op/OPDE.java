@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2006-2012 Torsten Löhr
+ * Copyright (C) 2006-2015 Torsten Löhr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -72,10 +72,8 @@ public class OPDE {
     public static final int WARNING_TIME = 4;
     public static final int ERROR_TIME = 4;
     public static final int START_OF_MODULE_TIME = 6;
-
     public static final int DEFAULT_SCREEN_RESFRESH_MILLIS = 50;
     public static final int DEFAULT_DOCUMENT_LISTENER_REACTION_TIME_IN_MILLIS = 500;
-
 
     private static long uptime;
     public static ResourceBundle lang;
@@ -88,34 +86,15 @@ public class OPDE {
     protected static SortedProperties localProps;
     private static Logger logger;
     public static HashMap[] anonymize = null;
-
-
-//    public static String SUBDIR_CACHE = "cache";
-
     protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
     protected static SYSLogin login;
     protected static ValidatorFactory validatorFactory;
-
     protected static boolean animation = false;
     protected static boolean debug;
-    //    protected static boolean training;
     protected static boolean experimental;
-    //    protected static String oldopwd = "";
-    protected static String css = "";
-
+    protected static String css = SYSConst.fallbackCSS;
     private static int DEFAULT_TIMEOUT = 30;
-
-    //    protected static boolean FTPisWORKING = false;
-//    public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
-    protected static boolean updateAvailable = false;
-
-    public static String getUpdateDescriptionURL() {
-        return updateDescriptionURL;
-    }
-
-    protected static String updateDescriptionURL = "http://www.offene-pflege.de";
-
     protected static final String sep = System.getProperty("file.separator");
 
     /**
@@ -128,18 +107,6 @@ public class OPDE {
     public static long getUPTime() {
         return uptime;
     }
-
-    public static boolean isUpdateAvailable() {
-        return updateAvailable;
-    }
-
-    public static void setUpdateAvailable(boolean updateAvailable, String url) {
-        OPDE.updateAvailable = updateAvailable;
-        if (updateAvailable) {
-            updateDescriptionURL = url;
-        }
-    }
-
 
     public static LogicalPrinters getLogicalPrinters() {
         return printers;
@@ -246,7 +213,7 @@ public class OPDE {
     public static void fatal(Logger classLogger, Throwable e) {
         classLogger.fatal(e.getMessage(), e);
 
-        if (emf != null) {
+        if (emf != null && emf.isOpen()) {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
@@ -349,10 +316,6 @@ public class OPDE {
         return experimental;
     }
 
-//    public static boolean isTraining() {
-//        return training;
-//    }
-
     public static DesEncrypter getDesEncrypter() {
         return desEncrypter;
     }
@@ -389,7 +352,12 @@ public class OPDE {
          *
          */
 
-        System.setProperty("logs", Hardware.getAppDataPath());
+
+        FileUtils.forceMkdir(new File(AppInfo.getOPCache()));
+        FileUtils.forceMkdir(new File(AppInfo.getUserTemplatePath()));
+        FileUtils.forceMkdir(new File(Hardware.getLogPath()));
+
+        System.setProperty("logs", Hardware.getLogPath());
         logger = Logger.getRootLogger();
         uptime = SYSCalendar.now();
 
@@ -403,9 +371,12 @@ public class OPDE {
         props = new Properties();
         appInfo = new AppInfo();
 
+
         // JideSoft
         Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
         WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
+
+
 
         /***
          *       ____                                          _   _     _               ___        _   _
@@ -420,14 +391,9 @@ public class OPDE {
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
         opts.addOption("x", "experimental", false, "Schaltet experimentelle Programm-Module für User frei, die Admin Rechte haben. VORSICHT !!!!");
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
-//        opts.addOption("w", "workingdir", true, "Damit kannst Du ein anderes Arbeitsverzeichnis setzen. Wenn Du diese Option weglässt, dann ist das Dein Benutzerverzeichnis: " + System.getProperty("user.home"));
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
-
         opts.addOption("t", "setup-database", false, "Erzwingt den Start des Datenbank-Setups. Auch wenn OPDE glaubt, dass das nicht nötig ist.");
         opts.addOption("c", "enable-cache", false, "Aktiviert den JPA Cache. Standardmässig ist der abgeschaltet. (!! Achtung. Experimentell !!)");
-//        Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(SYSTools.xx("cmdline.ftpserver")).create("f");
-//        opts.addOption(optFTPserver);
-//        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
 
         Option notification = OptionBuilder.withLongOpt("notification").hasOptionalArg().withDescription("Schickt allen festgelegten Empfängern die jeweilige Benachrichtungs-Mail.").create("n");
         notification.setArgName("Liste der Empfänger (durch Komma getrennt, ohne Leerzeichen. UID verwenden). Damit kannst Du die Benachrichtigungen einschränken. Fehlt diese Liste, erhalten ALLE Empfänger eine Mail.");
@@ -447,7 +413,7 @@ public class OPDE {
 
         BasicParser parser = new BasicParser();
         CommandLine cl = null;
-        String footer = "http://www.Offene-Pflege.de";
+        String footer = "https://www.Offene-Pflege.de" + " [" + OPDE.getAppInfo().getBuilddate() + "]";
 
         /***
          *      _          _
@@ -501,33 +467,17 @@ public class OPDE {
             anonym = false;
         }
 
-        /***
-         *      _       _ _                _       _
-         *     (_)_ __ (_) |_   _ __  _ __(_)_ __ | |_ ___ _ __ ___
-         *     | | '_ \| | __| | '_ \| '__| | '_ \| __/ _ \ '__/ __|
-         *     | | | | | | |_  | |_) | |  | | | | | ||  __/ |  \__ \
-         *     |_|_| |_|_|\__| | .__/|_|  |_|_| |_|\__\___|_|  |___/
-         *                     |_|
-         */
-        printers = new LogicalPrinters();
-
-        /***
-         *      _                 _   _                 _                                   _   _
-         *     | | ___   __ _  __| | | | ___   ___ __ _| |  _ __  _ __ ___  _ __   ___ _ __| |_(_) ___  ___
-         *     | |/ _ \ / _` |/ _` | | |/ _ \ / __/ _` | | | '_ \| '__/ _ \| '_ \ / _ \ '__| __| |/ _ \/ __|
-         *     | | (_) | (_| | (_| | | | (_) | (_| (_| | | | |_) | | | (_) | |_) |  __/ |  | |_| |  __/\__ \
-         *     |_|\___/ \__,_|\__,_| |_|\___/ \___\__,_|_| | .__/|_|  \___/| .__/ \___|_|   \__|_|\___||___/
-         *                                                 |_|             |_|
-         */
 
         try {
+
+            printers = new LogicalPrinters();
 
             loadLocalProperties();
 
             try {
                 css = SYSTools.readFileAsString(AppInfo.getTemplate(AppInfo.fileStandardCSS).getAbsolutePath());
             } catch (IOException ie) {
-                css = "";
+                css = SYSConst.fallbackCSS;
             }
 
             animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
@@ -539,9 +489,6 @@ public class OPDE {
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty("debug")).equalsIgnoreCase("true")) {
                 debug = true;
                 logger.setLevel(Level.DEBUG);
-            } else {
-                debug = false;
-                logger.setLevel(Level.INFO);
             }
 
             for (Map.Entry<String, Object> obj : com.install4j.api.launcher.Variables.getInstallerVariables().entrySet()) {
@@ -721,7 +668,7 @@ public class OPDE {
 
             // trouble with the setup ?
             // start the init wizard
-            if (ioe instanceof SQLException || ioe instanceof PersistenceException) {
+            if (ioe instanceof SQLException || ioe instanceof PersistenceException || ioe instanceof IOException) {
                 logger.warn(ioe);
                 InitWizard initWizard = new InitWizard();
                 SYSTools.center(initWizard);
@@ -733,7 +680,7 @@ public class OPDE {
                 });
                 initWizard.setVisible(true);
             } else {
-                logger.fatal(ioe);
+                fatal(ioe);
                 System.exit(0);
             }
         }
@@ -857,6 +804,5 @@ public class OPDE {
         UIManager.put("ToolTip.font", SYSConst.ARIAL14);
         UIManager.put("Tree.font", SYSConst.ARIAL14);
     }
-
 
 }

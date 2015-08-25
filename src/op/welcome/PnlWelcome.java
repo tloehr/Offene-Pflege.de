@@ -4,6 +4,9 @@
 
 package op.welcome;
 
+import com.install4j.api.update.ApplicationDisplayMode;
+import com.install4j.api.update.UpdateChecker;
+import com.install4j.api.update.UpdateDescriptor;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
@@ -29,7 +32,6 @@ import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.PnlCare;
 import op.controlling.PnlControlling;
-import op.dev.PnlDev;
 import op.misc.DlgIntervention;
 import op.residents.bwassistant.AddBWWizard;
 import op.system.InternalClass;
@@ -40,6 +42,7 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
@@ -72,6 +75,8 @@ public class PnlWelcome extends CleanablePanel {
     private ArrayList<Object[]> violatingLiquidValues;
     private ArrayList<Qms> dueQMSes;
     private final int BIRTHDAY = 4;
+    private Logger logger = Logger.getLogger(getClass());
+    private UpdateDescriptor updateDescriptor = null;
 
     public PnlWelcome(JScrollPane jspSearch) {
         super("opde.welcome");
@@ -99,9 +104,17 @@ public class PnlWelcome extends CleanablePanel {
     }
 
     private void initPanel() {
-        if (OPDE.isUpdateAvailable()) {
+
+
+        try {
+            updateDescriptor = UpdateChecker.getUpdateDescriptor("https://www.offene-pflege.de/updates/updates.xml", ApplicationDisplayMode.GUI);
             btnAbout.setText(SYSTools.xx("misc.msg.updateAvailable"));
+        } catch (Exception e) {
+            logger.warn(e);
+            updateDescriptor = null;
         }
+
+
         addApps();
 
         prepareSearchArea();
@@ -563,17 +576,17 @@ public class PnlWelcome extends CleanablePanel {
     }
 
     private void btnAboutActionPerformed(ActionEvent e) {
-        Desktop desktop = Desktop.getDesktop();
-        try {
-
-            desktop.browse(new URI(OPDE.getUpdateDescriptionURL()));
-
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } catch (URISyntaxException use) {
-            use.printStackTrace();
-
-        }
+//        Desktop desktop = Desktop.getDesktop();
+//        try {
+//
+//            desktop.browse(new URI(OPDE.getUpdateDescriptionURL()));
+//
+//        } catch (IOException ioe) {
+//            ioe.printStackTrace();
+//        } catch (URISyntaxException use) {
+//            use.printStackTrace();
+//
+//        }
     }
 
 

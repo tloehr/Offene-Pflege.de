@@ -58,11 +58,10 @@ public class LogicalPrinters {
         return mapName2LogicalPrinter;
     }
 
-    public LogicalPrinters() {
+    public LogicalPrinters() throws IOException {
         initTags();
-        printers = new ArrayList<LogicalPrinter>();
-        mapName2LogicalPrinter = new HashMap<String, LogicalPrinter>();
-//        File configfile = AppInfo.getTemplate(AppInfo.filePrinters);
+        printers = new ArrayList<>();
+        mapName2LogicalPrinter = new HashMap<>();
 
         try {
             XMLReader parser = XMLReaderFactory.createXMLReader();
@@ -72,8 +71,6 @@ public class LogicalPrinters {
             parser.parse(is);
         } catch (SAXException sAXException) {
             OPDE.fatal(sAXException);
-        } catch (IOException iOException) {
-            OPDE.fatal(iOException);
         }
 
     }

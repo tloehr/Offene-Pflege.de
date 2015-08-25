@@ -26,14 +26,11 @@
  */
 package op.tools;
 
-import com.itextpdf.text.BadElementException;
-import com.itextpdf.text.Image;
 import gui.GUITools;
 import op.system.AppInfo;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -79,22 +76,22 @@ public class SYSConst {
     public static Color sun3 = new Color(153, 153, 204);
 
     // remember to add these to the installation process
-    public static String html_22x22_StopSign = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/stop.png\" border=\"0\">";
-    public static String html_22x22_Eraser = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/eraser.png\" border=\"0\">";
-    public static String html_22x22_Edited = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/edited.png\" border=\"0\">";
-    public static String html_22x22_Annotate = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/comment2.png\" border=\"0\">";
-    public static String html_48x48_biohazard = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/biohazard.png\" border=\"0\">";
-    public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/warning.png\" border=\"0\">";
-    public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/diabetes.png\" border=\"0\">";
-    public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
-    public static String html_22x22_tagPurple = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/tag_purple.png\" border=\"0\">";
-    public static String html_16x16_Eraser = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/eraser.png\" border=\"0\">";
-    public static String html_16x16_Edited = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/edited.png\" border=\"0\">";
-    public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
-    public static String html_16x16_Annotate = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/comment2.png\" border=\"0\">";
-    public static String html_16x16_apply = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/apply.png\" border=\"0\">";
-    public static String html_16x16_cancel = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/cancel.png\" border=\"0\">";
-    public static String html_16x16_empty = "<img src=\"" + SYSTools.replace(Hardware.getAppDataPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/empty.png\" border=\"0\">";
+    public static String html_22x22_StopSign = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/stop.png\" border=\"0\">";
+    public static String html_22x22_Eraser = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/eraser.png\" border=\"0\">";
+    public static String html_22x22_Edited = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/edited.png\" border=\"0\">";
+    public static String html_22x22_Annotate = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/comment2.png\" border=\"0\">";
+    public static String html_48x48_biohazard = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/biohazard.png\" border=\"0\">";
+    public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/warning.png\" border=\"0\">";
+    public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/diabetes.png\" border=\"0\">";
+    public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
+    public static String html_22x22_tagPurple = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/tag_purple.png\" border=\"0\">";
+    public static String html_16x16_Eraser = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/eraser.png\" border=\"0\">";
+    public static String html_16x16_Edited = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/edited.png\" border=\"0\">";
+    public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
+    public static String html_16x16_Annotate = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/comment2.png\" border=\"0\">";
+    public static String html_16x16_apply = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/apply.png\" border=\"0\">";
+    public static String html_16x16_cancel = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/cancel.png\" border=\"0\">";
+    public static String html_16x16_empty = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/empty.png\" border=\"0\">";
 
     public static String html_16x16_tagPurple_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/tag_purple.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Eraser_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/eraser.png").toString() + "\" border=\"0\">";
@@ -102,11 +99,11 @@ public class SYSConst {
     public static String html_16x16_scales_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/scales_of_balance_16.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Annotate_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/comment2.png").toString() + "\" border=\"0\">";
 
-    public static Image getPDF_16x16_tagPurple() throws BadElementException, IOException {
-        return Image.getInstance(Hardware.getAppDataPath() + sep + AppInfo.dirArtwork + sep + AppInfo.dirArtwork16 + sep + "tag_purple.png");
-    }
+//    public static Image getPDF_16x16_tagPurple() throws BadElementException, IOException {
+//        return Image.getInstance(Hardware.getAppDataPath() + sep + AppInfo.dirArtwork + sep + AppInfo.dirArtwork16 + sep + "tag_purple.png");
+//    }
 
-    String p = getClass().getResource("artwork/16x16/tag_purple.png").toString();
+//    String p = getClass().getResource("artwork/16x16/tag_purple.png").toString();
 
     public static String html_darkgreen = "color=\"#007600\"";
     public static String html_darkred = "color=\"#bd0000\"";
@@ -728,5 +725,26 @@ public class SYSConst {
     public static final Icon icon32reload13 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload2925.png"));
     public static final Icon icon32reload14 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload3150.png"));
     public static final Icon icon32reload15 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload3375.png"));
+
+
+    public static final String fallbackCSS = "<style type=\"text/css\" media=\"all\">\n" +
+            "body { margin:0;\n" +
+            "padding:0;\n" +
+            "}\n" +
+            "#fontsmall { font-size:10px; font-weight:bold; font-family:Arial,sans-serif;}\n" +
+            "#fonth1 { font-size:24px; font-family:Arial,sans-serif;}\n" +
+            "#fonth2 { font-size:16px; font-weight:bold; font-family:Arial,sans-serif;}\n" +
+            "#fonth3 { font-size:12px; font-weight:bold; font-family:Arial,sans-serif;}\n" +
+            "#fonttext { font-size:12px; font-family:Arial,sans-serif;}\n" +
+            "#font14 { font-size:14px; font-family:Arial,sans-serif;}\n" +
+            "#font16 { font-size:16px; font-family:Arial,sans-serif;}\n" +
+            "#font18 { font-size:18px; font-family:Arial,sans-serif;}\n" +
+            "#font20 { font-size:20px; font-family:Arial,sans-serif;}\n" +
+            "#fonttextgray { font-size:12px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
+            "#fonttextgray14 { font-size:14px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
+            "#fonttextgray16 { font-size:16px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
+            "#fonttextgray18 { font-size:18px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
+            "#fonttextgray20 { font-size:20px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
+            "</style>";
 
 }

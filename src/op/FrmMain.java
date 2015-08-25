@@ -175,10 +175,9 @@ public class FrmMain extends JFrame {
         printProcessor = new PrintProcessor();
         printProcessor.start();
 
-
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
-        label.setText(OPDE.getUrl() + " [Build " + OPDE.getAppInfo().getBuildnum() + "]" + " [JVM " + System.getProperty("java.version") + "]");
+        label.setText(OPDE.getUrl() + " [" + OPDE.getAppInfo().getBuilddate() + "]" + " [JVM " + System.getProperty("java.version") + "]");
         if (OPDE.isCustomUrl()) {
             label.setForeground(Color.RED);
         }
@@ -202,23 +201,6 @@ public class FrmMain extends JFrame {
         btnResetSplitpane.setToolTipText(SYSTools.xx("opde.mainframe.btnSplitReset.tooltip"));
 
         initPhase = false;
-
-
-//        JDialog dlg = new JDialog(this, false);
-//
-//        JPanel pnl = new JPanel();
-//        pnl.setLayout(new VerticalLayout());
-//
-//        for (float f = 0.0f; f <= 1.0; f = f + 0.01f){
-//            JLabel lbl = new JLabel(Float.toString(f));
-//            lbl.setForeground(GUITools.blend(Color.red, Color.WHITE, f));
-//            pnl.add(lbl);
-//        }
-//
-//        dlg.setContentPane(new JScrollPane(pnl));
-//
-//        dlg.pack();
-//        dlg.setVisible(true);
 
     }
 

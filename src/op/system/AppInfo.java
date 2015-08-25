@@ -53,7 +53,7 @@ public class AppInfo {
     public static final String fileStandardCSS = "standard.css";
 
     public static final String dirCache = "cache";
-    public static final String dirSql = "mysql";
+    public static final String dirSql = "dbscripts";
     public static final String dirArtwork = "artwork";
     private static final String dirTemplates = "templates";
 
@@ -85,6 +85,12 @@ public class AppInfo {
     private Properties appinfo;
 
     private String version;
+
+    public String getBuilddate() {
+        return builddate;
+    }
+
+    private String builddate;
     private int build, dbversion;
     private String progname;
 
@@ -103,6 +109,7 @@ public class AppInfo {
             in2.close();
 
             progname = appinfo.getProperty("program.PROGNAME");
+            builddate = appinfo.getProperty("program.BUILDDATE");
             version = appinfo.getProperty("program.MAJOR") + "." + appinfo.getProperty("program.MINOR") + "." + appinfo.getProperty("program.RELEASE");
             dbversion = Integer.parseInt(appinfo.getProperty("program.DBVERSION"));
             build = Integer.parseInt(appinfo.getProperty("program.BUILDNUM"));
@@ -281,9 +288,17 @@ public class AppInfo {
     }
 
 
+    public static String getUserTemplatePath() throws IOException {
+        return Hardware.getAppDataPath() + File.separator + dirTemplates;
+    }
+
+    public static String getSystemTemplatePath() throws IOException {
+        return Hardware.getProgrammPath() + File.separator + dirTemplates;
+    }
+
     public static File getTemplate(String templateName) throws IOException {
-        String userTemplatePath = Hardware.getAppDataPath() + File.separator + dirTemplates + File.separator + templateName;
-        String systemTemplatePath = Hardware.getProgrammPath() + File.separator + dirTemplates + File.separator + templateName;
+        String userTemplatePath = getUserTemplatePath() + File.separator + templateName;
+        String systemTemplatePath = getSystemTemplatePath() + File.separator + templateName;
 
         File user = new File(userTemplatePath);
         File sys = new File(systemTemplatePath);

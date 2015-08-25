@@ -1,5 +1,7 @@
 package op.tools;
 
+import op.OPDE;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,12 +62,17 @@ public class Hardware4Nix {
 		try {
 			br = read("dmidecode -t system");
 			while ((line = br.readLine()) != null) {
+				OPDE.debug(line);
+				System.out.println(line);
 				if (line.indexOf(marker) != -1) {
 					sn = line.split(marker)[1].trim();
 					break;
 				}
 			}
 		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			OPDE.error(e);
 			throw new RuntimeException(e);
 		} finally {
 			if (br != null) {
