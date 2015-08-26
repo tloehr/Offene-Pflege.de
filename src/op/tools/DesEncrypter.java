@@ -26,7 +26,7 @@ public class DesEncrypter {
     // Iteration count
     int iterationCount = 19;
 
-    private static final char[] PASSWORD = Hardware.getSerialNumber().toCharArray();
+    private static final char[] PASSWORD = LocalMachine.getSerialNumber().toCharArray();
     private static final byte[] SALT = {
             (byte) 0x1f, (byte) 0xac, (byte) 0xea, (byte) 0xff,
             (byte) 0xcf, (byte) 0x98, (byte) 0x1a, (byte) 0x01

@@ -127,21 +127,15 @@ public class FrmMain extends JFrame {
 //        }
 
         // for the timeout function
-        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-            @Override
-            public void eventDispatched(AWTEvent event) {
-                if (OPDE.getLogin() != null) {
-                    displayManager.touch();
-                }
+        Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
+            if (OPDE.getLogin() != null) {
+                displayManager.touch();
             }
         }, AWTEvent.MOUSE_MOTION_EVENT_MASK);
 
-        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-            @Override
-            public void eventDispatched(AWTEvent event) {
-                if (OPDE.getLogin() != null) {
-                    displayManager.touch();
-                }
+        Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
+            if (OPDE.getLogin() != null) {
+                displayManager.touch();
             }
         }, AWTEvent.KEY_EVENT_MASK);
 
@@ -149,7 +143,7 @@ public class FrmMain extends JFrame {
         currentResident = null;
         lblWait.setText(SYSTools.xx("misc.msg.wait"));
         lblWait.setVisible(false);
-        listOfNursingrecords = new ArrayList<CollapsiblePane>();
+        listOfNursingrecords = new ArrayList<>();
         btnHelp.setToolTipText(SYSTools.xx("opde.mainframe.btnHelp.tooltip"));
 
         iconPanels = Collections.synchronizedMap(new HashMap<Resident, JPanel>());
@@ -162,13 +156,10 @@ public class FrmMain extends JFrame {
 
         setTitle(SYSTools.getWindowTitle(""));
 
-        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, pnlIcons, pbTimeout, new Closure() {
-            @Override
-            public void execute(Object o) {
-                OPDE.debug("TIMEOUT");
-                logout();
-                showLogin();
-            }
+        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, pnlIcons, pbTimeout, o -> {
+            OPDE.debug("TIMEOUT");
+            logout();
+            showLogin();
         });
         displayManager.start();
 
@@ -282,17 +273,6 @@ public class FrmMain extends JFrame {
 
     private void btnHelpActionPerformed(ActionEvent e) {
         if (currentVisiblePanel != null && Desktop.isDesktopSupported() ) { // && currentVisiblePanel.getInternalClassID() != null && OPDE.getAppInfo().getInternalClasses().containsKey(currentVisiblePanel.getInternalClassID())
-
-//            if (OPDE.getAppInfo().getInternalClasses().get(currentVisiblePanel.getInternalClassID()).getHelpurl() != null) {
-//                try {
-//                    URI uri = new URI(SYSTools.xx(OPDE.getAppInfo().getInternalClasses().get(currentVisiblePanel.getInternalClassID()).getHelpurl()));
-//                    Desktop.getDesktop().browse(uri);
-//                } catch (Exception ex) {
-//                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
-//                }
-//            } else {
-//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
-//            }
 
             if (currentVisiblePanel.getHelpKey() != null) {
                 try {

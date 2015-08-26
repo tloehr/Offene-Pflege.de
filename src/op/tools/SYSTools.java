@@ -584,7 +584,7 @@ public class SYSTools {
         if (!moduleName.isEmpty()) {
             moduleName = ", " + SYSTools.xx(moduleName);
         }
-        return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion() + " [" + OPDE.getAppInfo().getBuildnum() + "]";
+        return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion();
     }
 
     public static void expandAll(JTree tree) {

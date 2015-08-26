@@ -101,7 +101,7 @@ public class OPDE {
      * @return Das Arbeitsverzeichnis für OPDE.
      */
     public static String getOPWD() {
-        return Hardware.getAppDataPath();
+        return LocalMachine.getAppDataPath();
     }
 
     public static long getUPTime() {
@@ -290,7 +290,7 @@ public class OPDE {
 
     public static void saveLocalProps() {
         try {
-            File configFile = new File(Hardware.getAppDataPath() + sep + AppInfo.fileConfig);
+            File configFile = new File(LocalMachine.getAppDataPath() + sep + AppInfo.fileConfig);
             FileOutputStream out = new FileOutputStream(configFile);
             localProps.store(out, "Settings Offene-Pflege.de");
             out.close();
@@ -355,15 +355,14 @@ public class OPDE {
 
         FileUtils.forceMkdir(new File(AppInfo.getOPCache()));
         FileUtils.forceMkdir(new File(AppInfo.getUserTemplatePath()));
-        FileUtils.forceMkdir(new File(Hardware.getLogPath()));
+        FileUtils.forceMkdir(new File(LocalMachine.getLogPath()));
 
-        System.setProperty("logs", Hardware.getLogPath());
+        System.setProperty("logs", LocalMachine.getLogPath());
         logger = Logger.getRootLogger();
         uptime = SYSCalendar.now();
 
         lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
         validatorFactory = Validation.buildDefaultValidatorFactory();
-        desEncrypter = new DesEncrypter();
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> OPDE.fatal(e));
 
@@ -375,7 +374,6 @@ public class OPDE {
         // JideSoft
         Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
         WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
-
 
 
         /***
@@ -473,6 +471,7 @@ public class OPDE {
             printers = new LogicalPrinters();
 
             loadLocalProperties();
+            desEncrypter = new DesEncrypter();
 
             try {
                 css = SYSTools.readFileAsString(AppInfo.getTemplate(AppInfo.fileStandardCSS).getAbsolutePath());
@@ -702,7 +701,7 @@ public class OPDE {
     private static void loadLocalProperties() throws IOException {
 
 
-        File configFile = new File(Hardware.getAppDataPath() + sep + AppInfo.fileConfig);
+        File configFile = new File(LocalMachine.getAppDataPath() + sep + AppInfo.fileConfig);
         info("configFile:" + configFile);
 
         // make sure the file exists
@@ -726,16 +725,16 @@ public class OPDE {
 
         configFile.createNewFile();
 
-        // minimum requirement
-        localProps.put(SYSPropsTools.KEY_STATION, "1");
-
         FileInputStream in = new FileInputStream(configFile);
         Properties p = new Properties();
         p.load(in);
         localProps.putAll(p);
         p.clear();
-
         in.close();
+
+        // minimum requirement
+        if (!localProps.containsKey(SYSPropsTools.KEY_STATION)) localProps.put(SYSPropsTools.KEY_STATION, "1");
+        if (!localProps.containsKey(SYSPropsTools.KEY_HOSTKEY)) localProps.put(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
 
     }
 

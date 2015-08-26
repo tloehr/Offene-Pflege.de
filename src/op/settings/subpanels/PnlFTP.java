@@ -8,7 +8,7 @@ import gui.interfaces.DefaultPanel;
 import op.OPDE;
 import op.settings.databeans.FTPConfigBean;
 import op.threads.DisplayMessage;
-import op.tools.Hardware;
+import op.tools.LocalMachine;
 import op.tools.SYSTools;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -81,9 +81,9 @@ public class PnlFTP extends DefaultPanel {
                         String md5a = SYSTools.getMD5Checksum(file);
                         ftp.uploadFile(file.getPath(), "ftptest.file");
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.upload", 1));
-                        ftp.downloadFile(Hardware.getAppDataPath() + File.separator + "ftptest.file", "ftptest.file");
+                        ftp.downloadFile(LocalMachine.getAppDataPath() + File.separator + "ftptest.file", "ftptest.file");
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.download", 1));
-                        File file2 = new File(Hardware.getAppDataPath() + File.separator + "ftptest.file");
+                        File file2 = new File(LocalMachine.getAppDataPath() + File.separator + "ftptest.file");
                         String md5b = SYSTools.getMD5Checksum(file2);
                         if (md5b.equalsIgnoreCase(md5a)) {
                             success = true;

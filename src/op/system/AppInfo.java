@@ -7,7 +7,7 @@ package op.system;
 import entity.system.Acl;
 import entity.system.SYSGROUPS2ACL;
 import op.OPDE;
-import op.tools.Hardware;
+import op.tools.LocalMachine;
 import op.tools.SYSTools;
 import op.tools.SortedProperties;
 import org.xml.sax.Attributes;
@@ -110,7 +110,7 @@ public class AppInfo {
 
             progname = appinfo.getProperty("program.PROGNAME");
             builddate = appinfo.getProperty("program.BUILDDATE");
-            version = appinfo.getProperty("program.MAJOR") + "." + appinfo.getProperty("program.MINOR") + "." + appinfo.getProperty("program.RELEASE");
+            version = appinfo.getProperty("program.MAJOR") + "." + appinfo.getProperty("program.MINOR") + "." + appinfo.getProperty("program.RELEASE") + "." + appinfo.getProperty("program.BUILDNUM");
             dbversion = Integer.parseInt(appinfo.getProperty("program.DBVERSION"));
             build = Integer.parseInt(appinfo.getProperty("program.BUILDNUM"));
 //            updateCheckUrl = appinfo.getProperty("program.UPDATECHECKURL");
@@ -289,11 +289,11 @@ public class AppInfo {
 
 
     public static String getUserTemplatePath() throws IOException {
-        return Hardware.getAppDataPath() + File.separator + dirTemplates;
+        return LocalMachine.getAppDataPath() + File.separator + dirTemplates;
     }
 
     public static String getSystemTemplatePath() throws IOException {
-        return Hardware.getProgrammPath() + File.separator + dirTemplates;
+        return LocalMachine.getProgrammPath() + File.separator + dirTemplates;
     }
 
     public static File getTemplate(String templateName) throws IOException {
@@ -307,7 +307,7 @@ public class AppInfo {
     }
 
     public static String getSQLScriptPath() {
-        return Hardware.getProgrammPath() + File.separator + dirSql;
+        return LocalMachine.getProgrammPath() + File.separator + dirSql;
     }
 
     public static File getSQLUpdateScript(int startVersion) {
@@ -331,7 +331,7 @@ public class AppInfo {
     }
 
     public static String getOPCache() {
-        return Hardware.getAppDataPath() + File.separator + dirCache;
+        return LocalMachine.getAppDataPath() + File.separator + dirCache;
     }
 
     public int getDbversion() {

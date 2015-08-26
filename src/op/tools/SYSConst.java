@@ -76,22 +76,22 @@ public class SYSConst {
     public static Color sun3 = new Color(153, 153, 204);
 
     // remember to add these to the installation process
-    public static String html_22x22_StopSign = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/stop.png\" border=\"0\">";
-    public static String html_22x22_Eraser = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/eraser.png\" border=\"0\">";
-    public static String html_22x22_Edited = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/edited.png\" border=\"0\">";
-    public static String html_22x22_Annotate = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/comment2.png\" border=\"0\">";
-    public static String html_48x48_biohazard = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/biohazard.png\" border=\"0\">";
-    public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/warning.png\" border=\"0\">";
-    public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/diabetes.png\" border=\"0\">";
-    public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
-    public static String html_22x22_tagPurple = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/tag_purple.png\" border=\"0\">";
-    public static String html_16x16_Eraser = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/eraser.png\" border=\"0\">";
-    public static String html_16x16_Edited = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/edited.png\" border=\"0\">";
-    public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
-    public static String html_16x16_Annotate = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/comment2.png\" border=\"0\">";
-    public static String html_16x16_apply = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/apply.png\" border=\"0\">";
-    public static String html_16x16_cancel = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/cancel.png\" border=\"0\">";
-    public static String html_16x16_empty = "<img src=\"" + SYSTools.replace(Hardware.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/empty.png\" border=\"0\">";
+    public static String html_22x22_StopSign = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/stop.png\" border=\"0\">";
+    public static String html_22x22_Eraser = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/eraser.png\" border=\"0\">";
+    public static String html_22x22_Edited = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/edited.png\" border=\"0\">";
+    public static String html_22x22_Annotate = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/comment2.png\" border=\"0\">";
+    public static String html_48x48_biohazard = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/biohazard.png\" border=\"0\">";
+    public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/warning.png\" border=\"0\">";
+    public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/diabetes.png\" border=\"0\">";
+    public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
+    public static String html_22x22_tagPurple = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/tag_purple.png\" border=\"0\">";
+    public static String html_16x16_Eraser = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/eraser.png\" border=\"0\">";
+    public static String html_16x16_Edited = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/edited.png\" border=\"0\">";
+    public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
+    public static String html_16x16_Annotate = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/comment2.png\" border=\"0\">";
+    public static String html_16x16_apply = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/apply.png\" border=\"0\">";
+    public static String html_16x16_cancel = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/cancel.png\" border=\"0\">";
+    public static String html_16x16_empty = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/empty.png\" border=\"0\">";
 
     public static String html_16x16_tagPurple_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/tag_purple.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Eraser_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/eraser.png").toString() + "\" border=\"0\">";

@@ -20,7 +20,7 @@ import java.util.Properties;
  */
 public class SYSPropsTools {
 
-    // unused keys
+    // this key is needed, when the hardware key generation fails. need something to encrypt the passwords with.
     public static final String KEY_HOSTKEY = "hostkey";
 
     // vital parameters. needs to be present
