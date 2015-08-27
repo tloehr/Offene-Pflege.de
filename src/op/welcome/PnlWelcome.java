@@ -108,7 +108,8 @@ public class PnlWelcome extends CleanablePanel {
 
         try {
             updateDescriptor = UpdateChecker.getUpdateDescriptor("https://www.offene-pflege.de/updates/updates.xml", ApplicationDisplayMode.GUI);
-            btnAbout.setText(SYSTools.xx("misc.msg.updateAvailable"));
+
+            btnAbout.setText(updateDescriptor.getPossibleUpdateEntry() != null ? SYSTools.xx("misc.msg.updateAvailable") : null);
         } catch (Exception e) {
             logger.warn(e);
             updateDescriptor = null;
@@ -576,17 +577,14 @@ public class PnlWelcome extends CleanablePanel {
     }
 
     private void btnAboutActionPerformed(ActionEvent e) {
-//        Desktop desktop = Desktop.getDesktop();
-//        try {
-//
-//            desktop.browse(new URI(OPDE.getUpdateDescriptionURL()));
-//
-//        } catch (IOException ioe) {
-//            ioe.printStackTrace();
-//        } catch (URISyntaxException use) {
-//            use.printStackTrace();
-//
-//        }
+        Desktop desktop = Desktop.getDesktop();
+        try {
+            desktop.browse(new URI(updateDescriptor.getPossibleUpdateEntry() == null ? SYSTools.xx("opde.general.website.url") : SYSTools.xx("opde.general.versions.url")));
+        } catch (IOException ioe) {
+            logger.warn(ioe);
+        } catch (URISyntaxException use) {
+            logger.warn(use);
+        }
     }
 
 

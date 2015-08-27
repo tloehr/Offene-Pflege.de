@@ -385,28 +385,28 @@ public class OPDE {
          *                                                                                   |_|
          */
         Options opts = new Options();
-        opts.addOption("h", "hilfe", false, "Gibt die Hilfeseite für OPDE aus.");
-        opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
-        opts.addOption("x", "experimental", false, "Schaltet experimentelle Programm-Module für User frei, die Admin Rechte haben. VORSICHT !!!!");
-        opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
-        opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
-        opts.addOption("t", "setup-database", false, "Erzwingt den Start des Datenbank-Setups. Auch wenn OPDE glaubt, dass das nicht nötig ist.");
-        opts.addOption("c", "enable-cache", false, "Aktiviert den JPA Cache. Standardmässig ist der abgeschaltet. (!! Achtung. Experimentell !!)");
+        opts.addOption("h", "help", false, SYSTools.xx("cmdline.help.description"));
+        opts.addOption("v", "version", false, SYSTools.xx("cmdline.version.description"));
+        opts.addOption("x", "experimental", false, SYSTools.xx("cmdline.experimental.description"));
+        opts.addOption("a", "anonymous", false, SYSTools.xx("cmdline.anonymous.description"));
+        opts.addOption("l", "debug", false, SYSTools.xx("cmdline.debug.description"));
+        opts.addOption("t", "setup-database", false, SYSTools.xx("cmdline.setup-database.description"));
+        opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
 
-        Option notification = OptionBuilder.withLongOpt("notification").hasOptionalArg().withDescription("Schickt allen festgelegten Empfängern die jeweilige Benachrichtungs-Mail.").create("n");
-        notification.setArgName("Liste der Empfänger (durch Komma getrennt, ohne Leerzeichen. UID verwenden). Damit kannst Du die Benachrichtigungen einschränken. Fehlt diese Liste, erhalten ALLE Empfänger eine Mail.");
-        opts.addOption(notification);
+//        Option notification = OptionBuilder.withLongOpt("notification").hasOptionalArg().withDescription("Schickt allen festgelegten Empfängern die jeweilige Benachrichtungs-Mail.").create("n");
+//        notification.setArgName("Liste der Empfänger (durch Komma getrennt, ohne Leerzeichen. UID verwenden). Damit kannst Du die Benachrichtigungen einschränken. Fehlt diese Liste, erhalten ALLE Empfänger eine Mail.");
+//        opts.addOption(notification);
 
-        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(SYSTools.xx("cmdline.jdbc")).create("j"));
+        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(SYSTools.xx("cmdline.jdbc.description")).create("j"));
 
         Option dfnimport = OptionBuilder //.withArgName("datum")
                 .withLongOpt("dfnimport").hasOptionalArg()
-                .withDescription("Startet OPDE im DFNImport Modus für den aktuellen Tag.").create("d");
-        dfnimport.setArgName("Anzahl der Tage (+ oder -) abweichend vom aktuellen Tag für den der Import durchgeführt werden soll. Nur in Ausnahmefällen anzuwenden.");
+                .withDescription(SYSTools.xx("cmdline.dfnimport.description")).create("d");
+        dfnimport.setArgName(SYSTools.xx("cmdline.dfnimport.arg1.description"));
         opts.addOption(dfnimport);
 
-        Option bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription("Startet OPDE im BHPImport Modus für den aktuellen Tag.").create("b");
-        bhpimport.setArgName("Anzahl der Tage (+ oder -) abweichend vom aktuellen Tag für den der Import durchgeführt werden soll. Nur in Ausnahmefällen anzuwenden.");
+        Option bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription(SYSTools.xx("cmdline.bhpimport.description")).create("b");
+        bhpimport.setArgName(SYSTools.xx("cmdline.dfnimport.arg1.description"));
         opts.addOption(bhpimport);
 
         BasicParser parser = new BasicParser();
@@ -532,7 +532,7 @@ public class OPDE {
             jdbcConnection.close();
 
             if (neededVersion != currentVersion)
-                throw new PersistenceException("opde database scheme version mismatch");
+                throw new PersistenceException(SYSTools.xx("error.sql.schema.version.mismatch"));
 
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
@@ -711,7 +711,7 @@ public class OPDE {
 
             // is there an old opde.cfg ?
             // then we should copy it over
-            String oldopwd = com.install4j.api.launcher.Variables.getInstallerVariable("sys.userHome") + sep + AppInfo.dirBase;
+            String oldopwd = System.getProperty("user.home") + sep + AppInfo.dirBase;
             File oldConfigFile = new File(oldopwd + sep + AppInfo.fileConfig);
 
             if (oldConfigFile.exists()) {
@@ -734,7 +734,8 @@ public class OPDE {
 
         // minimum requirement
         if (!localProps.containsKey(SYSPropsTools.KEY_STATION)) localProps.put(SYSPropsTools.KEY_STATION, "1");
-        if (!localProps.containsKey(SYSPropsTools.KEY_HOSTKEY)) localProps.put(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
+        if (!localProps.containsKey(SYSPropsTools.KEY_HOSTKEY))
+            localProps.put(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
 
     }
 
@@ -803,5 +804,6 @@ public class OPDE {
         UIManager.put("ToolTip.font", SYSConst.ARIAL14);
         UIManager.put("Tree.font", SYSConst.ARIAL14);
     }
+
 
 }
