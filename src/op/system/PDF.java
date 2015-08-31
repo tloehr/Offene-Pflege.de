@@ -196,7 +196,7 @@ public class PDF {
         endofreport.add(DateFormat.getDateTimeInstance().format(new Date()));
 
         endofreport.add(Chunk.NEWLINE);
-        endofreport.add(OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum());
+        endofreport.add(OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion());
 
         return endofreport;
     }

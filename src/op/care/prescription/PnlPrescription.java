@@ -818,74 +818,66 @@ public class PnlPrescription extends NursingRecordsPanel {
              */
             final JButton btnChange = GUITools.createHyperlinkButton("nursingrecords.prescription.btnChange.tooltip", SYSConst.icon22playerPlay, null);
             btnChange.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnChange.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgRegular(prescription.clone(), DlgRegular.MODE_CHANGE, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
+            btnChange.addActionListener(actionEvent -> new DlgRegular(prescription.clone(), DlgRegular.MODE_CHANGE, o -> {
+                if (o != null) {
 
-                                Pair<Prescription, java.util.List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
+                    Pair<Prescription, List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
 
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
 
-                                    // Fetch the new prescription from the PAIR
-                                    Prescription newPrescription = em.merge(returnPackage.getFirst());
-                                    Prescription oldPrescription = em.merge(prescription);
-                                    em.lock(oldPrescription, LockModeType.OPTIMISTIC);
+                        // Fetch the new prescription from the PAIR
+                        Prescription newPrescription = em.merge(returnPackage.getFirst());
+                        Prescription oldPrescription = em.merge(prescription);
+                        em.lock(oldPrescription, LockModeType.OPTIMISTIC);
 
-                                    // First close the old prescription
-                                    DateTime now = new DateTime();
-                                    oldPrescription.setTo(now.toDate());
-                                    oldPrescription.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-                                    oldPrescription.setDocOFF(newPrescription.getDocON() == null ? null : em.merge(newPrescription.getDocON()));
-                                    oldPrescription.setHospitalOFF(newPrescription.getHospitalON() == null ? null : em.merge(newPrescription.getHospitalON()));
+                        // First close the old prescription
+                        DateTime now = new DateTime();
+                        oldPrescription.setTo(now.toDate());
+                        oldPrescription.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+                        oldPrescription.setDocOFF(newPrescription.getDocON() == null ? null : em.merge(newPrescription.getDocON()));
+                        oldPrescription.setHospitalOFF(newPrescription.getHospitalON() == null ? null : em.merge(newPrescription.getHospitalON()));
 
-                                    // the new prescription starts 1 second after the old one closes
-                                    newPrescription.setFrom(now.plusSeconds(1).toDate());
+                        // the new prescription starts 1 second after the old one closes
+                        newPrescription.setFrom(now.plusSeconds(1).toDate());
 
-                                    // create new BHPs according to the prescription
-                                    BHPTools.generate(em, newPrescription.getPrescriptionSchedule(), new LocalDate(), true);
-                                    em.getTransaction().commit();
+                        // create new BHPs according to the prescription
+                        BHPTools.generate(em, newPrescription.getPrescriptionSchedule(), new LocalDate(), true);
+                        em.getTransaction().commit();
 
-                                    lstPrescriptions.remove(prescription);
-                                    lstPrescriptions.add(oldPrescription);
-                                    lstPrescriptions.add(newPrescription);
-                                    Collections.sort(lstPrescriptions);
+                        lstPrescriptions.remove(prescription);
+                        lstPrescriptions.add(oldPrescription);
+                        lstPrescriptions.add(newPrescription);
+                        Collections.sort(lstPrescriptions);
 
-                                    // Refresh Display
-                                    createCP4(oldPrescription);
-                                    final CollapsiblePane myNewCP = createCP4(newPrescription);
-                                    buildPanel();
-                                    GUITools.flashBackground(myNewCP, Color.YELLOW, 2);
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-//                                buildPanel();
-                            }
+                        // Refresh Display
+                        createCP4(oldPrescription);
+                        final CollapsiblePane myNewCP = createCP4(newPrescription);
+                        buildPanel();
+                        GUITools.flashBackground(myNewCP, Color.YELLOW, 2);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
                         }
-                    });
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+//                                buildPanel();
                 }
-            });
+            }));
             btnChange.setEnabled(!prescription.isClosed() && !prescription.isOnDemand() && numBHPs != 0);
             pnlMenu.add(btnChange);
 
@@ -899,63 +891,55 @@ public class PnlPrescription extends NursingRecordsPanel {
              */
             final JButton btnStop = GUITools.createHyperlinkButton("nursingrecords.prescription.btnStop.tooltip", SYSConst.icon22playerStop, null);
             btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnStop.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgDiscontinue(prescription, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    Prescription myPrescription = (Prescription) em.merge(o);
-                                    em.lock(myPrescription.getResident(), LockModeType.OPTIMISTIC);
-                                    em.lock(myPrescription, LockModeType.OPTIMISTIC);
-                                    myPrescription.setTo(new Date());
-                                    em.getTransaction().commit();
+            btnStop.addActionListener(actionEvent -> new DlgDiscontinue(prescription, o -> {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Prescription myPrescription = (Prescription) em.merge(o);
+                        em.lock(myPrescription.getResident(), LockModeType.OPTIMISTIC);
+                        em.lock(myPrescription, LockModeType.OPTIMISTIC);
+                        myPrescription.setTo(new Date());
+                        em.getTransaction().commit();
 
-                                    lstPrescriptions.remove(prescription);
-                                    lstPrescriptions.add(myPrescription);
-                                    Collections.sort(lstPrescriptions);
-                                    final CollapsiblePane myCP = createCP4(myPrescription);
+                        lstPrescriptions.remove(prescription);
+                        lstPrescriptions.add(myPrescription);
+                        Collections.sort(lstPrescriptions);
+                        final CollapsiblePane myCP = createCP4(myPrescription);
 
-                                    buildPanel();
+                        buildPanel();
 
 
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
-                                                @Override
-                                                public void execute(Object o) {
-                                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
-                                                }
-                                            });
-                                        }
-                                    });
-
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
+                                    @Override
+                                    public void execute(Object o) {
+                                        GUITools.flashBackground(myCP, Color.YELLOW, 2);
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
+                                });
                             }
+                        });
+
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
                         }
-                    });
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        em.getTransaction().rollback();
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
                 }
-            });
+            }));
             btnStop.setEnabled(!prescription.isClosed()); //  && numBHPs != 0
             pnlMenu.add(btnStop);
 
@@ -1129,7 +1113,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
 
             });
-            btnEdit.setEnabled(!prescription.isClosed() && numBHPs == 0);
+            btnEdit.setEnabled(prescription.isMine() && !prescription.isClosed() && numBHPs == 0);
             pnlMenu.add(btnEdit);
 
 
@@ -1257,7 +1241,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
                 }
             });
-            btnTAGs.setEnabled(!prescription.isClosed());
+            btnTAGs.setEnabled(prescription.isMine() && !prescription.isClosed());
             pnlMenu.add(btnTAGs);
 
 
@@ -1333,7 +1317,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
                 }
             });
-            btnAnnotation.setEnabled(!prescription.isClosed() && prescription.hasMed() && PrescriptionTools.isAnnotationNecessary(prescription));
+            btnAnnotation.setEnabled(prescription.isMine() && !prescription.isClosed() && prescription.hasMed() && PrescriptionTools.isAnnotationNecessary(prescription));
             pnlMenu.add(btnAnnotation);
         }
 
@@ -1396,7 +1380,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
 
             });
-            btnDelete.setEnabled(numBHPs == 0 && !prescription.isClosed());
+            btnDelete.setEnabled(prescription.isMine() && numBHPs == 0 && !prescription.isClosed());
             pnlMenu.add(btnDelete);
         }
         // checked for acls

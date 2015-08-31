@@ -336,7 +336,7 @@ public class TXEssenDoc {
                     + " // " + ResidentTools.getLabelText(resident)
                     + " // " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(new Date())
                     + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
-                    + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                    + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
 
             ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
             stamp.alterContents();
@@ -351,7 +351,7 @@ public class TXEssenDoc {
                 String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
                         + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
-                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
                 ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
                 stamp.alterContents();
                 copy.addPage(page);
@@ -366,7 +366,7 @@ public class TXEssenDoc {
                 String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
                         + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
-                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
                 ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
                 stamp.alterContents();
                 copy.addPage(page);
@@ -382,7 +382,7 @@ public class TXEssenDoc {
                 String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
                         + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
-                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
                 ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
                 stamp.alterContents();
                 copy.addPage(page);
@@ -398,7 +398,7 @@ public class TXEssenDoc {
                 String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
                         + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
-                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
                 ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
                 stamp.alterContents();
                 copy.addPage(page);

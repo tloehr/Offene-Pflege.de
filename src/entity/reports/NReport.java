@@ -4,6 +4,7 @@
  */
 package entity.reports;
 
+import entity.Ownable;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.process.QProcess;
@@ -26,7 +27,7 @@ import java.util.*;
 @Entity
 @Table(name = "nreports")
 
-public class NReport implements Serializable, QProcessElement, Comparable<NReport>, Cloneable {
+public class NReport extends Ownable implements Serializable, QProcessElement, Comparable<NReport>, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -277,9 +278,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         return commontags;
     }
 
-//    public void setTags(Collection<NReportTAGS> tags) {
-//        this.tags = tags;
-//    }
 
     public Users getUser() {
         return user;
@@ -287,6 +285,11 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    @Override
+    public Users getOwner() {
+        return user;
     }
 
     @Override

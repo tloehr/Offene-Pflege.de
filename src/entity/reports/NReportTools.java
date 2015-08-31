@@ -35,13 +35,10 @@ import java.util.List;
  */
 public class NReportTools {
 
-    public static boolean isMine(NReport nReport) {
-        return OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser());
-    }
+    public static boolean ALLOW_EDIT_OF_OTHER_PEOPLES_REPORTS = false;
 
     public static boolean isChangeable(NReport nReport) {
-//        OPDE.debug(nReport.getPbid());
-        return !nReport.isObsolete() && nReport.getResident().isActive() && nReport.getUsersAcknowledged().isEmpty();
+        return (ALLOW_EDIT_OF_OTHER_PEOPLES_REPORTS || nReport.isMine()) && !nReport.isObsolete() && nReport.getResident().isActive() && nReport.getUsersAcknowledged().isEmpty();
     }
 
     /**

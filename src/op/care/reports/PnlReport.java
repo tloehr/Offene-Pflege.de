@@ -1541,7 +1541,7 @@ public class PnlReport extends NursingRecordsPanel {
 
                 }
             });
-            btnTAGs.setEnabled(NReportTools.isChangeable(nreport) && NReportTools.isMine(nreport));
+            btnTAGs.setEnabled(NReportTools.isChangeable(nreport));
             pnlMenu.add(btnTAGs);
 
 
@@ -1620,7 +1620,7 @@ public class PnlReport extends NursingRecordsPanel {
                     menu.show(btnMinutes, 0, btnMinutes.getHeight());
                 }
             });
-            btnMinutes.setEnabled(!nreport.isObsolete() && NReportTools.isMine(nreport));
+            btnMinutes.setEnabled(!nreport.isObsolete() && nreport.isMine());
             pnlMenu.add(btnMinutes);
 
             pnlMenu.add(new JSeparator());

@@ -84,14 +84,14 @@ public class AppInfo {
      */
     private Properties appinfo;
 
-    private String version;
+//    private String version;
 
-    public String getBuilddate() {
-        return builddate;
-    }
+//    public String getBuilddate() {
+//        return builddate;
+//    }
 
     private String builddate;
-    private int build, dbversion;
+    private int dbversion;
     private String progname;
 
     public AppInfo() {
@@ -110,10 +110,7 @@ public class AppInfo {
 
             progname = appinfo.getProperty("program.PROGNAME");
             builddate = appinfo.getProperty("program.BUILDDATE");
-            version = appinfo.getProperty("program.MAJOR") + "." + appinfo.getProperty("program.MINOR") + "." + appinfo.getProperty("program.RELEASE") + "." + appinfo.getProperty("program.BUILDNUM");
             dbversion = Integer.parseInt(appinfo.getProperty("program.DBVERSION"));
-            build = Integer.parseInt(appinfo.getProperty("program.BUILDNUM"));
-//            updateCheckUrl = appinfo.getProperty("program.UPDATECHECKURL");
 
             // parse appinfo.xml
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
@@ -186,17 +183,22 @@ public class AppInfo {
         return allowed;
     }
 
-    public SortedProperties getDefaultProperties() {
-        return defaultProperties;
-    }
+//    public SortedProperties getDefaultProperties() {
+//        return defaultProperties;
+//    }
 
     public String getVersion() {
-        return version;
+        return appinfo.getProperty("program.MAJOR") + "." + appinfo.getProperty("program.MINOR") + "." + appinfo.getProperty("program.RELEASE");
     }
 
-    public int getBuildnum() {
-        return build;
+    public String getBuildInformation() {
+        return "[" + appinfo.getProperty("program.BUILDNUM") + "|" + appinfo.getProperty("program.BUILDDATE") + "|" + System.getProperty("java.version") + "]";
     }
+
+    public String getVersionVerbose() {
+        return getVersion() + " " + getBuildInformation();
+    }
+
 
     public String getProgname() {
         return progname;
@@ -340,10 +342,7 @@ public class AppInfo {
 
     public String getSignature() {
         return (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "") + "; " + DateFormat.getDateTimeInstance().format(new Date())
-                + "; " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                + "; " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
     }
 
-//    public String getUpdateCheckUrl() {
-//        return updateCheckUrl;
-//    }
 }

@@ -109,7 +109,7 @@ public class FrmMain extends JFrame {
 
     private CleanablePanel currentVisiblePanel;
     private Resident currentResident;
-//    private String currentClassname;
+    //    private String currentClassname;
     private JideButton previousProgButton;
     private LabelStatusBarItem labelUSER;
     private JScrollPane jspSearch, jspApps;
@@ -121,10 +121,6 @@ public class FrmMain extends JFrame {
         initPhase = true;
         initComponents();
 
-
-//        if (OPDE.isTraining()) {
-//            pnlMainMessage.setBackground(SYSConst.mediumorchid2.brighter().brighter());
-//        }
 
         // for the timeout function
         Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
@@ -168,8 +164,8 @@ public class FrmMain extends JFrame {
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
-        label.setText(OPDE.getUrl() + " [" + OPDE.getAppInfo().getBuilddate() + "]" + " [JVM " + System.getProperty("java.version") + "]");
-        if (OPDE.isCustomUrl()) {
+        label.setText(OPDE.getUrl() + " " + OPDE.getAppInfo().getBuildInformation());
+        if (OPDE.isCustomJDBCUrl()) {
             label.setForeground(Color.RED);
         }
         label.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -272,7 +268,7 @@ public class FrmMain extends JFrame {
     }
 
     private void btnHelpActionPerformed(ActionEvent e) {
-        if (currentVisiblePanel != null && Desktop.isDesktopSupported() ) { // && currentVisiblePanel.getInternalClassID() != null && OPDE.getAppInfo().getInternalClasses().containsKey(currentVisiblePanel.getInternalClassID())
+        if (currentVisiblePanel != null && Desktop.isDesktopSupported()) { // && currentVisiblePanel.getInternalClassID() != null && OPDE.getAppInfo().getInternalClasses().containsKey(currentVisiblePanel.getInternalClassID())
 
             if (currentVisiblePanel.getHelpKey() != null) {
                 try {
@@ -442,16 +438,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -872,9 +868,12 @@ public class FrmMain extends JFrame {
         if (blocked) {
             lblWait.setVisible(true);
             JPanel glass = new JPanel();
-            glass.addMouseListener(new MouseAdapter() {});
-            glass.addMouseMotionListener(new MouseMotionAdapter() {});
-            glass.addKeyListener(new KeyAdapter() {});
+            glass.addMouseListener(new MouseAdapter() {
+            });
+            glass.addMouseMotionListener(new MouseMotionAdapter() {
+            });
+            glass.addKeyListener(new KeyAdapter() {
+            });
             glass.setOpaque(false);
             setGlassPane(glass);
             getGlassPane().setVisible(true);

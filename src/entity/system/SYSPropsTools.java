@@ -97,6 +97,10 @@ public class SYSPropsTools {
     public static final String KEY_OUTCOME_FGSHIFT = "OUTCOME_FGSHIFT";
     public static final String KEY_OUTCOME_BGSHIFT = "OUTCOME_BGSHIFT";
 
+    public static final String KEY_ANIMATION = "animation";
+    public static final String KEY_DEBUG = "debug";
+    public static final String KEY_EXPERIMENTAL = "experimental";
+
     // not used
 //    public static final String KEY_OUTCOME_FGITEM = "OUTCOME_FGITEM";
 //    public static final String KEY_OUTCOME_BGITEM = "OUTCOME_BGITEM";

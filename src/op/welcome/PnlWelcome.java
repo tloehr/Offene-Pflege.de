@@ -105,19 +105,16 @@ public class PnlWelcome extends CleanablePanel {
 
     private void initPanel() {
 
-
         try {
             updateDescriptor = UpdateChecker.getUpdateDescriptor("https://www.offene-pflege.de/updates/updates.xml", ApplicationDisplayMode.GUI);
-
+            // this may rise an uncritical java.io.FileNotFoundException, usually during development not in production.
             btnAbout.setText(updateDescriptor.getPossibleUpdateEntry() != null ? SYSTools.xx("misc.msg.updateAvailable") : null);
         } catch (Exception e) {
             logger.warn(e);
             updateDescriptor = null;
         }
 
-
         addApps();
-
         prepareSearchArea();
     }
 

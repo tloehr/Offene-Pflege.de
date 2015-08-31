@@ -5,6 +5,7 @@
 
 package entity.prescription;
 
+import entity.Ownable;
 import entity.files.SYSPRE2FILE;
 import entity.info.ResInfo;
 import entity.info.Resident;
@@ -15,7 +16,6 @@ import entity.process.SYSPRE2PROCESS;
 import entity.system.Commontags;
 import entity.system.Users;
 import op.OPDE;
-import op.care.prescription.PnlPrescription;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -89,7 +89,7 @@ import java.util.List;
 @Entity
 @Table(name = "prescription")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class Prescription implements Serializable, QProcessElement, Cloneable, Comparable<Prescription> {
+public class Prescription extends Ownable implements Serializable, QProcessElement, Cloneable, Comparable<Prescription> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -361,6 +361,11 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
 
     @Override
+    public Users getOwner() {
+        return userON;
+    }
+
+    @Override
     public String getTitle() {
         return SYSTools.xx("nursingrecords.prescription") + ": " + PrescriptionTools.getShortDescriptionAsCompactText(this);
     }
@@ -384,6 +389,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     public boolean isLimited() {
         return to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
+
 
     public boolean isOnDemand() {
         return situation != null;

@@ -849,7 +849,8 @@ public class InitWizard extends WizardDialog {
 
         protected void append(LoggingEvent event) {
             if (event.getLevel().isGreaterOrEqual(Logger.getRootLogger().getLevel())) {
-                GUITools.appendText(SYSTools.left(defaultPatternLayout.format(event), 100, "...\n"), jTextA, getCurrentStyle(event.getLevel()));
+                String message = event.getLevel().isGreaterOrEqual(Level.WARN) ? defaultPatternLayout.format(event) : SYSTools.left(defaultPatternLayout.format(event), 100, "...\n");
+                GUITools.appendText(message, jTextA, getCurrentStyle(event.getLevel()));
             }
         }
 

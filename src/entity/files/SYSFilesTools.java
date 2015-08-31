@@ -575,7 +575,7 @@ public class SYSFilesTools {
                     "<div id=\"fonttext\">" +
                     "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum() + "</div></body></html>";
+                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "</div></body></html>";
 
 
             // Write to temp file
@@ -605,7 +605,7 @@ public class SYSFilesTools {
                     "<div id=\"fonttext\">" +
                     "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum() + "</div></body></html>";
+                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "</div></body></html>";
 
 
             // Write to temp file

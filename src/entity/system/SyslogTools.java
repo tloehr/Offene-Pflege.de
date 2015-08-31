@@ -46,7 +46,7 @@ public class SyslogTools {
 
         SYSLogin login = OPDE.getLogin();
 
-        message = String.format("[%s] [%s] %s", Integer.toString(OPDE.getAppInfo().getBuildnum()), login != null ? login.getUser().getUID() : "nobody", message);
+        message = String.format("[%s] %s", login != null ? login.getUser().getUID() : "nobody", message);
 
         try {
             localMachine = InetAddress.getLocalHost();
@@ -62,7 +62,7 @@ public class SyslogTools {
 
         InetAddress localMachine = null;
         SYSLogin login = OPDE.getLogin();
-        message = String.format("[%s] [%s] %s", Integer.toString(OPDE.getAppInfo().getBuildnum()), login != null ? login.getUser().getUID() : "nobody", message);
+        message = String.format("[%s] %s",  login != null ? login.getUser().getUID() : "nobody", message);
 
         try {
             localMachine = InetAddress.getLocalHost();

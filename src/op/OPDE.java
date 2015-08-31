@@ -96,6 +96,7 @@ public class OPDE {
     protected static String css = SYSConst.fallbackCSS;
     private static int DEFAULT_TIMEOUT = 30;
     protected static final String sep = System.getProperty("file.separator");
+    private static boolean customJDBCUrl;
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -156,9 +157,8 @@ public class OPDE {
     }
 
 
-    public static boolean isCustomUrl() {
-        return !url.equals(localProps.getProperty("javax.persistence.jdbc.url"));
-
+    public static boolean isCustomJDBCUrl() {
+        return customJDBCUrl;
     }
 
     public static String getUrl() {
@@ -411,7 +411,7 @@ public class OPDE {
 
         BasicParser parser = new BasicParser();
         CommandLine cl = null;
-        String footer = "https://www.Offene-Pflege.de" + " [" + OPDE.getAppInfo().getBuilddate() + "]";
+        String footer = "https://www.Offene-Pflege.de" + " [" + OPDE.getAppInfo().getBuildInformation() + "]";
 
         /***
          *      _          _
@@ -425,13 +425,13 @@ public class OPDE {
             cl = parser.parse(opts, args);
         } catch (ParseException ex) {
             HelpFormatter f = new HelpFormatter();
-            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion() + " [" + appInfo.getBuildnum() + "]", opts, footer);
+            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion(), opts, footer);
             System.exit(0);
         }
 
         if (cl.hasOption("h")) {
             HelpFormatter f = new HelpFormatter();
-            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion() + " [" + appInfo.getBuildnum() + "]", opts, footer);
+            f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion(), opts, footer);
             System.exit(0);
         }
 
@@ -446,6 +446,7 @@ public class OPDE {
         String header = SYSTools.getWindowTitle("");
         if (cl.hasOption("v")) {
             System.out.println(header);
+            System.out.println(appInfo.getVersionVerbose());
             System.out.println(footer);
             System.exit(0);
         }
@@ -479,13 +480,13 @@ public class OPDE {
                 css = SYSConst.fallbackCSS;
             }
 
-            animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
+            animation = SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_ANIMATION)).equals("true");
 
-            logger.info("######### START ###########  " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum());
+            logger.info("######### START ###########  " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion());
             logger.info(System.getProperty("os.name").toLowerCase());
 
 
-            if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty("debug")).equalsIgnoreCase("true")) {
+            if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_DEBUG)).equalsIgnoreCase("true")) {
                 debug = true;
                 logger.setLevel(Level.DEBUG);
             }
@@ -496,7 +497,7 @@ public class OPDE {
 
             Logger.getLogger("org.hibernate").setLevel(Level.OFF);
 
-            if (cl.hasOption("x") || SYSTools.catchNull(localProps.getProperty("experimental")).equalsIgnoreCase("true")) {
+            if (cl.hasOption("x") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_EXPERIMENTAL)).equalsIgnoreCase("true")) {
                 experimental = true;
 
             } else {
@@ -518,7 +519,9 @@ public class OPDE {
             Properties jpaProps = new Properties();
             jpaProps.putAll(localProps);
 
-            url = cl.hasOption("j") ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
+            customJDBCUrl = cl.hasOption("j");
+            url = customJDBCUrl ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
+
             jpaProps.put(SYSPropsTools.KEY_JDBC_URL, url);
             jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, decryptJDBCPasswort());
 
@@ -734,6 +737,7 @@ public class OPDE {
 
         // minimum requirement
         if (!localProps.containsKey(SYSPropsTools.KEY_STATION)) localProps.put(SYSPropsTools.KEY_STATION, "1");
+        if (!localProps.containsKey(SYSPropsTools.KEY_ANIMATION)) localProps.put(SYSPropsTools.KEY_ANIMATION, "true");
         if (!localProps.containsKey(SYSPropsTools.KEY_HOSTKEY))
             localProps.put(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
 
