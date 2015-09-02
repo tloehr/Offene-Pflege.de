@@ -18,20 +18,17 @@ import java.util.List;
  */
 public class SituationsTools {
     public static ListCellRenderer getSituationenRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
+        return (jList, o, i, b, b1) -> {
 
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof Situations) {
-                    text = ((Situations) o).getText();
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+            } else if (o instanceof Situations) {
+                text = ((Situations) o).getText();
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
         };
     }
 

@@ -48,7 +48,6 @@ import java.util.Properties;
  */
 @Entity
 @Table(name = "resident")
-
 public class Resident implements Serializable, Comparable<Resident> {
     private static final long serialVersionUID = 1L;
     @Id

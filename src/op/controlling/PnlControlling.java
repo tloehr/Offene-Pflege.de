@@ -57,6 +57,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
@@ -121,7 +122,6 @@ public class PnlControlling extends CleanablePanel {
 //    boolean isCancelled;
 //    Object[] o = null;
 //
-
 
 
     /**
@@ -481,15 +481,17 @@ public class PnlControlling extends CleanablePanel {
 
 
                             if (copyTargetDirectory != null) {
-                                FileUtils.copyFile(source, copyTargetDirectory);
+                                FileUtils.copyFileToDirectory(source, copyTargetDirectory);
                             } else {
                                 if (n == 0) {
                                     SYSFilesTools.handleFile((File) get(), Desktop.Action.OPEN);
                                 }
                             }
-
+                        } catch (IOException ioe) {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ioe.getMessage(), DisplayMessage.WARNING));
+                            Logger.getLogger(getClass()).error(ioe);
                         } catch (Exception e) {
-                            OPDE.fatal(e);
+                            OPDE.fatal(Logger.getLogger(getClass()), e);
                         }
 
                         OPDE.getDisplayManager().setProgressBarMessage(null);
