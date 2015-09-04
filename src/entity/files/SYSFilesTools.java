@@ -549,6 +549,10 @@ public class SYSFilesTools {
         return SYSConst.html_fontface + result + "</font>";
     }
 
+    public static File print(String html, boolean addPrintJScript) {
+        return print(html, addPrintJScript, true);
+    }
+
     /**
      * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit.
      * Erstellt temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
@@ -556,7 +560,7 @@ public class SYSFilesTools {
      * @param html
      * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
      */
-    public static File print(String html, boolean addPrintJScript) {
+    public static File print(String html, boolean addPrintJScript, boolean handleTheFile) {
         File temp = null;
         try {
             // Create temp file.
@@ -583,7 +587,7 @@ public class SYSFilesTools {
             out.write(text);
 
             out.close();
-            SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
+            if (handleTheFile) SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
             OPDE.error(e);
         }

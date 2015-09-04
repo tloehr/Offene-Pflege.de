@@ -4,9 +4,7 @@ import entity.EntityTools;
 import entity.info.ResInfoCategory;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.system.Commontags;
 import op.OPDE;
-import op.care.nursingprocess.PnlNursingProcess;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -38,6 +36,22 @@ public class NursingProcessTools {
         Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :resident AND p.category = :cat ORDER BY p.topic, p.from");
         query.setParameter("cat", cat);
         query.setParameter("resident", resident);
+        ArrayList<NursingProcess> planungen = new ArrayList<NursingProcess>(query.getResultList());
+        em.close();
+        return planungen;
+    }
+
+    public static ArrayList<NursingProcess> getAll(Resident resident, ResInfoCategory cat, LocalDate from, LocalDate to) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :resident AND p.category = :cat " +
+                " AND ((p.from <= :from AND p.to >= :from) OR " +
+                " (p.from <= :to AND p.to >= :to) OR " +
+                " (p.from > :from AND p.to < :to)) " +
+                " ORDER BY p.topic, p.from");
+        query.setParameter("cat", cat);
+        query.setParameter("resident", resident);
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(to).toDate());
         ArrayList<NursingProcess> planungen = new ArrayList<NursingProcess>(query.getResultList());
         em.close();
         return planungen;
@@ -100,7 +114,12 @@ public class NursingProcessTools {
      * @return
      */
     public static String getAsHTML(NursingProcess np, boolean withHeader, boolean withDetails, boolean withIcon, boolean showAllEvals) {
-        String html = SYSConst.html_h2((withHeader ? SYSTools.xx("nursingrecords.nursingprocess") + " " + SYSTools.xx("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")" : "") + "&nbsp;&raquo;" + np.getTopic() + "&laquo");
+        String html = "";// : "";
+
+        if (withHeader) {
+            html += SYSConst.html_h2(SYSTools.xx("nursingrecords.nursingprocess") + " " + SYSTools.xx("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")");
+            html += "<br/>&raquo;" + np.getTopic() + "&laquo";
+        }
 
         html += withIcon && np.isClosed() ? SYSConst.html_22x22_StopSign : "";
 

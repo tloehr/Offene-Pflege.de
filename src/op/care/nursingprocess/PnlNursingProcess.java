@@ -38,6 +38,7 @@ import entity.files.SYSFilesTools;
 import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.nursingprocess.*;
 import entity.process.*;
 import entity.system.Commontags;
@@ -632,6 +633,41 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
         GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
+
+        /***
+         *      ____       _       _
+         *     |  _ \ _ __(_)_ __ | |_
+         *     | |_) | '__| | '_ \| __|
+         *     |  __/| |  | | | | | |_
+         *     |_|   |_|  |_|_| |_|\__|
+         *
+         */
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+            final JButton btnPrint = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    String html = "";
+                    html += "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.nursingprocess");
+                    html += " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
+
+                    for (ResInfoCategory cat : categories) {
+                        ArrayList<NursingProcess> allNPsForThisCat = NursingProcessTools.getAll(resident, cat);
+                        if (!allNPsForThisCat.isEmpty()) {
+                            html += "<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n";
+                            for (NursingProcess np : NursingProcessTools.getAll(resident, cat)) {
+                                html += "<h3 id=\"fonth3\" >" + np.getTopic() + "</h3>\n";
+                                html += NursingProcessTools.getAsHTML(np, false, true, true, true);
+                            }
+                        }
+                    }
+                    SYSFilesTools.print(html, true);
+                }
+            });
+            btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+            mypanel.add(btnPrint);
+        }
         GUITools.addAllComponents(mypanel, addKey());
 
         searchPane.setContentPane(mypanel);
@@ -884,7 +920,10 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 }
             });
 
+
             list.add(addTemplate);
+
+
         }
 
         final JideButton btnExpandAll = GUITools.createHyperlinkButton(SYSTools.xx("misc.msg.expandall"), SYSConst.icon22expand, new ActionListener() {

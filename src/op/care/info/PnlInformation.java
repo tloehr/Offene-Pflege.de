@@ -246,10 +246,49 @@ public class PnlInformation extends NursingRecordsPanel {
                                     }
                                 }
                             });
+//                            cpTitleCat.getRight().add(new JButton());
+
+
+                            /***
+                             *      ____       _       _
+                             *     |  _ \ _ __(_)_ __ | |_
+                             *     | |_) | '__| | '_ \| __|
+                             *     |  __/| |  | | | | | |_
+                             *     |_|   |_|  |_|_| |_|\__|
+                             *
+                             */
+                            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+                                final JButton btnPrint = GUITools.getTinyButton(SYSTools.xx("misc.commands.print"), SYSConst.icon22print2);
+                                btnPrint.addActionListener(e -> {
+
+                                    String html = "";
+                                    html += "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.info");
+                                    html += " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
+
+
+                                    html += "<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n";
+                                    for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
+                                        if (mapType2ResInfos.containsKey(type) && !mapType2ResInfos.get(type).isEmpty()) {
+                                            html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
+
+                                            html += type.getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
+                                            html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
+                                            html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
+                                            html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+
+                                            html += ResInfoTools.getResInfosAsHTML(mapType2ResInfos.get(type), true, null);
+                                        }
+                                    }
+
+                                    SYSFilesTools.print(html, true);
+                                });
+                                btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+                                cpTitleCat.getRight().add(btnPrint);
+                            }
 
 
                             GUITools.addExpandCollapseButtons(cpCat, cpTitleCat.getRight());
-
 
 
                             cpTitleCat.getButton().setFont(SYSConst.ARIAL24);
@@ -281,6 +320,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                         mapKey2CP.put(keyResInfoType, new CollapsiblePane());
                                     }
                                     mapKey2CP.get(keyResInfoType).setStyle(CollapsiblePane.TREE_STYLE);
+
 
                                     CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
                                         @Override
@@ -327,19 +367,57 @@ public class PnlInformation extends NursingRecordsPanel {
                                     }
                                 }
 
+                                DefaultCPTitle dctpt = null;
                                 if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-                                    cpResInfoType.setTitle(resInfoType.getShortDescription() + " [" + single + "]");
+                                    dctpt = new DefaultCPTitle(resInfoType.getShortDescription() + " [" + single + "]", null);
+//                                    cpResInfoType.setTitleLabelComponent(dctpt.getMain());
                                 } else {
 
                                     if (active + closed == 0) {
-                                        cpResInfoType.setTitle(resInfoType.getShortDescription());
+                                        dctpt = new DefaultCPTitle(resInfoType.getShortDescription(), null);
                                     } else {
-                                        cpResInfoType.setTitle(resInfoType.getShortDescription() + " [" + SYSTools.xx("misc.msg.active") + ": " + active +
+                                        dctpt = new DefaultCPTitle(resInfoType.getShortDescription() + " [" + SYSTools.xx("misc.msg.active") + ": " + active +
                                                 " " + SYSTools.xx("misc.msg.closed") + ": " + closed +
-                                                "]");
+                                                "]", null);
                                     }
                                 }
+                                cpResInfoType.setTitleLabelComponent(dctpt.getMain());
+                                /***
+                                 *      ____       _       _
+                                 *     |  _ \ _ __(_)_ __ | |_
+                                 *     | |_) | '__| | '_ \| __|
+                                 *     |  __/| |  | | | | | |_
+                                 *     |_|   |_|  |_|_| |_|\__|
+                                 *
+                                 */
+                                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+                                    final JButton btnPrint = GUITools.getTinyButton(SYSTools.xx("misc.commands.print"), SYSConst.icon22print2);
+                                    btnPrint.addActionListener(e -> {
 
+                                        String html = "";
+                                        html += "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.info");
+                                        html += " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
+
+
+                                        html += "<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n";
+
+                                        if (mapType2ResInfos.containsKey(resInfoType) && !mapType2ResInfos.get(resInfoType).isEmpty()) {
+                                            html += "<h3 id=\"fonth3\" >" + resInfoType.getShortDescription() + "</h3>\n";
+
+                                            html += resInfoType.getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
+                                            html += resInfoType.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
+                                            html += resInfoType.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
+                                            html += resInfoType.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+
+                                            html += ResInfoTools.getResInfosAsHTML(mapType2ResInfos.get(resInfoType), true, null);
+                                        }
+
+
+                                        SYSFilesTools.print(html, true);
+                                    });
+                                    btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                                    dctpt.getRight().add(btnPrint);
+                                }
 
                                 cpResInfoType.setFont(SYSConst.ARIAL18);
 
@@ -1301,6 +1379,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 //BAH!
             }
         }
+
 
         /***
          *      ____       _       _

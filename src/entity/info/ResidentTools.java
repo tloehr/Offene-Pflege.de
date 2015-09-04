@@ -6,7 +6,6 @@ package entity.info;
 
 import entity.EntityTools;
 import entity.building.Homes;
-import entity.building.RoomsTools;
 import entity.building.Station;
 import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.MedInventoryTools;
@@ -121,8 +120,9 @@ public class ResidentTools {
 
     public static String getLabelText(Resident resident) {
         boolean dead = ResInfoTools.isDead(resident);
-        boolean left = ResInfoTools.isDead(resident);
-        ResInfo stay = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        boolean gone = ResInfoTools.isGone(resident);
+        ResInfo stay2 = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        ResInfo stay1 = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
 
         DateFormat df = DateFormat.getDateInstance();
         String result = resident.getName() + ", " + resident.getFirstname() + " (*" + df.format(resident.getDOB()) + "), ";
@@ -130,8 +130,9 @@ public class ResidentTools {
 
         result += getAge(resident).getYears() + " " + SYSTools.xx("misc.msg.Years") + " [" + resident.getRIDAnonymous() + "]";
 
-        if (dead || left) {
-            result += "  " + (dead ? SYSTools.xx("misc.msg.late") : SYSTools.xx("misc.msg.movedout")) + ": " + df.format(stay.getTo()) + ", ";
+        if (dead || gone) {
+            result += "  " + SYSTools.xx("") + ": " + df.format(stay1.getFrom()) + ", ";
+            result += (dead ? SYSTools.xx("misc.msg.late") : SYSTools.xx("misc.msg.movedout")) + ": " + df.format(stay2.getTo());
         }
 
         return result;

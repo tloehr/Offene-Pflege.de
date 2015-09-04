@@ -4,20 +4,28 @@
 
 package op.dev;
 
-import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
+import com.toedter.calendar.JDateChooser;
+import entity.EntityTools;
+import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.nursingprocess.DFNTools;
+import entity.nursingprocess.NursingProcess;
+import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.*;
+import entity.reports.NReportTools;
 import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.care.info.PnlEditResInfo;
 import op.threads.DisplayManager;
-import op.tools.*;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -29,6 +37,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.CaretEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -37,15 +46,19 @@ import java.awt.event.FocusEvent;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlDev extends CleanablePanel {
-
+    Resident resident = null;
 
     public PnlDev() {
         super("opde.dev");
@@ -522,6 +535,87 @@ public class PnlDev extends CleanablePanel {
 //        new MREPrevalenceSheets(new LocalDate(), false);
     }
 
+    private void txtResSearchActionPerformed(ActionEvent e) {
+        resident = EntityTools.find(Resident.class, txtResSearch.getText().trim());
+        if (resident == null) return;
+
+        ResInfo stay1 = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        ResInfo stay2 = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+
+        lblResname.setText(ResidentTools.getLabelText(resident));
+        dcFrom.setDate(stay1.getFrom());
+        dcTo.setDate(stay2.getTo());
+
+    }
+
+    private void btnVKontroleActionPerformed(ActionEvent e) {
+
+        // ResInfos
+
+        OPDE.debug("ResInfos");
+        StringBuilder html = new StringBuilder(2000000);
+
+        html.append(SYSConst.center("Pflegeverlauf " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(resident) +
+                "<br/>Zeitraum: " + DateFormat.getDateInstance().format(dcFrom.getDate()) + " bis " + DateFormat.getDateInstance().format(dcTo.getDate())));
+
+        html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.info"));
+
+        for (ResInfoCategory cat : ResInfoCategoryTools.getAll()) {
+
+
+            ArrayList<ResInfo> listInfos = ResInfoTools.getAll(resident, cat, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
+            if (!listInfos.isEmpty()) {
+                html.append("<h2 id=\"fonth2\"><b>Pflegemodellkategorie:</b> " + cat.getText() + "</h2>\n");
+//            for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
+//                ArrayList<ResInfo> listInfos = ResInfoTools.getAll(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
+//
+//                if ()
+
+//                html.append("<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n");
+//
+//                html.append(type.getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "");
+//                html.append(type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "");
+//                html.append(type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "");
+//                html.append(type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "");
+
+                html.append(ResInfoTools.getResInfosAsHTML(listInfos, true, null));
+            }
+        }
+
+        OPDE.debug("nursingProcess");
+        // nursingProcess
+        html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.nursingprocess") + "</h1>\n");
+
+        for (ResInfoCategory cat : ResInfoCategoryTools.getAll4NP()) {
+            ArrayList<NursingProcess> allNPsForThisCat = NursingProcessTools.getAll(resident, cat, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
+            if (!allNPsForThisCat.isEmpty()) {
+                html.append("<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n");
+                for (NursingProcess np : allNPsForThisCat) {
+                    html.append("<h3 id=\"fonth3\" >" + np.getTopic() + "</h3>\n");
+                    html.append(NursingProcessTools.getAsHTML(np, false, true, true, true));
+                }
+            }
+        }
+
+        OPDE.debug("prescriptions");
+        html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.prescription") + "</h1>\n");
+        html.append(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getAll(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate())), false, false, true, true, true));
+
+        OPDE.debug("reports");
+        html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.reports") + "</h1>\n");
+        html.append(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate())), false, null, null));
+
+
+        File f = SYSFilesTools.print(html.toString(), true, false);
+        try {
+            FileUtils.copyFileToDirectory(f, new File(System.getProperty("user.home")));
+        } catch (IOException e1) {
+            OPDE.error(e1);
+        }
+
+
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -541,6 +635,14 @@ public class PnlDev extends CleanablePanel {
         txtPZN = new JTextField();
         btnMod11 = new JButton();
         btnImportMedDB = new JButton();
+        panel4 = new JPanel();
+        txtResSearch = new JTextField();
+        lblResname = new JLabel();
+        label3 = new JLabel();
+        dcFrom = new JDateChooser();
+        label4 = new JLabel();
+        dcTo = new JDateChooser();
+        btnVKontrole = new JButton();
 
         //======== this ========
         setLayout(new BorderLayout());
@@ -551,8 +653,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                    "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
-                    "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
+                        "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //======== scrollPane1 ========
                 {
@@ -589,8 +691,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel3 ========
             {
                 panel3.setLayout(new FormLayout(
-                    "pref, 9*($lcgap, default)",
-                    "pref, 7*($lgap, default)"));
+                        "pref, 9*($lcgap, default)",
+                        "pref, 7*($lgap, default)"));
 
                 //---- label1 ----
                 label1.setText("text");
@@ -606,8 +708,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "left:default:grow",
-                    "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
+                        "left:default:grow",
+                        "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----
@@ -637,6 +739,37 @@ public class PnlDev extends CleanablePanel {
                 panel2.add(btnImportMedDB, CC.xy(1, 17));
             }
             tabbedPane1.addTab("text", panel2);
+
+            //======== panel4 ========
+            {
+                panel4.setLayout(new FormLayout(
+                        "default, $lcgap, default",
+                        "6*(default, $lgap), default"));
+
+                //---- txtResSearch ----
+                txtResSearch.addActionListener(e -> txtResSearchActionPerformed(e));
+                panel4.add(txtResSearch, CC.xy(3, 3));
+
+                //---- lblResname ----
+                lblResname.setText("resname");
+                panel4.add(lblResname, CC.xy(3, 5));
+
+                //---- label3 ----
+                label3.setText("von");
+                panel4.add(label3, CC.xy(1, 7));
+                panel4.add(dcFrom, CC.xy(3, 7));
+
+                //---- label4 ----
+                label4.setText("bis");
+                panel4.add(label4, CC.xy(1, 9));
+                panel4.add(dcTo, CC.xy(3, 9));
+
+                //---- btnVKontrole ----
+                btnVKontrole.setText("Pflegeverlaufskontrolle");
+                btnVKontrole.addActionListener(e -> btnVKontroleActionPerformed(e));
+                panel4.add(btnVKontrole, CC.xy(3, 11));
+            }
+            tabbedPane1.addTab("text", panel4);
         }
         add(tabbedPane1, BorderLayout.CENTER);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -659,5 +792,13 @@ public class PnlDev extends CleanablePanel {
     private JTextField txtPZN;
     private JButton btnMod11;
     private JButton btnImportMedDB;
+    private JPanel panel4;
+    private JTextField txtResSearch;
+    private JLabel lblResname;
+    private JLabel label3;
+    private JDateChooser dcFrom;
+    private JLabel label4;
+    private JDateChooser dcTo;
+    private JButton btnVKontrole;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

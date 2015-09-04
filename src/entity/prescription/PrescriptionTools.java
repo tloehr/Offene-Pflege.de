@@ -17,16 +17,12 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
-import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.care.prescription.PnlPrescription;
 import op.system.PDF;
 import op.threads.DisplayMessage;
-import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -941,6 +937,23 @@ public class PrescriptionTools {
         query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         query.setParameter("to", SYSCalendar.eod(to).toDate());
         query.setParameter("type", type);
+        ArrayList<Prescription> prescriptions = new ArrayList<Prescription>(query.getResultList());
+        em.close();
+        return prescriptions;
+    }
+
+    public static ArrayList<Prescription> getAll(Resident resident, LocalDate from, LocalDate to) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT DISTINCT p FROM Prescription p " +
+                " WHERE ((p.from <= :from AND p.to >= :from) OR " +
+                " (p.from <= :to AND p.to >= :to) OR " +
+                " (p.from > :from AND p.to < :to)) " +
+                " AND p.resident = :resident " +
+                " ORDER BY p.from");
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(to).toDate());
+        query.setParameter("resident", resident);
         ArrayList<Prescription> prescriptions = new ArrayList<Prescription>(query.getResultList());
         em.close();
         return prescriptions;

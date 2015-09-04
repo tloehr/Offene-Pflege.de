@@ -491,9 +491,9 @@ public class OPDE {
                 logger.setLevel(Level.DEBUG);
             }
 
-            for (Map.Entry<String, Object> obj : com.install4j.api.launcher.Variables.getInstallerVariables().entrySet()) {
-                logger.debug(obj.toString());
-            }
+//            for (Map.Entry<String, Object> obj : com.install4j.api.launcher.Variables.getInstallerVariables().entrySet()) {
+//                logger.debug(obj.toString());
+//            }
 
             Logger.getLogger("org.hibernate").setLevel(Level.OFF);
 
@@ -521,6 +521,7 @@ public class OPDE {
 
             customJDBCUrl = cl.hasOption("j");
             url = customJDBCUrl ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
+            logger.info(url);
 
             jpaProps.put(SYSPropsTools.KEY_JDBC_URL, url);
             jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, decryptJDBCPasswort());

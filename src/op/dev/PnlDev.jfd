@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "5.2.1.0.138" Java: "1.6.0_65" encoding: "UTF-8"
+JFDML JFormDesigner: "5.2.2.0.199" Java: "1.6.0_65" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -123,6 +123,61 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 1
 						"gridY": 17
+					} )
+				}, new FormLayoutConstraints( null ) {
+					"title": "text"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+					"$columnSpecs": "default, labelcompgap, default"
+					"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default"
+				} ) {
+					name: "panel4"
+					add( new FormComponent( "javax.swing.JTextField" ) {
+						name: "txtResSearch"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "txtResSearchActionPerformed", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 3
+						"gridY": 3
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "lblResname"
+						"text": "resname"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 3
+						"gridY": 5
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label3"
+						"text": "von"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 1
+						"gridY": 7
+					} )
+					add( new FormComponent( "com.toedter.calendar.JDateChooser" ) {
+						name: "dcFrom"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 3
+						"gridY": 7
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label4"
+						"text": "bis"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 9
+					} )
+					add( new FormComponent( "com.toedter.calendar.JDateChooser" ) {
+						name: "dcTo"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 3
+						"gridY": 9
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnVKontrole"
+						"text": "Pflegeverlaufskontrolle"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnVKontroleActionPerformed", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 3
+						"gridY": 11
 					} )
 				}, new FormLayoutConstraints( null ) {
 					"title": "text"

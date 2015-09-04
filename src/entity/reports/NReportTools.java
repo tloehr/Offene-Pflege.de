@@ -681,6 +681,37 @@ public class NReportTools {
         return html.toString();
     }
 
+    public static ArrayList<NReport> getNReports(Resident resident, LocalDate ldfrom, LocalDate ldto) {
+            EntityManager em = OPDE.createEM();
+            ArrayList<NReport> list = null;
+            DateTime from = ldfrom.toDateTimeAtStartOfDay();
+            DateTime to = SYSCalendar.eod(ldto);
+
+            OPDE.debug(to);
+            try {
+
+                String jpql = " SELECT nr " +
+                        " FROM NReport nr " +
+                        " WHERE nr.resident = :resident " +
+                        " AND nr.pit >= :from AND nr.pit <= :to " +
+                        " ORDER BY nr.pit ASC ";
+
+                Query query = em.createQuery(jpql);
+
+                query.setParameter("resident", resident);
+                query.setParameter("from", from.toDate());
+                query.setParameter("to", to.toDate());
+
+                list = new ArrayList<NReport>(query.getResultList());
+
+            } catch (Exception se) {
+                OPDE.fatal(se);
+            } finally {
+                em.close();
+            }
+            return list;
+        }
+
     public static ArrayList<NReport> getNReports4Month(Resident resident, LocalDate month) {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;

@@ -167,6 +167,28 @@ public class ResInfoTools {
         return resInfos;
     }
 
+
+    public static ArrayList<ResInfo> getAll(Resident resident, ResInfoCategory cat, LocalDate start, LocalDate end) {
+        DateTime from = start.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(end);
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(
+                " SELECT rinfo FROM ResInfo rinfo " +
+                        " WHERE rinfo.resident = :bewohner AND rinfo.bwinfotyp.resInfoCat = :cat " +
+                        " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
+                        " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
+                        " (rinfo.from > :from AND rinfo.to < :to)) " +
+                        " ORDER BY rinfo.bwinfotyp.bWInfoKurz, rinfo.from DESC"
+        );
+        query.setParameter("bewohner", resident);
+        query.setParameter("cat", cat);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
+
     public static ArrayList<ResInfo> getAll(Resident resident, LocalDate start, LocalDate end) {
         DateTime from = start.toDateTimeAtStartOfDay();
         DateTime to = SYSCalendar.eod(end);
@@ -177,7 +199,7 @@ public class ResInfoTools {
                         " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
                         " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
                         " (rinfo.from > :from AND rinfo.to < :to)) " +
-                        " ORDER BY rinfo.from DESC"
+                        " ORDER BY rinfo.bwinfotyp.bWInfoKurz, rinfo.from DESC"
         );
         query.setParameter("bewohner", resident);
         query.setParameter("from", from.toDate());

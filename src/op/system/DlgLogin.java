@@ -75,17 +75,8 @@ public class DlgLogin extends MyJDialog {
 
         initComponents();
 
-        String defaultlogin = "";
-
-        String defaultpw = "";
-        if (OPDE.getLocalProps().containsKey("defaultlogin")) {
-            defaultlogin = OPDE.getLocalProps().getProperty("defaultlogin");
-        }
-        if (OPDE.getLocalProps().containsKey("defaultpw")) {
-            defaultpw = OPDE.getLocalProps().getProperty("defaultpw");
-        }
-        txtUsername.setText(defaultlogin);
-        txtPassword.setText(defaultpw);
+        txtUsername.setText(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_USER)));
+        txtPassword.setText(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_PASSWORD)));
         lblUsernamePassword.setText(SYSTools.xx("misc.msg.username") + "/" + SYSTools.xx("misc.msg.password"));
 
         setVisible(true);
