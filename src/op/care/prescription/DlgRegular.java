@@ -94,7 +94,8 @@ public class DlgRegular extends MyJDialog {
      * Creates new form DlgRegular
      */
     public DlgRegular(Prescription prescription, int mode, Closure actionBlock) {
-        super(false);
+        super();
+        setResizable(false);
         this.actionBlock = actionBlock;
         this.prescription = prescription;
         schedules2delete = new ArrayList<PrescriptionSchedule>();
@@ -307,15 +308,15 @@ public class DlgRegular extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "$rgap, $lcgap, default, $lcgap, pref, $lcgap, $rgap",
-                "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+            "$rgap, $lcgap, default, $lcgap, pref, $lcgap, $rgap",
+            "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                    "68dlu, $lcgap, 284dlu, $lcgap, pref",
-                    "2*(16dlu, $lgap), default, $lgap, fill:default:grow"));
+                "68dlu, $lcgap, 284dlu, $lcgap, pref",
+                "2*(16dlu, $lgap), default, $lgap, fill:default:grow"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -331,11 +332,11 @@ public class DlgRegular extends MyJDialog {
             jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel<>(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMed.addItemListener(e -> cmbMedItemStateChanged(e));
@@ -359,11 +360,11 @@ public class DlgRegular extends MyJDialog {
             jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbIntervention ----
-            cmbIntervention.setModel(new DefaultComboBoxModel<>(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbIntervention.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbIntervention, CC.xywh(3, 3, 3, 1));
@@ -377,11 +378,11 @@ public class DlgRegular extends MyJDialog {
             //======== jPanel8 ========
             {
                 jPanel8.setBorder(new TitledBorder(null, "Dosis / H\u00e4ufigkeit", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
-                        new Font("Arial", Font.PLAIN, 14)));
+                    new Font("Arial", Font.PLAIN, 14)));
                 jPanel8.setFont(new Font("Arial", Font.PLAIN, 14));
                 jPanel8.setLayout(new FormLayout(
-                        "370dlu",
-                        "fill:default:grow, $lgap, pref"));
+                    "370dlu",
+                    "fill:default:grow, $lgap, pref"));
 
                 //======== jspDosis ========
                 {
@@ -389,15 +390,15 @@ public class DlgRegular extends MyJDialog {
 
                     //---- tblDosis ----
                     tblDosis.setModel(new DefaultTableModel(
-                            new Object[][]{
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                                    {null, null, null, null},
-                            },
-                            new String[]{
-                                    "Title 1", "Title 2", "Title 3", "Title 4"
-                            }
+                        new Object[][] {
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                            {null, null, null, null},
+                        },
+                        new String[] {
+                            "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                     ));
                     tblDosis.setSurrendersFocusOnKeystroke(true);
                     tblDosis.setToolTipText(null);
@@ -436,15 +437,15 @@ public class DlgRegular extends MyJDialog {
         {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
-                    "149dlu",
-                    "3*(fill:default, $lgap), fill:108dlu:grow, $lgap, 60dlu"));
+                "149dlu",
+                "3*(fill:default, $lgap), fill:108dlu:grow, $lgap, 60dlu"));
 
             //======== pnlOFF ========
             {
                 pnlOFF.setBorder(new TitledBorder("Absetzung"));
                 pnlOFF.setLayout(new FormLayout(
-                        "pref, 86dlu:grow",
-                        "2*(fill:17dlu, $lgap), fill:17dlu"));
+                    "pref, 86dlu:grow",
+                    "2*(fill:17dlu, $lgap), fill:17dlu"));
 
                 //---- rbActive ----
                 rbActive.setText("text");
@@ -490,15 +491,15 @@ public class DlgRegular extends MyJDialog {
             {
                 pnlON.setBorder(new TitledBorder("Ansetzung"));
                 pnlON.setLayout(new FormLayout(
-                        "119dlu:grow, $lcgap, default",
-                        "default, $lgap, default"));
+                    "119dlu:grow, $lcgap, default",
+                    "default, $lgap, default"));
 
                 //---- cmbDocON ----
-                cmbDocON.setModel(new DefaultComboBoxModel<>(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbDocON.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbDocON.addKeyListener(new KeyAdapter() {
                     @Override
@@ -520,11 +521,11 @@ public class DlgRegular extends MyJDialog {
                 pnlON.add(btnAddGP, CC.xy(3, 1));
 
                 //---- cmbHospitalON ----
-                cmbHospitalON.setModel(new DefaultComboBoxModel<>(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbHospitalON.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 pnlON.add(cmbHospitalON, CC.xy(1, 3));
 
@@ -565,7 +566,7 @@ public class DlgRegular extends MyJDialog {
         lblTX.setText(null);
         lblTX.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2.png")));
         contentPane.add(lblTX, CC.xy(3, 5));
-        setSize(1015, 640);
+        setSize(1015, 585);
         setLocationRelativeTo(getOwner());
 
         //---- bgMedikament ----
@@ -724,6 +725,7 @@ public class DlgRegular extends MyJDialog {
 
     @Override
     public void dispose() {
+        returnPackage = null;
         actionBlock.execute(returnPackage);
         SYSTools.unregisterListeners(this);
         super.dispose();
@@ -815,9 +817,10 @@ public class DlgRegular extends MyJDialog {
     }//GEN-LAST:event_tblDosisMousePressed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        returnPackage = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
+
+
 
 
     private void fillComboBoxes() {

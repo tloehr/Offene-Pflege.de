@@ -89,7 +89,8 @@ public class DlgOnDemand extends MyJDialog {
      * Creates new form DlgRegular
      */
     public DlgOnDemand(Prescription prescription, Closure actionBlock) {
-        super(false);
+        super();
+        setResizable(false);
         // OnDemand prescriptions have exactly ONE schedule
         if (prescription.getPrescriptionSchedule().isEmpty()) {
             PrescriptionSchedule schedule = new PrescriptionSchedule(prescription);
@@ -109,6 +110,9 @@ public class DlgOnDemand extends MyJDialog {
         pack();
         setVisible(true);
     }
+
+
+
 
 
     private void txtSitActionPerformed(ActionEvent e) {
@@ -208,7 +212,7 @@ public class DlgOnDemand extends MyJDialog {
             String pzn = null;
             try {
                 pzn = MedPackageTools.parsePZN(txtMed.getText());
-            } catch (NumberFormatException nfe){
+            } catch (NumberFormatException nfe) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(nfe.getMessage(), DisplayMessage.WARNING));
                 pzn = null;
             }
@@ -310,6 +314,10 @@ public class DlgOnDemand extends MyJDialog {
         }
     }
 
+    private void thisWindowClosed(WindowEvent e) {
+        // TODO add your code here
+    }
+
     private void txtMassActionPerformed(ActionEvent e) {
         cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
     }
@@ -377,12 +385,7 @@ public class DlgOnDemand extends MyJDialog {
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
             txtMed.setPrompt("Medikamente");
             txtMed.setFocusBehavior(PromptSupport.FocusBehavior.HIGHLIGHT_PROMPT);
-            txtMed.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtMedActionPerformed(e);
-                }
-            });
+            txtMed.addActionListener(e -> txtMedActionPerformed(e));
             txtMed.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
@@ -399,12 +402,7 @@ public class DlgOnDemand extends MyJDialog {
                 "Item 4"
             }));
             cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbMed.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbMedItemStateChanged(e);
-                }
-            });
+            cmbMed.addItemListener(e -> cmbMedItemStateChanged(e));
             jPanel1.add(cmbMed, CC.xy(3, 1));
 
             //======== panel4 ========
@@ -419,12 +417,7 @@ public class DlgOnDemand extends MyJDialog {
                 btnMedWizard.setToolTipText("Neues Medikament eintragen");
                 btnMedWizard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnMedWizard.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
-                btnMedWizard.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnMedActionPerformed(e);
-                    }
-                });
+                btnMedWizard.addActionListener(e -> btnMedActionPerformed(e));
                 panel4.add(btnMedWizard);
             }
             jPanel1.add(panel4, CC.xy(5, 1));
@@ -442,12 +435,7 @@ public class DlgOnDemand extends MyJDialog {
             //---- txtSit ----
             txtSit.setPrompt("Situationen");
             txtSit.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtSit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtSitActionPerformed(e);
-                }
-            });
+            txtSit.addActionListener(e -> txtSitActionPerformed(e));
             jPanel1.add(txtSit, CC.xy(1, 3));
 
             //---- cmbSit ----
@@ -458,18 +446,8 @@ public class DlgOnDemand extends MyJDialog {
                 "Item 4"
             }));
             cmbSit.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbSit.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbSitItemStateChanged(e);
-                }
-            });
-            cmbSit.addPropertyChangeListener("model", new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    cmbSitPropertyChange(e);
-                }
-            });
+            cmbSit.addItemListener(e -> cmbSitItemStateChanged(e));
+            cmbSit.addPropertyChangeListener("model", e -> cmbSitPropertyChange(e));
             jPanel1.add(cmbSit, CC.xy(3, 3));
 
             //======== panel3 ========
@@ -484,12 +462,7 @@ public class DlgOnDemand extends MyJDialog {
                 btnAddSit.setToolTipText("Neue  Situation eintragen");
                 btnAddSit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnAddSit.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
-                btnAddSit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnSituationActionPerformed(e);
-                    }
-                });
+                btnAddSit.addActionListener(e -> btnSituationActionPerformed(e));
                 panel3.add(btnAddSit);
             }
             jPanel1.add(panel3, CC.xy(5, 3, CC.RIGHT, CC.DEFAULT));
@@ -497,12 +470,7 @@ public class DlgOnDemand extends MyJDialog {
             //---- txtIntervention ----
             txtIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
             txtIntervention.setPrompt("Massnahmen");
-            txtIntervention.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtMassActionPerformed(e);
-                }
-            });
+            txtIntervention.addActionListener(e -> txtMassActionPerformed(e));
             jPanel1.add(txtIntervention, CC.xy(1, 5));
 
             //======== jPanel2 ========
@@ -526,12 +494,7 @@ public class DlgOnDemand extends MyJDialog {
                 //---- txtMaxTimes ----
                 txtMaxTimes.setHorizontalAlignment(SwingConstants.CENTER);
                 txtMaxTimes.setText("1");
-                txtMaxTimes.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtMaxTimesActionPerformed(e);
-                    }
-                });
+                txtMaxTimes.addActionListener(e -> txtMaxTimesActionPerformed(e));
                 txtMaxTimes.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusGained(FocusEvent e) {
@@ -561,12 +524,7 @@ public class DlgOnDemand extends MyJDialog {
                         txtEDosisFocusLost(e);
                     }
                 });
-                txtEDosis.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtEDosisActionPerformed(e);
-                    }
-                });
+                txtEDosis.addActionListener(e -> txtEDosisActionPerformed(e));
                 jPanel2.add(txtEDosis, CC.xy(7, 2));
 
                 //---- lblCheckResultAfter ----
@@ -603,22 +561,12 @@ public class DlgOnDemand extends MyJDialog {
                 //---- rbActive ----
                 rbActive.setText("text");
                 rbActive.setSelected(true);
-                rbActive.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        rbActiveItemStateChanged(e);
-                    }
-                });
+                rbActive.addItemListener(e -> rbActiveItemStateChanged(e));
                 pnlOFF.add(rbActive, CC.xywh(1, 1, 2, 1));
 
                 //---- rbDate ----
                 rbDate.setText(null);
-                rbDate.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        rbDateItemStateChanged(e);
-                    }
-                });
+                rbDate.addItemListener(e -> rbDateItemStateChanged(e));
                 pnlOFF.add(rbDate, CC.xy(1, 3));
 
                 //---- txtOFF ----
@@ -638,12 +586,7 @@ public class DlgOnDemand extends MyJDialog {
             {
 
                 //---- txtBemerkung ----
-                txtBemerkung.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtBemerkungCaretUpdate(e);
-                    }
-                });
+                txtBemerkung.addCaretListener(e -> txtBemerkungCaretUpdate(e));
                 jScrollPane3.setViewportView(txtBemerkung);
             }
             jPanel3.add(jScrollPane3, CC.xy(1, 7));
@@ -694,23 +637,13 @@ public class DlgOnDemand extends MyJDialog {
             //---- btnClose ----
             btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
             btnClose.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnClose.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCloseActionPerformed(e);
-                }
-            });
+            btnClose.addActionListener(e -> btnCloseActionPerformed(e));
             panel1.add(btnClose);
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnSave.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnSave.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnSaveActionPerformed(e);
-                }
-            });
+            btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
@@ -855,6 +788,7 @@ public class DlgOnDemand extends MyJDialog {
 
     @Override
     public void dispose() {
+        prescription = null;
         actionBlock.execute(prescription);
         SYSTools.unregisterListeners(this);
         super.dispose();
@@ -936,7 +870,7 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        prescription = null;
+//        prescription = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 
