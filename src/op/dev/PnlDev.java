@@ -16,6 +16,7 @@ import entity.nursingprocess.NursingProcess;
 import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.*;
 import entity.reports.NReportTools;
+import fx.ReportsCtrl;
 import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
@@ -65,6 +66,10 @@ public class PnlDev extends CleanablePanel {
         initComponents();
 
         cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
+
+
+        tabbedPane1.insertTab("JavaFX", null, new ReportsCtrl(), "no tips", 0);
+        tabbedPane1.setSelectedIndex(0);
 
 //        tabbedPane1.setComponentAt(1, new PnlCommonTags(new HashSet<Commontags>()));
 
@@ -653,8 +658,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                        "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
-                        "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                    "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
+                    "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //======== scrollPane1 ========
                 {
@@ -691,8 +696,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel3 ========
             {
                 panel3.setLayout(new FormLayout(
-                        "pref, 9*($lcgap, default)",
-                        "pref, 7*($lgap, default)"));
+                    "pref, 9*($lcgap, default)",
+                    "pref, 7*($lgap, default)"));
 
                 //---- label1 ----
                 label1.setText("text");
@@ -708,8 +713,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                        "left:default:grow",
-                        "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
+                    "left:default:grow",
+                    "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----
@@ -743,8 +748,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel4 ========
             {
                 panel4.setLayout(new FormLayout(
-                        "default, $lcgap, default",
-                        "6*(default, $lgap), default"));
+                    "default, $lcgap, default",
+                    "6*(default, $lgap), default"));
 
                 //---- txtResSearch ----
                 txtResSearch.addActionListener(e -> txtResSearchActionPerformed(e));

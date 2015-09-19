@@ -84,6 +84,7 @@ public class PnlReport extends NursingRecordsPanel {
     private Map<String, ArrayList<NReport>> valuecache;
     private Map<NReport, JPanel> linemap;
     private Map<LocalDate, String> holidays;
+    private MutableInterval minmax = null;
     private List<Commontags> listUsedCommontags;
 
     private Resident resident;
@@ -93,7 +94,7 @@ public class PnlReport extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
 
 
-    private MutableInterval minmax = null;
+
 //    private Pair<DateTime, DateTime> minmax = null;
 
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
