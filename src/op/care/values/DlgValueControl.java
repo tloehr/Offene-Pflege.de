@@ -203,8 +203,9 @@ public class DlgValueControl extends MyJDialog {
         props.setProperty(ResidentTools.KEY_DAYSDRINK, drinkon ? txtDaysDrink.getText() : "off");
     }
 
+    // #fixes #19
     private void txtStoolDaysFocusLost(FocusEvent e) {
-        txtStoolDays.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtStoolDays.getText(), "0")).toString());
+        txtStoolDays.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtStoolDays.getText(), "0")).toBigInteger().toString());
     }
 
     private void txtLowInFocusLost(FocusEvent e) {
@@ -215,8 +216,9 @@ public class DlgValueControl extends MyJDialog {
         txtHighIn.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtHighIn.getText(), "0")).toString());
     }
 
+    // #fixes #19
     private void txtDaysDrinkFocusLost(FocusEvent e) {
-        txtDaysDrink.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtDaysDrink.getText(), "0")).toString());
+        txtDaysDrink.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtDaysDrink.getText(), "0")).toBigInteger().toString());
     }
 
     private void txtTargetInFocusLost(FocusEvent e) {
@@ -252,8 +254,8 @@ public class DlgValueControl extends MyJDialog {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "13dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-                    "13dlu, 16*($lgap, default), $pgap, default, $lgap, 13dlu"));
+                "13dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
+                "13dlu, 16*($lgap, default), $pgap, default, $lgap, 13dlu"));
 
             //---- lblDayStool ----
             lblDayStool.setText("tage ohne stuhlgang");
@@ -359,23 +361,13 @@ public class DlgValueControl extends MyJDialog {
                 //---- btnCancel ----
                 btnCancel.setText(null);
                 btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                btnCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCancelActionPerformed(e);
-                    }
-                });
+                btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
                 panel2.add(btnCancel);
 
                 //---- btnApply ----
                 btnApply.setText(null);
                 btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                btnApply.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnApplyActionPerformed(e);
-                    }
-                });
+                btnApply.addActionListener(e -> btnApplyActionPerformed(e));
                 panel2.add(btnApply);
             }
             panel1.add(panel2, CC.xy(3, 35, CC.RIGHT, CC.DEFAULT));

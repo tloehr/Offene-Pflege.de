@@ -1237,13 +1237,16 @@ public class SYSTools {
             if (num instanceof Long) {
                 wert = new BigDecimal(num.longValue());
             } else if (num instanceof Double) {
-                wert = new BigDecimal(num.doubleValue());
+                wert = new BigDecimal(num.doubleValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
             } else if (num instanceof BigDecimal) {
                 wert = (BigDecimal) num;
             } else {
                 wert = null;
             }
         }
+
+
+
 
         return wert;
     }
