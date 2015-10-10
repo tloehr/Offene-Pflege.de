@@ -112,6 +112,7 @@ public class PnlWelcome extends CleanablePanel {
         } catch (Exception e) {
             logger.warn(e);
             updateDescriptor = null;
+            btnAbout.setText(null);
         }
 
         addApps();

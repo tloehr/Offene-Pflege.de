@@ -16,7 +16,7 @@ import entity.nursingprocess.NursingProcess;
 import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.*;
 import entity.reports.NReportTools;
-import fx.ReportsCtrl;
+import fx.RepCtrl;
 import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
@@ -68,7 +68,7 @@ public class PnlDev extends CleanablePanel {
         cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
 
 
-        tabbedPane1.insertTab("JavaFX", null, new ReportsCtrl(), "no tips", 0);
+        tabbedPane1.insertTab("JavaFX", null, new RepCtrl(), "no tips", 0);
         tabbedPane1.setSelectedIndex(0);
 
 //        tabbedPane1.setComponentAt(1, new PnlCommonTags(new HashSet<Commontags>()));
