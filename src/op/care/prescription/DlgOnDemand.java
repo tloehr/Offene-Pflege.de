@@ -314,8 +314,10 @@ public class DlgOnDemand extends MyJDialog {
         }
     }
 
-    private void thisWindowClosed(WindowEvent e) {
-        // TODO add your code here
+
+    private void thisWindowClosing(WindowEvent e) {
+        prescription = null;
+        // fixes #22
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
@@ -369,6 +371,12 @@ public class DlgOnDemand extends MyJDialog {
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                thisWindowClosing(e);
+            }
+        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "14dlu, $lcgap, default, 6dlu, 355dlu, $lcgap, 14dlu",
@@ -788,7 +796,6 @@ public class DlgOnDemand extends MyJDialog {
 
     @Override
     public void dispose() {
-        prescription = null;
         actionBlock.execute(prescription);
         SYSTools.unregisterListeners(this);
         super.dispose();
@@ -870,7 +877,7 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-//        prescription = null;
+        prescription = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 

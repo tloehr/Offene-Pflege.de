@@ -87,11 +87,6 @@ public class PnlSettings extends CleanablePanel {
     }
 
     @Override
-    public void reload() {
-        currentPanel.reload();
-    }
-
-    @Override
     public String getInternalClassID() {
         return internalClassID;
     }

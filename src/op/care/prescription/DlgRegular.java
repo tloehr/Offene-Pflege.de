@@ -259,6 +259,12 @@ public class DlgRegular extends MyJDialog {
         GUITools.showPopup(popup, SwingConstants.EAST);
     }
 
+    private void thisWindowClosing(WindowEvent e) {
+        returnPackage = null;
+        // the red button was pressed
+        // fixes #22
+    }
+
     private void txtMassActionPerformed(ActionEvent e) {
         cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
     }
@@ -306,6 +312,12 @@ public class DlgRegular extends MyJDialog {
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                thisWindowClosing(e);
+            }
+        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "$rgap, $lcgap, default, $lcgap, pref, $lcgap, $rgap",
@@ -725,7 +737,6 @@ public class DlgRegular extends MyJDialog {
 
     @Override
     public void dispose() {
-        returnPackage = null;
         actionBlock.execute(returnPackage);
         SYSTools.unregisterListeners(this);
         super.dispose();
@@ -817,6 +828,7 @@ public class DlgRegular extends MyJDialog {
     }//GEN-LAST:event_tblDosisMousePressed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+        returnPackage = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 
