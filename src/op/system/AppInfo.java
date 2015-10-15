@@ -188,11 +188,11 @@ public class AppInfo {
 //    }
 
     public String getVersion() {
-        return appinfo.getProperty("program.MAJOR") + "." + appinfo.getProperty("program.MINOR") + "." + appinfo.getProperty("program.RELEASE");
+        return appinfo.getProperty("program.MAJOR") + "." + appinfo.getProperty("program.MINOR") + "." + appinfo.getProperty("program.RELEASE") + "." + appinfo.getProperty("program.BUILDNUM");
     }
 
     public String getBuildInformation() {
-        return "[" + appinfo.getProperty("program.BUILDNUM") + "|" + appinfo.getProperty("program.BUILDDATE") + "|" + System.getProperty("java.version") + "]";
+        return "[" + appinfo.getProperty("program.BUILDDATE") + "|" + System.getProperty("java.version") + "]";
     }
 
     public String getVersionVerbose() {

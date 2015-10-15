@@ -8,13 +8,14 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import gui.GUITools;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import gui.GUITools;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import java.awt.*;
@@ -105,6 +106,12 @@ public class DlgValueControl extends MyJDialog {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 txtStoolDays.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1" : "");
+                // #24
+                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                    props.setProperty(ResidentTools.KEY_DATE1, new LocalDate().toString("yyyy-MM-dd"));
+                } else {
+                    props.remove(ResidentTools.KEY_DATE1);
+                }
                 txtStoolDays.setEnabled(tbStool.isSelected());
             }
         });
@@ -120,6 +127,12 @@ public class DlgValueControl extends MyJDialog {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 setTxtDaysDrink();
+                // #24
+                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                    props.setProperty(ResidentTools.KEY_DATE2, new LocalDate().toString("yyyy-MM-dd"));
+                } else {
+                    props.remove(ResidentTools.KEY_DATE2);
+                }
                 txtLowIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1000" : "");
                 txtLowIn.setEnabled(tbLowIn.isSelected());
             }
@@ -128,6 +141,12 @@ public class DlgValueControl extends MyJDialog {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 setTxtDaysDrink();
+                // #24
+                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                    props.setProperty(ResidentTools.KEY_DATE3, new LocalDate().toString("yyyy-MM-dd"));
+                } else {
+                    props.remove(ResidentTools.KEY_DATE3);
+                }
                 txtHighIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1700" : "");
                 txtHighIn.setEnabled(tbHighIn.isSelected());
             }
@@ -254,8 +273,8 @@ public class DlgValueControl extends MyJDialog {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "13dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-                "13dlu, 16*($lgap, default), $pgap, default, $lgap, 13dlu"));
+                    "13dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
+                    "13dlu, 16*($lgap, default), $pgap, default, $lgap, 13dlu"));
 
             //---- lblDayStool ----
             lblDayStool.setText("tage ohne stuhlgang");

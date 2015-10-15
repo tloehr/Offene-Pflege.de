@@ -5,10 +5,8 @@ import entity.building.Station;
 import entity.building.StationTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.nursingprocess.DFNTools;
 import gui.GUITools;
 import op.OPDE;
-import op.controlling.PnlControlling;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -217,7 +215,6 @@ public class ResValueTools {
         }
 
 
-
         String html = "";
 
         html += SYSConst.html_h1(resValues.get(0).getType().getText());
@@ -287,55 +284,55 @@ public class ResValueTools {
         return result;
     }
 
-    /**
-     * retrieves the PITs of the first and the last entry in the ResValue table.
-     *
-     * @param resident
-     * @return
-     */
-    public static Pair<DateTime, DateTime> getMinMax(Resident resident, ResValueTypes vtype) {
-        Pair<DateTime, DateTime> result = null;
-
-        EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit ASC ");
-        queryMin.setParameter("resident", resident);
-        queryMin.setParameter("vtype", vtype);
-        queryMin.setMaxResults(1);
-
-        Query queryMax = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit DESC ");
-        queryMax.setParameter("resident", resident);
-        queryMax.setParameter("vtype", vtype);
-        queryMax.setMaxResults(1);
-
-        try {
-            ArrayList<ResValue> min = new ArrayList<ResValue>(queryMin.getResultList());
-            ArrayList<ResValue> max = new ArrayList<ResValue>(queryMax.getResultList());
-            if (min.isEmpty()) {
-                result = null;
-            } else {
-                result = new Pair<DateTime, DateTime>(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
-            }
-
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        }
-        return result;
-    }
-
-    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("" +
-                " SELECT rv FROM ResValue rv " +
-                " WHERE rv.resident = :resident " +
-                " AND rv.vtype = :vtype" +
-                " ORDER BY rv.pit DESC ");
-        query.setParameter("resident", resident);
-        query.setParameter("vtype", vtype);
-        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
-        em.close();
-
-        return list;
-    }
+//    /**
+//     * retrieves the PITs of the first and the last entry in the ResValue table.
+//     *
+//     * @param resident
+//     * @return
+//     */
+//    public static Pair<DateTime, DateTime> getMinMax(Resident resident, ResValueTypes vtype) {
+//        Pair<DateTime, DateTime> result = null;
+//
+//        EntityManager em = OPDE.createEM();
+//        Query queryMin = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit ASC ");
+//        queryMin.setParameter("resident", resident);
+//        queryMin.setParameter("vtype", vtype);
+//        queryMin.setMaxResults(1);
+//
+//        Query queryMax = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit DESC ");
+//        queryMax.setParameter("resident", resident);
+//        queryMax.setParameter("vtype", vtype);
+//        queryMax.setMaxResults(1);
+//
+//        try {
+//            ArrayList<ResValue> min = new ArrayList<ResValue>(queryMin.getResultList());
+//            ArrayList<ResValue> max = new ArrayList<ResValue>(queryMax.getResultList());
+//            if (min.isEmpty()) {
+//                result = null;
+//            } else {
+//                result = new Pair<DateTime, DateTime>(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
+//            }
+//
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//        }
+//        return result;
+//    }
+//
+//    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("" +
+//                " SELECT rv FROM ResValue rv " +
+//                " WHERE rv.resident = :resident " +
+//                " AND rv.vtype = :vtype" +
+//                " ORDER BY rv.pit DESC ");
+//        query.setParameter("resident", resident);
+//        query.setParameter("vtype", vtype);
+//        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+//        em.close();
+//
+//        return list;
+//    }
 
     public static ArrayList<ResValue> getResValues(Resident resident, short type, LocalDate f, LocalDate t) {
 
@@ -502,9 +499,9 @@ public class ResValueTools {
                 html.append(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
                 html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.targetDrink")) + ": " + targetIn.setScale(2, RoundingMode.HALF_UP).toString() + " ml"));
 
-                HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> balanceMap = getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight());
+                HashMap<LocalDate, Pair<BigDecimal, BigDecimal>> balanceMap = getLiquidBalancePerDay(resident, from.toLocalDate(), to.toLocalDate());
 
-                ArrayList<DateMidnight> listDays = new ArrayList<DateMidnight>(balanceMap.keySet());
+                ArrayList<LocalDate> listDays = new ArrayList<>(balanceMap.keySet());
                 Collections.sort(listDays);
 
                 StringBuilder table = new StringBuilder(1000);
@@ -514,7 +511,7 @@ public class ResValueTools {
                                 SYSConst.html_table_th(SYSTools.xx("misc.msg.egestion")) +
                                 SYSConst.html_table_th(SYSTools.xx("misc.msg.balance"))
                 ));
-                for (DateMidnight day : listDays) {
+                for (LocalDate day : listDays) {
                     BigDecimal linesum = balanceMap.get(day).getFirst().add(balanceMap.get(day).getSecond());
                     table.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(DateFormat.getDateInstance().format(day.toDate()), null) +
@@ -655,7 +652,7 @@ public class ResValueTools {
     }
 
 
-    public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, DateMidnight from, DateMidnight to) {
+    public static HashMap<LocalDate, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, LocalDate from, LocalDate to) {
         // First BD is for the influx, second for the outflow
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
@@ -669,20 +666,20 @@ public class ResValueTools {
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
         query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
-        query.setParameter("from", from.toDate());
-        query.setParameter("to", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(to).toDate());
         ArrayList<ResValue> list = null;
         list = new ArrayList<ResValue>(query.getResultList());
         em.close();
 
         // init with dates. so that there are now "empty" days
-        HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> hm = new HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>>();
-        for (DateMidnight day = from; day.compareTo(to) <= 0; day = day.plusDays(1)) {
-            hm.put(day, new Pair<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
+        HashMap<LocalDate, Pair<BigDecimal, BigDecimal>> hm = new HashMap<>();
+        for (LocalDate day = from; day.compareTo(to) <= 0; day = day.plusDays(1)) {
+            hm.put(day, new Pair<>(BigDecimal.ZERO, BigDecimal.ZERO));
         }
 
         for (ResValue val : list) {
-            Pair<BigDecimal, BigDecimal> pair = hm.get(new DateMidnight(val.getPit()));
+            Pair<BigDecimal, BigDecimal> pair = hm.get(new LocalDate(val.getPit()));
             BigDecimal ingestion = pair.getFirst();
             BigDecimal egestion = pair.getSecond();
             if (val.getVal1().compareTo(BigDecimal.ZERO) < 0) {
@@ -690,58 +687,58 @@ public class ResValueTools {
             } else {
                 ingestion = ingestion.add(val.getVal1());
             }
-            hm.put(new DateMidnight(val.getPit()), new Pair<BigDecimal, BigDecimal>(ingestion, egestion));
+            hm.put(new LocalDate(val.getPit()), new Pair<>(ingestion, egestion));
         }
 
         return hm;
     }
 
 
-    public static BigDecimal getIngestion(Resident resident, LocalDate day) {
-        // First BD is for the influx, second for the outflow
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("" +
-                " SELECT SUM(rv.val1) FROM ResValue rv " +
-                " WHERE rv.resident = :resident " +
-                " AND rv.replacedBy IS NULL " +
-                " AND rv.editedBy IS NULL " +
-                " AND rv.val1 > 0 " +
-                " AND rv.vtype.valType = :valType " +
-                " AND rv.pit >= :from " +
-                " AND rv.pit <= :to ");
-
-        query.setParameter("resident", resident);
-        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
-        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
-        query.setParameter("to", SYSCalendar.eod(day).toDate());
-        BigDecimal sum = (BigDecimal) query.getSingleResult();
-        em.close();
-
-        return sum == null ? BigDecimal.ZERO : sum;
-    }
-
-    public static BigDecimal getEgestion(Resident resident, LocalDate day) {
-        // First BD is for the influx, second for the outflow
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("" +
-                " SELECT SUM(rv.val1) FROM ResValue rv " +
-                " WHERE rv.resident = :resident " +
-                " AND rv.replacedBy IS NULL " +
-                " AND rv.editedBy IS NULL " +
-                " AND rv.val1 < 0 " +
-                " AND rv.vtype.valType = :valType " +
-                " AND rv.pit >= :from " +
-                " AND rv.pit <= :to ");
-
-        query.setParameter("resident", resident);
-        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
-        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
-        query.setParameter("to", SYSCalendar.eod(day).toDate());
-        BigDecimal sum = (BigDecimal) query.getSingleResult();
-        em.close();
-
-        return sum == null ? BigDecimal.ZERO : sum;
-    }
+//    public static BigDecimal getIngestion(Resident resident, LocalDate day) {
+//        // First BD is for the influx, second for the outflow
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("" +
+//                " SELECT SUM(rv.val1) FROM ResValue rv " +
+//                " WHERE rv.resident = :resident " +
+//                " AND rv.replacedBy IS NULL " +
+//                " AND rv.editedBy IS NULL " +
+//                " AND rv.val1 > 0 " +
+//                " AND rv.vtype.valType = :valType " +
+//                " AND rv.pit >= :from " +
+//                " AND rv.pit <= :to ");
+//
+//        query.setParameter("resident", resident);
+//        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
+//        query.setParameter("to", SYSCalendar.eod(day).toDate());
+//        BigDecimal sum = (BigDecimal) query.getSingleResult();
+//        em.close();
+//
+//        return sum == null ? BigDecimal.ZERO : sum;
+//    }
+//
+//    public static BigDecimal getEgestion(Resident resident, LocalDate day) {
+//        // First BD is for the influx, second for the outflow
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("" +
+//                " SELECT SUM(rv.val1) FROM ResValue rv " +
+//                " WHERE rv.resident = :resident " +
+//                " AND rv.replacedBy IS NULL " +
+//                " AND rv.editedBy IS NULL " +
+//                " AND rv.val1 < 0 " +
+//                " AND rv.vtype.valType = :valType " +
+//                " AND rv.pit >= :from " +
+//                " AND rv.pit <= :to ");
+//
+//        query.setParameter("resident", resident);
+//        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
+//        query.setParameter("to", SYSCalendar.eod(day).toDate());
+//        BigDecimal sum = (BigDecimal) query.getSingleResult();
+//        em.close();
+//
+//        return sum == null ? BigDecimal.ZERO : sum;
+//    }
 
 //    public static BigDecimal getAvgIn(Resident resident, DateMidnight month) {
 //        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
@@ -840,14 +837,26 @@ public class ResValueTools {
         ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 
 //        DateTime now = new DateTime();
+        LocalDate now = new LocalDate();
 
         for (Resident resident : listResident) {
             Properties controlling = resident.getControlling();
+            // if the controlling was just set its not necessary to look too far into the past
+            // #24
+            String sDate = controlling.getProperty(ResidentTools.KEY_DATE1);
+            LocalDate startingOn = null;
+            if (sDate != null) {
+                startingOn = new LocalDate(sDate);
+            }
+
             if (controlling.containsKey(ResidentTools.KEY_STOOLDAYS) && !controlling.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off")) {
                 int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_STOOLDAYS));
+                if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
+                    startingOn = now.minusDays(days);
+                }
                 ResValue lastStool = getLast(resident, ResValueTypesTools.STOOL);
 
-                if (lastStool == null || new DateTime(lastStool.getPit()).toLocalDate().isBefore(new LocalDate().minusDays(days))) {
+                if (lastStool == null || new DateTime(lastStool.getPit()).toLocalDate().isBefore(startingOn)) {
                     result.add(new Object[]{resident, lastStool, days});
                 }
             }
@@ -871,10 +880,24 @@ public class ResValueTools {
                 Properties controlling = resident.getControlling();
 
                 if (controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) {
+
+                    // if the controlling was just set its not necessary to look too far into the past
+                    // #24
+                    String sDate = controlling.getProperty(ResidentTools.KEY_DATE2);
+                    LocalDate startingOn = null;
+                    if (sDate != null) {
+                        startingOn = new LocalDate(sDate);
+                    }
+
+
                     int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
-                    HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
+                    if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
+                        startingOn = now.minusDays(days);
+                    }
+                    HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, startingOn);
+
                     if (!in.isEmpty()) {
-                        for (LocalDate day = now.minusDays(days); day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
+                        for (LocalDate day = startingOn; day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
 
                             if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
                                 violatingValues.add(new Pair<LocalDate, BigDecimal>(day, in.get(day)));
@@ -884,10 +907,23 @@ public class ResValueTools {
                 }
 
                 if (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off")) {
+
+                    // if the controlling was just set its not necessary to look too far into the past
+                    // #24
+                    String sDate = controlling.getProperty(ResidentTools.KEY_DATE3);
+                    LocalDate startingOn = null;
+                    if (sDate != null) {
+                        startingOn = new LocalDate(sDate);
+                    }
+
                     int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
-                    HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
+                    if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
+                        startingOn = now.minusDays(days);
+                    }
+
+                    HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, startingOn);
                     if (!in.isEmpty()) {
-                        for (LocalDate day = now.minusDays(days); day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
+                        for (LocalDate day = startingOn; day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
 
                             if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
                                 violatingValues.add(new Pair<LocalDate, BigDecimal>(day, in.get(day)));

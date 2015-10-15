@@ -1149,18 +1149,21 @@ public class SYSTools {
         return bd;
     }
 
-    // fixes GitHub #17
+    // fixes #17
+    // caused #23 afterwards, so got rid of it
+    // todo: remove me
     public static String assimilateDecimalSeparators(String in) {
-        if (SYSTools.catchNull(in).isEmpty()) return in;
-
-        char sep = new DecimalFormatSymbols(Locale.getDefault(Locale.Category.FORMAT)).getDecimalSeparator();
-        char replace = '.';
-
-        if (sep == '.') {
-            replace = ',';
-        }
-
-        return in.replace(replace, sep);
+        return in;
+//        if (SYSTools.catchNull(in).isEmpty()) return in;
+//
+//        char sep = new DecimalFormatSymbols(Locale.getDefault(Locale.Category.FORMAT)).getDecimalSeparator();
+//        char replace = '.';
+//
+//        if (sep == '.') {
+//            replace = ',';
+//        }
+//
+//        return in.replace(replace, sep);
     }
 
     public static BigDecimal checkBigDecimal(String txt) {

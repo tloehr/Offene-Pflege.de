@@ -37,6 +37,9 @@ public class ResidentTools {
     public static final String GENDER[] = {"", SYSTools.xx("misc.msg.male"), SYSTools.xx("misc.msg.female")};
     public static final String ADDRESS[] = {"", SYSTools.xx("misc.msg.termofaddress.mr"), SYSTools.xx("misc.msg.termofaddress.mrs")};
     public static final String KEY_STOOLDAYS = "stooldays";
+    public static final String KEY_DATE1 = "date1";
+    public static final String KEY_DATE2 = "date2";
+    public static final String KEY_DATE3 = "date3";
     public static final String KEY_BALANCE = "liquidbalance";
     public static final String KEY_LOWIN = "lowin";
     public static final String KEY_TARGETIN = "targetin";
