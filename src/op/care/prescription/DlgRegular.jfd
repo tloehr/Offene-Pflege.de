@@ -970,10 +970,6 @@
              <boolean>false</boolean> 
             </void> 
             <void method="setProperty"> 
-             <string>toolTipText</string> 
-             <string>Neues Medikament eintragen</string> 
-            </void> 
-            <void method="setProperty"> 
              <string>cursor</string> 
              <object idref="Cursor0"/> 
             </void> 

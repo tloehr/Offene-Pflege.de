@@ -56,10 +56,9 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -97,6 +96,7 @@ public class OPDE {
     private static int DEFAULT_TIMEOUT = 30;
     protected static final String sep = System.getProperty("file.separator");
     private static boolean customJDBCUrl;
+    private static boolean runningInstanceDetected;
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -353,6 +353,13 @@ public class OPDE {
          */
 
 
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                System.out.println("Shutdown Hook");
+            }
+        });
+
         FileUtils.forceMkdir(new File(AppInfo.getOPCache()));
         FileUtils.forceMkdir(new File(AppInfo.getUserTemplatePath()));
         FileUtils.forceMkdir(new File(LocalMachine.getLogPath()));
@@ -370,11 +377,9 @@ public class OPDE {
         props = new Properties();
         appInfo = new AppInfo();
 
-
         // JideSoft
         Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
         WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
-
 
         /***
          *       ____                                          _   _     _               ___        _   _
@@ -660,6 +665,34 @@ public class OPDE {
              *     |_|  |_|  |_| |_| |_|_|  |_|\__,_|_|_| |_| |  | |
              *                                               \_\/_/
              */
+            try {
+                // testing for other running instances (especially for linux. is prevented by install4j on other OSes)
+                File pidFile = new File(LocalMachine.getAppDataPath() + sep + AppInfo.filePID);
+
+                if (pidFile.exists()) {
+                    if (JOptionPane.showConfirmDialog(new JFrame(), SYSTools.xx("warning.running.instance.message"), SYSTools.getWindowTitle("warning.running.instance.title"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
+                        RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
+                        String pid = rt.getName().substring(0, rt.getName().indexOf("@")).trim();
+                        PrintWriter out = new PrintWriter(pidFile);
+                        out.write(pid);
+                        out.close();
+                        pidFile.deleteOnExit();
+                    } else {
+                        System.exit(0);
+                    }
+                } else {
+                    RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
+                    String pid = rt.getName().substring(0, rt.getName().indexOf("@")).trim();
+                    PrintWriter out = new PrintWriter(pidFile);
+                    out.write(pid);
+                    out.close();
+                    pidFile.deleteOnExit();
+                }
+
+            } catch (Exception e) {
+                // fair enough
+            }
+
             mainframe = new FrmMain();
             mainframe.setVisible(true);
         } catch (Exception ioe) {
@@ -771,6 +804,51 @@ public class OPDE {
         }
         return password;
     }
+
+//    // http://stackoverflow.com/questions/19082265/how-to-ensure-only-one-instance-of-a-java-program-can-be-executed
+//    private static boolean getMonitoredVMs(int processPid) {
+//        MonitoredHost host;
+//        Set vms;
+//        try {
+//            host = MonitoredHost.getMonitoredHost(new HostIdentifier((String) null));
+//            vms = host.activeVms();
+//        } catch (java.net.URISyntaxException sx) {
+//            throw new InternalError(sx.getMessage());
+//        } catch (MonitorException mx) {
+//            throw new InternalError(mx.getMessage());
+//        }
+//        MonitoredVm mvm = null;
+//        String processName = null;
+//        try {
+//            mvm = host.getMonitoredVm(new VmIdentifier(String.valueOf(processPid)));
+//            processName = MonitoredVmUtil.commandLine(mvm);
+//            processName = processName.substring(processName.lastIndexOf("\\") + 1, processName.length());
+//            mvm.detach();
+//        } catch (Exception ex) {
+//
+//        }
+//        // This line is just to verify the process name. It can be removed.
+//        JOptionPane.showMessageDialog(null, processName);
+//        for (Object vmid : vms) {
+//            if (vmid instanceof Integer) {
+//                int pid = ((Integer) vmid).intValue();
+//                String name = vmid.toString(); // default to pid if name not available
+//                try {
+//                    mvm = host.getMonitoredVm(new VmIdentifier(name));
+//                    // use the command line as the display name
+//                    name = MonitoredVmUtil.commandLine(mvm);
+//                    name = name.substring(name.lastIndexOf("\\") + 1, name.length());
+//                    mvm.detach();
+//                    if ((name.equalsIgnoreCase(processName)) && (processPid != pid))
+//                        return false;
+//                } catch (Exception x) {
+//                    // ignore
+//                }
+//            }
+//        }
+//
+//        return true;
+//    }
 
     public static boolean isAdmin() {
         return UsersTools.isAdmin(login.getUser());

@@ -51,6 +51,7 @@ public class AppInfo {
     public static final String fileNewuser = "newuser.html";
     public static final String filePrinters = "printers.xml";
     public static final String fileStandardCSS = "standard.css";
+    public static final String filePID = "opde.pid";
 
     public static final String dirCache = "cache";
     public static final String dirSql = "dbscripts";

@@ -526,7 +526,6 @@ public class DlgRegular extends MyJDialog {
                 btnAddGP.setBorderPainted(false);
                 btnAddGP.setBorder(null);
                 btnAddGP.setContentAreaFilled(false);
-                btnAddGP.setToolTipText("Neues Medikament eintragen");
                 btnAddGP.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnAddGP.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
                 btnAddGP.addActionListener(e -> btnAddGPActionPerformed(e));
@@ -646,6 +645,11 @@ public class DlgRegular extends MyJDialog {
         setFocusTraversalPolicy(GUITools.createTraversalPolicy(new ArrayList<Component>(Arrays.asList(new Component[]{cmbDocON, cmbHospitalON, txtMed, rbActive, txtBemerkung}))));
 
         reloadTable();
+
+        // #28
+        btnMed.setToolTipText(SYSTools.xx("nursingrecords.prescription.dlgRegular.addMed.tooltip"));
+        btnAddGP.setToolTipText(SYSTools.xx("nursingrecords.prescription.dlgRegular.addGP.tooltip"));
+        btnAddHospital.setToolTipText(SYSTools.xx("nursingrecords.prescription.dlgRegular.addHospital.tooltip"));
 
         pnlCommonTags = new PnlCommonTags(prescription.getCommontags(), true, 3);
         jPanel3.add(new JScrollPane(pnlCommonTags), CC.xy(1, 9, CC.DEFAULT, CC.FILL));

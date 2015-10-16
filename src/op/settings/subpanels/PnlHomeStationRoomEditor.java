@@ -26,7 +26,6 @@ import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -219,7 +218,6 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 }
                 dcps1.addExpansion();
 
-
                 dcp.setContentPane(dcps1);
             };
 
@@ -321,6 +319,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 dcps1.add(createAddRoomButton(floor));
                 for (final Rooms room : myFloor.getRooms()) {
                     dcps1.add(createCP(room));
+                    // #27
+                    parentCPS.put(getKey(room), dcps1);
                 }
                 dcps1.addExpansion();
 
@@ -474,7 +474,6 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         });
 
         return btnAddHome;
-
     }
 
     private JideButton createAddRoomButton(final Floors floor) {
@@ -499,7 +498,10 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             try {
                 parentCPS.get("rooms4:" + getKey(floor)).removeExpansion();
                 parentCPS.get("rooms4:" + getKey(floor)).add(createCP(newRoom));
+
                 parentCPS.get("rooms4:" + getKey(floor)).addExpansion();
+                // #27
+                parentCPS.put(getKey(newRoom), parentCPS.get("rooms4:" + getKey(floor)));
             } catch (Exception e1) {
                 OPDE.fatal(logger, e1);
             }
@@ -619,10 +621,9 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
             ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + room.getText() + " (#" + room.getRoomID() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
                 if (o.equals(JOptionPane.YES_OPTION)) {
-                    EntityTools.delete(EntityTools.find(Rooms.class, room.getRoomID()));
-
                     parentCPS.get(getKey(room)).remove(cpMap.get(getKey(room)));
                     cpMap.remove(getKey(room));
+                    EntityTools.delete(EntityTools.find(Rooms.class, room.getRoomID()));
                 }
                 mainView();
             }));
@@ -651,7 +652,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     Station myStation = station;
                     String key = getKey(myStation);
-                    EntityTools.delete(EntityTools.find(String.class, station.getStatID()));
+                    // #27
+                    EntityTools.delete(EntityTools.find(Station.class, station.getStatID()));
 
                     parentCPS.get(getKey(myStation.getHome()) + ":station").remove(cpMap.get(key));
                     cpMap.remove(key);

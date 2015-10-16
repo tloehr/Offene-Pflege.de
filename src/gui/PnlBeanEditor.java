@@ -10,6 +10,8 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.Converter;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.ArrayUtils;
@@ -171,7 +173,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                                 value = parserClazz.getMethod("parse", String.class).invoke(parserClazz.newInstance(), text);
                             }
 
-                            PropertyUtils.setProperty(data, field.getName(), field.getType().cast(value));
+                            PropertyUtils.setProperty(data, field.getName(), ConvertUtils.convert(value, field.getType())); // ConverterUtils fixes #25
                             if (saveMode == SAVE_MODE_IMMEDIATE)
                                 broadcast();
                             OPDE.getDisplayManager().clearSubMessages();
@@ -452,7 +454,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
      * @throws NoSuchMethodException
      * @throws InvocationTargetException
      */
-
     public void broadcast() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, SQLIntegrityConstraintViolationException {
         super.broadcast(new DataChangeEvent(thisPanel, data));
     }
