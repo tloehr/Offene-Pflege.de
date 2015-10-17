@@ -118,6 +118,7 @@ public class MedInventoryTools {
 
         if (stock.getTradeForm().getDosageForm().isUPRn()) {
             BigDecimal upr = stock.getTradeForm().getUPR() != null ? stock.getTradeForm().getUPR() : stock.getUPR();
+            // #16
             quantity = quantity.divide(upr, 4, BigDecimal.ROUND_HALF_UP); // GitHub #16 Exception tritt hier auf. Weiter prüfen.
         }
 

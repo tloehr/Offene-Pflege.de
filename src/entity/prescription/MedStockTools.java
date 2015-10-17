@@ -43,7 +43,8 @@ public class MedStockTools {
     // This is also needed when fiddling with the UPRs afterwards in order to correct awkward values.
     public static final int ADD_TO_AVERAGES_UPR_WHEN_CLOSING = 0;
     public static final int REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING = 1;
-    public static final int DONT_REPLACE_UPR = 2;
+    public static final int REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING = 2; // #16
+    public static final int DONT_REPLACE_UPR = 3;
 
     public static ListCellRenderer getBestandOnlyIDRenderer() {
         return new ListCellRenderer() {
@@ -244,10 +245,7 @@ public class MedStockTools {
 
         BigDecimal effectiveUPR = getEffectiveUPR(medStock);
         if (medStock.getTradeForm().getDosageForm().isUPRn()) {
-            if (medStock.getTradeForm().getUPR() != null) {
-                medStock.setUPR(medStock.getTradeForm().getUPR());
-                medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
-            } else {
+            if (medStock.getTradeForm().getUPR() == null) { // no contant UPR
                 if (medStock.getUPRDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
                     if (effectiveUPR.compareTo(BigDecimal.ZERO) > 0) { // if this stock was never used the effective UPR must be 0. we must handle this case separately
                         // if the deviation was too high (usually more than 20%), then the new UPR is discarded
@@ -266,11 +264,17 @@ public class MedStockTools {
                     } else {
                         OPDE.debug("effective UPR is 0 or less. new UPR discarded");
                     }
-                } else if (medStock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {  // REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING
+                } else if (medStock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
                     medStock.setUPR(effectiveUPR);
-                    medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
-                } else { // DONT_REPLACE_UPR
-                    medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
+                    medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // will be part of the calculation in future
+
+                    // https://github.com/tloehr/Offene-Pflege.de/issues/16
+                    for (MedStock dependantStocks : medStock.getInventory().getMedStocks()) {
+                        if (dependantStocks.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING) {
+                            dependantStocks.setUPR(effectiveUPR);
+                            dependantStocks.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
+                        }
+                    }
                 }
             }
         }
@@ -439,10 +443,10 @@ public class MedStockTools {
 //        return result;
 //    }
 
-    public static void open(EntityManager em, MedStock stock) {
-        MedStock myStock = em.merge(stock);
-        myStock.setOpened(new Date());
-    }
+//    public static void open(EntityManager em, MedStock stock) {
+//        MedStock myStock = em.merge(stock);
+//        myStock.setOpened(new Date());
+//    }
 
 //    public static MedStock getPreviousStock(MedStock fromThisOne) {
 //        MedInventory inventory = fromThisOne.getInventory();
@@ -569,8 +573,8 @@ public class MedStockTools {
         // Verhaltnis zur Packungseinheit 1. Wurden 100 Tropfen gegeben, bei einem APV von 20(:1)
         // Dann ergibt das einen rechnerischen Flascheninhalt von 5 ml.
 
-        // The doses of the applications which have been calculated by the BHPs are always in
-        // the unit of the usage.
+        // The doses of the applications which have been calculated by the BHPs equals the usage unit.
+        //
         // When a package is empty, we know two things for sure:
         // 1. The startContent has been completely used up
         // 2. the sum of all applications (theoreticalSum) is what we've got really out of the bottle
@@ -602,7 +606,7 @@ public class MedStockTools {
             OPDE.debug("STATE_UPRn");
 
             if (tradeForm.getUPR() != null) {
-                // if there is a constant UPR defined for that tradeform
+                // there is a constant UPR defined for that tradeform
                 // so there is no estimation necessary
                 upr = tradeForm.getUPR();
                 OPDE.debug("constant UPRn");
@@ -622,6 +626,11 @@ public class MedStockTools {
                     } else {
                         upr = (BigDecimal) query.getSingleResult();
                     }
+
+                    if (upr.equals(BigDecimal.ZERO)){
+                        upr = BigDecimal.ONE;
+                    }
+
                     upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
                     OPDE.debug("calculated UPRn. average so far: " + upr.toString());
                 } catch (NoResultException nre) {
@@ -668,6 +677,33 @@ public class MedStockTools {
         }
         return count == 0;
     }
+
+
+    public static boolean stillWorkingOnTheFirstOneToCalculateUPRn(TradeForm tradeForm) {
+            Integer count = null;
+            EntityManager em = OPDE.createEM();
+            try {
+                Query query = em.createQuery("SELECT COUNT(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
+                query.setParameter("dummymode", REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING);
+                query.setParameter("tradeform", tradeForm);
+                Object result = query.getSingleResult();
+
+                if (result == null) {
+                    count = 0;
+                } else if (result instanceof Long) {
+                    count = ((Long) result).intValue();
+                } else {
+                    count = (Integer) query.getSingleResult();
+                }
+            } catch (NoResultException nre) {
+                count = 0;
+            } catch (Exception e) {
+                OPDE.fatal(e);
+            } finally {
+                em.close();
+            }
+            return count == 1;
+        }
 
 
     public static List<MedStock> getExpiryList(int days) {

@@ -29,7 +29,6 @@ package op.tools;
 import com.jidesoft.swing.JideSplitPane;
 import com.sun.istack.internal.Nullable;
 import entity.files.SYSFilesTools;
-import entity.system.SYSPropsTools;
 import entity.system.Users;
 import op.OPDE;
 import op.system.AppInfo;
@@ -49,7 +48,6 @@ import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.io.*;
 import java.lang.reflect.Array;
@@ -63,7 +61,6 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -1109,44 +1106,10 @@ public class SYSTools {
     }
 
 
-    public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt, boolean nees2BePositive) {
-        BigDecimal bd = null;
+    public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt) {
+        // https://github.com/tloehr/Offene-Pflege.de/issues/30
         JTextComponent txt = (JTextComponent) evt.getSource();
-        Action toolTipAction = txt.getActionMap().get("hideTip");
-        if (toolTipAction != null) {
-            ActionEvent hideTip = new ActionEvent(txt, ActionEvent.ACTION_PERFORMED, "");
-            toolTipAction.actionPerformed(hideTip);
-        }
-        try {
-            OPDE.debug(txt.getText());
-            OPDE.debug(assimilateDecimalSeparators(txt.getText()));
-
-            bd = parseDecimal(txt.getText());
-
-//            bd = BigDecimal.valueOf(Double.parseDouble(assimilateDecimalSeparators(txt.getText())));
-            OPDE.debug(bd);
-            if (nees2BePositive && bd.compareTo(BigDecimal.ZERO) <= 0) {
-                txt.setToolTipText("<html><font color=\"red\"><b>" + SYSTools.xx("misc.msg.invalidnumber") + "</b></font></html>");
-                toolTipAction = txt.getActionMap().get("postTip");
-                bd = BigDecimal.ONE;
-            } else {
-                txt.setToolTipText("");
-            }
-
-        } catch (NumberFormatException ex) {
-            if (nees2BePositive) {
-                bd = BigDecimal.ONE;
-            } else {
-                bd = BigDecimal.ZERO;
-            }
-            txt.setToolTipText("<html><font color=\"red\"><b>" + SYSTools.xx("misc.msg.invalidnumber") + "</b></font></html>");
-            toolTipAction = txt.getActionMap().get("postTip");
-            if (toolTipAction != null) {
-                ActionEvent postTip = new ActionEvent(txt, ActionEvent.ACTION_PERFORMED, "");
-                toolTipAction.actionPerformed(postTip);
-            }
-        }
-        return bd;
+        return parseDecimal(txt.getText());
     }
 
     // fixes #17
@@ -1227,7 +1190,7 @@ public class SYSTools {
     public static BigDecimal parseDecimal(String test) {
         NumberFormat nf = DecimalFormat.getNumberInstance();
 
-        test = assimilateDecimalSeparators(test);
+//        test = assimilateDecimalSeparators(test);
         Number num;
         try {
             num = nf.parse(test);
@@ -1247,8 +1210,6 @@ public class SYSTools {
                 wert = null;
             }
         }
-
-
 
 
         return wert;
@@ -1423,14 +1384,13 @@ public class SYSTools {
     }
 
 
-
     public static void packTable(JTable table, int margin) {
         for (int colindex = 0; colindex < table.getColumnCount(); colindex++) {
             packColumn(table, colindex, margin);
         }
     }
 
-    public static String booleanToString(boolean b){
+    public static String booleanToString(boolean b) {
         return b ? SYSTools.xx("misc.msg.yes") : SYSTools.xx("misc.msg.no");
     }
 

@@ -119,7 +119,7 @@ public class DlgNewStocks extends MyJDialog {
             String pzn = null;
             try {
                 pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
-            } catch (NumberFormatException nfe){
+            } catch (NumberFormatException nfe) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(nfe.getMessage(), DisplayMessage.WARNING));
                 pzn = null;
             }
@@ -272,7 +272,7 @@ public class DlgNewStocks extends MyJDialog {
     }
 
     private void txtWeightControlCaretUpdate(CaretEvent evt) {
-        weight = SYSTools.checkBigDecimal(evt, false);
+        weight = SYSTools.checkBigDecimal(evt);
     }
 
     private void txtWeightControlFocusGained(FocusEvent e) {
@@ -330,8 +330,8 @@ public class DlgNewStocks extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default:grow, $lcgap, 14dlu",
-                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                    "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default:grow, $lcgap, 14dlu",
+                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- lblPZN ----
             lblPZN.setText("PZN oder Suchbegriff");
@@ -366,7 +366,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(lblProd, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[] {
+            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[]{
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -399,7 +399,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(lblPack, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[] {
+            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[]{
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -418,6 +418,7 @@ public class DlgNewStocks extends MyJDialog {
                 public void focusGained(FocusEvent e) {
                     txtExpiresFocusGained(e);
                 }
+
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtExpiresFocusLost(e);
@@ -429,8 +430,8 @@ public class DlgNewStocks extends MyJDialog {
             //======== panel3 ========
             {
                 panel3.setLayout(new FormLayout(
-                    "pref, $lcgap, default:grow",
-                    "fill:17dlu"));
+                        "pref, $lcgap, default:grow",
+                        "fill:17dlu"));
 
                 //---- lblWeightControl ----
                 lblWeightControl.setText("weightcontrol");
@@ -567,8 +568,21 @@ public class DlgNewStocks extends MyJDialog {
                 inventory.setText(TradeFormTools.toPrettyString(tradeForm) + "; " + ACMETools.toPrettyStringShort(tradeForm.getMedProduct().getACME()));
             }
 
-            BigDecimal estimatedUPR = MedStockTools.getEstimatedUPR(tradeForm);
-            int dummyMode = tradeForm.getDosageForm().isUPRn() && MedStockTools.isNoStockYetForThis(tradeForm) ? MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING : MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING;
+            // https://github.com/tloehr/Offene-Pflege.de/issues/16
+            BigDecimal estimatedUPR = BigDecimal.ONE;
+
+            int dummyMode = MedStockTools.DONT_REPLACE_UPR;
+            if (tradeForm.getDosageForm().isUPRn()) {
+                if (tradeForm.getMedStocks().isEmpty()) {
+                    // first of its kind. will calculate real UPR when it's closed
+                    dummyMode = MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING;
+                } else if (MedStockTools.stillWorkingOnTheFirstOneToCalculateUPRn(tradeForm)) {
+                    dummyMode = MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING;
+                } else {
+                    dummyMode = MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING;
+                    estimatedUPR = MedStockTools.getEstimatedUPR(tradeForm);
+                }
+            }
 
             MedStock newStock = em.merge(new MedStock(inventory, tradeForm, aPackage, txtBemerkung.getText(), estimatedUPR, dummyMode));
             newStock.setExpires(expiry);

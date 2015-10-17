@@ -27,6 +27,7 @@
 
 package op.care.med.inventory;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.MedStockTools;
@@ -58,10 +59,11 @@ public class DlgTX extends MyJDialog {
     private MedStockTransaction tx;
 
     public DlgTX(MedStockTransaction tx, Closure actionBlock) {
-        super(false);
+        super();
         this.tx = tx;
         this.actionBlock = actionBlock;
         initDialog();
+        pack();
     }
 
     private void txtMengeFocusGained(FocusEvent e) {
@@ -103,9 +105,24 @@ public class DlgTX extends MyJDialog {
     }
 
     private void txtWeightControlledCaretUpdate(CaretEvent evt) {
-        weight = SYSTools.checkBigDecimal(evt, false);
+        weight = SYSTools.checkBigDecimal(evt);
+        // https://github.com/tloehr/Offene-Pflege.de/issues/30
+        if (weight == null) weight = BigDecimal.ZERO;
         OPDE.debug("weight = " + weight.toString());
         btnBuchung.setEnabled(isAmountOk() && isWeightOk());
+    }
+
+    private void txtValueCaretUpdate(CaretEvent evt) {
+        amount = SYSTools.checkBigDecimal(evt);
+        // https://github.com/tloehr/Offene-Pflege.de/issues/30
+        if (amount == null) amount = BigDecimal.ZERO;
+
+        btnBuchung.setEnabled(isAmountOk() && isWeightOk());
+        OPDE.debug("amount = " + amount.toString());
+    }
+
+    private void thisWindowClosing(WindowEvent e) {
+        tx = null;
     }
 
     private void initDialog() {
@@ -157,10 +174,16 @@ public class DlgTX extends MyJDialog {
         btnBuchung = new JButton();
 
         //======== this ========
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                thisWindowClosing(e);
+            }
+        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
-                "2*(default, $lgap), fill:default, $lgap, default, $lgap, fill:default"));
+            "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
+            "2*(default, $lgap), fill:default, $lgap, default, $lgap, fill:default"));
 
         //---- lblText ----
         lblText.setText("Buchungstext");
@@ -176,7 +199,6 @@ public class DlgTX extends MyJDialog {
         txtValue.setHorizontalAlignment(SwingConstants.RIGHT);
         txtValue.setText("jTextField1");
         txtValue.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtValue.addCaretListener(e -> txtMengeCaretUpdate(e));
         txtValue.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -184,6 +206,7 @@ public class DlgTX extends MyJDialog {
             }
         });
         txtValue.addActionListener(e -> txtValueActionPerformed(e));
+        txtValue.addCaretListener(e -> txtValueCaretUpdate(e));
         contentPane.add(txtValue, CC.xy(5, 5));
 
         //---- lblValue ----
@@ -256,9 +279,8 @@ public class DlgTX extends MyJDialog {
 
 
     private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
-        amount = SYSTools.checkBigDecimal(evt, false);
-        btnBuchung.setEnabled(isAmountOk() && isWeightOk());
-        OPDE.debug("amount = " + amount.toString());
+
+
 //        if (amount.compareTo(BigDecimal.ZERO) < 0) {
 //            btnBuchung.setEnabled(amount.negate().compareTo(bestandsumme) <= 0);
 //        } else if (amount.compareTo(BigDecimal.ZERO) > 0) {
