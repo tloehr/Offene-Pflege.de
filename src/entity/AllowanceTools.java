@@ -45,7 +45,7 @@ public class AllowanceTools {
             }
         });
 
-        DecimalFormat cf = new DecimalFormat("######.00");
+//        DecimalFormat cf = new DecimalFormat("######.00");
         Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
 
         BigDecimal saldo = carry;
@@ -84,7 +84,7 @@ public class AllowanceTools {
                     html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
                     html += "<td width=\"340\">" + (monatsWechsel ? "Saldo zum Monatsende" : "Zwischensumme") + "</td>";
                     html += "<td>&nbsp;</td>";
-                    html += "<td width=\"100\" align=\"right\"" + (monatsWechsel ? " id=\"fonth2\">" : ">") + "&euro; " + cf.format(saldo) + "</td>";
+                    html += "<td width=\"100\" align=\"right\"" + (monatsWechsel ? " id=\"fonth2\">" : ">") + "&euro; " + SYSTools.formatCurrency(saldo) + "</td>";
                     html += "</tr>\n";
                     html += "</table>\n";
                 }
@@ -100,7 +100,7 @@ public class AllowanceTools {
                 html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
                 html += "<td width=\"340\">" + (pagebreak && !monatsWechsel ? "Übertrag von vorheriger Seite" : "Übertrag aus Vormonat") + "</td>";
                 html += "<td>&nbsp;</td>";
-                html += "<td width=\"100\" align=\"right\">&euro; " + cf.format(saldo) + "</td>";
+                html += "<td width=\"100\" align=\"right\">&euro; " + SYSTools.formatCurrency(saldo) + "</td>";
                 html += "</tr>\n";
 
                 elementNumber += 3;
@@ -118,8 +118,8 @@ public class AllowanceTools {
             html += allowance.isReplaced() || allowance.isReplacement() ? SYSConst.html_22x22_Eraser : "";
             html += DateFormat.getDateInstance().format(new Date(belegDatum.getTimeInMillis())) + "</td>";
             html += "<td width=\"340\">" + allowance.getText() + "</td>";
-            html += "<td width=\"100\" align=\"right\">&euro; " + cf.format(allowance.getAmount()) + "</td>";
-            html += "<td width=\"100\" align=\"right\">&euro; " + cf.format(saldo) + "</td>";
+            html += "<td width=\"100\" align=\"right\">&euro; " + SYSTools.formatCurrency(allowance.getAmount()) + "</td>";
+            html += "<td width=\"100\" align=\"right\">&euro; " + SYSTools.formatCurrency(saldo) + "</td>";
             html += "</tr>\n";
             elementNumber += 1;
 
@@ -130,7 +130,7 @@ public class AllowanceTools {
         html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
         html += "<td width=\"340\">Saldo zum Monatsende</td>";
         html += "<td>&nbsp;</td>";
-        html += "<td width=\"100\" align=\"right\" id=\"fonth2\">&euro; " + cf.format(saldo) + "</td>";
+        html += "<td width=\"100\" align=\"right\" id=\"fonth2\">&euro; " + SYSTools.formatCurrency(saldo) + "</td>";
         html += "</tr>\n";
 
         html += "</table>\n";
@@ -278,7 +278,7 @@ public class AllowanceTools {
 
 
     public static String getOverallSumAsHTML(int monthsback) {
-        DecimalFormat cf = new DecimalFormat("######.00");
+//        DecimalFormat cf = new DecimalFormat("######.00");
         Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
         String html = "<h1  align=\"center\" id=\"fonth1\">" + SYSTools.xx("admin.residents.cash.overallsum") + "</h1>";
 
@@ -297,7 +297,7 @@ public class AllowanceTools {
             String fonttext = end.getMonthOfYear() % 2 == 0 ? "fonttext" : "fonttextgray";
 
 
-            html += "<tr><td id=\"" + fonttext + "\" width=\"300\" align=\"right\">" + monthFormatter.format(end.toDate()) + "</td><td  id=\"" + fonttext + "\"  width=\"100\" align=\"right\">" + cf.format(bd) + " &euro;</td></tr>";
+            html += "<tr><td id=\"" + fonttext + "\" width=\"300\" align=\"right\">" + monthFormatter.format(end.toDate()) + "</td><td  id=\"" + fonttext + "\"  width=\"100\" align=\"right\">" + SYSTools.formatCurrency(bd) + " &euro;</td></tr>";
         }
 
         html += "</table>";

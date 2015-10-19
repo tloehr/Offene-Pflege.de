@@ -228,11 +228,11 @@ public class DlgValueControl extends MyJDialog {
     }
 
     private void txtLowInFocusLost(FocusEvent e) {
-        txtLowIn.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtLowIn.getText(), "0")).toString());
+        txtLowIn.setText(SYSTools.formatBigDecimal(SYSTools.parseDecimal(SYSTools.catchNull(txtLowIn.getText(), "0"))));
     }
 
     private void txtHighInFocusLost(FocusEvent e) {
-        txtHighIn.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtHighIn.getText(), "0")).toString());
+        txtHighIn.setText(SYSTools.formatBigDecimal(SYSTools.parseDecimal(SYSTools.catchNull(txtHighIn.getText(), "0"))));
     }
 
     // #fixes #19
@@ -241,7 +241,7 @@ public class DlgValueControl extends MyJDialog {
     }
 
     private void txtTargetInFocusLost(FocusEvent e) {
-        txtTargetIn.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtTargetIn.getText(), "0")).toString());
+        txtTargetIn.setText(SYSTools.formatBigDecimal(SYSTools.parseDecimal(SYSTools.catchNull(txtTargetIn.getText(), "0"))));
     }
 
     private void initComponents() {

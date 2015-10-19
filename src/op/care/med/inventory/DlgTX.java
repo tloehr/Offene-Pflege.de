@@ -108,7 +108,7 @@ public class DlgTX extends MyJDialog {
         weight = SYSTools.checkBigDecimal(evt);
         // https://github.com/tloehr/Offene-Pflege.de/issues/30
         if (weight == null) weight = BigDecimal.ZERO;
-        OPDE.debug("weight = " + weight.toString());
+        OPDE.debug("weight = " + SYSTools.formatBigDecimal(weight));
         btnBuchung.setEnabled(isAmountOk() && isWeightOk());
     }
 
@@ -118,7 +118,7 @@ public class DlgTX extends MyJDialog {
         if (amount == null) amount = BigDecimal.ZERO;
 
         btnBuchung.setEnabled(isAmountOk() && isWeightOk());
-        OPDE.debug("amount = " + amount.toString());
+        OPDE.debug("amount = " + SYSTools.formatBigDecimal(amount));
     }
 
     private void thisWindowClosing(WindowEvent e) {
@@ -144,11 +144,11 @@ public class DlgTX extends MyJDialog {
             packgroesse = BigDecimal.valueOf(Double.MAX_VALUE);
         }
 
-        txtValue.setText(NumberFormat.getNumberInstance().format(tx.getAmount()));
+        txtValue.setText(SYSTools.formatBigDecimal(tx.getAmount()));
 
         if (txtWeightControlled.isVisible()) {
             txtWeightControlled.setToolTipText(SYSTools.xx("opde.medication.controlWeight.only.after.change"));
-            txtWeightControlled.setText(NumberFormat.getNumberInstance().format(tx.getWeight() != null ? tx.getWeight() : BigDecimal.ZERO));
+            txtWeightControlled.setText(SYSTools.formatBigDecimal(tx.getWeight() != null ? tx.getWeight() : BigDecimal.ZERO));
         }
         setVisible(true);
     }

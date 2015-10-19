@@ -464,10 +464,10 @@ public class PnlEditResInfo {
      */
     private String getPreset(String preset, String deflt) {
         String d = SYSTools.catchNull(deflt);
-        NumberFormat nf = DecimalFormat.getNumberInstance();
-        nf.setMinimumFractionDigits(2);
-        nf.setMaximumFractionDigits(2);
-        nf.setGroupingUsed(false);
+//        NumberFormat nf = DecimalFormat.getNumberInstance();
+//        nf.setMinimumFractionDigits(2);
+//        nf.setMaximumFractionDigits(2);
+//        nf.setGroupingUsed(false);
 
         if (SYSTools.catchNull(preset).isEmpty()) {
             return d;
@@ -490,11 +490,11 @@ public class PnlEditResInfo {
 
         if (preset.equalsIgnoreCase("heightlast")) {
             ResValue r = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
-            return r == null ? d : nf.format(r.getVal1()).replace(",", ".");
+            return r == null ? d : SYSTools.formatBigDecimal(r.getVal1());
         }
         if (preset.equalsIgnoreCase("weightlast")) {
             ResValue r = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
-            return r == null ? d : nf.format(r.getVal1()).replace(",", ".");
+            return r == null ? d : SYSTools.formatBigDecimal(r.getVal1());
         }
         if (preset.equalsIgnoreCase("weight-1m")) {
             long target = new DateTime().minusMonths(1).getMillis();
@@ -509,7 +509,7 @@ public class PnlEditResInfo {
                 }
             }
 
-            return closest == null ? d : nf.format(closest.getVal1()).replace(",", ".");
+            return closest == null ? d : SYSTools.formatBigDecimal(closest.getVal1());
         }
         if (preset.equalsIgnoreCase("weight-6m")) {
             long target = new DateTime().minusMonths(6).getMillis();
@@ -524,7 +524,7 @@ public class PnlEditResInfo {
                 }
             }
 
-            return closest == null ? d : nf.format(closest.getVal1()).replace(",", ".");
+            return closest == null ? d : SYSTools.formatBigDecimal(closest.getVal1());
         }
         if (preset.equalsIgnoreCase("weight-1y")) {
             long target = new DateTime().minusYears(1).getMillis();
@@ -539,7 +539,7 @@ public class PnlEditResInfo {
                 }
             }
 
-            return closest == null ? d : nf.format(closest.getVal1()).replace(",", ".");
+            return closest == null ? d : SYSTools.formatBigDecimal(closest.getVal1());
         }
         return d;
     }
@@ -734,7 +734,7 @@ public class PnlEditResInfo {
             sumlabel.setText(scalesumlabeltext + ": " + scalesum + " (" + risiko + ")");
             sumlabel.setForeground(GUITools.getColor(color));
 
-            content.put("scalesum", scalesum.toString());
+            content.put("scalesum", SYSTools.formatBigDecimal(scalesum));
             content.put("risk", risiko);
             content.put("rating", rating);
 

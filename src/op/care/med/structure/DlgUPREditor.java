@@ -73,10 +73,10 @@ public class DlgUPREditor extends MyJDialog {
                 //        cmbDosageForm.setRenderer(DosageFormTools.getRenderer(0));
 
                 if (tradeForm.getUPR() != null) {
-                    txtUPR.setText(tradeForm.getUPR().setScale(2, RoundingMode.HALF_UP).toString());
+                    txtUPR.setText(SYSTools.formatBigDecimal(tradeForm.getUPR().setScale(2, RoundingMode.HALF_UP)));
                     rbUPRConst.setSelected(true);
                 } else {
-                    txtSetUPR.setText(MedStockTools.getEstimatedUPR(tradeForm).setScale(2, RoundingMode.HALF_UP).toString());
+                    txtSetUPR.setText(SYSTools.formatBigDecimal(MedStockTools.getEstimatedUPR(tradeForm).setScale(2, RoundingMode.HALF_UP)));
                     rbUPRAuto.setSelected(true);
                 }
 
@@ -128,11 +128,11 @@ public class DlgUPREditor extends MyJDialog {
 
     private void txtUPRActionPerformed(ActionEvent e) {
         BigDecimal upr = checkUPR(txtUPR.getText());
-        txtUPR.setText(upr.setScale(2, RoundingMode.HALF_UP).toString());
+        txtUPR.setText(SYSTools.formatBigDecimal(upr.setScale(2, RoundingMode.HALF_UP)));
     }
 
     private BigDecimal checkUPR(String text) {
-        BigDecimal upr = SYSTools.checkBigDecimal(text);
+        BigDecimal upr = SYSTools.parseDecimal(text);
         if (upr == null || upr.compareTo(BigDecimal.ZERO) <= 0) {
             upr = BigDecimal.TEN;
         }
@@ -141,7 +141,7 @@ public class DlgUPREditor extends MyJDialog {
 
     private void txtUPRFocusLost(FocusEvent e) {
         BigDecimal upr = checkUPR(txtUPR.getText());
-        txtUPR.setText(upr.setScale(2, RoundingMode.HALF_UP).toString());
+        txtUPR.setText(SYSTools.formatBigDecimal(upr.setScale(2, RoundingMode.HALF_UP)));
     }
 
     private void rbUPRAutoItemStateChanged(ItemEvent e) {
@@ -157,12 +157,12 @@ public class DlgUPREditor extends MyJDialog {
 
     private void txtSetUPRActionPerformed(ActionEvent e) {
         BigDecimal upr = checkUPR(txtSetUPR.getText());
-        txtSetUPR.setText(upr.setScale(2, RoundingMode.HALF_UP).toString());
+        txtSetUPR.setText(SYSTools.formatBigDecimal(upr.setScale(2, RoundingMode.HALF_UP)));
     }
 
     private void txtSetUPRFocusLost(FocusEvent e) {
         BigDecimal upr = checkUPR(txtSetUPR.getText());
-        txtSetUPR.setText(upr.setScale(2, RoundingMode.HALF_UP).toString());
+        txtSetUPR.setText(SYSTools.formatBigDecimal(upr.setScale(2, RoundingMode.HALF_UP)));
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
@@ -213,7 +213,8 @@ public class DlgUPREditor extends MyJDialog {
                                 }
                                 em.getTransaction().commit();
 
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -426,7 +427,7 @@ public class DlgUPREditor extends MyJDialog {
                     break;
                 }
                 case 2: {
-                    result = listStocks.get(rowIndex).getUPR().setScale(2, RoundingMode.HALF_UP).toString();
+                    result = SYSTools.formatBigDecimal(listStocks.get(rowIndex).getUPR().setScale(2, RoundingMode.HALF_UP));
                     break;
                 }
                 case 3: {
@@ -434,20 +435,20 @@ public class DlgUPREditor extends MyJDialog {
                     break;
                 }
                 case 4: {
-                    result = MedStockTools.getStartTX(listStocks.get(rowIndex)).getAmount().setScale(2, RoundingMode.HALF_UP).toString();
+                    result = SYSTools.formatBigDecimal(MedStockTools.getStartTX(listStocks.get(rowIndex)).getAmount().setScale(2, RoundingMode.HALF_UP));
                     break;
                 }
                 case 5: {
                     result = "OPEN";
                     if (mapEffectiveUPRs.containsKey(listStocks.get(rowIndex))) {
-                        result = mapEffectiveUPRs.get(listStocks.get(rowIndex)).getFirst().setScale(2, RoundingMode.HALF_UP).toString();
+                        result = SYSTools.formatBigDecimal(mapEffectiveUPRs.get(listStocks.get(rowIndex)).getFirst().setScale(2, RoundingMode.HALF_UP));
                     }
                     break;
                 }
                 case 6: {
                     result = "OPEN";
                     if (mapEffectiveUPRs.containsKey(listStocks.get(rowIndex))) {
-                        result = mapEffectiveUPRs.get(listStocks.get(rowIndex)).getSecond().setScale(2, RoundingMode.HALF_UP).toString();
+                        result = SYSTools.formatBigDecimal(mapEffectiveUPRs.get(listStocks.get(rowIndex)).getSecond().setScale(2, RoundingMode.HALF_UP));
                     }
                     break;
                 }

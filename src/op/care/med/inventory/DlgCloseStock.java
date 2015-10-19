@@ -314,12 +314,8 @@ public class DlgCloseStock extends MyJDialog {
     }//GEN-LAST:event_rbLeerActionPerformed
 
     private void txtLetzteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtLetzteFocusLost
-        try {
-            double inhalt = Double.parseDouble(txtLetzte.getText().replace(",", "."));
-            if (inhalt <= 0d) {
-                txtLetzte.setText("1");
-            }
-        } catch (NumberFormatException ex) {
+        BigDecimal inhalt = SYSTools.parseDecimal(txtLetzte.getText());
+        if (inhalt == null && inhalt.compareTo(BigDecimal.ZERO) <= 0) {
             txtLetzte.setText("1");
         }
     }//GEN-LAST:event_txtLetzteFocusLost
@@ -359,7 +355,7 @@ public class DlgCloseStock extends MyJDialog {
             }
 
             if (rbStellen.isSelected()) {
-                BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
+                BigDecimal inhalt =  SYSTools.parseDecimal(txtLetzte.getText());
                 MedStockTools.setStockTo(em, myStock, inhalt, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
                 myStock.setState(MedStockTools.STATE_WILL_BE_CLOSED_SOON);
                 OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);

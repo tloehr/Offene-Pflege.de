@@ -40,7 +40,7 @@ public class MedPackageTools {
     }
 
     public static String toPrettyString(MedPackage aPackage) {
-        String text = aPackage.getContent().toString() + " " + TradeFormTools.getPackUnit(aPackage.getTradeForm()) + ", " + GROESSE[aPackage.getSize()] + ", ";
+        String text = SYSTools.formatBigDecimal(aPackage.getContent()) + " " + TradeFormTools.getPackUnit(aPackage.getTradeForm()) + ", " + GROESSE[aPackage.getSize()] + ", ";
         text += "PZN: " + aPackage.getPzn();
         return text;
     }

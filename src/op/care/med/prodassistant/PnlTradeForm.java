@@ -172,18 +172,18 @@ public class PnlTradeForm extends JPanel {
     private void rbSetUPRItemStateChanged(ItemEvent e) {
         txtUPR.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            tradeForm.setUPR(SYSTools.checkBigDecimal(txtUPR.getText()));
+            tradeForm.setUPR(SYSTools.parseDecimal(txtUPR.getText()));
             validate.execute(tradeForm);
         }
     }
 
     private void txtUPRFocusLost(FocusEvent e) {
-        BigDecimal upr = SYSTools.checkBigDecimal(txtUPR.getText());
+        BigDecimal upr = SYSTools.parseDecimal(txtUPR.getText());
         if (upr == null || upr.compareTo(BigDecimal.ZERO) <= 0) {
             upr = BigDecimal.TEN;
             txtUPR.setText("10");
         } else {
-            txtUPR.setText(upr.setScale(2, RoundingMode.HALF_UP).toString());
+            txtUPR.setText(SYSTools.formatBigDecimal(upr.setScale(2, RoundingMode.HALF_UP)));
         }
         tradeForm.setUPR(upr);
     }
@@ -206,13 +206,15 @@ public class PnlTradeForm extends JPanel {
         Integer i = SYSTools.checkInteger(txtExpiresIn.getText());
         if (i == null || i.compareTo(0) <= 0) {
             i = 7;
-            txtExpiresIn.setText("7");
+//            txtExpiresIn.setText("7");
         }
         if (cmbDaysWeeks.getSelectedIndex() == 1) {
             tradeForm.setDaysToExpireAfterOpened(i * 7);
         } else {
             tradeForm.setDaysToExpireAfterOpened(i);
         }
+
+        txtExpiresIn.setText(Integer.toString(i));
 
         validate.execute(tradeForm);
     }
@@ -222,13 +224,14 @@ public class PnlTradeForm extends JPanel {
             Integer i = SYSTools.checkInteger(txtExpiresIn.getText());
             if (i == null || i.compareTo(0) <= 0) {
                 i = 7;
-                txtExpiresIn.setText("7");
+//                txtExpiresIn.setText("7");
             }
             if (cmbDaysWeeks.getSelectedIndex() == 1) {
                 tradeForm.setDaysToExpireAfterOpened(i * 7);
             } else {
                 tradeForm.setDaysToExpireAfterOpened(i);
             }
+            txtExpiresIn.setText(Integer.toString(i));
             validate.execute(tradeForm);
         }
     }
@@ -263,7 +266,7 @@ public class PnlTradeForm extends JPanel {
         //======== this ========
         setLayout(new FormLayout(
             "default, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
-            "2*(default, $lgap), default, $rgap, pref, 2*($lgap, default), $lgap, default:grow, $lgap, default"));
+            "2*(default, $lgap), default, $rgap, pref, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -291,7 +294,7 @@ public class PnlTradeForm extends JPanel {
         lbl1.setText(null);
         lbl1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine2.png")));
         lbl1.setFont(new Font("Arial", Font.PLAIN, 18));
-        add(lbl1, CC.xy(3, 13, CC.LEFT, CC.FILL));
+        add(lbl1, CC.xy(3, 15, CC.LEFT, CC.FILL));
 
         //---- lblMsg ----
         lblMsg.setText("text");
@@ -356,12 +359,12 @@ public class PnlTradeForm extends JPanel {
             cmbDaysWeeks.addItemListener(e -> cmbDaysWeeksItemStateChanged(e));
             panel1.add(cmbDaysWeeks);
         }
-        add(panel1, CC.xy(3, 11));
+        add(panel1, CC.xywh(3, 11, 3, 1));
 
         //---- cbWeightControlled ----
         cbWeightControlled.setText("text");
         cbWeightControlled.addItemListener(e -> cbWeightControlledItemStateChanged(e));
-        add(cbWeightControlled, CC.xywh(5, 11, 3, 1, CC.RIGHT, CC.DEFAULT));
+        add(cbWeightControlled, CC.xywh(3, 13, 3, 1));
 
         //======== jsp1 ========
         {
@@ -372,7 +375,7 @@ public class PnlTradeForm extends JPanel {
             lstDaf.addListSelectionListener(e -> lstDafValueChanged(e));
             jsp1.setViewportView(lstDaf);
         }
-        add(jsp1, CC.xywh(5, 13, 3, 1, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xywh(5, 15, 3, 1, CC.DEFAULT, CC.FILL));
 
         //---- buttonGroup1 ----
         ButtonGroup buttonGroup1 = new ButtonGroup();

@@ -208,35 +208,37 @@ public class PDF {
         Phrase phrase = new Phrase();
         phrase.setFont(plain());
 
-        if (bd.compareTo(BigDecimal.ZERO) == 0) {
-            // nop
-//        } else if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
-//            phrase.add(Integer.toString(bd.intValue()));
-        } else if (bd.compareTo(new BigDecimal(0.5d)) == 0) {
-            phrase.add(new Chunk(frac12));
-        } else if (bd.compareTo(new BigDecimal(0.25d)) == 0) {
-            phrase.add(new Chunk(frac14));
-        } else if (bd.compareTo(new BigDecimal(0.75d)) == 0) {
-            phrase.add(new Chunk(frac34));
-        } else if (bd.setScale(2, RoundingMode.HALF_UP).toString().equals("0.33")) {
-            Chunk one = new Chunk("1");
-            one.setTextRise(0.1f);
-            Chunk third = new Chunk("3");
-            third.setTextRise(-0.1f);
+        phrase.add(SYSTools.formatBigDecimal(bd.setScale(2, RoundingMode.HALF_UP)));
 
-            phrase = new Phrase(one);
-            phrase.add("/");
-            phrase.add(third);
-
-        } else {
-            DecimalFormat df = new DecimalFormat();
-
-            df.setMaximumFractionDigits(2);
-            df.setMinimumFractionDigits(0);
-            df.setGroupingUsed(false);
-
-            phrase.add(df.format(bd.setScale(2, RoundingMode.HALF_UP)));
-        }
+//        if (bd.compareTo(BigDecimal.ZERO) == 0) {
+//            // nop
+////        } else if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
+////            phrase.add(Integer.toString(bd.intValue()));
+//        } else if (bd.compareTo(new BigDecimal(0.5d)) == 0) {
+//            phrase.add(new Chunk(frac12));
+//        } else if (bd.compareTo(new BigDecimal(0.25d)) == 0) {
+//            phrase.add(new Chunk(frac14));
+//        } else if (bd.compareTo(new BigDecimal(0.75d)) == 0) {
+//            phrase.add(new Chunk(frac34));
+//        } else if (bd.setScale(2, RoundingMode.HALF_UP).toString().equals("0.33")) {
+//            Chunk one = new Chunk("1");
+//            one.setTextRise(0.1f);
+//            Chunk third = new Chunk("3");
+//            third.setTextRise(-0.1f);
+//
+//            phrase = new Phrase(one);
+//            phrase.add("/");
+//            phrase.add(third);
+//
+//        } else {
+//            DecimalFormat df = new DecimalFormat();
+//
+//            df.setMaximumFractionDigits(2);
+//            df.setMinimumFractionDigits(0);
+//            df.setGroupingUsed(false);
+//
+//            phrase.add(df.format(bd.setScale(2, RoundingMode.HALF_UP)));
+//        }
 
         return phrase;
     }

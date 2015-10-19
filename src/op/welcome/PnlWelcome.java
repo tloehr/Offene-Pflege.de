@@ -399,18 +399,18 @@ public class PnlWelcome extends CleanablePanel {
                     "<td width=\"100\" align=\"left\">" +
                     DateFormat.getDateInstance().format(val.getFirst().toDate()) + "</td>" +
                     "<td width=\"100\" align=\"left\">" +
-                    val.getSecond().setScale(2, RoundingMode.HALF_UP).toPlainString() + " ml</td>";
+                    SYSTools.formatBigDecimal(val.getSecond().setScale(2, RoundingMode.HALF_UP)) + " ml</td>";
 
             // TODO: replace ml with the values of the ResValueTypes
             if (highin != null && highin.compareTo(val.getSecond()) < 0) {
                 title += "<td width=\"350\" align=\"left\"><b>" +
                         SYSTools.xx("misc.msg.tooHigh") + "</b>, " + SYSTools.xx("opde.welcome.highin") +
-                        ": " + highin.setScale(2, RoundingMode.HALF_UP).toPlainString() + " ml</td>";
+                        ": " + SYSTools.formatBigDecimal(highin.setScale(2, RoundingMode.HALF_UP)) + " ml</td>";
             }
             if (lowin != null && lowin.compareTo(val.getSecond()) > 0) {
                 title += "<td width=\"350\" align=\"left\"><b>" +
                         SYSTools.xx("misc.msg.tooLow") + "</b>, " + SYSTools.xx("opde.welcome.lowin") +
-                        ": " + lowin.setScale(2, RoundingMode.HALF_UP).toPlainString() + " ml</td>";
+                        ": " + SYSTools.formatBigDecimal(lowin.setScale(2, RoundingMode.HALF_UP)) + " ml</td>";
             }
 
             title += "</tr>";

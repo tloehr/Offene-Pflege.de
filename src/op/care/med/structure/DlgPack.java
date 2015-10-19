@@ -65,7 +65,7 @@ public class DlgPack extends MyJDialog {
 
         if (aPackage.getID() != null) {
             txtPZN.setText(SYSTools.catchNull(aPackage.getPzn()));
-            txtInhalt.setText(aPackage.getContent().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+            txtInhalt.setText(SYSTools.formatBigDecimal(aPackage.getContent().setScale(2, BigDecimal.ROUND_HALF_UP)));
             cmbGroesse.setSelectedIndex(aPackage.getSize());
         }
         lblPackEinheit.setText(TradeFormTools.getPackUnit(aPackage.getTradeForm()));

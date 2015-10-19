@@ -31,7 +31,7 @@ public class PnlTX extends JPanel {
     public static final String internalClassID = "admin.residents.cash.pnltx";
     private Allowance tx;
     private Closure afterChange;
-    DecimalFormat cf = new DecimalFormat("######.00");
+//    DecimalFormat cf = new DecimalFormat("######.00");
     LocalDate min;
     Component focusOwner = null;
 
@@ -92,7 +92,7 @@ public class PnlTX extends JPanel {
     }
 
     private void txtCashFocusLost(FocusEvent e) {
-        txtCash.setText(NumberFormat.getCurrencyInstance().format(checkCash(txtCash.getText(), BigDecimal.ONE)));
+        txtCash.setText(SYSTools.formatCurrency(checkCash(txtCash.getText(), BigDecimal.ONE)));
     }
 
 
@@ -222,7 +222,7 @@ public class PnlTX extends JPanel {
         lblText.setText(SYSTools.xx("admin.residents.cash.pnltx.lbltext"));
         lblCash.setText(SYSTools.xx("admin.residents.cash.pnltx.lblcash"));
         txtDate.setText(DateFormat.getDateInstance().format(tx.getPit()));
-        txtCash.setText(cf.format(tx.getAmount()));
+        txtCash.setText(SYSTools.formatCurrency(tx.getAmount()));
         if (tx.getId() == null) {
             txtText.setText(SYSTools.xx("admin.residents.cash.pnltx.txtText"));
         } else {

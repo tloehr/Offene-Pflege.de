@@ -77,7 +77,7 @@ public class TMPlan extends AbstractTableModel {
         switch (col) {
             case COL_TXT: {
                 String html = SYSConst.html_div_open;
-                html += "<b>" + planung.getInterventionSchedule().get(row).getIntervention().getBezeichnung() + "</b> (" + planung.getInterventionSchedule().get(row).getDauer().toPlainString() + " " + SYSTools.xx("misc.msg.Minutes") + ")";
+                html += "<b>" + planung.getInterventionSchedule().get(row).getIntervention().getBezeichnung() + "</b> (" + SYSTools.formatBigDecimal(planung.getInterventionSchedule().get(row).getDauer()) + " " + SYSTools.xx("misc.msg.Minutes") + ")";
                 html += InterventionScheduleTools.getTerminAsHTML(planung.getInterventionSchedule().get(row));
                 html += SYSConst.html_div_close;
                 result = SYSTools.toHTML(html);

@@ -77,7 +77,7 @@ import java.util.HashMap;
  */
 public class PnlAllowance extends CleanablePanel {
 
-    NumberFormat cf = NumberFormat.getCurrencyInstance();
+//    NumberFormat cf = NumberFormat.getCurrencyInstance();
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
 
     private JScrollPane jspSearch;
@@ -269,7 +269,7 @@ public class PnlAllowance extends CleanablePanel {
                 "<td width=\"520\" align=\"left\"><font size=+1>" + resident.toString() + "</font></td>" +
                 "<td width=\"200\" align=\"right\"><font size=+1" +
                 (sumOverall.compareTo(BigDecimal.ZERO) < 0 ? " color=\"red\" " : "") +
-                ">" + cf.format(sumOverall) + "</font></td>" +
+                ">" + SYSTools.formatCurrency(sumOverall) + "</font></td>" +
 
                 "</tr>" +
                 "</table>" +
@@ -432,7 +432,7 @@ public class PnlAllowance extends CleanablePanel {
                 "<td width=\"520\" align=\"left\"><font size=+1>" + Integer.toString(year) + "</font></td>" +
                 "<td width=\"200\" align=\"right\">" +
                 (carrySums.get(key + "-12").compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                cf.format(carrySums.get(key + "-12")) +
+                SYSTools.formatCurrency(carrySums.get(key + "-12")) +
                 (carrySums.get(key + "-12").compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                 "</td>" +
 
@@ -553,7 +553,7 @@ public class PnlAllowance extends CleanablePanel {
                 "<td width=\"520\" align=\"left\">" + monthFormatter.format(month.toDate()) + "</td>" +
                 "<td width=\"200\" align=\"right\">" +
                 (carrySums.get(key).compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                cf.format(carrySums.get(key)) +
+                SYSTools.formatCurrency(carrySums.get(key)) +
                 (carrySums.get(key).compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                 "</td>" +
                 "</tr>" +
@@ -853,7 +853,7 @@ public class PnlAllowance extends CleanablePanel {
                     "<td width=\"100\" align=\"right\"></td>" +
                     "<td width=\"100\" align=\"right\">" +
                     (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                    cf.format(rowsum) +
+                    SYSTools.formatCurrency(rowsum) +
                     (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                     "</td>" +
                     "</tr>" +
@@ -870,12 +870,12 @@ public class PnlAllowance extends CleanablePanel {
                         "<td width=\"400\" align=\"left\">" + allowance.getText() + "</td>" +
                         "<td width=\"100\" align=\"right\">" +
                         (allowance.getAmount().compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                        cf.format(allowance.getAmount()) +
+                        SYSTools.formatCurrency(allowance.getAmount()) +
                         (allowance.getAmount().compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                         "</td>" +
                         "<td width=\"100\" align=\"right\">" +
                         (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                        cf.format(rowsum) +
+                        SYSTools.formatCurrency(rowsum) +
                         (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                         "</td>" +
                         "</tr>" +
@@ -947,7 +947,7 @@ public class PnlAllowance extends CleanablePanel {
                         public void actionPerformed(ActionEvent actionEvent) {
 
 
-                            new DlgYesNo(SYSTools.xx("misc.questions.undo1") + "<br/><i>" + "<br/><i>" + allowance.getText() + "&nbsp;" + cf.format(allowance.getAmount()) + "</i><br/>" + SYSTools.xx("misc.questions.undo2"), SYSConst.icon48undo, new Closure() {
+                            new DlgYesNo(SYSTools.xx("misc.questions.undo1") + "<br/><i>" + "<br/><i>" + allowance.getText() + "&nbsp;" + SYSTools.formatCurrency(allowance.getAmount()) + "</i><br/>" + SYSTools.xx("misc.questions.undo2"), SYSConst.icon48undo, new Closure() {
                                 @Override
                                 public void execute(Object answer) {
                                     if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1032,7 +1032,7 @@ public class PnlAllowance extends CleanablePanel {
                     btnDelete.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
-                            new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + allowance.getText() + "&nbsp;" + cf.format(allowance.getAmount()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                            new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + allowance.getText() + "&nbsp;" + SYSTools.formatCurrency(allowance.getAmount()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                                 @Override
                                 public void execute(Object answer) {
                                     if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1122,7 +1122,7 @@ public class PnlAllowance extends CleanablePanel {
                     "<td width=\"100\" align=\"right\"></td>" +
                     "<td width=\"100\" align=\"right\">" +
                     (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                    cf.format(rowsum) +
+                    SYSTools.formatCurrency(rowsum) +
                     (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                     "</td>" +
                     "</tr>" +

@@ -497,7 +497,7 @@ public class ResValueTools {
                 BigDecimal targetIn = SYSTools.parseDecimal(controlling.getProperty(ResidentTools.KEY_TARGETIN));
 
                 html.append(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
-                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.targetDrink")) + ": " + targetIn.setScale(2, RoundingMode.HALF_UP).toString() + " ml"));
+                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.targetDrink")) + ": " + SYSTools.formatBigDecimal(targetIn.setScale(2, RoundingMode.HALF_UP)) + " ml"));
 
                 HashMap<LocalDate, Pair<BigDecimal, BigDecimal>> balanceMap = getLiquidBalancePerDay(resident, from.toLocalDate(), to.toLocalDate());
 
@@ -515,9 +515,9 @@ public class ResValueTools {
                     BigDecimal linesum = balanceMap.get(day).getFirst().add(balanceMap.get(day).getSecond());
                     table.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(DateFormat.getDateInstance().format(day.toDate()), null) +
-                                    SYSConst.html_table_td(balanceMap.get(day).getFirst().setScale(2, RoundingMode.HALF_UP).toString(), "right") +
-                                    SYSConst.html_table_td(balanceMap.get(day).getSecond().setScale(2, RoundingMode.HALF_UP).toString(), "right") +
-                                    SYSConst.html_table_td(linesum.setScale(2, RoundingMode.HALF_UP).toString(), "right")
+                                    SYSConst.html_table_td(SYSTools.formatBigDecimal(balanceMap.get(day).getFirst().setScale(2, RoundingMode.HALF_UP)), "right") +
+                                    SYSConst.html_table_td(SYSTools.formatBigDecimal(balanceMap.get(day).getSecond().setScale(2, RoundingMode.HALF_UP)), "right") +
+                                    SYSConst.html_table_td(SYSTools.formatBigDecimal(linesum.setScale(2, RoundingMode.HALF_UP)), "right")
                     ));
 
                 }
@@ -588,7 +588,7 @@ public class ResValueTools {
 
             html.append(
                     SYSConst.html_div(
-                            heightType.getText() + ": " + (height == null ? SYSTools.xx("misc.msg.noentryyet") : height.getVal1().setScale(2, RoundingMode.HALF_UP).toString() + " " + heightType.getUnit1())
+                            heightType.getText() + ": " + (height == null ? SYSTools.xx("misc.msg.noentryyet") : SYSTools.formatBigDecimal(height.getVal1().setScale(2, RoundingMode.HALF_UP)) + " " + heightType.getUnit1())
                     )
             );
 
@@ -616,11 +616,11 @@ public class ResValueTools {
 
                 table.append(SYSConst.html_table_tr(
                         SYSConst.html_table_td(df.format(weight.getPit())) +
-                                SYSConst.html_table_td(weight.getVal1().setScale(2, RoundingMode.HALF_UP).toString(), "right") +
+                                SYSConst.html_table_td(SYSTools.formatBigDecimal(weight.getVal1().setScale(2, RoundingMode.HALF_UP)), "right") +
                                 SYSConst.html_table_td(SYSTools.catchNull(weight.getText(), "--"), weight.getText() == null ? "center" : "left") +
-                                SYSConst.html_table_td(SYSTools.catchNull(divWeight, "--"), divWeight == null ? "center" : "right") +
-                                SYSConst.html_table_td(SYSTools.catchNull(bmi, "--"), bmi == null ? "center" : "right") +
-                                SYSConst.html_table_td(SYSTools.catchNull(divBMI, "--"), divBMI == null ? "center" : "right")
+                                SYSConst.html_table_td(SYSTools.catchNull(SYSTools.formatBigDecimal(divWeight), "--"), divWeight == null ? "center" : "right") +
+                                SYSConst.html_table_td(SYSTools.catchNull(SYSTools.formatBigDecimal(bmi), "--"), bmi == null ? "center" : "right") +
+                                SYSConst.html_table_td(SYSTools.catchNull(SYSTools.formatBigDecimal(divBMI), "--"), divBMI == null ? "center" : "right")
                 ));
 
                 prevBMI = bmi;

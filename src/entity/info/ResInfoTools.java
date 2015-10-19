@@ -505,7 +505,7 @@ public class ResInfoTools {
                                     if (infonode.getTagName().equalsIgnoreCase("scalegroup")) {
                                         scalesum = scalesum == null ? thisNode.getScore() : scalesum.add(thisNode.getScore());
 //                                        Double score = (Double) ((Object[]) thisNode.getUserObject())[3];
-                                        html += "<li><b>" + infonode.getLabel() + ":</b> " + text + " (" + SYSTools.xx("misc.msg.scaleriskvalue") + ": " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + ")</li>";
+                                        html += "<li><b>" + infonode.getLabel() + ":</b> " + text + " (" + SYSTools.xx("misc.msg.scaleriskvalue") + ": " + SYSTools.formatBigDecimal(thisNode.getScore().setScale(2, BigDecimal.ROUND_UP)) + ")</li>";
 //                                        scalesum += score;
                                     } else {
                                         html += "<li><b>" + infonode.getLabel() + ":</b> " + text + "</li>";
@@ -601,7 +601,7 @@ public class ResInfoTools {
                                     if (infonode.getTagName().equalsIgnoreCase("scalegroup")) {
                                         scalesum = scalesum == null ? thisNode.getScore() : scalesum.add(thisNode.getScore());
                                         //                                        Double score = (Double) ((Object[]) thisNode.getUserObject())[3];
-                                        plaintext += infonode.getLabel() + ": " + text + " (" + SYSTools.xx("misc.msg.scaleriskvalue") + ": " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + "); ";
+                                        plaintext += infonode.getLabel() + ": " + text + " (" + SYSTools.xx("misc.msg.scaleriskvalue") + ": " + SYSTools.formatBigDecimal(thisNode.getScore().setScale(2, BigDecimal.ROUND_UP)) + "); ";
                                         //                                        scalesum += score;
                                     } else {
                                         plaintext += infonode.getLabel() + ": " + text + "; ";
@@ -909,7 +909,7 @@ public class ResInfoTools {
             BigDecimal adjustmentPercentage = getWeightAdjustmentPercentage(amputation);
 
             if (adjustmentPercentage.equals(BigDecimal.ZERO)) {
-                result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")";
+                result += SYSTools.formatBigDecimal(weight.getVal1()) + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")";
             } else {
                 result += "Das Körpergewicht muss aufgrund von Amputationen angepasst werden.<br/>";
                 result += SYSTools.xx("misc.msg.amputation") + ": " + getAmputationAsCompactText(amputation) + "<br/>";
@@ -929,7 +929,7 @@ public class ResInfoTools {
             if (height == null) {
                 result += "Bisher wurde noch keine Körpergröße ermittelt.";
             } else {
-                result += height.getVal1().toPlainString() + " " + height.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(height.getPit()) + ")";
+                result += SYSTools.formatBigDecimal(height.getVal1()) + " " + height.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(height.getPit()) + ")";
             }
             result += "</b></td></tr>";
 
@@ -991,7 +991,7 @@ public class ResInfoTools {
         if (bz == null) {
             result += "Bisher kein BZ Wert vorhanden.";
         } else {
-            result += bz.getVal1().toPlainString() + " " + bz.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(bz.getPit()) + ")";
+            result += SYSTools.formatBigDecimal(bz.getVal1()) + " " + bz.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(bz.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -1251,13 +1251,13 @@ public class ResInfoTools {
 
                         result += "<tr>";
                         result += "<td>" + df.format(((Timestamp) objects[0])) + "</td>";
-                        result += "<td>" + einfuhr.setScale(BigDecimal.ROUND_UP).toPlainString() + "</td>";
-                        result += "<td>" + ausfuhr.setScale(BigDecimal.ROUND_UP).abs().toPlainString() + "</td>";
-                        result += "<td>" + ergebnis.setScale(BigDecimal.ROUND_UP).toPlainString() + "</td>";
+                        result += "<td>" + SYSTools.formatBigDecimal(einfuhr.setScale(BigDecimal.ROUND_UP)) + "</td>";
+                        result += "<td>" + SYSTools.formatBigDecimal(ausfuhr.setScale(BigDecimal.ROUND_UP).abs()) + "</td>";
+                        result += "<td>" + SYSTools.formatBigDecimal(ergebnis.setScale(BigDecimal.ROUND_UP)) + "</td>";
                         if (trinkmin.compareTo(einfuhr) > 0) {
-                            result += "<td>Einfuhr zu niedrig. Minimum: " + trinkmin.setScale(BigDecimal.ROUND_UP).toPlainString() + " ml in 24h</td>";
+                            result += "<td>Einfuhr zu niedrig. Minimum: " + SYSTools.formatBigDecimal(trinkmin.setScale(BigDecimal.ROUND_UP)) + " ml in 24h</td>";
                         } else if (trinkmax.compareTo(einfuhr) > 0) {
-                            result += "<td>Einfuhr zu hoch. Maximum: " + trinkmax.setScale(BigDecimal.ROUND_UP).toPlainString() + " ml in 24h</td>";
+                            result += "<td>Einfuhr zu hoch. Maximum: " + SYSTools.formatBigDecimal(trinkmax.setScale(BigDecimal.ROUND_UP)) + " ml in 24h</td>";
                         } else {
                             result += "<td>--</td>";
                         }
@@ -1296,12 +1296,12 @@ public class ResInfoTools {
                         BigDecimal einfuhr = ((BigDecimal) objects[1]);
                         result += "<tr>";
                         result += "<td>" + df.format(((Timestamp) objects[0])) + "</td>";
-                        result += "<td>" + einfuhr.setScale(BigDecimal.ROUND_UP).toPlainString() + "</td>";
+                        result += "<td>" + SYSTools.formatBigDecimal(einfuhr.setScale(BigDecimal.ROUND_UP)) + "</td>";
 
                         if (trinkmin.compareTo(einfuhr) > 0) {
-                            result += "<td>Einfuhr zu niedrig. Minimum: " + trinkmin.setScale(BigDecimal.ROUND_UP).toPlainString() + " ml in 24h</td>";
+                            result += "<td>Einfuhr zu niedrig. Minimum: " + SYSTools.formatBigDecimal(trinkmin.setScale(BigDecimal.ROUND_UP)) + " ml in 24h</td>";
                         } else if (trinkmax.compareTo(einfuhr) > 0) {
-                            result += "<td>Einfuhr zu hoch. Maximum: " + trinkmax.setScale(BigDecimal.ROUND_UP).toPlainString() + " ml in 24h</td>";
+                            result += "<td>Einfuhr zu hoch. Maximum: " + SYSTools.formatBigDecimal(trinkmax.setScale(BigDecimal.ROUND_UP)) + " ml in 24h</td>";
                         } else {
                             result += "<td>--</td>";
                         }
@@ -1698,7 +1698,7 @@ public class ResInfoTools {
 
             tableContent += SYSConst.html_table_tr(
                     SYSConst.html_table_td(month.toString("MMMM YYYY")) +
-                            SYSConst.html_table_td(sumFalls.toString() + " / " + occupantDays + " * 1000 = " + fallsIndicator.setScale(2, BigDecimal.ROUND_HALF_UP), "right")
+                            SYSConst.html_table_td(SYSTools.formatBigDecimal(sumFalls) + " / " + occupantDays + " * 1000 = " + SYSTools.formatBigDecimal(fallsIndicator.setScale(2, BigDecimal.ROUND_HALF_UP)), "right")
             );
         }
 

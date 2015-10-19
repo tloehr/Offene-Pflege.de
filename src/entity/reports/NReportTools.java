@@ -666,12 +666,12 @@ public class NReportTools {
 
             table.append(SYSConst.html_table_tr(
                     SYSConst.html_table_td(ResidentTools.getTextCompact(resident)) +
-                            SYSConst.html_table_td(socialtime.toString(), socialtime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(socialtime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).toString(), socialtime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(socialtime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP).toString(), socialtime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(peatime.toString(), peatime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(peatime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).toString(), peatime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(peatime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP).toString(), peatime.equals(BigDecimal.ZERO))
+                            SYSConst.html_table_td(SYSTools.formatBigDecimal(socialtime), socialtime.equals(BigDecimal.ZERO)) +
+                            SYSConst.html_table_td(SYSTools.formatBigDecimal(socialtime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP)), socialtime.equals(BigDecimal.ZERO)) +
+                            SYSConst.html_table_td(SYSTools.formatBigDecimal(socialtime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP)), socialtime.equals(BigDecimal.ZERO)) +
+                            SYSConst.html_table_td(SYSTools.formatBigDecimal(peatime), peatime.equals(BigDecimal.ZERO)) +
+                            SYSConst.html_table_td(SYSTools.formatBigDecimal(peatime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP)), peatime.equals(BigDecimal.ZERO)) +
+                            SYSConst.html_table_td(SYSTools.formatBigDecimal(peatime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP)), peatime.equals(BigDecimal.ZERO))
                     , highlight));
         }
 

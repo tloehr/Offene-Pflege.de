@@ -773,17 +773,17 @@ public class PnlBHP extends NursingRecordsPanel {
                                     BHPTools.getScheduleText(bhp.getOutcome4(), "&rdquo;, ", "")
                     )
                     + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + BHPTools.getScheduleText(bhp, ", ", "") +
-                    (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : NumberFormat.getNumberInstance().format(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
+                    (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
 
                     "</font></html>";
         } else {
             title = "<html><font size=+1>" +
                     SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
-                    (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
+                    (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
                             " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                     BHPTools.getScheduleText(bhp, ", ", "") +
-                    (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : NumberFormat.getNumberInstance().format(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
+                    (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
                     "</font></html>";
         }

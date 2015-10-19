@@ -33,6 +33,7 @@ import entity.system.Users;
 import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayMessage;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -169,12 +170,17 @@ public class SYSTools {
 
     public static void handleBigDecimalFocusLost(FocusEvent evt, BigDecimal min, BigDecimal max, BigDecimal def) {
         BigDecimal myBD;
-        try {
-            myBD = BigDecimal.valueOf(Double.parseDouble(assimilateDecimalSeparators(((JTextField) evt.getSource()).getText())));
-        } catch (NumberFormatException ex) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongentry")));
-            myBD = def;
-        }
+//        try {
+//            myBD = NumberUtils.createBigDecimal(((JTextField) evt.getSource()).getText());
+//            myBD = new BigDecimal(); //BigDecimal.valueOf(Double.parseDouble(((JTextField) evt.getSource()).getText()));
+            myBD = parseDecimal(((JTextField) evt.getSource()).getText());
+
+        if (myBD == null) myBD = def;
+
+//        } catch (ParseException ex) {
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongentry")));
+//            myBD = def;
+//        }
         if (myBD.compareTo(min) < 0) {
             myBD = min;
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.entryTooSmall")));
@@ -184,8 +190,15 @@ public class SYSTools {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.entryTooBig")));
         }
 
-        ((JTextField) evt.getSource()).setText(myBD.setScale(2, RoundingMode.HALF_UP).toString());
+        ((JTextField) evt.getSource()).setText(formatBigDecimal(myBD.setScale(2, RoundingMode.HALF_UP)));
     }
+
+//
+//    public static BigDecimal parseBigDecimal(String in) throws ParseException {
+//        DecimalFormat fmt = new DecimalFormat();
+//        fmt.setParseBigDecimal(true);
+//        return (BigDecimal) fmt.parse(in);
+//    }
 
     public static void centerOnParent(Component parent, Component child) {
 
@@ -201,17 +214,17 @@ public class SYSTools {
         child.setLocation(newX, newY);
     }
 
-    public static void centerOnParent(Component comp) {
-        centerOnParent(comp.getParent(), comp);
-    }
-
-    public static double roundScale2(double d) {
-        return Math.rint(d * 100) / 100.;
-    }
-
-    public static String roundScale2(BigDecimal bd) {
-        return bd.setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString();
-    }
+//    public static void centerOnParent(Component comp) {
+//        centerOnParent(comp.getParent(), comp);
+//    }
+//
+//    public static double roundScale2(double d) {
+//        return Math.rint(d * 100) / 100.;
+//    }
+//
+//    public static String roundScale2(BigDecimal bd) {
+//        return bd.setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString();
+//    }
 
 
     /**
@@ -651,37 +664,37 @@ public class SYSTools {
 //    }
 
 
-    public static String printDouble(double d) {
-        String dbl = Double.toString(d);
-        if (dbl.substring(dbl.length() - 2).equals(".0")) {
-            dbl = dbl.substring(0, dbl.length() - 2);
-        } else if (dbl.equals("0.5")) {
-            dbl = "&frac12;";
-        } else if (dbl.equals("0.25")) {
-            dbl = "&frac14;";
-        } else if (dbl.equals("0.75")) {
-            dbl = "&frac34;";
-        } else if (dbl.equals("0.33")) {
-            dbl = "<sup>1</sup>/<sub>3</sub>";
-        }
-        return dbl;
-    }
-
-    public static String getAsHTML(BigDecimal bd) {
-        String dbl = bd.toPlainString();
-        if (dbl.endsWith(".00")) {
-            dbl = dbl.substring(0, dbl.length() - 3);
-        } else if (dbl.equals("0.50")) {
-            dbl = "&frac12;";
-        } else if (dbl.equals("0.25")) {
-            dbl = "&frac14;";
-        } else if (dbl.equals("0.75")) {
-            dbl = "&frac34;";
-        } else if (dbl.equals("0.33")) {
-            dbl = "<sup>1</sup>/<sub>3</sub>";
-        }
-        return dbl;
-    }
+//    public static String printDouble(double d) {
+//        String dbl = Double.toString(d);
+//        if (dbl.substring(dbl.length() - 2).equals(".0")) {
+//            dbl = dbl.substring(0, dbl.length() - 2);
+//        } else if (dbl.equals("0.5")) {
+//            dbl = "&frac12;";
+//        } else if (dbl.equals("0.25")) {
+//            dbl = "&frac14;";
+//        } else if (dbl.equals("0.75")) {
+//            dbl = "&frac34;";
+//        } else if (dbl.equals("0.33")) {
+//            dbl = "<sup>1</sup>/<sub>3</sub>";
+//        }
+//        return dbl;
+//    }
+//
+//    public static String getAsHTML(BigDecimal bd) {
+//        String dbl = bd.toPlainString();
+//        if (dbl.endsWith(".00")) {
+//            dbl = dbl.substring(0, dbl.length() - 3);
+//        } else if (dbl.equals("0.50")) {
+//            dbl = "&frac12;";
+//        } else if (dbl.equals("0.25")) {
+//            dbl = "&frac14;";
+//        } else if (dbl.equals("0.75")) {
+//            dbl = "&frac34;";
+//        } else if (dbl.equals("0.33")) {
+//            dbl = "<sup>1</sup>/<sub>3</sub>";
+//        }
+//        return dbl;
+//    }
 
     /**
      * Fügt html Tags vor und hinter den Eingangsstring ein.
@@ -1112,46 +1125,6 @@ public class SYSTools {
         return parseDecimal(txt.getText());
     }
 
-    // fixes #17
-    // caused #23 afterwards, so got rid of it
-    // todo: remove me
-    public static String assimilateDecimalSeparators(String in) {
-        return in;
-//        if (SYSTools.catchNull(in).isEmpty()) return in;
-//
-//        char sep = new DecimalFormatSymbols(Locale.getDefault(Locale.Category.FORMAT)).getDecimalSeparator();
-//        char replace = '.';
-//
-//        if (sep == '.') {
-//            replace = ',';
-//        }
-//
-//        return in.replace(replace, sep);
-    }
-
-    public static BigDecimal checkBigDecimal(String txt) {
-        BigDecimal bd = null;
-
-        txt = assimilateDecimalSeparators(txt);
-        try {
-            NumberFormat nf = DecimalFormat.getNumberInstance();
-            Number number = nf.parse(txt);
-
-            if (number instanceof Long) {
-                bd = BigDecimal.valueOf(number.longValue());
-            } else if (number instanceof Double) {
-                bd = BigDecimal.valueOf(number.doubleValue());
-            } else if (number instanceof BigDecimal) {
-                bd = (BigDecimal) number;
-            }
-
-        } catch (ParseException ex) {
-            OPDE.debug(ex);
-            // Pech
-        }
-        return bd;
-    }
-
     public static Integer checkInteger(String txt) {
         Integer i = null;
         try {
@@ -1186,39 +1159,53 @@ public class SYSTools {
         return text;
     }
 
-    //FIXES: GitHub #17
-    public static BigDecimal parseDecimal(String test) {
-        NumberFormat nf = DecimalFormat.getNumberInstance();
+    // https://github.com/tloehr/Offene-Pflege.de/issues/31
+    public static String formatCurrency(BigDecimal bd){
+            return DecimalFormat.getCurrencyInstance().format(bd);
+        }
 
+    // https://github.com/tloehr/Offene-Pflege.de/issues/31
+    public static String formatBigDecimal(BigDecimal bd){
+        if (bd == null) return "";
+        return DecimalFormat.getNumberInstance().format(bd);
+    }
+
+    // https://github.com/tloehr/Offene-Pflege.de/issues/17
+    // https://github.com/tloehr/Offene-Pflege.de/issues/31
+    public static BigDecimal parseDecimal(String test) {
+
+        if (test == null) return null;
+
+        DecimalFormat fmt = new DecimalFormat();
+        fmt.setParseBigDecimal(true);
 //        test = assimilateDecimalSeparators(test);
-        Number num;
+        BigDecimal num;
         try {
-            num = nf.parse(test);
-        } catch (Exception ex) {
+            num = (BigDecimal) fmt.parse(test);
+        } catch (ParseException ex) {
             num = null;
         }
 
-        BigDecimal wert = null;
-        if (num != null) {
-            if (num instanceof Long) {
-                wert = new BigDecimal(num.longValue());
-            } else if (num instanceof Double) {
-                wert = new BigDecimal(num.doubleValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
-            } else if (num instanceof BigDecimal) {
-                wert = (BigDecimal) num;
-            } else {
-                wert = null;
-            }
-        }
+//        BigDecimal wert = null;
+//        if (num != null) {
+//            if (num instanceof Long) {
+//                wert = new BigDecimal(num.longValue());
+//            } else if (num instanceof Double) {
+//                wert = new BigDecimal(num.doubleValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+//            } else if (num instanceof BigDecimal) {
+//                wert = (BigDecimal) num;
+//            } else {
+//                wert = null;
+//            }
+//        }
 
 
-        return wert;
+        return num;
     }
 
 
     public static BigDecimal parseCurrency(String test) {
         NumberFormat nf = DecimalFormat.getCurrencyInstance();
-        test = assimilateDecimalSeparators(test);
         Number num;
         try {
             num = nf.parse(test);

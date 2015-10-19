@@ -31,9 +31,9 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideTabbedPane;
 import entity.nursingprocess.InterventionSchedule;
+import gui.GUITools;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import gui.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -45,7 +45,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
@@ -75,7 +74,7 @@ public class PnlSchedule extends JPanel {
         this.actionBlock = actionBlock;
         this.is = is;
         initComponents();
-        initPanel();        
+        initPanel();
     }
 
     private void btnToTimeActionPerformed(ActionEvent e) {
@@ -115,8 +114,8 @@ public class PnlSchedule extends JPanel {
 
     private void txtMinutesFocusLost(FocusEvent e) {
         BigDecimal bd = SYSTools.parseDecimal(txtMinutes.getText());
-        if (bd == null || bd.compareTo(BigDecimal.ZERO) <= 0){
-            txtMinutes.setText(is.getDauer().toPlainString());
+        if (bd == null || bd.compareTo(BigDecimal.ZERO) <= 0) {
+            txtMinutes.setText(SYSTools.formatBigDecimal(is.getDauer()));
         }
     }
 
@@ -228,8 +227,8 @@ public class PnlSchedule extends JPanel {
         txtBemerkung.setText(is.getBemerkung());
 
         lblMinutes.setText(SYSTools.xx("misc.msg.Minute(s)"));
-        txtMinutes.setText(is.getDauer().toPlainString());
-        
+        txtMinutes.setText(SYSTools.formatBigDecimal(is.getDauer())); // https://github.com/tloehr/Offene-Pflege.de/issues/31
+
         tbFloating = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID + ".floatinginterventions"));
         tbFloating.setSelected(is.isFloating());
         panelMain.add(tbFloating, CC.xy(3, 5));
@@ -323,8 +322,8 @@ public class PnlSchedule extends JPanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                "$rgap, $lcgap, 223dlu:grow, $lcgap, $rgap",
-                "$rgap, $lgap, pref, $lgap, default, $lgap, pref, $lgap, default, $lgap, 72dlu:grow, 2*($lgap, default)"));
+                    "$rgap, $lcgap, 223dlu:grow, $lcgap, $rgap",
+                    "$rgap, $lgap, pref, $lgap, default, $lgap, pref, $lgap, default, $lgap, 72dlu:grow, 2*($lgap, default)"));
 
             //======== splitRegular ========
             {
@@ -338,8 +337,8 @@ public class PnlSchedule extends JPanel {
                     pnlTageszeit.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlTageszeit.setBorder(new EtchedBorder());
                     pnlTageszeit.setLayout(new FormLayout(
-                        "6*(28dlu, $lcgap), default",
-                        "fill:default, $lgap, fill:default"));
+                            "6*(28dlu, $lcgap), default",
+                            "fill:default, $lgap, fill:default"));
 
                     //---- jLabel6 ----
                     jLabel6.setText("Nachts, fr\u00fch morgens");
@@ -397,17 +396,13 @@ public class PnlSchedule extends JPanel {
                     txtNachtMo.setHorizontalAlignment(SwingConstants.RIGHT);
                     txtNachtMo.setText("0.0");
                     txtNachtMo.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtNachtMo.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtNachtMoActionPerformed(e);
-                        }
-                    });
+                    txtNachtMo.addActionListener(e -> txtNachtMoActionPerformed(e));
                     txtNachtMo.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -419,17 +414,13 @@ public class PnlSchedule extends JPanel {
                     txtMorgens.setHorizontalAlignment(SwingConstants.RIGHT);
                     txtMorgens.setText("1.0");
                     txtMorgens.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtMorgens.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtMorgensActionPerformed(e);
-                        }
-                    });
+                    txtMorgens.addActionListener(e -> txtMorgensActionPerformed(e));
                     txtMorgens.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -441,17 +432,13 @@ public class PnlSchedule extends JPanel {
                     txtMittags.setHorizontalAlignment(SwingConstants.RIGHT);
                     txtMittags.setText("0.0");
                     txtMittags.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtMittags.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtMittagsActionPerformed(e);
-                        }
-                    });
+                    txtMittags.addActionListener(e -> txtMittagsActionPerformed(e));
                     txtMittags.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -463,17 +450,13 @@ public class PnlSchedule extends JPanel {
                     txtNachmittags.setHorizontalAlignment(SwingConstants.RIGHT);
                     txtNachmittags.setText("0.0");
                     txtNachmittags.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtNachmittags.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtNachmittagsActionPerformed(e);
-                        }
-                    });
+                    txtNachmittags.addActionListener(e -> txtNachmittagsActionPerformed(e));
                     txtNachmittags.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -485,17 +468,13 @@ public class PnlSchedule extends JPanel {
                     txtAbends.setHorizontalAlignment(SwingConstants.RIGHT);
                     txtAbends.setText("0.0");
                     txtAbends.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtAbends.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtAbendsActionPerformed(e);
-                        }
-                    });
+                    txtAbends.addActionListener(e -> txtAbendsActionPerformed(e));
                     txtAbends.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -507,17 +486,13 @@ public class PnlSchedule extends JPanel {
                     txtNachtAb.setHorizontalAlignment(SwingConstants.RIGHT);
                     txtNachtAb.setText("0.0");
                     txtNachtAb.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtNachtAb.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtNachtAbActionPerformed(e);
-                        }
-                    });
+                    txtNachtAb.addActionListener(e -> txtNachtAbActionPerformed(e));
                     txtNachtAb.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -527,12 +502,7 @@ public class PnlSchedule extends JPanel {
 
                     //---- btnToTime ----
                     btnToTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1rightarrow.png")));
-                    btnToTime.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnToTimeActionPerformed(e);
-                        }
-                    });
+                    btnToTime.addActionListener(e -> btnToTimeActionPerformed(e));
                     pnlTageszeit.add(btnToTime, CC.xy(13, 3));
                 }
                 splitRegular.setLeftComponent(pnlTageszeit);
@@ -541,8 +511,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlUhrzeit.setBorder(new EtchedBorder());
                     pnlUhrzeit.setLayout(new FormLayout(
-                        "default, $ugap, 75dlu, $ugap, pref",
-                        "default:grow, $rgap, default"));
+                            "default, $ugap, 75dlu, $ugap, pref",
+                            "default:grow, $rgap, default"));
 
                     //---- lblUhrzeit ----
                     lblUhrzeit.setText("Anzahl Massnahmen");
@@ -555,29 +525,20 @@ public class PnlSchedule extends JPanel {
 
                     //---- btnToTimeOfDay ----
                     btnToTimeOfDay.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1leftarrow.png")));
-                    btnToTimeOfDay.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnToTimeOfDayActionPerformed(e);
-                        }
-                    });
+                    btnToTimeOfDay.addActionListener(e -> btnToTimeOfDayActionPerformed(e));
                     pnlUhrzeit.add(btnToTimeOfDay, CC.xy(1, 3));
 
                     //---- txtUhrzeit ----
                     txtUhrzeit.setHorizontalAlignment(SwingConstants.RIGHT);
                     txtUhrzeit.setText("0.0");
                     txtUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtUhrzeit.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtUhrzeitActionPerformed(e);
-                        }
-                    });
+                    txtUhrzeit.addActionListener(e -> txtUhrzeitActionPerformed(e));
                     txtUhrzeit.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -586,12 +547,7 @@ public class PnlSchedule extends JPanel {
                     pnlUhrzeit.add(txtUhrzeit, CC.xy(3, 3));
 
                     //---- cmbUhrzeit ----
-                    cmbUhrzeit.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent e) {
-                            cmbUhrzeitItemStateChanged(e);
-                        }
-                    });
+                    cmbUhrzeit.addItemListener(e -> cmbUhrzeitItemStateChanged(e));
                     pnlUhrzeit.add(cmbUhrzeit, CC.xy(5, 3));
                 }
                 splitRegular.setRightComponent(pnlUhrzeit);
@@ -605,8 +561,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlDaily.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlDaily.setLayout(new FormLayout(
-                        "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
-                        "default, $lgap, pref, $lgap, default"));
+                            "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
+                            "default, $lgap, pref, $lgap, default"));
 
                     //---- label3 ----
                     label3.setText("alle");
@@ -625,12 +581,7 @@ public class PnlSchedule extends JPanel {
 
                     //---- btnJedenTag ----
                     btnJedenTag.setText("Jeden Tag");
-                    btnJedenTag.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnJedenTagActionPerformed(e);
-                        }
-                    });
+                    btnJedenTag.addActionListener(e -> btnJedenTagActionPerformed(e));
                     pnlDaily.add(btnJedenTag, CC.xywh(2, 5, 6, 1));
                 }
                 tabWdh.addTab("T\u00e4glich", pnlDaily);
@@ -639,24 +590,19 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlWeekly.setLayout(new FormLayout(
-                        "default, 7*(13dlu), $lcgap, default:grow",
-                        "$ugap, $lgap, default, $lgap, pref, default:grow, $lgap, $rgap"));
+                            "default, 7*(13dlu), $lcgap, default:grow",
+                            "$ugap, $lgap, default, $lgap, pref, default:grow, $lgap, $rgap"));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                            "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
-                            "default:grow, $lgap, default"));
+                                "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
+                                "default:grow, $lgap, default"));
 
                         //---- btnJedeWoche ----
                         btnJedeWoche.setText("Jede Woche");
                         btnJedeWoche.setFont(new Font("Arial", Font.PLAIN, 14));
-                        btnJedeWoche.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnJedeWocheActionPerformed(e);
-                            }
-                        });
+                        btnJedeWoche.addActionListener(e -> btnJedeWocheActionPerformed(e));
                         panel3.add(btnJedeWoche, CC.xywh(3, 3, 3, 1));
 
                         //---- label2 ----
@@ -731,78 +677,43 @@ public class PnlSchedule extends JPanel {
                     //---- cbMon ----
                     cbMon.setBorder(BorderFactory.createEmptyBorder());
                     cbMon.setMargin(new Insets(0, 0, 0, 0));
-                    cbMon.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbMonActionPerformed(e);
-                        }
-                    });
+                    cbMon.addActionListener(e -> cbMonActionPerformed(e));
                     pnlWeekly.add(cbMon, CC.xy(2, 6, CC.CENTER, CC.DEFAULT));
 
                     //---- cbDie ----
                     cbDie.setBorder(BorderFactory.createEmptyBorder());
                     cbDie.setMargin(new Insets(0, 0, 0, 0));
-                    cbDie.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbDieActionPerformed(e);
-                        }
-                    });
+                    cbDie.addActionListener(e -> cbDieActionPerformed(e));
                     pnlWeekly.add(cbDie, CC.xy(3, 6, CC.CENTER, CC.DEFAULT));
 
                     //---- cbMit ----
                     cbMit.setBorder(BorderFactory.createEmptyBorder());
                     cbMit.setMargin(new Insets(0, 0, 0, 0));
-                    cbMit.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbMitActionPerformed(e);
-                        }
-                    });
+                    cbMit.addActionListener(e -> cbMitActionPerformed(e));
                     pnlWeekly.add(cbMit, CC.xy(4, 6, CC.CENTER, CC.DEFAULT));
 
                     //---- cbDon ----
                     cbDon.setBorder(BorderFactory.createEmptyBorder());
                     cbDon.setMargin(new Insets(0, 0, 0, 0));
-                    cbDon.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbDonActionPerformed(e);
-                        }
-                    });
+                    cbDon.addActionListener(e -> cbDonActionPerformed(e));
                     pnlWeekly.add(cbDon, CC.xy(5, 6, CC.CENTER, CC.DEFAULT));
 
                     //---- cbFre ----
                     cbFre.setBorder(BorderFactory.createEmptyBorder());
                     cbFre.setMargin(new Insets(0, 0, 0, 0));
-                    cbFre.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbFreActionPerformed(e);
-                        }
-                    });
+                    cbFre.addActionListener(e -> cbFreActionPerformed(e));
                     pnlWeekly.add(cbFre, CC.xy(6, 6, CC.CENTER, CC.DEFAULT));
 
                     //---- cbSam ----
                     cbSam.setBorder(BorderFactory.createEmptyBorder());
                     cbSam.setMargin(new Insets(0, 0, 0, 0));
-                    cbSam.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbSamActionPerformed(e);
-                        }
-                    });
+                    cbSam.addActionListener(e -> cbSamActionPerformed(e));
                     pnlWeekly.add(cbSam, CC.xy(7, 6, CC.CENTER, CC.DEFAULT));
 
                     //---- cbSon ----
                     cbSon.setBorder(BorderFactory.createEmptyBorder());
                     cbSon.setMargin(new Insets(0, 0, 0, 0));
-                    cbSon.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbSonActionPerformed(e);
-                        }
-                    });
+                    cbSon.addActionListener(e -> cbSonActionPerformed(e));
                     pnlWeekly.add(cbSon, CC.xy(8, 6, CC.CENTER, CC.DEFAULT));
                 }
                 tabWdh.addTab("W\u00f6chentlich", pnlWeekly);
@@ -811,8 +722,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.setLayout(new FormLayout(
-                        "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
-                        "3*(default, $lgap), default"));
+                            "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
+                            "3*(default, $lgap), default"));
 
                     //---- label4 ----
                     label4.setText("jeden");
@@ -832,12 +743,7 @@ public class PnlSchedule extends JPanel {
                     //---- btnJedenMonat ----
                     btnJedenMonat.setText("Jeden Monat");
                     btnJedenMonat.setFont(new Font("Arial", Font.PLAIN, 14));
-                    btnJedenMonat.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnJedenMonatActionPerformed(e);
-                        }
-                    });
+                    btnJedenMonat.addActionListener(e -> btnJedenMonatActionPerformed(e));
                     pnlMonthly.add(btnJedenMonat, CC.xywh(3, 5, 5, 1));
 
                     //---- label5 ----
@@ -848,24 +754,19 @@ public class PnlSchedule extends JPanel {
 
                     //---- spinMonatTag ----
                     spinMonatTag.setFont(new Font("Arial", Font.PLAIN, 14));
-                    spinMonatTag.addChangeListener(new ChangeListener() {
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                            spinMonatTagStateChanged(e);
-                        }
-                    });
+                    spinMonatTag.addChangeListener(e -> spinMonatTagStateChanged(e));
                     pnlMonthly.add(spinMonatTag, CC.xy(5, 7));
 
                     //---- cmbTag ----
-                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[] {
-                        "Tag des Monats",
-                        "Montag",
-                        "Dienstag",
-                        "Mittwoch",
-                        "Donnerstag",
-                        "Freitag",
-                        "Samstag",
-                        "Sonntag"
+                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[]{
+                            "Tag des Monats",
+                            "Montag",
+                            "Dienstag",
+                            "Mittwoch",
+                            "Donnerstag",
+                            "Freitag",
+                            "Samstag",
+                            "Sonntag"
                     }));
                     cmbTag.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.add(cmbTag, CC.xywh(7, 7, 3, 1));
@@ -877,8 +778,8 @@ public class PnlSchedule extends JPanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow, $ugap, default, $lcgap, default:grow",
-                    "default:grow"));
+                        "default, $lcgap, default:grow, $ugap, default, $lcgap, default:grow",
+                        "default:grow"));
 
                 //---- jLabel13 ----
                 jLabel13.setText("Erst einplanen ab dem");
@@ -915,7 +816,7 @@ public class PnlSchedule extends JPanel {
             //======== pnlBemerkung ========
             {
                 pnlBemerkung.setBorder(new TitledBorder(null, "Kommentar zur Anwendung (Erscheint im DFN)", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
-                    new Font("Arial", Font.PLAIN, 14)));
+                        new Font("Arial", Font.PLAIN, 14)));
                 pnlBemerkung.setLayout(new BoxLayout(pnlBemerkung, BoxLayout.X_AXIS));
 
                 //======== jScrollPane1 ========
@@ -932,12 +833,7 @@ public class PnlSchedule extends JPanel {
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnSave.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnSaveActionPerformed(e);
-                }
-            });
+            btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panelMain.add(btnSave, CC.xy(3, 13, CC.RIGHT, CC.DEFAULT));
         }
         add(panelMain, BorderLayout.CENTER);
@@ -1117,20 +1013,24 @@ public class PnlSchedule extends JPanel {
         }
     }//GEN-LAST:event_txtMaxTimesCaretUpdate
 
+
     private boolean isAtLeastOneTxtFieldNotZero() {
-        boolean yesItIs = false;
 
-        try {
-            double result = Double.parseDouble(txtNachtMo.getText()) + Double.parseDouble(txtMorgens.getText()) +
-                    Double.parseDouble(txtMittags.getText()) + Double.parseDouble(txtNachmittags.getText()) +
-                    Double.parseDouble(txtAbends.getText()) + Double.parseDouble(txtNachtAb.getText());
-            yesItIs = result > 0d;
-        } catch (NumberFormatException nfe) {
+        BigDecimal result = SYSTools.parseDecimal(txtNachtMo.getText()).add(
+                SYSTools.parseDecimal(txtMorgens.getText())
+        ).add(
+                SYSTools.parseDecimal(txtMittags.getText())
+        ).add(
+                SYSTools.parseDecimal(txtNachmittags.getText())
+        ).add(
+                SYSTools.parseDecimal(txtAbends.getText())
+        ).add(
+                SYSTools.parseDecimal(txtNachtAb.getText())
+        );
 
-        }
-
-        return yesItIs;
+        return result.compareTo(BigDecimal.ZERO) > 0;
     }
+
 
     private void txtNachtMoActionPerformed(ActionEvent evt) {//GEN-FIRST:event_txtNachtMoActionPerformed
         txtMorgens.requestFocus();

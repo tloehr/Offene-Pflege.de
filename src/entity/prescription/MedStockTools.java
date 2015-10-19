@@ -249,7 +249,7 @@ public class MedStockTools {
                 if (medStock.getUPRDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
                     if (effectiveUPR.compareTo(BigDecimal.ZERO) > 0) { // if this stock was never used the effective UPR must be 0. we must handle this case separately
                         // if the deviation was too high (usually more than 20%), then the new UPR is discarded
-                        BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR_CORRIDOR)));
+                        BigDecimal maxDeviation = SYSTools.parseDecimal(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR_CORRIDOR));
                         BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
                         OPDE.debug("the deviation was: " + deviation + "%");
 
@@ -383,9 +383,9 @@ public class MedStockTools {
         if (stock.getTradeForm().getDosageForm().isUPRn()) {
             result += ", APV: ";
             if (stock.getTradeForm().getUPR() != null) {
-                result += stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP).toString() + " (" + SYSTools.xx("upreditor.constant.upr") + ")";
+                result += SYSTools.formatBigDecimal(stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP)) + " (" + SYSTools.xx("upreditor.constant.upr") + ")";
             } else {
-                result += stock.getUPR().setScale(2, RoundingMode.HALF_UP).toString();
+                result += SYSTools.formatBigDecimal(stock.getUPR().setScale(2, RoundingMode.HALF_UP));
             }
             result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getUPR() != null ? SYSTools.xx("nursingrecords.inventory.UPRwillBeReplaced") : "");
         }
@@ -627,12 +627,12 @@ public class MedStockTools {
                         upr = (BigDecimal) query.getSingleResult();
                     }
 
-                    if (upr.equals(BigDecimal.ZERO)){
+                    if (upr.equals(BigDecimal.ZERO)) {
                         upr = BigDecimal.ONE;
                     }
 
                     upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
-                    OPDE.debug("calculated UPRn. average so far: " + upr.toString());
+                    OPDE.debug("calculated UPRn. average so far: " + SYSTools.formatBigDecimal(upr));
                 } catch (NoResultException nre) {
                     upr = BigDecimal.ONE;
                 } catch (Exception e) {
@@ -680,30 +680,30 @@ public class MedStockTools {
 
 
     public static boolean stillWorkingOnTheFirstOneToCalculateUPRn(TradeForm tradeForm) {
-            Integer count = null;
-            EntityManager em = OPDE.createEM();
-            try {
-                Query query = em.createQuery("SELECT COUNT(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
-                query.setParameter("dummymode", REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING);
-                query.setParameter("tradeform", tradeForm);
-                Object result = query.getSingleResult();
+        Integer count = null;
+        EntityManager em = OPDE.createEM();
+        try {
+            Query query = em.createQuery("SELECT COUNT(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
+            query.setParameter("dummymode", REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING);
+            query.setParameter("tradeform", tradeForm);
+            Object result = query.getSingleResult();
 
-                if (result == null) {
-                    count = 0;
-                } else if (result instanceof Long) {
-                    count = ((Long) result).intValue();
-                } else {
-                    count = (Integer) query.getSingleResult();
-                }
-            } catch (NoResultException nre) {
+            if (result == null) {
                 count = 0;
-            } catch (Exception e) {
-                OPDE.fatal(e);
-            } finally {
-                em.close();
+            } else if (result instanceof Long) {
+                count = ((Long) result).intValue();
+            } else {
+                count = (Integer) query.getSingleResult();
             }
-            return count == 1;
+        } catch (NoResultException nre) {
+            count = 0;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
         }
+        return count == 1;
+    }
 
 
     public static List<MedStock> getExpiryList(int days) {
@@ -776,14 +776,14 @@ public class MedStockTools {
 
                     BigDecimal quota = iamthefirstone ? BigDecimal.ZERO : diffWeight.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO : diffQuantity.divide(diffWeight, 2, RoundingMode.HALF_UP);
                     tableContent.append(SYSConst.html_table_tr(
-                                    SYSConst.html_table_td(df.format(tx.getPit())) +
-                                            SYSConst.html_table_td(weight.toString()) +
-                                            SYSConst.html_table_td(iamthefirstone ? "--" : diffWeight.toString()) +
-                                            SYSConst.html_table_td(quantity.toString()) +
-                                            SYSConst.html_table_td(iamthefirstone ? "--" : diffQuantity.toString()) +
-                                            SYSConst.html_table_td(quota.compareTo(BigDecimal.ZERO) == 0 ? "--" : quota.toString())
-                            )
-                    );
+                            SYSConst.html_table_td(df.format(tx.getPit())) +
+                                    SYSConst.html_table_td(SYSTools.formatBigDecimal(weight) +
+                                                    SYSConst.html_table_td(iamthefirstone ? "--" : SYSTools.formatBigDecimal(diffWeight)) +
+                                                    SYSConst.html_table_td(SYSTools.formatBigDecimal(quantity)) +
+                                                    SYSConst.html_table_td(iamthefirstone ? "--" : SYSTools.formatBigDecimal(diffQuantity)) +
+                                                    SYSConst.html_table_td(quota.compareTo(BigDecimal.ZERO) == 0 ? "--" : SYSTools.formatBigDecimal(quota))
+                                    )
+                    ));
 
 
                     previousWeight = weight;

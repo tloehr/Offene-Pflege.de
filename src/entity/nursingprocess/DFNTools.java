@@ -153,7 +153,7 @@ public class DFNTools {
      */
     public static int generate(EntityManager em, List<InterventionSchedule> list, LocalDate targetdate, boolean wholeday) {
         DateTimeZone dtz = DateTimeZone.getDefault();
-        String internalClassID = "nursingrecords.dfnimport";
+//        String internalClassID = "nursingrecords.dfnimport";
         BigDecimal maxrows = new BigDecimal(list.size());
         int numdfn = 0;
 
@@ -162,8 +162,8 @@ public class DFNTools {
 
         BigDecimal row = BigDecimal.ZERO;
 
-        System.out.println(SYSTools.xx(internalClassID) + " " + SYSTools.xx(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
-        System.out.println(SYSTools.xx(internalClassID + ".progress"));
+        System.out.println(SYSTools.xx("nursingrecords.dfnimport") + " " + SYSTools.xx("nursingrecords.dfnimport.generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
+        System.out.println(SYSTools.xx("nursingrecords.dfnimport.progress"));
 
         for (InterventionSchedule termin : list) {
 
@@ -298,7 +298,7 @@ public class DFNTools {
         }
 
         System.out.println();
-        System.out.println(SYSTools.xx(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numdfn);
+        System.out.println(SYSTools.xx("nursingrecords.dfnimport.numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numdfn);
 //        System.out.println("------------------------------------------");
         return numdfn;
     }
@@ -365,7 +365,7 @@ public class DFNTools {
 //        result += "<br/>Dauer: <b>" + dfn.getMinutes() + "</b> " + SYSTools.xx("misc.msg.Minutes");
 //
 //        if (dfn.getNursingProcess() == null) { // on demand
-//            result += " " + SYSTools.xx(PnlDFN.internalClassID + ".ondemand");
+//            result += " " + SYSTools.xx(PnlDFN."nursingrecords.dfnimport.ondemand");
 //        } else {
 //            result += " <font color=\"blue\">(" + dfn.getNursingProcess().getCategory().getText() + "</font>)";
 //        }

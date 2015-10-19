@@ -44,7 +44,7 @@ public class PrescriptionScheduleTools {
     }
 
     public static String getValueAsString(BigDecimal bd) {
-        return (bd.compareTo(BigDecimal.ZERO) > 0 ? SYSTools.printDouble(bd.doubleValue()) : "--");
+        return (bd.compareTo(BigDecimal.ZERO) > 0 ? SYSTools.formatBigDecimal(bd) : "--");
     }
 
 
@@ -352,7 +352,7 @@ public class PrescriptionScheduleTools {
             }
         } else if (getTerminStatus(schedule) == MAXDOSE) {
             result += "<b>" + SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ";
-            result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
+            result += schedule.getMaxAnzahl() + "x " + SYSTools.formatBigDecimal(schedule.getMaxEDosis());
             result += "</b><br/>";
             if (schedule.getCheckAfterHours() != null) {
                 result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
@@ -377,7 +377,7 @@ public class PrescriptionScheduleTools {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             result += "    <tr>" +
                     "      <td align=\"center\">" + sdf.format(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</td>" +
-                    "      <td align=\"center\">" + schedule.getUhrzeitDosis().toPlainString() + "</td>" +
+                    "      <td align=\"center\">" + SYSTools.formatBigDecimal(schedule.getUhrzeitDosis()) + "</td>" +
                     "      <td>" + getRepeatPattern(schedule, true) + "</td>" +
                     "    </tr>";
             if (singleUsageOnly) {
@@ -393,20 +393,20 @@ public class PrescriptionScheduleTools {
     public static String getDoseAsCompactText(PrescriptionSchedule schedule) {
         String result = "";
 
-        NumberFormat df = DecimalFormat.getNumberInstance();
-        df.setMaximumFractionDigits(2);
-        df.setMinimumFractionDigits(0);
-
-        df.setRoundingMode(RoundingMode.HALF_UP);
+//        NumberFormat df = DecimalFormat.getNumberInstance();
+//        df.setMaximumFractionDigits(2);
+//        df.setMinimumFractionDigits(0);
+//
+//        df.setRoundingMode(RoundingMode.HALF_UP);
 
         if (getTerminStatus(schedule) == ROUGHLY) {
 
-            result += schedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.earlyinthemorning.medium") + ". " + df.format(schedule.getNachtMo()).replace(",", ".") + ", " : "";
-            result += schedule.getMorgens().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.morning.medium") + ". " + df.format(schedule.getMorgens()).replace(",", ".") + ", " : "";
-            result += schedule.getMittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.noon.medium") + ". " + df.format(schedule.getMittags()).replace(",", ".") + ", " : "";
-            result += schedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.afternoon.medium") + ". " + df.format(schedule.getNachmittags()).replace(",", ".") + ", " : "";
-            result += schedule.getAbends().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.evening.medium") + ". " + df.format(schedule.getAbends()).replace(",", ".") + ", " : "";
-            result += schedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.lateatnight.medium") + ". " + df.format(schedule.getNachtAb()).replace(",", ".") + ", " : "";
+            result += schedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.earlyinthemorning.medium") + ". " + SYSTools.formatBigDecimal(schedule.getNachtMo()) + "; " : "";
+            result += schedule.getMorgens().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.morning.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getMorgens()) + "; " : "";
+            result += schedule.getMittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.noon.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getMittags()) + "; " : "";
+            result += schedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.afternoon.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getNachmittags()) + "; " : "";
+            result += schedule.getAbends().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.evening.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getAbends()) + "; " : "";
+            result += schedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.lateatnight.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getNachtAb()) + "; " : "";
 
             result = result.substring(0, result.length() - 2);
 
@@ -416,7 +416,7 @@ public class PrescriptionScheduleTools {
             }
         } else if (getTerminStatus(schedule) == MAXDOSE) {
             result += SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ";
-            result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
+            result += schedule.getMaxAnzahl() + "x " + SYSTools.formatBigDecimal(schedule.getMaxEDosis());
             if (schedule.getCheckAfterHours() != null) {
                 result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
                 result += schedule.getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)");
@@ -431,7 +431,7 @@ public class PrescriptionScheduleTools {
                 result += DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + "h";
             }
 
-            result += " " + df.format(schedule.getUhrzeitDosis()).replace(",", ".");
+            result += " " +  SYSTools.formatBigDecimal(schedule.getUhrzeitDosis());
             String repeat = getRepeatPatternAsCompactText(schedule);
             if (!repeat.isEmpty()) {
                 result = "(" + result + " => " + repeat + ")";

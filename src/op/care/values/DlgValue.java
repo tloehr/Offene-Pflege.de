@@ -17,7 +17,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
+
 
 /**
  * @author Torsten Löhr
@@ -30,12 +31,18 @@ public class DlgValue extends MyJDialog {
     public static final int MODE_NEW = 0;
     public static final int MODE_NEW_SAMEDAY = 1;
     public static final int MODE_EDIT = 2;
+    DecimalFormat dcf1, dcf2, dcf3;
 
     public DlgValue(ResValue resValue, int editMode, Closure afterAction) {
         super();
         this.resValue = resValue;
         this.editMode = editMode;
         this.afterAction = afterAction;
+
+        dcf1 = resValue.getType().getFormat1() == null ? null : new DecimalFormat(resValue.getType().getFormat1());
+        dcf2 = resValue.getType().getFormat2() == null ? null : new DecimalFormat(resValue.getType().getFormat2());
+        dcf3 = resValue.getType().getFormat2() == null ? null : new DecimalFormat(resValue.getType().getFormat3());
+
         initComponents();
         initPanel();
         setTitle(resValue.getType().getText());
@@ -56,7 +63,7 @@ public class DlgValue extends MyJDialog {
         if (resValue.getVal1() != null) {
             lblWert1.setText(resValue.getType().getLabel1());
             lblWert1Einheit.setText(resValue.getType().getUnit1());
-            txtWert1.setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
+            txtWert1.setText(dcf1.format(resValue.getVal1()));
         }
 
         lblWert2.setVisible(resValue.getVal2() != null);
@@ -65,7 +72,7 @@ public class DlgValue extends MyJDialog {
         if (resValue.getVal2() != null) {
             lblWert2.setText(resValue.getType().getLabel2());
             lblWert2Einheit.setText(resValue.getType().getUnit2());
-            txtWert2.setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
+            txtWert2.setText(dcf2.format(resValue.getVal2()));
         }
 
         lblWert3.setVisible(resValue.getVal3() != null);
@@ -74,7 +81,7 @@ public class DlgValue extends MyJDialog {
         if (resValue.getVal3() != null) {
             lblWert3.setText(resValue.getType().getLabel3());
             lblWert3Einheit.setText(resValue.getType().getUnit3());
-            txtWert3.setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
+            txtWert3.setText(dcf2.format(resValue.getVal3()));
         }
 
         txtText.setText(SYSTools.catchNull(resValue.getText()));
@@ -89,9 +96,9 @@ public class DlgValue extends MyJDialog {
 
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
+            ((JTextField) e.getSource()).setText(dcf1.format(resValue.getVal1()));
         } else {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
+            ((JTextField) e.getSource()).setText(dcf1.format(bd));
         }
     }
 
@@ -100,9 +107,9 @@ public class DlgValue extends MyJDialog {
 
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
+            ((JTextField) e.getSource()).setText(dcf2.format(resValue.getVal2()));
         } else {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
+            ((JTextField) e.getSource()).setText(dcf2.format(bd));
         }
     }
 
@@ -111,9 +118,9 @@ public class DlgValue extends MyJDialog {
 
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
+            ((JTextField) e.getSource()).setText(dcf3.format(resValue.getVal3()));
         } else {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
+            ((JTextField) e.getSource()).setText(dcf3.format(bd));
         }
     }
 

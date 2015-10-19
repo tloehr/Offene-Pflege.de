@@ -1326,7 +1326,7 @@ public class TXEssenDoc {
     }
 
     private String setBD(BigDecimal bd) {
-        return (bd != null && bd.compareTo(BigDecimal.ZERO) > 0) ? bd.setScale(2, RoundingMode.HALF_UP).toString() : "--";
+        return (bd != null && bd.compareTo(BigDecimal.ZERO) > 0) ? SYSTools.formatBigDecimal(bd.setScale(2, RoundingMode.HALF_UP)) : "--";
     }
 
     private String setCheckbox(Object in) {

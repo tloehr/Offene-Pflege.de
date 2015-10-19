@@ -156,7 +156,7 @@ public class NursingProcessTools {
             html += "<ul>";
             for (InterventionSchedule interventionSchedule : np.getInterventionSchedule()) {
                 html += "<li>";
-                html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b> (" + interventionSchedule.getDauer().toPlainString() + " " + SYSTools.xx("misc.msg.Minutes") + ")</div>";
+                html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b> (" + SYSTools.formatBigDecimal(interventionSchedule.getDauer()) + " " + SYSTools.xx("misc.msg.Minutes") + ")</div>";
                 html += InterventionScheduleTools.getTerminAsHTML(interventionSchedule);
                 html += "</li>";
             }

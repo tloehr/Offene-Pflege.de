@@ -154,7 +154,7 @@ public class BHPTools {
      */
     public static int generate(EntityManager em) throws Exception {
 
-        String internalClassID = "nursingrecords.bhpimport";
+//        String internalClassID = "nursingrecords.bhpimport";
         int numbhp = 0;
 
         LocalDate lastbhp = new LocalDate().minusDays(1);
@@ -199,7 +199,7 @@ public class BHPTools {
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.info(SYSTools.xx(internalClassID) + " " + SYSTools.xx("misc.msg.writingto") + ": " + OPDE.getUrl());
+            OPDE.info(SYSTools.xx("\"nursingrecords.bhpimport\"") + " " + SYSTools.xx("misc.msg.writingto") + ": " + OPDE.getUrl());
 
             select.setParameter("andatum", new Date(SYSCalendar.startOfDay(targetdate.toDate())));
             select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(targetdate.toDate())));
@@ -209,7 +209,7 @@ public class BHPTools {
 
             numbhp += generate(em, list, targetdate, true);
 
-            OPDE.important(em, SYSTools.xx(internalClassID) + " " + SYSTools.xx(internalClassID + ".completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + SYSTools.xx(internalClassID + ".numCreatedEntities") + ": " + numbhp);
+            OPDE.important(em, SYSTools.xx("\"nursingrecords.bhpimport\"") + " " + SYSTools.xx("nursingrecords.bhpimport.completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + SYSTools.xx("nursingrecords.bhpimport.numCreatedEntities") + ": " + numbhp);
         }
 
         SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateTimeFormat.forPattern("yyyy-MM-dd").print(targetdate));
@@ -244,7 +244,7 @@ public class BHPTools {
      */
     public static int generate(EntityManager em, List<PrescriptionSchedule> list, LocalDate targetdate, boolean wholeday) {
         DateTimeZone dtz = DateTimeZone.getDefault();
-        String internalClassID = "nursingrecords.bhpimport";
+//        String internalClassID = "nursingrecords.bhpimport";
         BigDecimal maxrows = new BigDecimal(list.size());
         int numbhp = 0;
 
@@ -254,8 +254,8 @@ public class BHPTools {
         BigDecimal row = BigDecimal.ZERO;
 
         System.out.println("------------------------------------------");
-        System.out.println(SYSTools.xx(internalClassID) + " " + SYSTools.xx(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
-        System.out.println(SYSTools.xx(internalClassID + ".progress"));
+        System.out.println(SYSTools.xx("nursingrecords.bhpimport") + " " + SYSTools.xx("nursingrecords.bhpimport.generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
+        System.out.println(SYSTools.xx("nursingrecords.bhpimport.progress"));
 
         for (PrescriptionSchedule pSchedule : list) {
             int numbhpbefore = numbhp;
@@ -363,7 +363,7 @@ public class BHPTools {
         }
 
         System.out.println();
-        System.out.println(SYSTools.xx(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numbhp);
+        System.out.println(SYSTools.xx("nursingrecords.bhpimport.numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numbhp);
         System.out.println("------------------------------------------");
 
         OPDE.debug("number of bhps overall: " + Integer.toString(numbhp));
@@ -776,7 +776,7 @@ public class BHPTools {
 
                 String text =
                         PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()) +
-                                (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
+                                (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
                                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                                 BHPTools.getScheduleText(bhp, ", ", "") +
                                 (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "");

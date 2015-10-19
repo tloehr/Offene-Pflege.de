@@ -391,7 +391,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
                     "<td width=\"520\" align=\"left\"><font size=+1>" +
                     inventory.getText() + "</font></td>" +
-                    "<td width=\"200\" align=\"right\"><font size=+1>" + NumberFormat.getNumberInstance().format(sumInventory) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(inventory)) + "</font></td>" +
+                    "<td width=\"200\" align=\"right\"><font size=+1>" + SYSTools.formatBigDecimal(sumInventory) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(inventory)) + "</font></td>" +
 
                     "</tr>" +
                     "</table>" +
@@ -644,7 +644,7 @@ public class PnlInventory extends NursingRecordsPanel {
                     "<tr>" +
                     (stock.isClosed() ? "<s>" : "") +
                     "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + "</td>" +
-                    "<td width=\"200\" align=\"right\">" + NumberFormat.getNumberInstance().format(sumStock) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
+                    "<td width=\"200\" align=\"right\">" + SYSTools.formatBigDecimal(sumStock) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
                     (stock.isClosed() ? "</s>" : "") +
                     "</tr>" +
                     "</table>" +
@@ -1180,19 +1180,19 @@ public class PnlInventory extends NursingRecordsPanel {
                             "<td width=\"200\" align=\"center\">" + SYSTools.catchNull(tx.getText(), "--") + "</td>" +
 
                             "<td width=\"100\" align=\"right\">" +
-                            NumberFormat.getNumberInstance().format(tx.getAmount()) +
+                            SYSTools.formatBigDecimal(tx.getAmount()) +
                             "</td>" +
 
                             "<td width=\"100\" align=\"right\">" +
                             (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                            NumberFormat.getNumberInstance().format(rowsum) +
+                            SYSTools.formatBigDecimal(rowsum) +
                             (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                             "</td>" +
 
 
                             (stock.getTradeForm().isWeightControlled() ?
                                     "<td width=\"100\" align=\"right\">" +
-                                            NumberFormat.getNumberInstance().format(tx.getWeight()) + "g" +
+                                            SYSTools.formatBigDecimal(tx.getWeight()) + "g" +
                                             "</td>" : "") +
 
                             "<td width=\"100\" align=\"left\">" +
@@ -1447,7 +1447,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                             }
                                         }
                                     }
-                                }, "nursingrecords.bhp.weight", NumberFormat.getNumberInstance().format(tx.getWeight()), new Validator<BigDecimal>() {
+                                }, "nursingrecords.bhp.weight", SYSTools.formatBigDecimal(tx.getWeight()), new Validator<BigDecimal>() {
                                     @Override
                                     public boolean isValid(String value) {
                                         BigDecimal bd = parse(value);

@@ -15,7 +15,6 @@ public class CurrencyParser implements TextParser<BigDecimal> {
 
     @Override
     public BigDecimal parse(String in) throws ParseException {
-        in = SYSTools.assimilateDecimalSeparators(in);
         Number num;
 
         num = nf.parse(in);

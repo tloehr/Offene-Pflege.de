@@ -101,19 +101,14 @@ public class PnlPackage extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "4*(default, $lgap), default"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "4*(default, $lgap), default"));
 
         //---- txtPZN ----
         txtPZN.setFont(new Font("Arial", Font.PLAIN, 14));
         txtPZN.setInstantSearchDelay(2000);
         txtPZN.setPrompt("PZN");
-        txtPZN.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtPZNActionPerformed(e);
-            }
-        });
+        txtPZN.addActionListener(e -> txtPZNActionPerformed(e));
         add(txtPZN, CC.xy(3, 3));
 
         //---- cmbGroesse ----
@@ -133,12 +128,7 @@ public class PnlPackage extends JPanel {
             txtInhalt.setFont(new Font("Arial", Font.PLAIN, 14));
             txtInhalt.setColumns(10);
             txtInhalt.setHorizontalAlignment(SwingConstants.TRAILING);
-            txtInhalt.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    txtInhaltCaretUpdate(e);
-                }
-            });
+            txtInhalt.addCaretListener(e -> txtInhaltCaretUpdate(e));
             panel1.add(txtInhalt);
 
             //---- lblUnit ----

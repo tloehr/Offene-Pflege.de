@@ -50,7 +50,6 @@ import org.joda.time.DateTime;
 import javax.persistence.*;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -234,7 +233,7 @@ public class DlgNewStocks extends MyJDialog {
         mainPane.add(ovrBW, CC.xywh(7, 17, 2, 1));
 
         if (resident == null) {
-            ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
+            ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_EAST);
             attentionIconBW.setToolTipText(SYSTools.xx("misc.msg.emptyselection"));
         } else {
             txtBWSuche.setEnabled(false);
@@ -244,16 +243,21 @@ public class DlgNewStocks extends MyJDialog {
         attentionIconMenge = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         correctIconMenge = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.CORRECT));
         txtMenge = new OverlayTextField();
-        txtMenge.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent caretEvent) {
-                txtMengeCaretUpdate(caretEvent);
-            }
-        });
+//        txtMenge.addCaretListener(new CaretListener() {
+//            @Override
+//            public void caretUpdate(CaretEvent caretEvent) {
+//                txtMengeCaretUpdate(caretEvent);
+//            }
+//        });
         txtMenge.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent focusEvent) {
                 txtMengeFocusGained(focusEvent);
+            }
+
+            @Override
+            public void focusLost(FocusEvent focusEvent) {
+                txtMengeFocusLost(focusEvent);
             }
         });
         txtMenge.setFont(SYSConst.ARIAL14);
@@ -670,35 +674,33 @@ public class DlgNewStocks extends MyJDialog {
         super.dispose();
     }
 
-    private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
+    private void txtMengeFocusLost(FocusEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
         if (ovrMenge.getOverlayComponents().length > 0) {
             ovrMenge.removeOverlayComponent(ovrMenge.getOverlayComponents()[0]);
         }
 
-        if (txtMenge.getText().trim().isEmpty()) {
-            amount = null;
-        } else {
+        amount = SYSTools.parseDecimal(txtMenge.getText().trim());
 
-            amount = SYSTools.checkBigDecimal(txtMenge.getText().trim());
-
-            if (amount != null) {
-                if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (amount != null) {
+            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
 //                lblMenge.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
-                    ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
-                    attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen müssen größer 0 sein.</i>"));
-                    amount = null;
-                } else if (aPackage != null && amount.compareTo(aPackage.getContent()) > 0) {
-                    ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
-                    attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen dürfen nicht größer als der Packungsinhalt sein.</i>"));
-                    amount = aPackage.getContent();
-                } else {
-                    ovrMenge.addOverlayComponent(correctIconMenge, DefaultOverlayable.SOUTH_WEST);
-                }
+                ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_EAST);
+                attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen müssen größer 0 sein.</i>"));
+                amount = null;
+            } else if (aPackage != null && amount.compareTo(aPackage.getContent()) > 0) {
+                ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_EAST);
+                attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen dürfen nicht größer als der Packungsinhalt sein.</i>"));
+                amount = aPackage.getContent();
             } else {
-                ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
-                attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Die Mengenangabe ist falsch.</i>"));
+                ovrMenge.addOverlayComponent(correctIconMenge, DefaultOverlayable.SOUTH_EAST);
             }
+        } else {
+            ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_EAST);
+            attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Die Mengenangabe ist falsch.</i>"));
         }
+        txtMenge.setText(SYSTools.formatBigDecimal(amount));
+
+
 
     }//GEN-LAST:event_txtMengeCaretUpdate
 
@@ -744,7 +746,7 @@ public class DlgNewStocks extends MyJDialog {
             ovrBW.removeOverlayComponent(ovrBW.getOverlayComponents()[0]);
         }
         if (resident == null) {
-            ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
+            ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_EAST);
             attentionIconBW.setToolTipText("<html>Keine(n) BewohnerIn ausgewählt.<html>");
         }
 
@@ -779,7 +781,7 @@ public class DlgNewStocks extends MyJDialog {
 
         if (resident != null) {
 //            ovrVorrat.removeOverlayComponent(ovrVorrat.getOverlayComponents()[0]);
-//            ovrVorrat.addOverlayComponent(questionIconVorrat, DefaultOverlayable.SOUTH_WEST);
+//            ovrVorrat.addOverlayComponent(questionIconVorrat, DefaultOverlayable.SOUTH_EAST);
 //
 
 
@@ -807,19 +809,19 @@ public class DlgNewStocks extends MyJDialog {
                     cmbVorrat.setSelectedIndex(0);
 
                     if (dcbm.getSize() > 1) {
-                        ovrVorrat.addOverlayComponent(attentionIconVorrat, DefaultOverlayable.SOUTH_WEST);
+                        ovrVorrat.addOverlayComponent(attentionIconVorrat, DefaultOverlayable.SOUTH_EAST);
                         attentionIconVorrat.setToolTipText("<html>Keinen <b>exakt</b> passender Vorrat gefunden. Wählen Sie selbst einen passenden aus oder verwenden Sie <b>automatisch</b>.<html>");
                         cmbVorrat.showPopup();
                     } else {
-                        ovrVorrat.addOverlayComponent(infoIconVorrat, DefaultOverlayable.SOUTH_WEST);
+                        ovrVorrat.addOverlayComponent(infoIconVorrat, DefaultOverlayable.SOUTH_EAST);
                         infoIconVorrat.setToolTipText("<html>Ein neuer Vorrat wird <b>automatisch</b> erstellt.</html>");
                     }
                 } else {
                     correctIconVorrat.setToolTipText(null);
-                    ovrVorrat.addOverlayComponent(correctIconVorrat, DefaultOverlayable.SOUTH_WEST);
+                    ovrVorrat.addOverlayComponent(correctIconVorrat, DefaultOverlayable.SOUTH_EAST);
                 }
             } else {
-                ovrVorrat.addOverlayComponent(questionIconVorrat, DefaultOverlayable.SOUTH_WEST);
+                ovrVorrat.addOverlayComponent(questionIconVorrat, DefaultOverlayable.SOUTH_EAST);
                 questionIconVorrat.setToolTipText("<html>Kein Medikament ausgewählt.<html>");
             }
         }
