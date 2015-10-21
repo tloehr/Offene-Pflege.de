@@ -567,6 +567,8 @@ public class SYSFilesTools {
             temp = File.createTempFile("opde", ".html");
 
             String text = "<html><head>";
+            // https://github.com/tloehr/Offene-Pflege.de/issues/32
+            text += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
             if (addPrintJScript) {
                 text += "<script type=\"text/javascript\">" +
                         "window.onload = function() {"
