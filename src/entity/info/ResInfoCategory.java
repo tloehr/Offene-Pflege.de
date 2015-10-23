@@ -34,7 +34,7 @@ public class ResInfoCategory implements Serializable, Comparable {
     @Column(name = "Bezeichnung")
     private String text;
     @Column(name = "KatArt")
-    @EditorComponent(label = "Etage", renderer = "gui.renderer.ResInfoCategoryTypesRenderer", model = "gui.renderer.ResInfoCategoryTypesModel", component = {"combobox"})
+    @EditorComponent(label = "misc.msg.categorytype", renderer = "gui.renderer.ResInfoCategoryTypesRenderer", model = "gui.renderer.ResInfoCategoryTypesModel", component = {"combobox"})
     private Integer catType;
     @Column(name = "Sortierung")
     @EditorComponent(label = "misc.msg.sorting", parserClass = "gui.parser.IntegerParser", component = {"textfield"})

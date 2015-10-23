@@ -282,7 +282,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                             dcbm = (DefaultComboBoxModel) modelClazz.newInstance();
 
-
                             // if there is a renderer weg got for the object itself, rather than the selected index
                             il = e -> {
                                 if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -311,7 +310,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     if (renderer != null) {
                         combobox.setSelectedItem(PropertyUtils.getProperty(data, field.getName()));
                     } else {
-                        combobox = new JComboBox(new DefaultComboBoxModel<>(ArrayUtils.subarray(editorComponent.component(), 1, editorComponent.component().length - 1)));
+                        // https://github.com/tloehr/Offene-Pflege.de/issues/29
+                        combobox.setSelectedIndex(Integer.parseInt(PropertyUtils.getProperty(data, field.getName()).toString()));
                     }
 
                     combobox.addItemListener(il);
