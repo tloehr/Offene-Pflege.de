@@ -28,7 +28,7 @@ import java.math.BigDecimal;
  * @author Torsten Löhr
  */
 public class PnlPackage extends JPanel {
-    public static final String internalClassID = MedProductWizard.internalClassID + ".package";
+    public static final String internalClassID = "opde.medication.medproduct.wizard.package";
     String pzn;
     BigDecimal inhalt;
     private TradeForm darreichung;
@@ -64,7 +64,7 @@ public class PnlPackage extends JPanel {
         try {
             pzn = MedPackageTools.parsePZN(txtPZN.getText().trim());
             if (MedPackageTools.checkNewPZN(pzn, null) == null) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist wird bereits verwendet.", DisplayMessage.WARNING));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.medication.medproduct.wizard.package.ppn.inuse", DisplayMessage.WARNING));
                 pzn = null;
             }
         } catch (NumberFormatException nfe) {
@@ -79,10 +79,10 @@ public class PnlPackage extends JPanel {
         inhalt = SYSTools.parseDecimal(txtInhalt.getText());
         if (inhalt == null) {
             if (!txtInhalt.getText().isEmpty()) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die Inhaltsangabe ist falsch.", DisplayMessage.WARNING));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.medication.medproduct.wizard.package.content.wrong", DisplayMessage.WARNING));
             }
         } else if (inhalt.compareTo(BigDecimal.ZERO) <= 0) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die Inhaltsangabe muss größer als 0 sein.", DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.medication.medproduct.wizard.package.content.greater0", DisplayMessage.WARNING));
         }
 
 
@@ -146,9 +146,6 @@ public class PnlPackage extends JPanel {
     }
 
     private void check() {
-
-        OPDE.debug("PZN: " + pzn);
-        OPDE.debug("inhalt: " + inhalt);
 
         if (pzn != null && inhalt != null) {
             aPackage = new MedPackage(darreichung);

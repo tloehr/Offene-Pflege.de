@@ -59,14 +59,6 @@ public class PnlProduct extends JPanel {
         em.close();
 
         if (!listProd.isEmpty()) {
-//            if (listProd.size() == 1 && ((MedProducts) listProd.get(0)).getText().equalsIgnoreCase(txtProd.getText().trim())) {
-//                // Die Eingabe des Produktnamens entspricht GENAU einem bestehenden Produkt. Dann muss das das gleiche sein.
-//                produkt = (MedProducts) listProd.get(0);
-//                lblProdMsg.setVisible(false);
-//                jsp1.setVisible(false);
-//                lstProd.setVisible(false);
-//                validate.execute(produkt);
-//            } else {
             lblProdMsg.setVisible(true);
             jsp1.setVisible(true);
             lstProd.setVisible(true);
@@ -75,7 +67,6 @@ public class PnlProduct extends JPanel {
             lmProd = SYSTools.list2dlm(listProd);
             lstProd.setModel(lmProd);
             lstProd.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
-//            }
         } else {
             produkt = txtProd.getText().trim().isEmpty() ? null : new MedProducts(txtProd.getText().trim());
             lblProdMsg.setVisible(false);
@@ -97,7 +88,7 @@ public class PnlProduct extends JPanel {
     }
 
     private void lstProdMouseClicked(MouseEvent e) {
-        // TODO: double click goes forth in wizard.
+        // TODO: double click handed over to wizard.
     }
 
 
@@ -112,19 +103,14 @@ public class PnlProduct extends JPanel {
         //======== this ========
         setPreferredSize(new Dimension(610, 198));
         setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, $lcgap, default",
-                "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
+            "2*(default, $lcgap), default:grow, $lcgap, default",
+            "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
 
         //---- txtProd ----
         txtProd.setFont(new Font("Arial", Font.PLAIN, 14));
         txtProd.setInstantSearchDelay(500);
         txtProd.setPrompt("Produktname");
-        txtProd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtProdActionPerformed(e);
-            }
-        });
+        txtProd.addActionListener(e -> txtProdActionPerformed(e));
         add(txtProd, CC.xywh(3, 2, 3, 1));
 
         //---- label1 ----
@@ -145,12 +131,7 @@ public class PnlProduct extends JPanel {
             lstProd.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             lstProd.setFont(new Font("Arial", Font.PLAIN, 14));
             lstProd.setVisible(false);
-            lstProd.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    lstProdValueChanged(e);
-                }
-            });
+            lstProd.addListSelectionListener(e -> lstProdValueChanged(e));
             lstProd.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {

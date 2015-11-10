@@ -630,6 +630,9 @@ public class GUITools {
 
 
     public static void flashBackground(final JComponent component, final Color flashcolor, int repeatTimes) {
+        // https://github.com/tloehr/Offene-Pflege.de/issues/37
+        if (component == null)
+            return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
         flashBackground(component, flashcolor, component.getBackground(), repeatTimes);
     }
 

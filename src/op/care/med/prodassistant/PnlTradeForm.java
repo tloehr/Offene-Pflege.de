@@ -7,9 +7,9 @@ package op.care.med.prodassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.*;
+import gui.GUITools;
 import op.OPDE;
 import op.care.med.structure.PnlDosageForm;
-import gui.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -20,7 +20,10 @@ import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -116,11 +119,15 @@ public class PnlTradeForm extends JPanel {
             if (lstDaf.getSelectedIndex() > 0) {
                 tradeForm = (TradeForm) lstDaf.getSelectedValue();
                 txtZusatz.setText(null);
-                cmbFormen.setEnabled(false);
             } else {
-                cmbFormen.setEnabled(true);
                 tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
             }
+            // https://github.com/tloehr/Offene-Pflege.de/issues/34
+            btnAdd.setEnabled(lstDaf.getSelectedIndex() <= 0);
+            cmbFormen.setEnabled(lstDaf.getSelectedIndex() <= 0);
+            SYSTools.setXEnabled(pnlUPR, lstDaf.getSelectedIndex() <= 0);
+            SYSTools.setXEnabled(panel1, lstDaf.getSelectedIndex() <= 0);
+            cbWeightControlled.setEnabled(lstDaf.getSelectedIndex() <= 0);
             validate.execute(tradeForm);
         }
     }
@@ -246,8 +253,6 @@ public class PnlTradeForm extends JPanel {
         txtZusatz = new JXSearchField();
         cmbFormen = new JComboBox();
         btnAdd = new JButton();
-        lbl1 = new JLabel();
-        lblMsg = new JLabel();
         pnlUPR = new JPanel();
         rbCalcUPR = new JRadioButton();
         rbSetUPR = new JRadioButton();
@@ -259,7 +264,9 @@ public class PnlTradeForm extends JPanel {
         txtExpiresIn = new JTextField();
         hSpacer2 = new JPanel(null);
         cmbDaysWeeks = new JComboBox();
+        lbl1 = new JLabel();
         cbWeightControlled = new JCheckBox();
+        lblMsg = new JLabel();
         jsp1 = new JScrollPane();
         lstDaf = new JList();
 
@@ -290,18 +297,6 @@ public class PnlTradeForm extends JPanel {
         btnAdd.addActionListener(e -> btnAddActionPerformed(e));
         add(btnAdd, CC.xy(7, 5));
 
-        //---- lbl1 ----
-        lbl1.setText(null);
-        lbl1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine2.png")));
-        lbl1.setFont(new Font("Arial", Font.PLAIN, 18));
-        add(lbl1, CC.xy(3, 15, CC.LEFT, CC.FILL));
-
-        //---- lblMsg ----
-        lblMsg.setText("text");
-        lblMsg.setFont(new Font("Arial", Font.PLAIN, 14));
-        lblMsg.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(lblMsg, CC.xywh(3, 7, 5, 1));
-
         //======== pnlUPR ========
         {
             pnlUPR.setLayout(new BoxLayout(pnlUPR, BoxLayout.X_AXIS));
@@ -330,7 +325,7 @@ public class PnlTradeForm extends JPanel {
             lblTo1.setText("text");
             pnlUPR.add(lblTo1);
         }
-        add(pnlUPR, CC.xywh(3, 9, 5, 1, CC.LEFT, CC.FILL));
+        add(pnlUPR, CC.xywh(3, 7, 5, 1, CC.LEFT, CC.FILL));
 
         //======== panel1 ========
         {
@@ -359,12 +354,24 @@ public class PnlTradeForm extends JPanel {
             cmbDaysWeeks.addItemListener(e -> cmbDaysWeeksItemStateChanged(e));
             panel1.add(cmbDaysWeeks);
         }
-        add(panel1, CC.xywh(3, 11, 3, 1));
+        add(panel1, CC.xywh(3, 9, 3, 1));
+
+        //---- lbl1 ----
+        lbl1.setText(null);
+        lbl1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine2.png")));
+        lbl1.setFont(new Font("Arial", Font.PLAIN, 18));
+        add(lbl1, CC.xy(3, 15, CC.LEFT, CC.FILL));
 
         //---- cbWeightControlled ----
         cbWeightControlled.setText("text");
         cbWeightControlled.addItemListener(e -> cbWeightControlledItemStateChanged(e));
-        add(cbWeightControlled, CC.xywh(3, 13, 3, 1));
+        add(cbWeightControlled, CC.xywh(3, 11, 3, 1));
+
+        //---- lblMsg ----
+        lblMsg.setText("text");
+        lblMsg.setFont(new Font("Arial", Font.PLAIN, 14));
+        lblMsg.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(lblMsg, CC.xywh(3, 13, 5, 1));
 
         //======== jsp1 ========
         {
@@ -388,8 +395,6 @@ public class PnlTradeForm extends JPanel {
     private JXSearchField txtZusatz;
     private JComboBox cmbFormen;
     private JButton btnAdd;
-    private JLabel lbl1;
-    private JLabel lblMsg;
     private JPanel pnlUPR;
     private JRadioButton rbCalcUPR;
     private JRadioButton rbSetUPR;
@@ -401,7 +406,9 @@ public class PnlTradeForm extends JPanel {
     private JTextField txtExpiresIn;
     private JPanel hSpacer2;
     private JComboBox cmbDaysWeeks;
+    private JLabel lbl1;
     private JCheckBox cbWeightControlled;
+    private JLabel lblMsg;
     private JScrollPane jsp1;
     private JList lstDaf;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

@@ -57,8 +57,7 @@ import javax.validation.ValidatorFactory;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -77,6 +76,7 @@ public class OPDE {
     private static long uptime;
     public static ResourceBundle lang;
     private static DesEncrypter desEncrypter;
+    private static Encryption encryption;
     public static FrmMain mainframe;
     protected static String url;
     protected static LogicalPrinters printers;
@@ -293,6 +293,7 @@ public class OPDE {
             File configFile = new File(LocalMachine.getAppDataPath() + sep + AppInfo.fileConfig);
             FileOutputStream out = new FileOutputStream(configFile);
             localProps.store(out, "Settings Offene-Pflege.de");
+
             out.close();
         } catch (Exception ex) {
             fatal(ex);
@@ -318,6 +319,10 @@ public class OPDE {
 
     public static DesEncrypter getDesEncrypter() {
         return desEncrypter;
+    }
+
+    public static Encryption getEncryption() {
+        return encryption;
     }
 
     /**
@@ -381,6 +386,7 @@ public class OPDE {
         Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
         WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
 
+
         /***
          *       ____                                          _   _     _               ___        _   _
          *      / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| | | |   (_)_ __   ___   / _ \ _ __ | |_(_) ___  _ __  ___
@@ -397,6 +403,7 @@ public class OPDE {
         opts.addOption("l", "debug", false, SYSTools.xx("cmdline.debug.description"));
         opts.addOption("t", "setup-database", false, SYSTools.xx("cmdline.setup-database.description"));
         opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
+        opts.addOption("p", "keyphrase", true, SYSTools.xx("cmdline.keyphrase.description"));
 
 //        Option notification = OptionBuilder.withLongOpt("notification").hasOptionalArg().withDescription("Schickt allen festgelegten Empfängern die jeweilige Benachrichtungs-Mail.").create("n");
 //        notification.setArgName("Liste der Empfänger (durch Komma getrennt, ohne Leerzeichen. UID verwenden). Damit kannst Du die Benachrichtigungen einschränken. Fehlt diese Liste, erhalten ALLE Empfänger eine Mail.");
@@ -472,6 +479,13 @@ public class OPDE {
         }
 
 
+        // different encryption keyphrase ?
+        if (cl.hasOption("p")) { // anonym Modus
+            encryption = new Encryption(cl.getOptionValue("p"));
+        } else {
+            encryption = new Encryption();
+        }
+
         try {
 
             printers = new LogicalPrinters();
@@ -529,7 +543,7 @@ public class OPDE {
             logger.info(url);
 
             jpaProps.put(SYSPropsTools.KEY_JDBC_URL, url);
-            jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, decryptJDBCPasswort());
+            jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, encryption.decryptJDBCPasswort());  // this is a temporarily clear version of the password.
 
             // enable JPA cache
             jpaProps.put("eclipselink.cache.shared.default", cl.hasOption("c") ? "true" : "false");
@@ -548,6 +562,7 @@ public class OPDE {
             EntityManager em1 = emf.createEntityManager();
             em1.close();
 
+            jpaProps.clear();
 
             /***
              *       ____                           _         ____  _____ _   _
@@ -665,33 +680,33 @@ public class OPDE {
              *     |_|  |_|  |_| |_| |_|_|  |_|\__,_|_|_| |_| |  | |
              *                                               \_\/_/
              */
-            try {
-                // testing for other running instances (especially for linux. is prevented by install4j on other OSes)
-                File pidFile = new File(LocalMachine.getAppDataPath() + sep + AppInfo.filePID);
-
-                if (pidFile.exists()) {
-                    if (JOptionPane.showConfirmDialog(new JFrame(), SYSTools.xx("warning.running.instance.message"), SYSTools.getWindowTitle("warning.running.instance.title"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
-                        RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
-                        String pid = rt.getName().substring(0, rt.getName().indexOf("@")).trim();
-                        PrintWriter out = new PrintWriter(pidFile);
-                        out.write(pid);
-                        out.close();
-                        pidFile.deleteOnExit();
-                    } else {
-                        System.exit(0);
-                    }
-                } else {
-                    RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
-                    String pid = rt.getName().substring(0, rt.getName().indexOf("@")).trim();
-                    PrintWriter out = new PrintWriter(pidFile);
-                    out.write(pid);
-                    out.close();
-                    pidFile.deleteOnExit();
-                }
-
-            } catch (Exception e) {
-                // fair enough
-            }
+//            try {
+//                // testing for other running instances (especially for linux. is prevented by install4j on other OSes)
+//                File pidFile = new File(LocalMachine.getAppDataPath() + sep + AppInfo.filePID);
+//
+//                if (pidFile.exists()) {
+//                    if (JOptionPane.showConfirmDialog(new JFrame(), SYSTools.xx("warning.running.instance.message"), SYSTools.getWindowTitle("warning.running.instance.title"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
+//                        RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
+//                        String pid = rt.getName().substring(0, rt.getName().indexOf("@")).trim();
+//                        PrintWriter out = new PrintWriter(pidFile);
+//                        out.write(pid);
+//                        out.close();
+//                        pidFile.deleteOnExit();
+//                    } else {
+//                        System.exit(0);
+//                    }
+//                } else {
+//                    RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
+//                    String pid = rt.getName().substring(0, rt.getName().indexOf("@")).trim();
+//                    PrintWriter out = new PrintWriter(pidFile);
+//                    out.write(pid);
+//                    out.close();
+//                    pidFile.deleteOnExit();
+//                }
+//
+//            } catch (Exception e) {
+//                // fair enough
+//            }
 
             mainframe = new FrmMain();
             mainframe.setVisible(true);
@@ -777,33 +792,7 @@ public class OPDE {
 
     }
 
-    public static String decryptJDBCPasswort() {
-        String password = "";
-        try {
-            password = OPDE.getDesEncrypter().decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-        } catch (BadPaddingException e) {
-            password = "";
-        } catch (IllegalBlockSizeException e) {
-            password = "";
-        } catch (Exception e) {
-            OPDE.fatal(logger, e);
-        }
-        // could still be encoded with the old algorithm. trying.
-        // i moved from the old standard (which was using the NIC as part of the key) to a new one (which is based on some sort of a calculated Machine ID) in 2015.
-        if (password.isEmpty()) {
-            DesEncrypter oldDesEncrypter = new DesEncrypter(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_HOSTKEY)));
-            try {
-                password = oldDesEncrypter.decrypt(SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-            } catch (BadPaddingException e) {
-                password = "";
-            } catch (IllegalBlockSizeException e) {
-                password = "";
-            } catch (Exception e) {
-                OPDE.fatal(logger, e);
-            }
-        }
-        return password;
-    }
+
 
 //    // http://stackoverflow.com/questions/19082265/how-to-ensure-only-one-instance-of-a-java-program-can-be-executed
 //    private static boolean getMonitoredVMs(int processPid) {

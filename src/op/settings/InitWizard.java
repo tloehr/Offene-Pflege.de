@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -421,7 +422,7 @@ public class InitWizard extends WizardDialog {
                 txtServer.getDocument().insertString(0, server, null);
                 txtPort.getDocument().insertString(0, sPort, null);
                 txtUser.getDocument().insertString(0, user, null);
-                txtPassword.getDocument().insertString(0, OPDE.decryptJDBCPasswort(), null);
+                txtPassword.getDocument().insertString(0, OPDE.getEncryption().decryptJDBCPasswort(), null);
                 txtCatalog.getDocument().insertString(0, catalog, null);
 
             } catch (BadLocationException e) {
@@ -504,7 +505,11 @@ public class InitWizard extends WizardDialog {
                 jdbcProps.put(SYSPropsTools.KEY_JDBC_PORT, Integer.toString(port));
                 jdbcProps.put(SYSPropsTools.KEY_JDBC_USER, txtUser.getText().trim());
                 try {
-                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(new String(txtPassword.getPassword()).trim()));
+//                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(new String(txtPassword.getPassword()).trim()));
+//                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, new String(OPDE.getEncryption().encrypt(new String(txtPassword.getPassword()).getBytes("UTF-8")), Charset.forName("UTF-8")));
+
+                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getEncryption().encrypt(new String(txtPassword.getPassword())));
+
                 } catch (Exception e) {
                     logger.fatal(e);
                     System.exit(1);
@@ -1013,7 +1018,10 @@ public class InitWizard extends WizardDialog {
                     btnCreateDB.setEnabled(false);
 
                     try {
-                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(generatedPassword4DBUser));
+//                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(generatedPassword4DBUser));
+//                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, new String(OPDE.getEncryption().encrypt(new String(txtPassword.getPassword()).getBytes("UTF-8")), Charset.forName("UTF-8")));
+
+                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getEncryption().encrypt(new String(txtPassword.getPassword())));
 
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);

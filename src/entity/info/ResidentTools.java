@@ -134,7 +134,7 @@ public class ResidentTools {
         result += getAge(resident).getYears() + " " + SYSTools.xx("misc.msg.Years") + " [" + resident.getRIDAnonymous() + "]";
 
         if (dead || gone) {
-            result += "  " + SYSTools.xx("") + ": " + df.format(stay1.getFrom()) + ", ";
+            result += "  " + SYSTools.xx("misc.msg.movein") + ": " + df.format(stay1.getFrom()) + ", ";
             result += (dead ? SYSTools.xx("misc.msg.late") : SYSTools.xx("misc.msg.movedout")) + ": " + df.format(stay2.getTo());
         }
 

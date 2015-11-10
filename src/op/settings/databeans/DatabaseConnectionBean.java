@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -51,26 +52,29 @@ public class DatabaseConnectionBean {
         }
         user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_USER), "opdeuser");
 
-        try {
-            password = OPDE.getDesEncrypter().decrypt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-        } catch (BadPaddingException e) {
-            password = "";
-        } catch (Exception e) {
-            OPDE.fatal(logger, e);
-        }
+        password = OPDE.getEncryption().decryptJDBCPasswort();
 
-        // could still be encoded with the old algorithm. trying.
-        if (password.isEmpty()) {
-            DesEncrypter oldDesEncrypter = new DesEncrypter(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_HOSTKEY)));
 
-            try {
-                password = oldDesEncrypter.decrypt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-            } catch (BadPaddingException e) {
-                password = "";
-            } catch (Exception e) {
-                OPDE.fatal(logger, e);
-            }
-        }
+//        try {
+//            password = OPDE.getDesEncrypter().decrypt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
+//        } catch (BadPaddingException e) {
+//            password = "";
+//        } catch (Exception e) {
+//            OPDE.fatal(logger, e);
+//        }
+//
+//        // could still be encoded with the old algorithm. trying.
+//        if (password.isEmpty()) {
+//            DesEncrypter oldDesEncrypter = new DesEncrypter(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_HOSTKEY)));
+//
+//            try {
+//                password = oldDesEncrypter.decrypt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
+//            } catch (BadPaddingException e) {
+//                password = "";
+//            } catch (Exception e) {
+//                OPDE.fatal(logger, e);
+//            }
+//        }
 
 
     }
@@ -120,7 +124,8 @@ public class DatabaseConnectionBean {
         myProps.put(SYSPropsTools.KEY_JDBC_HOST, host.trim());
         myProps.put(SYSPropsTools.KEY_JDBC_PORT, port.toString());
         myProps.put(SYSPropsTools.KEY_JDBC_USER, user.trim());
-        myProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(password.trim()));
+        myProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getEncryption().encrypt(password.trim()));
+//        myProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(password.trim()));
         myProps.put(SYSPropsTools.KEY_JDBC_CATALOG, catalog.trim());
         return myProps;
     }

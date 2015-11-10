@@ -453,63 +453,60 @@ public class PnlInformation extends NursingRecordsPanel {
                                         btnAdd.addActionListener(new ActionListener() {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
-                                                new DlgDiag(new ResInfo(resInfoType, resident), new Closure() {
-                                                    @Override
-                                                    public void execute(Object o) {
-                                                        if (o != null) {
-                                                            EntityManager em = OPDE.createEM();
-                                                            try {
-                                                                em.getTransaction().begin();
-                                                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                                                // so that no conflicts can occur if another user enters a new info at the same time
+                                                new DlgDiag(new ResInfo(resInfoType, resident), o -> {
+                                                    if (o != null) {
+                                                        EntityManager em = OPDE.createEM();
+                                                        try {
+                                                            em.getTransaction().begin();
+                                                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                                            // so that no conflicts can occur if another user enters a new info at the same time
 //                                                                ResInfoType myType = em.merge(resInfoType);
 //                                                                em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                                                final ResInfo newinfo = em.merge((ResInfo) o);
+                                                            final ResInfo newinfo = em.merge((ResInfo) o);
 
-                                                                em.getTransaction().commit();
-                                                                synchronized (mapType2ResInfos) {
-                                                                    mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
-                                                                    Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
-                                                                }
+                                                            em.getTransaction().commit();
+                                                            synchronized (mapType2ResInfos) {
+                                                                mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
+                                                                Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
+                                                            }
 
 //                                                                synchronized (listAllTypes) {
 //                                                                    listAllTypes.remove(resInfoType);
 //                                                                    listAllTypes.add(myType);
 //                                                                }
 
-                                                                synchronized (listAllInfos) {
-                                                                    listAllInfos.add(newinfo);
-                                                                }
-
-                                                                reload();
-
-                                                            } catch (OptimisticLockException ole) {
-                                                                OPDE.warn(ole);
-                                                                if (em.getTransaction().isActive()) {
-                                                                    em.getTransaction().rollback();
-                                                                }
-                                                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                                    OPDE.getMainframe().emptyFrame();
-                                                                    OPDE.getMainframe().afterLogin();
-                                                                }
-                                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                            } catch (RollbackException ole) {
-                                                                if (em.getTransaction().isActive()) {
-                                                                    em.getTransaction().rollback();
-                                                                }
-                                                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                                    OPDE.getMainframe().emptyFrame();
-                                                                    OPDE.getMainframe().afterLogin();
-                                                                }
-                                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                            } catch (Exception e) {
-                                                                if (em.getTransaction().isActive()) {
-                                                                    em.getTransaction().rollback();
-                                                                }
-                                                                OPDE.fatal(e);
-                                                            } finally {
-                                                                em.close();
+                                                            synchronized (listAllInfos) {
+                                                                listAllInfos.add(newinfo);
                                                             }
+
+                                                            reload();
+
+                                                        } catch (OptimisticLockException ole) {
+                                                            OPDE.warn(ole);
+                                                            if (em.getTransaction().isActive()) {
+                                                                em.getTransaction().rollback();
+                                                            }
+                                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                                                OPDE.getMainframe().emptyFrame();
+                                                                OPDE.getMainframe().afterLogin();
+                                                            }
+                                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                        } catch (RollbackException ole) {
+                                                            if (em.getTransaction().isActive()) {
+                                                                em.getTransaction().rollback();
+                                                            }
+                                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                                                OPDE.getMainframe().emptyFrame();
+                                                                OPDE.getMainframe().afterLogin();
+                                                            }
+                                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                        } catch (Exception e1) {
+                                                            if (em.getTransaction().isActive()) {
+                                                                em.getTransaction().rollback();
+                                                            }
+                                                            OPDE.fatal(e1);
+                                                        } finally {
+                                                            em.close();
                                                         }
                                                     }
                                                 });
@@ -535,11 +532,13 @@ public class PnlInformation extends NursingRecordsPanel {
                                             }
                                         }
 
-                                        final MyJDialog dlgPopup = new MyJDialog(true);
+
                                         final JideButton btnAdd = GUITools.createHyperlinkButton(buttonText, SYSConst.icon22add, null);
                                         btnAdd.addActionListener(new ActionListener() {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
+                                                // https://github.com/tloehr/Offene-Pflege.de/issues/35
+                                                final MyJDialog dlgPopup = new MyJDialog(true);
                                                 PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(new ResInfo(resInfoType, resident), new Closure() {
                                                     @Override
                                                     public void execute(Object o) {

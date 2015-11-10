@@ -49,7 +49,7 @@ public class LocalMachine {
             result = getSerialNumber(cmd, marker);
         }
 
-        // this is always a viable fallback, if everything else fails
+        // this is always a viable fallback, if everything else fails use the hostkey instead
         if (result == null) result = OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_HOSTKEY);
 
         OPDE.debug("Serial Number: " + result);

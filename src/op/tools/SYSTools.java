@@ -33,7 +33,6 @@ import entity.system.Users;
 import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayMessage;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -41,6 +40,8 @@ import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 import org.joda.time.DateTime;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
@@ -59,6 +60,7 @@ import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -173,7 +175,7 @@ public class SYSTools {
 //        try {
 //            myBD = NumberUtils.createBigDecimal(((JTextField) evt.getSource()).getText());
 //            myBD = new BigDecimal(); //BigDecimal.valueOf(Double.parseDouble(((JTextField) evt.getSource()).getText()));
-            myBD = parseDecimal(((JTextField) evt.getSource()).getText());
+        myBD = parseDecimal(((JTextField) evt.getSource()).getText());
 
         if (myBD == null) myBD = def;
 
@@ -1160,12 +1162,12 @@ public class SYSTools {
     }
 
     // https://github.com/tloehr/Offene-Pflege.de/issues/31
-    public static String formatCurrency(BigDecimal bd){
-            return DecimalFormat.getCurrencyInstance().format(bd);
-        }
+    public static String formatCurrency(BigDecimal bd) {
+        return DecimalFormat.getCurrencyInstance().format(bd);
+    }
 
     // https://github.com/tloehr/Offene-Pflege.de/issues/31
-    public static String formatBigDecimal(BigDecimal bd){
+    public static String formatBigDecimal(BigDecimal bd) {
         if (bd == null) return "";
         return DecimalFormat.getNumberInstance().format(bd);
     }
@@ -1202,6 +1204,8 @@ public class SYSTools {
 
         return num;
     }
+
+
 
 
     public static BigDecimal parseCurrency(String test) {
