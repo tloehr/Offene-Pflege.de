@@ -1,6 +1,5 @@
 package entity.prescription;
 
-import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.SYSTools;
 
@@ -139,7 +138,7 @@ public class MedPackageTools {
                     throw new NumberFormatException("error.pzn.at");
                 }
             } else {
-                pzn = null;
+                throw new NumberFormatException("error.pzn.at");
             }
         } else if (countrycode.equals("ch")) {
             if (pzn.matches("^\\d{13}")) {
@@ -148,6 +147,9 @@ public class MedPackageTools {
                 } else {
                     throw new NumberFormatException("error.pzn.ch");
                 }
+            } else {
+                // https://github.com/tloehr/Offene-Pflege.de/issues/33
+                throw new NumberFormatException("error.pzn.ch");
             }
         }
 
