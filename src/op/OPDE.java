@@ -45,8 +45,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -56,8 +54,10 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -75,7 +75,6 @@ public class OPDE {
 
     private static long uptime;
     public static ResourceBundle lang;
-    private static DesEncrypter desEncrypter;
     private static Encryption encryption;
     public static FrmMain mainframe;
     protected static String url;
@@ -317,9 +316,6 @@ public class OPDE {
         return experimental;
     }
 
-    public static DesEncrypter getDesEncrypter() {
-        return desEncrypter;
-    }
 
     public static Encryption getEncryption() {
         return encryption;
@@ -479,19 +475,18 @@ public class OPDE {
         }
 
 
-        // different encryption keyphrase ?
-        if (cl.hasOption("p")) { // anonym Modus
-            encryption = new Encryption(cl.getOptionValue("p"));
-        } else {
-            encryption = new Encryption();
-        }
-
         try {
 
             printers = new LogicalPrinters();
 
             loadLocalProperties();
-            desEncrypter = new DesEncrypter();
+
+            // different encryption keyphrase ?
+            if (cl.hasOption("p")) { // anonym Modus
+                encryption = new Encryption(cl.getOptionValue("p"));
+            } else {
+                encryption = new Encryption();
+            }
 
             try {
                 css = SYSTools.readFileAsString(AppInfo.getTemplate(AppInfo.fileStandardCSS).getAbsolutePath());
@@ -680,33 +675,6 @@ public class OPDE {
              *     |_|  |_|  |_| |_| |_|_|  |_|\__,_|_|_| |_| |  | |
              *                                               \_\/_/
              */
-//            try {
-//                // testing for other running instances (especially for linux. is prevented by install4j on other OSes)
-//                File pidFile = new File(LocalMachine.getAppDataPath() + sep + AppInfo.filePID);
-//
-//                if (pidFile.exists()) {
-//                    if (JOptionPane.showConfirmDialog(new JFrame(), SYSTools.xx("warning.running.instance.message"), SYSTools.getWindowTitle("warning.running.instance.title"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
-//                        RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
-//                        String pid = rt.getName().substring(0, rt.getName().indexOf("@")).trim();
-//                        PrintWriter out = new PrintWriter(pidFile);
-//                        out.write(pid);
-//                        out.close();
-//                        pidFile.deleteOnExit();
-//                    } else {
-//                        System.exit(0);
-//                    }
-//                } else {
-//                    RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
-//                    String pid = rt.getName().substring(0, rt.getName().indexOf("@")).trim();
-//                    PrintWriter out = new PrintWriter(pidFile);
-//                    out.write(pid);
-//                    out.close();
-//                    pidFile.deleteOnExit();
-//                }
-//
-//            } catch (Exception e) {
-//                // fair enough
-//            }
 
             mainframe = new FrmMain();
             mainframe.setVisible(true);
@@ -791,7 +759,6 @@ public class OPDE {
             localProps.put(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
 
     }
-
 
 
 //    // http://stackoverflow.com/questions/19082265/how-to-ensure-only-one-instance-of-a-java-program-can-be-executed

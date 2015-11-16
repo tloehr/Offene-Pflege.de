@@ -15,9 +15,7 @@ import java.net.NetworkInterface;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
 
-/**
- * http://www.exampledepot.com/egs/javax.crypto/PassKey.html
- */
+@Deprecated
 public class DesEncrypter {
     Cipher ecipher;
     Cipher dcipher;

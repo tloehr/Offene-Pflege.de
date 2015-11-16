@@ -6,6 +6,7 @@ import op.OPDE;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -38,11 +39,21 @@ public class LocalMachine {
             marker = "MachineGuid    REG_SZ";
             result = getSerialNumber(cmd, marker);
         }
+
+        // https://github.com/tloehr/Offene-Pflege.de/issues/36
         if (SystemUtils.IS_OS_LINUX) {
-            cmd = "blkid -o export";
-            marker = "UUID=";
-            result = getSerialNumber(cmd, marker);
+            File machineid = new File("/var/lib/dbus/machine-id"); // most systems have it here
+            if (!machineid.exists()) { // in Fedora 19 and 20 the file can be found here.
+                machineid = new File("/etc/machine-id");
+            }
+
+            try {
+                result = FileUtils.readFileToString(machineid).trim();
+            } catch (IOException e) {
+                result = null;
+            }
         }
+
         if (SystemUtils.IS_OS_MAC_OSX) {
             cmd = "/usr/sbin/system_profiler SPHardwareDataType";
             marker = "Hardware UUID:";
@@ -52,7 +63,7 @@ public class LocalMachine {
         // this is always a viable fallback, if everything else fails use the hostkey instead
         if (result == null) result = OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_HOSTKEY);
 
-        OPDE.debug("Serial Number: " + result);
+        OPDE.debug("Serial Number: " + SYSTools.catchNull(result, "null"));
 
         return result;
     }
@@ -74,6 +85,9 @@ public class LocalMachine {
         };
         executor.setStreamHandler(new PumpStreamHandler(output));
 
+        // todo: hier gibts ein Timing Problem bei Linux Maschinen
+        // todo: warum 2x aufgerufen ?
+
         try {
             executor.execute(cmdLine);
             Scanner scanner = new Scanner(consoleOutput.toString());
@@ -89,6 +103,10 @@ public class LocalMachine {
             scanner.close();
         } catch (IOException e) {
             OPDE.warn(e);
+            result = null;
+        } catch (Exception e) {
+            OPDE.error(e);
+            result = null;
         }
 
         return result;
