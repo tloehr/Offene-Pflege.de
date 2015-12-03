@@ -77,6 +77,11 @@ public class DesEncrypter {
 
                // Die 6-Bytes MAC Adresse muss noch um zwei weitere, beliebige Bytes aufgefüllt werden. Das verlangt der Algorithmus
                byte[] salt = ArrayUtils.addAll(ni.getHardwareAddress(), new byte[]{(byte) 0x9B, (byte) 0xC8});
+               // sometimes the ni has no hardware address (had this when using vmware). if that happens, everythins is messed up anyways
+               // so this class will never work and OPDE asks for a new password which will be encoded with the new class anyways.
+               if (salt.length != 8){ // this prevents nasty exceptions.
+                   salt = SALT;
+               }
 
                // Create the key
                KeySpec keySpec = new PBEKeySpec(passphrase.toCharArray(), salt, iterationCount);
