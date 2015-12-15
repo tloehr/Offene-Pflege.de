@@ -99,6 +99,9 @@ public class PnlFTP extends DefaultPanel {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.test.ok", 2));
                         SYSPropsTools.storeProp(SYSPropsTools.KEY_FTP_IS_WORKING, "true");
                     } catch (Exception ftpEx) {
+//                        OPDE.fatal(ftpEx);
+                        logger.error(ftpEx);
+//                        ftpEx.printStackTrace();
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ftpEx.getMessage(), DisplayMessage.WARNING));
                         SYSPropsTools.storeProp(SYSPropsTools.KEY_FTP_IS_WORKING, "false");
                     }

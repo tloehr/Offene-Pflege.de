@@ -503,6 +503,7 @@ public class SYSFilesTools {
         ftp.setRemoteHost(ftpProps.getProperty(SYSPropsTools.KEY_FTP_HOST));
         ftp.setUserName(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER));
         ftp.setPassword(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
+        OPDE.debug(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT));
         ftp.setRemotePort(Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));
         ftp.connect();
         ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
