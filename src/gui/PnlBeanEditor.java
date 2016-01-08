@@ -36,9 +36,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.util.HashSet;
+import java.util.Properties;
 
 /**
- * Created by tloehr on 28.05.15.
+ *
+ * This Panel accepts annotated Beans which describe a form that needs to be entered.
+ * It uses the annotations from the class gui.interfaces.EditorComponent to tell this editor
+ * how to handle the values of the Bean Class. Only fields which are annotated as EditorComponent
+ * are handled here. The others are ignored.
+ *
+ * there is a data object in the parent class which is automatically initialized by the constructor
+ *
+ *
+ * So why all this fuss ? This class makes the creation of an editor very easy. We simply define a Bean class
+ * with all the constraints we want to be obeyed during the edit phase. And this class handles it in no time.
+ * All the constraints are taken care of by the javax.validation framework.
+ *
  */
 public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private final Class<T> clazz;
@@ -54,6 +67,16 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private int saveMode;
 
 
+    /**
+     * constructor
+     *
+     * @param dataProvider is the implementation of the DataProvider which is used every time this editor needs the data to display
+     * @param clazz is the class object of the bound class for this editor. technical reasons. no big deal.
+     * @param saveMode tells the editor when to save its contents to the ancestor's data object
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
     public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz, int saveMode)
             throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         super(dataProvider);
@@ -73,11 +96,11 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         this(dataProvider, clazz, SAVE_MODE_CUSTOM);
     }
 
-    public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz, Closure cancelCallback)
-            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        this(dataProvider, clazz, SAVE_MODE_OK_CANCEL);
-        this.cancelCallback = cancelCallback;
-    }
+//    public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz, Closure cancelCallback)
+//            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+//        this(dataProvider, clazz, SAVE_MODE_OK_CANCEL);
+//        this.cancelCallback = cancelCallback;
+//    }
 
     public void setCustomPanel(JPanel customPanel) {
         add(customPanel, CC.xyw(1, componentSet.size() * 2 + 2, 5, CC.FILL, CC.FILL));
@@ -105,11 +128,21 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         }
     }
 
+
+    /**
+     * creates the panel programmically according to the definitions in the bean blass T.
+     *
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
     void initPanel() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
+        // fields means the fields of the BeanClass which defines the bahavior of the editor
         Field[] fields = data.getClass().getDeclaredFields();
 
         // I have to count them first.
+        // makes sure, that we only care about fields which are meant for this editor.
         int numfields = 0;
         for (final Field field : fields) {
             if (field.isAnnotationPresent(EditorComponent.class)) {
@@ -117,14 +150,15 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             }
         }
 
+        // create a simple formlayout which is extendable
         setLayout(new FormLayout("5dlu, default, $lcgap, 162dlu:grow, $lcgap, 5dlu",
                 "5dlu, " + (numfields + (saveMode == SAVE_MODE_IMMEDIATE ? 0 : 1) + "*(default, $lgap), default, 5dlu")));
 
         int row = 1;
 
-
+        // deal with every single field
         for (final Field field : fields) {
-            if (field.isAnnotationPresent(EditorComponent.class)) {
+            if (field.isAnnotationPresent(EditorComponent.class)) { // we only care about EditorComponents
 
                 EditorComponent editorComponent = field.getAnnotation(EditorComponent.class);
 
@@ -133,9 +167,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 JComponent comp = null;
 
+                // this section handles every single type of editor component
                 if (editorComponent.component()[0].equalsIgnoreCase("textfield")) {
-
-//                    boolean accepted = false;
 
                     JPanel innerPanel = new JPanel();
                     innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.LINE_AXIS));
@@ -149,6 +182,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         txt = new JTextField();
                     }
 
+                    // the data object sets the contents of the textfield
                     txt.setText(PropertyUtils.getProperty(data, field.getName()).toString());
 
                     txt.addFocusListener(new FocusAdapter() {
@@ -158,6 +192,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         }
                     });
 
+                    // changes to the textfield are handled by a document listener
                     txt.getDocument().addDocumentListener(new RelaxedDocumentListener(de -> {
                         if (ignoreListener) return;
 
@@ -167,15 +202,27 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         try {
                             String text = de.getDocument().getText(0, de.getDocument().getLength());
                             Object value = text;
+                            // if there is a parser defined. it is loaded here
                             if (!editorComponent.parserClass().isEmpty()) {
                                 String p = editorComponent.parserClass();
+                                logger.debug(String.format("Parserclass for Field %s: %s", field.getName(), p));
+
+                                // loads the specified parser class (needs to have a "parse" method)
                                 Class parserClazz = Class.forName(p);
+
+
                                 value = parserClazz.getMethod("parse", String.class).invoke(parserClazz.newInstance(), text);
+                                logger.debug(String.format("Parsed value: %s", value.toString()));
                             }
 
+
                             PropertyUtils.setProperty(data, field.getName(), ConvertUtils.convert(value, field.getType())); // ConverterUtils fixes #25
-                            if (saveMode == SAVE_MODE_IMMEDIATE)
-                                broadcast();
+//                            logger.debug(String.format("Content of the 'data' object: %s", ((Properties) data).getProperty(field.getName())));
+
+                            if (saveMode == SAVE_MODE_IMMEDIATE) {
+                                broadcast(); // spread the news, that the data object was updated. in case of a contraint violation, an exception is thrown
+                            }
+
                             OPDE.getDisplayManager().clearSubMessages();
                             lblOK.setIcon(SYSConst.icon16apply);
                             lblOK.setToolTipText(null);
@@ -200,6 +247,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             lblOK.setIcon(SYSConst.icon16cancel);
                             lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_bold(e.getMessage())));
                         } catch (ConstraintViolationException cve) {
+                            logger.debug("Constraint violation!!");
                             if (saveMode == SAVE_MODE_IMMEDIATE) {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
                             }

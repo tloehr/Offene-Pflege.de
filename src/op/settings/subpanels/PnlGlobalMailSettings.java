@@ -39,7 +39,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         try {
-            final PnlBeanEditor<MailSettingsBean> pbe = new PnlBeanEditor<>(() -> new MailSettingsBean(OPDE.getProps()), MailSettingsBean.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+            final PnlBeanEditor<MailSettingsBean> pbe = new PnlBeanEditor<>(() -> new MailSettingsBean(OPDE.getProps()), MailSettingsBean.class, PnlBeanEditor.SAVE_MODE_CUSTOM);
             pbe.setCustomPanel(getButtonPanel(pbe));
             pbe.addDataChangeListener(evt -> SYSPropsTools.storeProps(evt.getData().toProperties(new Properties())));
             add(pbe);
@@ -56,6 +56,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
         final YesNoToggleButton tbActive = new YesNoToggleButton("opde.settings.global.mail.active", "opde.settings.global.mail.inactive", SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE)).equalsIgnoreCase("true"));
         final JButton btnTestmail = new JButton(SYSTools.xx("opde.settings.global.mail.sendtest"));
         btnTestmail.addActionListener(e -> {
+            logger.debug("Testmail clicked");
             try {
                 if (checkInProgress) return;
 
@@ -109,8 +110,12 @@ public class PnlGlobalMailSettings extends DefaultPanel {
                 e1.printStackTrace();
             } catch (SQLIntegrityConstraintViolationException e1) {
                 e1.printStackTrace();
+            } catch (Exception e1){
+                OPDE.fatal(e1);
+            } finally {
+                checkInProgress = false;
             }
-            reload();
+//            reload();
         });
 //        buttonPanel.add(btnTestmail);
 

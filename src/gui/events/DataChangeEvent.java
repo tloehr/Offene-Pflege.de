@@ -38,9 +38,8 @@ public class DataChangeEvent<T> extends EventObject {
         this.data = data;
         Validator validator = OPDE.getValidatorFactory().getValidator();
 
-        Logger.getLogger(getClass()).debug(data);
-
         Set<ConstraintViolation<T>> constraintViolations = validator.validate(this.data);
+
         if (!constraintViolations.isEmpty()) {
             throw new ConstraintViolationException(constraintViolations);
         }

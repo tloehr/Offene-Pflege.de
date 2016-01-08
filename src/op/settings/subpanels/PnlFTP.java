@@ -16,6 +16,8 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import java.io.File;
 import java.io.FileWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
@@ -32,7 +34,7 @@ public class PnlFTP extends DefaultPanel {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         try {
-            final PnlBeanEditor<FTPConfigBean> pbe = new PnlBeanEditor<>(() -> new FTPConfigBean(OPDE.getProps()), FTPConfigBean.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+            final PnlBeanEditor<FTPConfigBean> pbe = new PnlBeanEditor<>(() -> new FTPConfigBean(OPDE.getProps()), FTPConfigBean.class, PnlBeanEditor.SAVE_MODE_CUSTOM); // SAVE_MODE_CUSTOM -> fixes #25
             pbe.setCustomPanel(getButtonPanel(pbe));
             pbe.addDataChangeListener(evt -> SYSPropsTools.storeProps(evt.getData().toProperties(new Properties())));
             add(pbe);
@@ -49,15 +51,23 @@ public class PnlFTP extends DefaultPanel {
         btnFTPTest.addActionListener(e -> {
 
             if (checkInProgress) return;
-
+            // fixes #25
+            try {
+                pbe.broadcast();
+            } catch (Exception e1) {
+                logger.warn(e1);
+                return;
+            }
 
             SwingWorker worker = new SwingWorker() {
                 @Override
                 protected Object doInBackground() {
                     boolean success = false;
                     try {
-                        FileTransferClient ftp = SYSFilesTools.getFTPClient(OPDE.getProps());
 
+
+
+                        FileTransferClient ftp = SYSFilesTools.getFTPClient(OPDE.getProps());
 
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.creating.testfile", 1));
                         // creating a testfile for the ftp test
