@@ -62,12 +62,23 @@ public class ResInfoTypeTools {
     public static final int TYPE_WOUND3 = 119;
     public static final int TYPE_WOUND4 = 120;
     public static final int TYPE_WOUND5 = 121;
+    public static final int TYPE_WOUND6 = 147;
+    public static final int TYPE_WOUND7 = 148;
+    public static final int TYPE_WOUND8 = 149;
+    public static final int TYPE_WOUND9 = 150;
+    public static final int TYPE_WOUND10 = 151;
     public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5};
+//    public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5, TYPE_WOUND6, TYPE_WOUND7, TYPE_WOUND8, TYPE_WOUND9, TYPE_WOUND10};
     public static final int TYPE_WOUNDHISTORY1 = 122;
     public static final int TYPE_WOUNDHISTORY2 = 123;
     public static final int TYPE_WOUNDHISTORY3 = 124;
     public static final int TYPE_WOUNDHISTORY4 = 125;
     public static final int TYPE_WOUNDHISTORY5 = 126;
+    public static final int TYPE_WOUNDHISTORY6 = 152;
+    public static final int TYPE_WOUNDHISTORY7 = 153;
+    public static final int TYPE_WOUNDHISTORY8 = 154;
+    public static final int TYPE_WOUNDHISTORY9 = 155;
+    public static final int TYPE_WOUNDHISTORY10 = 156;
     public static final int TYPE_SLEEP = 127;
     public static final int TYPE_FOOD = 128;
     public static final int TYPE_ARTIFICIAL_NUTRTITION = 129;
@@ -88,6 +99,8 @@ public class ResInfoTypeTools {
     public static final int TYPE_VACCINE = 144;
     public static final int TYPE_SURGERY = 145;
     public static final int TYPE_VESSEL_CATHETER = 146;
+
+    // find new max type via sql: SELECT MAX(equiv), MAX(TYPE) FROM resinfotype
 
     public static final String TYPE_ABSENCE_HOSPITAL = "HOSPITAL";
     public static final String TYPE_ABSENCE_HOLLIDAY = "HOLLIDAY";

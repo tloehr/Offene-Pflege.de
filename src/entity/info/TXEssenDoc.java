@@ -19,6 +19,7 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -332,7 +333,8 @@ public class TXEssenDoc {
             runningPage++;
             page = copy.getImportedPage(reader1, p);
             stamp = copy.createPageStamp(page);
-            String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
+
+            String sidenote = SYSTools.xx("pdf.pagefooter", runningPage, maxpages)
                     + " // " + ResidentTools.getLabelText(resident)
                     + " // " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(new Date())
                     + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
@@ -348,7 +350,7 @@ public class TXEssenDoc {
                 runningPage++;
                 page = copy.getImportedPage(readerAdditionalMeds, p);
                 stamp = copy.createPageStamp(page);
-                String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
+                String sidenote = SYSTools.xx("pdf.pagefooter", runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
                         + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                         + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
@@ -363,7 +365,7 @@ public class TXEssenDoc {
                 runningPage++;
                 page = copy.getImportedPage(readerICD, p);
                 stamp = copy.createPageStamp(page);
-                String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
+                String sidenote = SYSTools.xx("pdf.pagefooter", runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
                         + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                         + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
@@ -379,7 +381,7 @@ public class TXEssenDoc {
                 runningPage++;
                 page = copy.getImportedPage(readerMRE, p);
                 stamp = copy.createPageStamp(page);
-                String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
+                String sidenote = SYSTools.xx("pdf.pagefooter", runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
                         + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                         + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
@@ -395,7 +397,7 @@ public class TXEssenDoc {
                 runningPage++;
                 page = copy.getImportedPage(readerPSYCH, p);
                 stamp = copy.createPageStamp(page);
-                String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
+                String sidenote = SYSTools.xx("pdf.pagefooter", runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
                         + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                         + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
