@@ -58,6 +58,7 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -506,6 +507,8 @@ public class PnlUser extends CleanablePanel {
                     em.lock(myUser, LockModeType.OPTIMISTIC);
 
                     myUser.setStatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
+                    myUser.setActive_since(myUser.isActive() ? new Date() : null); // https://github.com/tloehr/Offene-Pflege.de/issues/43
+
                     em.getTransaction().commit();
                     lstUsers.remove(user);
                     lstUsers.add(myUser);

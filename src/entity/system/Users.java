@@ -28,7 +28,6 @@ package entity.system;
 import entity.files.*;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
-import entity.staff.Training;
 import entity.staff.Training2Users;
 import op.tools.SYSTools;
 import org.eclipse.persistence.annotations.OptimisticLocking;
@@ -38,6 +37,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -70,6 +70,11 @@ public class Users implements Serializable, Comparable<Users> {
     @Basic(optional = false)
     @Column(name = "mailconfirmed")
     private int mailConfirmed;
+    // https://github.com/tloehr/Offene-Pflege.de/issues/43
+    @Basic(optional = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "active_since")
+    private Date active_since;
 
     @ManyToMany
     @JoinTable(name = "member", joinColumns =
@@ -115,6 +120,16 @@ public class Users implements Serializable, Comparable<Users> {
         groups = new ArrayList<Groups>();
         status = UsersTools.STATUS_ACTIVE;
         mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
+        active_since = null;
+    }
+
+
+    public Date getActive_since() {
+        return active_since;
+    }
+
+    public void setActive_since(Date active_since) {
+        this.active_since = active_since;
     }
 
     public Set<Notification> getNotifications() {

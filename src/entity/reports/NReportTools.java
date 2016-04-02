@@ -906,37 +906,40 @@ public class NReportTools {
      * @return
      */
     public static ArrayList<NReport> getNReports4Handover(LocalDate day, Homes home) {
-
-        EntityManager em = OPDE.createEM();
-        ArrayList<NReport> list = null;
-
-        try {
-
-            String jpql = " SELECT DISTINCT nr " +
-                    " FROM NReport nr " +
-                    " JOIN nr.commontags ct " +
-                    " WHERE nr.pit >= :from AND nr.pit <= :to AND (ct.type = :handover OR ct.type = :emergency) " +
-                    " AND nr.resident.station.home = :home " +
-                    " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
-//                    " ORDER BY nr.pit DESC ";
-
-            Query query = em.createQuery(jpql);
-
-            query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
-            query.setParameter("to", SYSCalendar.eod(day).toDate());
-            query.setParameter("home", home);
-            query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
-            query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
-
-            list = new ArrayList<NReport>(query.getResultList());
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return list;
+       return getNReports4Handover(day, day, home);
     }
+
+    public static ArrayList<NReport> getNReports4Handover(LocalDate from, LocalDate to, Homes home) {
+
+            EntityManager em = OPDE.createEM();
+            ArrayList<NReport> list = null;
+
+            try {
+
+                String jpql = " SELECT DISTINCT nr " +
+                        " FROM NReport nr " +
+                        " JOIN nr.commontags ct " +
+                        " WHERE nr.pit >= :from AND nr.pit <= :to AND (ct.type = :handover OR ct.type = :emergency) " +
+                        " AND nr.resident.station.home = :home " +
+                        " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
+
+                Query query = em.createQuery(jpql);
+
+                query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+                query.setParameter("to", SYSCalendar.eod(to).toDate());
+                query.setParameter("home", home);
+                query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
+                query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
+
+                list = new ArrayList<NReport>(query.getResultList());
+
+            } catch (Exception se) {
+                OPDE.fatal(se);
+            } finally {
+                em.close();
+            }
+            return list;
+        }
 
     public static ArrayList<NReport> getNReports4Tags(Resident resident, Commontags tag) {
 

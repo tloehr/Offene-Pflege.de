@@ -5,30 +5,24 @@
 
 package entity.reports;
 
+import entity.building.Homes;
 import entity.system.Users;
-import op.OPDE;
-import op.care.supervisor.PnlHandover;
 import op.tools.SYSTools;
+import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.math.BigInteger;
 import java.text.DateFormat;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author tloehr
  */
 public class NR2UserTools {
-//    public static boolean containsUser(Collection<NR2User> list, Users user) {
-//        boolean found = false;
-//        for (NR2User conn : list) {
-//            found = conn.getUser().equals(user);
-//            if (found) break;
-//        }
-//        return found;
-//    }
 
     public static boolean containsUser(EntityManager em, NReport nReport, Users user) {
 
@@ -69,5 +63,27 @@ public class NR2UserTools {
             result += "<i>" + SYSTools.xx("misc.msg.currentlynoentry") + "</i>";
         }
         return result;
+    }
+
+
+    /**
+     * Returns a list of days with yet unacknowledged reports per user in a certain time frame.
+     * https://github.com/tloehr/Offene-Pflege.de/issues/43
+     *
+     * @param from
+     * @param user
+     * @param home
+     * @return
+     */
+    public static Set<LocalDate> getDaysWithOpenReports(LocalDate from, Users user, Homes home) {
+        HashSet<LocalDate> listDays = new HashSet<>();
+
+        for (NReport nReport : NReportTools.getNReports4Handover(from, new LocalDate(), home)) {
+            Logger.getLogger(NR2UserTools.class).debug(nReport.getPbid());
+            if (!nReport.getUsersAcknowledged().contains(user)) {
+                listDays.add(new LocalDate(nReport.getPit()));
+            }
+        }
+        return listDays;
     }
 }

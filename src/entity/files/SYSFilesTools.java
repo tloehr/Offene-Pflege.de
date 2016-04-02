@@ -320,8 +320,13 @@ public class SYSFilesTools {
     private static File getFile(SYSFiles sysfile, EventListener eventListener) {
         File target = null;
         try {
-
             FileTransferClient ftp = getFTPClient();
+
+            // https://github.com/tloehr/Offene-Pflege.de/issues/38
+            if (ftp == null){
+                throw new FTPException("FTP server unreachable");
+            }
+
 
             String sep = System.getProperties().getProperty("file.separator"); // Fileseparator
 

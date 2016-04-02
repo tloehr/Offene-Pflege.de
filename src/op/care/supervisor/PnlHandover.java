@@ -47,6 +47,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -249,19 +250,9 @@ public class PnlHandover extends NursingRecordsPanel {
          *                                              |_|            |___/
          */
 
-
-//        synchronized (contentmap) {
-//            SYSTools.clear(contentmap);
-//        }
         synchronized (cpMap) {
             SYSTools.clear(cpMap);
         }
-//        synchronized (linemapHO) {
-//            SYSTools.clear(linemapHO);
-//        }
-//        synchronized (linemapNR) {
-//            SYSTools.clear(linemapNR);
-//        }
         synchronized (cacheHO) {
             SYSTools.clear(cacheHO);
         }
@@ -282,9 +273,12 @@ public class PnlHandover extends NursingRecordsPanel {
         }
 
         expandDay(new LocalDate());
+        //https://github.com/tloehr/Offene-Pflege.de/issues/43
+        for (LocalDate ld : NR2UserTools.getDaysWithOpenReports(new LocalDate().minusWeeks(2), OPDE.getLogin().getUser(), (Homes) cmbHomes.getSelectedItem())){
+            expandDay(ld);
+        }
 
         buildPanel();
-
     }
 
 
@@ -463,7 +457,6 @@ public class PnlHandover extends NursingRecordsPanel {
 
         return cpMonth;
     }
-
 
     private JPanel createContentPanel4Month(LocalDate month) {
         /***
