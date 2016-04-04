@@ -70,11 +70,6 @@ public class Users implements Serializable, Comparable<Users> {
     @Basic(optional = false)
     @Column(name = "mailconfirmed")
     private int mailConfirmed;
-    // https://github.com/tloehr/Offene-Pflege.de/issues/43
-    @Basic(optional = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "active_since")
-    private Date active_since;
 
     @ManyToMany
     @JoinTable(name = "member", joinColumns =
@@ -120,17 +115,8 @@ public class Users implements Serializable, Comparable<Users> {
         groups = new ArrayList<Groups>();
         status = UsersTools.STATUS_ACTIVE;
         mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
-        active_since = null;
     }
 
-
-    public Date getActive_since() {
-        return active_since;
-    }
-
-    public void setActive_since(Date active_since) {
-        this.active_since = active_since;
-    }
 
     public Set<Notification> getNotifications() {
         return notifications;

@@ -507,7 +507,6 @@ public class PnlUser extends CleanablePanel {
                     em.lock(myUser, LockModeType.OPTIMISTIC);
 
                     myUser.setStatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
-                    myUser.setActive_since(myUser.isActive() ? new Date() : null); // https://github.com/tloehr/Offene-Pflege.de/issues/43
 
                     em.getTransaction().commit();
                     lstUsers.remove(user);

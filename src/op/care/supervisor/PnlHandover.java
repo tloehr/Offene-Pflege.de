@@ -47,7 +47,6 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
-import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -91,7 +90,9 @@ public class PnlHandover extends NursingRecordsPanel {
 
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     Format dayFormat = new SimpleDateFormat("EEEE, dd.MM.yyyy");
-    boolean massAcknowledgeRunning = false;
+
+    int checkWeeksbackForNewReports = 4;
+
 
     /**
      * Creates new form PnlHandover
@@ -263,7 +264,6 @@ public class PnlHandover extends NursingRecordsPanel {
 
         Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
         if (minmax != null) {
-
             hollidays = SYSCalendar.getHolidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
             LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
             LocalDate end = new LocalDate();
@@ -273,11 +273,6 @@ public class PnlHandover extends NursingRecordsPanel {
         }
 
         expandDay(new LocalDate());
-        //https://github.com/tloehr/Offene-Pflege.de/issues/43
-        for (LocalDate ld : NR2UserTools.getDaysWithOpenReports(new LocalDate().minusWeeks(2), OPDE.getLogin().getUser(), (Homes) cmbHomes.getSelectedItem())){
-            expandDay(ld);
-        }
-
         buildPanel();
     }
 
@@ -551,7 +546,8 @@ public class PnlHandover extends NursingRecordsPanel {
                     em.getTransaction().commit();
                     createCP4Day(day);
                     buildPanel();
-                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -670,7 +666,8 @@ public class PnlHandover extends NursingRecordsPanel {
                                 createCP4Day(day);
                                 buildPanel();
 
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -713,9 +710,9 @@ public class PnlHandover extends NursingRecordsPanel {
 
                                 @Override
                                 protected void done() {
-                                    try{
+                                    try {
                                         get();
-                                    } catch (Exception ex1){
+                                    } catch (Exception ex1) {
                                         OPDE.fatal(ex1);
                                     }
                                     OPDE.getDisplayManager().setProgressBarMessage(null);
@@ -785,7 +782,8 @@ public class PnlHandover extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 createCP4Day(day);
                                 buildPanel();
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -875,9 +873,9 @@ public class PnlHandover extends NursingRecordsPanel {
 
             @Override
             protected void done() {
-                try{
+                try {
                     get();
-                } catch (Exception ex2){
+                } catch (Exception ex2) {
                     OPDE.fatal(ex2);
                 }
                 cpDay.setContentPane(dayPanel);
@@ -954,7 +952,8 @@ public class PnlHandover extends NursingRecordsPanel {
 //                                            GUITools.flashBackground(linemapHO.get(myHO), Color.YELLOW, 2);
                                         }
                                     });
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -978,6 +977,54 @@ public class PnlHandover extends NursingRecordsPanel {
             });
             list.add(addButton);
         }
+
+
+        //https://github.com/tloehr/Offene-Pflege.de/issues/43
+        final JideButton btnFindOpenHandovers = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnFindOpenHandovers"), SYSConst.icon22RedFlag, null);
+        btnFindOpenHandovers.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+//                OPDE.getMainframe().setBlocked(true);
+//                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
+                final long time = System.currentTimeMillis();
+
+                SwingWorker worker = new SwingWorker() {
+                    Date max = null;
+
+                    @Override
+                    protected Object doInBackground() throws Exception {
+
+                        LocalDate start = new LocalDate().minusWeeks(checkWeeksbackForNewReports);
+                        LocalDate end = new LocalDate();
+                        int maxdays = checkWeeksbackForNewReports * 7;
+                        int running = 0;
+
+                        for (LocalDate day = start; day.compareTo(end) <= 0; day = day.plusDays(1)) {
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), running, maxdays));
+                            running++;
+
+                            if (NR2UserTools.hasOpenReports(day, OPDE.getLogin().getUser(), (Homes) cmbHomes.getSelectedItem())) {
+                                expandDay(day);
+                            }
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+
+                    }
+                };
+                worker.execute();
+            }
+        });
+        list.add(btnFindOpenHandovers);
+
 
         final JideButton btnControllingToday = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
         btnControllingToday.addActionListener(new ActionListener() {

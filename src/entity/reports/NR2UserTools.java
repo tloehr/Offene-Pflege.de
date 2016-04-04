@@ -8,16 +8,12 @@ package entity.reports;
 import entity.building.Homes;
 import entity.system.Users;
 import op.tools.SYSTools;
-import org.apache.commons.logging.Log;
-import org.apache.log4j.Logger;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author tloehr
@@ -37,6 +33,15 @@ public class NR2UserTools {
 
         return count.longValue() > 0;
 
+    }
+
+    public static boolean containsUser(NReport nReport, Users user) {
+        boolean contains = false;
+        for (NR2User nr2User : nReport.getUsersAcknowledged()) {
+            contains = nr2User.getUser().equals(user);
+            if (contains) break;
+        }
+        return contains;
     }
 
     public static String getAsHTML(NReport nReport) {
@@ -67,23 +72,20 @@ public class NR2UserTools {
 
 
     /**
-     * Returns a list of days with yet unacknowledged reports per user in a certain time frame.
+     * Tells, if there are open reports for a specific day...
      * https://github.com/tloehr/Offene-Pflege.de/issues/43
      *
-     * @param from
+     * @param day
      * @param user
      * @param home
      * @return
      */
-    public static Set<LocalDate> getDaysWithOpenReports(LocalDate from, Users user, Homes home) {
-        HashSet<LocalDate> listDays = new HashSet<>();
-
-        for (NReport nReport : NReportTools.getNReports4Handover(from, new LocalDate(), home)) {
-            Logger.getLogger(NR2UserTools.class).debug(nReport.getPbid());
-            if (!nReport.getUsersAcknowledged().contains(user)) {
-                listDays.add(new LocalDate(nReport.getPit()));
-            }
+    public static boolean hasOpenReports(LocalDate day, Users user, Homes home) {
+        boolean openReports = false;
+        for (NReport nReport : NReportTools.getNReports4Handover(day, home)) {
+            openReports = !containsUser(nReport, user);
+            if (openReports) break;
         }
-        return listDays;
+        return openReports;
     }
 }
