@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xml:id="medikamente.xml"
+         version="5.0"
+         xml:lang="de"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd">
+
+    <title>Medikamente</title>
+    <para>
+        Die Handhabung von Medikamenten gehört zu den Aufgaben, die der Pflege vom Arzt übertragen werden. Früher wurde
+        hier von der Behandlungspflege gesprochen. Heute nennt man diesen Aufgaben bereicht Mithilfe bei der ärztlichen
+        Therapie und Diagnostik.
+    </para>
+    <para>OPDE unterstützt die Anwender bei der Verwaltung von Beständen, der Beschaffung von Medikamenten, sowie bei
+        der Handhabung ärztlicher Verordnungen und der Kontrolle der Vergabe.
+    </para>
+
+    <sect1>
+        <title>Verwaltung von Medikamenten</title>
+        <para>
+            Beschaffung, Lagerung und Entsorgung von Medikamenten sind in vielen Einrichtung ein Problem. So lange ich
+            denken kann, haben wir immer großen Aufwand betrieben “die Medikamente” in Ordnung zu halten. Sei es, dass
+            es um
+            abgelaufene Sachen ging. Oder irgendetwas vergessen wurde zu bestellen. Das von einem Medikament viel zu
+            viel vorrätig
+            war. Das zwei Packungen von demselben Produkt angebrochen waren. usw, usw.
+        </para>
+        <para>
+            Durch die Bestandsverwaltung in OPDE und den damit verbundenen Verwaltungsaufgaben sind die beschrieben
+            Probleme fast vollständig verschwunden. Und das ganz von selbst. Natürlich kann immer noch mal was schief
+            laufen.
+            Aber die grundsätzliche Handhabung läuft nun seit Jahren fast reibungslos.
+        </para>
+        <para>
+            <emphasis>Hinweis</emphasis>: Du musst die Bestandsverwaltung nicht benutzen. Du kannst sie für jede[n]
+            Bewohner[in] einzeln an-
+            oder
+            abschalten. Das geht bei den Informationen unter “Grunddaten ändern”. Es gibt so einen Schalter auch in den
+            System-Einstellungen. Diese Einstellung wird aber nur beim Neu-Eintrag eine[s|r] Bewohner[s|in] als
+            Voreinstellung für den Bestandsverwaltungs-Schalter de[s|r] Bewohner[in] verwendet. Wenn Du den Schalter in
+            der
+            System-Einstellung nachträglich umschaltest, hat das auf den laufenden Betrieb erstmal keinen Einfluss.
+        </para>
+        <para>
+            Ich habe das deshalb so geregelt, weil ich aus meiner eigenen Erfahrung weiss, dass man so einen
+            umfangreichen
+            Schritt (hin zu einer Bestandsverwaltung) nicht mal eben für alle von heute auf morgen durchführen kann. So
+            etwas fängt mit eine[m|r] Bewohner[in] an und wird dann nach und nach auf alle ausgedehnt.
+        </para>
+        <mediaobject>
+            <imageobject>
+                <imagedata fileref="https://dl.dropboxusercontent.com/u/167931/docbook/btmrezept-neu.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+        <para>
+            Wenn Du die Bestandsverwaltung nicht benutzt, brauchst Du das hier alles nicht zu lesen.
+        </para>
+
+        <sect2>
+            <title>Bevor es losgeht</title>
+            <para>
+                Lass uns zusammen mal durchgehen, wie Medikamente in einer Pflegeeinrichtung im Allgemeinen gehandhabt
+                werden.
+                Du erhältst Medikamente für Deine Bewohner[innen] auf Anordnung eines Arztes. Diese Anordnungen (in Form
+                eines
+                Rezeptes) leitest Du an die Apotheke weiter. Von dort gelangen die Präparate dann irgendwie in Deine
+                Einrichtung. Du musst für jede[n] Bewohner[in] einen eigenen Bestand führen. Außerdem kann es sein, dass
+                der
+                Arzt irgendwann mal ein Präparat von einem Hersteller A verordnet hat und dann doch ein
+                "wirkstoffgleiches"
+                Präparat von einem Hersteller B geliefert wurde. Es kann sogar vorkommen, dass dann die Darreichungsform
+                ganz
+                leicht abweicht (ursprünglich Tabletten, dann aber doch Dragees).
+            </para>
+            <para>
+                Diese Präparate werden von verschiedenen Herstellern in unterschiedlichen Darreichungsformen über eine
+                Apotheke
+                an uns geliefert. Es kann auch sein, dass (z.B. beim Einzug) Medikamente von zu Hause mitgebracht werden
+                uns
+                dann die Verpackung fehlt.
+            </para>
+            <para>
+                Medikamente kommen in der Regel in einer Verpackung und können verschiedene Darreichungsformen haben.
+                Z.B.
+                Tabletten, Tropfen, Lösung zum Einnehmen, Salben etc. Auf fast jeder Schachtel findest Du die
+                Pharmazentralnummer (nachfolgend PZN genannt). Diese Nummer ist für jede Schachtelgröße, für jedes
+                Präparat,
+                für
+                jede Wirkstoff-Stärke und jede Darreichungsform eindeutig. Somit hat z.B. eine 10er Schachtel ASS 100
+                eine
+                andere PZN als eine 20er Schachtel. PZNs sind sind mittlerweile 8-stellig. Ab 2017 sollen diese Nummern
+                durch
+                ein neues, weltweit einheitliches Zahlensystem (der PPN oder Pharmacy-Product-Number) abgelöst werden.
+                Aber
+                damit wollen wir uns im Moment nicht weiter beschäftigen.
+            </para>
+        </sect2>
+
+    </sect1>
+    <sect1>
+        <title>Betäubungsmittel</title>
+        <para>Die BtMVV
+            <footnote>
+                <para>
+                    Betäubungsmittel-Verschreibungsverordnung
+                </para>
+            </footnote>
+            ist die Verordnung über das Verschreiben, die
+            Abgabe und den Nachweis des Verbleibs von Betäubungsmitteln. Die Medikamente, um die es hier geht sind meist
+            sehr starke Schmerzmittel oder Substitutionspräparate, die in der Suchttherapie eingesetzt werden. Wir
+            nennen sie im Alltag meist BTMs. Bei allen BTMs besteht ein hohes Suchtpotential.
+
+            Aufgrund der Vorschriften müssen wir auf besondere Vorgaben beim Umgang achten. Der Sinn an der Sache ist
+            es, dass bei allen verwendeten BTM Medikamenten genau nachgewiesen werden kann, dass sie bestimmungsgemäß
+            verwendet wurden.
+        </para>
+    </sect1>
+
+</chapter>
