@@ -48,73 +48,273 @@
             Schritt (hin zu einer Bestandsverwaltung) nicht mal eben für alle von heute auf morgen durchführen kann. So
             etwas fängt mit eine[m|r] Bewohner[in] an und wird dann nach und nach auf alle ausgedehnt.
         </para>
-        <mediaobject>
-            <imageobject>
-                <imagedata fileref="https://dl.dropboxusercontent.com/u/167931/docbook/btmrezept-neu.png"></imagedata>
-            </imageobject>
-        </mediaobject>
-        <para>
-            Wenn Du die Bestandsverwaltung nicht benutzt, brauchst Du das hier alles nicht zu lesen.
-        </para>
 
         <sect2>
-            <title>Bevor es losgeht</title>
+            <title>Die Bestandsverwaltung in OPDE</title>
             <para>
-                Lass uns zusammen mal durchgehen, wie Medikamente in einer Pflegeeinrichtung im Allgemeinen gehandhabt
+                Dieser Abschnitt ist nur interessant, falls Sie planen die Bestandsverwaltung zu benutzen. Sie können
+                die Verwaltungsfunktionen auch abschalten.
+            </para>
+            <para>
+                Zuerst sollten wir betrachten, wie Medikamente in einer Pflegeeinrichtung im Allgemeinen gehandhabt
                 werden.
-                Du erhältst Medikamente für Deine Bewohner[innen] auf Anordnung eines Arztes. Diese Anordnungen (in Form
-                eines
-                Rezeptes) leitest Du an die Apotheke weiter. Von dort gelangen die Präparate dann irgendwie in Deine
-                Einrichtung. Du musst für jede[n] Bewohner[in] einen eigenen Bestand führen. Außerdem kann es sein, dass
-                der
-                Arzt irgendwann mal ein Präparat von einem Hersteller A verordnet hat und dann doch ein
-                "wirkstoffgleiches"
-                Präparat von einem Hersteller B geliefert wurde. Es kann sogar vorkommen, dass dann die Darreichungsform
-                ganz
-                leicht abweicht (ursprünglich Tabletten, dann aber doch Dragees).
+                Die Mitarbeiter[innen] erhalten Medikamente für die Bewohner[innen] auf Anordnung eines Arztes/Ärztin.
+                Diese Anordnungen (in Form eines Rezeptes) werden an die jeweilige Apotheke weiter geleitet.
+                Von dort gelangen die Präparate dann in die Einrichtung.
+
             </para>
             <para>
-                Diese Präparate werden von verschiedenen Herstellern in unterschiedlichen Darreichungsformen über eine
-                Apotheke
-                an uns geliefert. Es kann auch sein, dass (z.B. beim Einzug) Medikamente von zu Hause mitgebracht werden
-                uns
-                dann die Verpackung fehlt.
+                Es muss für jede[n] Bewohner[in] ein eigener Bestand geführt werden (bewohnerbezogene Aufbewahrung).
+                Außerdem kann es sein, dass der Arzt/Ärztin irgendwann mal ein Präparat von einem Hersteller A verordnet
+                hat und dann doch ein "wirkstoffgleiches" Präparat von einem Hersteller B geliefert wird. Es kann sogar
+                vorkommen, dass dann die Darreichungsform ganz leicht abweicht (z.B. ursprünglich Tabletten, dann aber
+                doch Dragees). Es kann auch sein, dass (z.B. beim Einzug) Medikamente von zu Hause mitgebracht werden
+                uns dann die Verpackung fehlt.
             </para>
             <para>
-                Medikamente kommen in der Regel in einer Verpackung und können verschiedene Darreichungsformen haben.
-                Z.B.
-                Tabletten, Tropfen, Lösung zum Einnehmen, Salben etc. Auf fast jeder Schachtel findest Du die
+                Medikamente kommen in der Regel jedoch in einer Verpackung und können verschiedene Darreichungsformen
+                haben.
+                Z.B. Tabletten, Tropfen, Lösung zum Einnehmen, Salben etc. Auf fast jeder Schachtel findet man eine
                 Pharmazentralnummer (nachfolgend PZN genannt). Diese Nummer ist für jede Schachtelgröße, für jedes
-                Präparat,
-                für
-                jede Wirkstoff-Stärke und jede Darreichungsform eindeutig. Somit hat z.B. eine 10er Schachtel ASS 100
-                eine
-                andere PZN als eine 20er Schachtel. PZNs sind sind mittlerweile 8-stellig. Ab 2017 sollen diese Nummern
-                durch
-                ein neues, weltweit einheitliches Zahlensystem (der PPN oder Pharmacy-Product-Number) abgelöst werden.
-                Aber
-                damit wollen wir uns im Moment nicht weiter beschäftigen.
+                Präparat, für jede Wirkstoff-Stärke und jede Darreichungsform eindeutig. Somit hat z.B. eine 10er
+                Schachtel ASS 100 eine andere PZN als eine 20er Schachtel. PZNs sind sind mittlerweile 8-stellig. Ab
+                2017 sollen diese Nummern durch ein neues, weltweit einheitliches Zahlensystem (der PPN oder
+                Pharmacy-Product-Number) abgelöst werden. Aber damit wollen wir uns im Moment nicht weiter beschäftigen.
             </para>
         </sect2>
 
-    </sect1>
-    <sect1>
-        <title>Betäubungsmittel</title>
-        <para>Die BtMVV
-            <footnote>
+        <sect2>
+            <title>Betäubungsmittel</title>
+            <para>Die BtMVV
+                <footnote>
+                    <para>
+                        Betäubungsmittel-Verschreibungsverordnung
+                    </para>
+                </footnote>
+                ist die Verordnung über das Verschreiben, die Abgabe und den Nachweis des Verbleibs von
+                Betäubungsmitteln.
+                Die Medikamente, um die es hier geht sind meist
+                sehr starke Schmerzmittel oder Substitutionspräparate, die in der Suchttherapie eingesetzt werden. Wir
+                nennen sie im Alltag meist BTMs. Bei allen BTMs besteht ein hohes Suchtpotential.
+            </para>
+            <para>Aufgrund der Vorschriften müssen wir auf besondere Vorgaben beim Umgang achten. Der Sinn an der Sache
+                ist
+                es, dass bei allen verwendeten BTM Medikamenten genau nachgewiesen werden kann, dass sie
+                bestimmungsgemäß
+                verwendet wurden.
+            </para>
+            <sect3>
+                <title>Das BTM-Blatt</title>
                 <para>
-                    Betäubungsmittel-Verschreibungsverordnung
+                    Neben den üblichen Grundlagen, die bei allen Medikamenten gelten (ärztliche Verordnung,
+                    bewohnerbezogene
+                    Aufbewahrung und Vergabe) müssen wir hier vor allem die Aufzeichnungspflichten beachten. Dazu führen
+                    wir, neben den Eintragungen in OPDE, noch zusätzlich ein BTM Blatt. Sie finden dieses Blatt in der
+                    Download Sektion auf der OPDE Webseite.
                 </para>
-            </footnote>
-            ist die Verordnung über das Verschreiben, die
-            Abgabe und den Nachweis des Verbleibs von Betäubungsmitteln. Die Medikamente, um die es hier geht sind meist
-            sehr starke Schmerzmittel oder Substitutionspräparate, die in der Suchttherapie eingesetzt werden. Wir
-            nennen sie im Alltag meist BTMs. Bei allen BTMs besteht ein hohes Suchtpotential.
+                <para>
+                    Bei uns in der Einrichtung haben wir gute Erfahrungen damit gemacht, dieses Dokument beidseitig auf
+                    einem Farb-Laser auszudrucken. Wir verwenden dazu weißes 160g Papier.
+                </para>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                                fileref="https://dl.dropboxusercontent.com/u/167931/docbook/btm-opde-0914.png"
+                                scalefit="1" width="60%" contentdept="100%"/>
+                    </imageobject>
+                </mediaobject>
 
-            Aufgrund der Vorschriften müssen wir auf besondere Vorgaben beim Umgang achten. Der Sinn an der Sache ist
-            es, dass bei allen verwendeten BTM Medikamenten genau nachgewiesen werden kann, dass sie bestimmungsgemäß
-            verwendet wurden.
-        </para>
+                <sect4>
+                    Bitte beachten Sie beim Ausfüllen des Blattes die folgende Anleitung. Die eingekreisten Zahlen
+                    entsprechen den Zahlen in der nachfolgenden Aufzählung.
+                    <para>
+                        <orderedlist numeration="arabic">
+                            <listitem>
+                                <para>Hierhin schreiben Sie den Handelsnamen des Medikamentes. So wie er auf der Packung
+                                    steht.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Bitte den Bewohnernamen hier eintragen.</para>
+                            </listitem>
+                            <listitem>
+                                <para>In OPDE steht die BW-Kennung meist in eckigen Klammern hinter den Bewohnernamen.
+                                    Sie
+                                    ist dreistellig und sieht ungefähr so aus:
+                                    <emphasis role="bold">BM2</emphasis>
+                                </para>
+                            </listitem>
+
+                            <listitem>
+                                <para>Schreiben Sie hier den Namen des verordnenden Arztes hin.</para>
+                            </listitem>
+                            <listitem>
+                                <para>Schreiben Sie die zugehörige Verordnung (in Kurzform, z.B. so<emphasis>
+                                    1-0-1</emphasis>) auf.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Hierher schreiben Sie die Verordnungs-Nummer, so wie sie in OPDE angezeigt wird.
+                                    Sie
+                                    steht in eckigen Klammern auf der linken Seite. Jedes mal, wenn Verordnung geändert
+                                    wird, fangen Sie auch ein neues BTM Blatt an. Mehr zu dem
+                                    Thema, wann ein neues Blatt angefangen werden muss, finden Sie hier:
+                                    <xref linkend="volles-btm-blatt" xrefstyle='template:"%t" auf Seite %p'/>
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Hierhin kommt der Name der Apotheke, die das Medikament geliefert hat.</para>
+                            </listitem>
+                            <listitem>
+                                <para>Alle Blätter müssen durchgehend nummeriert werden. Bei einem neuen Medikament
+                                    fangen
+                                    Sie immer eine neue Serie an. Also mit Blatt 1. Alle folgenden Blätter werden
+                                    jeweils um
+                                    1 erhöht. Also das nächste Blatt hat dann 2, das nächste 3 und so weiter. Mehr zu
+                                    dem
+                                    Thema, wann ein neues Blatt angefangen werden muss, finden Sie hier:
+                                    <xref linkend="volles-btm-blatt" xrefstyle='template:"%t" auf Seite %p'/>
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Wenn eine neue Lieferung kommt oder eine Dosis entnommen wurde, dann schreiben Sie
+                                    das
+                                    jeweilige Datum in die Spalte (9)
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Schreiben Sie hierhin, wieviel geliefert wurde (Eingang).</para>
+                            </listitem>
+                            <listitem>
+                                <para>Die entnommene Menge kommt in dieser Spalte. Es gilt (auch bei Spalte 10) immer
+                                    die
+                                    Einheit, die bei Punkt (19) angekreuzt wurde.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Wenn Sie ein neues Blatt beginnen, und es nicht das erste Blatt aus dieser Serie
+                                    ist,
+                                    dann schreiben Sie die End-Summe des vorherigen Blattes in diese Zelle.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Wenn Sie etwas hinzugefügt oder entnommen haben, dann rechnen Sie bitte aus, wie
+                                    viel insgesamt von dem Medikament noch übrig ist. Diese Summe kommt dann in diese
+                                    Spalte
+                                    (12).
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Wenn eine Packung eingebucht, angebrochen oder abgeschlossen wird, dann schreiben
+                                    Sie
+                                    hier die Bestandsnummer aus OPDE hin. Diese Nummer steht auf jeder Packung.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Wenn die Packung eingebucht wird, kreuzen Sie den grünen Kreis an. Wird sie
+                                    angebrochen,
+                                    dann den gelben. Bei Abschluss bitte den
+                                    <emphasis role="red">roten</emphasis>
+                                    Kreis.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Hier unterzeichnen Sie Ihre Eintragung.</para>
+                            </listitem>
+                            <listitem>
+                                <para>Wenn Sie eine neue Lieferung erhalten haben, dann müssen Sie in diese Spalte die
+                                    Rezeptnummer des BTM Rezeptes eintragen. Die Rezeptnummer steht fett gedruckt im
+                                    unteren, rechten Viertel des Rezeptes. Im Beispiel ist sie lila markiert.
+                                    <xref linkend="btm-rezept-neu" xrefstyle='template:"%t" auf Seite %p'/>
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Wenn das Blatt vollgeschrieben ist, schreibsen Sie die End-Summe in diese Zelle.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>Bitte kreuzen Sie hier an, in welcher Einheit dieses BTM angewendet wird.</para>
+                            </listitem>
+                            <listitem>
+                                <para>
+                                    Neuerdings haben wir mehrfach flüssige BTMs. Das hat uns bei den Aufzeichnungen vor
+                                    größere Probleme gestellt. Die Vergabe ist bei dieser Darreichungsform (im Vergleich
+                                    zu
+                                    Tabletten) deutlich schwieriger und ungenauer. Um sicher zu stellen, dass die
+                                    Blätter so
+                                    korrekt wie möglich geführt werden haben wir bei uns zwei Massnahmen ergriffen. Zum
+                                    einen verwenden wir zur Abmessung Labor-Pipetten mit Peläusball. Diese Pipetten sind
+                                    sehr genau. Weiterhin wiegen wir die Flasche nach jeder Entnahme und schreiben das
+                                    jeweilige Gewicht mit auf das BTM-Blatt. So fallen Fehler sofort auf. Die Gewichte
+                                    schreiben Sie in diese Spalte. Falls es sich um feste Darreichungsformen handelt,
+                                    kann
+                                    diese Spalte leer bleiben.
+                                </para>
+                            </listitem>
+                        </orderedlist>
+                    </para>
+
+                    <figure id="btm-rezept-neu" Pgwide="0">
+                        <title>Ein BTM-Rezept-Formular, so wie es seit 2014 verwendet wird.</title>
+                        <mediaobject role="fo">
+                            <imageobject>
+                                <imagedata
+                                        fileref="https://dl.dropboxusercontent.com/u/167931/docbook/btmrezept-neu.png"
+                                        scalefit="1" width="60%" contentdept="100%"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                </sect4>
+                <sect4 id="volles-btm-blatt">
+                    <title>Wann fängt man ein neues Blatt an ?</title>
+                    <para>So einfach diese Frage auch klingt, aus praktischer Erfahrung gibt es verschiedene Varianten:
+                    </para>
+
+                    <itemizedlist>
+                        <listitem>
+                            <para>
+                                <emphasis role="bold">Es gilt immer:</emphasis>
+                                Ändert sich die Verordnung (also die zugehörige Verordnungsnummer in OPDE), dann muss
+                                auch
+                                ein neues Blatt angefangen werden. Die laufende Nummer wird um 1 hochgezählt.
+                            </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <emphasis role="bold">Bei festen Darreichungsformen:</emphasis>
+                                In diesem einfachen Fall gilt, dass ein neues Blatt immer dann angefangen wird, wenn es
+                                voll
+                                geschrieben wurde.
+                            </para>
+                        </listitem>
+                        <listitem>
+                            <para>
+                                <emphasis role="bold">Bei flüssigen Darreichungsformen:</emphasis>
+                                Hierbei hat es sich nach unserer Erfahrung bewährt, dass für jede neue Flasche auch ein
+                                neues Blatt angefangen wird. Das bedeutet, wenn die Flasche leer ist, dann wird auch das
+                                laufende Blatt abgeschlossen.
+                            </para>
+                        </listitem>
+                    </itemizedlist>
+
+                    <para>Auch wenn diese Regeln im ersten Moment unnötig kompliziert erscheinen, dürfen wir hier nicht
+                        vergessen, dass diese Blätter später einer Nachkontrolle unterzogen werden müssen. Dann ist es
+                        sehr
+                        unübersichtlich, wenn die einzelnen Bögen hintereinander durchgeschrieben werden. Daher haben
+                        wir
+                        mit der Zeit uns zu der beschriebenen Verfahrensweise entschlossen.
+                    </para>
+                    <para>
+                        Es kann in seltenen Fällen vorkommen, dass ein BTM bei eine[m|r] Bewohner[in] in mehreren
+                        Verordnungen benutzt wird. Zum Beispiel bei einer Regelverodnung, die um zusätzliche
+                        Bedarfsverordnungen erweitert wurde. In diesem Fall sollten Sie einfach ein Blatt für alle
+                        beteiligten Verordnungen führen, sonst ist das hinterher zu verwirrend.
+                    </para>
+                </sect4>
+                <sect4 id="btm-fluessig-gewichte">
+                    <title>Kontrolle mittels Gewichtsmessung</title>
+                </sect4>
+            </sect3>
+        </sect2>
     </sect1>
-
 </chapter>
