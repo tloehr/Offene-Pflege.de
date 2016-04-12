@@ -4,7 +4,8 @@
          xml:lang="de"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd">
+         xsi:schemaLocation="http://docbook.org/ns/docbook http://www.docbook.org/xml/5.0/xsd/docbook.xsd"
+>
 
     <title>Medikamente</title>
     <para>
@@ -21,65 +22,305 @@
         <para>
             Beschaffung, Lagerung und Entsorgung von Medikamenten sind in vielen Einrichtung ein Problem. So lange ich
             denken kann, haben wir immer großen Aufwand betrieben “die Medikamente” in Ordnung zu halten. Sei es, dass
-            es um
-            abgelaufene Sachen ging. Oder irgendetwas vergessen wurde zu bestellen. Das von einem Medikament viel zu
-            viel vorrätig
-            war. Das zwei Packungen von demselben Produkt angebrochen waren. usw, usw.
+            es um abgelaufene Bestände ging. Oder irgendetwas vergessen wurde zu bestellen. Das von einem Medikament
+            viel zu
+            viel vorrätig war. Das zwei Packungen von demselben Produkt angebrochen waren. usw...
         </para>
-        <para>
-            Durch die Bestandsverwaltung in OPDE und den damit verbundenen Verwaltungsaufgaben sind die beschrieben
-            Probleme fast vollständig verschwunden. Und das ganz von selbst. Natürlich kann immer noch mal was schief
-            laufen.
-            Aber die grundsätzliche Handhabung läuft nun seit Jahren fast reibungslos.
-        </para>
-        <para>
-            <emphasis>Hinweis</emphasis>: Du musst die Bestandsverwaltung nicht benutzen. Du kannst sie für jede[n]
-            Bewohner[in] einzeln an-
-            oder
-            abschalten. Das geht bei den Informationen unter “Grunddaten ändern”. Es gibt so einen Schalter auch in den
-            System-Einstellungen. Diese Einstellung wird aber nur beim Neu-Eintrag eine[s|r] Bewohner[s|in] als
-            Voreinstellung für den Bestandsverwaltungs-Schalter de[s|r] Bewohner[in] verwendet. Wenn Du den Schalter in
-            der
-            System-Einstellung nachträglich umschaltest, hat das auf den laufenden Betrieb erstmal keinen Einfluss.
-        </para>
-        <para>
-            Ich habe das deshalb so geregelt, weil ich aus meiner eigenen Erfahrung weiss, dass man so einen
-            umfangreichen
-            Schritt (hin zu einer Bestandsverwaltung) nicht mal eben für alle von heute auf morgen durchführen kann. So
-            etwas fängt mit eine[m|r] Bewohner[in] an und wird dann nach und nach auf alle ausgedehnt.
-        </para>
+
 
         <sect2>
             <title>Die Bestandsverwaltung in OPDE</title>
-            <para>
-                Dieser Abschnitt ist nur interessant, falls Sie planen die Bestandsverwaltung zu benutzen. Sie können
-                die Verwaltungsfunktionen auch abschalten.
-            </para>
-            <para>
-                Zuerst sollten wir betrachten, wie Medikamente in einer Pflegeeinrichtung im Allgemeinen gehandhabt
-                werden.
-                Die Mitarbeiter[innen] erhalten Medikamente für die Bewohner[innen] auf Anordnung eines Arztes/Ärztin.
-                Diese Anordnungen (in Form eines Rezeptes) werden an die jeweilige Apotheke weiter geleitet.
-                Von dort gelangen die Präparate dann in die Einrichtung.
 
+            <para>
+                Dieser Abschnitt ist nur interessant, falls Sie planen die
+                <emphasis>optionale</emphasis>
+                Bestandsverwaltung zu benutzen.
+            </para>
+
+            <para>
+                Durch die Bestandsverwaltung in OPDE und den damit verbundenen Verwaltungsaufgaben sind die beschrieben
+                Probleme fast vollständig verschwunden. Und das ganz von selbst. Natürlich kann immer noch mal was
+                schief laufen, aber die grundsätzliche Handhabung läuft nun seit Jahren reibungslos.
             </para>
             <para>
-                Es muss für jede[n] Bewohner[in] ein eigener Bestand geführt werden (bewohnerbezogene Aufbewahrung).
-                Außerdem kann es sein, dass der Arzt/Ärztin irgendwann mal ein Präparat von einem Hersteller A verordnet
-                hat und dann doch ein "wirkstoffgleiches" Präparat von einem Hersteller B geliefert wird. Es kann sogar
-                vorkommen, dass dann die Darreichungsform ganz leicht abweicht (z.B. ursprünglich Tabletten, dann aber
-                doch Dragees). Es kann auch sein, dass (z.B. beim Einzug) Medikamente von zu Hause mitgebracht werden
-                uns dann die Verpackung fehlt.
+                <emphasis role="bold-underline">Hinweis:</emphasis>
+                Die Bestandsverwaltung muss nicht benutzt werden.
+                Besonders am Anfang, wenn man ein neues Dokumentations-System einführt, ist es nicht hilfreich auch noch
+                die Medikamenten-Verwaltung direkt mit umzustellen. Wir selbst haben das auch nicht zusammen gemacht
+                sondern erst nach einem Jahr.
             </para>
             <para>
-                Medikamente kommen in der Regel jedoch in einer Verpackung und können verschiedene Darreichungsformen
-                haben.
-                Z.B. Tabletten, Tropfen, Lösung zum Einnehmen, Salben etc. Auf fast jeder Schachtel findet man eine
-                Pharmazentralnummer (nachfolgend PZN genannt). Diese Nummer ist für jede Schachtelgröße, für jedes
-                Präparat, für jede Wirkstoff-Stärke und jede Darreichungsform eindeutig. Somit hat z.B. eine 10er
-                Schachtel ASS 100 eine andere PZN als eine 20er Schachtel. PZNs sind sind mittlerweile 8-stellig. Ab
-                2017 sollen diese Nummern durch ein neues, weltweit einheitliches Zahlensystem (der PPN oder
-                Pharmacy-Product-Number) abgelöst werden. Aber damit wollen wir uns im Moment nicht weiter beschäftigen.
+                Aus diesem Grund ist OPDE so aufgebaut, dass auch Sie nicht zu diesem Schritt gezwungen sind.
+                Sie können mit eine[m|r] Bewohner[in] anfangen und das System nach und nach auf alle ausdehnen.
+                Daher können Sie für jede[n] Bewohner[in] einzeln an- oder abschalten, ob OPDE die Medikamenten Bestände
+                verwalten soll.
+                Dazu verwenden Sie bitte den entsprechenden Schalter bei den Bewohner-Informationen, dann auf der linken
+                Seite das Menü
+                <emphasis>Funktionen</emphasis>
+                ausklappen, dann
+                <emphasis>Grunddaten ändern</emphasis>
+                aufrufen.
+                <xref linkend="bwinfo-bestand-verwalten"/>
+            </para>
+            <para>
+                Wenn ein neuer Bewohner eingetragen wird, dann wird der oben genannte Schalter immer gemäß der
+                Grundeinstellung gesetzt. Diese Vorgane können Sie in dem Programm-Punkt
+                <emphasis>Einstellung</emphasis>
+                einstellen. Das bezieht sich aber
+                nur auf die zukünftigen Bewohner. Die bestehenden Einstellungen sind von dieser Änderung nicht
+                betroffen.
+            </para>
+            <figure id="bwinfo-bestand-verwalten" Pgwide="0">
+                <title>Die Grunddaten für eine[n] Bewohner[in]</title>
+                <mediaobject role="fo">
+                    <imageobject>
+                        <imagedata
+                                fileref="https://dl.dropboxusercontent.com/u/167931/docbook/bwinfo-bestand-verwalten.png"
+                                width="400px"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+            <sect3>
+                <title>Grundlagen</title>
+                <para>
+                    Zuerst sollten wir betrachten, wie Medikamente in einer Pflegeeinrichtung im Allgemeinen gehandhabt
+                    werden.
+                    Die Mitarbeiter[innen] erhalten Medikamente für die Bewohner[innen] auf Anordnung eines
+                    Arztes/Ärztin.
+                    Diese Anordnungen (in Form eines Rezeptes) werden an die jeweilige Apotheke weiter geleitet.
+                    Von dort gelangen die Präparate dann in die Einrichtung.
+                </para>
+                <para>
+                    Es muss für jede[n] Bewohner[in] ein eigener Vorrat geführt werden (bewohnerbezogene Aufbewahrung).
+                    Außerdem kann es sein, dass der Arzt/Ärztin irgendwann mal ein Präparat von einem Hersteller A
+                    verordnet
+                    hat und dann doch ein "wirkstoffgleiches" Präparat von einem Hersteller B geliefert wird. Es kann
+                    sogar
+                    vorkommen, dass dann die Darreichungsform ganz leicht abweicht (z.B. ursprünglich Tabletten, dann
+                    aber
+                    doch Dragees). Es kann auch sein, dass (z.B. beim Einzug) Medikamente von zu Hause mitgebracht
+                    werden
+                    uns dann die Verpackung fehlt.
+                </para>
+                <para>
+                    Medikamente kommen in der Regel jedoch in einer Verpackung und können verschiedene
+                    Darreichungsformen
+                    haben.
+                    Z.B. Tabletten, Tropfen, Lösung zum Einnehmen, Salben etc. Auf fast jeder Schachtel findet man eine
+                    Pharmazentralnummer (nachfolgend PZN genannt). Diese Nummer ist für jede Schachtelgröße, für jedes
+                    Präparat, für jede Wirkstoff-Stärke und jede Darreichungsform eindeutig. Somit hat z.B. eine 10er
+                    Schachtel ASS 100 eine andere PZN als eine 20er Schachtel. PZNs sind sind mittlerweile 8-stellig. Ab
+                    2017 sollen diese Nummern durch ein neues, weltweit einheitliches Zahlensystem (der PPN oder
+                    Pharmacy-Product-Number) abgelöst werden. Aber damit wollen wir uns im Moment nicht weiter
+                    beschäftigen.
+                </para>
+            </sect3>
+
+            <sect3>
+                <title>Verpackungs- und Anwendungseinheit</title>
+                <para>
+                    Wie bereits erwähnt haben Medikamente unterschiedliche Darreichungsformen. Dadurch ergeben sich
+                    unterschiedliche Einheiten wie Stück, Gramm oder Milliliter. Eine Besonderheit in der Buchführung
+                    des Verbrauches ergibt sich dann, wenn die Einheit in der das Präparat angewendet wird, sich von der
+                    Einheit unterscheidet, in der es geliefert wird. Ein gutes Beispiel dafür sind die Tropfen. Die
+                    werden z.B. in einer 100ml Flasche geliefert aber in Stück Tropfen einzeln dosiert.
+                </para>
+                <para>
+                    Wir haben dafür den Begriff Anwendungs-Packungs-Verhältnis (APV) eingeführt. Aus den Vorüberlegung
+                    ergeben sich für uns 3 unterschiedliche Gruppen von Präparaten: APV
+                    <subscript>1</subscript>
+                    und APV
+                    <subscript>n</subscript>
+                    (einmal berechnet und einmal fest).
+                </para>
+                <sect4>
+                    <title>APV
+                        <subscript>1</subscript>
+                        - der einfachste Fall
+                    </title>
+
+                    <para>
+                        Da haben wir zuerst die Gruppe der Tabletten, Ampullen, Kapseln, Zäpfchen und ähnliches. Also
+                        alles, was in Stückzahlen geliefert und in der selben Einheit verabreicht wird. Bei diesen
+                        Präparaten ist das Verhältnis zwischen der Packungseinheit und der Anwendungseinheit 1:1. Im
+                        nachfolgenden
+                        sprechen
+                        wir daher immer von den APV
+                        <subscript>1</subscript>
+                        Medikamenten. Bei den APV
+                        <subscript>1</subscript>
+                        sind die Bestände einfach zu berechnen
+                        und
+                        auch in der laufenden Anwendung bereitet es keine Schwierigkeiten die Inventare stets aktuell zu
+                        halten.
+                    </para>
+                    <para>
+                        Zu der Gruppe der APV
+                        <subscript>1</subscript>
+                        gehören auch Säfte und sonstige flüssigen Medikamente, solange sie in
+                        derselben Einheit verabreicht werden, in der sie auch kommen. Ein gutes Beispiel für diese
+                        Medikamente ist die Lactulose. Davon bekommt man in der Regel einen Liter (also 1000 ml) und
+                        vergibt
+                        dann täglich zwischen 10 ml und 20 ml an [den|die] Bewohner[in].
+                    </para>
+                    <para>
+                        Natürlich kann man sich hier auf die Bestandsberechnung nur dann verlassen, wenn genau
+                        gearbeitet wird. Das heisst, dass unbedingt eine Pipette benutzt werden muss. Entweder wird eine
+                        mitgeliefert oder Sie müssen selbst eine kaufen. Laborpipetten kosten zwischen € 5,- und € 10,-.
+                        Dazu
+                        kommt noch ein Peläusball. Allerdings erkaufen Sie sich damit eine Präzision bei der Vergabe von
+                        Medikamenten, die nichts zu wünschen übrig lässt.
+                    </para>
+                </sect4>
+                <sect4>
+                    <title>APV
+                        <subscript>n</subscript>
+                    </title>
+
+                    <para>
+                        Eine weitere Gruppe sind diejenigen, bei denen sich Anwendungs- und Packungseinheit voneinander
+                        unterscheiden. Das ist z.B. bei Tropfen und Insulin der Fall. In diesem Fall gibt es einen
+                        indivduellen Umrechnungsfaktor (den nennen wir hier APVn) anhand dessen OPDE ausrechnen kann,
+                        wieviel von der Packung ausgebucht werden muss, wenn der Benutzer die entsprechende BHP
+                        abgeklickt hat. Allerdings gibt es hier noch zwei Varianten: konstant oder berechnet.
+                    </para>
+
+                    <sect5>
+                        <title>Konstantes APV
+                            <subscript>n</subscript>
+                        </title>
+
+                        <para>
+                            Ein konstantes APV
+                            <subscript>n</subscript>
+                            findet man z.B. bei Insulin-Fertigpens. Hier ist die Vergabe absolut präzise.
+                            In der Regel ist der Umrechnungsfaktor zwischen den I.E. und den ml 100 zu 1. Das bedeutet
+                            100
+                            IE entsprechen 1
+                            ml Insulin. Somit wären in einem üblichen 3 ml Pen exakt 300 IE enthalten.
+
+                        </para>
+                        <para>
+                            Unser Apotheker Ingo Klein
+                            <footnote>
+                                <para>
+                                    http://www.bahnhof-apotheke-eitorf.de
+                                </para>
+                            </footnote>
+                            hat sich mit einem Hersteller in Verbindung gesetzt und der
+                            bestätigte, dass die exakte IE Zahl durch eine Begrenzung mittels der Pen-Mechanik erreicht
+                            würde. Der Pen gibt also genau 300 IE (bei 3 ml) ab.
+                        </para>
+                        <para>
+                            Das ist letztlich so genau, dass OPDE hier keine eigenen Berechnungen zur Ermittlung des
+                            APVn
+                            mehr durchführen muss. Bei der erstmaligen Eingabe eines neuen Präparates legen Sie hier das
+                            APVn
+                            konstant fest.
+                        </para>
+                    </sect5>
+
+                    <sect5>
+                        <title>Berechnetes APV
+                            <subscript>n</subscript>
+                        </title>
+
+                        <para>
+                            Bei den Tropfen-Flaschen mit den üblichen Tropfmechanismen oder Pumpen können wir uns
+                            ebenfalls auf eine präzise Vergabe verlassen. Dennoch ist es zu Beginn oft nicht
+                            feststellbar, wie das genau Verhältnis zwischen Tropfen und Füllmenge (ml) ist. Da gibts
+                            immer wieder die Faustregel 20 zu 1. Aber auch das kann, je nach Viskosität der Lösung,
+                            variieren.
+                        </para>
+                        <para>
+                            In letzterem Fall kann man OPDE dazu verwenden anhand der Anbruchs- und Abschlussdaten einer
+                            Tropfenflasche und der dazwischen liegenden Anwendungsmenge (BHPs) das tatsächliche
+                            Verhältnis zu errechnen. Also umgangssprachlich: “wieviel haben wir aus der Flasche
+                            herausbekommen ?”
+                        </para>
+                        <para>
+
+                            Beispiel Rechnung: Nehmen wir eine Flasche mit 50 ml Lösung. Die Verordnung war 3x 30
+                            Tropfen
+                            am Tag, die Flasche war nach 11½ Tagen leer. Somit errechnet sich das APV
+                            <subscript>n</subscript>
+                            in diesem Fall
+                            wie folgt:
+                        </para>
+
+
+                        <figure id="formel-apv">
+                            <title>Formel zu APV Berechnung</title>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata
+                                            fileref="https://dl.dropboxusercontent.com/u/167931/docbook/formel-apv.png"
+                                            width="400px"/>
+                                </imageobject>
+                            </mediaobject>
+                        </figure>
+
+                        <para>
+                            Somit können wir hier davon ausgehen, dass 20,7 Tropfen ziemlich genau 1 ml der Lösung
+                            entsprechen. Wie gesagt, dass berechnet OPDE automatisch. Sie müssen dem Programm nur
+                            sagen, wann Du Packung genau angebrochen wurde, alle zugehörigen BHPs müssen abgehakt werden
+                            und Sie müssen vermerken, wann die Packung leer war.
+                            Dann kann OPDE beim nächsten Mal ziemlich genau vorhersagen, wie lange die Tropfen reichen
+                            werden.
+                        </para>
+                        <para>
+                            Bei jedem Klicken auf eine BHP wird die Dosis geteilt durch das entsprechende APV aus dem
+                            Bestand herunter gebucht. Im obigen Beispiel wären dass bei 30 Tropfen eine Menge von:
+                        </para>
+
+                        <figure id="formel-apv-beispiel">
+                            <title>Beispielberechnung</title>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata
+                                            fileref="https://dl.dropboxusercontent.com/u/167931/docbook/formel-apv-beispiel.png"
+                                            width="200px"/>
+                                </imageobject>
+                            </mediaobject>
+                        </figure>
+
+                    </sect5>
+
+                    <sect5>
+                        <title>Bestände, die nicht berechnet werden
+                        </title>
+
+                        <para>
+                            Bei Salben, Gele und ähnlichem ist eine Berechnung nicht möglich. Oder sagen wir, sie führt
+                            zu nichts. Und zwar aus folgender Überlegung. Theoretisch gesehen können wir die Salben
+                            Anwendung auch einzeln ermitteln und sie auf das Gewicht der Packung umrechnen. Wir
+                            ermitteln somit auch hier ein APV
+                            <subscript>n</subscript>. Bei Salben sind Dispenser, die genormte Mengen von dem Produkt
+                            abgeben, unüblich. Außerdem variiert die benötigte Menge je
+                            nach Krankheitbild. Muss eine große Fläche behandelt werden, braucht man mehr Salbe, als bei
+                            einer kleinen.
+                            Manche Sachen müssen dünn aufgetragen werden, manche dicker. Außerdem wird die zu
+                            behandelnde Fläche über den Behandlungszeitraum auch eher kleiner. Somit variiert die
+                            Vergabemenge.
+                        </para>
+                        <para>
+                            Alles in allem, kommen bei den APV
+                            <subscript>n</subscript>
+                            im Salbenfall immer unbrauchbare Werte heraus. Daher wurde die APV
+                            <subscript>n</subscript>
+                            Berechnung im Falle von Salben aufgegeben.
+                            Bestände können zwar immer noch ein- und ausgebucht werden, aber OPDE
+                            berechnet keine Entnahmen durch BHPs. Bei Bestell-Listen werden die Salben ebenfalls
+                            weg gelassen.
+                        </para>
+                    </sect5>
+
+                </sect4>
+            </sect3>
+
+            <para>
+
             </para>
         </sect2>
 
@@ -116,14 +357,16 @@
                     Bei uns in der Einrichtung haben wir gute Erfahrungen damit gemacht, dieses Dokument beidseitig auf
                     einem Farb-Laser auszudrucken. Wir verwenden dazu weißes 160g Papier.
                 </para>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata
-                                fileref="https://dl.dropboxusercontent.com/u/167931/docbook/btm-opde-0914.png"
-                                scalefit="1" width="60%" contentdept="100%"/>
-                    </imageobject>
-                </mediaobject>
-
+                <figure>
+                    <title>Das BTM Blatt aus OPDE</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata
+                                    fileref="https://dl.dropboxusercontent.com/u/167931/docbook/btm-opde-0914.png"
+                                    width="400px"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
                 <sect4>
                     Bitte beachten Sie beim Ausfüllen des Blattes die folgende Anleitung. Die eingekreisten Zahlen
                     entsprechen den Zahlen in der nachfolgenden Aufzählung.
@@ -139,8 +382,7 @@
                             </listitem>
                             <listitem>
                                 <para>In OPDE steht die BW-Kennung meist in eckigen Klammern hinter den Bewohnernamen.
-                                    Sie
-                                    ist dreistellig und sieht ungefähr so aus:
+                                    Sie ist dreistellig und sieht ungefähr so aus:
                                     <emphasis role="bold">BM2</emphasis>
                                 </para>
                             </listitem>
@@ -249,6 +491,7 @@
                                     schreiben Sie in diese Spalte. Falls es sich um feste Darreichungsformen handelt,
                                     kann
                                     diese Spalte leer bleiben.
+                                    <xref linkend="btm-fluessig-gewichte" xrefstyle='template:"%t" auf Seite %p'/>
                                 </para>
                             </listitem>
                         </orderedlist>
@@ -260,7 +503,7 @@
                             <imageobject>
                                 <imagedata
                                         fileref="https://dl.dropboxusercontent.com/u/167931/docbook/btmrezept-neu.png"
-                                        scalefit="1" width="60%" contentdept="100%"/>
+                                        width="400px"/>
                             </imageobject>
                         </mediaobject>
                     </figure>
@@ -312,7 +555,79 @@
                     </para>
                 </sect4>
                 <sect4 id="btm-fluessig-gewichte">
-                    <title>Kontrolle mittels Gewichtsmessung</title>
+                    <title>Kontrolle von flüssigen BTMs mittels Gewichtsmessung</title>
+                    <para>
+                        Wie bereits weiter oben beschrieben ist bei den flüssigen BTMs ohne Tropfendispenser die
+                        Dosierung mittels einer Laborpipette nötig.
+                        Damit es hinterher nicht zu Abweichungen zwischen den Berechnungen auf dem BTM Blatt und dem
+                        tatsächlichen Füllstand der Flasche kommt, haben wir zusätzlich eine Gewichtsmessung eingeführt.
+                    </para>
+                    <para>Wir verwenden zum Wiegen eine elektronische Briefwaage. Diese Geräte kosten um die €30,- bei
+                        den üblichen Online Versendern.
+                    </para>
+                    <para>Das läuft dann wie folgt ab:</para>
+                    <para>
+                        <orderedlist numeration="arabic">
+                            <listitem>
+                                <para>Bei jeder neuen Flasche ermitteln Sie das Anfangsgewicht. Wiegen Sie nur die
+                                    Flasche selbst, mit dem Verschluss (ohne Schachtel oder Beipackzettel). Wichtig ist,
+                                    dass immer auf die gleiche Weise gewogen wird. Das Anfangsgewicht schreiben Sie in
+                                    die Zeile, in der auch der Eingang der neuen Flasche vermerkt wird.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para>
+                                    <emphasis role="bold">Nach</emphasis>
+                                    jeder Entnahme wiegen Sie die Flasche (in beschriebener Weise) erneut. Dann
+                                    schreiben Sie das Gewicht in dieselbe Zeile, in der Sie auch die Entnahme
+                                    eingetragen haben.
+                                </para>
+                            </listitem>
+                        </orderedlist>
+                    </para>
+                    <para>Anhand der Gewichtsdifferenz merken Sie sehr schnell falls jemand bei einem Entnahmevorgang zu
+                        viel oder zu wenig entnommen hat.
+                    </para>
+                    <para>Uns ist aufgefallen, dass die neuen, ungeöffneten Flaschen jeweils deutliche
+                        Gewichtsunterschiede aufweisen. Daher ist es nötig, dass Sie jede Flasche bei Erhalt neu wiegen.
+                        Sie können nicht das Anfangsgewicht von einer vorherigen Leiferung heranziehen.
+                    </para>
+                </sect4>
+
+                <sect4 id="flasche-rechnerisch-leer">
+                    <title>Wenn die Flasche rechnerisch leer ist</title>
+                    <para>Auch dieses Phänomen haben wir oft beobachtet. Selbst wenn alle Entnahmen exakt sind. Die
+                        Gewichtsdifferent absolut nachvollziehbar sind, bleibt fast immer etwas in der Flasche übrig.
+                        Diese Menge dürfte aber rechnerisch gar nicht da sein. Wir gehen davon aus, dass die Hersteller
+                        der Medikamente etwas mehr abfüllen, damit die Flasche ganz sicher genug Inhalt hat. Das ist
+                        aber nur eine Vermutung.
+                    </para>
+                    <para>Weil aber die Handhabung der BTMs so heikel ist, geben wir in diesen Fällen die Flasche an den
+                        Apotheker zurück und lassen den Rest-Inhalt dort entsorgen.
+                    </para>
+                </sect4>
+
+                <sect4 id="btm-zum-abschluss">
+                    <title>Zum Abschluss</title>
+                    <para>
+                        Beim Tod eines Patienten dürfen die BTMs nicht den Angehörigen übergeben werden. Hier spielt das
+                        Erbrecht nur eine untergeordnete Rolle. Diese BTMs müssen unbedingt an die Apotheke oder den
+                        Arzt zurück
+                        gegeben werden. Diese Rückgabe muss mit Stempel, Datum und Unterschrift (vom Arzt oder
+                        Apotheker) auf dem
+                        letzten BTM Blatt bestätigt werden. Gleiches gilt für abgesetzte BTMs.
+                    </para>
+                    <para>
+                        Falls [der|die] Bewohner[in] auszieht, dann müssen Sie den verordneten Arzt fragen, was mit den
+                        noch vorhandenen BTMs geschehen soll. Wenn Sie diese jemanden mitgeben sollen, dann muss die
+                        exakte, übergebene Menge von dieser Person mit Datum und Unterschrift schriftlich bestätigt
+                        werden. Am besten erfolgt die Übergabe unter Zeugen, die ebenfalls mit ihrer Unterschrift
+                        bestätigen. Das kann alles auf dem letzten BTM Blatt unterschrieben werden. Geben Sie niemals
+                        die
+                        beschriebenen BTM Blätter aus der Hand. Alle BTM Aufzeichnungen müssen mindestens 3 Jahre nach
+                        der letzten Eintragung aufbewahrt werden.
+                        Somit müssen diese Dokumente in der Einrichtung verbleiben.
+                    </para>
                 </sect4>
             </sect3>
         </sect2>
