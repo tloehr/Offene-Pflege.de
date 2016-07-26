@@ -790,7 +790,6 @@ public class PnlBHP extends NursingRecordsPanel {
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? applyActionListener : null);
 
-
         JLabel icon1 = new JLabel(BHPTools.getIcon(bhp));
         icon1.setOpaque(false);
         if (!bhp.isOpen()) {

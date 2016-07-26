@@ -72,8 +72,8 @@ public class DlgUPREditor extends MyJDialog {
                 //        cmbDosageForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
                 //        cmbDosageForm.setRenderer(DosageFormTools.getRenderer(0));
 
-                if (tradeForm.getUPR() != null) {
-                    txtUPR.setText(SYSTools.formatBigDecimal(tradeForm.getUPR().setScale(2, RoundingMode.HALF_UP)));
+                if (tradeForm.getConstantUPRn() != null) {
+                    txtUPR.setText(SYSTools.formatBigDecimal(tradeForm.getConstantUPRn().setScale(2, RoundingMode.HALF_UP)));
                     rbUPRConst.setSelected(true);
                 } else {
                     txtSetUPR.setText(SYSTools.formatBigDecimal(MedStockTools.getEstimatedUPR(tradeForm).setScale(2, RoundingMode.HALF_UP)));
@@ -268,8 +268,8 @@ public class DlgUPREditor extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, pref, $lcgap, default:grow, $lcgap, default",
-                "6*(default, $lgap), default:grow, 2*($lgap, default)"));
+            "default, $lcgap, pref, $lcgap, default:grow, $lcgap, default",
+            "6*(default, $lgap), default:grow, 2*($lgap, default)"));
 
         //---- lblProduct ----
         lblProduct.setText("Product here");
@@ -282,21 +282,11 @@ public class DlgUPREditor extends MyJDialog {
 
             //---- rbUPRAuto ----
             rbUPRAuto.setText("UPR automatic");
-            rbUPRAuto.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    rbUPRAutoItemStateChanged(e);
-                }
-            });
+            rbUPRAuto.addItemListener(e -> rbUPRAutoItemStateChanged(e));
             panel3.add(rbUPRAuto);
 
             //---- txtSetUPR ----
-            txtSetUPR.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtSetUPRActionPerformed(e);
-                }
-            });
+            txtSetUPR.addActionListener(e -> txtSetUPRActionPerformed(e));
             txtSetUPR.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
@@ -322,21 +312,11 @@ public class DlgUPREditor extends MyJDialog {
 
             //---- rbUPRConst ----
             rbUPRConst.setText("UPR constant");
-            rbUPRConst.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    rbUPRConstItemStateChanged(e);
-                }
-            });
+            rbUPRConst.addItemListener(e -> rbUPRConstItemStateChanged(e));
             panel1.add(rbUPRConst);
 
             //---- txtUPR ----
-            txtUPR.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtUPRActionPerformed(e);
-                }
-            });
+            txtUPR.addActionListener(e -> txtUPRActionPerformed(e));
             txtUPR.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
@@ -360,23 +340,13 @@ public class DlgUPREditor extends MyJDialog {
             //---- btnClose ----
             btnClose.setText(null);
             btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnClose.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCloseActionPerformed(e);
-                }
-            });
+            btnClose.addActionListener(e -> btnCloseActionPerformed(e));
             panel4.add(btnClose);
 
             //---- btnSave ----
             btnSave.setText(null);
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnSave.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnSaveActionPerformed(e);
-                }
-            });
+            btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panel4.add(btnSave);
         }
         contentPane.add(panel4, CC.xy(5, 15, CC.RIGHT, CC.FILL));

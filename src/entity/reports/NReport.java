@@ -19,7 +19,10 @@ import org.apache.commons.collections.CollectionUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -37,10 +40,18 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     @Version
     @Column(name = "version")
     private Long version;
+
+    /**
+     * Auf welchen Zeitpunkt bezieht sich diese Bericht ?
+     */
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date pit;
+
+    /**
+     * Wann wurde der Bericht korrigiert ?
+     */
     @Basic(optional = false)
     @Column(name = "EditPIT")
     @Temporal(TemporalType.TIMESTAMP)
@@ -48,14 +59,26 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     @Lob
     @Column(name = "Text")
     private String text;
+
+    /**
+     * Die Angabe der Pflegezeit die gebraucht wurde.
+     */
     @Basic(optional = false)
     @Column(name = "Dauer")
     private int minutes;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
+
+    /**
+     * Wer hat diesen Bericht eingetragen.
+     */
     private Users user;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
+
+    /**
+     * zu welchem BW gehört dieser Bericht ?
+     */
     private Resident resident;
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne

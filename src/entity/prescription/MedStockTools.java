@@ -238,14 +238,14 @@ public class MedStockTools {
         BigDecimal stocksum = getSum(medStock);
         MedStockTransaction finalTX = new MedStockTransaction(medStock, stocksum.negate(), state);
         finalTX.setText(text);
-//        medStock.getStockTransaction().add(finalTX);
+        medStock.getStockTransaction().add(finalTX);
         medStock.setState(MedStockTools.STATE_NOTHING);
         DateTime now = new DateTime();
         medStock.setOut(now.toDate());
 
         BigDecimal effectiveUPR = getEffectiveUPR(medStock);
         if (medStock.getTradeForm().getDosageForm().isUPRn()) {
-            if (medStock.getTradeForm().getUPR() == null) { // no contant UPR
+            if (medStock.getTradeForm().getConstantUPRn() == null) { // dynamic UPRn
                 if (medStock.getUPRDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
                     if (effectiveUPR.compareTo(BigDecimal.ZERO) > 0) { // if this stock was never used the effective UPR must be 0. we must handle this case separately
                         // if the deviation was too high (usually more than 20%), then the new UPR is discarded
@@ -269,6 +269,7 @@ public class MedStockTools {
                     medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // will be part of the calculation in future
 
                     // https://github.com/tloehr/Offene-Pflege.de/issues/16
+                    // todo: nicht nur die eignen Stocks ändern (also innerhalb des Inventories), sondern auch für alle anderen BW, bei denen APV auch noch nicht feststeht.
                     for (MedStock dependantStocks : medStock.getInventory().getMedStocks()) {
                         if (dependantStocks.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING) {
                             dependantStocks.setUPR(effectiveUPR);
@@ -382,12 +383,12 @@ public class MedStockTools {
 
         if (stock.getTradeForm().getDosageForm().isUPRn()) {
             result += ", APV: ";
-            if (stock.getTradeForm().getUPR() != null) {
-                result += SYSTools.formatBigDecimal(stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP)) + " (" + SYSTools.xx("upreditor.constant.upr") + ")";
+            if (stock.getTradeForm().getConstantUPRn() != null) {
+                result += SYSTools.formatBigDecimal(stock.getTradeForm().getConstantUPRn().setScale(2, RoundingMode.HALF_UP)) + " (" + SYSTools.xx("upreditor.constant.upr") + ")";
             } else {
                 result += SYSTools.formatBigDecimal(stock.getUPR().setScale(2, RoundingMode.HALF_UP));
             }
-            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getUPR() != null ? SYSTools.xx("nursingrecords.inventory.UPRwillBeReplaced") : "");
+            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getConstantUPRn() != null ? SYSTools.xx("nursingrecords.inventory.UPRwillBeReplaced") : "");
         }
 
         if (stock.hasNext2Open()) {
@@ -439,7 +440,7 @@ public class MedStockTools {
 //        if (stock.hasPackage()) {
 //            result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
 //        }
-//        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isDummyUPR() ? SYSTools.xx(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
+//        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getConstantUPRn()) + " " + (stock.isDummyUPR() ? SYSTools.xx(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
 //        return result;
 //    }
 
@@ -542,9 +543,11 @@ public class MedStockTools {
     }
 
     /**
-     * This method calculates the effective UPR as it transpired during the lifetime of that particular medstock.
+     * This method calculates the effective UPR as it acually was during the lifetime of that particular medstock.
      * It is vital, that this calculation is only done, when a package is empty. Otherwise the estimation
      * of the UPR is wrong.
+     *
+     * Stichwort: berechnetes APVn
      *
      * @param medstock, für den das Verhältnis neu berechnet werden soll.
      */
@@ -552,8 +555,8 @@ public class MedStockTools {
         if (medstock.getTradeForm().getDosageForm().isUPR1()) {
             return BigDecimal.ONE;
         }
-        if (medstock.getTradeForm().getUPR() != null) {
-            return medstock.getTradeForm().getUPR();
+        if (medstock.getTradeForm().getConstantUPRn() != null) {
+            return medstock.getTradeForm().getConstantUPRn();
         }
 
         OPDE.debug("<--- recalculateUPR ");
@@ -593,7 +596,7 @@ public class MedStockTools {
     /**
      * calculates a starting UPR for a newly opened stock. If there is no UPR yet, it creates a new one and marks it as dummy,
      * so it will be replaced by the first calculated result, when this package is closed.
-     * For DosageForms with type STATE_UPR1, there is no calculation at all. Those are always 1 constantly.
+     * For DosageForms with type STATE_UPR1, there is no calculation at all. Those values are constantly 1.
      */
     public static BigDecimal getEstimatedUPR(TradeForm tradeForm) {
         OPDE.debug("<--- calcProspectiveUPR");
@@ -605,10 +608,10 @@ public class MedStockTools {
         } else if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
             OPDE.debug("STATE_UPRn");
 
-            if (tradeForm.getUPR() != null) {
+            if (tradeForm.getConstantUPRn() != null) {
                 // there is a constant UPR defined for that tradeform
                 // so there is no estimation necessary
-                upr = tradeForm.getUPR();
+                upr = tradeForm.getConstantUPRn();
                 OPDE.debug("constant UPRn");
             } else {
                 EntityManager em = OPDE.createEM();
@@ -679,6 +682,12 @@ public class MedStockTools {
     }
 
 
+    /**
+     * this method returns true, when a given tradeform is still busy with it's first stock, and this stock is a UPRn one. This effective UPR cannot be calculated yet.
+     * That first stock is still open.
+     * @param tradeForm
+     * @return
+     */
     public static boolean stillWorkingOnTheFirstOneToCalculateUPRn(TradeForm tradeForm) {
         Integer count = null;
         EntityManager em = OPDE.createEM();

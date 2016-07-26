@@ -89,7 +89,7 @@ public class DlgCloseStock extends MyJDialog {
         jLabel2 = new JLabel();
         jLabel3 = new JLabel();
         rbGefallen = new JRadioButton();
-        cmbBestID = new JComboBox();
+        cmbBestID = new JComboBox<>();
         panel1 = new JPanel();
         btnClose = new JButton();
         btnOk = new JButton();
@@ -104,8 +104,8 @@ public class DlgCloseStock extends MyJDialog {
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                    "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
-                    "14dlu, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
+                "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
+                "14dlu, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
 
             //======== jScrollPane1 ========
             {
@@ -121,23 +121,13 @@ public class DlgCloseStock extends MyJDialog {
             rbLeer.setSelected(true);
             rbLeer.setText("Die Packung ist nun leer");
             rbLeer.setFont(new Font("Arial", Font.PLAIN, 14));
-            rbLeer.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    rbLeerActionPerformed(e);
-                }
-            });
+            rbLeer.addActionListener(e -> rbLeerActionPerformed(e));
             jPanel1.add(rbLeer, CC.xy(3, 5));
 
             //---- rbStellen ----
             rbStellen.setText("Beim Vorab Stellen haben Sie die letzten ");
             rbStellen.setFont(new Font("Arial", Font.PLAIN, 14));
-            rbStellen.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    rbStellenActionPerformed(e);
-                }
-            });
+            rbStellen.addActionListener(e -> rbStellenActionPerformed(e));
             jPanel1.add(rbStellen, CC.xywh(3, 7, 2, 1));
 
             //---- txtLetzte ----
@@ -159,12 +149,7 @@ public class DlgCloseStock extends MyJDialog {
             //---- rbAbgelaufen ----
             rbAbgelaufen.setText("Die Packung ist abgelaufen oder wird nicht mehr ben\u00f6tigt. Bereit zur Entsorgung.");
             rbAbgelaufen.setFont(new Font("Arial", Font.PLAIN, 14));
-            rbAbgelaufen.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    rbAbgelaufenActionPerformed(e);
-                }
-            });
+            rbAbgelaufen.addActionListener(e -> rbAbgelaufenActionPerformed(e));
             jPanel1.add(rbAbgelaufen, CC.xywh(3, 9, 5, 1));
             jPanel1.add(jSeparator1, CC.xywh(3, 13, 5, 1));
 
@@ -182,28 +167,18 @@ public class DlgCloseStock extends MyJDialog {
             //---- rbGefallen ----
             rbGefallen.setText("<html>Die Packung ist <font color=\"red\">runter gefallen</font> oder <font color=\"red\">verschwunden</font> und muss ausgebucht werden.</html>");
             rbGefallen.setFont(new Font("Arial", Font.PLAIN, 14));
-            rbGefallen.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    rbGefallenActionPerformed(e);
-                }
-            });
+            rbGefallen.addActionListener(e -> rbGefallenActionPerformed(e));
             jPanel1.add(rbGefallen, CC.xywh(3, 11, 5, 1));
 
             //---- cmbBestID ----
-            cmbBestID.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbBestID.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbBestID.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbBestIDItemStateChanged(e);
-                }
-            });
+            cmbBestID.addItemListener(e -> cmbBestIDItemStateChanged(e));
             jPanel1.add(cmbBestID, CC.xy(5, 15));
 
             //======== panel1 ========
@@ -213,23 +188,13 @@ public class DlgCloseStock extends MyJDialog {
                 //---- btnClose ----
                 btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
                 btnClose.setText(null);
-                btnClose.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCloseActionPerformed(e);
-                    }
-                });
+                btnClose.addActionListener(e -> btnCloseActionPerformed(e));
                 panel1.add(btnClose);
 
                 //---- btnOk ----
                 btnOk.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
                 btnOk.setText(null);
-                btnOk.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnOkActionPerformed(e);
-                    }
-                });
+                btnOk.addActionListener(e -> btnOkActionPerformed(e));
                 panel1.add(btnOk);
             }
             jPanel1.add(panel1, CC.xy(7, 19, CC.RIGHT, CC.DEFAULT));
@@ -410,7 +375,7 @@ public class DlgCloseStock extends MyJDialog {
     private JLabel jLabel2;
     private JLabel jLabel3;
     private JRadioButton rbGefallen;
-    private JComboBox cmbBestID;
+    private JComboBox<String> cmbBestID;
     private JPanel panel1;
     private JButton btnClose;
     private JButton btnOk;

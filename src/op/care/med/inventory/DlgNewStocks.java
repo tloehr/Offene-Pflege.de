@@ -334,8 +334,8 @@ public class DlgNewStocks extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default:grow, $lcgap, 14dlu",
-                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default:grow, $lcgap, 14dlu",
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- lblPZN ----
             lblPZN.setText("PZN oder Suchbegriff");
@@ -370,7 +370,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(lblProd, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[]{
+            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[] {
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -403,7 +403,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(lblPack, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[]{
+            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[] {
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -422,7 +422,6 @@ public class DlgNewStocks extends MyJDialog {
                 public void focusGained(FocusEvent e) {
                     txtExpiresFocusGained(e);
                 }
-
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtExpiresFocusLost(e);
@@ -434,8 +433,8 @@ public class DlgNewStocks extends MyJDialog {
             //======== panel3 ========
             {
                 panel3.setLayout(new FormLayout(
-                        "pref, $lcgap, default:grow",
-                        "fill:17dlu"));
+                    "pref, $lcgap, default:grow",
+                    "fill:17dlu"));
 
                 //---- lblWeightControl ----
                 lblWeightControl.setText("weightcontrol");

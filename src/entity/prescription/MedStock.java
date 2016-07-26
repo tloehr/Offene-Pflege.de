@@ -113,12 +113,6 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     }
 
     public boolean isExpired() {
-//        if (isClosed()) {
-//            return false;
-//        }
-//        boolean expired1 = expires != null && new DateTime(expires).isBeforeNow();
-//        boolean expired2 = isOpened() && tradeform.getDaysToExpireAfterOpened() != null && new DateTime(opened).plusDays(tradeform.getDaysToExpireAfterOpened()).isBeforeNow();
-//        return expired1 || expired2;
         return expiresIn(0);
     }
 
@@ -172,7 +166,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
      * the UPREffective value is in fact never used. it is simply stored for debugging reasons.
      * when the user sets a new UPR, then THIS UPR is always stored as UPReffective. The setUPR method
      * then decides if the UPR should be preserved or discarded.
-     * if it is discarded the UPR which was used when the new stock was registeres is kept.
+     * if it is discarded the UPR which was used when the new stock was registered is kept.
      * if not, it replaces the old value.
      * if the UPR is a dummy (because its the first stock for that tradeform) its always used.
      *
@@ -245,17 +239,9 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         return nextStock != null;
     }
 
-//    public void setVorrat(MedInventory inventory) {
-//        this.inventory = inventory;
-//    }
-
     public TradeForm getTradeForm() {
         return tradeform;
     }
-
-//    public void setTradeForm(Darreichung darreichung) {
-//        this.darreichung = darreichung;
-//    }
 
     public MedStock getNextStock() {
         return nextStock;

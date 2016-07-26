@@ -2,8 +2,6 @@ package entity.prescription;
 
 import entity.info.Resident;
 import op.OPDE;
-import op.care.med.inventory.DlgCloseStock;
-import op.care.med.inventory.PnlInventory;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -117,7 +115,7 @@ public class MedInventoryTools {
         }
 
         if (stock.getTradeForm().getDosageForm().isUPRn()) {
-            BigDecimal upr = stock.getTradeForm().getUPR() != null ? stock.getTradeForm().getUPR() : stock.getUPR();
+            BigDecimal upr = stock.getTradeForm().getConstantUPRn() != null ? stock.getTradeForm().getConstantUPRn() : stock.getUPR();
             // #16
             quantity = quantity.divide(upr, 4, BigDecimal.ROUND_HALF_UP); // GitHub #16 Exception tritt hier auf. Weiter prüfen.
         }

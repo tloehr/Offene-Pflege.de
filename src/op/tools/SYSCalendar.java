@@ -458,27 +458,6 @@ public class SYSCalendar {
         return zeit;
     }
 
-    /**
-     * Ermittelt zu einer gegebenen Zeit die entsprechende Schicht.
-     *
-     * @param ts - Die Uhrzeit in Millis.
-     * @return - Antwort als int entsprechend der SYSConst Konstanten zu den Schichten.
-     */
-    public static int ermittleSchicht(long ts) {
-        int zeit = ermittleZeit(ts);
-        int schicht;
-        if (SYSConst.FM <= zeit && zeit < SYSConst.MO) {
-            schicht = SYSConst.ZEIT_NACHT_MO;
-        } else if (SYSConst.MO <= zeit && zeit < SYSConst.NM) {
-            schicht = SYSConst.ZEIT_FRUEH;
-        } else if (SYSConst.NM <= zeit && zeit < SYSConst.NA) {
-            schicht = SYSConst.ZEIT_SPAET;
-        } else {
-            schicht = SYSConst.ZEIT_NACHT_AB;
-        }
-        return schicht;
-    }
-
 
     public static byte whatShiftIs(byte timeID) {
         byte shift;
@@ -527,12 +506,12 @@ public class SYSCalendar {
         Period period_late_at_night = new Period(late_at_night.getHourOfDay(), late_at_night.getMinuteOfHour(), late_at_night.getSecondOfMinute(), late_at_night.getMillisOfSecond());
 
         DateTime ref = new DateTime(date);
-        DateTime eitm = new DateMidnight(date).toDateTime().plus(period_early_in_the_morning);
-        DateTime m = new DateMidnight(date).toDateTime().plus(period_morning);
-        DateTime n = new DateMidnight(date).toDateTime().plus(period_noon);
-        DateTime a = new DateMidnight(date).toDateTime().plus(period_afternoon);
-        DateTime e = new DateMidnight(date).toDateTime().plus(period_evening);
-        DateTime lan = new DateMidnight(date).toDateTime().plus(period_late_at_night);
+        DateTime eitm = new LocalDate(date).toDateTimeAtStartOfDay().plus(period_early_in_the_morning);
+        DateTime m = new LocalDate(date).toDateTimeAtStartOfDay().plus(period_morning);
+        DateTime n = new LocalDate(date).toDateTimeAtStartOfDay().plus(period_noon);
+        DateTime a = new LocalDate(date).toDateTimeAtStartOfDay().plus(period_afternoon);
+        DateTime e = new LocalDate(date).toDateTimeAtStartOfDay().plus(period_evening);
+        DateTime lan = new LocalDate(date).toDateTimeAtStartOfDay().plus(period_late_at_night);
 
         if (eitm.compareTo(ref) <= 0 && ref.compareTo(m) < 0) {
             timeid = BYTE_EARLY_IN_THE_MORNING;

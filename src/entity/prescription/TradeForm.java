@@ -11,6 +11,9 @@ import java.util.Collection;
 @Entity
 @Table(name = "tradeform")
 
+/**
+ * Darereichungsform
+ */
 public class TradeForm implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -24,7 +27,7 @@ public class TradeForm implements Serializable {
     private Long version;
     @Basic(optional = false)
     @Column(name = "UPR")
-    private BigDecimal upr;
+    private BigDecimal constantUPRn;
     @Basic(optional = false)
     @Column(name = "expDaysWhenOpen")
     private Integer daysToExpireAfterOpened;
@@ -39,7 +42,7 @@ public class TradeForm implements Serializable {
         this.medProduct = medProduct;
         this.packages = new ArrayList<MedPackage>();
         this.stocks = new ArrayList<MedStock>();
-        this.upr = null;
+        this.constantUPRn = null;
         this.weightControlled = false;
     }
 
@@ -49,7 +52,7 @@ public class TradeForm implements Serializable {
         this.dosageForm = dosageForm;
         this.packages = new ArrayList<MedPackage>();
         this.stocks = new ArrayList<MedStock>();
-        this.upr = null;
+        this.constantUPRn = null;
         this.weightControlled = false;
     }
 
@@ -136,17 +139,19 @@ public class TradeForm implements Serializable {
 
 
     /**
-     * This is only relevant for DosageFormTypes UPRn. If this UPR is null, then the UPRs from the single MedStocks are
-     * used for calculation. If this UPR is NOT null then it is used for calculations instead.
+     * There is a distinction between constant UPRn and dynamic UPRn.
+     * If the assigned DosageForm defines this drug as UPR1 oder dynamic UPRn, then this field is <b>NULL</b>.
      *
-     * @return the upr to be used. NULL if not set.
+     * NULL means, that the UPR values of the MedStocks are used instead.
+     *
+     * @return the constantUPRn to be used. NULL if constant UPRn oder UPR1.
      */
-    public BigDecimal getUPR() {
-        return upr;
+    public BigDecimal getConstantUPRn() {
+        return constantUPRn;
     }
 
     public void setUPR(BigDecimal upr) {
-        this.upr = upr;
+        this.constantUPRn = upr;
     }
 
     @Override
