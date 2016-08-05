@@ -53,6 +53,7 @@ import op.care.med.structure.PnlMed;
 import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
 import op.dev.PnlDev;
+import op.mx.PnlMX;
 import op.process.PnlProcess;
 import op.settings.PnlSettings;
 import op.system.DlgLogin;
@@ -116,6 +117,8 @@ public class FrmMain extends JFrame {
     private CollapsiblePanes panesSearch, panesApps;
     //    private HashMap<Resident, JideButton> bwButtonMap;
     private JideButton homeButton;
+
+    boolean mailIconToggled = true; // just a little helper
 
     public FrmMain() {
         initPhase = true;
@@ -236,8 +239,7 @@ public class FrmMain extends JFrame {
         if (OPDE.getLogin() != null) {
             logout();
         }
-        //todo: remove after install4j
-        FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
+
         System.exit(0);
     }
 
@@ -338,6 +340,16 @@ public class FrmMain extends JFrame {
         splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, 0.5d));
     }
 
+    private void btnMailActionPerformed(ActionEvent e) {
+        clearPreviousProgbutton();
+        setPanelTo(OPDE.getMainframe().loadPanel("op.mx.PnlMX"));
+    }
+
+    public void toggleMailIcon(){
+        mailIconToggled = !mailIconToggled;
+        btnMail.setIcon(mailIconToggled ? SYSConst.icon22mailGeneric : SYSConst.icon22mailGet);
+    }
+
 
     public void afterLogin() {
         OPDE.getDisplayManager().touch();
@@ -376,20 +388,17 @@ public class FrmMain extends JFrame {
         prepareSearchArea();
         labelUSER.setText(OPDE.getLogin().getUser().getFullname());
 
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                initPhase = true;
-                double pos;
-                try {
-                    pos = Double.parseDouble(OPDE.getProps().getProperty("opde.mainframe:splitPaneLeftDividerLocation"));
-                } catch (Exception e) {
-                    pos = 0.5d;
-                }
-                splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, pos));
-                initPhase = false;
-                homeButton.doClick();
+        Runnable runnable = () -> {
+            initPhase = true;
+            double pos;
+            try {
+                pos = Double.parseDouble(OPDE.getProps().getProperty("opde.mainframe:splitPaneLeftDividerLocation"));
+            } catch (Exception e) {
+                pos = 0.5d;
             }
+            splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, pos));
+            initPhase = false;
+            homeButton.doClick();
         };
 
         SwingUtilities.invokeLater(runnable);
@@ -421,6 +430,7 @@ public class FrmMain extends JFrame {
         pbTimeout = new JProgressBar();
         panel2 = new JPanel();
         btnResetSplitpane = new JButton();
+        btnMail = new JButton();
         statusBar = new StatusBar();
 
         //======== this ========
@@ -571,6 +581,13 @@ public class FrmMain extends JFrame {
                 btnResetSplitpane.addActionListener(e -> btnResetSplitpaneActionPerformed(e));
                 panel2.add(btnResetSplitpane);
 
+                //---- btnMail ----
+                btnMail.setText(null);
+                btnMail.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/mail_generic.png")));
+                btnMail.setAlignmentY(1.0F);
+                btnMail.addActionListener(e -> btnMailActionPerformed(e));
+                panel2.add(btnMail);
+
                 //---- statusBar ----
                 statusBar.setBackground(new Color(238, 238, 238));
                 statusBar.setAlignmentY(1.0F);
@@ -699,6 +716,8 @@ public class FrmMain extends JFrame {
             panel = new PnlDev();
         } else if (classname.equals("op.training.PnlTraining")) {
             panel = new PnlTraining(jspSearch);
+        } else if (classname.equals("op.mx.PnlMX")) {
+            panel = new PnlMX(jspSearch);
         }
         return panel;
     }
@@ -949,6 +968,16 @@ public class FrmMain extends JFrame {
 //        SYSTools.checkForSoftwareupdates();
     }
 
+    public void setMailIconOff() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                btnMail.setIcon( SYSConst.icon22mailGeneric );
+            }
+        });
+
+    }
+
     /**
      * this class is only used for resident names that are so long, that the icons are not visible anymore.
      * it simply tells Swing, that this particular scroll pane is 16 pixels wider than it really is.
@@ -997,6 +1026,7 @@ public class FrmMain extends JFrame {
     private JProgressBar pbTimeout;
     private JPanel panel2;
     private JButton btnResetSplitpane;
+    private JButton btnMail;
     private StatusBar statusBar;
     // End of variables declaration//GEN-END:variables
 

@@ -16,7 +16,6 @@ import entity.nursingprocess.NursingProcess;
 import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.*;
 import entity.reports.NReportTools;
-import fx.RepCtrl;
 import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
@@ -65,11 +64,11 @@ public class PnlDev extends CleanablePanel {
         super("opde.dev");
         initComponents();
 
-        cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
-
-
-        tabbedPane1.insertTab("JavaFX", null, new RepCtrl(), "no tips", 0);
-        tabbedPane1.setSelectedIndex(0);
+//        cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
+//
+//
+//        tabbedPane1.insertTab("JavaFX", null, new RepCtrl(), "no tips", 0);
+//        tabbedPane1.setSelectedIndex(0);
 
 //        tabbedPane1.setComponentAt(1, new PnlCommonTags(new HashSet<Commontags>()));
 
@@ -648,6 +647,14 @@ public class PnlDev extends CleanablePanel {
         label4 = new JLabel();
         dcTo = new JDateChooser();
         btnVKontrole = new JButton();
+        panel5 = new JPanel();
+        scrollPane3 = new JScrollPane();
+        tree1 = new JTree();
+        splitPane1 = new JSplitPane();
+        scrollPane5 = new JScrollPane();
+        table1 = new JTable();
+        scrollPane4 = new JScrollPane();
+        textArea1 = new JTextArea();
 
         //======== this ========
         setLayout(new BorderLayout());
@@ -775,6 +782,38 @@ public class PnlDev extends CleanablePanel {
                 panel4.add(btnVKontrole, CC.xy(3, 11));
             }
             tabbedPane1.addTab("text", panel4);
+
+            //======== panel5 ========
+            {
+                panel5.setLayout(new FormLayout(
+                    "default, $rgap, default:grow",
+                    "fill:default, $lgap, default:grow"));
+
+                //======== scrollPane3 ========
+                {
+                    scrollPane3.setViewportView(tree1);
+                }
+                panel5.add(scrollPane3, CC.xy(1, 3, CC.DEFAULT, CC.FILL));
+
+                //======== splitPane1 ========
+                {
+                    splitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
+
+                    //======== scrollPane5 ========
+                    {
+                        scrollPane5.setViewportView(table1);
+                    }
+                    splitPane1.setTopComponent(scrollPane5);
+
+                    //======== scrollPane4 ========
+                    {
+                        scrollPane4.setViewportView(textArea1);
+                    }
+                    splitPane1.setBottomComponent(scrollPane4);
+                }
+                panel5.add(splitPane1, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
+            }
+            tabbedPane1.addTab("text", panel5);
         }
         add(tabbedPane1, BorderLayout.CENTER);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -805,5 +844,13 @@ public class PnlDev extends CleanablePanel {
     private JLabel label4;
     private JDateChooser dcTo;
     private JButton btnVKontrole;
+    private JPanel panel5;
+    private JScrollPane scrollPane3;
+    private JTree tree1;
+    private JSplitPane splitPane1;
+    private JScrollPane scrollPane5;
+    private JTable table1;
+    private JScrollPane scrollPane4;
+    private JTextArea textArea1;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -370,6 +370,7 @@ public class OPDE {
         uptime = SYSCalendar.now();
 
         lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
+
         validatorFactory = Validation.buildDefaultValidatorFactory();
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> OPDE.fatal(e));

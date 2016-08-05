@@ -495,6 +495,16 @@ public class SYSConst {
     public static final Icon icon22add = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/add.png"));
     public static final Icon icon22mailON = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_forward.png"));
     public static final Icon icon22mailOFF = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_delete.png"));
+
+    public static final Icon icon22mailForward = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_forward.png"));
+    public static final Icon icon22mailDelete = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_delete.png"));
+    public static final Icon icon22mailSend = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_send.png"));
+    public static final Icon icon22mailGeneric = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_generic.png"));
+    public static final Icon icon22mailGet = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_get.png"));
+    public static final Icon icon22mailNew = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_new.png"));
+    public static final Icon icon22mailReply = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_reply.png"));
+    public static final Icon icon22mailReplayAll = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_replyall.png"));
+
     public static final Icon icon22addGroup = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_group.png"));
     public static final Icon icon22addPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/add-pressed.png"));
     public static final Icon icon22addUser = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_user.png"));

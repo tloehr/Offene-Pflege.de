@@ -42,6 +42,11 @@
             <manager langbundle="opde.settings.acl.manager"/>
             <user1 langbundle="opde.settings.acl.user1"/>
         </class>
+        <class name="opde.mx" short="opde.mx.appinfo.short"
+               long="opde.mx.appinfo.long" main="true"
+               javaclass="op.mx.PnlMX" icon="mail.png">
+            <execute langbundle="opde.mx.acl.execute"/>
+        </class>
         <class name="admin.residents.cash" short="admin.residents.cash.appinfo.short"
                long="admin.residents.cash.appinfo.long" main="true"
                javaclass="op.allowance.PnlAllowance" icon="coins.png">
@@ -69,7 +74,8 @@
             <update langbundle="nursingrecords.prescription.acl.update"/>
         </class>
         <class name="nursingrecords.nursingprocess" short="nursingrecords.nursingprocess.appinfo.short"
-               long="nursingrecords.nursingprocess.appinfo.long" helpurl="nursingrecords.nursingprocess.appinfo.helpurl">
+               long="nursingrecords.nursingprocess.appinfo.long"
+               helpurl="nursingrecords.nursingprocess.appinfo.helpurl">
             <print langbundle="nursingrecords.nursingprocess.acl.print"/>
             <delete langbundle="nursingrecords.nursingprocess.acl.delete"/>
             <update langbundle="nursingrecords.nursingprocess.acl.update"/>
@@ -85,12 +91,14 @@
             <update langbundle="nursingrecords.reports.acl.update"/>
         </class>
         <class name="nursingrecords.vitalparameters" short="nursingrecords.vitalparameters.appinfo.short"
-               long="nursingrecords.vitalparameters.appinfo.long" helpurl="nursingrecords.vitalparameters.appinfo.helpurl">
+               long="nursingrecords.vitalparameters.appinfo.long"
+               helpurl="nursingrecords.vitalparameters.appinfo.helpurl">
             <print langbundle="nursingrecords.vitalparameters.acl.print"/>
             <update langbundle="nursingrecords.vitalparameters.acl.update"/>
         </class>
         <class name="nursingrecords.liquidbalances" short="nursingrecords.liquidbalances.appinfo.short"
-               long="nursingrecords.liquidbalances.appinfo.long" helpurl="nursingrecords.liquidbalances.appinfo.helpurl">
+               long="nursingrecords.liquidbalances.appinfo.long"
+               helpurl="nursingrecords.liquidbalances.appinfo.helpurl">
         </class>
         <class name="nursingrecords.bhp" short="nursingrecords.bhp.appinfo.short" long="nursingrecords.bhp.appinfo.long"
                helpurl="nursingrecords.bhp.appinfo.helpurl">
@@ -124,7 +132,8 @@
         </class>
         <class name="nursingrecords.handover" short="nursingrecords.handover.appinfo.short"
                long="nursingrecords.handover.appinfo.long" main="true"
-               javaclass="op.care.supervisor.PnlHandover" icon="meeting.png" helpurl="nursingrecords.handover.appinfo.helpurl">
+               javaclass="op.care.supervisor.PnlHandover" icon="meeting.png"
+               helpurl="nursingrecords.handover.appinfo.helpurl">
             <execute langbundle="appinfo.default.acl.execute"/>
             <insert langbundle="nursingrecords.handover.acl.insert"/>
         </class>
@@ -145,7 +154,6 @@
             <archive langbundle="nursingrecords.info.acl.archive"/>
         </class>
     </classes>
-
 
 
 </app>

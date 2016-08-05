@@ -40,6 +40,7 @@ public abstract class CleanablePanel extends javax.swing.JPanel {
         super();
         this.internalClassID = internalClassID;
         helpkey = OPDE.getAppInfo().getInternalClasses().containsKey(internalClassID) ? OPDE.getAppInfo().getInternalClasses().get(internalClassID).getHelpurl() : null;
+        OPDE.getDisplayManager().setMainMessage(internalClassID);
     }
 
     public abstract void cleanup();

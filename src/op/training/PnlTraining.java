@@ -81,7 +81,7 @@ public class PnlTraining extends CleanablePanel {
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
         trainingMap = Collections.synchronizedMap(new HashMap<String, Training>());
         prepareSearchArea();
-        OPDE.getDisplayManager().setMainMessage(internalClassID);
+
     }
 
     @Override

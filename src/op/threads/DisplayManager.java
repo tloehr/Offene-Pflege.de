@@ -1,6 +1,7 @@
 package op.threads;
 
 import entity.files.SYSFilesTools;
+import entity.mx.MXmsgTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -46,6 +47,8 @@ public class DisplayManager extends Thread {
     private int currentAnimationFrameForReload = -1; // -1 means, no animation
     private int timeoutmins;
     private final Logger logger = Logger.getLogger(getClass());
+
+    private SwingWorker mailIconFlasher = null;
 
     public DisplayManager() {
         this.timeoutAction = null;
@@ -295,18 +298,57 @@ public class DisplayManager extends Thread {
         }
     }
 
-    private void check4MaintenanceMode() {
+    public void mailCheck() {
+        // Check 4 new mails ?
+        if (MXmsgTools.hasUnread(OPDE.getLogin().getUser())) {
+            addSubMessage(new DisplayMessage("mx.you.have.mail", 5));
+            if (mailIconFlasher == null) {
+                mailIconFlasher = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        while (!interrupted) {
+                            OPDE.getMainframe().toggleMailIcon();
+                            currentThread().sleep(1000);
+                            OPDE.getMainframe().toggleMailIcon();
+                            currentThread().sleep(1000);
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getMainframe().toggleMailIcon();
+                    }
+                };
+                mailIconFlasher.execute();
+            }
+        } else {
+            if (mailIconFlasher != null) {
+                if (!mailIconFlasher.isDone()) {
+                    mailIconFlasher.cancel(true);
+                    mailIconFlasher = null;
+                }
+            }
+        }
+    }
+
+    private void check4EventsEveryMinute() {
         if (OPDE.getLogin() == null) {
             return;
         }
         int minute = new DateTime().getMinuteOfHour();
         if (minute != lastMinute) {
             lastMinute = minute;
+
+            // Maintenance Mode
             if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
                 SYSFilesTools.print(SYSTools.xx("maintenance.mode.sorry"), false);
                 SYSLoginTools.logout();
                 System.exit(0);
             }
+
+            mailCheck();
+
         }
     }
 
@@ -372,7 +414,7 @@ public class DisplayManager extends Thread {
 
                 processProgressBar();
                 processSubMessage();
-                check4MaintenanceMode();
+                check4EventsEveryMinute();
 
                 if (timeoutmins > 0 && step % 120 == 0) {
                     if (OPDE.getLogin() != null) {

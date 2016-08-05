@@ -1012,6 +1012,21 @@ public class SYSTools {
     }
 
 
+    public static Double getDividerInRelativePosition(JSplitPane mysplit) {
+            int max;
+            int pos = mysplit.getDividerLocation();
+
+            if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
+                max = mysplit.getWidth();
+            } else {
+                max = mysplit.getHeight();
+            }
+            OPDE.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
+            OPDE.debug("DIVIDER MAX POSITION: " + max);
+            OPDE.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
+            return new Double(pos) / new Double(max);
+        }
+
     // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
     public static boolean isWindows() {
 
