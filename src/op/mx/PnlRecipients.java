@@ -41,7 +41,7 @@ public class PnlRecipients extends JPanel {
     int MAXLINE = 5;
 
     public PnlRecipients() {
-        this(new ArrayList<Users>(), false);
+        this(new ArrayList<>(), false);
     }
 
     public PnlRecipients(Collection<Users> recipients, boolean editable) {

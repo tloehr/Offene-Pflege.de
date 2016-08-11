@@ -28,6 +28,22 @@ public class MXmsgTools {
         return result;
     }
 
+    public static ArrayList<MXmsg> getSentFor(Users sender) {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT msg FROM MXmsg msg WHERE msg.sender = :sender ORDER BY msg.pit DESC");
+            query.setParameter("sender", sender);
+            ArrayList<MXmsg> result = null;
+            try {
+                result = new ArrayList<MXmsg>(query.getResultList());
+            } catch (Exception e) {
+                OPDE.fatal(e);
+            }
+            if (result == null) {
+                result = new ArrayList<MXmsg>();
+            }
+            return result;
+        }
+
     public static boolean hasUnread(Users recipient) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT rcp.msg FROM MXrecipient rcp WHERE rcp.recipient = :recipient and rcp.unread = TRUE and rcp.msg.draft = FALSE ");
@@ -41,6 +57,17 @@ public class MXmsgTools {
         }
 
         return result.size() > 0;
+    }
+
+    public static boolean isUnread(MXmsg msg){
+        boolean unread = true;
+        for (MXrecipient mXrecipient : msg.getRecipients()){
+            if (!mXrecipient.isUnread()){
+                unread = false;
+                break;
+            }
+        }
+        return unread;
     }
 
 //     public static boolean isUnread(MXmsg mXmsg, Users user){

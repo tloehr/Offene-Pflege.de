@@ -308,6 +308,11 @@ public class OPDE {
         return login;
     }
 
+    public static Users getMe(){
+        if (login == null) return null;
+        return login.getUser();
+    }
+
     public static void setLogin(SYSLogin login) {
         OPDE.login = login;
     }

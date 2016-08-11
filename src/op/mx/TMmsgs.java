@@ -26,7 +26,9 @@
 package op.mx;
 
 import entity.mx.MXmsg;
+import entity.mx.MXrecipient;
 import entity.mx.MXrecipientTools;
+import entity.system.UsersTools;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -34,7 +36,6 @@ import op.tools.SYSTools;
 import javax.swing.table.AbstractTableModel;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * @author tloehr
@@ -59,27 +60,28 @@ public class TMmsgs extends AbstractTableModel {
     @Override
     public Class getColumnClass(int column) {
 
-        Class thisclass;
-        switch (column) {
-            case COL_PIT: {
-                thisclass = Date.class;
-                break;
-            }
-//                   case COL_USER: {
-//                       thisclass = String.class;
-//                       break;
-//                   }
-//                   case COL_TEXT: {
-//                       thisclass = String.class;
-//                       break;
-//                   }
-            default: {
-                thisclass = String.class;
-            }
-        }
-
-
-        return thisclass;
+        return String.class;
+//        Class thisclass;
+//        switch (column) {
+//            case COL_PIT: {
+//                thisclass = Date.class;
+//                break;
+//            }
+////                   case COL_USER: {
+////                       thisclass = String.class;
+////                       break;
+////                   }
+////                   case COL_TEXT: {
+////                       thisclass = String.class;
+////                       break;
+////                   }
+//            default: {
+//                thisclass = String.class;
+//            }
+//        }
+//
+//
+//        return thisclass;
     }
 
     public void addMsg(MXmsg mXmsg) {
@@ -121,7 +123,10 @@ public class TMmsgs extends AbstractTableModel {
     }
 
     String boldIfUnread(MXmsg msg, String in) {
-        return MXrecipientTools.findMXrecipient(msg, OPDE.getLogin().getUser()).isUnread() ? SYSConst.html_bold(in) : in;
+        if (msg.getRecipients().isEmpty()) return in;
+        if (msg.isDraft()) return in;
+        if (msg.getSender().equals(OPDE.getMe())) return in;
+        return MXrecipientTools.findMXrecipient(msg, OPDE.getMe()).isUnread() ? SYSConst.html_bold(in) : in;
     }
 
 
@@ -132,11 +137,24 @@ public class TMmsgs extends AbstractTableModel {
         MXmsg mymsg = mymodel.get(row);
         switch (column) {
             case COL_PIT: {
-                value = mymodel.get(row).getPit();
+                value = df.format(mymodel.get(row).getPit());
                 break;
             }
             case COL_USER: {
-                value = SYSTools.anonymizeUser(mymodel.get(row).getSender().getUID());
+
+                if (mymsg.getSender().equals(OPDE.getMe())) {
+
+                    String listOfRecipients = "";
+                    for (MXrecipient mxr : mymsg.getRecipients()) {
+                        listOfRecipients += UsersTools.getFullnameWithID(mxr.getRecipient()) + " ";
+                    }
+                    if (listOfRecipients.isEmpty()) listOfRecipients = "mx.norecipients.yet";
+
+                    value = SYSTools.xx("mx.from.me") + " ==> " + listOfRecipients;
+                } else {
+                    value = UsersTools.getFullnameWithID(mymsg.getSender()) + " ==> " + SYSTools.xx("mx.to.me");
+                }
+
                 break;
             }
 
@@ -153,7 +171,9 @@ public class TMmsgs extends AbstractTableModel {
             String html = SYSConst.html_fontface;
             html += "<p>" + boldIfUnread(mymodel.get(row), value.toString()) + "</p>";
             html += "</font>";
-            value = html;
+            value = SYSTools.toHTMLForScreen(html);
+        } else {
+            value = "Fehler";
         }
 
         return value;

@@ -351,6 +351,7 @@ public class FrmMain extends JFrame {
     }
 
 
+
     public void afterLogin() {
         OPDE.getDisplayManager().touch();
         dlgLogin = null;

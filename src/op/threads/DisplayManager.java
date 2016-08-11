@@ -327,6 +327,7 @@ public class DisplayManager extends Thread {
                 if (!mailIconFlasher.isDone()) {
                     mailIconFlasher.cancel(true);
                     mailIconFlasher = null;
+                    OPDE.getMainframe().setMailIconOff();
                 }
             }
         }

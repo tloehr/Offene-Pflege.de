@@ -261,4 +261,5 @@ public class Users implements Serializable, Comparable<Users> {
     public String getFullname() {
         return getName() + ", " + getVorname();
     }
+
 }

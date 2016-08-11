@@ -14,9 +14,10 @@ import entity.mx.MXmsg;
 import entity.mx.MXmsgTools;
 import entity.mx.MXrecipient;
 import entity.mx.MXrecipientTools;
-import entity.system.SYSPropsTools;
 import entity.system.Users;
+import entity.system.UsersTools;
 import gui.GUITools;
+import gui.events.RelaxedDocumentListener;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -26,13 +27,16 @@ import org.jdesktop.swingx.VerticalLayout;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -46,36 +50,49 @@ public class PnlMX extends CleanablePanel {
     private MXmsg currentMessage = null;
     private PnlRecipients pnlRecipients;
     private TMmsgs tmmsgs;
-    boolean splitPaneCurrentlyBeingSetBySystem = false;
+    private boolean singleLineSelected;
+    DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
     public PnlMX(JScrollPane jspSearch) {
         super("opde.mx");
         this.jspSearch = jspSearch;
         initComponents();
+        txtMessage.getDocument().addDocumentListener(new RelaxedDocumentListener(50, var1 -> {
+            if (currentMessage != null) {
+                currentMessage.setText(txtMessage.getText());
+            }
+        }));
+
+        txtSubject.getDocument().addDocumentListener(new RelaxedDocumentListener(50, var1 -> {
+            if (currentMessage != null) {
+                currentMessage.setSubject(txtSubject.getText());
+            }
+        }));
         pnlRecipients = new PnlRecipients();
         initTable();
         prepareSearchArea();
 
-        splitPaneCurrentlyBeingSetBySystem = true;
-        double pos;
-        try {
-            pos = Double.parseDouble(OPDE.getProps().getProperty("opde.mx:splitPaneDividerLocation"));
-        } catch (Exception e) {
-            pos = 0.5d;
-        }
-        splitPane1.setDividerLocation(SYSTools.getDividerInAbsolutePosition(splitPane1, pos));
-        splitPaneCurrentlyBeingSetBySystem = false;
 
         btnSend.setText(SYSTools.xx("mx.send"));
         btnReply.setText(SYSTools.xx("mx.reply"));
+        btnEdit.setText(SYSTools.xx("misc.msg.edit"));
+        btnDelete.setText(SYSTools.xx("misc.msg.delete"));
         btnSave.setText(SYSTools.xx("mx.save.as.draft"));
         btnCancel.setText(SYSTools.xx("opde.wizards.buttontext.cancel"));
-        panel2.add(pnlRecipients, CC.xy(1, 3, CC.DEFAULT, CC.DEFAULT));
+
+        btnSend.setIcon(SYSConst.icon22mailSend);
+        btnReply.setIcon(SYSConst.icon22mailReply);
+        btnEdit.setIcon(SYSConst.icon22edit);
+        btnDelete.setIcon(SYSConst.icon22mailDelete);
+        btnSave.setIcon(SYSConst.icon22save);
+        btnCancel.setIcon(SYSConst.icon22cancel);
+
+        panel2.add(pnlRecipients, CC.xy(1, 3));
         displayMessage();
     }
 
     private void initTable() {
-        tmmsgs = new TMmsgs(MXmsgTools.getAllFor(OPDE.getLogin().getUser()));
+        tmmsgs = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
         tblMsgs.setModel(tmmsgs);
         tblMsgs.getColumnModel().getColumn(TMmsgs.COL_PIT).setCellRenderer(new RNDHTML());
         tblMsgs.getColumnModel().getColumn(TMmsgs.COL_USER).setCellRenderer(new RNDHTML());
@@ -84,6 +101,18 @@ public class PnlMX extends CleanablePanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 mousePressedOnTable(e);
+            }
+        });
+        tblMsgs.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+                if (e.getFirstIndex() == e.getLastIndex()) {
+                    currentMessage = tmmsgs.getRow(e.getFirstIndex());
+                } else {
+                    currentMessage = null;
+                }
+                displayMessage();
             }
         });
     }
@@ -147,7 +176,7 @@ public class PnlMX extends CleanablePanel {
         newMessage.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
         newMessage.setAlignmentX(Component.LEFT_ALIGNMENT);
         newMessage.addActionListener(actionEvent -> {
-            currentMessage = new MXmsg(OPDE.getLogin().getUser());
+            currentMessage = new MXmsg(OPDE.getMe());
             currentMessage.setText("mx.text");
             currentMessage.setSubject("mx.subject");
             displayMessage();
@@ -160,17 +189,26 @@ public class PnlMX extends CleanablePanel {
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        final JButton btnIncoming = GUITools.createHyperlinkButton("mx.incoming", SYSConst.icon16tagPurple, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TMmsgs newModel = new TMmsgs(MXmsgTools.getAllFor(OPDE.getLogin().getUser()));
-                tblMsgs.setModel(newModel);
-                tmmsgs.cleanup();
-                tmmsgs = newModel;
-            }
+        final JButton btnIncoming = GUITools.createHyperlinkButton("mx.incoming", SYSConst.icon16mailGeneric, e -> {
+            TMmsgs newModel = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
+            tblMsgs.setModel(newModel);
+            tmmsgs.cleanup();
+            tmmsgs = newModel;
+            currentMessage = null;
+            displayMessage();
         });
-
         list.add(btnIncoming);
+
+        final JButton btnSent = GUITools.createHyperlinkButton("mx.sent", SYSConst.icon16mailSend, e -> {
+            TMmsgs newModel = new TMmsgs(MXmsgTools.getSentFor(OPDE.getMe()));
+            tblMsgs.setModel(newModel);
+            tmmsgs.cleanup();
+            tmmsgs = newModel;
+            currentMessage = null;
+            displayMessage();
+        });
+        list.add(btnSent);
+
         return list;
     }
 
@@ -184,7 +222,7 @@ public class PnlMX extends CleanablePanel {
                 panel2.remove(pnlRecipients);
                 pnlRecipients.clear();
                 pnlRecipients = new PnlRecipients();
-                panel2.add(pnlRecipients, CC.xy(1, 1, CC.DEFAULT, CC.DEFAULT));
+                panel2.add(pnlRecipients, CC.xy(1, 3, CC.DEFAULT, CC.DEFAULT));
                 revalidate();
                 repaint();
             });
@@ -206,11 +244,8 @@ public class PnlMX extends CleanablePanel {
                 } else {
                     currentMessage.getRecipients().remove(mxRcp);
                 }
-
-                revalidate();
-                repaint();
             }));
-            panel2.add(pnlRecipients, CC.xy(1, 1, CC.DEFAULT, CC.DEFAULT));
+            panel2.add(pnlRecipients, CC.xy(1, 3, CC.DEFAULT, CC.DEFAULT));
             revalidate();
             repaint();
         });
@@ -221,12 +256,12 @@ public class PnlMX extends CleanablePanel {
         txtMessage.setEditable(currentMessage.isDraft());
         txtSubject.setEditable(currentMessage.isDraft());
 
-        if (!currentMessage.isDraft() && !currentMessage.getSender().equals(OPDE.getLogin().getUser()) && MXrecipientTools.isUnread(currentMessage, OPDE.getLogin().getUser())) {
+        if (!currentMessage.isDraft() && !currentMessage.getSender().equals(OPDE.getMe()) && MXrecipientTools.isUnread(currentMessage, OPDE.getMe())) {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
                 final MXmsg myMessage = em.merge(currentMessage);
-                final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getLogin().getUser()));
+                final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
                 myRCP.setReceived(new Date());
                 myRCP.setUnread(false);
                 myMessage.getRecipients().add(myRCP);
@@ -245,11 +280,21 @@ public class PnlMX extends CleanablePanel {
                 OPDE.fatal(ex);
             } finally {
                 em.close();
+                OPDE.getDisplayManager().mailCheck();
             }
+        }
+
+        if (currentMessage.isDraft()) {
+            txtMessage.requestFocus();
         }
     }
 
     private void btnSendActionPerformed(ActionEvent e) {
+
+        if (currentMessage == null) {
+            return;
+        }
+
         if (currentMessage.getRecipients().isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.cant.send.without.recipients", DisplayMessage.WARNING)));
             return;
@@ -261,6 +306,7 @@ public class PnlMX extends CleanablePanel {
         try {
             em.getTransaction().begin();
             final MXmsg myMessage = em.merge(currentMessage);
+            em.lock(myMessage, LockModeType.OPTIMISTIC);
             myMessage.setDraft(false);
             em.getTransaction().commit();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.msg.sent")));
@@ -282,10 +328,15 @@ public class PnlMX extends CleanablePanel {
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
+        if (currentMessage == null) return;
+        if (!currentMessage.getSender().equals(OPDE.getMe())) return;
+        if (!currentMessage.isDraft()) return;
+
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
             final MXmsg myMessage = em.merge(currentMessage);
+            em.lock(myMessage, LockModeType.OPTIMISTIC);
             myMessage.setDraft(true);
             em.getTransaction().commit();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.msg.draft.saved")));
@@ -310,18 +361,61 @@ public class PnlMX extends CleanablePanel {
         SYSTools.markAllTxt((JTextField) e.getSource());
     }
 
-    private void txtMessageCaretUpdate(CaretEvent e) {
-        currentMessage.setText(txtMessage.getText());
-    }
-
-    private void txtSubjectCaretUpdate(CaretEvent e) {
-        currentMessage.setSubject(txtSubject.getText());
-    }
-
     private void splitPane1PropertyChange(PropertyChangeEvent e) {
-        if (!splitPaneCurrentlyBeingSetBySystem) {
-            SYSPropsTools.storeProp("opde.mx:splitPaneDividerLocation", SYSTools.getDividerInRelativePosition(splitPane1).toString(), OPDE.getLogin().getUser());
+//        if (!splitPaneCurrentlyBeingSetBySystem) {
+//            SYSPropsTools.storeProp("opde.mx:splitPaneDividerLocation", SYSTools.getDividerInRelativePosition(splitPane1).toString(), OPDE.getMe());
+//        }
+    }
+
+    private void splitPane1ComponentResized(ComponentEvent e) {
+        splitPane1.setDividerLocation(SYSTools.getDividerInAbsolutePosition(splitPane1, 0.5d));
+    }
+
+    private void splitPane1ComponentShown(ComponentEvent e) {
+
+//        splitPane1.setDividerLocation(SYSTools.getDividerInAbsolutePosition(splitPane1, 0.5d));
+
+        /*
+        splitPaneCurrentlyBeingSetBySystem = true;
+        double pos;
+        try {
+            pos = Double.parseDouble(OPDE.getProps().getProperty("opde.mx:splitPaneDividerLocation"));
+        } catch (Exception ex) {
+            pos = 0.5d;
         }
+        splitPane1.setDividerLocation(SYSTools.getDividerInAbsolutePosition(splitPane1, pos));
+        splitPaneCurrentlyBeingSetBySystem = false;
+        */
+    }
+
+    private void btnCancelActionPerformed(ActionEvent e) {
+        currentMessage = null;
+        displayMessage();
+    }
+
+    private void btnReplyActionPerformed(ActionEvent e) {
+        if (currentMessage == null) return;
+        if (currentMessage.isDraft()) return;
+        if (currentMessage.getSender().equals(OPDE.getMe())) return; // cant reply to myself
+        MXmsg answer = new MXmsg(OPDE.getMe());
+
+        answer.getRecipients().add(new MXrecipient(currentMessage.getSender(), answer));
+        answer.setText("\n----\n" + SYSTools.xx("mx.in.reply.to") + "\n" + UsersTools.getFullnameWithID(currentMessage.getSender()) + ", " + df.format(currentMessage.getPit()) + "\n----\n" + currentMessage.getText());
+        answer.setSubject(currentMessage.getSubject().startsWith("Re:") ? currentMessage.getSubject() : "Re: " + currentMessage.getSubject());
+
+        currentMessage = answer;
+
+        displayMessage();
+    }
+
+    private void btnEditActionPerformed(ActionEvent e) {
+        if (currentMessage == null) return;
+        if (!currentMessage.getSender().equals(OPDE.getMe())) return; // cant edit others
+        if (!currentMessage.isDraft() || !MXmsgTools.isUnread(currentMessage)) return;
+
+        currentMessage.setDraft(true);
+
+        displayMessage();
     }
 
     private void initComponents() {
@@ -338,17 +432,25 @@ public class PnlMX extends CleanablePanel {
         btnSend = new JButton();
         btnReply = new JButton();
         btnSave = new JButton();
+        btnEdit = new JButton();
+        btnDelete = new JButton();
         btnCancel = new JButton();
 
         //======== this ========
         setLayout(new FormLayout(
-            "pref:grow",
-            "default:grow, default"));
+                "pref:grow",
+                "default:grow, default"));
 
         //======== splitPane1 ========
         {
             splitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
             splitPane1.addPropertyChangeListener(e -> splitPane1PropertyChange(e));
+            splitPane1.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    splitPane1ComponentResized(e);
+                }
+            });
 
             //======== scrollPane5 ========
             {
@@ -359,8 +461,8 @@ public class PnlMX extends CleanablePanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "default:grow",
-                    "default, $nlgap, pref, $nlgap, default, $nlgap, fill:default:grow"));
+                        "default:grow",
+                        "default, $nlgap, pref, $nlgap, default, $nlgap, fill:default:grow"));
 
                 //---- lblFrom ----
                 lblFrom.setText("text");
@@ -374,14 +476,10 @@ public class PnlMX extends CleanablePanel {
                         txtSubjectFocusGained(e);
                     }
                 });
-                txtSubject.addCaretListener(e -> txtSubjectCaretUpdate(e));
                 panel2.add(txtSubject, CC.xy(1, 5));
 
                 //======== scrollPane4 ========
                 {
-
-                    //---- txtMessage ----
-                    txtMessage.addCaretListener(e -> txtMessageCaretUpdate(e));
                     scrollPane4.setViewportView(txtMessage);
                 }
                 panel2.add(scrollPane4, CC.xy(1, 7));
@@ -393,8 +491,8 @@ public class PnlMX extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "3*(default, $lcgap), right:default:grow",
-                "default"));
+                    "5*(default, $lcgap), right:default:grow",
+                    "default"));
 
             //---- btnSend ----
             btnSend.setText("Senden");
@@ -403,6 +501,7 @@ public class PnlMX extends CleanablePanel {
 
             //---- btnReply ----
             btnReply.setText("text");
+            btnReply.addActionListener(e -> btnReplyActionPerformed(e));
             panel1.add(btnReply, CC.xy(3, 1));
 
             //---- btnSave ----
@@ -410,9 +509,19 @@ public class PnlMX extends CleanablePanel {
             btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panel1.add(btnSave, CC.xy(5, 1));
 
+            //---- btnEdit ----
+            btnEdit.setText("text");
+            btnEdit.addActionListener(e -> btnEditActionPerformed(e));
+            panel1.add(btnEdit, CC.xy(7, 1));
+
+            //---- btnDelete ----
+            btnDelete.setText("text");
+            panel1.add(btnDelete, CC.xy(9, 1));
+
             //---- btnCancel ----
             btnCancel.setText("text");
-            panel1.add(btnCancel, CC.xy(7, 1));
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
+            panel1.add(btnCancel, CC.xy(11, 1));
         }
         add(panel1, CC.xy(1, 2));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -431,6 +540,8 @@ public class PnlMX extends CleanablePanel {
     private JButton btnSend;
     private JButton btnReply;
     private JButton btnSave;
+    private JButton btnEdit;
+    private JButton btnDelete;
     private JButton btnCancel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -496,6 +496,8 @@ public class SYSConst {
     public static final Icon icon22mailON = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_forward.png"));
     public static final Icon icon22mailOFF = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_delete.png"));
 
+    public static final Icon icon22save = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/lc_save.png"));
+
     public static final Icon icon22mailForward = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_forward.png"));
     public static final Icon icon22mailDelete = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_delete.png"));
     public static final Icon icon22mailSend = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_send.png"));
@@ -718,6 +720,16 @@ public class SYSConst {
 
     public static final Icon icon16user = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/user_active.png"));
     public static final Icon icon16userDel = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/delete_user.png"));
+
+    public static final Icon icon16mailForward = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_forward.png"));
+    public static final Icon icon16mailDelete = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_delete.png"));
+    public static final Icon icon16mailSend = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_send.png"));
+    public static final Icon icon16mailGeneric = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_generic.png"));
+    public static final Icon icon16mailGet = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_get.png"));
+    public static final Icon icon16mailNew = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_new.png"));
+    public static final Icon icon16mailReply = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_reply.png"));
+    public static final Icon icon16mailReplayAll = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_replyall.png"));
+
 
     public static final Icon icon32reload0 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0000.png"));
     public static final Icon icon32reload1 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0225.png"));

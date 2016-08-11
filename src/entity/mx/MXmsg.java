@@ -59,7 +59,7 @@ public class MXmsg implements Serializable {
     /**
      * the list of the users to receive this message
      */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "msg", fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "msg", fetch = FetchType.LAZY)
     private Set<MXrecipient> recipients;
 
     @Version
