@@ -14,7 +14,7 @@ public class MXmsgTools {
 
     public static ArrayList<MXmsg> getAllFor(Users recipient) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT rcp.msg FROM MXrecipient rcp WHERE rcp.recipient = :recipient ORDER BY rcp.msg.pit DESC");
+        Query query = em.createQuery("SELECT rcp.msg FROM MXrecipient rcp WHERE rcp.recipient = :recipient AND rcp.msg.draft = FALSE AND rcp.trashed = FALSE ORDER BY rcp.msg.pit DESC");
         query.setParameter("recipient", recipient);
         ArrayList<MXmsg> result = null;
         try {
@@ -29,20 +29,52 @@ public class MXmsgTools {
     }
 
     public static ArrayList<MXmsg> getSentFor(Users sender) {
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT msg FROM MXmsg msg WHERE msg.sender = :sender ORDER BY msg.pit DESC");
-            query.setParameter("sender", sender);
-            ArrayList<MXmsg> result = null;
-            try {
-                result = new ArrayList<MXmsg>(query.getResultList());
-            } catch (Exception e) {
-                OPDE.fatal(e);
-            }
-            if (result == null) {
-                result = new ArrayList<MXmsg>();
-            }
-            return result;
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT msg FROM MXmsg msg WHERE msg.sender = :sender AND msg.draft = FALSE ORDER BY msg.pit DESC");
+        query.setParameter("sender", sender);
+        ArrayList<MXmsg> result = null;
+        try {
+            result = new ArrayList<MXmsg>(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
         }
+        if (result == null) {
+            result = new ArrayList<MXmsg>();
+        }
+        return result;
+    }
+
+    public static ArrayList<MXmsg> getDrafts(Users sender) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT msg FROM MXmsg msg WHERE msg.sender = :sender AND msg.draft = TRUE ORDER BY msg.pit DESC");
+        query.setParameter("sender", sender);
+        ArrayList<MXmsg> result = null;
+        try {
+            result = new ArrayList<MXmsg>(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        if (result == null) {
+            result = new ArrayList<MXmsg>();
+        }
+        return result;
+    }
+
+    public static ArrayList<MXmsg> getTrashed(Users recipient) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT rcp.msg FROM MXrecipient rcp WHERE rcp.recipient = :recipient AND rcp.trashed = TRUE ORDER BY rcp.msg.pit DESC");
+        query.setParameter("recipient", recipient);
+        ArrayList<MXmsg> result = null;
+        try {
+            result = new ArrayList<MXmsg>(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        if (result == null) {
+            result = new ArrayList<MXmsg>();
+        }
+        return result;
+    }
 
     public static boolean hasUnread(Users recipient) {
         EntityManager em = OPDE.createEM();
@@ -59,10 +91,10 @@ public class MXmsgTools {
         return result.size() > 0;
     }
 
-    public static boolean isUnread(MXmsg msg){
+    public static boolean isUnread(MXmsg msg) {
         boolean unread = true;
-        for (MXrecipient mXrecipient : msg.getRecipients()){
-            if (!mXrecipient.isUnread()){
+        for (MXrecipient mXrecipient : msg.getRecipients()) {
+            if (!mXrecipient.isUnread()) {
                 unread = false;
                 break;
             }

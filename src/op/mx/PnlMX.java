@@ -21,8 +21,11 @@ import gui.events.RelaxedDocumentListener;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.threads.DisplayMessage;
+import op.tools.DlgYesNo;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import tablerenderer.RNDHTML;
 
@@ -30,8 +33,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -47,25 +48,26 @@ public class PnlMX extends CleanablePanel {
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private MXmsg currentMessage = null;
+    //    private MXmsg currentMessageInEditor = null;
     private PnlRecipients pnlRecipients;
     private TMmsgs tmmsgs;
     private boolean singleLineSelected;
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    private Logger logger = Logger.getLogger(getClass());
 
     public PnlMX(JScrollPane jspSearch) {
         super("opde.mx");
         this.jspSearch = jspSearch;
         initComponents();
         txtMessage.getDocument().addDocumentListener(new RelaxedDocumentListener(50, var1 -> {
-            if (currentMessage != null) {
-                currentMessage.setText(txtMessage.getText());
+            if (currentMessageInEditor != null) {
+                currentMessageInEditor.setText(txtMessage.getText());
             }
         }));
 
         txtSubject.getDocument().addDocumentListener(new RelaxedDocumentListener(50, var1 -> {
-            if (currentMessage != null) {
-                currentMessage.setSubject(txtSubject.getText());
+            if (currentMessageInEditor != null) {
+                currentMessageInEditor.setSubject(txtSubject.getText());
             }
         }));
         pnlRecipients = new PnlRecipients();
@@ -75,15 +77,11 @@ public class PnlMX extends CleanablePanel {
 
         btnSend.setText(SYSTools.xx("mx.send"));
         btnReply.setText(SYSTools.xx("mx.reply"));
-        btnEdit.setText(SYSTools.xx("misc.msg.edit"));
-        btnDelete.setText(SYSTools.xx("misc.msg.delete"));
         btnSave.setText(SYSTools.xx("mx.save.as.draft"));
         btnCancel.setText(SYSTools.xx("opde.wizards.buttontext.cancel"));
 
         btnSend.setIcon(SYSConst.icon22mailSend);
         btnReply.setIcon(SYSConst.icon22mailReply);
-        btnEdit.setIcon(SYSConst.icon22edit);
-        btnDelete.setIcon(SYSConst.icon22mailDelete);
         btnSave.setIcon(SYSConst.icon22save);
         btnCancel.setIcon(SYSConst.icon22cancel);
 
@@ -103,18 +101,18 @@ public class PnlMX extends CleanablePanel {
                 mousePressedOnTable(e);
             }
         });
-        tblMsgs.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) return;
-                if (e.getFirstIndex() == e.getLastIndex()) {
-                    currentMessage = tmmsgs.getRow(e.getFirstIndex());
-                } else {
-                    currentMessage = null;
-                }
-                displayMessage();
-            }
-        });
+//        tblMsgs.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//            @Override
+//            public void valueChanged(ListSelectionEvent e) {
+//                if (e.getValueIsAdjusting()) return;
+//                if (e.getFirstIndex() == e.getLastIndex()) {
+//                    currentMessageInEditor = tmmsgs.getRow(e.getFirstIndex());
+//                } else {
+//                    currentMessageInEditor = null;
+//                }
+//                displayMessage();
+//            }
+//        });
     }
 
     private void mousePressedOnTable(MouseEvent evt) {
@@ -133,9 +131,14 @@ public class PnlMX extends CleanablePanel {
             lsm.setSelectionInterval(row, row);
         }
 
-        currentMessage = tmmsgs.getRow(row);
-        displayMessage();
+//        currentMessageInEditor = tmmsgs.getRow(row);
+//        displayMessage();
 
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
     }
 
     private void prepareSearchArea() {
@@ -176,10 +179,10 @@ public class PnlMX extends CleanablePanel {
         newMessage.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
         newMessage.setAlignmentX(Component.LEFT_ALIGNMENT);
         newMessage.addActionListener(actionEvent -> {
-            currentMessage = new MXmsg(OPDE.getMe());
-            currentMessage.setText("mx.text");
-            currentMessage.setSubject("mx.subject");
-            displayMessage();
+            MXmsg myMsg = new MXmsg(OPDE.getMe());
+            myMsg.setText("mx.text");
+            myMsg.setSubject("mx.subject");
+            displayMessage(myMsg);
         });
         list.add(newMessage);
 
@@ -190,30 +193,54 @@ public class PnlMX extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         final JButton btnIncoming = GUITools.createHyperlinkButton("mx.incoming", SYSConst.icon16mailGeneric, e -> {
+            currentMessageInEditor = null;
             TMmsgs newModel = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
             tblMsgs.setModel(newModel);
             tmmsgs.cleanup();
             tmmsgs = newModel;
-            currentMessage = null;
             displayMessage();
         });
         list.add(btnIncoming);
 
         final JButton btnSent = GUITools.createHyperlinkButton("mx.sent", SYSConst.icon16mailSend, e -> {
+            currentMessageInEditor = null;
             TMmsgs newModel = new TMmsgs(MXmsgTools.getSentFor(OPDE.getMe()));
             tblMsgs.setModel(newModel);
             tmmsgs.cleanup();
             tmmsgs = newModel;
-            currentMessage = null;
             displayMessage();
         });
         list.add(btnSent);
 
+        final JButton btnDrafts = GUITools.createHyperlinkButton("mx.drafts", SYSConst.icon16mailGeneric, e -> {
+            currentMessageInEditor = null;
+            TMmsgs newModel = new TMmsgs(MXmsgTools.getDrafts(OPDE.getMe()));
+            tblMsgs.setModel(newModel);
+            tmmsgs.cleanup();
+            tmmsgs = newModel;
+            displayMessage();
+        });
+        list.add(btnDrafts);
+
+        final JButton btnTrashed = GUITools.createHyperlinkButton("mx.trashed", SYSConst.icon16mailGeneric, e -> {
+            currentMessageInEditor = null;
+            TMmsgs newModel = new TMmsgs(MXmsgTools.getTrashed(OPDE.getMe()));
+            tblMsgs.setModel(newModel);
+            tmmsgs.cleanup();
+            tmmsgs = newModel;
+            displayMessage();
+        });
+        list.add(btnTrashed);
+
         return list;
     }
 
-    private void displayMessage() {
-        if (currentMessage == null) {
+    private void displayMessage(MXmsg msg) {
+        currentMessageInEditor = msg;
+
+        logger.debug("displayMessage(" + msg.toString() + ")");
+
+        if (msg == null) {
             txtSubject.setText("");
             txtMessage.setText("");
             lblFrom.setText("");
@@ -230,19 +257,52 @@ public class PnlMX extends CleanablePanel {
             return;
         }
 
-        txtMessage.setText(currentMessage.getText());
+        // as soon as you can read the message in the editor, it is marked as RECEIVED with the current time.
+              if (!msg.isDraft() && !msg.getSender().equals(OPDE.getMe()) && MXrecipientTools.isUnread(msg, OPDE.getMe())) {
+                  EntityManager em = OPDE.createEM();
+                  try {
+                      em.getTransaction().begin();
+                      final MXmsg myMessage = em.merge(msg);
+                      final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
+                      myRCP.setReceived(new Date());
+                      myRCP.setUnread(false);
+                      myMessage.getRecipients().add(myRCP);
+                      em.getTransaction().commit();
+                      currentMessageInEditor = myMessage;
+                      msg = myMessage;
+                      tmmsgs.updateMsg(myMessage);
+                  } catch (OptimisticLockException ole) {
+                      OPDE.warn(ole);
+                      if (em.getTransaction().isActive()) {
+                          em.getTransaction().rollback();
+                      }
+                      currentMessageInEditor = null;
+                      reload();
+                  } catch (Exception ex) {
+                      if (em.getTransaction().isActive()) {
+                          em.getTransaction().rollback();
+                      }
+                      OPDE.fatal(ex);
+                  } finally {
+                      em.close();
+                      OPDE.getDisplayManager().mailCheck();
+                  }
+              }
+
+
+        txtMessage.setText(msg.getText());
 
         SwingUtilities.invokeLater(() -> {
             panel2.remove(pnlRecipients);
             pnlRecipients.clear();
-            pnlRecipients = new PnlRecipients(MXrecipientTools.getAllUsersFor(currentMessage.getRecipients()), currentMessage.isDraft());
+            pnlRecipients = new PnlRecipients(MXrecipientTools.getAllUsersFor(msg.getRecipients()), msg.isDraft());
             pnlRecipients.addNotifyListeners(o -> SwingUtilities.invokeLater(() -> {
                 Users recipientToChange = ((Users) o);
-                MXrecipient mxRcp = MXrecipientTools.findMXrecipient(currentMessage, recipientToChange);
+                MXrecipient mxRcp = MXrecipientTools.findMXrecipient(msg, recipientToChange);
                 if (mxRcp == null) {
-                    currentMessage.getRecipients().add(new MXrecipient(recipientToChange, currentMessage));
+                    msg.getRecipients().add(new MXrecipient(recipientToChange, msg));
                 } else {
-                    currentMessage.getRecipients().remove(mxRcp);
+                    msg.getRecipients().remove(mxRcp);
                 }
             }));
             panel2.add(pnlRecipients, CC.xy(1, 3, CC.DEFAULT, CC.DEFAULT));
@@ -250,62 +310,34 @@ public class PnlMX extends CleanablePanel {
             repaint();
         });
 
-        txtSubject.setText(currentMessage.getSubject());
-        lblFrom.setText(SYSTools.xx("mx.sender") + ": " + currentMessage.getSender().getVorname() + " " + currentMessage.getSender().getName() + " [" + currentMessage.getSender().getUID() + "]");
-        pnlRecipients.setEditable(currentMessage.isDraft());
-        txtMessage.setEditable(currentMessage.isDraft());
-        txtSubject.setEditable(currentMessage.isDraft());
+        txtSubject.setText(msg.getSubject());
+        lblFrom.setText(SYSTools.xx("mx.sender") + ": " + msg.getSender().getVorname() + " " + msg.getSender().getName() + " [" + msg.getSender().getUID() + "]");
+        pnlRecipients.setEditable(msg.isDraft());
+        txtMessage.setEditable(msg.isDraft());
+        txtSubject.setEditable(msg.isDraft());
 
-        if (!currentMessage.isDraft() && !currentMessage.getSender().equals(OPDE.getMe()) && MXrecipientTools.isUnread(currentMessage, OPDE.getMe())) {
-            EntityManager em = OPDE.createEM();
-            try {
-                em.getTransaction().begin();
-                final MXmsg myMessage = em.merge(currentMessage);
-                final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
-                myRCP.setReceived(new Date());
-                myRCP.setUnread(false);
-                myMessage.getRecipients().add(myRCP);
-                em.getTransaction().commit();
-                currentMessage = myMessage;
-                tmmsgs.updateMsg(currentMessage);
-            } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-            } catch (Exception ex) {
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                OPDE.fatal(ex);
-            } finally {
-                em.close();
-                OPDE.getDisplayManager().mailCheck();
-            }
-        }
 
-        if (currentMessage.isDraft()) {
-            txtMessage.requestFocus();
-        }
+
+
     }
 
     private void btnSendActionPerformed(ActionEvent e) {
 
-        if (currentMessage == null) {
+        if (currentMessageInEditor == null) {
             return;
         }
 
-        if (currentMessage.getRecipients().isEmpty()) {
+        if (currentMessageInEditor.getRecipients().isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.cant.send.without.recipients", DisplayMessage.WARNING)));
             return;
         }
 
-        if (!currentMessage.isDraft()) return;
+        if (!currentMessageInEditor.isDraft()) return;
 
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            final MXmsg myMessage = em.merge(currentMessage);
+            final MXmsg myMessage = em.merge(currentMessageInEditor);
             em.lock(myMessage, LockModeType.OPTIMISTIC);
             myMessage.setDraft(false);
             em.getTransaction().commit();
@@ -322,20 +354,20 @@ public class PnlMX extends CleanablePanel {
             OPDE.fatal(ex);
         } finally {
             em.close();
-            currentMessage = null;
+            currentMessageInEditor = null;
             displayMessage();
         }
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
-        if (currentMessage == null) return;
-        if (!currentMessage.getSender().equals(OPDE.getMe())) return;
-        if (!currentMessage.isDraft()) return;
+        if (currentMessageInEditor == null) return;
+        if (!currentMessageInEditor.getSender().equals(OPDE.getMe())) return;
+        if (!currentMessageInEditor.isDraft()) return;
 
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            final MXmsg myMessage = em.merge(currentMessage);
+            final MXmsg myMessage = em.merge(currentMessageInEditor);
             em.lock(myMessage, LockModeType.OPTIMISTIC);
             myMessage.setDraft(true);
             em.getTransaction().commit();
@@ -352,7 +384,7 @@ public class PnlMX extends CleanablePanel {
             OPDE.fatal(ex);
         } finally {
             em.close();
-            currentMessage = null;
+            currentMessageInEditor = null;
             displayMessage();
         }
     }
@@ -389,34 +421,149 @@ public class PnlMX extends CleanablePanel {
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
-        currentMessage = null;
-        displayMessage();
+        displayMessage(null);
     }
 
     private void btnReplyActionPerformed(ActionEvent e) {
-        if (currentMessage == null) return;
-        if (currentMessage.isDraft()) return;
-        if (currentMessage.getSender().equals(OPDE.getMe())) return; // cant reply to myself
+        if (currentMessageInEditor == null) return;
+        if (currentMessageInEditor.isDraft()) return;
+        if (currentMessageInEditor.getSender().equals(OPDE.getMe())) return; // cant reply to myself
         MXmsg answer = new MXmsg(OPDE.getMe());
 
-        answer.getRecipients().add(new MXrecipient(currentMessage.getSender(), answer));
-        answer.setText("\n----\n" + SYSTools.xx("mx.in.reply.to") + "\n" + UsersTools.getFullnameWithID(currentMessage.getSender()) + ", " + df.format(currentMessage.getPit()) + "\n----\n" + currentMessage.getText());
-        answer.setSubject(currentMessage.getSubject().startsWith("Re:") ? currentMessage.getSubject() : "Re: " + currentMessage.getSubject());
+        answer.getRecipients().add(new MXrecipient(currentMessageInEditor.getSender(), answer));
+        answer.setText("\n----\n" + SYSTools.xx("mx.in.reply.to") + "\n" + UsersTools.getFullnameWithID(currentMessageInEditor.getSender()) + ", " + df.format(currentMessageInEditor.getPit()) + "\n----\n" + currentMessageInEditor.getText());
+        answer.setSubject(currentMessageInEditor.getSubject().startsWith("Re:") ? currentMessageInEditor.getSubject() : "Re: " + currentMessageInEditor.getSubject());
 
-        currentMessage = answer;
-
-        displayMessage();
-    }
-
-    private void btnEditActionPerformed(ActionEvent e) {
-        if (currentMessage == null) return;
-        if (!currentMessage.getSender().equals(OPDE.getMe())) return; // cant edit others
-        if (!currentMessage.isDraft() || !MXmsgTools.isUnread(currentMessage)) return;
-
-        currentMessage.setDraft(true);
+        currentMessageInEditor = answer;
 
         displayMessage();
     }
+
+
+    private JPanel getMenu(final MXmsg msg) {
+
+        JPanel pnlMenu = new JPanel(new VerticalLayout());
+
+
+        /***
+         *      _____    _ _ _
+         *     | ____|__| (_) |_
+         *     |  _| / _` | | __|
+         *     | |__| (_| | | |_
+         *     |_____\__,_|_|\__|
+         *
+         */
+        final JButton btnEdit = GUITools.createHyperlinkButton("misc.msg.edit", SYSConst.icon22edit3, null);
+        btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnEdit.addActionListener(actionEvent -> {
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                final MXmsg myMessage = em.merge(msg);
+                em.lock(myMessage, LockModeType.OPTIMISTIC);
+                myMessage.setDraft(true);
+                em.getTransaction().commit();
+                displayMessage(msg);
+            } catch (OptimisticLockException ole) {
+                OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                displayMessage(null);
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(ex);
+            } finally {
+                em.close();
+
+            }
+        });
+        btnEdit.setEnabled(
+                msg.getSender().equals(OPDE.getMe()) &&
+                        (msg.isDraft() || MXmsgTools.isUnread(msg))
+        );
+        pnlMenu.add(btnEdit);
+
+        /***
+         *      ____       _      _
+         *     |  _ \  ___| | ___| |_ ___
+         *     | | | |/ _ \ |/ _ \ __/ _ \
+         *     | |_| |  __/ |  __/ ||  __/
+         *     |____/ \___|_|\___|\__\___|
+         *
+         */
+        final JButton btnDelete = GUITools.createHyperlinkButton("misc.msg.delete", SYSConst.icon22delete, null);
+        btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(msg.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    @Override
+                    public void execute(Object answer) {
+                        if (answer.equals(JOptionPane.YES_OPTION)) {
+
+
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                final MXmsg myMessage = em.merge(msg);
+                                em.lock(myMessage, LockModeType.OPTIMISTIC);
+
+                                if (myMessage.getSender().equals(OPDE.getMe())) {
+                                    // my message ? then delete it
+                                    em.remove(myMessage);
+                                } else {
+                                    // FOR me ? mark it as trashed
+                                    final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
+                                    em.lock(myRCP, LockModeType.OPTIMISTIC);
+                                    myRCP.setTrashed(true);
+                                }
+
+                                em.getTransaction().commit();
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.msg.trashed")));
+
+                                displayMessage(null);
+
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                            } catch (Exception ex) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(ex);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        btnDelete.setEnabled(
+                (
+                        // if this is my message, then I can only delete it as long as it is in Draft mode or yet unread.
+                        // my own messages are REALLY delete rather than marked as trashed
+                        msg.getSender().equals(OPDE.getMe()) &&
+                                (msg.isDraft() || MXmsgTools.isUnread(msg))
+                ) ||
+                        (
+                                // I can always delete messages sent to me, because they are never really
+                                // deleted. simply put to trash.
+                                !msg.getSender().equals(OPDE.getMe())
+                        )
+        );
+        pnlMenu.add(btnDelete);
+
+
+        return pnlMenu;
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -432,8 +579,6 @@ public class PnlMX extends CleanablePanel {
         btnSend = new JButton();
         btnReply = new JButton();
         btnSave = new JButton();
-        btnEdit = new JButton();
-        btnDelete = new JButton();
         btnCancel = new JButton();
 
         //======== this ========
@@ -480,6 +625,10 @@ public class PnlMX extends CleanablePanel {
 
                 //======== scrollPane4 ========
                 {
+
+                    //---- txtMessage ----
+                    txtMessage.setLineWrap(true);
+                    txtMessage.setWrapStyleWord(true);
                     scrollPane4.setViewportView(txtMessage);
                 }
                 panel2.add(scrollPane4, CC.xy(1, 7));
@@ -509,15 +658,6 @@ public class PnlMX extends CleanablePanel {
             btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panel1.add(btnSave, CC.xy(5, 1));
 
-            //---- btnEdit ----
-            btnEdit.setText("text");
-            btnEdit.addActionListener(e -> btnEditActionPerformed(e));
-            panel1.add(btnEdit, CC.xy(7, 1));
-
-            //---- btnDelete ----
-            btnDelete.setText("text");
-            panel1.add(btnDelete, CC.xy(9, 1));
-
             //---- btnCancel ----
             btnCancel.setText("text");
             btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
@@ -540,8 +680,6 @@ public class PnlMX extends CleanablePanel {
     private JButton btnSend;
     private JButton btnReply;
     private JButton btnSave;
-    private JButton btnEdit;
-    private JButton btnDelete;
     private JButton btnCancel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

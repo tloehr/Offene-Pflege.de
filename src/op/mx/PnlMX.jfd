@@ -45,6 +45,8 @@ new FormModel {
 						name: "scrollPane4"
 						add( new FormComponent( "javax.swing.JTextArea" ) {
 							name: "txtMessage"
+							"lineWrap": true
+							"wrapStyleWord": true
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 1
@@ -80,21 +82,6 @@ new FormModel {
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnSaveActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 5
-					"gridY": 1
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "btnEdit"
-					"text": "text"
-					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnEditActionPerformed", true ) )
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 7
-					"gridY": 1
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "btnDelete"
-					"text": "text"
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 9
 					"gridY": 1
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
