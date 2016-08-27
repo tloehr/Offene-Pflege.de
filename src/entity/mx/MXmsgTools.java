@@ -28,6 +28,22 @@ public class MXmsgTools {
         return result;
     }
 
+    public static ArrayList<MXmsg> getAllUnreadFor(Users recipient) {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT rcp.msg FROM MXrecipient rcp WHERE rcp.recipient = :recipient AND rcp.msg.draft = FALSE AND rcp.trashed = FALSE and rcp.unread = TRUE ORDER BY rcp.msg.pit DESC");
+            query.setParameter("recipient", recipient);
+            ArrayList<MXmsg> result = null;
+            try {
+                result = new ArrayList<MXmsg>(query.getResultList());
+            } catch (Exception e) {
+                OPDE.fatal(e);
+            }
+            if (result == null) {
+                result = new ArrayList<MXmsg>();
+            }
+            return result;
+        }
+
     public static ArrayList<MXmsg> getSentFor(Users sender) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT msg FROM MXmsg msg WHERE msg.sender = :sender AND msg.draft = FALSE ORDER BY msg.pit DESC");

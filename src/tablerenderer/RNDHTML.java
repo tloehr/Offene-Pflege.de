@@ -4,21 +4,13 @@
  */
 package tablerenderer;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Closure;
-import entity.files.SYSFiles;
-import entity.files.SYSFilesTools;
-import op.OPDE;
-import op.system.FileDrop;
-import op.threads.DisplayMessage;
 import op.tools.SYSTools;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.text.EditorKit;
-import javax.swing.text.StyledEditorKit;
 import java.awt.*;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -33,8 +25,8 @@ import java.util.Map;
  *
  * @author Heinz Kabutz: This code is from The Java Specialists' Newsletter http://www.javaspecialists.eu, used with permission.
  * @see "http://www.offene-pflege.de/component/content/article/3-informationen/9-quellen#TJSN"
- *      <p/>
- *      geringe Änderung zur HTML Fähigkeit. JTextPane statt JTextArea
+ * <p/>
+ * geringe Änderung zur HTML Fähigkeit. JTextPane statt JTextArea
  */
 public class RNDHTML implements TableCellRenderer {
 
@@ -47,6 +39,7 @@ public class RNDHTML implements TableCellRenderer {
 
     protected JTextPane txt;
     protected JPanel panel;
+    private Logger logger = Logger.getLogger(getClass());
 
 //    public RNDHTML() {
 //        this(null);
@@ -81,8 +74,11 @@ public class RNDHTML implements TableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus, int row, int column) {
 
-        txt.setText(obj.toString());
 
+//        logger.debug("txt: "+txt);
+//        logger.debug("obj:"+obj);
+
+        txt.setText(SYSTools.catchNull(obj));
 
         // This line was very important to get it working with JDK1.4
         TableColumnModel columnModel = table.getColumnModel();

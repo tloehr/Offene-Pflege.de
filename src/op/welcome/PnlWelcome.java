@@ -4,8 +4,6 @@
 
 package op.welcome;
 
-import com.install4j.api.update.ApplicationDisplayMode;
-import com.install4j.api.update.UpdateChecker;
 import com.install4j.api.update.UpdateDescriptor;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -17,6 +15,8 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.mx.MXmsg;
+import entity.mx.MXmsgTools;
 import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
 import entity.process.QProcess;
@@ -24,6 +24,7 @@ import entity.process.QProcessTools;
 import entity.qms.Qms;
 import entity.qms.QmsTools;
 import entity.system.CommontagsTools;
+import entity.system.UsersTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import gui.GUITools;
@@ -71,6 +72,7 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<QProcess> processList;
     private java.util.List<MedStock> expiryList;
     private java.util.List<Object[]> birthdayList;
+    private java.util.List<MXmsg> unreadMsgList;
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
     private ArrayList<Qms> dueQMSes;
@@ -91,11 +93,13 @@ public class PnlWelcome extends CleanablePanel {
     public void cleanup() {
         cpsWelcome.removeAll();
 
+        SYSTools.clear(unreadMsgList);
         SYSTools.clear(processList);
         SYSTools.clear(birthdayList);
         SYSTools.clear(noStoolList);
         SYSTools.clear(violatingLiquidValues);
         SYSTools.clear(dueQMSes);
+
     }
 
     @Override
@@ -106,12 +110,11 @@ public class PnlWelcome extends CleanablePanel {
     private void initPanel() {
 
 
-
         // todo: conflicts with the new website
                /*
 
                 try {
-                updateDescriptor = UpdateChecker.getUpdateDescriptor("http://www.offene-pflege.de/updates/updates.xml", ApplicationDisplayMode.GUI);
+                updateDescriptor = UpdateChecker.getUpdateDescriptor("https://www.offene-pflege.de/updates/updates.xml", ApplicationDisplayMode.GUI);
                 // this may rise an uncritical java.io.FileNotFoundException, usually during development not in production.
                 btnAbout.setText(updateDescriptor.getPossibleUpdateEntry() != null ? SYSTools.xx("misc.msg.updateAvailable") : null);
                 } catch (Exception e) {
@@ -121,7 +124,6 @@ public class PnlWelcome extends CleanablePanel {
                 }
 
                 */
-
 
 
         addApps();
@@ -194,11 +196,27 @@ public class PnlWelcome extends CleanablePanel {
                 processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
                 birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
                 expiryList = MedStockTools.getExpiryList(7);
+                unreadMsgList = MXmsgTools.getAllUnreadFor(OPDE.getMe());
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
                 dueQMSes = QmsTools.getDueList(OPDE.getLogin().getUser());
                 Collections.sort(processList);
-                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size();
+                int max = unreadMsgList.size() + processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size();
+
+                if (!unreadMsgList.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            SYSTools.xx("mx.unread.msg.list") +
+                            "</font></html>";
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    for (MXmsg msg : unreadMsgList) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4(msg).getMain());
+                    }
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
+                }
 
                 if (!processList.isEmpty()) {
                     String title = "<html><font size=+1>" +
@@ -361,10 +379,10 @@ public class PnlWelcome extends CleanablePanel {
     private DefaultCPTitle createCP4DueQms(final Qms due) {
 
         String title = SYSTools.toHTMLForScreen(QmsTools.toHTML(due)
-                        + " " + SYSConst.html_bold(due.getQmssched().getMeasure())
-                        + " [" + SYSConst.html_italic(due.getQmsplan().getTitle())
-                        + " " + CommontagsTools.getAsHTML(due.getQmsplan().getCommontags(), SYSConst.html_16x16_tagPurple_internal)
-                        + "]"
+                + " " + SYSConst.html_bold(due.getQmssched().getMeasure())
+                + " [" + SYSConst.html_italic(due.getQmsplan().getTitle())
+                + " " + CommontagsTools.getAsHTML(due.getQmsplan().getCommontags(), SYSConst.html_16x16_tagPurple_internal)
+                + "]"
         );
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -506,12 +524,9 @@ public class PnlWelcome extends CleanablePanel {
                 "</table>" +
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().clearPreviousProgbutton();
-                OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel("op.process.PnlProcess"));
-            }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel("op.process.PnlProcess"));
         });
 
         if (qProcess.isRevisionPastDue()) {
@@ -545,6 +560,29 @@ public class PnlWelcome extends CleanablePanel {
                 OPDE.getMainframe().clearPreviousProgbutton();
                 OPDE.getMainframe().setCurrentResident(stock.getInventory().getResident());
                 OPDE.getMainframe().setPanelTo(new PnlCare(stock.getInventory().getResident(), jspSearch));
+            }
+        });
+
+        return cptitle;
+    }
+
+    private DefaultCPTitle createCP4(final MXmsg msg) {
+
+        String subject = SYSTools.catchNull(msg.getSubject(), SYSConst.html_italic("mx.no.subject"));
+
+        String title = "<html><table border=\"0\">" +
+                "<tr>" +
+                "<td width=\"600\" align=\"left\">" + subject + " (" + SYSTools.xx("misc.msg.from") + ": " + UsersTools.getFullnameWithID(msg.getSender()) + ", "+DateFormat.getDateTimeInstance().format(msg.getPit())+")</td>" +
+                "</tr>" +
+                "</table>" +
+
+                "</html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().clearPreviousProgbutton();
+                OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel("op.mx.PnlMX"));
             }
         });
 

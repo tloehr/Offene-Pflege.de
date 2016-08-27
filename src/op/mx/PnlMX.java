@@ -20,6 +20,7 @@ import gui.GUITools;
 import gui.events.RelaxedDocumentListener;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.DlgYesNo;
 import op.tools.SYSConst;
@@ -47,11 +48,11 @@ import java.util.Date;
 public class PnlMX extends CleanablePanel {
 
     private JScrollPane jspSearch;
+    private JPopupMenu menu;
     private CollapsiblePanes searchPanes;
-    //    private MXmsg currentMessageInEditor = null;
+    private MXmsg currentMessageInEditor = null;
     private PnlRecipients pnlRecipients;
     private TMmsgs tmmsgs;
-    private boolean singleLineSelected;
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     private Logger logger = Logger.getLogger(getClass());
 
@@ -82,15 +83,45 @@ public class PnlMX extends CleanablePanel {
 
         btnSend.setIcon(SYSConst.icon22mailSend);
         btnReply.setIcon(SYSConst.icon22mailReply);
-        btnSave.setIcon(SYSConst.icon22save);
+        btnSave.setIcon(SYSConst.icon22edit3);
         btnCancel.setIcon(SYSConst.icon22cancel);
 
         panel2.add(pnlRecipients, CC.xy(1, 3));
-        displayMessage();
+        displayMessage(null);
     }
 
     private void initTable() {
-        tmmsgs = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
+        MXDataModelProvider incoming = new MXDataModelProvider("incoming") {
+            @Override
+            public void loadModel() {
+                setModel(MXmsgTools.getAllFor(OPDE.getMe()));
+            }
+        };
+
+        MXDataModelProvider sent = new MXDataModelProvider("sent") {
+            @Override
+            public void loadModel() {
+                setModel(MXmsgTools.getSentFor(OPDE.getMe()));
+            }
+        };
+
+        MXDataModelProvider draft = new MXDataModelProvider("draft") {
+            @Override
+            public void loadModel() {
+                setModel(MXmsgTools.getDrafts(OPDE.getMe()));
+            }
+        };
+
+        MXDataModelProvider trash = new MXDataModelProvider("trash") {
+            @Override
+            public void loadModel() {
+                setModel(MXmsgTools.getTrashed(OPDE.getMe()));
+            }
+        };
+
+
+        tmmsgs = new TMmsgs(incoming, sent, draft, trash);
+
         tblMsgs.setModel(tmmsgs);
         tblMsgs.getColumnModel().getColumn(TMmsgs.COL_PIT).setCellRenderer(new RNDHTML());
         tblMsgs.getColumnModel().getColumn(TMmsgs.COL_USER).setCellRenderer(new RNDHTML());
@@ -101,18 +132,6 @@ public class PnlMX extends CleanablePanel {
                 mousePressedOnTable(e);
             }
         });
-//        tblMsgs.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//            @Override
-//            public void valueChanged(ListSelectionEvent e) {
-//                if (e.getValueIsAdjusting()) return;
-//                if (e.getFirstIndex() == e.getLastIndex()) {
-//                    currentMessageInEditor = tmmsgs.getRow(e.getFirstIndex());
-//                } else {
-//                    currentMessageInEditor = null;
-//                }
-//                displayMessage();
-//            }
-//        });
     }
 
     private void mousePressedOnTable(MouseEvent evt) {
@@ -131,14 +150,139 @@ public class PnlMX extends CleanablePanel {
             lsm.setSelectionInterval(row, row);
         }
 
-//        currentMessageInEditor = tmmsgs.getRow(row);
-//        displayMessage();
+        displayMessage(tmmsgs.getRow(tblMsgs.convertRowIndexToModel(row)));
 
+        if (SwingUtilities.isRightMouseButton(evt)) {
+
+            SYSTools.unregisterListeners(menu);
+            menu = new JPopupMenu();
+
+            /***
+             *      _____    _ _ _
+             *     | ____|__| (_) |_
+             *     |  _| / _` | | __|
+             *     | |__| (_| | | |_
+             *     |_____\__,_|_|\__|
+             *
+             */
+            JMenuItem itemPopupEdit = new JMenuItem(SYSTools.xx("misc.msg.edit"), SYSConst.icon22edit3);
+            itemPopupEdit.addActionListener(actionEvent -> {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    final MXmsg myMessage = em.merge(currentMessageInEditor);
+                    em.lock(myMessage, LockModeType.OPTIMISTIC);
+                    myMessage.setDraft(true);
+                    em.getTransaction().commit();
+                    displayMessage(currentMessageInEditor);
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    reload();
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
+
+                }
+            });
+            itemPopupEdit.setEnabled(
+                    currentMessageInEditor.getSender().equals(OPDE.getMe()) &&
+                            (currentMessageInEditor.isDraft() || MXmsgTools.isUnread(currentMessageInEditor))
+            );
+            menu.add(itemPopupEdit);
+
+
+            /***
+             *      ____       _      _
+             *     |  _ \  ___| | ___| |_ ___
+             *     | | | |/ _ \ |/ _ \ __/ _ \
+             *     | |_| |  __/ |  __/ ||  __/
+             *     |____/ \___|_|\___|\__\___|
+             *
+             */
+            JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.msg.delete"), SYSConst.icon22delete);
+            itemPopupDelete.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(currentMessageInEditor.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                        @Override
+                        public void execute(Object answer) {
+                            if (answer.equals(JOptionPane.YES_OPTION)) {
+
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    final MXmsg myMessage = em.merge(currentMessageInEditor);
+                                    em.lock(myMessage, LockModeType.OPTIMISTIC);
+
+                                    if (myMessage.getSender().equals(OPDE.getMe())) {
+                                        // my message ? then delete it
+                                        em.remove(myMessage);
+                                    } else {
+                                        // FOR me ? mark it as trashed
+                                        final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
+                                        em.lock(myRCP, LockModeType.OPTIMISTIC);
+                                        myRCP.setTrashed(true);
+                                    }
+
+                                    em.getTransaction().commit();
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.msg.trashed")));
+
+                                    displayMessage(null);
+
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    reload();
+                                } catch (Exception ex) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(ex);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            itemPopupDelete.setEnabled(
+                    (
+                            // if this is my message, then I can only delete it as long as it is in Draft mode or yet unread.
+                            // my own messages are REALLY delete rather than marked as trashed
+                            currentMessageInEditor.getSender().equals(OPDE.getMe()) &&
+                                    (currentMessageInEditor.isDraft() || MXmsgTools.isUnread(currentMessageInEditor))
+                    ) ||
+                            (
+                                    // I can always delete messages sent to me, because they are never really
+                                    // deleted. simply put to trash.
+                                    !currentMessageInEditor.getSender().equals(OPDE.getMe())
+                            )
+            );
+            menu.add(itemPopupDelete);
+
+            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+        }
     }
 
     @Override
     public void reload() {
         super.reload();
+        displayMessage(null);
+        tmmsgs.reload();
     }
 
     private void prepareSearchArea() {
@@ -175,12 +319,12 @@ public class PnlMX extends CleanablePanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        JideButton newMessage = GUITools.createHyperlinkButton(SYSTools.xx("mx.new.message"), SYSConst.icon22work, null);
+        JideButton newMessage = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), SYSConst.icon22mailNew, null);
         newMessage.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
         newMessage.setAlignmentX(Component.LEFT_ALIGNMENT);
         newMessage.addActionListener(actionEvent -> {
             MXmsg myMsg = new MXmsg(OPDE.getMe());
-            myMsg.setText("mx.text");
+            myMsg.setText("mx.enter.text.here");
             myMsg.setSubject("mx.subject");
             displayMessage(myMsg);
         });
@@ -192,59 +336,88 @@ public class PnlMX extends CleanablePanel {
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        final JButton btnIncoming = GUITools.createHyperlinkButton("mx.incoming", SYSConst.icon16mailGeneric, e -> {
+        final JButton btnIncoming = GUITools.createHyperlinkButton("mx.incoming", SYSConst.icon16mailGet, e -> {
             currentMessageInEditor = null;
-            TMmsgs newModel = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
-            tblMsgs.setModel(newModel);
-            tmmsgs.cleanup();
-            tmmsgs = newModel;
-            displayMessage();
+//            tblMsgs.setModel(new DefaultTableModel(0, 3)); //to prevent exceptions from RNDHtml
+//            TMmsgs newModel = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
+//            tblMsgs.setModel(newModel);
+//            tmmsgs.cleanup();
+//            tmmsgs = newModel;
+
+            tmmsgs.setCurrentMpdel("incoming");
+
+            displayMessage(null);
+            String buttonText = SYSTools.xx("mx.incoming") + " (" + tmmsgs.getRowCount() + ")";
+            OPDE.getDisplayManager().setMainMessage(buttonText);
         });
         list.add(btnIncoming);
 
         final JButton btnSent = GUITools.createHyperlinkButton("mx.sent", SYSConst.icon16mailSend, e -> {
-            currentMessageInEditor = null;
-            TMmsgs newModel = new TMmsgs(MXmsgTools.getSentFor(OPDE.getMe()));
-            tblMsgs.setModel(newModel);
-            tmmsgs.cleanup();
-            tmmsgs = newModel;
-            displayMessage();
+//            currentMessageInEditor = null;
+//            tblMsgs.setModel(new DefaultTableModel(0, 3));
+//            TMmsgs newModel = new TMmsgs(MXmsgTools.getSentFor(OPDE.getMe()));
+//            tblMsgs.setModel(newModel);
+//            tmmsgs.cleanup();
+//            tmmsgs = newModel;
+
+            tmmsgs.setCurrentMpdel("sent");
+
+            displayMessage(null);
+            OPDE.getDisplayManager().setMainMessage("mx.sent");
         });
         list.add(btnSent);
 
-        final JButton btnDrafts = GUITools.createHyperlinkButton("mx.drafts", SYSConst.icon16mailGeneric, e -> {
-            currentMessageInEditor = null;
-            TMmsgs newModel = new TMmsgs(MXmsgTools.getDrafts(OPDE.getMe()));
-            tblMsgs.setModel(newModel);
-            tmmsgs.cleanup();
-            tmmsgs = newModel;
-            displayMessage();
+        final JButton btnDrafts = GUITools.createHyperlinkButton("mx.drafts", SYSConst.icon16edit, e -> {
+//            currentMessageInEditor = null;
+//            tblMsgs.setModel(new DefaultTableModel(0, 3));
+//            TMmsgs newModel = new TMmsgs(MXmsgTools.getDrafts(OPDE.getMe()));
+//            tblMsgs.setModel(newModel);
+//            tmmsgs.cleanup();
+//            tmmsgs = newModel;
+            tmmsgs.setCurrentMpdel("draft");
+            displayMessage(null);
+            OPDE.getDisplayManager().setMainMessage("mx.drafts");
         });
         list.add(btnDrafts);
 
-        final JButton btnTrashed = GUITools.createHyperlinkButton("mx.trashed", SYSConst.icon16mailGeneric, e -> {
-            currentMessageInEditor = null;
-            TMmsgs newModel = new TMmsgs(MXmsgTools.getTrashed(OPDE.getMe()));
-            tblMsgs.setModel(newModel);
-            tmmsgs.cleanup();
-            tmmsgs = newModel;
-            displayMessage();
+        final JButton btnTrashed = GUITools.createHyperlinkButton("mx.trashed", SYSConst.icon16trash, e -> {
+//            currentMessageInEditor = null;
+//            tblMsgs.setModel(new DefaultTableModel(0, 3));
+//            TMmsgs newModel = new TMmsgs(MXmsgTools.getTrashed(OPDE.getMe()));
+//            tblMsgs.setModel(newModel);
+//            tmmsgs.cleanup();
+//            tmmsgs = newModel;
+            tmmsgs.setCurrentMpdel("trash");
+            displayMessage(null);
+            OPDE.getDisplayManager().setMainMessage("mx.trashed");
         });
         list.add(btnTrashed);
 
         return list;
     }
 
-    private void displayMessage(MXmsg msg) {
+//    private void setTableModel() {
+//        currentMessageInEditor = null;
+//        tblMsgs.setModel(new DefaultTableModel(0, 3)); //to prevent exceptions from RNDHtml
+//        TMmsgs newModel = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
+//        tblMsgs.setModel(newModel);
+//        tmmsgs.cleanup();
+//        tmmsgs = newModel;
+//        displayMessage(null);
+//        String buttonText = SYSTools.xx("mx.incoming") + " (" + newModel.getRowCount() + ")";
+//        OPDE.getDisplayManager().setMainMessage(buttonText);
+//    }
+
+    private void displayMessage(final MXmsg msg) {
         currentMessageInEditor = msg;
 
-        logger.debug("displayMessage(" + msg.toString() + ")");
-
-        if (msg == null) {
+        if (currentMessageInEditor == null) {
             txtSubject.setText("");
             txtMessage.setText("");
             lblFrom.setText("");
             txtMessage.setEditable(false);
+
+
             SwingUtilities.invokeLater(() -> {
                 panel2.remove(pnlRecipients);
                 pnlRecipients.clear();
@@ -257,52 +430,54 @@ public class PnlMX extends CleanablePanel {
             return;
         }
 
+//        logger.debug("displayMessage(" + msg.toString() + ")");
+
         // as soon as you can read the message in the editor, it is marked as RECEIVED with the current time.
-              if (!msg.isDraft() && !msg.getSender().equals(OPDE.getMe()) && MXrecipientTools.isUnread(msg, OPDE.getMe())) {
-                  EntityManager em = OPDE.createEM();
-                  try {
-                      em.getTransaction().begin();
-                      final MXmsg myMessage = em.merge(msg);
-                      final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
-                      myRCP.setReceived(new Date());
-                      myRCP.setUnread(false);
-                      myMessage.getRecipients().add(myRCP);
-                      em.getTransaction().commit();
-                      currentMessageInEditor = myMessage;
-                      msg = myMessage;
-                      tmmsgs.updateMsg(myMessage);
-                  } catch (OptimisticLockException ole) {
-                      OPDE.warn(ole);
-                      if (em.getTransaction().isActive()) {
-                          em.getTransaction().rollback();
-                      }
-                      currentMessageInEditor = null;
-                      reload();
-                  } catch (Exception ex) {
-                      if (em.getTransaction().isActive()) {
-                          em.getTransaction().rollback();
-                      }
-                      OPDE.fatal(ex);
-                  } finally {
-                      em.close();
-                      OPDE.getDisplayManager().mailCheck();
-                  }
-              }
+        if (!currentMessageInEditor.isDraft() && !currentMessageInEditor.getSender().equals(OPDE.getMe()) && MXrecipientTools.isUnread(currentMessageInEditor, OPDE.getMe())) {
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                final MXmsg myMessage = em.merge(currentMessageInEditor);
+                final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
+                myRCP.setReceived(new Date());
+                myRCP.setUnread(false);
+                myMessage.getRecipients().add(myRCP);
+                em.getTransaction().commit();
+                currentMessageInEditor = myMessage;
+                tmmsgs.updateMsg(myMessage);
+            } catch (OptimisticLockException ole) {
+                OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                reload();
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(ex);
+            } finally {
+                em.close();
+                OPDE.getDisplayManager().mailCheck();
+            }
+        }
 
 
-        txtMessage.setText(msg.getText());
+        txtMessage.setText(currentMessageInEditor.getText());
+
 
         SwingUtilities.invokeLater(() -> {
             panel2.remove(pnlRecipients);
             pnlRecipients.clear();
-            pnlRecipients = new PnlRecipients(MXrecipientTools.getAllUsersFor(msg.getRecipients()), msg.isDraft());
+            pnlRecipients = new PnlRecipients(MXrecipientTools.getAllUsersFor(currentMessageInEditor.getRecipients()), currentMessageInEditor.isDraft());
             pnlRecipients.addNotifyListeners(o -> SwingUtilities.invokeLater(() -> {
                 Users recipientToChange = ((Users) o);
-                MXrecipient mxRcp = MXrecipientTools.findMXrecipient(msg, recipientToChange);
+                MXrecipient mxRcp = MXrecipientTools.findMXrecipient(currentMessageInEditor, recipientToChange);
                 if (mxRcp == null) {
-                    msg.getRecipients().add(new MXrecipient(recipientToChange, msg));
+                    currentMessageInEditor.getRecipients().add(new MXrecipient(recipientToChange, currentMessageInEditor));
                 } else {
-                    msg.getRecipients().remove(mxRcp);
+                    currentMessageInEditor.getRecipients().remove(mxRcp);
                 }
             }));
             panel2.add(pnlRecipients, CC.xy(1, 3, CC.DEFAULT, CC.DEFAULT));
@@ -310,13 +485,11 @@ public class PnlMX extends CleanablePanel {
             repaint();
         });
 
-        txtSubject.setText(msg.getSubject());
-        lblFrom.setText(SYSTools.xx("mx.sender") + ": " + msg.getSender().getVorname() + " " + msg.getSender().getName() + " [" + msg.getSender().getUID() + "]");
-        pnlRecipients.setEditable(msg.isDraft());
-        txtMessage.setEditable(msg.isDraft());
-        txtSubject.setEditable(msg.isDraft());
-
-
+        txtSubject.setText(currentMessageInEditor.getSubject());
+        lblFrom.setText(SYSTools.xx("mx.sender") + ": " + currentMessageInEditor.getSender().getVorname() + " " + currentMessageInEditor.getSender().getName() + " [" + currentMessageInEditor.getSender().getUID() + "]");
+        pnlRecipients.setEditable(currentMessageInEditor.isDraft());
+        txtMessage.setEditable(currentMessageInEditor.isDraft());
+        txtSubject.setEditable(currentMessageInEditor.isDraft());
 
 
     }
@@ -347,6 +520,8 @@ public class PnlMX extends CleanablePanel {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            reload();
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -354,8 +529,7 @@ public class PnlMX extends CleanablePanel {
             OPDE.fatal(ex);
         } finally {
             em.close();
-            currentMessageInEditor = null;
-            displayMessage();
+            displayMessage(null);
         }
     }
 
@@ -377,6 +551,8 @@ public class PnlMX extends CleanablePanel {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            reload();
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -384,8 +560,7 @@ public class PnlMX extends CleanablePanel {
             OPDE.fatal(ex);
         } finally {
             em.close();
-            currentMessageInEditor = null;
-            displayMessage();
+            displayMessage(null);
         }
     }
 
@@ -431,137 +606,24 @@ public class PnlMX extends CleanablePanel {
         MXmsg answer = new MXmsg(OPDE.getMe());
 
         answer.getRecipients().add(new MXrecipient(currentMessageInEditor.getSender(), answer));
-        answer.setText("\n----\n" + SYSTools.xx("mx.in.reply.to") + "\n" + UsersTools.getFullnameWithID(currentMessageInEditor.getSender()) + ", " + df.format(currentMessageInEditor.getPit()) + "\n----\n" + currentMessageInEditor.getText());
+        answer.setText("\n----\n" + SYSTools.xx("mx.in.reply.to") + "\n" + UsersTools.getFullnameWithID(currentMessageInEditor.getSender()) + ", " + df.format(currentMessageInEditor.getPit()) + "\n" + currentMessageInEditor.getText());
         answer.setSubject(currentMessageInEditor.getSubject().startsWith("Re:") ? currentMessageInEditor.getSubject() : "Re: " + currentMessageInEditor.getSubject());
 
-        currentMessageInEditor = answer;
+        displayMessage(answer);
+        pnlRecipients.setEditable(false);
 
-        displayMessage();
     }
 
+    private void scrollPane5ComponentResized(ComponentEvent evt) {
+        resizeTable();
+    }
 
-    private JPanel getMenu(final MXmsg msg) {
-
-        JPanel pnlMenu = new JPanel(new VerticalLayout());
-
-
-        /***
-         *      _____    _ _ _
-         *     | ____|__| (_) |_
-         *     |  _| / _` | | __|
-         *     | |__| (_| | | |_
-         *     |_____\__,_|_|\__|
-         *
-         */
-        final JButton btnEdit = GUITools.createHyperlinkButton("misc.msg.edit", SYSConst.icon22edit3, null);
-        btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnEdit.addActionListener(actionEvent -> {
-            EntityManager em = OPDE.createEM();
-            try {
-                em.getTransaction().begin();
-                final MXmsg myMessage = em.merge(msg);
-                em.lock(myMessage, LockModeType.OPTIMISTIC);
-                myMessage.setDraft(true);
-                em.getTransaction().commit();
-                displayMessage(msg);
-            } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                displayMessage(null);
-            } catch (Exception ex) {
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                OPDE.fatal(ex);
-            } finally {
-                em.close();
-
-            }
-        });
-        btnEdit.setEnabled(
-                msg.getSender().equals(OPDE.getMe()) &&
-                        (msg.isDraft() || MXmsgTools.isUnread(msg))
-        );
-        pnlMenu.add(btnEdit);
-
-        /***
-         *      ____       _      _
-         *     |  _ \  ___| | ___| |_ ___
-         *     | | | |/ _ \ |/ _ \ __/ _ \
-         *     | |_| |  __/ |  __/ ||  __/
-         *     |____/ \___|_|\___|\__\___|
-         *
-         */
-        final JButton btnDelete = GUITools.createHyperlinkButton("misc.msg.delete", SYSConst.icon22delete, null);
-        btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(msg.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                    @Override
-                    public void execute(Object answer) {
-                        if (answer.equals(JOptionPane.YES_OPTION)) {
-
-
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                final MXmsg myMessage = em.merge(msg);
-                                em.lock(myMessage, LockModeType.OPTIMISTIC);
-
-                                if (myMessage.getSender().equals(OPDE.getMe())) {
-                                    // my message ? then delete it
-                                    em.remove(myMessage);
-                                } else {
-                                    // FOR me ? mark it as trashed
-                                    final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
-                                    em.lock(myRCP, LockModeType.OPTIMISTIC);
-                                    myRCP.setTrashed(true);
-                                }
-
-                                em.getTransaction().commit();
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.msg.trashed")));
-
-                                displayMessage(null);
-
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                            } catch (Exception ex) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(ex);
-                            } finally {
-                                em.close();
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
-        btnDelete.setEnabled(
-                (
-                        // if this is my message, then I can only delete it as long as it is in Draft mode or yet unread.
-                        // my own messages are REALLY delete rather than marked as trashed
-                        msg.getSender().equals(OPDE.getMe()) &&
-                                (msg.isDraft() || MXmsgTools.isUnread(msg))
-                ) ||
-                        (
-                                // I can always delete messages sent to me, because they are never really
-                                // deleted. simply put to trash.
-                                !msg.getSender().equals(OPDE.getMe())
-                        )
-        );
-        pnlMenu.add(btnDelete);
-
-
-        return pnlMenu;
+    private void resizeTable() {
+        Dimension dim = scrollPane5.getSize();
+        int textWidth = dim.width - 140 - 20;
+        tblMsgs.getColumnModel().getColumn(0).setPreferredWidth(textWidth / 2);
+        tblMsgs.getColumnModel().getColumn(1).setPreferredWidth(textWidth / 2);
+        tblMsgs.getColumnModel().getColumn(2).setPreferredWidth(140);
     }
 
 
@@ -599,6 +661,15 @@ public class PnlMX extends CleanablePanel {
 
             //======== scrollPane5 ========
             {
+                scrollPane5.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        scrollPane5ComponentResized(e);
+                    }
+                });
+
+                //---- tblMsgs ----
+                tblMsgs.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 scrollPane5.setViewportView(tblMsgs);
             }
             splitPane1.setTopComponent(scrollPane5);

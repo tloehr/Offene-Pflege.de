@@ -36,6 +36,7 @@ import op.tools.SYSTools;
 import javax.swing.table.AbstractTableModel;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author tloehr
@@ -45,11 +46,43 @@ public class TMmsgs extends AbstractTableModel {
     public static final int COL_SUBJECT = 1;
     public static final int COL_PIT = 2;
     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    String currentModel = "";
+    HashMap<String, MXDataModelProvider> mymodels;
 
-    ArrayList<MXmsg> mymodel;
+    /**
+     * This TableModel allows several models to be switched when needed.
+     * I wanted to try this concept in order to get rid of all this new model assignments to tables with
+     * all the event problems turning up.
+     *
+     * @param mxDataModelProviders list of data providers to be used.
+     */
+    public TMmsgs(MXDataModelProvider... mxDataModelProviders) {
+        mymodels = new HashMap<>();
+        for (MXDataModelProvider provider : mxDataModelProviders){
+            mymodels.put(provider.getKey(), provider);
+        }
+        // set to the first model in the list
+        setCurrentMpdel(mxDataModelProviders[0].getKey());
+    }
 
-    public TMmsgs(ArrayList<MXmsg> modelData) {
-        mymodel = modelData;
+    /**
+     * switch the current model in use.
+     * @param key
+     */
+    public void setCurrentMpdel(String key){
+        currentModel = key;
+        mymodels.get(currentModel).loadModel();
+        fireTableDataChanged();
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        String name = "";
+        if (column ==  COL_USER) name = SYSTools.xx("mx.col_user");
+        if (column ==  COL_SUBJECT) name = SYSTools.xx("mx.col_subject");
+        if (column ==  COL_PIT) name = SYSTools.xx("mx.col_pit");
+
+        return name;
     }
 
     @Override
@@ -84,23 +117,38 @@ public class TMmsgs extends AbstractTableModel {
 //        return thisclass;
     }
 
-    public void addMsg(MXmsg mXmsg) {
-        mymodel.add(0, mXmsg);
-        fireTableRowsUpdated(0, 1);
-    }
+//    public void addMsg(MXmsg mXmsg) {
+//        mymodel.add(0, mXmsg);
+//        fireTableRowsUpdated(0, 1);
+//    }
 
+    /**
+     * adds or updates a message without rereading the whole model.
+     * @param mXmsg
+     */
     public void updateMsg(MXmsg mXmsg) {
-        int row = mymodel.indexOf(mXmsg);
+        int row = mymodels.get(currentModel).getDataModel().indexOf(mXmsg);
         if (row == -1) {
-            addMsg(mXmsg);
+            mymodels.get(currentModel).getDataModel().add(0, mXmsg);
+            fireTableRowsUpdated(0, 1);
         } else {
-            mymodel.set(row, mXmsg);
+            mymodels.get(currentModel).getDataModel().set(row, mXmsg);
             fireTableRowsUpdated(row, row);
         }
     }
 
+    public void reload(){
+        mymodels.get(currentModel).loadModel();
+        fireTableDataChanged();
+    }
+
+    /**
+     * to help the GC
+     */
     public void cleanup() {
-        mymodel.clear();
+        for (String key : mymodels.keySet()){
+            mymodels.get(key).getDataModel().clear();
+        }
     }
 
     @Override
@@ -109,17 +157,12 @@ public class TMmsgs extends AbstractTableModel {
     }
 
     public MXmsg getRow(int row) {
-        return mymodel.get(row);
+        return mymodels.get(currentModel).getDataModel().get(row);
     }
 
     @Override
     public int getRowCount() {
-        int rowcount = 0;
-
-        if (mymodel != null) {
-            rowcount = mymodel.size();
-        }
-        return rowcount;
+        return mymodels.get(currentModel).getDataModel().size();
     }
 
     String boldIfUnread(MXmsg msg, String in) {
@@ -134,10 +177,10 @@ public class TMmsgs extends AbstractTableModel {
     public Object getValueAt(int row, int column) {
         Object value;
 
-        MXmsg mymsg = mymodel.get(row);
+        MXmsg mymsg = mymodels.get(currentModel).getDataModel().get(row);
         switch (column) {
             case COL_PIT: {
-                value = df.format(mymodel.get(row).getPit());
+                value = df.format(mymodels.get(currentModel).getDataModel().get(row).getPit());
                 break;
             }
             case COL_USER: {
@@ -159,7 +202,7 @@ public class TMmsgs extends AbstractTableModel {
             }
 
             case COL_SUBJECT: {
-                value = SYSTools.catchNull(mymodel.get(row).getSubject(), "mx.no.subject");
+                value = SYSTools.catchNull(mymodels.get(currentModel).getDataModel().get(row).getSubject(), SYSConst.html_italic("mx.no.subject"));
                 break;
             }
             default: {
@@ -169,7 +212,7 @@ public class TMmsgs extends AbstractTableModel {
 
         if (value != null) {
             String html = SYSConst.html_fontface;
-            html += "<p>" + boldIfUnread(mymodel.get(row), value.toString()) + "</p>";
+            html += "<p>" + boldIfUnread(mymodels.get(currentModel).getDataModel().get(row), value.toString()) + "</p>";
             html += "</font>";
             value = SYSTools.toHTMLForScreen(html);
         } else {

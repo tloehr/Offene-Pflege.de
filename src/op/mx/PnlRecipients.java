@@ -72,7 +72,6 @@ public class PnlRecipients extends JPanel {
 
         mapBtn4Recipient = new HashMap<>();
 
-
         int rcpnum = 1;
         for (Users recipient : recipients) {
             if (rcpnum % MAXLINE == 0) {
@@ -160,7 +159,8 @@ public class PnlRecipients extends JPanel {
 
     }
 
-    public void setEditable(boolean editable){
+    public void setEditable(boolean editable) {
+        this.editable = editable;
         txtRecipients.setEnabled(editable);
     }
 
@@ -177,36 +177,34 @@ public class PnlRecipients extends JPanel {
         jButton.setHorizontalTextPosition(SwingConstants.LEADING);
         jButton.setForeground(SYSConst.blue1[SYSConst.dark3]);
 
+        jButton.addActionListener(e -> {
+            if (!editable) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("mx.recipients.cant.edit"));
+                return;
+            }
+            recipients.remove(recipient);
+            mapBtn4Recipient.remove(recipient);
+            SwingUtilities.invokeLater(() -> {
+                removeAll();
+                add(txtRecipients);
 
-
-            jButton.addActionListener(e -> {
-                if (!editable){
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("mx.recipients.cant.edit"));
-                    return;
-                }
-                recipients.remove(recipient);
-                mapBtn4Recipient.remove(recipient);
-                SwingUtilities.invokeLater(() -> {
-                    removeAll();
-                    add(txtRecipients);
-
-                    int rcpnum = 1;
-                    for (JButton btn : mapBtn4Recipient.values()) {
-                        if (rcpnum % MAXLINE == 0) {
-                            add(btn, RiverLayout.LINE_BREAK);
-                        } else {
-                            add(btn, RiverLayout.LEFT);
-                        }
-                        rcpnum++;
+                int rcpnum = 1;
+                for (JButton btn : mapBtn4Recipient.values()) {
+                    if (rcpnum % MAXLINE == 0) {
+                        add(btn, RiverLayout.LINE_BREAK);
+                    } else {
+                        add(btn, RiverLayout.LEFT);
                     }
+                    rcpnum++;
+                }
 
-                    remove(jButton);
-                    revalidate();
-                    repaint();
-                    notifyListeners(recipient);
-                });
-
+                remove(jButton);
+                revalidate();
+                repaint();
+                notifyListeners(recipient);
             });
+
+        });
 
         mapBtn4Recipient.put(recipient, jButton);
 

@@ -15,8 +15,10 @@ new FormModel {
 				addEvent( new FormEvent( "java.awt.event.ComponentListener", "componentResized", "splitPane1ComponentResized", true ) )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "scrollPane5"
+					addEvent( new FormEvent( "java.awt.event.ComponentListener", "componentResized", "scrollPane5ComponentResized", true ) )
 					add( new FormComponent( "javax.swing.JTable" ) {
 						name: "tblMsgs"
+						"autoResizeMode": 0
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "left"

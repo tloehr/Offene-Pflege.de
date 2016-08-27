@@ -729,7 +729,8 @@ public class SYSConst {
     public static final Icon icon16mailNew = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_new.png"));
     public static final Icon icon16mailReply = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_reply.png"));
     public static final Icon icon16mailReplayAll = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/mail_replyall.png"));
-
+    public static final Icon icon16trash = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/edittrash.png"));
+    public static final Icon icon16edit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/edit.png"));
 
     public static final Icon icon32reload0 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0000.png"));
     public static final Icon icon32reload1 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/reload0225.png"));
