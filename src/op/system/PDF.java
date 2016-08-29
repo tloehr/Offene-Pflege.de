@@ -136,7 +136,7 @@ public class PDF {
 
                     table.addCell(footer);
                     table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-                    table.addCell(String.format(SYSTools.xx("misc.msg.pageOf"), writer.getPageNumber()));
+                    table.addCell(SYSTools.xx("misc.msg.pageOf", writer.getPageNumber()));
 
                     PdfPCell cell = new PdfPCell(Image.getInstance(totalPages));
                     cell.setBorder(Rectangle.TOP);

@@ -407,10 +407,6 @@ public class OPDE {
         opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
         opts.addOption("p", "keyphrase", true, SYSTools.xx("cmdline.keyphrase.description"));
 
-//        Option notification = OptionBuilder.withLongOpt("notification").hasOptionalArg().withDescription("Schickt allen festgelegten Empfängern die jeweilige Benachrichtungs-Mail.").create("n");
-//        notification.setArgName("Liste der Empfänger (durch Komma getrennt, ohne Leerzeichen. UID verwenden). Damit kannst Du die Benachrichtigungen einschränken. Fehlt diese Liste, erhalten ALLE Empfänger eine Mail.");
-//        opts.addOption(notification);
-
         opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(SYSTools.xx("cmdline.jdbc.description")).create("j"));
 
         Option dfnimport = OptionBuilder //.withArgName("datum")
@@ -635,41 +631,6 @@ public class OPDE {
                 System.exit(0);
             }
 
-
-            /***
-             *      _   _       _   _  __ _           _   _
-             *     | \ | | ___ | |_(_)/ _(_) ___ __ _| |_(_) ___  _ __
-             *     |  \| |/ _ \| __| | |_| |/ __/ _` | __| |/ _ \| '_ \
-             *     | |\  | (_) | |_| |  _| | (_| (_| | |_| | (_) | | | |
-             *     |_| \_|\___/ \__|_|_| |_|\___\__,_|\__|_|\___/|_| |_|
-             *
-             */
-            if (cl.hasOption("n")) {
-
-                EntityManager em = OPDE.createEM();
-
-                try {
-                    em.getTransaction().begin();
-                    Users rootUser = em.find(Users.class, "admin");
-
-                    SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
-                    OPDE.setLogin(rootLogin);
-                    initProps();
-
-                    EMailSystem.notify(cl.getOptionValue("n"));
-
-                    em.getTransaction().commit();
-                } catch (Exception ex) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    fatal(ex);
-                } finally {
-                    em.close();
-                }
-                System.exit(0);
-            }
-
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             setStandardFont();
 
@@ -686,7 +647,7 @@ public class OPDE {
             mainframe.setVisible(true);
         } catch (Exception ioe) {
 
-            if (cl.hasOption("d") || cl.hasOption("b") || cl.hasOption("n")) {
+            if (cl.hasOption("d") || cl.hasOption("b")) {
                 logger.fatal(ioe);
                 System.exit(0);
             }

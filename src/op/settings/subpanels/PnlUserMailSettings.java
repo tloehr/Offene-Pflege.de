@@ -8,6 +8,7 @@ import gui.PnlBeanEditor;
 import gui.events.RelaxedDocumentListener;
 import gui.interfaces.BoundedTextField;
 import gui.interfaces.DefaultPanel;
+import gui.interfaces.YesNoToggleButton;
 import gui.parser.IntegerParser;
 import op.OPDE;
 import op.settings.databeans.PersonalMailBean;
@@ -23,6 +24,8 @@ import javax.swing.text.BadLocationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
@@ -40,12 +43,16 @@ public class PnlUserMailSettings extends DefaultPanel {
     String mailaddress = "";
     boolean keyConfirmed = false;
     final JLabel lblLED = new JLabel();
+    final YesNoToggleButton tbNotifications;
 
     public PnlUserMailSettings() {
         super("opde.settings.personal.mail");
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         keyConfirmed = OPDE.getLogin().getUser().getMailConfirmed() >= UsersTools.MAIL_CONFIRMED;
         lblLED.setIcon(keyConfirmed ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
+
+        tbNotifications = new YesNoToggleButton("opde.settings.personal.enable.notification", "opde.settings.personal.disable.notification", OPDE.getLogin().getUser().getMailConfirmed() == UsersTools.MAIL_NOTIFICATIONS_ENABLED);
+        tbNotifications.setEnabled(keyConfirmed);
 
         try {
             final PnlBeanEditor<PersonalMailBean> pbe = new PnlBeanEditor<>(() -> new PersonalMailBean(OPDE.getLogin().getUser()), PersonalMailBean.class);
@@ -56,13 +63,17 @@ public class PnlUserMailSettings extends DefaultPanel {
             OPDE.fatal(logger, e);
         }
 
+        tbNotifications.addItemListener(ie -> {
+            if (ie.getStateChange() != ItemEvent.SELECTED && ie.getStateChange() != ItemEvent.DESELECTED) return;
+            Users myUser = OPDE.getLogin().getUser();
+            myUser.setMailConfirmed(ie.getStateChange() == ItemEvent.SELECTED ? UsersTools.MAIL_NOTIFICATIONS_ENABLED : UsersTools.MAIL_CONFIRMED);
+            OPDE.getLogin().setUser(EntityTools.merge(myUser));
+        });
+
     }
 
 
     private JPanel getButtonPanel(PnlBeanEditor<PersonalMailBean> pbe) {
-
-        // todo: notifications noch einschaltbar machen
-        // final YesNoToggleButton tbActive = new YesNoToggleButton("opde.settings.global.mail.active", "opde.settings.global.mail.inactive", SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE)).equalsIgnoreCase("true"));
         final JButton btnTestmail = new JButton(SYSTools.xx("opde.settings.global.mail.sendtest"));
         btnTestmail.addActionListener(e -> {
             try {
@@ -77,6 +88,7 @@ public class PnlUserMailSettings extends DefaultPanel {
                     protected Object doInBackground() {
                         lastCheckOk = false;
                         keyConfirmed = false;
+                        tbNotifications.setEnabled(keyConfirmed);
                         lblLED.setIcon(SYSConst.icon22ledRedOn);
 
                         Users myUser = OPDE.getLogin().getUser();
@@ -149,6 +161,7 @@ public class PnlUserMailSettings extends DefaultPanel {
                 IntegerParser parser = new IntegerParser();
                 parser.parse(text);
                 keyConfirmed = text.equals(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TESTKEY));
+                tbNotifications.setEnabled(keyConfirmed);
                 lblLED.setIcon(keyConfirmed ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(keyConfirmed ? "opde.settings.personal.mail.confirmed" : "opde.settings.personal.mail.not.confirmed"));
                 if (keyConfirmed) {
@@ -163,7 +176,6 @@ public class PnlUserMailSettings extends DefaultPanel {
             }
 
         }));
-//        btf.setEnabled(OPDE.getProps().containsKey(SYSPropsTools.KEY_MAIL_TESTKEY));
 
         Box line1 = Box.createHorizontalBox();
         line1.add(btnTestmail);
@@ -173,6 +185,15 @@ public class PnlUserMailSettings extends DefaultPanel {
         line1.add(btf);
         line1.add(Box.createHorizontalGlue());
 
+//        Box line2 = Box.createHorizontalBox();
+//        line2.add(lbl);
+//        line2.add(Box.createRigidArea(new Dimension(50, 00)));
+//        line2.add(lblLED);
+//        line2.add(Box.createHorizontalStrut(5));
+//        line2.add(btf);
+//        line2.add(Box.createHorizontalGlue());
+
+
 //        line.add(Box.createHorizontalGlue());
 //        line.add(tbActive);
 
@@ -181,7 +202,9 @@ public class PnlUserMailSettings extends DefaultPanel {
         page.add(new JSeparator());
         page.add(Box.createRigidArea(new Dimension(0, 10)));
         page.add(line1);
-//        page.add(line2);
+        page.add(Box.createRigidArea(new Dimension(0, 10)));
+        page.add(tbNotifications);
+
         page.add(Box.createVerticalGlue());
 
         JPanel content = new JPanel();

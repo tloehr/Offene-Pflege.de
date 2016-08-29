@@ -71,7 +71,6 @@ public class QmsTools {
             String jpql = " SELECT qms " +
                     " FROM Qms qms " +
                     " WHERE qms.qmssched.state = :schedstate AND qms.qmsplan.state = :planstate AND qms.state = :qmsstate " +
-                    " AND :user MEMBER OF qms.qmsplan.notification " +
                     " ORDER BY qms.target DESC ";
 
             Query query = em.createQuery(jpql);
@@ -79,7 +78,6 @@ public class QmsTools {
             query.setParameter("schedstate", QmsschedTools.STATE_ACTIVE);
             query.setParameter("planstate", QmsplanTools.STATE_ACTIVE);
             query.setParameter("qmsstate", QmsTools.STATE_OPEN);
-            query.setParameter("user", user);
 
             ArrayList<Qms> listPre = new ArrayList<Qms>(query.getResultList());
 

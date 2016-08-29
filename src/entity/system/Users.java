@@ -92,10 +92,6 @@ public class Users implements Serializable, Comparable<Users> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSLogin> logins;
 
-
-    @ManyToMany(mappedBy = "notification")
-    private Collection<Qmsplan> notifiedAboutQmsplan;
-
     public Collection<User2File> getAttachedFilesConnections() {
         return attachedFilesConnections;
     }
@@ -106,10 +102,6 @@ public class Users implements Serializable, Comparable<Users> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "attendee")
     private Collection<Training2Users> attendedTrainings;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Set<Notification> notifications;
-
-
     public Users() {
         uid = null;
         groups = new ArrayList<Groups>();
@@ -117,10 +109,6 @@ public class Users implements Serializable, Comparable<Users> {
         mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
     }
 
-
-    public Set<Notification> getNotifications() {
-        return notifications;
-    }
 
     public int getMailConfirmed() {
         return mailConfirmed;

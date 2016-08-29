@@ -56,7 +56,7 @@ public class DlgQMSPlan extends MyJDialog {
     private Closure actionBlock;
     private JPopupMenu menu;
     private PnlCommonTags pnlCommonTags;
-    private ArrayList<Users> notifyList;
+
 
 
     /**
@@ -81,18 +81,12 @@ public class DlgQMSPlan extends MyJDialog {
         lblTitle.setText(SYSTools.xx("misc.msg.title"));
         lblDescription.setText(SYSTools.xx("misc.msg.description"));
         lblTags.setText(SYSTools.xx("misc.msg.commontags"));
-        lblNotify.setText(SYSTools.xx("misc.msg.notification.list"));
+
 
         txtTitle.setText(qmsplan.getTitle());
         txtDescription.setText(qmsplan.getDescription());
 
-        cmbNotify.setModel(new DefaultComboBoxModel(UsersTools.getUsers(false).toArray()));
-        cmbNotify.setRenderer(UsersTools.getRenderer());
-        lstNotify.setCellRenderer(UsersTools.getRenderer());
-        cmbNotify.setSelectedItem(null);
 
-        notifyList = new ArrayList<>(qmsplan.getNotification());
-        lstNotify.setModel(SYSTools.list2dlm(notifyList));
 
     }
 
@@ -116,19 +110,9 @@ public class DlgQMSPlan extends MyJDialog {
     }
 
     private void cmbNotifyItemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-            if (!notifyList.contains(e.getItem())) {
-                notifyList.add((Users) e.getItem());
-                lstNotify.setModel(SYSTools.list2dlm(notifyList));
-            }
-        }
+        // TODO add your code here
     }
 
-    private void lstNotifyValueChanged(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting()) return;
-        notifyList.remove(lstNotify.getSelectedValue());
-        lstNotify.setModel(SYSTools.list2dlm(notifyList));
-    }
 
     /**
      * Reasons why you couldn't save it
@@ -156,13 +140,9 @@ public class DlgQMSPlan extends MyJDialog {
         pnlLeft = new JPanel();
         lblTitle = new JLabel();
         txtTitle = new JTextField();
-        lblNotify = new JideLabel();
-        cmbNotify = new JComboBox();
         jScrollPane3 = new JScrollPane();
         txtDescription = new JTextArea();
         lblDescription = new JideLabel();
-        scrollPane1 = new JScrollPane();
-        lstNotify = new JList();
         lblTags = new JLabel();
         panel1 = new JPanel();
         btnCancel = new JButton();
@@ -178,7 +158,7 @@ public class DlgQMSPlan extends MyJDialog {
         //======== pnlLeft ========
         {
             pnlLeft.setLayout(new FormLayout(
-                "pref, $lcgap, default:grow, $lcgap, pref, $lcgap, default:grow",
+                "pref, $lcgap, default:grow",
                 "default, $lgap, fill:default, $rgap, fill:default:grow, $lgap, 40dlu, $rgap, default"));
 
             //---- lblTitle ----
@@ -196,23 +176,6 @@ public class DlgQMSPlan extends MyJDialog {
                 }
             });
             pnlLeft.add(txtTitle, CC.xy(3, 3));
-
-            //---- lblNotify ----
-            lblNotify.setText("text");
-            lblNotify.setOrientation(1);
-            lblNotify.setFont(new Font("Arial", Font.PLAIN, 18));
-            lblNotify.setHorizontalAlignment(SwingConstants.CENTER);
-            lblNotify.setClockwise(false);
-            pnlLeft.add(lblNotify, CC.xywh(5, 3, 1, 3));
-
-            //---- cmbNotify ----
-            cmbNotify.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbNotifyItemStateChanged(e);
-                }
-            });
-            pnlLeft.add(cmbNotify, CC.xy(7, 3));
 
             //======== jScrollPane3 ========
             {
@@ -240,26 +203,11 @@ public class DlgQMSPlan extends MyJDialog {
             lblDescription.setClockwise(false);
             pnlLeft.add(lblDescription, CC.xy(1, 5, CC.DEFAULT, CC.CENTER));
 
-            //======== scrollPane1 ========
-            {
-
-                //---- lstNotify ----
-                lstNotify.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                lstNotify.addListSelectionListener(new ListSelectionListener() {
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-                        lstNotifyValueChanged(e);
-                    }
-                });
-                scrollPane1.setViewportView(lstNotify);
-            }
-            pnlLeft.add(scrollPane1, CC.xy(7, 5));
-
             //---- lblTags ----
             lblTags.setFont(new Font("Arial", Font.PLAIN, 18));
             lblTags.setText("Markierung");
             lblTags.setHorizontalAlignment(SwingConstants.CENTER);
-            pnlLeft.add(lblTags, CC.xywh(3, 9, 5, 1));
+            pnlLeft.add(lblTags, CC.xy(3, 9));
         }
         contentPane.add(pnlLeft, CC.xy(3, 3));
 
@@ -270,23 +218,13 @@ public class DlgQMSPlan extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
             btnCancel.setText(null);
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnSave.setText(null);
-            btnSave.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnSaveActionPerformed(e);
-                }
-            });
+            btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(3, 5, CC.RIGHT, CC.DEFAULT));
@@ -314,8 +252,6 @@ public class DlgQMSPlan extends MyJDialog {
         qmsplan.setDescription(SYSTools.tidy(txtDescription.getText()));
         qmsplan.getCommontags().clear();
         qmsplan.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
-        qmsplan.getNotification().clear();
-        qmsplan.getNotification().addAll(notifyList);
 
     }
 
@@ -323,13 +259,9 @@ public class DlgQMSPlan extends MyJDialog {
     private JPanel pnlLeft;
     private JLabel lblTitle;
     private JTextField txtTitle;
-    private JideLabel lblNotify;
-    private JComboBox cmbNotify;
     private JScrollPane jScrollPane3;
     private JTextArea txtDescription;
     private JideLabel lblDescription;
-    private JScrollPane scrollPane1;
-    private JList lstNotify;
     private JLabel lblTags;
     private JPanel panel1;
     private JButton btnCancel;

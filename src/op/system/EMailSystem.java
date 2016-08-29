@@ -1,7 +1,5 @@
 package op.system;
 
-import entity.files.SYSFilesTools;
-import entity.system.NotificationTools;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
@@ -17,15 +15,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Properties;
-import java.util.StringTokenizer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -74,86 +69,65 @@ public class EMailSystem {
     }
 
 
-    public static boolean notify(String list) {
-        if (!isMailsystemActive() || SYSTools.catchNull(list).isEmpty()) return false;
+//    public static boolean notify(String list) {
+//        if (!isMailsystemActive() || SYSTools.catchNull(list).isEmpty()) return false;
+//
+//        StringTokenizer st = new StringTokenizer(list, ",");
+//        if (st.countTokens() == 0) return false;
+//
+//        boolean error = false;
+//
+//        EntityManager em = OPDE.createEM();
+////        ArrayList<Users> listUsers = new ArrayList<>();
+//        while (st.hasMoreElements()) {
+//            String uid = st.nextToken();
+//            Users user = em.find(Users.class, uid);
+//
+//            if (user != null) {
+//                try {
+//                    sendMail(SYSTools.xx("mail.notification.subject") + ": " + new Date(), SYSTools.xx("hier ist die gewünschte email"), new Recipient(user), NotificationTools.notify(user));
+//                } catch (Exception e){
+//                    OPDE.error(e);
+//                    error = true;
+//                }
+//            }
+//        }
+//        em.close();
+//
+//        return !error;
+//
+//    }
 
-        StringTokenizer st = new StringTokenizer(list, ",");
-        if (st.countTokens() == 0) return false;
-
-        boolean error = false;
-
-        EntityManager em = OPDE.createEM();
-        ArrayList<Users> listUsers = new ArrayList<>();
-        while (st.hasMoreElements()) {
-            String uid = st.nextToken();
-            Users user = em.find(Users.class, uid);
-
-            if (user != null) {
-                try {
-                    sendMail(SYSTools.xx("mail.notification.subject") + ": " + new Date(), SYSTools.xx("hier ist die gewünschte email"), new Recipient(user), NotificationTools.notify(user));
-                } catch (Exception e){
-                    OPDE.error(e);
-                    error = true;
-                }
-            }
-        }
-        em.close();
-
-        return !error;
-
+    public static boolean sendMail(String subject, String bodyText, Users user) {
+        return sendMail(subject, bodyText, new Recipient[]{new Recipient(user)}, null);
     }
 
     /**
      * sends an email message. but only if the EMail System is active and working.
      *
-     * @param subject    the text for the subject line
-     * @param bodyText   the text for the mail body
-     * @param attach     array of files to attach
+     * @param subject  the text for the subject line
+     * @param bodyText the text for the mail body
+     * @param attach   array of files to attach
      * @return true if sent successfully, false if not
      */
-//    public static boolean sendMail(String subject, String bodyText, Pair<String, String>[] recipients, File[] attach) {
-//        if (!isMailsystemActive()) {
-//            return false;
-//        }
-//        return send(subject, bodyText, recipients, attach, OPDE.getProps());
-//    }
     public static boolean sendMail(String subject, String bodyText, Users user, File[] attach) {
-
-
         return sendMail(subject, bodyText, new Recipient[]{new Recipient(user)}, attach);
     }
 
     public static boolean sendMail(String subject, String bodyText, Recipient recipient, File[] attach) {
-//        if (!isMailsystemActive()) {
-//            return false;
-//        }
-
         return sendMail(subject, bodyText, new Recipient[]{recipient}, attach);
     }
 
     public static boolean sendMail(String subject, String bodyText, ArrayList<Users> users, File[] attach) {
-//        if (!isMailsystemActive()) {
-//            return false;
-//        }
-
         if (users.isEmpty()) return false;
 
         ArrayList<Recipient> recipients = new ArrayList<>();
 
         users.forEach(user -> {
-            if (user.isActive()&& user.getMailConfirmed() == UsersTools.MAIL_CONFIRMED) {
+            if (user.isActive() && user.getMailConfirmed() == UsersTools.MAIL_CONFIRMED) {
                 recipients.add(new Recipient(user));
             }
         });
-
-//        for (Users user : users) {
-//            if (user.getMailConfirmed() == UsersTools.MAIL_CONFIRMED) {
-//                recipients.add(new Recipient(user));
-//            }
-//        }
-
-
-
 
         return sendMail(subject, bodyText, recipients.toArray(new Recipient[]{}), attach);
     }

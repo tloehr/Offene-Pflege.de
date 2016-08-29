@@ -1161,56 +1161,56 @@ public class PnlControlling extends CleanablePanel {
             }
         });
 
-        final JToggleButton btnNotify = new JToggleButton(SYSConst.icon22mailOFF);
-        btnNotify.setSelectedIcon(SYSConst.icon22mailON);
-        btnNotify.setSelected(NotificationTools.find(OPDE.getLogin().getUser(), NotificationTools.NKEY_DRUG_WEIGHT_CONTROL) != null);
-        btnNotify.setToolTipText(SYSTools.xx("opde.notification.enable.for.this.topic"));
-
-        btnNotify.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-
-                EntityManager em = OPDE.createEM();
-                try {
-                    em.getTransaction().begin();
-                    Users user = em.merge(OPDE.getLogin().getUser());
-                    em.lock(user, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        Notification myNotification = em.merge(new Notification(NotificationTools.NKEY_DRUG_WEIGHT_CONTROL, user));
-                        user.getNotifications().add(myNotification);
-                    } else {
-                        Notification myNotification = em.merge(NotificationTools.find(OPDE.getLogin().getUser(), NotificationTools.NKEY_DRUG_WEIGHT_CONTROL));
-                        user.getNotifications().remove(myNotification);
-                        em.remove(myNotification);
-                    }
-
-                    em.getTransaction().commit();
-                    OPDE.getLogin().setUser(user);
-                } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                        OPDE.getMainframe().emptyFrame();
-                        OPDE.getMainframe().afterLogin();
-                    }
-                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                } catch (Exception ex) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.fatal(ex);
-                } finally {
-                    em.close();
-                }
-
-            }
-        });
+//        final JToggleButton btnNotify = new JToggleButton(SYSConst.icon22mailOFF);
+//        btnNotify.setSelectedIcon(SYSConst.icon22mailON);
+//        btnNotify.setSelected(NotificationTools.find(OPDE.getLogin().getUser(), NotificationTools.NKEY_DRUG_WEIGHT_CONTROL) != null);
+//        btnNotify.setToolTipText(SYSTools.xx("opde.notification.enable.for.this.topic"));
+//
+//        btnNotify.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//
+//                EntityManager em = OPDE.createEM();
+//                try {
+//                    em.getTransaction().begin();
+//                    Users user = em.merge(OPDE.getLogin().getUser());
+//                    em.lock(user, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+//
+//                    if (e.getStateChange() == ItemEvent.SELECTED) {
+//                        Notification myNotification = em.merge(new Notification(NotificationTools.NKEY_DRUG_WEIGHT_CONTROL, user));
+//                        user.getNotifications().add(myNotification);
+//                    } else {
+//                        Notification myNotification = em.merge(NotificationTools.find(OPDE.getLogin().getUser(), NotificationTools.NKEY_DRUG_WEIGHT_CONTROL));
+//                        user.getNotifications().remove(myNotification);
+//                        em.remove(myNotification);
+//                    }
+//
+//                    em.getTransaction().commit();
+//                    OPDE.getLogin().setUser(user);
+//                } catch (OptimisticLockException ole) {
+//                    OPDE.warn(ole);
+//                    if (em.getTransaction().isActive()) {
+//                        em.getTransaction().rollback();
+//                    }
+//                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+//                        OPDE.getMainframe().emptyFrame();
+//                        OPDE.getMainframe().afterLogin();
+//                    }
+//                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+//                } catch (Exception ex) {
+//                    if (em.getTransaction().isActive()) {
+//                        em.getTransaction().rollback();
+//                    }
+//                    OPDE.fatal(ex);
+//                } finally {
+//                    em.close();
+//                }
+//
+//            }
+//        });
 
         pnlWeightControllNarcotics.add(btnWeightControl, BorderLayout.WEST);
-        pnlWeightControllNarcotics.add(btnNotify, BorderLayout.EAST);
+//        pnlWeightControllNarcotics.add(btnNotify, BorderLayout.EAST);
         pnlContent.add(pnlWeightControllNarcotics);
 
 

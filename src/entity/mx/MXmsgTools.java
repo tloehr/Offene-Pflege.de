@@ -1,10 +1,16 @@
 package entity.mx;
 
 import entity.system.Users;
+import entity.system.UsersTools;
 import op.OPDE;
+import op.system.EMailSystem;
+import op.system.Recipient;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.swing.*;
+import java.text.DateFormat;
 import java.util.ArrayList;
 
 /**
@@ -116,6 +122,37 @@ public class MXmsgTools {
             }
         }
         return unread;
+    }
+
+    public static void sendNotificationsFor(MXmsg msg){
+        if (!EMailSystem.isMailsystemActive()) return;
+
+        for (MXrecipient mXrecipient : msg.getRecipients()){
+            if (mXrecipient.getRecipient().getMailConfirmed() == UsersTools.MAIL_NOTIFICATIONS_ENABLED){
+                SwingWorker w = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        EMailSystem.sendMail(SYSTools.xx("mx.mail.notification.subject"), SYSTools.xx("mx.mail.notification.body", mXrecipient.getRecipient().getVorname()) + getMsgAsText(msg), mXrecipient.getRecipient());
+                        return null;
+                    }
+                };
+                w.execute();
+            }
+        }
+    }
+
+    /**
+     * compact string representation of the msg
+     * @param msg
+     * @return
+     */
+    public static String getMsgAsText(MXmsg msg){
+        String text = SYSTools.xx("mx.sender") + ": "+ UsersTools.getFullnameWithID(msg.getSender()) + ", " + DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(msg.getPit()) + "<br/>";
+        text += "<br/>";
+        text += SYSTools.xx("mx.col_subject")+ ": " + SYSTools.catchNull(msg.getSubject(), "mx.no.subject");
+        text += "<br/><br/>";
+        text +=  msg.getText();
+        return text;
     }
 
 //     public static boolean isUnread(MXmsg mXmsg, Users user){

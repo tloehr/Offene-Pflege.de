@@ -74,7 +74,6 @@
         <class>entity.qms.Qmssched</class>
         <class>entity.system.Commontags</class>
         <class>entity.staff.Training2Users</class>
-        <class>entity.system.Notification</class>
         <class>entity.building.Resident2Rooms</class>
         <class>entity.building.Floors</class>
         <class>entity.mx.MXmsg</class>

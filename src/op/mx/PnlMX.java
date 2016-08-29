@@ -20,6 +20,7 @@ import gui.GUITools;
 import gui.events.RelaxedDocumentListener;
 import gui.interfaces.CleanablePanel;
 import op.OPDE;
+import op.system.EMailSystem;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.DlgYesNo;
@@ -324,8 +325,8 @@ public class PnlMX extends CleanablePanel {
         newMessage.setAlignmentX(Component.LEFT_ALIGNMENT);
         newMessage.addActionListener(actionEvent -> {
             MXmsg myMsg = new MXmsg(OPDE.getMe());
-            myMsg.setText("mx.enter.text.here");
-            myMsg.setSubject("mx.subject");
+            myMsg.setText(SYSTools.xx("mx.enter.text.here"));
+            myMsg.setSubject(SYSTools.xx("mx.col_subject"));
             displayMessage(myMsg);
         });
         list.add(newMessage);
@@ -338,14 +339,7 @@ public class PnlMX extends CleanablePanel {
 
         final JButton btnIncoming = GUITools.createHyperlinkButton("mx.incoming", SYSConst.icon16mailGet, e -> {
             currentMessageInEditor = null;
-//            tblMsgs.setModel(new DefaultTableModel(0, 3)); //to prevent exceptions from RNDHtml
-//            TMmsgs newModel = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
-//            tblMsgs.setModel(newModel);
-//            tmmsgs.cleanup();
-//            tmmsgs = newModel;
-
             tmmsgs.setCurrentMpdel("incoming");
-
             displayMessage(null);
             String buttonText = SYSTools.xx("mx.incoming") + " (" + tmmsgs.getRowCount() + ")";
             OPDE.getDisplayManager().setMainMessage(buttonText);
@@ -353,27 +347,13 @@ public class PnlMX extends CleanablePanel {
         list.add(btnIncoming);
 
         final JButton btnSent = GUITools.createHyperlinkButton("mx.sent", SYSConst.icon16mailSend, e -> {
-//            currentMessageInEditor = null;
-//            tblMsgs.setModel(new DefaultTableModel(0, 3));
-//            TMmsgs newModel = new TMmsgs(MXmsgTools.getSentFor(OPDE.getMe()));
-//            tblMsgs.setModel(newModel);
-//            tmmsgs.cleanup();
-//            tmmsgs = newModel;
-
             tmmsgs.setCurrentMpdel("sent");
-
             displayMessage(null);
             OPDE.getDisplayManager().setMainMessage("mx.sent");
         });
         list.add(btnSent);
 
         final JButton btnDrafts = GUITools.createHyperlinkButton("mx.drafts", SYSConst.icon16edit, e -> {
-//            currentMessageInEditor = null;
-//            tblMsgs.setModel(new DefaultTableModel(0, 3));
-//            TMmsgs newModel = new TMmsgs(MXmsgTools.getDrafts(OPDE.getMe()));
-//            tblMsgs.setModel(newModel);
-//            tmmsgs.cleanup();
-//            tmmsgs = newModel;
             tmmsgs.setCurrentMpdel("draft");
             displayMessage(null);
             OPDE.getDisplayManager().setMainMessage("mx.drafts");
@@ -381,12 +361,6 @@ public class PnlMX extends CleanablePanel {
         list.add(btnDrafts);
 
         final JButton btnTrashed = GUITools.createHyperlinkButton("mx.trashed", SYSConst.icon16trash, e -> {
-//            currentMessageInEditor = null;
-//            tblMsgs.setModel(new DefaultTableModel(0, 3));
-//            TMmsgs newModel = new TMmsgs(MXmsgTools.getTrashed(OPDE.getMe()));
-//            tblMsgs.setModel(newModel);
-//            tmmsgs.cleanup();
-//            tmmsgs = newModel;
             tmmsgs.setCurrentMpdel("trash");
             displayMessage(null);
             OPDE.getDisplayManager().setMainMessage("mx.trashed");
@@ -395,18 +369,6 @@ public class PnlMX extends CleanablePanel {
 
         return list;
     }
-
-//    private void setTableModel() {
-//        currentMessageInEditor = null;
-//        tblMsgs.setModel(new DefaultTableModel(0, 3)); //to prevent exceptions from RNDHtml
-//        TMmsgs newModel = new TMmsgs(MXmsgTools.getAllFor(OPDE.getMe()));
-//        tblMsgs.setModel(newModel);
-//        tmmsgs.cleanup();
-//        tmmsgs = newModel;
-//        displayMessage(null);
-//        String buttonText = SYSTools.xx("mx.incoming") + " (" + newModel.getRowCount() + ")";
-//        OPDE.getDisplayManager().setMainMessage(buttonText);
-//    }
 
     private void displayMessage(final MXmsg msg) {
         currentMessageInEditor = msg;
@@ -514,6 +476,7 @@ public class PnlMX extends CleanablePanel {
             em.lock(myMessage, LockModeType.OPTIMISTIC);
             myMessage.setDraft(false);
             em.getTransaction().commit();
+            MXmsgTools.sendNotificationsFor(myMessage);
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.msg.sent")));
         } catch (OptimisticLockException ole) {
             OPDE.warn(ole);

@@ -104,23 +104,11 @@ public class Qmsplan {
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
 
-
-    @ManyToMany
-    @JoinTable(name = "notify4qmsplan", joinColumns =
-    @JoinColumn(name = "qmsplanid"), inverseJoinColumns =
-    @JoinColumn(name = "uid"))
-    private Collection<Users> notification;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmsplan", orphanRemoval = true)
     private List<Qmssched> qmsschedules;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmsplan")
     private Collection<Qmsplan2File> attachedFilesConnections;
-
-
-    public Collection<Users> getNotification() {
-        return notification;
-    }
 
     public List<Qmssched> getQmsschedules() {
         return qmsschedules;
@@ -133,9 +121,7 @@ public class Qmsplan {
         this.title = title;
         commontags = new HashSet<>();
         qmsschedules = new ArrayList<>();
-        notification = new HashSet<>();
         this.user = OPDE.getLogin().getUser();
-        notification.add(this.user);
         this.state = QmsplanTools.STATE_ACTIVE;
         this.color = "000000"; // Back in black
         this.version = 0l;
