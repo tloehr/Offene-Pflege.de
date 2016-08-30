@@ -759,7 +759,7 @@ public class PnlHandover extends NursingRecordsPanel {
                             nreport.getText() +
                             "</td>" +
 
-                            "<td width=\"100\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
+                            "<td width=\"100\" align=\"left\">" + nreport.getNewBy().getFullname() + "</td>" +
                             "</tr>" +
                             "</table>" +
                             "</html>";

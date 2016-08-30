@@ -906,7 +906,7 @@ public class PnlReport extends NursingRecordsPanel {
                                                     DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                                                     " " + SYSTools.xx("misc.msg.Time.short") +
                                                     ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
-                                                    ", " + nreport.getUser().getFullname() +
+                                                    ", " + nreport.getNewBy().getFullname() +
                                                     (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple_internal)) + "</p></b></td>"
                                     ) +
                                             SYSConst.html_table_tr(
@@ -1254,21 +1254,16 @@ public class PnlReport extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+
                                     final NReport newReport = em.merge((NReport) o);
                                     NReport oldReport = em.merge(nreport);
                                     em.lock(oldReport, LockModeType.OPTIMISTIC);
                                     newReport.setReplacementFor(oldReport);
 
-                                    for (SYSNR2FILE oldAssignment : oldReport.getAttachedFilesConnections()) {
-                                        em.remove(oldAssignment);
-                                    }
                                     oldReport.getAttachedFilesConnections().clear();
-                                    for (SYSNR2PROCESS oldAssignment : oldReport.getAttachedQProcessConnections()) {
-                                        em.remove(oldAssignment);
-                                    }
                                     oldReport.getAttachedQProcessConnections().clear();
 
-                                    oldReport.setEditedBy(em.merge(OPDE.getLogin().getUser()));
+                                    oldReport.setEditedBy(em.merge(OPDE.getMe()));
                                     oldReport.setEditDate(new Date());
                                     oldReport.setReplacedBy(newReport);
 
@@ -1373,18 +1368,12 @@ public class PnlReport extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
+
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    final NReport delReport = em.merge(nreport);
+                                    NReport delReport = em.merge(nreport);
                                     em.lock(delReport, LockModeType.OPTIMISTIC);
-                                    delReport.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
-                                    for (SYSNR2FILE oldAssignment : delReport.getAttachedFilesConnections()) {
-                                        em.remove(oldAssignment);
-                                    }
-                                    delReport.getAttachedFilesConnections().clear();
-                                    for (SYSNR2PROCESS oldAssignment : delReport.getAttachedQProcessConnections()) {
-                                        em.remove(oldAssignment);
-                                    }
-                                    delReport.getAttachedQProcessConnections().clear();
+                                    delReport = NReportTools.delete(delReport, em.merge(OPDE.getMe()));
+
                                     em.getTransaction().commit();
 
                                     final String keyDay = DateFormat.getDateInstance().format(delReport.getPit());

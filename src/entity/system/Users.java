@@ -26,7 +26,6 @@
 package entity.system;
 
 import entity.files.*;
-import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training2Users;
 import op.tools.SYSTools;
@@ -37,8 +36,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
 
 /**
  * @author tloehr
@@ -85,7 +82,7 @@ public class Users implements Serializable, Comparable<Users> {
     private Collection<SYSNR2FILE> SYSNR2FILECollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSPRE2FILE> SYSPRE2FILECollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "newBy")
     private Collection<NReport> NReport;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "editedBy")
     private Collection<NReport> korrigierteNReport;

@@ -6,11 +6,14 @@ package entity.reports;
 
 import entity.EntityTools;
 import entity.building.Homes;
+import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.QProcessElement;
+import entity.process.SYSNR2PROCESS;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
@@ -28,7 +31,6 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 /**
  * @author tloehr
@@ -173,7 +175,7 @@ public class NReportTools {
     public static String getPITAsHTML(NReport nReport) {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
-        html += df.format(nReport.getPit()) + "; " + nReport.getUser().getFullname();
+        html += df.format(nReport.getPit()) + "; " + nReport.getNewBy().getFullname();
         return html;
     }
 
@@ -214,7 +216,7 @@ public class NReportTools {
                                     DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                                     " " + SYSTools.xx("misc.msg.Time.short") +
                                     ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
-                                    ", " + nreport.getUser().getFullname() +
+                                    ", " + nreport.getNewBy().getFullname() +
                                     (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
 
                     );
@@ -364,7 +366,7 @@ public class NReportTools {
     public static String getDateAndUser(NReport nReport, boolean showIDs, boolean showMinutes) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-        result = sdf.format(nReport.getPit()) + "; " + nReport.getUser().getFullname();
+        result = sdf.format(nReport.getPit()) + "; " + nReport.getNewBy().getFullname();
         if (showMinutes && !nReport.isDeleted() && !nReport.isReplaced()) {
             result += "<br/>" + SYSTools.xx("misc.msg.Effort") + ": " + nReport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)");
         }
@@ -390,13 +392,13 @@ public class NReportTools {
         DateFormat df = DateFormat.getDateTimeInstance();
 
         if (nReport.isDeleted()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getDelPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getDeletedBy().getFullname() + "<br/>";
         }
         if (nReport.isReplacement() && !nReport.isReplaced()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditDate()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditedPIT()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
         }
         if (nReport.isReplaced()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
+            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
             result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
         }
 //        if (!nReport.getAttachedFilesConnections().isEmpty()) {
@@ -424,14 +426,14 @@ public class NReportTools {
 
         DateFormat df = DateFormat.getDateTimeInstance();
         if (nReport.isDeleted()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getDelPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getDeletedBy().getFullname() + "<br/>";
         } else if (nReport.isReplacement() && !nReport.isReplaced()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditDate()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditedPIT()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
         } else if (nReport.isReplaced()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
+            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
             result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
         } else {
-            result += "<br/>" + SYSTools.xx("misc.msg.created") + " " + SYSTools.xx("misc.msg.atchrono") + ": " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + ": " + nReport.getUser().getFullname();
+            result += "<br/>" + SYSTools.xx("misc.msg.created") + " " + SYSTools.xx("misc.msg.atchrono") + ": " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + ": " + nReport.getNewBy().getFullname();
         }
 
 
@@ -478,7 +480,7 @@ public class NReportTools {
                     html.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(df.format(nReport.getPit()), null) +
                                     SYSConst.html_table_td(SYSConst.html_paragraph(nReport.getText()), null) +
-                                    SYSConst.html_table_td(nReport.getUser().getFullname(), null)
+                                    SYSConst.html_table_td(nReport.getNewBy().getFullname(), null)
                     ));
                 }
                 html.append("</table>");
@@ -539,7 +541,7 @@ public class NReportTools {
                             SYSConst.html_table_td(df.format(nReport.getPit()), null) +
                                     SYSConst.html_table_td(ResidentTools.getTextCompact(nReport.getResident()), null) +
                                     SYSConst.html_table_td(SYSConst.html_paragraph(nReport.getText()), null) +
-                                    SYSConst.html_table_td(nReport.getUser().getFullname(), null)
+                                    SYSConst.html_table_td(nReport.getNewBy().getFullname(), null)
                     );
                 }
                 html.append(SYSConst.html_table(table, "1"));
@@ -682,35 +684,35 @@ public class NReportTools {
     }
 
     public static ArrayList<NReport> getNReports(Resident resident, LocalDate ldfrom, LocalDate ldto) {
-            EntityManager em = OPDE.createEM();
-            ArrayList<NReport> list = null;
-            DateTime from = ldfrom.toDateTimeAtStartOfDay();
-            DateTime to = SYSCalendar.eod(ldto);
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
+        DateTime from = ldfrom.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(ldto);
 
-            OPDE.debug(to);
-            try {
+        OPDE.debug(to);
+        try {
 
-                String jpql = " SELECT nr " +
-                        " FROM NReport nr " +
-                        " WHERE nr.resident = :resident " +
-                        " AND nr.pit >= :from AND nr.pit <= :to " +
-                        " ORDER BY nr.pit ASC ";
+            String jpql = " SELECT nr " +
+                    " FROM NReport nr " +
+                    " WHERE nr.resident = :resident " +
+                    " AND nr.pit >= :from AND nr.pit <= :to " +
+                    " ORDER BY nr.pit ASC ";
 
-                Query query = em.createQuery(jpql);
+            Query query = em.createQuery(jpql);
 
-                query.setParameter("resident", resident);
-                query.setParameter("from", from.toDate());
-                query.setParameter("to", to.toDate());
+            query.setParameter("resident", resident);
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
 
-                list = new ArrayList<NReport>(query.getResultList());
+            list = new ArrayList<NReport>(query.getResultList());
 
-            } catch (Exception se) {
-                OPDE.fatal(se);
-            } finally {
-                em.close();
-            }
-            return list;
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
         }
+        return list;
+    }
 
     public static ArrayList<NReport> getNReports4Month(Resident resident, LocalDate month) {
         EntityManager em = OPDE.createEM();
@@ -906,40 +908,40 @@ public class NReportTools {
      * @return
      */
     public static ArrayList<NReport> getNReports4Handover(LocalDate day, Homes home) {
-       return getNReports4Handover(day, day, home);
+        return getNReports4Handover(day, day, home);
     }
 
     public static ArrayList<NReport> getNReports4Handover(LocalDate from, LocalDate to, Homes home) {
 
-            EntityManager em = OPDE.createEM();
-            ArrayList<NReport> list = null;
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
 
-            try {
+        try {
 
-                String jpql = " SELECT DISTINCT nr " +
-                        " FROM NReport nr " +
-                        " JOIN nr.commontags ct " +
-                        " WHERE nr.pit >= :from AND nr.pit <= :to AND (ct.type = :handover OR ct.type = :emergency) " +
-                        " AND nr.resident.station.home = :home " +
-                        " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
+            String jpql = " SELECT DISTINCT nr " +
+                    " FROM NReport nr " +
+                    " JOIN nr.commontags ct " +
+                    " WHERE nr.pit >= :from AND nr.pit <= :to AND (ct.type = :handover OR ct.type = :emergency) " +
+                    " AND nr.resident.station.home = :home " +
+                    " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
 
-                Query query = em.createQuery(jpql);
+            Query query = em.createQuery(jpql);
 
-                query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
-                query.setParameter("to", SYSCalendar.eod(to).toDate());
-                query.setParameter("home", home);
-                query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
-                query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
+            query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("to", SYSCalendar.eod(to).toDate());
+            query.setParameter("home", home);
+            query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
+            query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
 
-                list = new ArrayList<NReport>(query.getResultList());
+            list = new ArrayList<NReport>(query.getResultList());
 
-            } catch (Exception se) {
-                OPDE.fatal(se);
-            } finally {
-                em.close();
-            }
-            return list;
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
         }
+        return list;
+    }
 
     public static ArrayList<NReport> getNReports4Tags(Resident resident, Commontags tag) {
 
@@ -972,6 +974,33 @@ public class NReportTools {
         return list;
     }
 
+    /**
+     * sets all necessary changes to <i>DELETE</i> a report. Which is in fact never really deleted.
+     * @param report
+     * @param deletedBy
+     * @return
+     */
+    public static NReport delete(NReport report, Users deletedBy) {
+        report.setDeletedBy(deletedBy);
+        report.setDelPIT(new Date());
+        report.getAttachedFilesConnections().clear();
+        report.getAttachedQProcessConnections().clear();
+        return report;
+    }
+
+    /**
+        * sets all necessary changes to <i>DELETE</i> a report. Which is in fact never really deleted.
+        * @param report
+        * @param deletedBy
+        * @return
+        */
+       public static NReport replace(NReport report, Users deletedBy) {
+           report.setDeletedBy(deletedBy);
+           report.setDelPIT(new Date());
+           report.getAttachedFilesConnections().clear();
+           report.getAttachedQProcessConnections().clear();
+           return report;
+       }
 
     public static ArrayList<NReport> getNReports4Tags(Commontags tag, LocalDate start, LocalDate end) {
 

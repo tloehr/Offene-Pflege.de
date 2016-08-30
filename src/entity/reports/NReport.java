@@ -50,12 +50,33 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Date pit;
 
     /**
-     * Wann wurde der Bericht korrigiert ?
+     * Wann wurde der Bericht eingetragen ? Das ist immer die aktuelle Zeit. Auch wenn jemand einen bestehenden Bericht ändert,
+     * dann übernimmt der die Eigentümerschaft und die newPIT wird auf den jeweiligen Bearbeitungszeitpunkt gesetzt.
      */
     @Basic(optional = false)
-    @Column(name = "EditPIT")
+    @Column(name = "NewPIT")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date editpit;
+    private Date newPIT;
+
+    /**
+     * Wann wurde der Bericht korrigiert ?
+     */
+    @Basic(optional = true)
+    @Column(name = "EditedPIT")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date editedPIT;
+
+    /**
+     * Wann wurde der Bericht gelöscht ?
+     */
+    @Basic(optional = true)
+    @Column(name = "DelPIT")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date delPIT;
+
+    /**
+     * der Bericht selbst
+     */
     @Lob
     @Column(name = "Text")
     private String text;
@@ -66,45 +87,56 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     @Basic(optional = false)
     @Column(name = "Dauer")
     private int minutes;
-    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
-    @ManyToOne
 
     /**
      * Wer hat diesen Bericht eingetragen.
      */
-    private Users user;
-    @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
+    @JoinColumn(name = "NewBy", referencedColumnName = "UKennung")
     @ManyToOne
+    private Users newBy;
+
+
+    /**
+     * Wer hat diesen Bericht gelöscht.
+     */
+    @JoinColumn(name = "DeletedBy", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users deletedBy;
 
     /**
      * zu welchem BW gehört dieser Bericht ?
      */
+    @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
+    @ManyToOne
     private Resident resident;
-    @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
+
+    /**
+     * Wer hat diesen Bericht geändert.
+     */
+    @JoinColumn(name = "EditedBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editedBy;
+
+    /**
+     * Bei einer Nachkorrektur: durch welchen Bericht wurde dieses hier ersetzt.
+     */
     @JoinColumn(name = "ReplacedBy", referencedColumnName = "PBID")
     @OneToOne
     private NReport replacedBy;
+
+    /**
+     * Bei einer Nachkorrektur: welcher Bericht wird duch diesen hier ersetzt.
+     */
     @JoinColumn(name = "ReplacementFor", referencedColumnName = "PBID")
     @OneToOne
     private NReport replacementFor;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nReport")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nReport")
     private Collection<SYSNR2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht", fetch = FetchType.EAGER)
     private List<NR2User> usersAcknowledged;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nreport")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nreport")
     private Collection<SYSNR2PROCESS> attachedProcessConnections;
-
-    // ==
-    // M:N Relations
-    // ==
-//    @ManyToMany
-//    @JoinTable(name = "nr2tags", joinColumns =
-//    @JoinColumn(name = "PBID"), inverseJoinColumns =
-//    @JoinColumn(name = "PBTAGID"))
-//    private Collection<NReportTAGS> tags;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "nreports2tags", joinColumns =
@@ -117,11 +149,11 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
 
     public NReport(Resident resident) {
         this.pit = new Date();
-        this.editpit = this.pit;
+        this.newPIT = new Date();
         this.text = "";
         this.minutes = 3;
         this.resident = resident;
-        this.user = OPDE.getLogin().getUser();
+        this.newBy = OPDE.getLogin().getUser();
         this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
         this.commontags = new ArrayList<Commontags>();
         this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
@@ -129,12 +161,13 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.version = 0l;
     }
 
-    private NReport(Date pit, Date editpit, String text, int minutes, Users user, Resident resident, Users editedBy, NReport replacedBy, NReport replacementFor) {
+    private NReport(Date pit, Date newPIT, Date editedPIT, String text, int minutes, Users newBy, Resident resident, Users editedBy, NReport replacedBy, NReport replacementFor) {
         this.pit = pit;
-        this.editpit = editpit;
+        this.newPIT = newPIT;
+        this.editedPIT = editedPIT;
         this.text = SYSTools.tidy(text);
         this.minutes = minutes;
-        this.user = user;
+        this.newBy = newBy;
         this.resident = resident;
         this.editedBy = editedBy;
         this.replacedBy = replacedBy;
@@ -177,7 +210,9 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     /**
      * Dieses Date ist aus technischen Gründen vorhanden. Es gibt mehrere Möglichkeiten, wie diese PIT zu verstehen ist:
      * <ul>
-     * <li> Bei einem gelöschten Beitrag steht hier der Zeitpunkt der Lösung drin.</li>
+     * <li>Falls ein Bericht nachgetragen wird, dann steht hier immer der wirkliche Zeitpunkt des Eintrags drin. Im Gegensatz zu <code>PIT</code>, der sich auf den <b>fachlichen</b> Zeitpunkt bezeichnet.</li>
+     * <p>
+     * <li> Bei einem gelöschten Beitrag steht hier der Zeitpunkt der Löschung drin.</li>
      * <li> Wurde dieser Eintrag durch einen anderen ersetzt, steht hier drin wann das passiert ist.</li>
      * <li> Ist dies ein Eintrag, der einen anderen ersetzt hat dann steht hier <code>null</code>.</li>
      * <li> Wurde der Eintrag nicht geändert, dann steht hier ebenfalls <code>null</code>.</li>
@@ -185,8 +220,8 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
      *
      * @return
      */
-    public Date getEditDate() {
-        return editpit;
+    public Date getEditedPIT() {
+        return editedPIT;
     }
 
 
@@ -212,18 +247,43 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     public void setEditDate(Date editpit) {
-        this.editpit = editpit;
+        this.editedPIT = editpit;
     }
 
     public Collection<SYSNR2FILE> getAttachedFilesConnections() {
         return attachedFilesConnections;
     }
 
+    public Date getNewPIT() {
+        return newPIT;
+    }
+
+    public void setNewPIT(Date newPIT) {
+        this.newPIT = newPIT;
+    }
+
+    public void setEditedPIT(Date editedPIT) {
+        this.editedPIT = editedPIT;
+    }
+
+    public Date getDelPIT() {
+        return delPIT;
+    }
+
+    public void setDelPIT(Date delPIT) {
+        this.delPIT = delPIT;
+    }
+
+    public Users getDeletedBy() {
+        return deletedBy;
+    }
+
     public void setDeletedBy(Users deletedBy) {
-        editedBy = deletedBy;
-        editpit = new Date();
-        replacedBy = null;
-        replacementFor = null;
+        this.deletedBy = deletedBy;
+    }
+
+    public void setResident(Resident resident) {
+        this.resident = resident;
     }
 
 //    public boolean isSpecial() {
@@ -236,12 +296,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
 //        return found;
 //    }
 
-    /**
-     * NReport, die gelöscht oder geändert wurden enthalten als <code>editBy</code> den User, der die Änderung vorgenommen hat.
-     * Ein normaler, ungeänderter, ungelöschter Bericht gibt hier <code>null</code> zurück.
-     *
-     * @return User, der geändert oder gelöscht hat oder null, wenn ungeändert.
-     */
+
     public Users getEditedBy() {
         return editedBy;
     }
@@ -273,7 +328,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     public boolean isDeleted() {
-        return editedBy != null && replacedBy == null && replacementFor == null;
+        return delPIT != null;
     }
 
     /**
@@ -302,17 +357,22 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
 
-    public Users getUser() {
-        return user;
+    public Users getNewBy() {
+        return newBy;
     }
 
-    public void setUser(Users user) {
-        this.user = user;
+    @Override
+    public Users getUser() {
+        return newBy;
+    }
+
+    public void setNewBy(Users user) {
+        this.newBy = user;
     }
 
     @Override
     public Users getOwner() {
-        return user;
+        return newBy;
     }
 
     @Override
@@ -324,7 +384,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
 
         if (minutes != nReport.minutes) return false;
 //        if (editedBy != null ? !editedBy.equals(nReport.editedBy) : nReport.editedBy != null) return false;
-        if (editpit != null ? !editpit.equals(nReport.editpit) : nReport.editpit != null) return false;
+        if (editedPIT != null ? !editedPIT.equals(nReport.editedPIT) : nReport.editedPIT != null) return false;
         if (pbid != null ? !pbid.equals(nReport.pbid) : nReport.pbid != null) return false;
         if (pit != null ? !pit.equals(nReport.pit) : nReport.pit != null) return false;
 //        if (replacedBy != null ? !replacedBy.equals(nReport.replacedBy) : nReport.replacedBy != null) return false;
@@ -333,7 +393,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         if (resident != null ? !resident.equals(nReport.resident) : nReport.resident != null) return false;
         if (commontags != null ? !commontags.equals(nReport.commontags) : nReport.commontags != null) return false;
         if (text != null ? !text.equals(nReport.text) : nReport.text != null) return false;
-        if (user != null ? !user.equals(nReport.user) : nReport.user != null) return false;
+        if (newBy != null ? !newBy.equals(nReport.newBy) : nReport.newBy != null) return false;
         if (version != null ? !version.equals(nReport.version) : nReport.version != null) return false;
 
         return true;
@@ -344,10 +404,10 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         int result = pbid != null ? pbid.hashCode() : 0;
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (pit != null ? pit.hashCode() : 0);
-        result = 31 * result + (editpit != null ? editpit.hashCode() : 0);
+        result = 31 * result + (editedPIT != null ? editedPIT.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + minutes;
-        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (newBy != null ? newBy.hashCode() : 0);
         result = 31 * result + (resident != null ? resident.hashCode() : 0);
 //        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
 //        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
@@ -398,7 +458,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     @Override
     public NReport clone() {
 
-        final NReport clonedReport = new NReport(pit, editpit, text, minutes, user, resident, editedBy, null, null);
+        final NReport clonedReport = new NReport(pit, newPIT, editedPIT, text, minutes, newBy, resident, editedBy, null, null);
 
         CollectionUtils.forAllDo(commontags, new Closure() {
             public void execute(Object o) {
@@ -416,7 +476,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         CollectionUtils.forAllDo(attachedFilesConnections, new Closure() {
             public void execute(Object o) {
                 SYSNR2FILE oldAssignment = (SYSNR2FILE) o;
-                clonedReport.attachedFilesConnections.add(new SYSNR2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getUser(), clonedReport.getPit()));
+                clonedReport.attachedFilesConnections.add(new SYSNR2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getNewBy(), clonedReport.getPit()));
             }
         });
         return clonedReport;

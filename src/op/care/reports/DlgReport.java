@@ -136,7 +136,8 @@ public class DlgReport extends MyJDialog {
         nReport.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
 
         nReport.setPit(pnlPIT.getPIT());
-        nReport.setUser(OPDE.getLogin().getUser());
+        nReport.setNewBy(OPDE.getMe());
+        nReport.setNewPIT(new Date());
         dispose();
     }
 
