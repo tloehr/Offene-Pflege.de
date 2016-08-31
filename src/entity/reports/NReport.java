@@ -246,9 +246,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         return resident;
     }
 
-    public void setEditDate(Date editpit) {
-        this.editedPIT = editpit;
-    }
 
     public Collection<SYSNR2FILE> getAttachedFilesConnections() {
         return attachedFilesConnections;
@@ -385,6 +382,8 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         if (minutes != nReport.minutes) return false;
 //        if (editedBy != null ? !editedBy.equals(nReport.editedBy) : nReport.editedBy != null) return false;
         if (editedPIT != null ? !editedPIT.equals(nReport.editedPIT) : nReport.editedPIT != null) return false;
+        if (newPIT != null ? !newPIT.equals(nReport.newPIT) : nReport.newPIT != null) return false;
+        if (delPIT != null ? !delPIT.equals(nReport.delPIT) : nReport.delPIT != null) return false;
         if (pbid != null ? !pbid.equals(nReport.pbid) : nReport.pbid != null) return false;
         if (pit != null ? !pit.equals(nReport.pit) : nReport.pit != null) return false;
 //        if (replacedBy != null ? !replacedBy.equals(nReport.replacedBy) : nReport.replacedBy != null) return false;

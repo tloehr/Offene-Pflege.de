@@ -1264,7 +1264,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     oldReport.getAttachedQProcessConnections().clear();
 
                                     oldReport.setEditedBy(em.merge(OPDE.getMe()));
-                                    oldReport.setEditDate(new Date());
+                                    oldReport.setEditedPIT(new Date());
                                     oldReport.setReplacedBy(newReport);
 
                                     em.getTransaction().commit();
@@ -1561,12 +1561,11 @@ public class PnlReport extends NursingRecordsPanel {
                                 em.lock(myReport, LockModeType.OPTIMISTIC);
 
                                 myReport.setMinutes((Integer) o);
-                                myReport.setEditDate(new Date());
+                                myReport.setEditedPIT(new Date());
 
                                 em.getTransaction().commit();
 
                                 final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-
 
                                 synchronized (contentmap) {
                                     contentmap.remove(keyNewDay);

@@ -9,6 +9,8 @@ import com.jgoodies.forms.layout.FormLayout;
 import op.OPDE;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,9 +26,10 @@ import java.util.GregorianCalendar;
  * @author Torsten Löhr
  */
 public class PnlPIT extends JPanel {
-    private DateTime time;
+    private LocalTime time;
     private Date preset;
     private Date max, min;
+
 
     public PnlPIT() {
         this(new Date(), new Date(), SYSConst.DATE_THE_VERY_BEGINNING);
@@ -36,12 +39,12 @@ public class PnlPIT extends JPanel {
         this(preset, new Date(), SYSConst.DATE_THE_VERY_BEGINNING);
         txtDate.setEnabled(enableDate);
     }
-
-    public PnlPIT(Date preset) {
-        this(preset, true);
-
-    }
-
+//
+//    public PnlPIT(Date preset) {
+//        this(preset, true);
+//
+//    }
+//
 
     public PnlPIT(Date preset, Date max, Date min) {
         this.max = max;
@@ -54,20 +57,21 @@ public class PnlPIT extends JPanel {
 
         txtDate.setText(DateFormat.getDateInstance().format(preset));
 
-        time = new DateTime(preset);
-        txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(time.toDate()));
+        time = new LocalTime(preset);
+        txtUhrzeit.setText(time.toString("HH:mm"));
     }
 
     public Date getPIT() {
-        DateMidnight day;
+        LocalDate day;
         try {
-            day = new DateMidnight(SYSCalendar.parseDate(txtDate.getText()));
+            day = new LocalDate(SYSCalendar.parseDate(txtDate.getText()));
         } catch (NumberFormatException ex) {
-            day = new DateMidnight();
+            day = new LocalDate();
         }
 
-        DateTime time = new DateTime(this.time);
-        return day.toDateTime().plusHours(time.getHourOfDay()).plusMinutes(time.getMinuteOfHour()).plusSeconds(time.getSecondOfMinute()).toDate();
+//        DateTime time = new DateTime(this.time);
+
+        return day.toLocalDateTime(time).toDate();//.plusHours(time.getHourOfDay()).plusMinutes(time.getMinuteOfHour()).plusSeconds(time.getSecondOfMinute()).toDate();
     }
 
     private void txtUhrzeitFocusLost(FocusEvent e) {
@@ -84,9 +88,9 @@ public class PnlPIT extends JPanel {
 
         DateTime pit;
         if (gc != null) {
-            DateTime time = new DateTime(gc.getTimeInMillis());
-            DateMidnight day = new DateMidnight(SYSCalendar.parseDate(txtDate.getText()));
-            pit = day.toDateTime().plusHours(time.getHourOfDay()).plusMinutes(time.getMinuteOfHour()).plusSeconds(time.getSecondOfMinute());
+            LocalTime time = new LocalTime(gc.getTimeInMillis());
+            LocalDate day = new LocalDate(SYSCalendar.parseDate(txtDate.getText()));
+            pit = day.toDateTime(time);//.plusHours(time.getHourOfDay()).plusMinutes(time.getMinuteOfHour()).plusSeconds(time.getSecondOfMinute());
 
             if (pit.isAfter(new DateTime(max))) {
                 pit = new DateTime(max);
@@ -102,7 +106,7 @@ public class PnlPIT extends JPanel {
 
 
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(pit.toDate()));
-        time = pit;//this.time = new Time(gc.getTimeInMillis());
+        time = pit.toLocalTime();//this.time = new Time(gc.getTimeInMillis());
 
     }
 
@@ -111,7 +115,7 @@ public class PnlPIT extends JPanel {
     }
 
     private void txtDateFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(min), new DateMidnight(max));
+        SYSCalendar.handleDateFocusLost(evt, new LocalDate(min), new LocalDate(max));
     }
 
     private void txtDateFocusGained(FocusEvent e) {

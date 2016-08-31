@@ -433,7 +433,7 @@ public class NReportTools {
             result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
             result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
         } else {
-            result += "<br/>" + SYSTools.xx("misc.msg.created") + " " + SYSTools.xx("misc.msg.atchrono") + ": " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + ": " + nReport.getNewBy().getFullname();
+            result += "<br/>" + SYSTools.xx("misc.msg.created") + " " + SYSTools.xx("misc.msg.atchrono") + ": " + df.format(nReport.getNewPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + ": " + nReport.getNewBy().getFullname();
         }
 
 

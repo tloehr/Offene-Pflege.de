@@ -137,7 +137,6 @@ public class DlgReport extends MyJDialog {
 
         nReport.setPit(pnlPIT.getPIT());
         nReport.setNewBy(OPDE.getMe());
-        nReport.setNewPIT(new Date());
         dispose();
     }
 
