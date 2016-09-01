@@ -903,6 +903,7 @@ public class PnlReport extends NursingRecordsPanel {
                                                     "<b><p>" +
                                                     (nreport.isObsolete() ? SYSConst.html_16x16_Eraser_internal : "") +
                                                     (nreport.isReplacement() ? SYSConst.html_16x16_Edited_internal : "") +
+                                                    (nreport.isAddedLater() ? SYSConst.html_16x16_Clock + "&nbsp;": "") +
                                                     DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                                                     " " + SYSTools.xx("misc.msg.Time.short") +
                                                     ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +

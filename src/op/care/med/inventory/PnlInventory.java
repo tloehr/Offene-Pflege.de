@@ -40,10 +40,8 @@ import entity.system.SYSPropsTools;
 import gui.GUITools;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
-import op.care.info.PnlInformation;
 import op.care.med.structure.DlgTradeForm;
 import op.care.med.structure.DlgUPREditor;
-import op.care.med.structure.PnlMed;
 import op.system.InternalClassACL;
 import op.system.LogicalPrinter;
 import op.system.PrinterForm;
@@ -67,7 +65,6 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.List;
 
@@ -412,6 +409,82 @@ public class PnlInventory extends NursingRecordsPanel {
             cpMap.get(key).setSlidingDirection(SwingConstants.SOUTH);
             cptitle.getButton().setIcon(inventory.isClosed() ? SYSConst.icon22stopSign : null);
 
+
+            // https://github.com/tloehr/Offene-Pflege.de/issues/42
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "nursingrecords.inventory")) {
+                /***
+                 *       ____ _                ___                      _
+                 *      / ___| | ___  ___  ___|_ _|_ ____   _____ _ __ | |_ ___  _ __ _   _
+                 *     | |   | |/ _ \/ __|/ _ \| || '_ \ \ / / _ \ '_ \| __/ _ \| '__| | | |
+                 *     | |___| | (_) \__ \  __/| || | | \ V /  __/ | | | || (_) | |  | |_| |
+                 *      \____|_|\___/|___/\___|___|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, |
+                 *                                                                    |___/
+                 */
+                final JButton btnCloseInventory = new JButton(SYSConst.icon22playerStop);
+                btnCloseInventory.setPressedIcon(SYSConst.icon22playerStopPressed);
+                btnCloseInventory.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnCloseInventory.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnCloseInventory.setContentAreaFilled(false);
+                btnCloseInventory.setBorder(null);
+                btnCloseInventory.setToolTipText(SYSTools.xx("nursingrecords.inventory.btncloseinventory.tooltip"));
+                btnCloseInventory.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgYesNo(SYSTools.xx("nursingrecords.inventory.question.close1") + "<br/><b>" + inventory.getText() + "</b>" +
+                                "<br/>" + SYSTools.xx("nursingrecords.inventory.question.close2"), SYSConst.icon48playerStop, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+
+                                        MedInventory myInventory = em.merge(inventory);
+                                        em.lock(myInventory, LockModeType.OPTIMISTIC);
+                                        em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
+
+                                        // close all stocks
+                                        for (MedStock stock : MedStockTools.getAll(myInventory)) {
+                                            if (!stock.isClosed()) {
+                                                MedStock mystock = em.merge(stock);
+                                                em.lock(mystock, LockModeType.OPTIMISTIC);
+                                                mystock.setNextStock(null);
+                                                MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
+                                            }
+                                        }
+                                        // close inventory
+                                        myInventory.setTo(new Date());
+
+                                        em.getTransaction().commit();
+
+                                        createCP4(myInventory);
+                                        buildPanel();
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.warn(ole);
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+                btnCloseInventory.setEnabled(!inventory.isClosed());
+                cptitle.getRight().add(btnCloseInventory);
+            }
 
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "nursingrecords.inventory")) {
                 /***

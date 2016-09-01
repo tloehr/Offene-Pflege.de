@@ -94,6 +94,7 @@ public class SYSConst {
     public static String html_16x16_empty = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/empty.png\" border=\"0\">";
 
     public static String html_16x16_tagPurple_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/tag_purple.png").toString() + "\" border=\"0\">";
+    public static String html_16x16_Clock = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/clock.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Eraser_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/eraser.png").toString() + "\" border=\"0\">";
     public static String html_16x16_Edited_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/edited.png").toString() + "\" border=\"0\">";
     public static String html_16x16_scales_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/scales_of_balance_16.png").toString() + "\" border=\"0\">";

@@ -16,6 +16,9 @@ import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
+import org.joda.time.Seconds;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -323,6 +326,13 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     public boolean isReplacement() {
         return replacementFor != null;
     }
+
+    public boolean isAddedLater() {
+        // OPDE considers up to 2 minutes as NOT added later
+        int ignoredDeviation = 120;
+        return Seconds.secondsBetween(new DateTime(pit), new DateTime(newPIT)).isGreaterThan(Seconds.seconds(ignoredDeviation));
+//            return pit.compareTo(newPIT) != 0;
+        }
 
     public boolean isDeleted() {
         return delPIT != null;
