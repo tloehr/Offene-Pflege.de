@@ -24,6 +24,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -866,14 +867,20 @@ public class PrescriptionTools {
                         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
                         // variable expiry ?
                         if (stockInUse.getTradeForm().getDaysToExpireAfterOpened() != null) {
-                            String color = stockInUse.isExpired() ? "red" : "black";
-                            result += "<br/><font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stockInUse.getOpened()).plusDays(stockInUse.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
+                            result += "<br/><font color=\"" + MedStockTools.getHTMLColor(stockInUse) + "\">" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stockInUse.getOpened()).plusDays(stockInUse.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
                         }
 
                         // fixed expiry ?
                         if (stockInUse.getExpires() != null) {
-                            String color = stockInUse.isExpired() ? "red" : "black";
-                            result += "<br/><font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expires") + ": " + new SimpleDateFormat("MM/yy").format(stockInUse.getExpires()) + "</font>";
+                            // only abbreviate on the first of a month
+                            String expiryString;
+                            if (new LocalDate(stockInUse.getExpires()).getDayOfMonth() == 1){
+                                expiryString = new SimpleDateFormat("MM/yy").format(stockInUse.getExpires());
+                            } else {
+                                expiryString = df.format(stockInUse.getExpires());
+                            }
+
+                            result += "<br/><font color=\"" +  MedStockTools.getHTMLColor(stockInUse) + "\">" + SYSTools.xx("misc.msg.expires") + ": " + expiryString + "</font>";
                         }
 
 

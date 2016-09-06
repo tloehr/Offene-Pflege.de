@@ -48,6 +48,7 @@ public class PnlICD extends DefaultPanel {
         btnImportICD.setText(SYSTools.xx("opde.settings.icd"));
         btnImportICD.setIcon(SYSConst.icon22ledRedOn);
         btnEmptyList.setToolTipText(SYSTools.xx("opde.settings.icd.btnEmptyList"));
+
         pnlICD.add(GUITools.getDropPanel(files -> {
             for (File file : files) {
                 if (file.isDirectory()) {
@@ -227,6 +228,11 @@ public class PnlICD extends DefaultPanel {
             }
         };
         worker.execute();
+    }
+
+    @Override
+    public String getHelpKey() {
+        return SYSTools.xx("opde.settings.icd.helpurl");
     }
 
     private void initComponents() {

@@ -106,7 +106,7 @@ public class PnlInformation extends NursingRecordsPanel {
         mapEquiv2Type = Collections.synchronizedMap(new HashMap<Integer, ResInfoType>());
         listUsedCommontags = Collections.synchronizedList(new ArrayList<Commontags>());
         prepareSearchArea();
-        reload();
+        switchResident(resident);
     }
 
     public void sortData() {

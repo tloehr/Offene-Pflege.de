@@ -45,6 +45,7 @@ public class MedStockTools {
     public static final int REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING = 1;
     public static final int REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING = 2; // #16
     public static final int DONT_REPLACE_UPR = 3;
+    public static final int DAYS_TO_EXPIRE_SOON = 5;
 
     public static ListCellRenderer getBestandOnlyIDRenderer() {
         return new ListCellRenderer() {
@@ -413,14 +414,12 @@ public class MedStockTools {
 
         // fixed expiry ?
         if (stock.getExpires() != null && !stock.isClosed()) {
-            String color = stock.isExpired() ? "red" : "black";
-
             DateFormat sdf = df;
-            // if expiry isa at the end of a month then it has a different format
-            if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
+            // if expiry is at the end of a month then it has a different format
+            if (new LocalDate(stock.getExpires()).equals(new LocalDate(stock.getExpires()).dayOfMonth().withMaximumValue())) {
                 sdf = new SimpleDateFormat("MM/yy");
             }
-            result += "&nbsp;<font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expires") + ": " + sdf.format(stock.getExpires()) + "</font>";
+            result += "&nbsp;<font color=\"" + getHTMLColor(stock) + "\">" + SYSTools.xx("misc.msg.expires") + ": " + sdf.format(stock.getExpires()) + "</font>";
         }
 
         if (stock.isClosed()) {
@@ -546,7 +545,7 @@ public class MedStockTools {
      * This method calculates the effective UPR as it acually was during the lifetime of that particular medstock.
      * It is vital, that this calculation is only done, when a package is empty. Otherwise the estimation
      * of the UPR is wrong.
-     *
+     * <p>
      * Stichwort: berechnetes APVn
      *
      * @param medstock, für den das Verhältnis neu berechnet werden soll.
@@ -685,6 +684,7 @@ public class MedStockTools {
     /**
      * this method returns true, when a given tradeform is still busy with it's first stock, and this stock is a UPRn one. This effective UPR cannot be calculated yet.
      * That first stock is still open.
+     *
      * @param tradeForm
      * @return
      */
@@ -787,10 +787,10 @@ public class MedStockTools {
                     tableContent.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(df.format(tx.getPit())) +
                                     SYSConst.html_table_td(SYSTools.formatBigDecimal(weight) +
-                                                    SYSConst.html_table_td(iamthefirstone ? "--" : SYSTools.formatBigDecimal(diffWeight)) +
-                                                    SYSConst.html_table_td(SYSTools.formatBigDecimal(quantity)) +
-                                                    SYSConst.html_table_td(iamthefirstone ? "--" : SYSTools.formatBigDecimal(diffQuantity)) +
-                                                    SYSConst.html_table_td(quota.compareTo(BigDecimal.ZERO) == 0 ? "--" : SYSTools.formatBigDecimal(quota))
+                                            SYSConst.html_table_td(iamthefirstone ? "--" : SYSTools.formatBigDecimal(diffWeight)) +
+                                            SYSConst.html_table_td(SYSTools.formatBigDecimal(quantity)) +
+                                            SYSConst.html_table_td(iamthefirstone ? "--" : SYSTools.formatBigDecimal(diffQuantity)) +
+                                            SYSConst.html_table_td(quota.compareTo(BigDecimal.ZERO) == 0 ? "--" : SYSTools.formatBigDecimal(quota))
                                     )
                     ));
 
@@ -809,5 +809,19 @@ public class MedStockTools {
 
 
         return html;
+    }
+
+
+    public static String getHTMLColor(MedStock stock) {
+        String color;
+
+        if (stock.isExpired()) color = "red";
+        else if (stock.expiresIn(DAYS_TO_EXPIRE_SOON)) color = "orange";
+        else color = "black";
+
+        return color;
+
+
+
     }
 }

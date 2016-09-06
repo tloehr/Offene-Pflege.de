@@ -48,7 +48,6 @@ import op.care.med.inventory.DlgCloseStock;
 import op.care.med.inventory.DlgNewStocks;
 import op.care.med.inventory.DlgOpenStock;
 import op.care.med.inventory.PnlExpiry;
-import op.care.med.structure.PnlMed;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
 import op.system.InternalClassACL;
@@ -76,7 +75,6 @@ import java.util.List;
  * @author tloehr
  */
 public class PnlPrescription extends NursingRecordsPanel {
-
 
 
     private Resident resident;
@@ -472,6 +470,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                     icon = SYSConst.icon22ledRedOn;
                 } else if (stockInUse.isExpired()) {
                     icon = SYSConst.icon22ledOrangeOn;
+                } else if (stockInUse.expiresIn(MedStockTools.DAYS_TO_EXPIRE_SOON)) {
+                    icon = SYSConst.icon22ledOrangeOff;
                 } else if (!stockInUse.getTradeForm().getDosageForm().isDontCALC() && MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
                     icon = SYSConst.icon22ledYellowOn;
                 } else {
@@ -567,6 +567,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 //        if (resident.isCalcMediUPR1()) {
         list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
         list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription5"), SYSConst.icon22ledOrangeOff, SwingConstants.LEADING));
         list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
 //        }
         return list;
@@ -1150,11 +1151,11 @@ public class PnlPrescription extends NursingRecordsPanel {
 
                                 // merging is important, hence no addAll() for this one
                                 ArrayList<Commontags> listTags2Add = new ArrayList<Commontags>();
-                                for (Commontags tag2add : pnlCommonTags.getListSelectedTags()){
+                                for (Commontags tag2add : pnlCommonTags.getListSelectedTags()) {
                                     listTags2Add.add(em.merge(tag2add));
                                 }
 
-                                        // Annotations need to be added, tooo
+                                // Annotations need to be added, tooo
                                 // these are the remaining tags, that need to be disconnected
                                 myPrescription.getCommontags().addAll(listTags2Add);
                                 ArrayList<Commontags> listTags2Remove = new ArrayList<Commontags>(myPrescription.getCommontags());
