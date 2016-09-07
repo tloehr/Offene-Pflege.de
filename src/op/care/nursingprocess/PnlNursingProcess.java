@@ -88,6 +88,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
     private Color[] color1, color2;
     private List<Commontags> listUsedCommontags;
+    private JToggleButton tbShowClosed;
 
     /**
      * Creates new form PnlNursingProcess
@@ -127,25 +128,22 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     public void reload() {
         cleanup();
         listNP = NursingProcessTools.getAll(resident);
-        Collections.sort(listNP, new Comparator<NursingProcess>() {
-            @Override
-            public int compare(NursingProcess o1, NursingProcess o2) {
-                int result = 0;
+        Collections.sort(listNP, (o1, o2) -> {
+            int result = 0;
 
-                if (result == 0 && !o1.isClosed() && o2.isClosed()) {
-                    result = -1;
-                }
-
-                if (result == 0 && o1.isClosed() && !o2.isClosed()) {
-                    result = 1;
-                }
-
-                if (result == 0) {
-                    result = o1.getFrom().compareTo(o2.getFrom()) * -1;
-                }
-
-                return result;
+            if (result == 0 && !o1.isClosed() && o2.isClosed()) {
+                result = -1;
             }
+
+            if (result == 0 && o1.isClosed() && !o2.isClosed()) {
+                result = 1;
+            }
+
+            if (result == 0) {
+                result = o1.getFrom().compareTo(o2.getFrom()) * -1;
+            }
+
+            return result;
         });
         reloadDisplay();
     }
@@ -192,10 +190,13 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private void reloadDisplay() {
         if (valuecache.isEmpty()) {
             for (NursingProcess np : listNP) {
-                if (!valuecache.containsKey(np.getCategory())) {
-                    valuecache.put(np.getCategory(), new ArrayList<NursingProcess>());
+                if (tbShowClosed.isSelected() || !np.isClosed()) {
+                    if (!valuecache.containsKey(np.getCategory())) {
+                        valuecache.put(np.getCategory(), new ArrayList<NursingProcess>());
+                    }
+                    valuecache.get(np.getCategory()).add(np);
+
                 }
-                valuecache.get(np.getCategory()).add(np);
             }
         }
 
@@ -341,6 +342,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                     "<td width=\"280\" align=\"left\">" + np.getPITAsHTML() + "</td>" +
                     "<td width=\"500\" align=\"left\">" +
                     (np.isClosed() ? "<s>" : "") +
+                    SYSConst.html_h2(np.getTopic()) +
                     np.getContentAsHTML() +
                     (np.isClosed() ? "</s>" : "") +
                     "</td></tr>";
@@ -646,18 +648,17 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             final JButton btnPrint = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
                     String html = "";
-                    html += "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.nursingprocess");
-                    html += " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
-
+                    html += SYSConst.html_h1(SYSTools.xx("nursingrecords.nursingprocess") + " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(resident));
                     for (ResInfoCategory cat : categories) {
-                        ArrayList<NursingProcess> allNPsForThisCat = NursingProcessTools.getAll(resident, cat);
-                        if (!allNPsForThisCat.isEmpty()) {
-                            html += "<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n";
-                            for (NursingProcess np : NursingProcessTools.getAll(resident, cat)) {
-                                html += "<h3 id=\"fonth3\" >" + np.getTopic() + "</h3>\n";
-                                html += NursingProcessTools.getAsHTML(np, false, true, true, true);
+                        if (valuecache.containsKey(cat) && !valuecache.get(cat).isEmpty()) {
+                            html += SYSConst.html_h2(cat.getText());
+                            for (NursingProcess np : valuecache.get(cat)) {
+                                if (tbShowClosed.isSelected() || !np.isClosed()) {
+                                    html += SYSConst.html_h3(np.getTopic());
+                                    html += NursingProcessTools.getAsHTML(np, false, true, true, true);
+                                    html += "<hr/>";
+                                }
                             }
                         }
                     }
@@ -691,6 +692,14 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
+
+        tbShowClosed = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showclosed"));
+        tbShowClosed.addItemListener(itemEvent -> {
+            reload();
+        });
+        list.add(tbShowClosed);
+        tbShowClosed.setHorizontalAlignment(SwingConstants.LEFT);
+
 
 //           if (!listUsedCommontags.isEmpty()) {
 //

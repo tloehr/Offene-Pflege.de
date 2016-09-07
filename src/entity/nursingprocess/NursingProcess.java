@@ -115,10 +115,8 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         attachedQProcessConnections = new ArrayList<SYSNP2PROCESS>();
         nextEval = new DateTime().plusWeeks(4).toDate();
         from = new Date();
-//        flag = NursingProcessTools.FLAG_NONE;
         to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.commontags = new ArrayList<Commontags>();
-
         this.npseries = -1l;
     }
 
@@ -129,14 +127,6 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         }
         return id;
     }
-
-//    public Integer getFlag() {
-//        return flag;
-//    }
-//
-//    public void setFlag(Integer flag) {
-//        this.flag = flag;
-//    }
 
     public String getTopic() {
         return topic;
