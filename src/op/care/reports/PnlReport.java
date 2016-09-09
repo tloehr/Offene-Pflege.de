@@ -51,6 +51,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.*;
@@ -92,7 +93,7 @@ public class PnlReport extends NursingRecordsPanel {
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-
+    private Logger logger = Logger.getLogger(getClass());
 
 
 //    private Pair<DateTime, DateTime> minmax = null;
@@ -429,7 +430,6 @@ public class PnlReport extends NursingRecordsPanel {
 
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
-        final long time = System.currentTimeMillis();
 
         SwingWorker worker = new SwingWorker() {
             Date max = null;
@@ -444,6 +444,8 @@ public class PnlReport extends NursingRecordsPanel {
                     minmax = NReportTools.getMinMax(resident);
                 }
 
+
+
                 holidays = Collections.synchronizedMap(SYSCalendar.getHolidays(minmax.getStart().getYear(), minmax.getEnd().getYear()));
 
                 if (minmax != null) {
@@ -456,13 +458,13 @@ public class PnlReport extends NursingRecordsPanel {
 
                     int i = 0;
                     for (int year = end.getYear(); year >= start.getYear(); year--) {
-                        OPDE.debug((System.currentTimeMillis() - time) + " ms");
+                        long time = System.currentTimeMillis();
                         i++;
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i, maxYears));
                         createCP4Year(year, start, end);
+                        logger.debug((System.currentTimeMillis() - time) + " ms for year "+year);
                     }
 
-                    OPDE.debug((System.currentTimeMillis() - time) + " ms1");
                 }
 
                 return null;
@@ -470,12 +472,14 @@ public class PnlReport extends NursingRecordsPanel {
 
             @Override
             protected void done() {
-                OPDE.debug((System.currentTimeMillis() - time) + " ms2");
+                long time = System.currentTimeMillis();
+
                 expandTheLast2Weeks();
 
-                OPDE.debug((System.currentTimeMillis() - time) + " ms3");
+                logger.debug((System.currentTimeMillis() - time) + " ms for expanding 2 weeks");
+                time = System.currentTimeMillis();
                 buildPanel();
-                OPDE.debug((System.currentTimeMillis() - time) + " ms4");
+                logger.debug((System.currentTimeMillis() - time) + " ms for bulding the panel");
                 initPhase = false;
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);

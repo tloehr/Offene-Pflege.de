@@ -163,22 +163,52 @@ public class SYSFilesTools {
                                 SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getNrAssignCollection().add(link);
                                 ((NReport) attachable).getAttachedFilesConnections().add(link);
+
+                                // backup link to prevent orphaned files
+                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((NReport) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getResidentAssignCollection().add(link2);
+
                             } else if (attachable instanceof Prescription) {
                                 SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescription) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getPreAssignCollection().add(link);
                                 ((Prescription) attachable).getAttachedFilesConnections().add(link);
+
+                                // backup link to prevent orphaned files
+                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((Prescription) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getResidentAssignCollection().add(link2);
+
                             } else if (attachable instanceof ResInfo) {
                                 SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (ResInfo) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getBwiAssignCollection().add(link);
                                 ((ResInfo) attachable).getAttachedFilesConnections().add(link);
+
+                                // backup link to prevent orphaned files
+                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((ResInfo) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getResidentAssignCollection().add(link2);
+
                             } else if (attachable instanceof ResValue) {
                                 SYSVAL2FILE link = em.merge(new SYSVAL2FILE(sysfile, (ResValue) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getValAssignCollection().add(link);
                                 ((ResValue) attachable).getAttachedFilesConnections().add(link);
+
+                                // backup link to prevent orphaned files
+                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((ResValue) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getResidentAssignCollection().add(link2);
+
                             } else if (attachable instanceof NursingProcess) {
                                 SYSNP2FILE link = em.merge(new SYSNP2FILE(sysfile, (NursingProcess) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getNpAssignCollection().add(link);
                                 ((NursingProcess) attachable).getAttachedFilesConnections().add(link);
+
+                                // backup link to prevent orphaned files
+                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((NursingProcess) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getResidentAssignCollection().add(link2);
+
                             } else if (attachable instanceof Training) {
                                 Training2File link = em.merge(new Training2File(sysfile, (Training) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getTrAssignCollection().add(link);
@@ -199,10 +229,6 @@ public class SYSFilesTools {
                                 Qms2File link = em.merge(new Qms2File(sysfile, (Qms) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getQmsAssignCollection().add(link);
                                 ((Qms) attachable).getAttachedFilesConnections().add(link);
-                            } else if (attachable instanceof Training) {
-                                Training2File link = em.merge(new Training2File(sysfile, (Training) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getTrainingAssignCollection().add(link);
-                                ((Training) attachable).getAttachedFilesConnections().add(link);
                             } else if (attachable instanceof Training2Users) {
                                 em.merge(((SYSFilesContainer) attachable).attachFile(sysfile));
                             }
@@ -323,7 +349,7 @@ public class SYSFilesTools {
             FileTransferClient ftp = getFTPClient();
 
             // https://github.com/tloehr/Offene-Pflege.de/issues/38
-            if (ftp == null){
+            if (ftp == null) {
                 throw new FTPException("FTP server unreachable");
             }
 

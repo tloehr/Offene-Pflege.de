@@ -6,11 +6,9 @@ package entity.reports;
 
 import entity.EntityTools;
 import entity.building.Homes;
-import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.QProcessElement;
-import entity.process.SYSNR2PROCESS;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import entity.system.Users;
@@ -20,6 +18,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.MutableInterval;
@@ -38,6 +37,8 @@ import java.util.*;
 public class NReportTools {
 
     public static boolean ALLOW_EDIT_OF_OTHER_PEOPLES_REPORTS = false;
+    public static int IGNORED_AMOUNT_SECONDS_TILL_THE_CLOCK_TURNS_UP = 120;
+    private static Logger logger = Logger.getLogger(NReport.class);
 
     public static boolean isChangeable(NReport nReport) {
         return (ALLOW_EDIT_OF_OTHER_PEOPLES_REPORTS || nReport.isMine()) && !nReport.isObsolete() && nReport.getResident().isActive() && nReport.getUsersAcknowledged().isEmpty();
@@ -49,42 +50,35 @@ public class NReportTools {
      *
      * @return
      */
-    public static Pair<DateTime, DateTime> getMinMax() {
-        Pair<DateTime, DateTime> result = null;
-        long min, max;
+    public static MutableInterval getMinMax() {
+        MutableInterval result = null;
+        DateTime min, max;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin1 = em.createQuery("SELECT nr FROM NReport nr ORDER BY nr.pit ASC ");
-        queryMin1.setMaxResults(1);
-
-        Query queryMax1 = em.createQuery("SELECT nr FROM NReport nr ORDER BY nr.pit DESC ");
-        queryMax1.setMaxResults(1);
-
-        Query queryMin2 = em.createQuery("SELECT ho FROM Handovers ho ORDER BY ho.pit ASC ");
-        queryMin2.setMaxResults(1);
-
-        Query queryMax2 = em.createQuery("SELECT ho FROM Handovers ho ORDER BY ho.pit DESC ");
-        queryMax2.setMaxResults(1);
+        Query queryMin1 = em.createQuery("SELECT MIN(nr.pit) FROM NReport nr ");
+        Query queryMax1 = em.createQuery("SELECT MAX(nr.pit) FROM NReport nr ");
+        Query queryMin2 = em.createQuery("SELECT MIN(nr.pit) FROM Handovers nr ");
+        Query queryMax2 = em.createQuery("SELECT MAX(nr.pit) FROM Handovers nr ");
 
         try {
-            ArrayList<NReport> min1 = new ArrayList<NReport>(queryMin1.getResultList());
-            ArrayList<NReport> max1 = new ArrayList<NReport>(queryMax1.getResultList());
-            ArrayList<Handovers> min2 = new ArrayList<Handovers>(queryMin2.getResultList());
-            ArrayList<Handovers> max2 = new ArrayList<Handovers>(queryMax2.getResultList());
 
+            Object min1 = queryMin1.getSingleResult();
+            Object max1 = queryMax1.getSingleResult();
+            Object min2 = queryMin2.getSingleResult();
+            Object max2 = queryMax2.getSingleResult();
 
-            if (min1.isEmpty() && min2.isEmpty()) { // that means, that there is now report at all
+            if (min1 == null && min2 == null) { // that means, that there is now report at all
                 result = null;
             } else {
-                long mi1 = min1.isEmpty() ? System.currentTimeMillis() : min1.get(0).getPit().getTime();
-                long mi2 = min2.isEmpty() ? System.currentTimeMillis() : min2.get(0).getPit().getTime();
-                min = Math.min(mi1, mi2);
+                DateTime mi1 = min1 == null ? new DateTime() : new DateTime(min1);
+                DateTime mi2 = min2 == null ? new DateTime() : new DateTime(min2);
+                min = SYSCalendar.min(mi1, mi2);
 
-                long ma1 = max1.isEmpty() ? System.currentTimeMillis() : max1.get(0).getPit().getTime();
-                long ma2 = max2.isEmpty() ? System.currentTimeMillis() : max2.get(0).getPit().getTime();
-                max = Math.max(ma1, ma2);
+                DateTime ma1 = max1 == null ? new DateTime() : new DateTime(max1);
+                DateTime ma2 = max2 == null ? new DateTime() : new DateTime(max2);
+                max = SYSCalendar.max(ma1, ma2);
 
-                result = new Pair<DateTime, DateTime>(new DateTime(min), new DateTime(max));
+                result = new MutableInterval(min, max);
 
             }
         } catch (Exception e) {
@@ -106,21 +100,22 @@ public class NReportTools {
         MutableInterval result = null;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit ASC ");
+        Query queryMin = em.createQuery("SELECT MIN(nr.pit) FROM NReport nr WHERE nr.resident = :resident ");
         queryMin.setParameter("resident", resident);
-        queryMin.setMaxResults(1);
 
-        Query queryMax = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit DESC ");
+        Query queryMax = em.createQuery("SELECT MAX(nr.pit) FROM NReport nr WHERE nr.resident = :resident ");
         queryMax.setParameter("resident", resident);
-        queryMax.setMaxResults(1);
 
         try {
-            ArrayList<NReport> min = new ArrayList<NReport>(queryMin.getResultList());
-            ArrayList<NReport> max = new ArrayList<NReport>(queryMax.getResultList());
-            if (min.isEmpty()) {
+
+            Object min = queryMin.getSingleResult();
+            Object max = queryMax.getSingleResult();
+
+
+            if (min == null) {
                 result = null;
             } else {
-                result = new MutableInterval(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
+                result = new MutableInterval(new DateTime(min), new DateTime(max));
             }
 
         } catch (Exception e) {
@@ -129,7 +124,7 @@ public class NReportTools {
 
 
         em.close();
-        OPDE.debug((System.currentTimeMillis() - time) + " ms_xx");
+        logger.debug((System.currentTimeMillis() - time) + " ms for minmax");
         return result;
     }
 
@@ -976,6 +971,7 @@ public class NReportTools {
 
     /**
      * sets all necessary changes to <i>DELETE</i> a report. Which is in fact never really deleted.
+     *
      * @param report
      * @param deletedBy
      * @return
@@ -989,18 +985,19 @@ public class NReportTools {
     }
 
     /**
-        * sets all necessary changes to <i>DELETE</i> a report. Which is in fact never really deleted.
-        * @param report
-        * @param deletedBy
-        * @return
-        */
-       public static NReport replace(NReport report, Users deletedBy) {
-           report.setDeletedBy(deletedBy);
-           report.setDelPIT(new Date());
-           report.getAttachedFilesConnections().clear();
-           report.getAttachedQProcessConnections().clear();
-           return report;
-       }
+     * sets all necessary changes to <i>DELETE</i> a report. Which is in fact never really deleted.
+     *
+     * @param report
+     * @param deletedBy
+     * @return
+     */
+    public static NReport replace(NReport report, Users deletedBy) {
+        report.setDeletedBy(deletedBy);
+        report.setDelPIT(new Date());
+        report.getAttachedFilesConnections().clear();
+        report.getAttachedQProcessConnections().clear();
+        return report;
+    }
 
     public static ArrayList<NReport> getNReports4Tags(Commontags tag, LocalDate start, LocalDate end) {
 

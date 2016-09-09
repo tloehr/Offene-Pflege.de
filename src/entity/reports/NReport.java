@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package entity.reports;
 
 import entity.Ownable;
@@ -17,7 +13,6 @@ import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Minutes;
 import org.joda.time.Seconds;
 
 import javax.persistence.*;
@@ -28,11 +23,28 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * This is the entity class responsible for the storage of nursing reports. As this is a documentation, there are some features
+ * with this database table that guarantees the correct handling, even when reports are deleted or changed.
+ * <p>
+ * The reports are <b>never</b> really deleted or altered. They are <b>marked</b> as deleted or altered.
+ * <p>
+ * <ul>
+ * <li><b>DELETE</b> - see remarks for delPit</li>
+ * <li><b>CHANGE</b> - when a report is changed:
+ * <ol>
+ * <li>a new report is cloned from the old one.</li>
+ * <li>the new one is marked as replacement for the old one</li>
+ * <li>the old report is marked as replaced by the new report</li>
+ * <li>the old report looses all attached files and qprocess connections (which the new one inherited of course)</li>
+ * <li>the old report is marked with the editor and the PIT (editedBy, editedPIT)</li>
+ * </ol>
+ * </li>
+ * </ul>
+ *
  * @author tloehr
  */
 @Entity
 @Table(name = "nreports")
-
 public class NReport extends Ownable implements Serializable, QProcessElement, Comparable<NReport>, Cloneable {
 
     private static final long serialVersionUID = 1L;
@@ -45,7 +57,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Long version;
 
     /**
-     * Auf welchen Zeitpunkt bezieht sich diese Bericht ?
+     * When did the event depicted in this report really happen ?
      */
     @Basic(optional = false)
     @Column(name = "PIT")
@@ -53,8 +65,8 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Date pit;
 
     /**
-     * Wann wurde der Bericht eingetragen ? Das ist immer die aktuelle Zeit. Auch wenn jemand einen bestehenden Bericht ändert,
-     * dann übernimmt der die Eigentümerschaft und die newPIT wird auf den jeweiligen Bearbeitungszeitpunkt gesetzt.
+     * This is the time, when the new report was entered. A replacement report has also the PIT of the replacement time.
+     * It does NOT carry over the newPIT from the old report.
      */
     @Basic(optional = false)
     @Column(name = "NewPIT")
@@ -62,7 +74,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Date newPIT;
 
     /**
-     * Wann wurde der Bericht korrigiert ?
+     * The time when this report was edited. null if it wasn't.
      */
     @Basic(optional = true)
     @Column(name = "EditedPIT")
@@ -70,7 +82,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Date editedPIT;
 
     /**
-     * Wann wurde der Bericht gelöscht ?
+     * The time when this report was deleted. null if it wasn't.
      */
     @Basic(optional = true)
     @Column(name = "DelPIT")
@@ -78,21 +90,21 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Date delPIT;
 
     /**
-     * der Bericht selbst
+     * the text of the report
      */
     @Lob
     @Column(name = "Text")
     private String text;
 
     /**
-     * Die Angabe der Pflegezeit die gebraucht wurde.
+     * the amount of time the events in this text took to happen. (how much work was it ?)
      */
     @Basic(optional = false)
     @Column(name = "Dauer")
     private int minutes;
 
     /**
-     * Wer hat diesen Bericht eingetragen.
+     * the user who entered this report.
      */
     @JoinColumn(name = "NewBy", referencedColumnName = "UKennung")
     @ManyToOne
@@ -100,47 +112,61 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
 
 
     /**
-     * Wer hat diesen Bericht gelöscht.
+     * The user who deleted this report. null if its not deleted.
      */
     @JoinColumn(name = "DeletedBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users deletedBy;
 
     /**
-     * zu welchem BW gehört dieser Bericht ?
+     * the resident who <i>owns</i> this report
      */
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Resident resident;
 
     /**
-     * Wer hat diesen Bericht geändert.
+     * the user who edited this report. null, if it is still unchanged.
      */
     @JoinColumn(name = "EditedBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editedBy;
 
     /**
-     * Bei einer Nachkorrektur: durch welchen Bericht wurde dieses hier ersetzt.
+     * if this report has been replaced by another one, it is stored here. null, if its not replaced.
      */
     @JoinColumn(name = "ReplacedBy", referencedColumnName = "PBID")
     @OneToOne
     private NReport replacedBy;
 
     /**
-     * Bei einer Nachkorrektur: welcher Bericht wird duch diesen hier ersetzt.
+     * if this report is a replacement for another report, then this report is stored here. null, if its no replacement.
      */
     @JoinColumn(name = "ReplacementFor", referencedColumnName = "PBID")
     @OneToOne
     private NReport replacementFor;
 
+    /**
+     * the list of attached files.
+     */
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nReport")
     private Collection<SYSNR2FILE> attachedFilesConnections;
+
+    /**
+     * for handovers only. the list of users who acknowledged this report.
+     */
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht", fetch = FetchType.EAGER)
     private List<NR2User> usersAcknowledged;
+
+    /**
+     * the list of processes which this report was attached to
+     */
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nreport")
     private Collection<SYSNR2PROCESS> attachedProcessConnections;
 
+    /**
+     * the list of tags which were sticked to this report.
+     */
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "nreports2tags", joinColumns =
     @JoinColumn(name = "pbid"), inverseJoinColumns =
@@ -164,6 +190,20 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.version = 0l;
     }
 
+    /**
+     * private constructor for the cloning only
+     *
+     * @param pit
+     * @param newPIT
+     * @param editedPIT
+     * @param text
+     * @param minutes
+     * @param newBy
+     * @param resident
+     * @param editedBy
+     * @param replacedBy
+     * @param replacementFor
+     */
     private NReport(Date pit, Date newPIT, Date editedPIT, String text, int minutes, Users newBy, Resident resident, Users editedBy, NReport replacedBy, NReport replacementFor) {
         this.pit = pit;
         this.newPIT = newPIT;
@@ -194,39 +234,17 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         return usersAcknowledged;
     }
 
-    /**
-     * PIT steht für Point In Time. In diesem Fall Datum und Uhrzeit des Bericht Eintrages.
-     *
-     * @return
-     */
     public Date getPit() {
         return pit;
     }
 
-    /**
-     * @param pit steht für Point In Time. In diesem Fall Datum und Uhrzeit des Bericht Eintrages.
-     */
     public void setPit(Date pit) {
         this.pit = pit;
     }
 
-    /**
-     * Dieses Date ist aus technischen Gründen vorhanden. Es gibt mehrere Möglichkeiten, wie diese PIT zu verstehen ist:
-     * <ul>
-     * <li>Falls ein Bericht nachgetragen wird, dann steht hier immer der wirkliche Zeitpunkt des Eintrags drin. Im Gegensatz zu <code>PIT</code>, der sich auf den <b>fachlichen</b> Zeitpunkt bezeichnet.</li>
-     * <p>
-     * <li> Bei einem gelöschten Beitrag steht hier der Zeitpunkt der Löschung drin.</li>
-     * <li> Wurde dieser Eintrag durch einen anderen ersetzt, steht hier drin wann das passiert ist.</li>
-     * <li> Ist dies ein Eintrag, der einen anderen ersetzt hat dann steht hier <code>null</code>.</li>
-     * <li> Wurde der Eintrag nicht geändert, dann steht hier ebenfalls <code>null</code>.</li>
-     * <ul>
-     *
-     * @return
-     */
     public Date getEditedPIT() {
         return editedPIT;
     }
-
 
     public String getText() {
         SYSTools.anonymizeText(resident.getNameNeverAnonymous(), text);
@@ -286,17 +304,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.resident = resident;
     }
 
-//    public boolean isSpecial() {
-//        boolean found = false;
-//
-//        Iterator<NReportTAGS> it = tags.iterator();
-//        while (!found && it.hasNext()) {
-//            found = it.next().isBesonders();
-//        }
-//        return found;
-//    }
-
-
     public Users getEditedBy() {
         return editedBy;
     }
@@ -305,12 +312,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.editedBy = editedBy;
     }
 
-    /**
-     * Geänderte Berichte treten immer im Doppel auf. In diesem Fall enthält der alte Bericht in <code>replacedBy</code> einen Verweis auf
-     * den Bericht, "der ihn ersetzt". Normale Berichte geben hier <code>null</code> zurück.
-     *
-     * @return
-     */
     public NReport getReplacedBy() {
         return replacedBy;
     }
@@ -328,11 +329,8 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     public boolean isAddedLater() {
-        // OPDE considers up to 2 minutes as NOT added later
-        int ignoredDeviation = 120;
-        return Seconds.secondsBetween(new DateTime(pit), new DateTime(newPIT)).isGreaterThan(Seconds.seconds(ignoredDeviation));
-//            return pit.compareTo(newPIT) != 0;
-        }
+        return Seconds.secondsBetween(new DateTime(pit), new DateTime(newPIT)).isGreaterThan(Seconds.seconds(NReportTools.IGNORED_AMOUNT_SECONDS_TILL_THE_CLOCK_TURNS_UP));
+    }
 
     public boolean isDeleted() {
         return delPIT != null;

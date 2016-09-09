@@ -593,7 +593,7 @@ public class SYSCalendar {
 //            case GregorianCalendar.DECEMBER: {
 //                return 31;
 //            }
-//
+//   min
 //            default: {
 //                return 0;
 //            }
@@ -1261,6 +1261,14 @@ public class SYSCalendar {
 
     public static LocalDate min(LocalDate a, LocalDate b) {
         return new LocalDate(Math.min(a.toDateTimeAtStartOfDay().getMillis(), b.toDateTimeAtStartOfDay().getMillis()));
+    }
+
+    public static DateTime max(DateTime a, DateTime b) {
+        return a.compareTo(b) > 0 ? a : b;
+    }
+
+    public static DateTime min(DateTime a, DateTime b) {
+        return a.compareTo(b) < 0 ? a : b;
     }
 
     public static LocalDate max(LocalDate a, LocalDate b) {

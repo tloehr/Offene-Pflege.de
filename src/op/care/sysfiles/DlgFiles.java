@@ -83,16 +83,12 @@ public class DlgFiles extends MyJDialog {
         dropPanel.add(BorderLayout.CENTER, dropLabel);
         dropPanel.setPreferredSize(new Dimension(180, 180));
         dropPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        new FileDrop(dropPanel, new FileDrop.Listener() {
-            @Override
-            public void filesDropped(File[] files) {
-
-                java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, attachable);
-                if (!successful.isEmpty()) {
-                    list.setModel(SYSTools.list2dlm(getAttachedFilesList(attachable)));
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
-                    filesAttached = true;
-                }
+        new FileDrop(dropPanel, files -> {
+            java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, attachable);
+            if (!successful.isEmpty()) {
+                list.setModel(SYSTools.list2dlm(getAttachedFilesList(attachable)));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
+                filesAttached = true;
             }
         });
         return dropPanel;
@@ -146,7 +142,6 @@ public class DlgFiles extends MyJDialog {
 //
 //
 //
-//                            //todo: handle some sort of orphan deletes when detaching files
 //
 //                            em.close();
 //

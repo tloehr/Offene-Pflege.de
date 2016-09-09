@@ -53,6 +53,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
+import org.joda.time.MutableInterval;
 
 import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
@@ -78,11 +79,8 @@ public class PnlHandover extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
 
     private Map<String, CollapsiblePane> cpMap;
-    //    private Map<String, JPanel> contentmap;
     private Map<String, ArrayList<Handovers>> cacheHO;
     private Map<String, ArrayList<NReport>> cacheNR;
-    //    private Map<NReport, JPanel> linemapNR;
-//    private Map<Handovers, JPanel> linemapHO;
     private HashMap<LocalDate, String> hollidays;
     private JComboBox cmbHomes;
     private JToggleButton tbResidentFirst;
@@ -139,10 +137,7 @@ public class PnlHandover extends NursingRecordsPanel {
             }
         };
 
-//        contentmap = Collections.synchronizedMap(new HashMap<String, JPanel>());
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
-//        linemapNR = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
-//        linemapHO = Collections.synchronizedMap(new HashMap<Handovers, JPanel>());
         cacheHO = Collections.synchronizedMap(new HashMap<String, ArrayList<Handovers>>());
         cacheNR = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
         OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
@@ -214,18 +209,10 @@ public class PnlHandover extends NursingRecordsPanel {
     public void cleanup() {
         cpsHandover.removeAll();
 
-//        synchronized (contentmap) {
-//            SYSTools.clear(contentmap);
-//        }
         synchronized (cpMap) {
             SYSTools.clear(cpMap);
         }
-//        synchronized (linemapHO) {
-//            SYSTools.clear(linemapHO);
-//        }
-//        synchronized (linemapNR) {
-//            SYSTools.clear(linemapNR);
-//        }
+
         synchronized (cacheHO) {
             SYSTools.clear(cacheHO);
         }
@@ -262,10 +249,10 @@ public class PnlHandover extends NursingRecordsPanel {
         }
 
 
-        Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
+       MutableInterval minmax = NReportTools.getMinMax();
         if (minmax != null) {
-            hollidays = SYSCalendar.getHolidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
-            LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
+            hollidays = SYSCalendar.getHolidays(minmax.getStart().getYear(), minmax.getEnd().getYear());
+            LocalDate start = SYSCalendar.bom(minmax.getStart()).toLocalDate();
             LocalDate end = new LocalDate();
             for (int year = end.getYear(); year >= start.getYear(); year--) {
                 createCP4Year(year, start, end);
@@ -897,9 +884,9 @@ public class PnlHandover extends NursingRecordsPanel {
         cpsHandover.removeAll();
         cpsHandover.setLayout(new JideBoxLayout(cpsHandover, JideBoxLayout.Y_AXIS));
 
-        Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
+        MutableInterval minmax = NReportTools.getMinMax();
         if (minmax != null) {
-            LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
+            LocalDate start = SYSCalendar.bom(minmax.getStart()).toLocalDate();
             LocalDate end = new LocalDate();
 
             for (int year = end.getYear(); year >= start.getYear(); year--) {
@@ -1063,10 +1050,10 @@ public class PnlHandover extends NursingRecordsPanel {
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
 
-        Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
+        MutableInterval  minmax = NReportTools.getMinMax();
         if (minmax != null) {
             final DefaultComboBoxModel yearModel = new DefaultComboBoxModel();
-            for (int year = new LocalDate().getYear(); year >= minmax.getFirst().getYear(); year--) {
+            for (int year = new LocalDate().getYear(); year >= minmax.getStart().getYear(); year--) {
                 yearModel.addElement(year);
             }
 
