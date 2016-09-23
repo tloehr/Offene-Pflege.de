@@ -109,7 +109,7 @@ public class HandoversTools {
 
         result += "<p>" + tmp + "<p/>";
 
-        result += "<div/>";
+        result += "</div>";
         return result;
     }
 

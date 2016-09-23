@@ -320,6 +320,20 @@ public class SYSConst {
         return html_table_td((bold ? "<b>" : "") + content + (bold ? "</b>" : ""), null);
     }
 
+    public static String html_table_tr(String... content) {
+        String row = "";
+        for (String line : content) {
+            row += line;
+        }
+        return html_table_tr(row);
+    }
+
+
+    public static String html_rectangle_around(String content) {
+        return "<div class=\"boxed\">" + SYSTools.xx(content) + "</div>\n";
+    }
+
+
     public static String html_table_tr(String content) {
         return "<tr>" + SYSTools.xx(content) + "</tr>\n";
     }
@@ -769,6 +783,7 @@ public class SYSConst {
             "#fonttextgray16 { font-size:16px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
             "#fonttextgray18 { font-size:18px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
             "#fonttextgray20 { font-size:20px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
+            ".boxed {border: 1px solid black; background-color:#CCCCCC;}" +
             "</style>";
 
 }

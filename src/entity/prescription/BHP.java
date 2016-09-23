@@ -93,13 +93,15 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.resident = this.prescriptionSchedule.getPrescription().getResident();
         this.tradeform = this.prescriptionSchedule.getPrescription().getTradeForm();
 
+        // the target time depends on the moment when the original OnDemand BHP is clicked.
+        // the outcome needs to be checked "check after hours" + this moment
         DateTime targetTime = new DateTime().plusMinutes(this.prescriptionSchedule.getCheckAfterHours().multiply(new BigDecimal(60)).intValue());
 
         this.soll = targetTime.toDate();
         this.version = 0l;
         this.nanotime = System.nanoTime();
         this.sZeit = SYSCalendar.BYTE_TIMEOFDAY;
-        this.dosis = BigDecimal.ONE.negate();
+        this.dosis = BigDecimal.ONE.negate(); // this is ALWAYS -1. its NOT the negation of the original dose
         this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
         stockTransaction = new ArrayList<MedStockTransaction>();

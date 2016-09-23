@@ -55,27 +55,31 @@ public class NReportTools {
         DateTime min, max;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin1 = em.createQuery("SELECT MIN(nr.pit) FROM NReport nr ");
-        Query queryMax1 = em.createQuery("SELECT MAX(nr.pit) FROM NReport nr ");
-        Query queryMin2 = em.createQuery("SELECT MIN(nr.pit) FROM Handovers nr ");
-        Query queryMax2 = em.createQuery("SELECT MAX(nr.pit) FROM Handovers nr ");
+        Query queryMin1 = em.createQuery("SELECT nr FROM NReport nr ORDER BY nr.pit ASC");
+        queryMin1.setMaxResults(1);
+        Query queryMax1 = em.createQuery("SELECT nr FROM NReport nr ORDER BY nr.pit DESC");
+        queryMax1.setMaxResults(1);
+        Query queryMin2 = em.createQuery("SELECT nr FROM Handovers nr ORDER BY nr.pit ASC");
+        queryMin2.setMaxResults(1);
+        Query queryMax2 = em.createQuery("SELECT nr FROM Handovers nr ORDER BY nr.pit DESC");
+        queryMax2.setMaxResults(1);
 
         try {
 
-            Object min1 = queryMin1.getSingleResult();
-            Object max1 = queryMax1.getSingleResult();
-            Object min2 = queryMin2.getSingleResult();
-            Object max2 = queryMax2.getSingleResult();
+            NReport min1 = (NReport) queryMin1.getSingleResult();
+            NReport max1 = (NReport) queryMax1.getSingleResult();
+            Handovers min2 = (Handovers) queryMin2.getSingleResult();
+            Handovers max2 = (Handovers) queryMax2.getSingleResult();
 
             if (min1 == null && min2 == null) { // that means, that there is now report at all
                 result = null;
             } else {
-                DateTime mi1 = min1 == null ? new DateTime() : new DateTime(min1);
-                DateTime mi2 = min2 == null ? new DateTime() : new DateTime(min2);
+                DateTime mi1 = min1 == null ? new DateTime() : new DateTime(min1.getPit());
+                DateTime mi2 = min2 == null ? new DateTime() : new DateTime(min2.getPit());
                 min = SYSCalendar.min(mi1, mi2);
 
-                DateTime ma1 = max1 == null ? new DateTime() : new DateTime(max1);
-                DateTime ma2 = max2 == null ? new DateTime() : new DateTime(max2);
+                DateTime ma1 = max1 == null ? new DateTime() : new DateTime(max1.getPit());
+                DateTime ma2 = max2 == null ? new DateTime() : new DateTime(max2.getPit());
                 max = SYSCalendar.max(ma1, ma2);
 
                 result = new MutableInterval(min, max);
@@ -89,44 +93,44 @@ public class NReportTools {
         return result;
     }
 
+
     /**
-     * retrieves the PITs of the first and the last entry in the NReports table.
-     *
-     * @param resident
-     * @return
-     */
-    public static MutableInterval getMinMax(Resident resident) {
-        long time = System.currentTimeMillis();
-        MutableInterval result = null;
+        * retrieves the PITs of the first and the last entry in the NReports table.
+        *
+        * @param resident
+        * @return
+        */
+       public static MutableInterval getMinMax(Resident resident) {
+           long time = System.currentTimeMillis();
+           MutableInterval result = null;
 
-        EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT MIN(nr.pit) FROM NReport nr WHERE nr.resident = :resident ");
-        queryMin.setParameter("resident", resident);
+           EntityManager em = OPDE.createEM();
+           Query queryMin = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit ASC ");
+           queryMin.setParameter("resident", resident);
+           queryMin.setMaxResults(1);
 
-        Query queryMax = em.createQuery("SELECT MAX(nr.pit) FROM NReport nr WHERE nr.resident = :resident ");
-        queryMax.setParameter("resident", resident);
+           Query queryMax = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit DESC ");
+           queryMax.setParameter("resident", resident);
+           queryMax.setMaxResults(1);
 
-        try {
+           try {
+               ArrayList<NReport> min = new ArrayList<>(queryMin.getResultList());
+               ArrayList<NReport> max = new ArrayList<>(queryMax.getResultList());
+               if (min.isEmpty()) {
+                   result = null;
+               } else {
+                   result = new MutableInterval(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
+               }
 
-            Object min = queryMin.getSingleResult();
-            Object max = queryMax.getSingleResult();
-
-
-            if (min == null) {
-                result = null;
-            } else {
-                result = new MutableInterval(new DateTime(min), new DateTime(max));
-            }
-
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        }
+           } catch (Exception e) {
+               OPDE.fatal(e);
+           }
 
 
-        em.close();
-        logger.debug((System.currentTimeMillis() - time) + " ms for minmax");
-        return result;
-    }
+           em.close();
+           logger.debug((System.currentTimeMillis() - time) + " ms for minmax");
+           return result;
+       }
 
 
     public static long getNum(Resident resident, LocalDate day) {
@@ -390,7 +394,7 @@ public class NReportTools {
             result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getDelPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getDeletedBy().getFullname() + "<br/>";
         }
         if (nReport.isReplacement() && !nReport.isReplaced()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditedPIT()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getNewPIT()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
         }
         if (nReport.isReplaced()) {
             result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
@@ -410,7 +414,7 @@ public class NReportTools {
 
         result += "<p>" + tmp + "</p>";
 
-        result += "<div/>";
+        result += "</div>";
         return result;
     }
 
@@ -1006,21 +1010,31 @@ public class NReportTools {
 
         try {
 
-            String jpql = " SELECT nr " +
-                    " FROM NReport nr " +
-                    " JOIN nr.commontags t " +
-                    " WHERE nr.resident.adminonly <> 2 " +
-                    " AND t = :tag " +
-                    " AND nr.pit >= :from AND nr.pit <= :to  " +
-                    " ORDER BY nr.pit DESC ";
+            long begin = System.currentTimeMillis();
 
-            Query query = em.createQuery(jpql);
 
-            query.setParameter("tag", tag);
-            query.setParameter("from", start.toDateTimeAtStartOfDay().toDate());
-            query.setParameter("to", SYSCalendar.eod(end).toDate());
+//            String jpql = " SELECT nr " +
+//                    " FROM NReport nr " +
+//                    " JOIN nr.commontags t " +
+//                    " WHERE nr.pit >= :from AND nr.pit <= :to  " +
+//                    " ORDER BY nr.pit DESC ";
+//                    " WHERE nr.resident.adminonly <> 2 " +
+//                    " AND t = :tag " +
 
-            list = new ArrayList<NReport>(query.getResultList());
+
+            // native sql. the generated one is awfully slow
+            String nativeSQL = "SELECT nr.* FROM nreports nr " +
+                    " INNER JOIN nreports2tags tg ON nr.`PBID` = tg.`PBID` " +
+                    " WHERE nr.`PIT` >= ? AND nr.`PIT` <= ? " +
+                    " AND tg.ctagid = ?;";
+
+            Query query = em.createNativeQuery(nativeSQL, NReport.class);
+            query.setParameter(1, start.toDateTimeAtStartOfDay().toDate());
+            query.setParameter(2, SYSCalendar.eod(end).toDate());
+            query.setParameter(3, tag.getId());
+
+            list = new ArrayList<>(query.getResultList());
+            SYSTools.showTimeDifference(begin);
 
         } catch (Exception se) {
             OPDE.fatal(se);

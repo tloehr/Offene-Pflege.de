@@ -68,7 +68,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -677,7 +676,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         BHP outcomeBHP = null;
                         // add outcome check BHP if necessary
                         if (!myBHP.isOutcomeText() && myBHP.getPrescriptionSchedule().getCheckAfterHours() != null) {
-                            outcomeBHP = em.merge(new BHP(myBHP));
+                            outcomeBHP = em.merge(new BHP(myBHP)); // the outcome BHPs are created on the fly, if necessary
                             mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).add(outcomeBHP);
                         }
 
@@ -770,9 +769,10 @@ public class PnlBHP extends NursingRecordsPanel {
             title = "<html><font size=+1>" +
                     SYSConst.html_italic(
                             SYSTools.left("&ldquo;" + PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
-                                    BHPTools.getScheduleText(bhp.getOutcome4(), "&rdquo;, ", "")
+                                    BHPTools.getScheduleText(bhp, "&rdquo;, ", "")
                     )
-                    + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + BHPTools.getScheduleText(bhp, ", ", "") +
+                    // https://github.com/tloehr/Offene-Pflege.de/issues/63
+                    + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + (bhp.isOpen() ? "--" : DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + SYSTools.xx("misc.msg.Time.short")) +
                     (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
 
@@ -793,7 +793,7 @@ public class PnlBHP extends NursingRecordsPanel {
         JLabel icon1 = new JLabel(BHPTools.getIcon(bhp));
         icon1.setOpaque(false);
         if (!bhp.isOpen()) {
-            icon1.setToolTipText(DateFormat.getDateTimeInstance().format(bhp.getIst()));
+            icon1.setToolTipText("[" + bhp.getBHPid() + "] " + DateFormat.getDateTimeInstance().format(bhp.getIst()));
         }
 
         JLabel icon2 = new JLabel(BHPTools.getWarningIcon(bhp, stock));

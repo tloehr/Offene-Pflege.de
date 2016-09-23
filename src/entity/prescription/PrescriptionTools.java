@@ -504,6 +504,7 @@ public class PrescriptionTools {
         return result;
     }
 
+
     public static String getShortDescriptionAsCompactText(Prescription prescription) {
         String result = "";
 
@@ -599,7 +600,7 @@ public class PrescriptionTools {
 
 
     public static String getLongDescription(Prescription presription) {
-        String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
+        String result = "";//"<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
         if (!presription.hasMed()) {
             result += presription.getIntervention().getBezeichnung();
@@ -634,7 +635,7 @@ public class PrescriptionTools {
                 result = TradeFormTools.toPrettyHTML(presription.getTradeForm());
             }
         }
-        return result + "</div>";
+        return result;
     }
 
 //    public static String getPrescriptionAsShortText(Prescription verordnung) {
@@ -1142,8 +1143,9 @@ public class PrescriptionTools {
 
                 if (myprescription.isOnDemand()) {
                     ArrayList<BHP> listBHP = BHPTools.getBHPs(myprescription, from, to);
+
                     if (!listBHP.isEmpty()) {
-                        result += SYSConst.html_h4("BHPs");
+                        result += SYSConst.html_h3("BHPs");
                         result += SYSConst.html_paragraph(BHPTools.getBHPsAsHTMLtable(listBHP, false));
                     }
                 }

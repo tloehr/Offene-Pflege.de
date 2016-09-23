@@ -45,14 +45,15 @@ import entity.qms.ControllingTools;
 import entity.qms.Qmsplan;
 import entity.reports.NReportTools;
 import entity.staff.TrainingTools;
-import entity.system.*;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
+import entity.system.SYSPropsTools;
 import entity.values.ResValueTools;
 import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClassACL;
-import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -62,7 +63,6 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
@@ -574,12 +574,18 @@ public class PnlControlling extends CleanablePanel {
                     @Override
                     protected Object doInBackground() throws Exception {
                         SYSPropsTools.storeProp("opde.controlling::paindossiermonthsback", txtPainMonthsBack.getText(), OPDE.getLogin().getUser());
-                        SYSFilesTools.print(ControllingTools.getPainDossierAsHTML(new LocalDate().minusMonths(Integer.parseInt(txtPainMonthsBack.getText())), new LocalDate(), progressClosure), false);
-                        return null;
+
+                        return ControllingTools.getPainDossierAsHTML(new LocalDate().minusMonths(Integer.parseInt(txtPainMonthsBack.getText())), new LocalDate(), progressClosure);
                     }
 
                     @Override
                     protected void done() {
+                        try {
+                            SYSFilesTools.print(get().toString(), false);
+                        } catch (Exception e1) {
+                            OPDE.fatal(e1);
+                        }
+
                         OPDE.getDisplayManager().setProgressBarMessage(null);
                         OPDE.getMainframe().setBlocked(false);
                     }

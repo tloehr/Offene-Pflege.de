@@ -10,6 +10,7 @@ import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultPanel;
 import op.OPDE;
 import op.settings.subpanels.*;
+import op.system.EMailSystem;
 import op.system.InternalClassACL;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -43,7 +44,7 @@ public class PnlSettings extends CleanablePanel {
 
         boolean admin = OPDE.isAdmin() || OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID);
 
-        btnMyEMail.setEnabled(true);
+        btnMyEMail.setEnabled(EMailSystem.isMailsystemActive());
         btnPassword.setEnabled(true);
         btnLabelPrinter.setEnabled(admin);
         btnTimeout.setEnabled(admin);

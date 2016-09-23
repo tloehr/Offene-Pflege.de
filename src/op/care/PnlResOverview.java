@@ -230,7 +230,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
         panelFilter.setCollapsible(false);
 
-        tbMedi = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.medication"));
+        tbMedi = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.prescription"));
         tbMedi.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {

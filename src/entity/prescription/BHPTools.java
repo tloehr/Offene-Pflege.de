@@ -4,8 +4,8 @@ import entity.building.Homes;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.system.SYSPropsTools;
-import op.OPDE;
 import gui.GUITools;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -35,9 +35,6 @@ public class BHPTools {
     public static final byte STATE_REFUSED_DISCARDED = 3;
 
 
-
-
-
 //    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
 //    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.bhp.shift.veryearly", "nursingrecords.bhp.shift.early", "nursingrecords.bhp.shift.late", "nursingrecords.bhp.shift.verylate"};
 //    public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
@@ -50,8 +47,6 @@ public class BHPTools {
 //    public static final byte BYTE_AFTERNOON = 4;
 //    public static final byte BYTE_EVENING = 5;
 //    public static final byte BYTE_LATE_AT_NIGHT = 6;
-
-
 
 
     public static final String UIDPREFIX = "__bhp";
@@ -332,7 +327,7 @@ public class BHPTools {
                         numbhp++;
                     }
                     if (erstAbAB && pSchedule.getAbends().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(),SYSCalendar.BYTE_EVENING, pSchedule.getAbends()));
+                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_EVENING, pSchedule.getAbends()));
                         numbhp++;
                     }
                     if (erstAbNA && pSchedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0) {
@@ -435,7 +430,14 @@ public class BHPTools {
         return listBHP;
     }
 
-
+    /**
+     * retrieves BHPs for a prescription <b>WITHOUT</b> outcomes
+     *
+     * @param prescription
+     * @param from
+     * @param to
+     * @return
+     */
     public static ArrayList<BHP> getBHPs(Prescription prescription, LocalDate from, LocalDate to) {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
@@ -447,6 +449,7 @@ public class BHPTools {
             String jpql = " SELECT bhp " +
                     " FROM BHP bhp " +
                     " WHERE bhp.prescription = :prescription " +
+                    " AND bhp.outcome4 IS NULL" +
                     " AND bhp.soll >= :from AND bhp.soll <= :to " +
                     " ORDER BY bhp.soll ";
             Query queryOnDemand = em.createQuery(jpql);
@@ -584,6 +587,33 @@ public class BHPTools {
     }
 
 
+//    public static BHP getOutcome4(BHP bhp) {
+//        long begin = System.currentTimeMillis();
+//        EntityManager em = OPDE.createEM();
+//        ArrayList<BHP> listBHP = null;
+//
+//        try {
+//
+//            String jpql = " SELECT bhp " +
+//                    " FROM BHP bhp " +
+//                    " WHERE bhp.outcome4 = :bhp ";
+//
+//            Query query = em.createQuery(jpql);
+//
+//            query.setParameter("bhp", bhp);
+//
+//            listBHP = new ArrayList<>(query.getResultList());
+//
+//        } catch (Exception se) {
+//            OPDE.fatal(se);
+//        } finally {
+//            em.close();
+//        }
+//        SYSTools.showTimeDifference(begin);
+//        return listBHP.isEmpty() ? null : listBHP.get(0);
+//    }
+
+
     public static boolean isOnDemandBHPs(Resident resident, LocalDate date) {
         EntityManager em = OPDE.createEM();
         boolean result = false;
@@ -650,7 +680,11 @@ public class BHPTools {
 
     public static String getScheduleText(BHP bhp, String prefix, String postfix) {
         String text = "";
-        if (!bhp.isOnDemand()) {
+
+        // https://github.com/tloehr/Offene-Pflege.de/issues/63
+        if (bhp.isOutcomeText()) {
+            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short");
+        } else if (!bhp.isOnDemand() && !bhp.isOutcomeText()) {
             if (bhp.getSollZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
                 text += "<font color=\"blue\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short") + "</font>";
             } else {
@@ -658,7 +692,6 @@ public class BHPTools {
                 text += msg[bhp.getSollZeit()];
             }
         } else {
-
             if (bhp.getState() == STATE_DONE) {
                 text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + SYSTools.xx("misc.msg.Time.short");
             } else {
@@ -768,48 +801,76 @@ public class BHPTools {
                 }
             }
 
-            result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th>" + SYSTools.xx("nursingrecords.nursingprocess.interventions") + "</th><th>" + SYSTools.xx("misc.msg.state") + "</th><th>" + SYSTools.xx("misc.msg.Users") + " / " + SYSTools.xx("misc.msg.time") + "</th></tr>";
+
+            String table = "";
+
+
+            if (b1.isOnDemand()) {
+                table += SYSConst.html_table_tr(
+                        SYSConst.html_table_th("nursingrecords.nursingprocess.interventions"),
+                        SYSConst.html_table_th("misc.msg.state", "center"),
+                        SYSConst.html_table_th("misc.msg.outcome", "center")
+                );
+            } else {
+                table += SYSConst.html_table_tr(
+                        SYSConst.html_table_th("nursingrecords.nursingprocess.interventions"),
+                        SYSConst.html_table_th("misc.msg.state", "center")
+                );
+            }
 
             for (BHP bhp : list) {
-
-
                 String text =
                         PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()) +
                                 (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
                                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
-                                BHPTools.getScheduleText(bhp, ", ", "") +
-                                (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "");
+                                (bhp.isOnDemand() || bhp.isOutcomeText() ? "" : getScheduleText(bhp, ", ", ""));
 
                 if (bhp.isOutcomeText() && bhp.getState() == BHPTools.STATE_DONE) {
                     text += "\n" + SYSConst.html_paragraph(bhp.getText());
                 }
 
 
-                result += "<tr>";
-                result += "<td valign=\"top\">" + text + "</td>";
-                result += "<td valign=\"top\">" + getStateAsHTML(bhp) + "<br/>";
-                result += "<td valign=\"top\">" + (bhp.isOpen() ? "" : bhp.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(bhp.getIst())) + "</td>";
-                //                result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
+                if (b1.isOnDemand()) {
+                    String outcomeText = "/";
+                    BHP outcome = getComment(bhp);
+                    if (outcome != null && !outcome.isOpen()) {
+                        outcomeText = getStateAsHTML(outcome) + " ";
+                        outcomeText += (bhp.isOpen() ? "" : outcome.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(outcome.getIst()));
+                        outcomeText += (bhp.isOpen() ? "" : "<br/>" + SYSConst.html_paragraph(bhp.getText()));
+                    }
 
-                result += "</td>";
-                result += "</tr>";
+                    table += SYSConst.html_table_tr(
+                            SYSConst.html_table_td(text, "top"),
+                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center"),
+                            SYSConst.html_table_td(outcomeText, "center")
+                    );
+
+                } else {
+                    table += SYSConst.html_table_tr(
+                            SYSConst.html_table_td(text, "top"),
+                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center")
+                    );
+                }
+
 
             }
 
-            result += "</table>";
+            result = SYSConst.html_table(table, "1");
         }
 
         return result;
     }
 
-    public static String getStateAsHTML(BHP bhp) {
+    private static String getStateAsHTML(BHP bhp) {
         String html = "";
         if (bhp.getState() == STATE_DONE) {
             html = "&#x2713;";
         }
         if (bhp.getState() == STATE_REFUSED) {
             html = "&#x2717;";
+        }
+        if (bhp.getState() == STATE_OPEN) {
+            html = "&#x274D;";
         }
         return html;
     }

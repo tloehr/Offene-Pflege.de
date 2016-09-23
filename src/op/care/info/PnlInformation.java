@@ -1093,9 +1093,6 @@ public class PnlInformation extends NursingRecordsPanel {
         btnEdit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                if (!mapInfo2Editor.containsKey(resInfo)) {
-//
-//                }
                 if (!mapInfo2Editor.containsKey(resInfo) || cpInfo.isCollapsed()) {
                     try {
                         cpInfo.setCollapsed(false);
@@ -1120,10 +1117,6 @@ public class PnlInformation extends NursingRecordsPanel {
                         mapInfo2Editor.get(resInfo).setEnabled(false, PnlEditResInfo.EDIT);
                         btnChange.setEnabled(wasChangeable);
                         btnEdit.setEnabled(wasEditable);
-
-//                        btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
-//                                (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
-//                        ));
 
                         if (o != null && mapInfo2Editor.get(resInfo).isChanged()) {
 
@@ -1622,168 +1615,168 @@ public class PnlInformation extends NursingRecordsPanel {
                     });
                     pnlMenu.add(btnDelete);
                 }
-                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-                    /***
-                     *      ____           _           _
-                     *     |  _ \ ___ _ __(_) ___   __| |
-                     *     | |_) / _ \ '__| |/ _ \ / _` |
-                     *     |  __/  __/ |  | | (_) | (_| |
-                     *     |_|   \___|_|  |_|\___/ \__,_|
-                     *
-                     */
-                    final JButton btnChangePeriod = GUITools.createHyperlinkButton("nursingrecords.info.btnChangePeriod.tooltip", SYSConst.icon22changePeriod, null);
-                    btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    btnChangePeriod.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            if (resInfo.isSingleIncident()) {
-                                final JidePopup popup = new JidePopup();
-                                PnlPIT pnlPIT = new PnlPIT(new DateTime(resInfo.getFrom()), null, null, new Closure() {
-                                    @Override
-                                    public void execute(Object o) {
-                                        popup.hidePopup();
-                                        if (o != null) {
-                                            EntityManager em = OPDE.createEM();
-                                            try {
-                                                em.getTransaction().begin();
-                                                ResInfo editinfo = em.merge(resInfo);
-                                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                                em.lock(editinfo, LockModeType.OPTIMISTIC);
-                                                DateTime date = (DateTime) o;
-                                                editinfo.setFrom(date.toDate());
-                                                editinfo.setTo(date.toDate());
-                                                em.getTransaction().commit();
 
-                                                synchronized (mapType2ResInfos) {
-                                                    int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
-                                                    mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
-                                                    mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
-                                                }
-                                                synchronized (listAllInfos) {
-                                                    listAllInfos.remove(resInfo);
-                                                    listAllInfos.add(editinfo);
-                                                }
-                                                synchronized (mapKey2CP) {
-                                                    mapKey2CP.remove(keyResInfo);
-                                                }
-                                                sortData();
-                                                reloadDisplay();
-                                                if (editinfo.getResInfoType().isAlertType() || editinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE) {
-                                                    GUITools.setResidentDisplay(resident);
-                                                    if (editinfo.isClosed()) {
-                                                        OPDE.getMainframe().removeSpeciality(editinfo.getResInfoType(), resident);
-                                                    } else {
-                                                        OPDE.getMainframe().addSpeciality(editinfo.getResInfoType(), resident);
-                                                    }
-                                                }
-                                            } catch (OptimisticLockException ole) {
-                                                OPDE.warn(ole);
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                    OPDE.getMainframe().emptyFrame();
-                                                    OPDE.getMainframe().afterLogin();
-                                                }
-                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                            } catch (Exception e) {
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                OPDE.fatal(e);
-                                            } finally {
-                                                em.close();
+            }
+        }
+
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+            /***
+             *      ____           _           _
+             *     |  _ \ ___ _ __(_) ___   __| |
+             *     | |_) / _ \ '__| |/ _ \ / _` |
+             *     |  __/  __/ |  | | (_) | (_| |
+             *     |_|   \___|_|  |_|\___/ \__,_|
+             *
+             */
+            final JButton btnChangePeriod = GUITools.createHyperlinkButton("nursingrecords.info.btnChangePeriod.tooltip", SYSConst.icon22changePeriod, null);
+            btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnChangePeriod.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    if (resInfo.isSingleIncident()) {
+                        final JidePopup popup = new JidePopup();
+                        PnlPIT pnlPIT = new PnlPIT(new DateTime(resInfo.getFrom()), null, null, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                popup.hidePopup();
+                                if (o != null) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        ResInfo editinfo = em.merge(resInfo);
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        em.lock(editinfo, LockModeType.OPTIMISTIC);
+                                        DateTime date = (DateTime) o;
+                                        editinfo.setFrom(date.toDate());
+                                        editinfo.setTo(date.toDate());
+                                        em.getTransaction().commit();
+
+                                        synchronized (mapType2ResInfos) {
+                                            int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
+                                            mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
+                                            mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+                                        }
+                                        synchronized (listAllInfos) {
+                                            listAllInfos.remove(resInfo);
+                                            listAllInfos.add(editinfo);
+                                        }
+                                        synchronized (mapKey2CP) {
+                                            mapKey2CP.remove(keyResInfo);
+                                        }
+                                        sortData();
+                                        reloadDisplay();
+                                        if (editinfo.getResInfoType().isAlertType() || editinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE) {
+                                            GUITools.setResidentDisplay(resident);
+                                            if (editinfo.isClosed()) {
+                                                OPDE.getMainframe().removeSpeciality(editinfo.getResInfoType(), resident);
+                                            } else {
+                                                OPDE.getMainframe().addSpeciality(editinfo.getResInfoType(), resident);
                                             }
                                         }
-                                    }
-                                });
-                                popup.setMovable(false);
-                                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-
-                                popup.setOwner(pnlMenu);
-                                popup.removeExcludedComponent(pnlMenu);
-                                popup.getContentPane().add(pnlPIT);
-                                popup.setDefaultFocusComponent(pnlPIT);
-                                GUITools.showPopup(popup, SwingConstants.WEST);
-                            } else {
-                                final JidePopup popup = new JidePopup();
-                                Pair<Date, Date> expansion = ResInfoTools.getMinMaxExpansion(resInfo, mapType2ResInfos.get(resInfo.getResInfoType()));
-                                PnlPeriod pnlPeriod = new PnlPeriod(expansion.getFirst(), expansion.getSecond(), resInfo.getFrom(), resInfo.getTo(), new Closure() {
-                                    @Override
-                                    public void execute(Object o) {
-                                        popup.hidePopup();
-                                        if (o != null) {
-                                            EntityManager em = OPDE.createEM();
-                                            try {
-                                                em.getTransaction().begin();
-                                                ResInfo editinfo = em.merge(resInfo);
-                                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                                em.lock(editinfo, LockModeType.OPTIMISTIC);
-                                                Pair<Date, Date> period = (Pair<Date, Date>) o;
-                                                editinfo.setFrom(period.getFirst());
-                                                editinfo.setTo(period.getSecond());
-                                                editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
-                                                em.getTransaction().commit();
-
-                                                synchronized (mapType2ResInfos) {
-                                                    int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
-                                                    mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
-                                                    mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
-                                                }
-                                                synchronized (listAllInfos) {
-                                                    listAllInfos.remove(resInfo);
-                                                    listAllInfos.add(editinfo);
-                                                }
-                                                synchronized (mapKey2CP) {
-                                                    mapKey2CP.remove(keyResInfo);
-                                                }
-                                                sortData();
-                                                reloadDisplay();
-                                            } catch (OptimisticLockException ole) {
-                                                OPDE.warn(ole);
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                    OPDE.getMainframe().emptyFrame();
-                                                    OPDE.getMainframe().afterLogin();
-                                                }
-                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                            } catch (Exception e) {
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                OPDE.fatal(e);
-                                            } finally {
-                                                em.close();
-                                            }
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.warn(ole);
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
                                         }
-
+                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
                                     }
-                                });
-                                popup.setMovable(false);
-                                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                                }
+                            }
+                        });
+                        popup.setMovable(false);
+                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
-                                popup.setOwner(pnlMenu);
-                                popup.removeExcludedComponent(pnlMenu);
-                                popup.getContentPane().add(pnlPeriod);
-                                popup.setDefaultFocusComponent(pnlPeriod);
-                                GUITools.showPopup(popup, SwingConstants.WEST);
+                        popup.setOwner(pnlMenu);
+                        popup.removeExcludedComponent(pnlMenu);
+                        popup.getContentPane().add(pnlPIT);
+                        popup.setDefaultFocusComponent(pnlPIT);
+                        GUITools.showPopup(popup, SwingConstants.WEST);
+                    } else {
+                        final JidePopup popup = new JidePopup();
+                        Pair<Date, Date> expansion = ResInfoTools.getMinMaxExpansion(resInfo, mapType2ResInfos.get(resInfo.getResInfoType()));
+                        PnlPeriod pnlPeriod = new PnlPeriod(expansion.getFirst(), expansion.getSecond(), resInfo.getFrom(), resInfo.getTo(), new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                popup.hidePopup();
+                                if (o != null) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        ResInfo editinfo = em.merge(resInfo);
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        em.lock(editinfo, LockModeType.OPTIMISTIC);
+                                        Pair<Date, Date> period = (Pair<Date, Date>) o;
+                                        editinfo.setFrom(period.getFirst());
+                                        editinfo.setTo(period.getSecond());
+                                        editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
+                                        em.getTransaction().commit();
+
+                                        synchronized (mapType2ResInfos) {
+                                            int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
+                                            mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
+                                            mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+                                        }
+                                        synchronized (listAllInfos) {
+                                            listAllInfos.remove(resInfo);
+                                            listAllInfos.add(editinfo);
+                                        }
+                                        synchronized (mapKey2CP) {
+                                            mapKey2CP.remove(keyResInfo);
+                                        }
+                                        sortData();
+                                        reloadDisplay();
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.warn(ole);
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                }
 
                             }
+                        });
+                        popup.setMovable(false);
+                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
-                        }
-                    });
-                    btnChangePeriod.setEnabled((ResInfoTools.isEditable(resInfo) || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY)  // && !resInfo.isSingleIncident()
-                            && (OPDE.isAdmin() ||
-                            (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
-                    ));
-                    //            btnChangePeriod.setEnabled(!resInfo.isClosed() && !resInfo.isSingleIncident());
-                    pnlMenu.add(btnChangePeriod);
+                        popup.setOwner(pnlMenu);
+                        popup.removeExcludedComponent(pnlMenu);
+                        popup.getContentPane().add(pnlPeriod);
+                        popup.setDefaultFocusComponent(pnlPeriod);
+                        GUITools.showPopup(popup, SwingConstants.WEST);
+                    }
 
-                    pnlMenu.add(new JSeparator());
                 }
-            }
+            });
+            btnChangePeriod.setEnabled((ResInfoTools.isEditable(resInfo) || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY)
+                    && (OPDE.isAdmin() ||
+                    (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new LocalDate(resInfo.getFrom()).equals(new LocalDate()))  // The same user only on the same day.
+            ));
+            pnlMenu.add(btnChangePeriod);
+
+            pnlMenu.add(new JSeparator());
         }
 
 
