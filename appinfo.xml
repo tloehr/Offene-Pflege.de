@@ -103,6 +103,7 @@
         <class name="nursingrecords.bhp" short="nursingrecords.bhp.appinfo.short" long="nursingrecords.bhp.appinfo.long"
                helpurl="nursingrecords.bhp.appinfo.helpurl">
             <update langbundle="nursingrecords.bhp.acl.update"/>
+            <print langbundle="nursingrecords.bhp.acl.print"/>
         </class>
         <class name="nursingrecords.dfn" short="nursingrecords.dfn.appinfo.short" long="nursingrecords.dfn.appinfo.long"
                helpurl="nursingrecords.dfn.appinfo.helpurl">

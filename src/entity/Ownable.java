@@ -10,6 +10,6 @@ public abstract class Ownable {
     public abstract Users getOwner();
 
     public boolean isMine(){
-        return OPDE.isAdmin() || getOwner().equals(OPDE.getLogin().getUser());
+        return OPDE.isAdmin() || getOwner().equals(OPDE.getMe());
     }
 }

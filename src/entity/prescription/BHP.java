@@ -1,5 +1,6 @@
 package entity.prescription;
 
+import entity.Ownable;
 import entity.info.Resident;
 import entity.system.Users;
 import op.OPDE;
@@ -469,4 +470,5 @@ public class BHP implements Serializable, Comparable<BHP> {
                 "bhpid=" + bhpid +
                 '}';
     }
+
 }

@@ -9,6 +9,8 @@ import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 
@@ -33,7 +35,7 @@ public class BHPTools {
     public static final byte STATE_DONE = 1;
     public static final byte STATE_REFUSED = 2;
     public static final byte STATE_REFUSED_DISCARDED = 3;
-
+    private static Logger logger = Logger.getLogger(BHPTools.class);
 
 //    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
 //    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.bhp.shift.veryearly", "nursingrecords.bhp.shift.early", "nursingrecords.bhp.shift.late", "nursingrecords.bhp.shift.verylate"};
@@ -737,6 +739,12 @@ public class BHPTools {
         return icon;
     }
 
+    /**
+     * see https://offene-pflege.de/doku.php?id=en:dev:pnlbhp#ischangeable
+     *
+     * @param bhp
+     * @return
+     */
     public static boolean isChangeable(BHP bhp) {
         int BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW));
         boolean residentAbsent = bhp.getResident().isActive() && ResInfoTools.absentSince(bhp.getResident()) != null;
@@ -747,7 +755,7 @@ public class BHPTools {
                 !bhp.getPrescription().isClosed() &&
                 !medTrouble &&
                 (bhp.getUser() == null ||
-                        (bhp.getUser().equals(OPDE.getLogin().getUser()) &&
+                        (bhp.getUser().equals(OPDE.getMe()) &&
                                 Minutes.minutesBetween(new DateTime(bhp.getMDate()), new DateTime()).getMinutes() < BHP_MAX_MINUTES_TO_WITHDRAW)) &&
                 !bhp.isClosedStockInvolved();
     }
@@ -876,4 +884,30 @@ public class BHPTools {
     }
 
 
+    /**
+     * a BHP should be confirmed on the same day. unless its during the night shift. Then you can click the BHPs from the nightshift before, until the night shift is over.
+     *
+     * https://github.com/tloehr/Offene-Pflege.de/issues/64
+     *
+     * @param bhp
+     * @return true, if its too late. false, if we can still access the bhp
+     */
+    public static boolean bhp2Old(BHP bhp) {
+
+        DateTime now = new DateTime();
+        LocalDate day = new LocalDate(bhp.getSoll());
+
+        if (now.toLocalDate().equals(day)) return false;
+        if (!now.toLocalDate().minusDays(1).equals(day)) return true; // if its more than 1 day, then we are out.
+
+        // this can only happen, when the morning part of the night shift is still active, and the BHP in question
+        // belongs to the same shift on the day before. (in the late evening)
+
+        logger.debug(bhp.getShift());
+
+        if (bhp.getShift() == SYSCalendar.SHIFT_VERY_LATE && SYSCalendar.whatShiftIs(now.toDate()) == SYSCalendar.SHIFT_VERY_EARLY)
+            return false;
+
+        return true;
+    }
 }
