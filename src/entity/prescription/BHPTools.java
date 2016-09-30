@@ -898,7 +898,7 @@ public class BHPTools {
         LocalDate day = new LocalDate(bhp.getSoll());
 
         if (now.toLocalDate().equals(day)) return false;
-        if (!now.toLocalDate().minusDays(1).equals(day)) return true; // if its more than 1 day, then we are out.
+        if (!now.toLocalDate().minusDays(1).equals(day)) return true; // Only ok, if its yesterday
 
         // this can only happen, when the morning part of the night shift is still active, and the BHP in question
         // belongs to the same shift on the day before. (in the late evening)

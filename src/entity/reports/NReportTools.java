@@ -36,12 +36,12 @@ import java.util.*;
  */
 public class NReportTools {
 
-    public static boolean ALLOW_EDIT_OF_OTHER_PEOPLES_REPORTS = false;
     public static int IGNORED_AMOUNT_SECONDS_TILL_THE_CLOCK_TURNS_UP = 120;
     private static Logger logger = Logger.getLogger(NReport.class);
 
+    //https://github.com/tloehr/Offene-Pflege.de/issues/66
     public static boolean isChangeable(NReport nReport) {
-        return (ALLOW_EDIT_OF_OTHER_PEOPLES_REPORTS || nReport.isMine()) && !nReport.isObsolete() && nReport.getResident().isActive() && nReport.getUsersAcknowledged().isEmpty();
+        return (nReport.isMine() && !nReport.isObsolete() && nReport.getResident().isActive() && nReport.getUsersAcknowledged().isEmpty());
     }
 
     /**
@@ -95,42 +95,122 @@ public class NReportTools {
 
 
     /**
-        * retrieves the PITs of the first and the last entry in the NReports table.
-        *
-        * @param resident
-        * @return
-        */
-       public static MutableInterval getMinMax(Resident resident) {
-           long time = System.currentTimeMillis();
-           MutableInterval result = null;
+     * retrieves the PITs of the first and the last entry in the NReports table.
+     *
+     * @param resident
+     * @return
+     */
+    @Deprecated
+    public static MutableInterval getNativeMinMax(Resident resident) {
+        long time = System.currentTimeMillis();
+        MutableInterval result = null;
 
-           EntityManager em = OPDE.createEM();
-           Query queryMin = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit ASC ");
-           queryMin.setParameter("resident", resident);
-           queryMin.setMaxResults(1);
+        EntityManager em = OPDE.createEM();
+        Query queryMin = em.createNativeQuery(" SELECT PIT FROM nreports WHERE BWKennung = ? ORDER BY PIT ASC LIMIT 0,1 ");
+        queryMin.setParameter(1, resident.getRID());
+        queryMin.setMaxResults(1);
 
-           Query queryMax = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit DESC ");
-           queryMax.setParameter("resident", resident);
-           queryMax.setMaxResults(1);
+        Query queryMax = em.createNativeQuery(" SELECT PIT FROM nreports WHERE BWKennung = ? ORDER BY PIT DESC LIMIT 0,1 ");
+        queryMax.setParameter(1, resident.getRID());
+        queryMax.setMaxResults(1);
 
-           try {
-               ArrayList<NReport> min = new ArrayList<>(queryMin.getResultList());
-               ArrayList<NReport> max = new ArrayList<>(queryMax.getResultList());
-               if (min.isEmpty()) {
-                   result = null;
-               } else {
-                   result = new MutableInterval(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
-               }
+        try {
+            ArrayList<Date> min = new ArrayList<>(queryMin.getResultList());
+            ArrayList<Date> max = new ArrayList<>(queryMax.getResultList());
+            if (min.isEmpty()) {
+                result = null;
+            } else {
+                result = new MutableInterval(new DateTime(min.get(0)), new DateTime(max.get(0)));
+            }
 
-           } catch (Exception e) {
-               OPDE.fatal(e);
-           }
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
 
 
-           em.close();
-           logger.debug((System.currentTimeMillis() - time) + " ms for minmax");
-           return result;
-       }
+        em.close();
+        logger.debug((System.currentTimeMillis() - time) + " ms for native minmax");
+        return result;
+    }
+
+
+    public static MutableInterval getNativeMinMax2(Resident resident) {
+        long time = System.currentTimeMillis();
+        MutableInterval result = null;
+
+        EntityManager em = OPDE.createEM();
+        Query queryMin = em.createNativeQuery(" SELECT MIN(PIT) FROM nreports WHERE BWKennung = ?");
+        queryMin.setParameter(1, resident.getRID());
+
+
+        Query queryMax = em.createNativeQuery(" SELECT MAX(PIT) FROM nreports WHERE BWKennung = ?");
+        queryMax.setParameter(1, resident.getRID());
+
+
+        try {
+            // Changed this from the old concept with arraylists and get(0) afterwards.
+            // the list handling slows everything down
+            //
+            // getSingleResult() does not throw exceptions when there are no results.
+            // just returns a null.
+            Date min = (Date) queryMin.getSingleResult();
+            Date max = (Date) queryMax.getSingleResult();
+
+            if (min == null) {
+                result = null;
+            } else {
+                result = new MutableInterval(new DateTime(min), new DateTime(max));
+            }
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+
+        em.close();
+        logger.debug((System.currentTimeMillis() - time) + " ms for native minmax2");
+        return result;
+    }
+
+
+    /**
+     * retrieves the PITs of the first and the last entry in the NReports table.
+     *
+     * @param resident
+     * @return
+     */
+    @Deprecated
+    public static MutableInterval getMinMax(Resident resident) {
+        long time = System.currentTimeMillis();
+        MutableInterval result = null;
+
+        EntityManager em = OPDE.createEM();
+        Query queryMin = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit ASC ");
+        queryMin.setParameter("resident", resident);
+        queryMin.setMaxResults(1);
+
+        Query queryMax = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit DESC ");
+        queryMax.setParameter("resident", resident);
+        queryMax.setMaxResults(1);
+
+        try {
+            NReport min = (NReport) queryMin.getSingleResult();
+            NReport max = (NReport) queryMax.getSingleResult();
+            if (min == null) {
+                result = null;
+            } else {
+                result = new MutableInterval(new DateTime(min.getPit()), new DateTime(max.getPit()));
+            }
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+
+        em.close();
+        logger.debug((System.currentTimeMillis() - time) + " ms for minmax");
+        return result;
+    }
 
 
     public static long getNum(Resident resident, LocalDate day) {

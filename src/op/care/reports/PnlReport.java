@@ -34,7 +34,6 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
-import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.process.*;
 import entity.reports.NReport;
@@ -62,7 +61,10 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.RollbackException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
@@ -74,7 +76,6 @@ import java.util.List;
  * @author root
  */
 public class PnlReport extends NursingRecordsPanel {
-
 
 
     private JXSearchField txtSearch;
@@ -441,9 +442,10 @@ public class PnlReport extends NursingRecordsPanel {
                 GUITools.setResidentDisplay(resident);
 
                 if (minmax == null) {
-                    minmax = NReportTools.getMinMax(resident);
+//                    MutableInterval nativeMinMax2 = NReportTools.getNativeMinMax2(resident);
+//                    MutableInterval nativeMinMax = NReportTools.getNativeMinMax(resident);
+                    minmax = NReportTools.getNativeMinMax2(resident);
                 }
-
 
 
                 holidays = Collections.synchronizedMap(SYSCalendar.getHolidays(minmax.getStart().getYear(), minmax.getEnd().getYear()));
@@ -462,7 +464,7 @@ public class PnlReport extends NursingRecordsPanel {
                         i++;
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i, maxYears));
                         createCP4Year(year, start, end);
-                        logger.debug((System.currentTimeMillis() - time) + " ms for year "+year);
+                        logger.debug((System.currentTimeMillis() - time) + " ms for year " + year);
                     }
 
                 }
@@ -907,7 +909,7 @@ public class PnlReport extends NursingRecordsPanel {
                                                     "<b><p>" +
                                                     (nreport.isObsolete() ? SYSConst.html_16x16_Eraser_internal : "") +
                                                     (nreport.isReplacement() ? SYSConst.html_16x16_Edited_internal : "") +
-                                                    (nreport.isAddedLater() ? SYSConst.html_16x16_Clock + "&nbsp;": "") +
+                                                    (nreport.isAddedLater() ? SYSConst.html_16x16_Clock + "&nbsp;" : "") +
                                                     DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                                                     " " + SYSTools.xx("misc.msg.Time.short") +
                                                     ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
@@ -1130,20 +1132,17 @@ public class PnlReport extends NursingRecordsPanel {
                     btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnMenu.setContentAreaFilled(false);
                     btnMenu.setBorder(null);
-                    btnMenu.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            JidePopup popup = new JidePopup();
-                            popup.setMovable(false);
-                            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                            popup.setOwner(btnMenu);
-                            popup.removeExcludedComponent(btnMenu);
-                            JPanel pnl = getMenu(nreport);
-                            popup.getContentPane().add(pnl);
-                            popup.setDefaultFocusComponent(pnl);
+                    btnMenu.addActionListener(e -> {
+                        JidePopup popup = new JidePopup();
+                        popup.setMovable(false);
+                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                        popup.setOwner(btnMenu);
+                        popup.removeExcludedComponent(btnMenu);
+                        JPanel pnl = getMenu(nreport);
+                        popup.getContentPane().add(pnl);
+                        popup.setDefaultFocusComponent(pnl);
 
-                            GUITools.showPopup(popup, SwingConstants.WEST);
-                        }
+                        GUITools.showPopup(popup, SwingConstants.WEST);
                     });
                     btnMenu.setEnabled(!nreport.isObsolete());
                     pnlSingle.getRight().add(btnMenu);
@@ -1184,7 +1183,7 @@ public class PnlReport extends NursingRecordsPanel {
 
 
                     // todo: to track down the NPEs.
-                    if (cpMap.get(keyYear) == null){
+                    if (cpMap.get(keyYear) == null) {
                         reload();
                         break;
                     }
@@ -1463,7 +1462,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
                                 myReport.getCommontags().clear();
-                                for (Commontags commontag : pnlCommonTags.getListSelectedTags()){
+                                for (Commontags commontag : pnlCommonTags.getListSelectedTags()) {
                                     myReport.getCommontags().add(em.merge(commontag));
                                 }
 
