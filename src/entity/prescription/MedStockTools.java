@@ -48,19 +48,16 @@ public class MedStockTools {
     public static final int DAYS_TO_EXPIRE_SOON = 5;
 
     public static ListCellRenderer getBestandOnlyIDRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public java.awt.Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = "<i>Keine Auswahl</i>"; //SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedStock) {
-                    text = ((MedStock) o).getID().toString();
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = "<i>Keine Auswahl</i>"; //SYSTools.toHTML("<i>Keine Auswahl</i>");
+            } else if (o instanceof MedStock) {
+                text = ((MedStock) o).getID().toString();
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 
@@ -764,12 +761,7 @@ public class MedStockTools {
 
                 ArrayList<MedStockTransaction> listStockTransactions = new ArrayList<MedStockTransaction>(stock.getStockTransaction());
 
-                Collections.sort(listStockTransactions, new Comparator<MedStockTransaction>() {
-                    @Override
-                    public int compare(MedStockTransaction o1, MedStockTransaction o2) {
-                        return o1.getPit().compareTo(o2.getPit());
-                    }
-                });
+                Collections.sort(listStockTransactions, (o1, o2) -> o1.getPit().compareTo(o2.getPit()));
 
                 boolean iamthefirstone = true;
                 BigDecimal previousWeight = BigDecimal.ZERO;

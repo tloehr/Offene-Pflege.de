@@ -61,10 +61,6 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.RollbackException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
@@ -201,6 +197,7 @@ public class PnlReport extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         synchronized (contentmap) {
             SYSTools.clear(contentmap);
         }
@@ -245,12 +242,9 @@ public class PnlReport extends NursingRecordsPanel {
         txtSearch = new JXSearchField(SYSTools.xx("misc.msg.searchphrase"));
         txtSearch.setInstantSearchDelay(100000);
         txtSearch.setFont(SYSConst.ARIAL14);
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (SYSTools.catchNull(txtSearch.getText()).trim().length() >= 3) {
-                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), true, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
-                }
+        txtSearch.addActionListener(e -> {
+            if (SYSTools.catchNull(txtSearch.getText()).trim().length() >= 3) {
+                SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), true, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
             }
         });
 
@@ -258,12 +252,9 @@ public class PnlReport extends NursingRecordsPanel {
 
 
         tbShowReplaced = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showreplaced"));
-        tbShowReplaced.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (initPhase) return;
-                reloadDisplay();
-            }
+        tbShowReplaced.addItemListener(itemEvent -> {
+            if (initPhase) return;
+            reloadDisplay();
         });
         list.add(tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
@@ -277,12 +268,7 @@ public class PnlReport extends NursingRecordsPanel {
             pnlTags.setOpaque(false);
 
             for (final Commontags commontag : listUsedCommontags) {
-                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), true, null, null), false);
-                    }
-                });
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), true, null, null), false));
                 btnTag.setForeground(GUITools.getColor(commontag.getColor()));
                 pnlTags.add(btnTag);
             }
@@ -305,93 +291,84 @@ public class PnlReport extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (!resident.isActive()) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
-                        return;
-                    }
-                    new DlgReport(new NReport(resident), new Closure() {
-                        @Override
-                        public void execute(Object report) {
-                            if (report != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    final NReport myReport = (NReport) em.merge(report);
-                                    em.getTransaction().commit();
-
-                                    final String keyYear = Integer.toString(new DateTime(myReport.getPit()).getYear()) + ".year";
-                                    if (!cpMap.containsKey(keyYear)) {
-                                        reloadDisplay();
-                                    } else {
-                                        final String keyDay = DateFormat.getDateInstance().format(myReport.getPit());
-                                        synchronized (contentmap) {
-                                            contentmap.remove(keyDay);
-                                        }
-                                        synchronized (valuecache) {
-                                            if (valuecache.containsKey(keyDay)) {
-                                                valuecache.get(keyDay).add(myReport);
-                                                Collections.sort(valuecache.get(keyDay));
-                                            }
-                                        }
-                                        synchronized (listUsedCommontags) {
-                                            boolean reloadSearch = false;
-                                            for (Commontags ctag : myReport.getCommontags()) {
-                                                if (!listUsedCommontags.contains(ctag)) {
-                                                    listUsedCommontags.add(ctag);
-                                                    reloadSearch = true;
-                                                }
-                                            }
-                                            if (reloadSearch) {
-                                                prepareSearchArea();
-                                            }
-                                        }
-
-                                        if (minmax.isAfter(new DateTime(myReport.getPit()))) {
-                                            minmax.setStart(new DateTime(myReport.getPit()));
-                                        }
-
-                                        if (minmax.isBefore(new DateTime(myReport.getPit()))) {
-                                            minmax.setEnd(new DateTime(myReport.getPit()));
-                                        }
-
-                                        createCP4Day(new LocalDate(myReport.getPit()));
-                                        expandDay(new LocalDate(myReport.getPit()));
-
-                                        buildPanel();
-                                        GUITools.scroll2show(jspReports, cpMap.get(keyDay), cpsReports, new Closure() {
-                                            @Override
-                                            public void execute(Object o) {
-                                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                                            }
-                                        });
-                                    }
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    } else {
-                                        reloadDisplay(true);
-                                    }
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-                            }
-                        }
-                    });
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), actionEvent -> {
+                if (!resident.isActive()) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                    return;
                 }
+                currentEditor = new DlgReport(new NReport(resident), report -> {
+                    if (report != null) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                            final NReport myReport = (NReport) em.merge(report);
+                            em.getTransaction().commit();
+
+                            final String keyYear = Integer.toString(new DateTime(myReport.getPit()).getYear()) + ".year";
+                            if (!cpMap.containsKey(keyYear)) {
+                                reloadDisplay();
+                            } else {
+                                final String keyDay = DateFormat.getDateInstance().format(myReport.getPit());
+                                synchronized (contentmap) {
+                                    contentmap.remove(keyDay);
+                                }
+                                synchronized (valuecache) {
+                                    if (valuecache.containsKey(keyDay)) {
+                                        valuecache.get(keyDay).add(myReport);
+                                        Collections.sort(valuecache.get(keyDay));
+                                    }
+                                }
+                                synchronized (listUsedCommontags) {
+                                    boolean reloadSearch = false;
+                                    for (Commontags ctag : myReport.getCommontags()) {
+                                        if (!listUsedCommontags.contains(ctag)) {
+                                            listUsedCommontags.add(ctag);
+                                            reloadSearch = true;
+                                        }
+                                    }
+                                    if (reloadSearch) {
+                                        prepareSearchArea();
+                                    }
+                                }
+
+                                if (minmax.isAfter(new DateTime(myReport.getPit()))) {
+                                    minmax.setStart(new DateTime(myReport.getPit()));
+                                }
+
+                                if (minmax.isBefore(new DateTime(myReport.getPit()))) {
+                                    minmax.setEnd(new DateTime(myReport.getPit()));
+                                }
+
+                                createCP4Day(new LocalDate(myReport.getPit()));
+                                expandDay(new LocalDate(myReport.getPit()));
+
+                                buildPanel();
+                                GUITools.scroll2show(jspReports, cpMap.get(keyDay), cpsReports, o -> GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2));
+                            }
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            } else {
+                                reloadDisplay(true);
+                            }
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
+                        }
+                    }
+                });
+                currentEditor.setVisible(true);
             });
             list.add(addButton);
         }
@@ -528,14 +505,11 @@ public class PnlReport extends NursingRecordsPanel {
                 "<b>" + Integer.toString(year) + "</b>" +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpYear.setCollapsed(!cpYear.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpYear.setCollapsed(!cpYear.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -615,14 +589,11 @@ public class PnlReport extends NursingRecordsPanel {
                 "</b>" +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpMonth.setCollapsed(!cpMonth.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpMonth.setCollapsed(!cpMonth.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -641,12 +612,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintMonth.setContentAreaFilled(false);
             btnPrintMonth.setBorder(null);
             btnPrintMonth.setToolTipText(SYSTools.xx("misc.tooltips.btnprintmonth"));
-            btnPrintMonth.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month), true, null, null), false);
-                }
-            });
+            btnPrintMonth.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month), true, null, null), false));
             cptitle.getRight().add(btnPrintMonth);
         }
         cpMonth.setTitleLabelComponent(cptitle.getMain());
@@ -727,14 +693,11 @@ public class PnlReport extends NursingRecordsPanel {
                 "</b>" +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpWeek.setCollapsed(!cpWeek.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpWeek.setCollapsed(!cpWeek.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -747,12 +710,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintWeek.setContentAreaFilled(false);
             btnPrintWeek.setBorder(null);
             btnPrintWeek.setToolTipText(SYSTools.xx("misc.tooltips.btnprintweek"));
-            btnPrintWeek.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week), true, null, null), false);
-                }
-            });
+            btnPrintWeek.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week), true, null, null), false));
             cptitle.getRight().add(btnPrintWeek);
         }
 
@@ -824,14 +782,11 @@ public class PnlReport extends NursingRecordsPanel {
                 dayFormat.format(day.toDate()) +
                 SYSTools.catchNull(holidays.get(day), " (", ")") +
                 "</font></html>";
-        final DefaultCPTitle titleCPDay = new DefaultCPTitle(titleDay, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpDay.setCollapsed(!cpDay.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        final DefaultCPTitle titleCPDay = new DefaultCPTitle(titleDay, e -> {
+            try {
+                cpDay.setCollapsed(!cpDay.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -842,12 +797,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintDay.setContentAreaFilled(false);
             btnPrintDay.setBorder(null);
             btnPrintDay.setToolTipText(SYSTools.xx("misc.tooltips.btnprintday"));
-            btnPrintDay.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day), true, null, null), false);
-                }
-            });
+            btnPrintDay.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day), true, null, null), false));
             titleCPDay.getRight().add(btnPrintDay);
         }
 
@@ -925,12 +875,7 @@ public class PnlReport extends NursingRecordsPanel {
 
 
                     final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
-                    pnlSingle.getButton().addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
-                        }
-                    });
+                    pnlSingle.getButton().addActionListener(e -> GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH));
 
                     if (!nreport.getAttachedFilesConnections().isEmpty()) {
                         /***
@@ -953,39 +898,34 @@ public class PnlReport extends NursingRecordsPanel {
                         btnFiles.setContentAreaFilled(false);
                         btnFiles.setBorder(null);
 
-                        btnFiles.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent actionEvent) {
-                                Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
-                                    @Override
-                                    public void execute(Object o) {
-                                        EntityManager em = OPDE.createEM();
-                                        final NReport myReport = em.find(NReport.class, nreport.getID());
-                                        em.close();
+                        btnFiles.addActionListener(actionEvent -> {
+                            Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : o -> {
+                                EntityManager em = OPDE.createEM();
+                                final NReport myReport = em.find(NReport.class, nreport.getID());
+                                em.close();
 
-                                        final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+                                final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
-                                        synchronized (contentmap) {
-                                            contentmap.remove(keyNewDay);
-                                        }
-                                        synchronized (linemap) {
-                                            linemap.remove(nreport);
-                                        }
+                                synchronized (contentmap) {
+                                    contentmap.remove(keyNewDay);
+                                }
+                                synchronized (linemap) {
+                                    linemap.remove(nreport);
+                                }
 
-                                        synchronized (valuecache) {
-                                            valuecache.get(keyNewDay).remove(nreport);
-                                            valuecache.get(keyNewDay).add(myReport);
-                                            Collections.sort(valuecache.get(keyNewDay));
-                                        }
+                                synchronized (valuecache) {
+                                    valuecache.get(keyNewDay).remove(nreport);
+                                    valuecache.get(keyNewDay).add(myReport);
+                                    Collections.sort(valuecache.get(keyNewDay));
+                                }
+                                currentEditor = null;
+                                createCP4Day(new LocalDate(myReport.getPit()));
 
-                                        createCP4Day(new LocalDate(myReport.getPit()));
-
-                                        buildPanel();
-                                        GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                                    }
-                                };
-                                new DlgFiles(nreport, fileHandleClosure);
-                            }
+                                buildPanel();
+                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                            };
+                            currentEditor = new DlgFiles(nreport, fileHandleClosure);
+                            currentEditor.setVisible(true);
                         });
                         btnFiles.setEnabled(OPDE.isFTPworking());
                         pnlSingle.getRight().add(btnFiles);
@@ -1012,106 +952,103 @@ public class PnlReport extends NursingRecordsPanel {
                         btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         btnProcess.setContentAreaFilled(false);
                         btnProcess.setBorder(null);
-                        btnProcess.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent actionEvent) {
-                                new DlgProcessAssign(nreport, new Closure() {
-                                    @Override
-                                    public void execute(Object o) {
-                                        if (o == null) {
-                                            return;
+                        btnProcess.addActionListener(actionEvent -> {
+                            currentEditor = new DlgProcessAssign(nreport, o -> {
+                                if (o == null) {
+                                    currentEditor = null;
+                                    return;
+                                }
+                                Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                                ArrayList<QProcess> assigned = result.getFirst();
+                                ArrayList<QProcess> unassigned = result.getSecond();
+
+                                EntityManager em = OPDE.createEM();
+
+                                try {
+                                    em.getTransaction().begin();
+
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                    NReport myReport = em.merge(nreport);
+                                    em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                    ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
+                                    for (SYSNR2PROCESS linkObject : attached) {
+                                        if (unassigned.contains(linkObject.getQProcess())) {
+                                            linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                            linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
+                                            em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+
+                                            em.remove(linkObject);
                                         }
-                                        Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
-
-                                        ArrayList<QProcess> assigned = result.getFirst();
-                                        ArrayList<QProcess> unassigned = result.getSecond();
-
-                                        EntityManager em = OPDE.createEM();
-
-                                        try {
-                                            em.getTransaction().begin();
-
-                                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                            NReport myReport = em.merge(nreport);
-                                            em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-
-                                            ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
-                                            for (SYSNR2PROCESS linkObject : attached) {
-                                                if (unassigned.contains(linkObject.getQProcess())) {
-                                                    linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                                    linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
-                                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
-
-                                                    em.remove(linkObject);
-                                                }
-                                            }
-                                            attached.clear();
-
-                                            for (QProcess qProcess : assigned) {
-                                                java.util.List<QProcessElement> listElements = qProcess.getElements();
-                                                if (!listElements.contains(myReport)) {
-                                                    QProcess myQProcess = em.merge(qProcess);
-                                                    SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-                                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
-                                                    qProcess.getAttachedNReportConnections().add(myLinkObject);
-                                                    myReport.getAttachedQProcessConnections().add(myLinkObject);
-                                                }
-                                            }
-
-                                            em.getTransaction().commit();
-
-                                            final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-
-
-                                            synchronized (contentmap) {
-                                                contentmap.remove(keyNewDay);
-                                            }
-                                            synchronized (linemap) {
-                                                linemap.remove(nreport);
-                                            }
-
-                                            synchronized (valuecache) {
-                                                valuecache.get(keyNewDay).remove(nreport);
-                                                valuecache.get(keyNewDay).add(myReport);
-                                                Collections.sort(valuecache.get(keyNewDay));
-                                            }
-
-                                            createCP4Day(new LocalDate(myReport.getPit()));
-
-                                            buildPanel();
-                                            GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                                        } catch (OptimisticLockException ole) {
-                                            OPDE.warn(ole);
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                OPDE.getMainframe().emptyFrame();
-                                                OPDE.getMainframe().afterLogin();
-                                            } else {
-                                                reloadDisplay(true);
-                                            }
-                                        } catch (RollbackException ole) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                OPDE.getMainframe().emptyFrame();
-                                                OPDE.getMainframe().afterLogin();
-                                            }
-                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                        } catch (Exception e) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            OPDE.fatal(e);
-                                        } finally {
-                                            em.close();
-                                        }
-
                                     }
-                                });
-                            }
+                                    attached.clear();
+
+                                    for (QProcess qProcess : assigned) {
+                                        List<QProcessElement> listElements = qProcess.getElements();
+                                        if (!listElements.contains(myReport)) {
+                                            QProcess myQProcess = em.merge(qProcess);
+                                            SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
+                                            em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                            qProcess.getAttachedNReportConnections().add(myLinkObject);
+                                            myReport.getAttachedQProcessConnections().add(myLinkObject);
+                                        }
+                                    }
+
+                                    em.getTransaction().commit();
+
+                                    final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+
+
+                                    synchronized (contentmap) {
+                                        contentmap.remove(keyNewDay);
+                                    }
+                                    synchronized (linemap) {
+                                        linemap.remove(nreport);
+                                    }
+
+                                    synchronized (valuecache) {
+                                        valuecache.get(keyNewDay).remove(nreport);
+                                        valuecache.get(keyNewDay).add(myReport);
+                                        Collections.sort(valuecache.get(keyNewDay));
+                                    }
+
+                                    createCP4Day(new LocalDate(myReport.getPit()));
+
+                                    buildPanel();
+                                    GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    } else {
+                                        reloadDisplay(true);
+                                    }
+                                } catch (RollbackException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                    currentEditor = null;
+                                }
+
+                            });
+                            currentEditor.setVisible(true);
                         });
                         btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
                         pnlSingle.getRight().add(btnProcess);
@@ -1246,109 +1183,100 @@ public class PnlReport extends NursingRecordsPanel {
              */
             final JButton btnEdit = GUITools.createHyperlinkButton("nursingrecords.reports.btnEdit.tooltip", SYSConst.icon22edit3, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnEdit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgReport(nreport.clone(), new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
+            btnEdit.addActionListener(actionEvent -> {
+                currentEditor = new DlgReport(nreport.clone(), o -> {
+                    if (o != null) {
 
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
 
-                                    final NReport newReport = em.merge((NReport) o);
-                                    NReport oldReport = em.merge(nreport);
-                                    em.lock(oldReport, LockModeType.OPTIMISTIC);
-                                    newReport.setReplacementFor(oldReport);
+                            final NReport newReport = em.merge((NReport) o);
+                            NReport oldReport = em.merge(nreport);
+                            em.lock(oldReport, LockModeType.OPTIMISTIC);
+                            newReport.setReplacementFor(oldReport);
 
-                                    oldReport.getAttachedFilesConnections().clear();
-                                    oldReport.getAttachedQProcessConnections().clear();
+                            oldReport.getAttachedFilesConnections().clear();
+                            oldReport.getAttachedQProcessConnections().clear();
 
-                                    oldReport.setEditedBy(em.merge(OPDE.getMe()));
-                                    oldReport.setEditedPIT(new Date());
-                                    oldReport.setReplacedBy(newReport);
+                            oldReport.setEditedBy(em.merge(OPDE.getMe()));
+                            oldReport.setEditedPIT(new Date());
+                            oldReport.setReplacedBy(newReport);
 
-                                    em.getTransaction().commit();
+                            em.getTransaction().commit();
 
-                                    final String keyNewDay = DateFormat.getDateInstance().format(newReport.getPit());
-                                    final String keyOldDay = DateFormat.getDateInstance().format(oldReport.getPit());
+                            final String keyNewDay = DateFormat.getDateInstance().format(newReport.getPit());
+                            final String keyOldDay = DateFormat.getDateInstance().format(oldReport.getPit());
 
-                                    synchronized (contentmap) {
-                                        contentmap.remove(keyNewDay);
-                                        contentmap.remove(keyOldDay);
-                                    }
-                                    synchronized (linemap) {
-                                        linemap.remove(oldReport);
-                                    }
+                            synchronized (contentmap) {
+                                contentmap.remove(keyNewDay);
+                                contentmap.remove(keyOldDay);
+                            }
+                            synchronized (linemap) {
+                                linemap.remove(oldReport);
+                            }
 
-                                    synchronized (valuecache) {
-                                        valuecache.get(keyOldDay).remove(nreport);
-                                        valuecache.get(keyOldDay).add(oldReport);
-                                        Collections.sort(valuecache.get(keyOldDay));
+                            synchronized (valuecache) {
+                                valuecache.get(keyOldDay).remove(nreport);
+                                valuecache.get(keyOldDay).add(oldReport);
+                                Collections.sort(valuecache.get(keyOldDay));
 
-                                        if (valuecache.containsKey(keyNewDay)) {
-                                            valuecache.get(keyNewDay).add(newReport);
-                                            Collections.sort(valuecache.get(keyNewDay));
-                                        }
-                                    }
-
-                                    synchronized (listUsedCommontags) {
-                                        boolean reloadSearch = false;
-                                        for (Commontags ctag : newReport.getCommontags()) {
-                                            if (!listUsedCommontags.contains(ctag)) {
-                                                listUsedCommontags.add(ctag);
-                                                reloadSearch = true;
-                                            }
-                                        }
-                                        if (reloadSearch) {
-                                            prepareSearchArea();
-                                        }
-                                    }
-
-                                    if (minmax.isAfter(new DateTime(newReport.getPit()))) {
-                                        minmax.setStart(new DateTime(newReport.getPit()));
-                                    }
-
-                                    if (minmax.isBefore(new DateTime(newReport.getPit()))) {
-                                        minmax.setEnd(new DateTime(newReport.getPit()));
-                                    }
-
-                                    createCP4Day(new LocalDate(oldReport.getPit()));
-                                    createCP4Day(new LocalDate(newReport.getPit()));
-
-                                    buildPanel();
-                                    GUITools.scroll2show(jspReports, cpMap.get(keyNewDay), cpsReports, new Closure() {
-                                        @Override
-                                        public void execute(Object o) {
-                                            GUITools.flashBackground(linemap.get(newReport), Color.YELLOW, 2);
-                                        }
-                                    });
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    } else {
-                                        reloadDisplay(true);
-                                    }
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
+                                if (valuecache.containsKey(keyNewDay)) {
+                                    valuecache.get(keyNewDay).add(newReport);
+                                    Collections.sort(valuecache.get(keyNewDay));
                                 }
                             }
+
+                            synchronized (listUsedCommontags) {
+                                boolean reloadSearch = false;
+                                for (Commontags ctag : newReport.getCommontags()) {
+                                    if (!listUsedCommontags.contains(ctag)) {
+                                        listUsedCommontags.add(ctag);
+                                        reloadSearch = true;
+                                    }
+                                }
+                                if (reloadSearch) {
+                                    prepareSearchArea();
+                                }
+                            }
+
+                            if (minmax.isAfter(new DateTime(newReport.getPit()))) {
+                                minmax.setStart(new DateTime(newReport.getPit()));
+                            }
+
+                            if (minmax.isBefore(new DateTime(newReport.getPit()))) {
+                                minmax.setEnd(new DateTime(newReport.getPit()));
+                            }
+
+                            createCP4Day(new LocalDate(oldReport.getPit()));
+                            createCP4Day(new LocalDate(newReport.getPit()));
+
+                            buildPanel();
+                            GUITools.scroll2show(jspReports, cpMap.get(keyNewDay), cpsReports, o1 -> GUITools.flashBackground(linemap.get(newReport), Color.YELLOW, 2));
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            } else {
+                                reloadDisplay(true);
+                            }
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
                         }
-                    });
-                }
+                    }
+                });
+                currentEditor.setVisible(true);
             });
             btnEdit.setEnabled(NReportTools.isChangeable(nreport));
             pnlMenu.add(btnEdit);
@@ -1362,70 +1290,66 @@ public class PnlReport extends NursingRecordsPanel {
              */
             final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.reports.btnDelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnDelete.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(nreport.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                        @Override
-                        public void execute(Object answer) {
-                            if (answer.equals(JOptionPane.YES_OPTION)) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
+            btnDelete.addActionListener(actionEvent -> {
+                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(nreport.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
+                    if (answer.equals(JOptionPane.YES_OPTION)) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
 
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    NReport delReport = em.merge(nreport);
-                                    em.lock(delReport, LockModeType.OPTIMISTIC);
-                                    delReport = NReportTools.delete(delReport, em.merge(OPDE.getMe()));
+                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                            NReport delReport = em.merge(nreport);
+                            em.lock(delReport, LockModeType.OPTIMISTIC);
+                            delReport = NReportTools.delete(delReport, em.merge(OPDE.getMe()));
 
-                                    em.getTransaction().commit();
+                            em.getTransaction().commit();
 
-                                    final String keyDay = DateFormat.getDateInstance().format(delReport.getPit());
+                            final String keyDay = DateFormat.getDateInstance().format(delReport.getPit());
 
 
-                                    synchronized (contentmap) {
-                                        contentmap.remove(keyDay);
-                                    }
-                                    synchronized (linemap) {
-                                        linemap.remove(delReport);
-                                    }
-
-                                    synchronized (valuecache) {
-                                        valuecache.get(keyDay).remove(nreport);
-                                        valuecache.get(keyDay).add(delReport);
-                                        Collections.sort(valuecache.get(keyDay));
-                                    }
-
-                                    createCP4Day(new LocalDate(delReport.getPit()));
-
-                                    buildPanel();
-                                    if (tbShowReplaced.isSelected()) {
-                                        GUITools.flashBackground(linemap.get(delReport), Color.YELLOW, 2);
-                                    }
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    } else {
-                                        reloadDisplay(true);
-                                    }
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-
+                            synchronized (contentmap) {
+                                contentmap.remove(keyDay);
                             }
+                            synchronized (linemap) {
+                                linemap.remove(delReport);
+                            }
+
+                            synchronized (valuecache) {
+                                valuecache.get(keyDay).remove(nreport);
+                                valuecache.get(keyDay).add(delReport);
+                                Collections.sort(valuecache.get(keyDay));
+                            }
+
+                            createCP4Day(new LocalDate(delReport.getPit()));
+
+                            buildPanel();
+                            if (tbShowReplaced.isSelected()) {
+                                GUITools.flashBackground(linemap.get(delReport), Color.YELLOW, 2);
+                            }
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            } else {
+                                reloadDisplay(true);
+                            }
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
                         }
-                    });
-                }
+
+                    }
+                });
+                currentEditor.setVisible(true);
             });
             btnDelete.setEnabled(NReportTools.isChangeable(nreport));
             pnlMenu.add(btnDelete);
@@ -1441,99 +1365,93 @@ public class PnlReport extends NursingRecordsPanel {
              */
             final JButton btnTAGs = GUITools.createHyperlinkButton("misc.msg.editTags", SYSConst.icon22tagPurple, null);
             btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnTAGs.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    final JidePopup popup = new JidePopup();
+            btnTAGs.addActionListener(actionEvent -> {
+                final JidePopup popup = new JidePopup();
 
-                    final JPanel pnl = new JPanel(new BorderLayout(5, 5));
-                    final PnlCommonTags pnlCommonTags = new PnlCommonTags(nreport.getCommontags(), true, 3);
-                    pnl.add(new JScrollPane(pnlCommonTags), BorderLayout.CENTER);
-                    JButton btnApply = new JButton(SYSConst.icon22apply);
-                    pnl.add(btnApply, BorderLayout.SOUTH);
-                    btnApply.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent ae) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                final NReport myReport = em.merge(nreport);
-                                em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                final JPanel pnl = new JPanel(new BorderLayout(5, 5));
+                final PnlCommonTags pnlCommonTags = new PnlCommonTags(nreport.getCommontags(), true, 3);
+                pnl.add(new JScrollPane(pnlCommonTags), BorderLayout.CENTER);
+                JButton btnApply = new JButton(SYSConst.icon22apply);
+                pnl.add(btnApply, BorderLayout.SOUTH);
+                btnApply.addActionListener(ae -> {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        final NReport myReport = em.merge(nreport);
+                        em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                myReport.getCommontags().clear();
-                                for (Commontags commontag : pnlCommonTags.getListSelectedTags()) {
-                                    myReport.getCommontags().add(em.merge(commontag));
+                        myReport.getCommontags().clear();
+                        for (Commontags commontag : pnlCommonTags.getListSelectedTags()) {
+                            myReport.getCommontags().add(em.merge(commontag));
+                        }
+
+                        em.getTransaction().commit();
+
+                        final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+
+                        synchronized (contentmap) {
+                            contentmap.remove(keyNewDay);
+                        }
+                        synchronized (linemap) {
+                            linemap.remove(nreport);
+                        }
+
+                        synchronized (valuecache) {
+                            valuecache.get(keyNewDay).remove(nreport);
+                            valuecache.get(keyNewDay).add(myReport);
+                            Collections.sort(valuecache.get(keyNewDay));
+                        }
+
+                        synchronized (listUsedCommontags) {
+                            boolean reloadSearch = false;
+                            for (Commontags ctag : myReport.getCommontags()) {
+                                if (!listUsedCommontags.contains(ctag)) {
+                                    listUsedCommontags.add(ctag);
+                                    reloadSearch = true;
                                 }
-
-                                em.getTransaction().commit();
-
-                                final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-
-                                synchronized (contentmap) {
-                                    contentmap.remove(keyNewDay);
-                                }
-                                synchronized (linemap) {
-                                    linemap.remove(nreport);
-                                }
-
-                                synchronized (valuecache) {
-                                    valuecache.get(keyNewDay).remove(nreport);
-                                    valuecache.get(keyNewDay).add(myReport);
-                                    Collections.sort(valuecache.get(keyNewDay));
-                                }
-
-                                synchronized (listUsedCommontags) {
-                                    boolean reloadSearch = false;
-                                    for (Commontags ctag : myReport.getCommontags()) {
-                                        if (!listUsedCommontags.contains(ctag)) {
-                                            listUsedCommontags.add(ctag);
-                                            reloadSearch = true;
-                                        }
-                                    }
-                                    if (reloadSearch) {
-                                        prepareSearchArea();
-                                    }
-                                }
-
-                                createCP4Day(new LocalDate(myReport.getPit()));
-
-                                buildPanel();
-                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                } else {
-                                    reloadDisplay(true);
-                                }
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
+                            }
+                            if (reloadSearch) {
+                                prepareSearchArea();
                             }
                         }
-                    });
 
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    popup.setOwner(btnTAGs);
-                    popup.removeExcludedComponent(btnTAGs);
-                    pnl.setPreferredSize(new Dimension(350, 150));
-                    popup.getContentPane().add(pnl);
-                    popup.setDefaultFocusComponent(pnl);
+                        createCP4Day(new LocalDate(myReport.getPit()));
 
-                    GUITools.showPopup(popup, SwingConstants.WEST);
+                        buildPanel();
+                        GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        } else {
+                            reloadDisplay(true);
+                        }
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                });
 
-                }
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(btnTAGs);
+                popup.removeExcludedComponent(btnTAGs);
+                pnl.setPreferredSize(new Dimension(350, 150));
+                popup.getContentPane().add(pnl);
+                popup.setDefaultFocusComponent(pnl);
+
+                GUITools.showPopup(popup, SwingConstants.WEST);
+
             });
             btnTAGs.setEnabled(NReportTools.isChangeable(nreport));
             pnlMenu.add(btnTAGs);
@@ -1549,69 +1467,63 @@ public class PnlReport extends NursingRecordsPanel {
              */
             final JButton btnMinutes = GUITools.createHyperlinkButton("nursingrecords.reports.btnminutes.tooltip", SYSConst.icon22clock, null);
             btnMinutes.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnMinutes.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
+            btnMinutes.addActionListener(actionEvent -> {
 
-                    final JPopupMenu menu = SYSCalendar.getMinutesMenu(new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360}, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
+                final JPopupMenu menu = SYSCalendar.getMinutesMenu(new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360}, o -> {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
 
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                NReport myReport = em.merge(nreport);
-                                em.lock(myReport, LockModeType.OPTIMISTIC);
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        NReport myReport = em.merge(nreport);
+                        em.lock(myReport, LockModeType.OPTIMISTIC);
 
-                                myReport.setMinutes((Integer) o);
-                                myReport.setEditedPIT(new Date());
+                        myReport.setMinutes((Integer) o);
+                        myReport.setEditedPIT(new Date());
 
-                                em.getTransaction().commit();
+                        em.getTransaction().commit();
 
-                                final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+                        final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
-                                synchronized (contentmap) {
-                                    contentmap.remove(keyNewDay);
-                                }
-                                synchronized (linemap) {
-                                    linemap.remove(nreport);
-                                }
-
-                                synchronized (valuecache) {
-                                    valuecache.get(keyNewDay).remove(nreport);
-                                    valuecache.get(keyNewDay).add(myReport);
-                                    Collections.sort(valuecache.get(keyNewDay));
-                                }
-
-                                createCP4Day(new LocalDate(myReport.getPit()));
-
-                                buildPanel();
-                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                } else {
-                                    reloadDisplay(true);
-                                }
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
+                        synchronized (contentmap) {
+                            contentmap.remove(keyNewDay);
                         }
-                    });
+                        synchronized (linemap) {
+                            linemap.remove(nreport);
+                        }
 
-                    menu.show(btnMinutes, 0, btnMinutes.getHeight());
-                }
+                        synchronized (valuecache) {
+                            valuecache.get(keyNewDay).remove(nreport);
+                            valuecache.get(keyNewDay).add(myReport);
+                            Collections.sort(valuecache.get(keyNewDay));
+                        }
+
+                        createCP4Day(new LocalDate(myReport.getPit()));
+
+                        buildPanel();
+                        GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        } else {
+                            reloadDisplay(true);
+                        }
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                });
+
+                menu.show(btnMinutes, 0, btnMinutes.getHeight());
             });
             btnMinutes.setEnabled(!nreport.isObsolete() && nreport.isMine());
             pnlMenu.add(btnMinutes);
@@ -1628,40 +1540,35 @@ public class PnlReport extends NursingRecordsPanel {
              */
             final JButton btnFiles = GUITools.createHyperlinkButton("misc.btnfiles.tooltip", SYSConst.icon22attach, null);
             btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnFiles.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    Closure fileHandleClosure = nreport.isObsolete() ? null : new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            final NReport myReport = em.find(NReport.class, nreport.getID());
-                            em.close();
+            btnFiles.addActionListener(actionEvent -> {
+                Closure fileHandleClosure = nreport.isObsolete() ? null : o -> {
+                    EntityManager em = OPDE.createEM();
+                    final NReport myReport = em.find(NReport.class, nreport.getID());
+                    em.close();
 
-                            final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+                    final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
 
-                            synchronized (contentmap) {
-                                contentmap.remove(keyNewDay);
-                            }
-                            synchronized (linemap) {
-                                linemap.remove(nreport);
-                            }
+                    synchronized (contentmap) {
+                        contentmap.remove(keyNewDay);
+                    }
+                    synchronized (linemap) {
+                        linemap.remove(nreport);
+                    }
 
-                            synchronized (valuecache) {
-                                valuecache.get(keyNewDay).remove(nreport);
-                                valuecache.get(keyNewDay).add(myReport);
-                                Collections.sort(valuecache.get(keyNewDay));
-                            }
+                    synchronized (valuecache) {
+                        valuecache.get(keyNewDay).remove(nreport);
+                        valuecache.get(keyNewDay).add(myReport);
+                        Collections.sort(valuecache.get(keyNewDay));
+                    }
 
-                            createCP4Day(new LocalDate(myReport.getPit()));
-
-                            buildPanel();
-                            GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                        }
-                    };
-                    new DlgFiles(nreport, fileHandleClosure);
-                }
+                    createCP4Day(new LocalDate(myReport.getPit()));
+                    currentEditor = null;
+                    buildPanel();
+                    GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                };
+                currentEditor = new DlgFiles(nreport, fileHandleClosure);
+                currentEditor.setVisible(true);
             });
             btnFiles.setEnabled(OPDE.isFTPworking());
             pnlMenu.add(btnFiles);
@@ -1677,105 +1584,102 @@ public class PnlReport extends NursingRecordsPanel {
              */
             final JButton btnProcess = GUITools.createHyperlinkButton("misc.btnprocess.tooltip", SYSConst.icon22link, null);
             btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnProcess.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgProcessAssign(nreport, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o == null) {
-                                return;
+            btnProcess.addActionListener(actionEvent -> {
+                currentEditor = new DlgProcessAssign(nreport, o -> {
+                    if (o == null) {
+                        currentEditor = null;
+                        return;
+                    }
+                    Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                    ArrayList<QProcess> assigned = result.getFirst();
+                    ArrayList<QProcess> unassigned = result.getSecond();
+
+                    EntityManager em = OPDE.createEM();
+
+                    try {
+                        em.getTransaction().begin();
+
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        NReport myReport = em.merge(nreport);
+                        em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                        ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
+                        for (SYSNR2PROCESS linkObject : attached) {
+                            if (unassigned.contains(linkObject.getQProcess())) {
+                                linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.remove(linkObject);
                             }
-                            Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
-
-                            ArrayList<QProcess> assigned = result.getFirst();
-                            ArrayList<QProcess> unassigned = result.getSecond();
-
-                            EntityManager em = OPDE.createEM();
-
-                            try {
-                                em.getTransaction().begin();
-
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                NReport myReport = em.merge(nreport);
-                                em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-
-                                ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
-                                for (SYSNR2PROCESS linkObject : attached) {
-                                    if (unassigned.contains(linkObject.getQProcess())) {
-                                        linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                        linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
-                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
-                                        em.remove(linkObject);
-                                    }
-                                }
-                                attached.clear();
-
-                                for (QProcess qProcess : assigned) {
-                                    java.util.List<QProcessElement> listElements = qProcess.getElements();
-                                    if (!listElements.contains(myReport)) {
-                                        QProcess myQProcess = em.merge(qProcess);
-                                        SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
-                                        qProcess.getAttachedNReportConnections().add(myLinkObject);
-                                        myReport.getAttachedQProcessConnections().add(myLinkObject);
-                                    }
-                                }
-
-                                em.getTransaction().commit();
-
-                                final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-
-
-                                synchronized (contentmap) {
-                                    contentmap.remove(keyNewDay);
-                                }
-                                synchronized (linemap) {
-                                    linemap.remove(nreport);
-                                }
-
-                                synchronized (valuecache) {
-                                    valuecache.get(keyNewDay).remove(nreport);
-                                    valuecache.get(keyNewDay).add(myReport);
-                                    Collections.sort(valuecache.get(keyNewDay));
-                                }
-
-                                createCP4Day(new LocalDate(myReport.getPit()));
-
-                                buildPanel();
-                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                } else {
-                                    reloadDisplay(true);
-                                }
-                            } catch (RollbackException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-
                         }
-                    });
-                }
+                        attached.clear();
+
+                        for (QProcess qProcess : assigned) {
+                            List<QProcessElement> listElements = qProcess.getElements();
+                            if (!listElements.contains(myReport)) {
+                                QProcess myQProcess = em.merge(qProcess);
+                                SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                qProcess.getAttachedNReportConnections().add(myLinkObject);
+                                myReport.getAttachedQProcessConnections().add(myLinkObject);
+                            }
+                        }
+
+                        em.getTransaction().commit();
+
+                        final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+
+
+                        synchronized (contentmap) {
+                            contentmap.remove(keyNewDay);
+                        }
+                        synchronized (linemap) {
+                            linemap.remove(nreport);
+                        }
+
+                        synchronized (valuecache) {
+                            valuecache.get(keyNewDay).remove(nreport);
+                            valuecache.get(keyNewDay).add(myReport);
+                            Collections.sort(valuecache.get(keyNewDay));
+                        }
+
+                        createCP4Day(new LocalDate(myReport.getPit()));
+
+                        buildPanel();
+                        GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        } else {
+                            reloadDisplay(true);
+                        }
+                    } catch (RollbackException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                        currentEditor = null;
+                    }
+
+                });
+                currentEditor.setVisible(true);
             });
             pnlMenu.add(btnProcess);
 

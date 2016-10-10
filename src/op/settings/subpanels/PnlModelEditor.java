@@ -94,6 +94,7 @@ public class PnlModelEditor extends DefaultPanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         cpMap.clear();
         cpsMain.removeAll();
     }

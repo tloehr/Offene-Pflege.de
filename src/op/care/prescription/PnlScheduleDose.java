@@ -896,6 +896,7 @@ public class PnlScheduleDose extends CleanablePanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         SYSTools.unregisterListeners(this);
 //        jdcLDatum.removePropertyChangeListener(jdcpcl);
 //        jdcLDatum.cleanup();

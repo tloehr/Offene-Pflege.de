@@ -49,15 +49,12 @@ public class PnlEditACL extends JPanel {
         add(RiverLayout.PARAGRAPH_BREAK + " " + RiverLayout.HFILL, new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(SYSConst.html_italic(ic.getLongDescription())))));
 
         if (!SYSTools.catchNull(ic.getHelpurl()).isEmpty()) {
-            JideButton helpButton = GUITools.createHyperlinkButton("misc.msg.explain.this.to.me", SYSConst.icon22helpMe, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        URI uri = new URI(SYSTools.xx(ic.getHelpurl()));
-                        Desktop.getDesktop().browse(uri);
-                    } catch (Exception ex) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
-                    }
+            JideButton helpButton = GUITools.createHyperlinkButton("misc.msg.explain.this.to.me", SYSConst.icon22helpMe, e -> {
+                try {
+                    URI uri = new URI(SYSTools.xx(ic.getHelpurl()));
+                    Desktop.getDesktop().browse(uri);
+                } catch (Exception ex) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
                 }
             });
             helpButton.setFont(SYSConst.ARIAL14ITALIC);
@@ -73,41 +70,38 @@ public class PnlEditACL extends JPanel {
             // The CB should be selected if (and only if) the IntClass (with the fitting internalClassesID) is assigned to the group and
             // a ACL is assigned to the SYSGROUPS2ACL object with the same SHORT code for the acl.
             cbACL.setSelected(SYSGROUPS2ACLTools.findACLbyCODE(sysgroups2ACL, possibleACL.getACLcode()) != null);
-            cbACL.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent itemEvent) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
+            cbACL.addItemListener(itemEvent -> {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
 
-                        SYSGROUPS2ACL mySYSGROUPS2ACL = em.merge(sysgroups2ACL);
-                        em.lock(mySYSGROUPS2ACL, LockModeType.OPTIMISTIC);
+                    SYSGROUPS2ACL mySYSGROUPS2ACL = em.merge(sysgroups2ACL);
+                    em.lock(mySYSGROUPS2ACL, LockModeType.OPTIMISTIC);
 
-                        if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                            mySYSGROUPS2ACL.getAclCollection().add(em.merge(new Acl(possibleACL.getACLcode(), mySYSGROUPS2ACL)));
-                        } else {
-                            Acl myAcl = em.merge(SYSGROUPS2ACLTools.findACLbyCODE(mySYSGROUPS2ACL, possibleACL.getACLcode()));
-                            mySYSGROUPS2ACL.getAclCollection().remove(myAcl);
-                            em.remove(myAcl);
-                        }
-                        em.getTransaction().commit();
-
-                        sysgroups2ACL = mySYSGROUPS2ACL;
-
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
+                    if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                        mySYSGROUPS2ACL.getAclCollection().add(em.merge(new Acl(possibleACL.getACLcode(), mySYSGROUPS2ACL)));
+                    } else {
+                        Acl myAcl = em.merge(SYSGROUPS2ACLTools.findACLbyCODE(mySYSGROUPS2ACL, possibleACL.getACLcode()));
+                        mySYSGROUPS2ACL.getAclCollection().remove(myAcl);
+                        em.remove(myAcl);
                     }
+                    em.getTransaction().commit();
+
+                    sysgroups2ACL = mySYSGROUPS2ACL;
+
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
                 }
             });
             add(RiverLayout.PARAGRAPH_BREAK+ " "+ RiverLayout.VTOP, cbACL);

@@ -47,17 +47,14 @@ public class DlgProcess extends MyJDialog {
         cmbPCat.setSelectedIndex(0);
 
 
-        cmbResident.setRenderer(new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTMLForScreen("<i>" + SYSTools.xx("nursingrecords.qprocesses.commonprocess") + "</i>");
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+        cmbResident.setRenderer((jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTMLForScreen("<i>" + SYSTools.xx("nursingrecords.qprocesses.commonprocess") + "</i>");
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         });
         if (qProcess.isCommon()) {
             EntityManager em = OPDE.createEM();
@@ -168,22 +165,12 @@ public class DlgProcess extends MyJDialog {
 
                 //---- btnCancel ----
                 btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                btnCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCancelActionPerformed(e);
-                    }
-                });
+                btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
                 panel2.add(btnCancel);
 
                 //---- btnApply ----
                 btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                btnApply.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnApplyActionPerformed(e);
-                    }
-                });
+                btnApply.addActionListener(e -> btnApplyActionPerformed(e));
                 panel2.add(btnApply);
             }
             pnlDetails.add(panel2, CC.xy(6, 14, CC.RIGHT, CC.DEFAULT));

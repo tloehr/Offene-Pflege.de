@@ -209,55 +209,51 @@ public class PnlMX extends CleanablePanel {
              *
              */
             JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.msg.delete"), SYSConst.icon22delete);
-            itemPopupDelete.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(currentMessageInEditor.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                        @Override
-                        public void execute(Object answer) {
-                            if (answer.equals(JOptionPane.YES_OPTION)) {
+            itemPopupDelete.addActionListener(actionEvent -> {
+                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(currentMessageInEditor.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
+                    if (answer.equals(JOptionPane.YES_OPTION)) {
 
 
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    final MXmsg myMessage = em.merge(currentMessageInEditor);
-                                    em.lock(myMessage, LockModeType.OPTIMISTIC);
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            final MXmsg myMessage = em.merge(currentMessageInEditor);
+                            em.lock(myMessage, LockModeType.OPTIMISTIC);
 
-                                    if (myMessage.getSender().equals(OPDE.getMe())) {
-                                        // my message ? then delete it
-                                        em.remove(myMessage);
-                                    } else {
-                                        // FOR me ? mark it as trashed
-                                        final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
-                                        em.lock(myRCP, LockModeType.OPTIMISTIC);
-                                        myRCP.setTrashed(true);
-                                    }
-
-                                    em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.msg.trashed")));
-
-                                    displayMessage(null);
-
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    reload();
-                                } catch (Exception ex) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(ex);
-                                } finally {
-                                    em.close();
-                                }
+                            if (myMessage.getSender().equals(OPDE.getMe())) {
+                                // my message ? then delete it
+                                em.remove(myMessage);
+                            } else {
+                                // FOR me ? mark it as trashed
+                                final MXrecipient myRCP = em.merge(MXrecipientTools.findMXrecipient(myMessage, OPDE.getMe()));
+                                em.lock(myRCP, LockModeType.OPTIMISTIC);
+                                myRCP.setTrashed(true);
                             }
+
+                            em.getTransaction().commit();
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("mx.msg.trashed")));
+
+                            displayMessage(null);
+
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            reload();
+                        } catch (Exception ex) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(ex);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
                         }
-                    });
-                }
+                    }
+                });
+                currentEditor.setVisible(true);
             });
 
             itemPopupDelete.setEnabled(
@@ -314,6 +310,7 @@ public class PnlMX extends CleanablePanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         tmmsgs.cleanup();
     }
 

@@ -19,20 +19,17 @@ import java.util.ArrayList;
 public class GPTools {
 
     public static ListCellRenderer getRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.xx("misc.commands.>>noselection<<");
-                } else if (o instanceof GP) {
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.xx("misc.commands.>>noselection<<");
+            } else if (o instanceof GP) {
 //                    text = ((GP) o).getName() + ", " + ((GP) o).getFirstname() + ", " + ((GP) o).getCity();
-                    text = getFullName((GP) o);
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+                text = getFullName((GP) o);
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 

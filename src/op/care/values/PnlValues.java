@@ -51,15 +51,12 @@ import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
-import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.util.*;
@@ -160,49 +157,43 @@ public class PnlValues extends NursingRecordsPanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        JideButton controlButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.vitalparameters.btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (!resident.isActive()) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
-                    return;
-                }
-                new DlgValueControl(resident, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Resident myResident = em.merge(resident);
-                                em.lock(myResident, LockModeType.OPTIMISTIC);
-                                myResident.setControlling((Properties) o);
-                                em.getTransaction().commit();
-
-                                resident = myResident;
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-
-                        }
-                    }
-                });
+        JideButton controlButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.vitalparameters.btnControlling.tooltip"), SYSConst.icon22magnify1, actionEvent -> {
+            if (!resident.isActive()) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                return;
             }
+            new DlgValueControl(resident, o -> {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Resident myResident = em.merge(resident);
+                        em.lock(myResident, LockModeType.OPTIMISTIC);
+                        myResident.setControlling((Properties) o);
+                        em.getTransaction().commit();
+
+                        resident = myResident;
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+                }
+            });
         });
         list.add(controlButton);
 
@@ -278,14 +269,11 @@ public class PnlValues extends NursingRecordsPanel {
         final String keyType = vtype.getID() + ".xtypes";
         final CollapsiblePane cpType = getCP(keyType);
 
-        final DefaultCPTitle cptitle = new DefaultCPTitle(vtype.getText(), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpType.setCollapsed(!cpType.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        final DefaultCPTitle cptitle = new DefaultCPTitle(vtype.getText(), e -> {
+            try {
+                cpType.setCollapsed(!cpType.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
         cptitle.getButton().setFont(SYSConst.ARIAL24);
@@ -311,12 +299,7 @@ public class PnlValues extends NursingRecordsPanel {
             btnAdd.setContentAreaFilled(false);
             btnAdd.setBorder(null);
             btnAdd.setToolTipText(SYSTools.xx("nursingrecords.vitalparameters.btnAdd.tooltip") + " (" + vtype.getText() + ")");
-            btnAdd.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    addValue(vtype);
-                }
-            });
+            btnAdd.addActionListener(actionEvent -> addValue(vtype));
             cptitle.getRight().add(btnAdd);
             btnAdd.setEnabled(resident.isActive());
         }
@@ -364,12 +347,7 @@ public class PnlValues extends NursingRecordsPanel {
              */
             final JideButton btnAdd = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.vitalparameters.btnAdd.tooltip") + " (" + vtype.getText() + ")", SYSConst.icon22add, null);
             btnAdd.setOpaque(false);
-            btnAdd.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addValue(vtype);
-                }
-            });
+            btnAdd.addActionListener(e -> addValue(vtype));
             pnlContent.add(btnAdd);
             btnAdd.setEnabled(resident.isActive());
         }
@@ -386,14 +364,11 @@ public class PnlValues extends NursingRecordsPanel {
         final String keyYears = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
         final CollapsiblePane cpYear = getCP(keyYears);
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(Integer.toString(year), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpYear.setCollapsed(!cpYear.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(Integer.toString(year), e -> {
+            try {
+                cpYear.setCollapsed(!cpYear.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -409,14 +384,11 @@ public class PnlValues extends NursingRecordsPanel {
             btnPrintYear.setContentAreaFilled(false);
             btnPrintYear.setBorder(null);
             btnPrintYear.setToolTipText(SYSTools.xx("misc.tooltips.btnprintyear"));
-            btnPrintYear.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (!mapType2Values.containsKey(keyYears)) {
-                        mapType2Values.put(keyYears, ResValueTools.getResValues(resident, vtype, year));
-                    }
-                    SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(mapType2Values.get(keyYears))), true);
+            btnPrintYear.addActionListener(actionEvent -> {
+                if (!mapType2Values.containsKey(keyYears)) {
+                    mapType2Values.put(keyYears, ResValueTools.getResValues(resident, vtype, year));
                 }
+                SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(mapType2Values.get(keyYears))), true);
             });
             cptitle.getRight().add(btnPrintYear);
         }
@@ -500,12 +472,7 @@ public class PnlValues extends NursingRecordsPanel {
                 pnlTitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22info));
             }
             if (pnlTitle.getAdditionalIconPanel().getComponentCount() > 0) {
-                pnlTitle.getButton().addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        GUITools.showPopup(GUITools.getHTMLPopup(pnlTitle.getButton(), ResValueTools.getInfoAsHTML(resValue)), SwingConstants.NORTH);
-                    }
-                });
+                pnlTitle.getButton().addActionListener(e -> GUITools.showPopup(GUITools.getHTMLPopup(pnlTitle.getButton(), ResValueTools.getInfoAsHTML(resValue)), SwingConstants.NORTH));
             }
 
 
@@ -530,27 +497,22 @@ public class PnlValues extends NursingRecordsPanel {
                 btnFiles.setContentAreaFilled(false);
                 btnFiles.setBorder(null);
 
-                btnFiles.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgFiles(resValue, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                EntityManager em = OPDE.createEM();
-                                final ResValue myValue = em.find(ResValue.class, resValue.getID());
-                                em.close();
+                btnFiles.addActionListener(actionEvent -> {
+                    currentEditor = new DlgFiles(resValue, o -> {
+                        EntityManager em = OPDE.createEM();
+                        final ResValue myValue = em.find(ResValue.class, resValue.getID());
+                        em.close();
 
-                                synchronized (mapType2Values) {
-                                    mapType2Values.get(keyYears).remove(resValue);
-                                    mapType2Values.get(keyYears).add(myValue);
-                                    Collections.sort(mapType2Values.get(keyYears));
-                                }
-
-                                createCP4Year(vtype, year);
-                                buildPanel();
-                            }
-                        });
-                    }
+                        synchronized (mapType2Values) {
+                            mapType2Values.get(keyYears).remove(resValue);
+                            mapType2Values.get(keyYears).add(myValue);
+                            Collections.sort(mapType2Values.get(keyYears));
+                        }
+                        currentEditor = null;
+                        createCP4Year(vtype, year);
+                        buildPanel();
+                    });
+                    currentEditor.setVisible(true);
                 });
                 btnFiles.setEnabled(OPDE.isFTPworking());
                 pnlTitle.getRight().add(btnFiles);
@@ -577,93 +539,90 @@ public class PnlValues extends NursingRecordsPanel {
                 btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnProcess.setContentAreaFilled(false);
                 btnProcess.setBorder(null);
-                btnProcess.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgProcessAssign(resValue, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                if (o == null) {
-                                    return;
-                                }
-                                Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+                btnProcess.addActionListener(actionEvent -> {
+                    currentEditor = new DlgProcessAssign(resValue, o -> {
+                        if (o == null) {
+                            currentEditor = null;
+                            return;
+                        }
+                        Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
 
-                                ArrayList<QProcess> assigned = result.getFirst();
-                                ArrayList<QProcess> unassigned = result.getSecond();
+                        ArrayList<QProcess> assigned = result.getFirst();
+                        ArrayList<QProcess> unassigned = result.getSecond();
 
-                                EntityManager em = OPDE.createEM();
+                        EntityManager em = OPDE.createEM();
 
-                                try {
-                                    em.getTransaction().begin();
+                        try {
+                            em.getTransaction().begin();
 
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    ResValue myValue = em.merge(resValue);
-                                    em.lock(myValue, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                            ResValue myValue = em.merge(resValue);
+                            em.lock(myValue, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                    ArrayList<SYSVAL2PROCESS> attached = new ArrayList<SYSVAL2PROCESS>(resValue.getAttachedProcessConnections());
-                                    for (SYSVAL2PROCESS linkObject : attached) {
-                                        if (unassigned.contains(linkObject.getQProcess())) {
-                                            linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                            linkObject.getResValue().getAttachedProcessConnections().remove(linkObject);
-                                            em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
-                                            em.remove(linkObject);
-                                        }
-                                    }
-                                    attached.clear();
-
-                                    for (QProcess qProcess : assigned) {
-                                        java.util.List<QProcessElement> listElements = qProcess.getElements();
-                                        if (!listElements.contains(myValue)) {
-                                            QProcess myQProcess = em.merge(qProcess);
-                                            SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
-                                            em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
-                                            qProcess.getAttachedResValueConnections().add(myLinkObject);
-                                            myValue.getAttachedProcessConnections().add(myLinkObject);
-                                        }
-                                    }
-
-                                    em.getTransaction().commit();
-
-                                    synchronized (mapType2Values) {
-                                        mapType2Values.get(keyYears).remove(resValue);
-                                        mapType2Values.get(keyYears).add(myValue);
-                                        Collections.sort(mapType2Values.get(keyYears));
-                                    }
-                                    createCP4Year(vtype, year);
-
-
-                                    buildPanel();
-
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (RollbackException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
+                            ArrayList<SYSVAL2PROCESS> attached = new ArrayList<SYSVAL2PROCESS>(resValue.getAttachedProcessConnections());
+                            for (SYSVAL2PROCESS linkObject : attached) {
+                                if (unassigned.contains(linkObject.getQProcess())) {
+                                    linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                    linkObject.getResValue().getAttachedProcessConnections().remove(linkObject);
+                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                    em.remove(linkObject);
                                 }
                             }
-                        });
-                    }
+                            attached.clear();
+
+                            for (QProcess qProcess : assigned) {
+                                java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                if (!listElements.contains(myValue)) {
+                                    QProcess myQProcess = em.merge(qProcess);
+                                    SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
+                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                    qProcess.getAttachedResValueConnections().add(myLinkObject);
+                                    myValue.getAttachedProcessConnections().add(myLinkObject);
+                                }
+                            }
+
+                            em.getTransaction().commit();
+
+                            synchronized (mapType2Values) {
+                                mapType2Values.get(keyYears).remove(resValue);
+                                mapType2Values.get(keyYears).add(myValue);
+                                Collections.sort(mapType2Values.get(keyYears));
+                            }
+                            createCP4Year(vtype, year);
+
+
+                            buildPanel();
+
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (RollbackException ole) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
+                        }
+                    });
+                    currentEditor.setVisible(true);
                 });
                 btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
                 pnlTitle.getRight().add(btnProcess);
@@ -683,20 +642,17 @@ public class PnlValues extends NursingRecordsPanel {
             btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnMenu.setContentAreaFilled(false);
             btnMenu.setBorder(null);
-            btnMenu.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JidePopup popup = new JidePopup();
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    popup.setOwner(btnMenu);
-                    popup.removeExcludedComponent(btnMenu);
-                    JPanel pnl = getMenu(resValue);
-                    popup.getContentPane().add(pnl);
-                    popup.setDefaultFocusComponent(pnl);
+            btnMenu.addActionListener(e -> {
+                JidePopup popup = new JidePopup();
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(btnMenu);
+                popup.removeExcludedComponent(btnMenu);
+                JPanel pnl = getMenu(resValue);
+                popup.getContentPane().add(pnl);
+                popup.setDefaultFocusComponent(pnl);
 
-                    GUITools.showPopup(popup, SwingConstants.WEST);
-                }
+                GUITools.showPopup(popup, SwingConstants.WEST);
             });
             btnMenu.setEnabled(!resValue.isObsolete());
             pnlTitle.getRight().add(btnMenu);
@@ -711,6 +667,7 @@ public class PnlValues extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         cpsValues.removeAll();
         synchronized (linemap) {
             linemap.clear();
@@ -761,89 +718,81 @@ public class PnlValues extends NursingRecordsPanel {
              */
             final JButton btnEdit = GUITools.createHyperlinkButton("nursingrecords.vitalparameters.btnEdit.tooltip", SYSConst.icon22edit3, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnEdit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgValue(resValue.clone(), DlgValue.MODE_EDIT, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
+            btnEdit.addActionListener(actionEvent -> new DlgValue(resValue.clone(), DlgValue.MODE_EDIT, o -> {
+                if (o != null) {
 
-                                EntityManager em = OPDE.createEM();
-                                try {
+                    EntityManager em = OPDE.createEM();
+                    try {
 
-                                    em.getTransaction().begin();
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    final ResValue newValue = em.merge((ResValue) o);
-                                    ResValue oldValue = em.merge(resValue);
+                        em.getTransaction().begin();
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        final ResValue newValue = em.merge((ResValue) o);
+                        ResValue oldValue = em.merge(resValue);
 
-                                    em.lock(oldValue, LockModeType.OPTIMISTIC);
-                                    newValue.setReplacementFor(oldValue);
+                        em.lock(oldValue, LockModeType.OPTIMISTIC);
+                        newValue.setReplacementFor(oldValue);
 
-                                    for (SYSVAL2FILE oldAssignment : oldValue.getAttachedFilesConnections()) {
-                                        em.remove(oldAssignment);
-                                    }
-                                    oldValue.getAttachedFilesConnections().clear();
-                                    for (SYSVAL2PROCESS oldAssignment : oldValue.getAttachedProcessConnections()) {
-                                        em.remove(oldAssignment);
-                                    }
-                                    oldValue.getAttachedProcessConnections().clear();
-
-                                    oldValue.setEditedBy(em.merge(OPDE.getLogin().getUser()));
-                                    oldValue.setEditDate(new Date());
-                                    oldValue.setReplacedBy(newValue);
-
-                                    em.getTransaction().commit();
-
-                                    DateTime dt = new DateTime(newValue.getPit());
-                                    final String keyType = vtype.getID() + ".xtypes";
-                                    final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-
-                                    synchronized (mapType2Values) {
-                                        mapType2Values.get(key).remove(resValue);
-                                        mapType2Values.get(key).add(oldValue);
-                                        mapType2Values.get(key).add(newValue);
-                                        Collections.sort(mapType2Values.get(key));
-                                    }
-
-                                    createCP4Year(vtype, dt.getYear());
-
-                                    try {
-                                        synchronized (cpMap) {
-                                            cpMap.get(keyType).setCollapsed(false);
-                                            cpMap.get(key).setCollapsed(false);
-                                        }
-                                    } catch (PropertyVetoException e) {
-                                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                    }
-
-                                    buildPanel();
-
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-
-
-                            }
+                        for (SYSVAL2FILE oldAssignment : oldValue.getAttachedFilesConnections()) {
+                            em.remove(oldAssignment);
                         }
-                    });
+                        oldValue.getAttachedFilesConnections().clear();
+                        for (SYSVAL2PROCESS oldAssignment : oldValue.getAttachedProcessConnections()) {
+                            em.remove(oldAssignment);
+                        }
+                        oldValue.getAttachedProcessConnections().clear();
+
+                        oldValue.setEditedBy(em.merge(OPDE.getLogin().getUser()));
+                        oldValue.setEditDate(new Date());
+                        oldValue.setReplacedBy(newValue);
+
+                        em.getTransaction().commit();
+
+                        DateTime dt = new DateTime(newValue.getPit());
+                        final String keyType = vtype.getID() + ".xtypes";
+                        final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+
+                        synchronized (mapType2Values) {
+                            mapType2Values.get(key).remove(resValue);
+                            mapType2Values.get(key).add(oldValue);
+                            mapType2Values.get(key).add(newValue);
+                            Collections.sort(mapType2Values.get(key));
+                        }
+
+                        createCP4Year(vtype, dt.getYear());
+
+                        try {
+                            synchronized (cpMap) {
+                                cpMap.get(keyType).setCollapsed(false);
+                                cpMap.get(key).setCollapsed(false);
+                            }
+                        } catch (PropertyVetoException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
+
+                        buildPanel();
+
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+
                 }
-            });
+            }));
             btnEdit.setEnabled(!resValue.isObsolete());
             pnlMenu.add(btnEdit);
 
@@ -857,83 +806,77 @@ public class PnlValues extends NursingRecordsPanel {
              */
             final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.vitalparameters.btnDelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnDelete.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance().format(resValue.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o.equals(JOptionPane.YES_OPTION)) {
+            btnDelete.addActionListener(actionEvent -> {
+                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance().format(resValue.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, o -> {
+                    if (o.equals(JOptionPane.YES_OPTION)) {
 
-                                EntityManager em = OPDE.createEM();
-                                try {
+                        EntityManager em = OPDE.createEM();
+                        try {
 
-                                    em.getTransaction().begin();
+                            em.getTransaction().begin();
 
-                                    ResValue myValue = em.merge(resValue);
-                                    myValue.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
+                            ResValue myValue = em.merge(resValue);
+                            myValue.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
 
-                                    for (SYSVAL2FILE file : myValue.getAttachedFilesConnections()) {
-                                        em.remove(file);
-                                    }
-                                    myValue.getAttachedFilesConnections().clear();
-
-                                    // Vorgangszuordnungen entfernen
-                                    for (SYSVAL2PROCESS connObj : myValue.getAttachedProcessConnections()) {
-                                        em.remove(connObj);
-                                    }
-                                    myValue.getAttachedProcessConnections().clear();
-                                    myValue.getAttachedProcesses().clear();
-                                    em.getTransaction().commit();
-
-                                    DateTime dt = new DateTime(myValue.getPit());
-                                    final String keyType = vtype.getID() + ".xtypes";
-
-                                    final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-
-                                    synchronized (mapType2Values) {
-                                        mapType2Values.get(key).remove(resValue);
-                                        mapType2Values.get(key).add(myValue);
-                                        Collections.sort(mapType2Values.get(key));
-                                    }
-
-                                    createCP4Year(vtype, dt.getYear());
-
-                                    try {
-                                        synchronized (cpMap) {
-                                            cpMap.get(keyType).setCollapsed(false);
-                                            cpMap.get(key).setCollapsed(false);
-                                        }
-                                    } catch (PropertyVetoException e) {
-                                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                    }
-
-                                    buildPanel();
-
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-
-
+                            for (SYSVAL2FILE file : myValue.getAttachedFilesConnections()) {
+                                em.remove(file);
                             }
+                            myValue.getAttachedFilesConnections().clear();
+
+                            // Vorgangszuordnungen entfernen
+                            for (SYSVAL2PROCESS connObj : myValue.getAttachedProcessConnections()) {
+                                em.remove(connObj);
+                            }
+                            myValue.getAttachedProcessConnections().clear();
+                            myValue.getAttachedProcesses().clear();
+                            em.getTransaction().commit();
+
+                            DateTime dt = new DateTime(myValue.getPit());
+                            final String keyType = vtype.getID() + ".xtypes";
+
+                            final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+
+                            synchronized (mapType2Values) {
+                                mapType2Values.get(key).remove(resValue);
+                                mapType2Values.get(key).add(myValue);
+                                Collections.sort(mapType2Values.get(key));
+                            }
+
+                            createCP4Year(vtype, dt.getYear());
+
+                            try {
+                                synchronized (cpMap) {
+                                    cpMap.get(keyType).setCollapsed(false);
+                                    cpMap.get(key).setCollapsed(false);
+                                }
+                            } catch (PropertyVetoException e) {
+                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            }
+
+                            buildPanel();
+
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
                         }
-                    });
-                }
+                    }
+                });
+                currentEditor.setVisible(true);
             });
             btnDelete.setEnabled(!resValue.isObsolete());
             pnlMenu.add(btnDelete);
@@ -951,29 +894,24 @@ public class PnlValues extends NursingRecordsPanel {
 
             final JButton btnFiles = GUITools.createHyperlinkButton("misc.btnfiles.tooltip", SYSConst.icon22attach, null);
             btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnFiles.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgFiles(resValue, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            final ResValue myValue = em.find(ResValue.class, resValue.getID());
-                            em.close();
+            btnFiles.addActionListener(actionEvent -> {
+                currentEditor = new DlgFiles(resValue, o -> {
+                    EntityManager em = OPDE.createEM();
+                    final ResValue myValue = em.find(ResValue.class, resValue.getID());
+                    em.close();
 
-                            DateTime dt = new DateTime(myValue.getPit());
-                            final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                    DateTime dt = new DateTime(myValue.getPit());
+                    final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
-                            synchronized (mapType2Values) {
-                                mapType2Values.get(key).remove(resValue);
-                                mapType2Values.get(key).add(myValue);
-                                Collections.sort(mapType2Values.get(key));
-                            }
-
-                            buildPanel();
-                        }
-                    });
-                }
+                    synchronized (mapType2Values) {
+                        mapType2Values.get(key).remove(resValue);
+                        mapType2Values.get(key).add(myValue);
+                        Collections.sort(mapType2Values.get(key));
+                    }
+                    currentEditor = null;
+                    buildPanel();
+                });
+                currentEditor.setVisible(true);
             });
             btnFiles.setEnabled(!resValue.isObsolete() && OPDE.isFTPworking());
             pnlMenu.add(btnFiles);
@@ -988,97 +926,94 @@ public class PnlValues extends NursingRecordsPanel {
              */
             final JButton btnProcess = GUITools.createHyperlinkButton("misc.btnprocess.tooltip", SYSConst.icon22link, null);
             btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnProcess.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgProcessAssign(resValue, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o == null) {
-                                return;
-                            }
-                            Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+            btnProcess.addActionListener(actionEvent -> {
+                currentEditor = new DlgProcessAssign(resValue, o -> {
+                    if (o == null) {
+                        currentEditor = null;
+                        return;
+                    }
+                    Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
 
-                            ArrayList<QProcess> assigned = result.getFirst();
-                            ArrayList<QProcess> unassigned = result.getSecond();
+                    ArrayList<QProcess> assigned = result.getFirst();
+                    ArrayList<QProcess> unassigned = result.getSecond();
 
-                            EntityManager em = OPDE.createEM();
+                    EntityManager em = OPDE.createEM();
 
-                            try {
-                                em.getTransaction().begin();
+                    try {
+                        em.getTransaction().begin();
 
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                ResValue myValue = em.merge(resValue);
-                                em.lock(myValue, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        ResValue myValue = em.merge(resValue);
+                        em.lock(myValue, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                ArrayList<SYSVAL2PROCESS> attached = new ArrayList<SYSVAL2PROCESS>(resValue.getAttachedProcessConnections());
-                                for (SYSVAL2PROCESS linkObject : attached) {
-                                    if (unassigned.contains(linkObject.getQProcess())) {
-                                        linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                        linkObject.getResValue().getAttachedProcessConnections().remove(linkObject);
-                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
-                                        em.remove(linkObject);
-                                    }
-                                }
-                                attached.clear();
-
-                                for (QProcess qProcess : assigned) {
-                                    java.util.List<QProcessElement> listElements = qProcess.getElements();
-                                    if (!listElements.contains(myValue)) {
-                                        QProcess myQProcess = em.merge(qProcess);
-                                        SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
-                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
-                                        qProcess.getAttachedResValueConnections().add(myLinkObject);
-                                        myValue.getAttachedProcessConnections().add(myLinkObject);
-                                    }
-                                }
-
-                                em.getTransaction().commit();
-
-                                DateTime dt = new DateTime(myValue.getPit());
-                                final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-
-                                synchronized (mapType2Values) {
-                                    mapType2Values.get(key).remove(resValue);
-                                    mapType2Values.get(key).add(myValue);
-                                    Collections.sort(mapType2Values.get(key));
-                                }
-
-                                createCP4Year(vtype, dt.getYear());
-
-                                buildPanel();
-                                //GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
-
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (RollbackException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
+                        ArrayList<SYSVAL2PROCESS> attached = new ArrayList<>(resValue.getAttachedProcessConnections());
+                        for (SYSVAL2PROCESS linkObject : attached) {
+                            if (unassigned.contains(linkObject.getQProcess())) {
+                                linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                linkObject.getResValue().getAttachedProcessConnections().remove(linkObject);
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.remove(linkObject);
                             }
                         }
-                    });
-                }
+                        attached.clear();
+
+                        for (QProcess qProcess : assigned) {
+                            java.util.List<QProcessElement> listElements = qProcess.getElements();
+                            if (!listElements.contains(myValue)) {
+                                QProcess myQProcess = em.merge(qProcess);
+                                SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                qProcess.getAttachedResValueConnections().add(myLinkObject);
+                                myValue.getAttachedProcessConnections().add(myLinkObject);
+                            }
+                        }
+
+                        em.getTransaction().commit();
+
+                        DateTime dt = new DateTime(myValue.getPit());
+                        final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+
+                        synchronized (mapType2Values) {
+                            mapType2Values.get(key).remove(resValue);
+                            mapType2Values.get(key).add(myValue);
+                            Collections.sort(mapType2Values.get(key));
+                        }
+
+                        createCP4Year(vtype, dt.getYear());
+
+                        buildPanel();
+                        //GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
+
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (RollbackException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                        currentEditor = null;
+                    }
+                });
+                currentEditor.setVisible(true);
             });
             btnProcess.setEnabled(!resValue.isObsolete());
             pnlMenu.add(btnProcess);
@@ -1109,99 +1044,91 @@ public class PnlValues extends NursingRecordsPanel {
 
         final String keyType = vtype.getID() + ".xtypes";
 
-        new DlgValue(new ResValue(resident, vtype), DlgValue.MODE_NEW, new Closure() {
-            @Override
-            public void execute(Object o) {
-                ResValue myValue = null;
+        new DlgValue(new ResValue(resident, vtype), DlgValue.MODE_NEW, o -> {
+            ResValue myValue = null;
 
-                if (o != null) {
+            if (o != null) {
 
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        myValue = em.merge((ResValue) o);
-                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                        em.getTransaction().commit();
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    myValue = em.merge((ResValue) o);
+                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                    em.getTransaction().commit();
 
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
+                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
+                }
 
-                    if (myValue != null) {
+                if (myValue != null) {
 
-                        DateTime dt = new DateTime(myValue.getPit());
+                    DateTime dt = new DateTime(myValue.getPit());
 
 //                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day";
-                        final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                    final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 //                        final LocalDate week = SYSCalendar.max(SYSCalendar.bow(dt.toLocalDate()), new LocalDate(dt.getYear(), 1, 1));
 //                        final String keyWeek = vtype.getID() + ".xtypes." + week + ".week";
 
-                        synchronized (mapType2Values) {
+                    synchronized (mapType2Values) {
 
-                            if (!mapType2Values.containsKey(keyYear)) {
-                                mapType2Values.put(keyYear, ResValueTools.getResValues(resident, vtype, dt.getYear()));
-                            }
+                        if (!mapType2Values.containsKey(keyYear)) {
+                            mapType2Values.put(keyYear, ResValueTools.getResValues(resident, vtype, dt.getYear()));
+                        }
 
-                            if (!mapType2Values.get(keyYear).contains(myValue)) {
-                                mapType2Values.get(keyYear).add(myValue);
-                                Collections.sort(mapType2Values.get(keyYear));
-                            }
+                        if (!mapType2Values.get(keyYear).contains(myValue)) {
+                            mapType2Values.get(keyYear).add(myValue);
+                            Collections.sort(mapType2Values.get(keyYear));
+                        }
 //                            }
-                        }
-
-                        try {
-                            // eh ?
-                            synchronized (cpMap) {
-                                cpMap.get(keyType).setCollapsible(true);
-
-
-                                if (cpMap.get(keyType).isCollapsed()) {
-                                    cpMap.get(keyType).setCollapsed(false);
-                                }
-                                if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
-                                    cpMap.get(keyYear).setCollapsed(false);
-                                }
-
-
-                            }
-                        } catch (PropertyVetoException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                        }
-
-
-                        createCP4Type(vtype);
-
-                        buildPanel();
-
-                        final ResValue myValueCopy = myValue;
-                        synchronized (linemap) {
-                            GUITools.scroll2show(jspValues, linemap.get(myValueCopy), cpsValues, new Closure() {
-                                @Override
-                                public void execute(Object o) {
-                                    GUITools.flashBackground(linemap.get(myValueCopy), Color.YELLOW, 2);
-                                }
-                            });
-                        }
-
                     }
-                }
 
+                    try {
+                        // eh ?
+                        synchronized (cpMap) {
+                            cpMap.get(keyType).setCollapsible(true);
+
+
+                            if (cpMap.get(keyType).isCollapsed()) {
+                                cpMap.get(keyType).setCollapsed(false);
+                            }
+                            if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
+                                cpMap.get(keyYear).setCollapsed(false);
+                            }
+
+
+                        }
+                    } catch (PropertyVetoException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+
+
+                    createCP4Type(vtype);
+
+                    buildPanel();
+
+                    final ResValue myValueCopy = myValue;
+                    synchronized (linemap) {
+                        GUITools.scroll2show(jspValues, linemap.get(myValueCopy), cpsValues, o1 -> GUITools.flashBackground(linemap.get(myValueCopy), Color.YELLOW, 2));
+                    }
+
+                }
             }
+
         });
     }
 

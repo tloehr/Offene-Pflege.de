@@ -91,6 +91,7 @@ public class PnlWelcome extends CleanablePanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         cpsWelcome.removeAll();
 
         SYSTools.clear(unreadMsgList);
@@ -151,12 +152,9 @@ public class PnlWelcome extends CleanablePanel {
                     // bah!
                 }
 
-                JideButton progButton = GUITools.createHyperlinkButton(shortDescription, icon, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        OPDE.getMainframe().clearPreviousProgbutton();
-                        OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel(javaclass));
-                    }
+                JideButton progButton = GUITools.createHyperlinkButton(shortDescription, icon, actionEvent -> {
+                    OPDE.getMainframe().clearPreviousProgbutton();
+                    OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel(javaclass));
                 });
                 progButton.setFont(SYSConst.ARIAL20);
                 progButton.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:150px;\">" + longDescription + "</p>"));
@@ -358,13 +356,10 @@ public class PnlWelcome extends CleanablePanel {
                 "</table>" +
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().clearPreviousProgbutton();
-                OPDE.getMainframe().setCurrentResident(resident);
-                OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
-            }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setCurrentResident(resident);
+            OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
         });
 //        cptitle.getTitleButton().setCursor(null);
 
@@ -385,13 +380,10 @@ public class PnlWelcome extends CleanablePanel {
                 + "]"
         );
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().clearPreviousProgbutton();
-                OPDE.getMainframe().setCurrentResident(null);
-                OPDE.getMainframe().setPanelTo(new PnlControlling(jspSearch, due.getQmsplan()));
-            }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setCurrentResident(null);
+            OPDE.getMainframe().setPanelTo(new PnlControlling(jspSearch, due.getQmsplan()));
         });
 
         return cptitle;
@@ -449,13 +441,10 @@ public class PnlWelcome extends CleanablePanel {
         title += "</table>" +
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().clearPreviousProgbutton();
-                OPDE.getMainframe().setCurrentResident(resident);
-                OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
-            }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setCurrentResident(resident);
+            OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
         });
 
         if (ResInfoTools.isAway(resident)) {
@@ -486,13 +475,10 @@ public class PnlWelcome extends CleanablePanel {
                 "</table>" +
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().clearPreviousProgbutton();
-                OPDE.getMainframe().setCurrentResident(resident);
-                OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
-            }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setCurrentResident(resident);
+            OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
         });
 //        cptitle.getTitleButton().setCursor(null);
 
@@ -554,13 +540,10 @@ public class PnlWelcome extends CleanablePanel {
 
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().clearPreviousProgbutton();
-                OPDE.getMainframe().setCurrentResident(stock.getInventory().getResident());
-                OPDE.getMainframe().setPanelTo(new PnlCare(stock.getInventory().getResident(), jspSearch));
-            }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setCurrentResident(stock.getInventory().getResident());
+            OPDE.getMainframe().setPanelTo(new PnlCare(stock.getInventory().getResident(), jspSearch));
         });
 
         return cptitle;
@@ -572,18 +555,15 @@ public class PnlWelcome extends CleanablePanel {
 
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
-                "<td width=\"600\" align=\"left\">" + subject + " (" + SYSTools.xx("misc.msg.from") + ": " + UsersTools.getFullnameWithID(msg.getSender()) + ", "+DateFormat.getDateTimeInstance().format(msg.getPit())+")</td>" +
+                "<td width=\"600\" align=\"left\">" + subject + " (" + SYSTools.xx("misc.msg.from") + ": " + UsersTools.getFullnameWithID(msg.getSender()) + ", " + DateFormat.getDateTimeInstance().format(msg.getPit()) + ")</td>" +
                 "</tr>" +
                 "</table>" +
 
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().clearPreviousProgbutton();
-                OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel("op.mx.PnlMX"));
-            }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel("op.mx.PnlMX"));
         });
 
         return cptitle;
@@ -700,22 +680,16 @@ public class PnlWelcome extends CleanablePanel {
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
 
             addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
-            addbw.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    final MyJDialog dlg = new MyJDialog(false);
-                    WizardDialog wizard = new AddBWWizard(new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            dlg.dispose();
-                            OPDE.getMainframe().completeRefresh();
-                        }
-                    }).getWizard();
-                    dlg.setContentPane(wizard.getContentPane());
-                    dlg.pack();
-                    dlg.setSize(new Dimension(800, 550));
-                    dlg.setVisible(true);
-                }
+            addbw.addActionListener(actionEvent -> {
+                final MyJDialog dlg = new MyJDialog(false);
+                WizardDialog wizard = new AddBWWizard(o -> {
+                    dlg.dispose();
+                    OPDE.getMainframe().completeRefresh();
+                }).getWizard();
+                dlg.setContentPane(wizard.getContentPane());
+                dlg.pack();
+                dlg.setSize(new Dimension(800, 550));
+                dlg.setVisible(true);
             });
             list.add(addbw);
         }
@@ -725,12 +699,9 @@ public class PnlWelcome extends CleanablePanel {
             JideButton editInterventions = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome.editInterventions"), SYSConst.icon22work, null);
             editInterventions.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editInterventions.setAlignmentX(Component.LEFT_ALIGNMENT);
-            editInterventions.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    DlgIntervention dlgIntervention = new DlgIntervention();
-                    dlgIntervention.setVisible(true);
-                }
+            editInterventions.addActionListener(actionEvent -> {
+                DlgIntervention dlgIntervention = new DlgIntervention();
+                dlgIntervention.setVisible(true);
             });
             list.add(editInterventions);
         }

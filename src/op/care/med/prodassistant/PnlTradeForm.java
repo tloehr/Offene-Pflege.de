@@ -72,12 +72,7 @@ public class PnlTradeForm extends JPanel {
         Query query = em.createQuery(" SELECT m FROM DosageForm m ");
 
         java.util.List listDosageForm = query.getResultList();
-        Collections.sort(listDosageForm, new Comparator<Object>() {
-            @Override
-            public int compare(Object us, Object them) {
-                return DosageFormTools.toPrettyString((DosageForm) us).compareTo(DosageFormTools.toPrettyString((DosageForm) them));
-            }
-        });
+        Collections.sort(listDosageForm, (us, them) -> DosageFormTools.toPrettyString((DosageForm) us).compareTo(DosageFormTools.toPrettyString((DosageForm) them)));
 
         cmbFormen.setModel(SYSTools.list2cmb(listDosageForm));
         cmbFormen.setRenderer(DosageFormTools.getRenderer(0));
@@ -155,15 +150,12 @@ public class PnlTradeForm extends JPanel {
     private void btnAddActionPerformed(ActionEvent e) {
         PnlDosageForm pnl = new PnlDosageForm(new DosageForm(0));
 
-        GUITools.showPopup(GUITools.createPanelPopup(pnl, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbFormen.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
-                    dosageForm = (DosageForm) cmbFormen.getSelectedItem();
-                    tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
-                    validate.execute(tradeForm);
-                }
+        GUITools.showPopup(GUITools.createPanelPopup(pnl, o -> {
+            if (o != null) {
+                cmbFormen.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
+                dosageForm = (DosageForm) cmbFormen.getSelectedItem();
+                tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
+                validate.execute(tradeForm);
             }
         }, btnAdd), SwingConstants.SOUTH_WEST);
     }

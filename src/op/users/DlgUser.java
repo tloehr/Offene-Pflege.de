@@ -209,23 +209,13 @@ public class DlgUser extends MyJDialog {
                 //---- btnCancel ----
                 btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
                 btnCancel.setToolTipText("Abbrechen");
-                btnCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCancelActionPerformed(e);
-                    }
-                });
+                btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
                 jPanel3.add(btnCancel);
 
                 //---- btnSave ----
                 btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
                 btnSave.setToolTipText("Sichern");
-                btnSave.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnSaveActionPerformed(e);
-                    }
-                });
+                btnSave.addActionListener(e -> btnSaveActionPerformed(e));
                 jPanel3.add(btnSave);
             }
             jPanel4.add(jPanel3, CC.xywh(5, 13, 2, 1, CC.RIGHT, CC.DEFAULT));

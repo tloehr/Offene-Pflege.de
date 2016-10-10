@@ -144,12 +144,7 @@ public class PnlEditHospital extends PopupPanel {
 
         //---- txtName ----
         txtName.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtName.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtNachnameActionPerformed(e);
-            }
-        });
+        txtName.addActionListener(e -> txtNachnameActionPerformed(e));
         add(txtName, CC.xy(5, 3));
 
         //---- lblStrasse ----
@@ -159,12 +154,7 @@ public class PnlEditHospital extends PopupPanel {
 
         //---- txtStrasse ----
         txtStrasse.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtStrasse.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtStrasseActionPerformed(e);
-            }
-        });
+        txtStrasse.addActionListener(e -> txtStrasseActionPerformed(e));
         add(txtStrasse, CC.xy(5, 5));
 
         //---- lblPLZ ----
@@ -174,12 +164,7 @@ public class PnlEditHospital extends PopupPanel {
 
         //---- txtPLZ ----
         txtPLZ.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtPLZ.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtPLZActionPerformed(e);
-            }
-        });
+        txtPLZ.addActionListener(e -> txtPLZActionPerformed(e));
         add(txtPLZ, CC.xy(5, 7));
 
         //---- lblOrt ----
@@ -189,12 +174,7 @@ public class PnlEditHospital extends PopupPanel {
 
         //---- txtOrt ----
         txtOrt.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtOrt.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtOrtActionPerformed(e);
-            }
-        });
+        txtOrt.addActionListener(e -> txtOrtActionPerformed(e));
         add(txtOrt, CC.xy(5, 9));
 
         //---- lblTel ----
@@ -204,12 +184,7 @@ public class PnlEditHospital extends PopupPanel {
 
         //---- txtTel ----
         txtTel.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtTel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtTelActionPerformed(e);
-            }
-        });
+        txtTel.addActionListener(e -> txtTelActionPerformed(e));
         add(txtTel, CC.xy(5, 11));
 
         //---- lblFax ----
@@ -219,12 +194,7 @@ public class PnlEditHospital extends PopupPanel {
 
         //---- txtFax ----
         txtFax.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtFax.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtFaxActionPerformed(e);
-            }
-        });
+        txtFax.addActionListener(e -> txtFaxActionPerformed(e));
         add(txtFax, CC.xy(5, 13));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

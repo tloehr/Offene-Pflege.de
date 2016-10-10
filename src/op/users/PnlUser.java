@@ -112,12 +112,7 @@ public class PnlUser extends CleanablePanel {
         prepareSearchArea();
         tabMain.setTitleAt(TAB_USER, SYSTools.xx("opde.users.tab.users"));
         tabMain.setTitleAt(TAB_GROUPS, SYSTools.xx("opde.users.tab.groups"));
-        tabMain.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                buildPanel();
-            }
-        });
+        tabMain.addChangeListener(e -> buildPanel());
     }
 
 
@@ -153,6 +148,7 @@ public class PnlUser extends CleanablePanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         lstGroups.clear();
         lstUsers.clear();
         usermap.clear();
@@ -273,12 +269,9 @@ public class PnlUser extends CleanablePanel {
          *
          */
         tbOldUsers = GUITools.getNiceToggleButton(SYSTools.xx("opde.users.showclosedmembers"));
-        tbOldUsers.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (initPhase) return;
-                buildPanel();
-            }
+        tbOldUsers.addItemListener(itemEvent -> {
+            if (initPhase) return;
+            buildPanel();
         });
         tbOldUsers.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbOldUsers);
@@ -300,39 +293,33 @@ public class PnlUser extends CleanablePanel {
          *
          */
         final JideButton btnAddUser = GUITools.createHyperlinkButton(SYSTools.xx("opde.users.btnAddUser"), SYSConst.icon22addUser, null);
-        btnAddUser.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (tabMain.getSelectedIndex() != TAB_USER) {
-                    tabMain.setSelectedIndex(TAB_USER);
-                }
-                new DlgUser(new Users(), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Users user = em.merge((Users) o);
-                                // Put everyone into >>everyone<<
-                                Groups everyone = em.find(Groups.class, "everyone");
-                                em.lock(everyone, LockModeType.OPTIMISTIC);
-                                user.getGroups().add(everyone);
-                                everyone.getMembers().add(user);
-
-                                em.getTransaction().commit();
-                                lstUsers.add(user);
-                                reloadDisplay();
-                            } catch (Exception e) {
-                                em.getTransaction().rollback();
-                            } finally {
-                                em.close();
-                            }
-                        }
-                    }
-                });
-
+        btnAddUser.addActionListener(actionEvent -> {
+            if (tabMain.getSelectedIndex() != TAB_USER) {
+                tabMain.setSelectedIndex(TAB_USER);
             }
+            new DlgUser(new Users(), o -> {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Users user = em.merge((Users) o);
+                        // Put everyone into >>everyone<<
+                        Groups everyone = em.find(Groups.class, "everyone");
+                        em.lock(everyone, LockModeType.OPTIMISTIC);
+                        user.getGroups().add(everyone);
+                        everyone.getMembers().add(user);
+
+                        em.getTransaction().commit();
+                        lstUsers.add(user);
+                        reloadDisplay();
+                    } catch (Exception e) {
+                        em.getTransaction().rollback();
+                    } finally {
+                        em.close();
+                    }
+                }
+            });
+
         });
         list.add(btnAddUser);
 
@@ -345,36 +332,30 @@ public class PnlUser extends CleanablePanel {
          *                                              |_|
          */
         final JideButton btnAddGroup = GUITools.createHyperlinkButton(SYSTools.xx("opde.users.btnAddGroup"), SYSConst.icon22addGroup, null);
-        btnAddGroup.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (tabMain.getSelectedIndex() != TAB_GROUPS) {
-                    tabMain.setSelectedIndex(TAB_GROUPS);
-                }
-                new DlgGroup(new Groups(), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Groups myGroup = em.merge((Groups) o);
-                                em.getTransaction().commit();
-                                createCP4(myGroup);
-                                lstGroups.add(myGroup);
-                                Collections.sort(lstGroups);
-                                buildPanel();
-                            } catch (Exception e) {
-//                                em.getTransaction().rollback();
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-                        }
-                    }
-                });
-
+        btnAddGroup.addActionListener(actionEvent -> {
+            if (tabMain.getSelectedIndex() != TAB_GROUPS) {
+                tabMain.setSelectedIndex(TAB_GROUPS);
             }
+            new DlgGroup(new Groups(), o -> {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Groups myGroup = em.merge((Groups) o);
+                        em.getTransaction().commit();
+                        createCP4(myGroup);
+                        lstGroups.add(myGroup);
+                        Collections.sort(lstGroups);
+                        buildPanel();
+                    } catch (Exception e) {
+//                                em.getTransaction().rollback();
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                }
+            });
+
         });
         list.add(btnAddGroup);
 
@@ -414,16 +395,13 @@ public class PnlUser extends CleanablePanel {
                 user.toString() +
                 (UsersTools.isQualified(user) ?
                         ", " + SYSTools.xx("opde.users.qualifiedNurse") : "") +
-                "</font></html>", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cp.setCollapsed(!cp.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
-            }
-        });
+                "</font></html>", e -> {
+                    try {
+                        cp.setCollapsed(!cp.isCollapsed());
+                    } catch (PropertyVetoException pve) {
+                        // BAH!
+                    }
+                });
 
 
         /***
@@ -440,43 +418,40 @@ public class PnlUser extends CleanablePanel {
         btnChangePW.setContentAreaFilled(false);
         btnChangePW.setBorder(null);
         btnChangePW.setToolTipText(SYSTools.xx("opde.users.btnChangePW.tooltip"));
-        btnChangePW.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        btnChangePW.addActionListener(actionEvent -> {
 
-                EntityManager em = OPDE.createEM();
-                try {
-                    em.getTransaction().begin();
-                    Users myUser = em.merge(usermap.get(user.getUID()));
-                    String newpw = SYSTools.generatePassword(myUser.getVorname(), myUser.getName());
-                    em.lock(myUser, LockModeType.OPTIMISTIC);
-                    myUser.setMd5pw(SYSTools.hashword(newpw));
-                    em.getTransaction().commit();
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                Users myUser = em.merge(usermap.get(user.getUID()));
+                String newpw = SYSTools.generatePassword(myUser.getVorname(), myUser.getName());
+                em.lock(myUser, LockModeType.OPTIMISTIC);
+                myUser.setMd5pw(SYSTools.hashword(newpw));
+                em.getTransaction().commit();
 
-                    lstUsers.remove(user);
-                    lstUsers.add(myUser);
-                    usermap.put(key, myUser);
-                    Collections.sort(lstUsers);
+                lstUsers.remove(user);
+                lstUsers.add(myUser);
+                usermap.put(key, myUser);
+                Collections.sort(lstUsers);
 
-                    SYSTools.printpw(newpw, myUser);
+                SYSTools.printpw(newpw, myUser);
 
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.users.pwchanged")));
-                } catch (OptimisticLockException ole) { OPDE.warn(ole);
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-
-                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.fatal(e);
-                } finally {
-                    em.close();
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.users.pwchanged")));
+            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
                 }
 
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(e);
+            } finally {
+                em.close();
             }
+
         });
         btnChangePW.setEnabled(user.isActive());
         cptitle.getRight().add(btnChangePW);
@@ -496,28 +471,78 @@ public class PnlUser extends CleanablePanel {
         btnActiveInactive.setContentAreaFilled(false);
         btnActiveInactive.setBorder(null);
         btnActiveInactive.setToolTipText(SYSTools.xx(internalClassID + (user.isActive() ? ".btnActiveInactive.stop" : ".btnActiveInactive.play")));
-        btnActiveInactive.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        btnActiveInactive.addActionListener(actionEvent -> {
 
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                Users myUser = em.merge(usermap.get(user.getUID()));
+                em.lock(myUser, LockModeType.OPTIMISTIC);
+
+                myUser.setStatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
+
+                em.getTransaction().commit();
+                lstUsers.remove(user);
+                lstUsers.add(myUser);
+                usermap.put(myUser.getUID(), myUser);
+                Collections.sort(lstUsers);
+                CollapsiblePane cp12 = createCP4(myUser);
+                boolean wasCollapsed = cpMap.get(key).isCollapsed();
+                cpMap.put(key, cp12);
+
+                cp12.setCollapsed(myUser.isActive() ? wasCollapsed : true);
+                buildPanel();
+            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(e);
+            } finally {
+                em.close();
+            }
+        });
+        cptitle.getRight().add(btnActiveInactive);
+
+        /***
+         *               _ _ _
+         *       ___  __| (_) |_
+         *      / _ \/ _` | | __|
+         *     |  __/ (_| | | |_
+         *      \___|\__,_|_|\__|
+         *
+         */
+        final JButton btnEdit = new JButton(SYSConst.icon22edit3);
+        btnEdit.setPressedIcon(SYSConst.icon22edit3Pressed);
+        btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnEdit.setContentAreaFilled(false);
+        btnEdit.setBorder(null);
+        btnEdit.setToolTipText(SYSTools.xx("opde.users.btnEdit"));
+        btnEdit.addActionListener(actionEvent -> new DlgUser(user, o -> {
+            if (o != null) {
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
-                    Users myUser = em.merge(usermap.get(user.getUID()));
+                    Users myUser = em.merge((Users) o);
                     em.lock(myUser, LockModeType.OPTIMISTIC);
-
-                    myUser.setStatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
-
                     em.getTransaction().commit();
                     lstUsers.remove(user);
                     lstUsers.add(myUser);
                     usermap.put(myUser.getUID(), myUser);
                     Collections.sort(lstUsers);
-                    CollapsiblePane cp = createCP4(myUser);
+                    CollapsiblePane cp1 = createCP4(myUser);
                     boolean wasCollapsed = cpMap.get(key).isCollapsed();
-                    cpMap.put(key, cp);
+                    cpMap.put(key, cp1);
 
-                    cp.setCollapsed(myUser.isActive() ? wasCollapsed : true);
+                    cp1.setCollapsed(myUser.isActive() ? wasCollapsed : true);
                     buildPanel();
                 } catch (OptimisticLockException ole) { OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {
@@ -537,73 +562,7 @@ public class PnlUser extends CleanablePanel {
                     em.close();
                 }
             }
-
-
-        });
-        cptitle.getRight().add(btnActiveInactive);
-
-        /***
-         *               _ _ _
-         *       ___  __| (_) |_
-         *      / _ \/ _` | | __|
-         *     |  __/ (_| | | |_
-         *      \___|\__,_|_|\__|
-         *
-         */
-        final JButton btnEdit = new JButton(SYSConst.icon22edit3);
-        btnEdit.setPressedIcon(SYSConst.icon22edit3Pressed);
-        btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnEdit.setContentAreaFilled(false);
-        btnEdit.setBorder(null);
-        btnEdit.setToolTipText(SYSTools.xx("opde.users.btnEdit"));
-        btnEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-
-                new DlgUser(user, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Users myUser = em.merge((Users) o);
-                                em.lock(myUser, LockModeType.OPTIMISTIC);
-                                em.getTransaction().commit();
-                                lstUsers.remove(user);
-                                lstUsers.add(myUser);
-                                usermap.put(myUser.getUID(), myUser);
-                                Collections.sort(lstUsers);
-                                CollapsiblePane cp = createCP4(myUser);
-                                boolean wasCollapsed = cpMap.get(key).isCollapsed();
-                                cpMap.put(key, cp);
-
-                                cp.setCollapsed(myUser.isActive() ? wasCollapsed : true);
-                                buildPanel();
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-                        }
-                    }
-                });
-            }
-
-
-        });
+        }));
         cptitle.getRight().add(btnEdit);
 
         cp.setTitleLabelComponent(cptitle.getMain());
@@ -673,16 +632,13 @@ public class PnlUser extends CleanablePanel {
                 group.getGID().toUpperCase() +
                 (group.isQualified() ?
                         ", " + SYSTools.xx("opde.users.qualifiedGroup") : "") +
-                "</font></html>", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cp.setCollapsed(!cp.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
-            }
-        });
+                "</font></html>", e -> {
+                    try {
+                        cp.setCollapsed(!cp.isCollapsed());
+                    } catch (PropertyVetoException pve) {
+                        // BAH!
+                    }
+                });
 
         /***
          *          _      _      _
@@ -698,46 +654,39 @@ public class PnlUser extends CleanablePanel {
         btnDeleteGroup.setContentAreaFilled(false);
         btnDeleteGroup.setBorder(null);
         btnDeleteGroup.setToolTipText(SYSTools.xx("opde.users.btnDeleteGroup"));
-        btnDeleteGroup.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + group.getGID() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o.equals(JOptionPane.YES_OPTION)) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Groups myGroup = em.merge(group);
-                                em.remove(myGroup);
-                                em.getTransaction().commit();
-                                lstGroups.remove(group);
-                                cpMap.remove(key);
-                                buildPanel();
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
+        btnDeleteGroup.addActionListener(actionEvent -> {
+            currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + group.getGID() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, o -> {
+                if (o.equals(JOptionPane.YES_OPTION)) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Groups myGroup = em.merge(group);
+                        em.remove(myGroup);
+                        em.getTransaction().commit();
+                        lstGroups.remove(group);
+                        cpMap.remove(key);
+                        buildPanel();
+                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
                         }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                        currentEditor = null;
                     }
-                });
-
-            }
-
-
+                }
+            });
+            currentEditor.setVisible(true);
         });
         btnDeleteGroup.setEnabled(!group.isSystem());
         cpTitle.getRight().add(btnDeleteGroup);

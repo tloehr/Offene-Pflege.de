@@ -141,17 +141,14 @@ public class DlgNursingProcess extends MyJDialog {
          *
          */
         final JidePopup popup = new JidePopup();
-        PnlSelectIntervention pnlSelectIntervention = new PnlSelectIntervention(new Closure() {
-            @Override
-            public void execute(Object o) {
-                popup.hidePopup();
-                if (o != null) {
-                    for (Object obj : (Object[]) o) {
-                        Intervention intervention = (Intervention) obj;
-                        nursingProcess.getInterventionSchedule().add(new InterventionSchedule(nursingProcess, intervention));
-                    }
-                    reloadInterventions();
+        PnlSelectIntervention pnlSelectIntervention = new PnlSelectIntervention(o -> {
+            popup.hidePopup();
+            if (o != null) {
+                for (Object obj : (Object[]) o) {
+                    Intervention intervention = (Intervention) obj;
+                    nursingProcess.getInterventionSchedule().add(new InterventionSchedule(nursingProcess, intervention));
                 }
+                reloadInterventions();
             }
         });
 
@@ -178,23 +175,17 @@ public class DlgNursingProcess extends MyJDialog {
     }
 
     private void btnPopoutSituationActionPerformed(ActionEvent e) {
-        new DlgYesNo(SYSConst.icon48edit, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    txtSituation.setText(o.toString());
-                }
+        new DlgYesNo(SYSConst.icon48edit, o -> {
+            if (o != null) {
+                txtSituation.setText(o.toString());
             }
         }, "nursingrecords.nursingprocess.dlgplanung.lblSituation", txtSituation.getText(), null);
     }
 
     private void btnPopoutGoalActionPerformed(ActionEvent e) {
-        new DlgYesNo(SYSConst.icon48edit, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    txtZiele.setText(o.toString());
-                }
+        new DlgYesNo(SYSConst.icon48edit, o -> {
+            if (o != null) {
+                txtZiele.setText(o.toString());
             }
         }, "nursingrecords.nursingprocess.dlgplanung.lblGoal", txtZiele.getText(), null);
     }
@@ -535,14 +526,12 @@ public class DlgNursingProcess extends MyJDialog {
          *                                    |_|         |_|
          */
         JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
-        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                for (int row : tblPlanung.getSelectedRows()) {
-                    listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
-                    nursingProcess.getInterventionSchedule().remove(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
-                }
-                ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
+        itemPopupDelete.addActionListener(evt12 -> {
+            for (int row13 : tblPlanung.getSelectedRows()) {
+                listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row13));
+                nursingProcess.getInterventionSchedule().remove(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row13));
             }
+            ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
         });
         menu.add(itemPopupDelete);
 
@@ -555,51 +544,45 @@ public class DlgNursingProcess extends MyJDialog {
          *                                    |_|         |_|
          */
         final JMenuItem itemPopupSchedule = new JMenuItem(SYSTools.xx("misc.commands.editsheduling"), SYSConst.icon22clock);
-        itemPopupSchedule.addActionListener(new java.awt.event.ActionListener() {
+        itemPopupSchedule.addActionListener(evt1 -> {
+            final JidePopup popup = new JidePopup();
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                final JidePopup popup = new JidePopup();
-
-                /**
-                 * This routine uses the <b>first</b> element of the selection as the template for editing
-                 * the schedule. After the edit it clones this "template", removes the original
-                 * InterventionSchedules (copying the apropriate Intervention of every single
-                 * Schedule first) and finally creates new schedules and adds them to
-                 * the CareProcess in question.
-                 */
-                int row = tblPlanung.getSelectedRows()[0];
-                InterventionSchedule firstInterventionScheduleWillBeTemplate = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row);
-                JPanel dlg = new PnlSchedule(firstInterventionScheduleWillBeTemplate, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            InterventionSchedule template = (InterventionSchedule) o;
-                            ArrayList<InterventionSchedule> listInterventionSchedule2Add = new ArrayList();
-                            for (int row : tblPlanung.getSelectedRows()) {
-                                InterventionSchedule oldTermin = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row);
-                                InterventionSchedule newTermin = template.clone();
-                                newTermin.setIntervention(oldTermin.getIntervention());
-                                listInterventionSchedule2Remove.add(oldTermin);
-                                listInterventionSchedule2Add.add(newTermin);
-                            }
-                            nursingProcess.getInterventionSchedule().removeAll(listInterventionSchedule2Remove);
-                            nursingProcess.getInterventionSchedule().addAll(listInterventionSchedule2Add);
-                            popup.hidePopup();
-                            Collections.sort(nursingProcess.getInterventionSchedule());
-                            ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
-                        }
+            /**
+             * This routine uses the <b>first</b> element of the selection as the template for editing
+             * the schedule. After the edit it clones this "template", removes the original
+             * InterventionSchedules (copying the apropriate Intervention of every single
+             * Schedule first) and finally creates new schedules and adds them to
+             * the CareProcess in question.
+             */
+            int row12 = tblPlanung.getSelectedRows()[0];
+            InterventionSchedule firstInterventionScheduleWillBeTemplate = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row12);
+            JPanel dlg = new PnlSchedule(firstInterventionScheduleWillBeTemplate, o -> {
+                if (o != null) {
+                    InterventionSchedule template = (InterventionSchedule) o;
+                    ArrayList<InterventionSchedule> listInterventionSchedule2Add = new ArrayList();
+                    for (int row1 : tblPlanung.getSelectedRows()) {
+                        InterventionSchedule oldTermin = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row1);
+                        InterventionSchedule newTermin = template.clone();
+                        newTermin.setIntervention(oldTermin.getIntervention());
+                        listInterventionSchedule2Remove.add(oldTermin);
+                        listInterventionSchedule2Add.add(newTermin);
                     }
-                });
+                    nursingProcess.getInterventionSchedule().removeAll(listInterventionSchedule2Remove);
+                    nursingProcess.getInterventionSchedule().addAll(listInterventionSchedule2Add);
+                    popup.hidePopup();
+                    Collections.sort(nursingProcess.getInterventionSchedule());
+                    ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
+                }
+            });
 
-                popup.setMovable(false);
-                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                popup.getContentPane().add(dlg);
-                popup.setOwner(jspPlanung);
-                popup.removeExcludedComponent(jspPlanung);
-                popup.setDefaultFocusComponent(dlg);
+            popup.setMovable(false);
+            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+            popup.getContentPane().add(dlg);
+            popup.setOwner(jspPlanung);
+            popup.removeExcludedComponent(jspPlanung);
+            popup.setDefaultFocusComponent(dlg);
 
-                GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
-            }
+            GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
         });
         menu.add(itemPopupSchedule);
 

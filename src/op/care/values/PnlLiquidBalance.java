@@ -125,20 +125,17 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
     }
 
     private void scrlLeftComponentResized(ComponentEvent e) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                tblLeft.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        SwingUtilities.invokeLater(() -> {
+            tblLeft.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-                if (highIn != null || lowIn != null) {
-                    TableUtils.autoResizeAllColumns(tblLeft, null, new int[]{100, 100, 100, 100}, true, false);
-                } else {
-                    TableUtils.autoResizeAllColumns(tblLeft, null, new int[]{100, 100, 100, 100, 100}, true, false);
-                }
-
-                TableUtils.autoResizeAllRows(tblLeft);
-
+            if (highIn != null || lowIn != null) {
+                TableUtils.autoResizeAllColumns(tblLeft, null, new int[]{100, 100, 100, 100}, true, false);
+            } else {
+                TableUtils.autoResizeAllColumns(tblLeft, null, new int[]{100, 100, 100, 100, 100}, true, false);
             }
+
+            TableUtils.autoResizeAllRows(tblLeft);
+
         });
     }
 
@@ -209,34 +206,19 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             //---- btnToday ----
             btnToday.setText(null);
             btnToday.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2leftarrow.png")));
-            btnToday.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnTodayActionPerformed(e);
-                }
-            });
+            btnToday.addActionListener(e -> btnTodayActionPerformed(e));
             panel1.add(btnToday);
 
             //---- btnBack ----
             btnBack.setText(null);
             btnBack.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1leftarrow.png")));
-            btnBack.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnBackActionPerformed(e);
-                }
-            });
+            btnBack.addActionListener(e -> btnBackActionPerformed(e));
             panel1.add(btnBack);
 
             //---- btnForward ----
             btnForward.setText(null);
             btnForward.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1rightarrow.png")));
-            btnForward.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnForwardActionPerformed(e);
-                }
-            });
+            btnForward.addActionListener(e -> btnForwardActionPerformed(e));
             panel1.add(btnForward);
         }
         add(panel1, CC.xy(1, 7, CC.CENTER, CC.DEFAULT));
@@ -248,12 +230,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             //---- btnPrint ----
             btnPrint.setText(null);
             btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer1.png")));
-            btnPrint.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnPrintActionPerformed(e);
-                }
-            });
+            btnPrint.addActionListener(e -> btnPrintActionPerformed(e));
             panel2.add(btnPrint);
         }
         add(panel2, CC.xy(3, 7, CC.RIGHT, CC.DEFAULT));
@@ -280,6 +257,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         SYSTools.clear(listValues);
         SYSTools.clear(listSummaries);
         SYSTools.clear(controlProps);
@@ -344,35 +322,29 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         };
 
         tblLeft.setModel(tmLeft);
-        tblLeft.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) return;
-                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+        tblLeft.getSelectionModel().addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) return;
+            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
-                int minIndex = lsm.getMinSelectionIndex();
-                int maxIndex = lsm.getMaxSelectionIndex();
+            int minIndex = lsm.getMinSelectionIndex();
+            int maxIndex = lsm.getMaxSelectionIndex();
 
-                if (minIndex < 0 || maxIndex < 0) return;
+            if (minIndex < 0 || maxIndex < 0) return;
 
-                cleanup();
+            cleanup();
 
-                loadRightTable((LocalDate) tblLeft.getModel().getValueAt(maxIndex, 0), (LocalDate) tblLeft.getModel().getValueAt(minIndex, 0));
-            }
+            loadRightTable((LocalDate) tblLeft.getModel().getValueAt(maxIndex, 0), (LocalDate) tblLeft.getModel().getValueAt(minIndex, 0));
         });
-        tblLeft.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object o, boolean isSelected, boolean hasFocus, int row, int column) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.xx("misc.commands.>>noselection<<");
-                } else if (o instanceof LocalDate) {
-                    text = ((LocalDate) o).toString("dd.MM.yyyy");
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultTableCellRenderer().getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
+        tblLeft.getColumnModel().getColumn(0).setCellRenderer((table, o, isSelected, hasFocus, row, column) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.xx("misc.commands.>>noselection<<");
+            } else if (o instanceof LocalDate) {
+                text = ((LocalDate) o).toString("dd.MM.yyyy");
+            } else {
+                text = o.toString();
             }
+            return new DefaultTableCellRenderer().getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
         });
 
 
@@ -443,54 +415,52 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             public void actionPerformed(ActionEvent ae) {
                 final int row = Integer.parseInt(ae.getActionCommand());
                 final ResValue val2Delete = listValues.get(row);
-                new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + "<br/><i>" + df.format(val2Delete.getPit()) + "<br/>" + nf.format(val2Delete.getVal1()) + " ml<br/>" + val2Delete.getUser().toString() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                    @Override
-                    public void execute(Object answer) {
-                        if (answer.equals(JOptionPane.YES_OPTION)) {
+                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + "<br/><i>" + df.format(val2Delete.getPit()) + "<br/>" + nf.format(val2Delete.getVal1()) + " ml<br/>" + val2Delete.getUser().toString() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
+                    if (answer.equals(JOptionPane.YES_OPTION)) {
 
 
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                ResValue myValue = em.merge(val2Delete);
-                                em.lock(myValue, LockModeType.OPTIMISTIC);
-                                myValue.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
-                                for (SYSVAL2FILE file : myValue.getAttachedFilesConnections()) {
-                                    em.remove(file);
-                                }
-                                myValue.getAttachedFilesConnections().clear();
-                                for (SYSVAL2PROCESS connObj : myValue.getAttachedProcessConnections()) {
-                                    em.remove(connObj);
-                                }
-                                myValue.getAttachedProcessConnections().clear();
-                                myValue.getAttachedProcesses().clear();
-                                em.getTransaction().commit();
-                                listValues.remove(row);
-                                tmRight.removeRow(row);
-                                loadLeftTable();
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            ResValue myValue = em.merge(val2Delete);
+                            em.lock(myValue, LockModeType.OPTIMISTIC);
+                            myValue.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
+                            for (SYSVAL2FILE file : myValue.getAttachedFilesConnections()) {
+                                em.remove(file);
                             }
-
-
+                            myValue.getAttachedFilesConnections().clear();
+                            for (SYSVAL2PROCESS connObj : myValue.getAttachedProcessConnections()) {
+                                em.remove(connObj);
+                            }
+                            myValue.getAttachedProcessConnections().clear();
+                            myValue.getAttachedProcesses().clear();
+                            em.getTransaction().commit();
+                            listValues.remove(row);
+                            tmRight.removeRow(row);
+                            loadLeftTable();
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
                         }
+
                     }
                 });
+                currentEditor.setVisible(true);
             }
         }, 4);
         bc.setMnemonic(KeyEvent.VK_DELETE);
@@ -544,104 +514,92 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
          *
          */
 
-        JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (!resident.isActive()) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
-                    return;
-                }
-                new DlgValue(new ResValue(resident, LIQUIDBALANCE), DlgValue.MODE_NEW, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        ResValue myValue = null;
-
-                        if (o != null) {
-
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                myValue = em.merge((ResValue) o);
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                em.getTransaction().commit();
-
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-
-                            startDay = new LocalDate(myValue.getPit());
-                            loadLeftTable();
-                            loadRightTable(startDay, startDay);
-
-                        }
-
-                    }
-                });
-
+        JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), actionEvent -> {
+            if (!resident.isActive()) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                return;
             }
+            new DlgValue(new ResValue(resident, LIQUIDBALANCE), DlgValue.MODE_NEW, o -> {
+                ResValue myValue = null;
+
+                if (o != null) {
+
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        myValue = em.merge((ResValue) o);
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        em.getTransaction().commit();
+
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+                    startDay = new LocalDate(myValue.getPit());
+                    loadLeftTable();
+                    loadRightTable(startDay, startDay);
+
+                }
+
+            });
+
         });
         list.add(addButton);
 
 
-        JideButton controlButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.vitalparameters.btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (!resident.isActive()) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
-                    return;
-                }
-                new DlgValueControl(resident, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                Resident myResident = em.merge(resident);
-                                em.lock(myResident, LockModeType.OPTIMISTIC);
-                                myResident.setControlling((Properties) o);
-                                em.getTransaction().commit();
-                                resident = myResident;
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-                            parseControlling();
-                            loadLeftTable();
-
-                        }
-                    }
-                });
+        JideButton controlButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.vitalparameters.btnControlling.tooltip"), SYSConst.icon22magnify1, actionEvent -> {
+            if (!resident.isActive()) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                return;
             }
+            new DlgValueControl(resident, o -> {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Resident myResident = em.merge(resident);
+                        em.lock(myResident, LockModeType.OPTIMISTIC);
+                        myResident.setControlling((Properties) o);
+                        em.getTransaction().commit();
+                        resident = myResident;
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                    parseControlling();
+                    loadLeftTable();
+
+                }
+            });
         });
         list.add(controlButton);
 

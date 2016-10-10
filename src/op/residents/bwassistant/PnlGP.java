@@ -42,13 +42,10 @@ public class PnlGP extends JPanel {
     }
 
     private void btnAddActionPerformed(ActionEvent e) {
-        final JidePopup popupGP = GUITools.createPanelPopup(new PnlEditGP(new GP()), new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbArzt.setModel(new DefaultComboBoxModel(new GP[]{(GP) o}));
-                    validate.execute(cmbArzt.getSelectedItem());
-                }
+        final JidePopup popupGP = GUITools.createPanelPopup(new PnlEditGP(new GP()), o -> {
+            if (o != null) {
+                cmbArzt.setModel(new DefaultComboBoxModel(new GP[]{(GP) o}));
+                validate.execute(cmbArzt.getSelectedItem());
             }
         }, btnAdd);
         popupGP.setMovable(false);
@@ -70,12 +67,7 @@ public class PnlGP extends JPanel {
                 "default"));
 
         //---- cmbArzt ----
-        cmbArzt.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbArztItemStateChanged(e);
-            }
-        });
+        cmbArzt.addItemListener(e -> cmbArztItemStateChanged(e));
         add(cmbArzt, CC.xy(1, 1));
 
         //---- btnAdd ----
@@ -84,12 +76,7 @@ public class PnlGP extends JPanel {
         btnAdd.setContentAreaFilled(false);
         btnAdd.setBorderPainted(false);
         btnAdd.setBorder(null);
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnAddActionPerformed(e);
-            }
-        });
+        btnAdd.addActionListener(e -> btnAddActionPerformed(e));
         add(btnAdd, CC.xy(3, 1));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

@@ -94,12 +94,7 @@ public class PnlDosageForm extends PopupPanel {
         add(lblUsageUnit, CC.xy(3, 7));
 
         //---- cmbUsageUnit ----
-        cmbUsageUnit.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbUsageUnitItemStateChanged(e);
-            }
-        });
+        cmbUsageUnit.addItemListener(e -> cmbUsageUnitItemStateChanged(e));
         add(cmbUsageUnit, CC.xy(5, 7));
 
         //---- lblPackUnit ----
@@ -107,12 +102,7 @@ public class PnlDosageForm extends PopupPanel {
         add(lblPackUnit, CC.xy(3, 9));
 
         //---- cmbPackUnit ----
-        cmbPackUnit.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbPackUnitItemStateChanged(e);
-            }
-        });
+        cmbPackUnit.addItemListener(e -> cmbPackUnitItemStateChanged(e));
         add(cmbPackUnit, CC.xy(5, 9));
 
         //---- lblIntervention ----

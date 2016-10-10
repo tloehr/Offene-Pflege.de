@@ -160,12 +160,9 @@ public class PnlEditResInfo {
             final JButton ttip = GUITools.getTinyButton(SYSTools.toHTMLForScreen(tooltip), SYSConst.icon16info);
             txt.setText(SYSTools.toHTMLForScreen(tooltip));
 
-            ttip.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    popupInfo.setOwner(ttip);
-                    GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
-                }
+            ttip.addActionListener(e -> {
+                popupInfo.setOwner(ttip);
+                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
             });
             pnl.add("left", ttip);
         }
@@ -184,12 +181,9 @@ public class PnlEditResInfo {
             final JButton btntx = GUITools.getTinyButton(SYSTools.toHTMLForScreen(tx), SYSConst.icon16ambulance);
             txt.setText(SYSTools.toHTMLForScreen(tx));
 
-            btntx.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    popupInfo.setOwner(btntx);
-                    GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
-                }
+            btntx.addActionListener(e -> {
+                popupInfo.setOwner(btntx);
+                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
             });
 
 
@@ -256,12 +250,9 @@ public class PnlEditResInfo {
             txtComment.setWrapStyleWord(true);
             txtComment.setLineWrap(true);
             txtComment.setDisabledTextColor(Color.DARK_GRAY);
-            txtComment.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    if (initPanel) return;
-                    changed = true;
-                }
+            txtComment.addCaretListener(e -> {
+                if (initPanel) return;
+                changed = true;
             });
             ovrComment = new DefaultOverlayable(txtComment);
             JLabel lblComment = new JLabel(SYSTools.xx("misc.msg.comment"));
@@ -317,61 +308,40 @@ public class PnlEditResInfo {
             png.setContentAreaFilled(false);
             png.setPressedIcon(SYSConst.icon22Pressed);
             png.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            png.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    GUITools.exportToPNG(pnlContent, resInfo.getResInfoType().getID());
-                }
-            });
+            png.addActionListener(e -> GUITools.exportToPNG(pnlContent, resInfo.getResInfoType().getID()));
             upperButtonBanel.add(png);
         }
 
         JButton apply1 = GUITools.getTinyButton(null, SYSConst.icon22apply);
-        apply1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (resInfo != null) {
-                    closure.execute(getResInfo());
-                } else {
-                    closure.execute(content);
-                }
-                cleanup();
+        apply1.addActionListener(e -> {
+            if (resInfo != null) {
+                closure.execute(getResInfo());
+            } else {
+                closure.execute(content);
             }
+            cleanup();
         });
         upperButtonBanel.add(apply1);
 
         JButton apply2 = GUITools.getTinyButton(null, SYSConst.icon22apply);
-        apply2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (resInfo != null) {
-                    closure.execute(getResInfo());
-                } else {
-                    closure.execute(content);
-                }
-                cleanup();
+        apply2.addActionListener(e -> {
+            if (resInfo != null) {
+                closure.execute(getResInfo());
+            } else {
+                closure.execute(content);
             }
+            cleanup();
         });
         lowerButtonBanel.add(apply2);
 
 
         JButton cancel1 = GUITools.getTinyButton(null, SYSConst.icon22cancel);
-        cancel1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancel();
-            }
-        });
+        cancel1.addActionListener(e -> cancel());
         upperButtonBanel.add(cancel1);
 
 
         JButton cancel2 = GUITools.getTinyButton(null, SYSConst.icon22cancel);
-        cancel2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancel();
-            }
-        });
+        cancel2.addActionListener(e -> cancel());
         lowerButtonBanel.add(cancel2);
 
 
@@ -435,12 +405,9 @@ public class PnlEditResInfo {
                     return focusTraversal.get(0);
                 }
             });
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    focusTraversal.get(0).requestFocus();
-                    focusOwner = focusTraversal.get(0);
-                }
+            SwingUtilities.invokeLater(() -> {
+                focusTraversal.get(0).requestFocus();
+                focusOwner = focusTraversal.get(0);
             });
         }
         setXEnabled(main, false);
@@ -1351,22 +1318,19 @@ public class PnlEditResInfo {
                 String sDermatology = attributes.getValue("dermatology");
                 Boolean dermatology = sDermatology == null ? null : (sDermatology.equalsIgnoreCase("true") ? true : false);
 
-                PnlGP pnlGP = new PnlGP(new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        long gpid;
-                        String gpText;
-                        if (o == null) {
-                            gpid = -1;
-                            gpText = "--";
-                        } else {
-                            gpid = ((GP) o).getArztID();
-                            gpText = GPTools.getCompleteAddress((GP) o);
-                        }
-                        content.put(thisGroupName + ".id", Long.toString(gpid));
-                        content.put(thisGroupName + ".text", gpText);
-                        changed = true;
+                PnlGP pnlGP = new PnlGP(o -> {
+                    long gpid;
+                    String gpText;
+                    if (o == null) {
+                        gpid = -1;
+                        gpText = "--";
+                    } else {
+                        gpid = ((GP) o).getArztID();
+                        gpText = GPTools.getCompleteAddress((GP) o);
                     }
+                    content.put(thisGroupName + ".id", Long.toString(gpid));
+                    content.put(thisGroupName + ".text", gpText);
+                    changed = true;
                 }, neurologist, dermatology);
 
                 int fontstyle = Font.PLAIN;
@@ -1422,23 +1386,20 @@ public class PnlEditResInfo {
 
                 cmbRooms.setRenderer(RoomsTools.getRenderer());
 
-                cmbRooms.addItemListener(new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        if (e.getStateChange() == ItemEvent.SELECTED) {
-                            long rid;
-                            String roomText;
-                            if (e.getItem() == null) {
-                                rid = -1;
-                                roomText = "--";
-                            } else {
-                                rid = ((Rooms) e.getItem()).getRoomID();
-                                roomText = ((Rooms) e.getItem()).toString();
-                            }
-                            content.put(thisGroupName + ".id", Long.toString(rid));
-                            content.put(thisGroupName + ".text", roomText);
-                            changed = true;
+                cmbRooms.addItemListener(e -> {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        long rid;
+                        String roomText;
+                        if (e.getItem() == null) {
+                            rid = -1;
+                            roomText = "--";
+                        } else {
+                            rid = ((Rooms) e.getItem()).getRoomID();
+                            roomText = ((Rooms) e.getItem()).toString();
                         }
+                        content.put(thisGroupName + ".id", Long.toString(rid));
+                        content.put(thisGroupName + ".text", roomText);
+                        changed = true;
                     }
                 });
                 pnlRoom.add(cmbRooms, BorderLayout.CENTER);
@@ -1484,22 +1445,19 @@ public class PnlEditResInfo {
                 groupname = attributes.getValue("name");
                 final String thisGroupName = groupname;
 
-                PnlHospital pnlHospital = new PnlHospital(new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        long hid;
-                        String hText;
-                        if (o == null) {
-                            hid = -1;
-                            hText = "--";
-                        } else {
-                            hid = ((Hospital) o).getKhid();
-                            hText = HospitalTools.getCompleteAddress((Hospital) o);
-                        }
-                        content.put(thisGroupName + ".id", Long.toString(hid));
-                        content.put(thisGroupName + ".text", hText);
-                        changed = true;
+                PnlHospital pnlHospital = new PnlHospital(o -> {
+                    long hid;
+                    String hText;
+                    if (o == null) {
+                        hid = -1;
+                        hText = "--";
+                    } else {
+                        hid = ((Hospital) o).getKhid();
+                        hText = HospitalTools.getCompleteAddress((Hospital) o);
                     }
+                    content.put(thisGroupName + ".id", Long.toString(hid));
+                    content.put(thisGroupName + ".text", hText);
+                    changed = true;
                 });
 
                 int fontstyle = Font.PLAIN;
@@ -1545,31 +1503,25 @@ public class PnlEditResInfo {
                 ArrayList<ResInfo> listTemplates = ResInfoTools.getTemplatesByType(resInfo.getResident(), resInfo.getResInfoType().getType());
                 final JComboBox cmb = new JComboBox();
                 cmb.setModel(SYSTools.list2cmb(listTemplates));
-                cmb.setRenderer(new ListCellRenderer() {
-                    @Override
-                    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                        String text = "";
-                        if (value instanceof ResInfo) {
-                            text = ResidentTools.getFullName(((ResInfo) value).getResident());
-                        } else {
-                            text = SYSTools.catchNull(value);
-                        }
-
-                        return new DefaultListCellRenderer().getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+                cmb.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+                    String text = "";
+                    if (value instanceof ResInfo) {
+                        text = ResidentTools.getFullName(((ResInfo) value).getResident());
+                    } else {
+                        text = SYSTools.catchNull(value);
                     }
+
+                    return new DefaultListCellRenderer().getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
                 });
                 cmb.setSelectedIndex(-1);
                 pnl.add("left hfill", cmb);
 
                 JButton btnCopyOver = new JButton(SYSTools.xx("nursingrecords.info.dlg.copyfromtemplate"));
-                btnCopyOver.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (cmb.getSelectedItem() != null) {
-                            ResInfo template = (ResInfo) cmb.getSelectedItem();
-                            resInfo.setProperties(template.getProperties());
-                            setContent();
-                        }
+                btnCopyOver.addActionListener(e -> {
+                    if (cmb.getSelectedItem() != null) {
+                        ResInfo template = (ResInfo) cmb.getSelectedItem();
+                        resInfo.setProperties(template.getProperties());
+                        setContent();
                     }
                 });
                 pnl.add("left", btnCopyOver);
@@ -1611,18 +1563,15 @@ public class PnlEditResInfo {
              *
              */
             if (tagName.equalsIgnoreCase("url")) {
-                JideButton link = GUITools.createHyperlinkButton(attributes.getValue("label"), SYSConst.icon16internet, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        Desktop desktop = Desktop.getDesktop();
-                        try {
-                            desktop.browse(new URI(attributes.getValue("link")));
-                        } catch (IOException ioe) {
-                            ioe.printStackTrace();
-                        } catch (URISyntaxException use) {
-                            use.printStackTrace();
+                JideButton link = GUITools.createHyperlinkButton(attributes.getValue("label"), SYSConst.icon16internet, e -> {
+                    Desktop desktop = Desktop.getDesktop();
+                    try {
+                        desktop.browse(new URI(attributes.getValue("link")));
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    } catch (URISyntaxException use) {
+                        use.printStackTrace();
 
-                        }
                     }
                 });
                 link.setToolTipText(attributes.getValue("link"));

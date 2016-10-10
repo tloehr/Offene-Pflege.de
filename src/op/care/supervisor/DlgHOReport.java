@@ -116,23 +116,13 @@ public class DlgHOReport extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
             btnCancel.setText(null);
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnSave.setText(null);
-            btnSave.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnSaveActionPerformed(e);
-                }
-            });
+            btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(3, 7, CC.RIGHT, CC.DEFAULT));

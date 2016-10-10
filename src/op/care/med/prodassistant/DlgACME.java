@@ -48,12 +48,7 @@ public class DlgACME extends JPanel {
         ovrFirma.setOverlayVisible(true);
         contentPanel.add(ovrFirma, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
 
-        txtFirma.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent caretEvent) {
-                ovrFirma.setOverlayVisible(txtFirma.getText().trim().isEmpty());
-            }
-        });
+        txtFirma.addCaretListener(caretEvent -> ovrFirma.setOverlayVisible(txtFirma.getText().trim().isEmpty()));
 
         attentionIconOrt = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         txtOrt = new OverlayTextField(25);
@@ -62,12 +57,7 @@ public class DlgACME extends JPanel {
         ovrOrt.setOverlayVisible(true);
         contentPanel.add(ovrOrt, CC.xy(3, 7));
 
-        txtOrt.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent caretEvent) {
-                ovrOrt.setOverlayVisible(txtOrt.getText().trim().isEmpty());
-            }
-        });
+        txtOrt.addCaretListener(caretEvent -> ovrOrt.setOverlayVisible(txtOrt.getText().trim().isEmpty()));
 
     }
 
@@ -179,12 +169,7 @@ public class DlgACME extends JPanel {
                 btnOK.setBorderPainted(false);
                 btnOK.setBorder(null);
                 btnOK.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnOK.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnOKActionPerformed(e);
-                    }
-                });
+                btnOK.addActionListener(e -> btnOKActionPerformed(e));
                 contentPanel.add(btnOK, CC.xy(3, 17, CC.RIGHT, CC.DEFAULT));
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);

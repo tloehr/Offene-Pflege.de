@@ -84,20 +84,17 @@ public class InterventionTools {
 //            "nursingrecords.nursingprocess.flag.logo"};
 
     public static ListCellRenderer getRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
+        return (jList, o, i, b, b1) -> {
 
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof Intervention) {
-                    text = ((Intervention) o).getBezeichnung();
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+            } else if (o instanceof Intervention) {
+                text = ((Intervention) o).getBezeichnung();
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
         };
     }
 

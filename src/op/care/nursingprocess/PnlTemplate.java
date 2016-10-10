@@ -42,20 +42,14 @@ public class PnlTemplate extends MyJDialog {
         txtSearch.setPrompt(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.searchtopic"));
         tbInactive = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.inactive"));
         SYSPropsTools.restoreState("nursingrecords.nursingprocess.pnltemplate.tbInactive", tbInactive);
-        tbInactive.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState("nursingrecords.nursingprocess.pnltemplate:tbInactive", tbInactive);
-                refreshDisplay();
-            }
+        tbInactive.addItemListener(e -> {
+            SYSPropsTools.storeState("nursingrecords.nursingprocess.pnltemplate:tbInactive", tbInactive);
+            refreshDisplay();
         });
         lstTemplates.setCellRenderer(getListCellRenderer());
-        lstTemplates.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting() && lstTemplates.getSelectedValue() != null) {
-                    txtContent.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false, false)));
-                }
+        lstTemplates.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && lstTemplates.getSelectedValue() != null) {
+                txtContent.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false, false)));
             }
         });
 

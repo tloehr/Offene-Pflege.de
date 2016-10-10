@@ -103,13 +103,11 @@ public class BHPTools {
     }
 
     public static Comparator<BHP> getOnDemandComparator() {
-        return new Comparator<BHP>() {
-            @Override
-            public int compare(BHP o1, BHP o2) {
-                int result = o1.getPrescription().getSituation().getText().toUpperCase().compareTo(o2.getPrescription().getSituation().getText().toUpperCase());
-                if (result == 0) {
-                    result = o1.getPrescription().compareTo(o2.getPrescription());
-                }
+        return (o1, o2) -> {
+            int result = o1.getPrescription().getSituation().getText().toUpperCase().compareTo(o2.getPrescription().getSituation().getText().toUpperCase());
+            if (result == 0) {
+                result = o1.getPrescription().compareTo(o2.getPrescription());
+            }
 //                if (result == 0) {
 //                    Long l1 = o1.getOutcome4();
 //                    Long l2 = o2.getOutcome4();
@@ -120,8 +118,7 @@ public class BHPTools {
 //                    }
 //                }
 
-                return result;
-            }
+            return result;
         };
     }
 

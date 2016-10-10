@@ -199,12 +199,9 @@ public class PnlQMSSchedule extends JPanel {
 
         cmbMonth.setSelectedIndex(qmssched.isYearly() ? qmssched.getMonthinyear() - 1 : 0);
         spinDayInMonthInYear.setModel(new SpinnerNumberModel(qmssched.isYearly() ? qmssched.getDayinmonth() : 1, 1, maxdays[cmbMonth.getSelectedIndex()], 1));
-        cmbMonth.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    spinDayInMonthInYear.setModel(new SpinnerNumberModel(1, 1, maxdays[cmbMonth.getSelectedIndex()], 1));
-                }
+        cmbMonth.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                spinDayInMonthInYear.setModel(new SpinnerNumberModel(1, 1, maxdays[cmbMonth.getSelectedIndex()], 1));
             }
         });
 
@@ -394,12 +391,7 @@ public class PnlQMSSchedule extends JPanel {
 
                     //---- btnJedenTag ----
                     btnJedenTag.setText("Jeden Tag");
-                    btnJedenTag.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnJedenTagActionPerformed(e);
-                        }
-                    });
+                    btnJedenTag.addActionListener(e -> btnJedenTagActionPerformed(e));
                     pnlDaily.add(btnJedenTag, CC.xywh(2, 5, 6, 1));
                 }
                 tabWdh.addTab("T\u00e4glich", pnlDaily);
@@ -420,12 +412,7 @@ public class PnlQMSSchedule extends JPanel {
                         //---- btnJedeWoche ----
                         btnJedeWoche.setText("Jede Woche");
                         btnJedeWoche.setFont(new Font("Arial", Font.PLAIN, 14));
-                        btnJedeWoche.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnJedeWocheActionPerformed(e);
-                            }
-                        });
+                        btnJedeWoche.addActionListener(e -> btnJedeWocheActionPerformed(e));
                         panel3.add(btnJedeWoche, CC.xywh(3, 3, 3, 1));
 
                         //---- lblEveryWeek ----
@@ -500,78 +487,43 @@ public class PnlQMSSchedule extends JPanel {
                     //---- cbMon ----
                     cbMon.setBorder(BorderFactory.createEmptyBorder());
                     cbMon.setMargin(new Insets(0, 0, 0, 0));
-                    cbMon.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbMonActionPerformed(e);
-                        }
-                    });
+                    cbMon.addActionListener(e -> cbMonActionPerformed(e));
                     pnlWeekly.add(cbMon, CC.xy(2, 7, CC.CENTER, CC.DEFAULT));
 
                     //---- cbDie ----
                     cbDie.setBorder(BorderFactory.createEmptyBorder());
                     cbDie.setMargin(new Insets(0, 0, 0, 0));
-                    cbDie.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbDieActionPerformed(e);
-                        }
-                    });
+                    cbDie.addActionListener(e -> cbDieActionPerformed(e));
                     pnlWeekly.add(cbDie, CC.xy(3, 7, CC.CENTER, CC.DEFAULT));
 
                     //---- cbMit ----
                     cbMit.setBorder(BorderFactory.createEmptyBorder());
                     cbMit.setMargin(new Insets(0, 0, 0, 0));
-                    cbMit.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbMitActionPerformed(e);
-                        }
-                    });
+                    cbMit.addActionListener(e -> cbMitActionPerformed(e));
                     pnlWeekly.add(cbMit, CC.xy(4, 7, CC.CENTER, CC.DEFAULT));
 
                     //---- cbDon ----
                     cbDon.setBorder(BorderFactory.createEmptyBorder());
                     cbDon.setMargin(new Insets(0, 0, 0, 0));
-                    cbDon.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbDonActionPerformed(e);
-                        }
-                    });
+                    cbDon.addActionListener(e -> cbDonActionPerformed(e));
                     pnlWeekly.add(cbDon, CC.xy(5, 7, CC.CENTER, CC.DEFAULT));
 
                     //---- cbFre ----
                     cbFre.setBorder(BorderFactory.createEmptyBorder());
                     cbFre.setMargin(new Insets(0, 0, 0, 0));
-                    cbFre.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbFreActionPerformed(e);
-                        }
-                    });
+                    cbFre.addActionListener(e -> cbFreActionPerformed(e));
                     pnlWeekly.add(cbFre, CC.xy(6, 7, CC.CENTER, CC.DEFAULT));
 
                     //---- cbSam ----
                     cbSam.setBorder(BorderFactory.createEmptyBorder());
                     cbSam.setMargin(new Insets(0, 0, 0, 0));
-                    cbSam.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbSamActionPerformed(e);
-                        }
-                    });
+                    cbSam.addActionListener(e -> cbSamActionPerformed(e));
                     pnlWeekly.add(cbSam, CC.xy(7, 7, CC.CENTER, CC.DEFAULT));
 
                     //---- cbSon ----
                     cbSon.setBorder(BorderFactory.createEmptyBorder());
                     cbSon.setMargin(new Insets(0, 0, 0, 0));
-                    cbSon.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            cbSonActionPerformed(e);
-                        }
-                    });
+                    cbSon.addActionListener(e -> cbSonActionPerformed(e));
                     pnlWeekly.add(cbSon, CC.xy(8, 7, CC.CENTER, CC.DEFAULT));
                 }
                 tabWdh.addTab("W\u00f6chentlich", pnlWeekly);
@@ -601,12 +553,7 @@ public class PnlQMSSchedule extends JPanel {
                     //---- btnJedenMonat ----
                     btnJedenMonat.setText("Jeden Monat");
                     btnJedenMonat.setFont(new Font("Arial", Font.PLAIN, 14));
-                    btnJedenMonat.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnJedenMonatActionPerformed(e);
-                        }
-                    });
+                    btnJedenMonat.addActionListener(e -> btnJedenMonatActionPerformed(e));
                     pnlMonthly.add(btnJedenMonat, CC.xywh(3, 5, 5, 1));
 
                     //---- llblOnDayOfMonth ----
@@ -617,12 +564,7 @@ public class PnlQMSSchedule extends JPanel {
 
                     //---- spinDayInMonth ----
                     spinDayInMonth.setFont(new Font("Arial", Font.PLAIN, 14));
-                    spinDayInMonth.addChangeListener(new ChangeListener() {
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                            spinMonatTagStateChanged(e);
-                        }
-                    });
+                    spinDayInMonth.addChangeListener(e -> spinMonatTagStateChanged(e));
                     pnlMonthly.add(spinDayInMonth, CC.xy(5, 7));
 
                     //---- cmbTag ----
@@ -637,12 +579,7 @@ public class PnlQMSSchedule extends JPanel {
                             "Sonntag"
                     }));
                     cmbTag.setFont(new Font("Arial", Font.PLAIN, 14));
-                    cmbTag.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent e) {
-                            cmbTagItemStateChanged(e);
-                        }
-                    });
+                    cmbTag.addItemListener(e -> cmbTagItemStateChanged(e));
                     pnlMonthly.add(cmbTag, CC.xywh(7, 7, 3, 1));
                 }
                 tabWdh.addTab("Monatlich", pnlMonthly);
@@ -671,12 +608,7 @@ public class PnlQMSSchedule extends JPanel {
                     //---- btnEveryYear ----
                     btnEveryYear.setText("jedes Jahr");
                     btnEveryYear.setFont(new Font("Arial", Font.PLAIN, 14));
-                    btnEveryYear.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnEveryYearActionPerformed(e);
-                        }
-                    });
+                    btnEveryYear.addActionListener(e -> btnEveryYearActionPerformed(e));
                     pnlYearly.add(btnEveryYear, CC.xy(7, 1));
 
                     //---- lblOnDay ----
@@ -716,12 +648,7 @@ public class PnlQMSSchedule extends JPanel {
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnSave.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnSaveActionPerformed(e);
-                }
-            });
+            btnSave.addActionListener(e -> btnSaveActionPerformed(e));
             panelMain.add(btnSave, CC.xy(5, 19, CC.RIGHT, CC.DEFAULT));
 
             //---- lblDueDays ----

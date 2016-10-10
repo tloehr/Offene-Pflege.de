@@ -56,6 +56,7 @@ public class PnlUserlistEditor extends JPanel {
     JPanel pnlUsersearch, pnlSelectedUsers;
     JList lstUsersFound;
 
+
     int MAXLINE = 4;
 
     public PnlUserlistEditor(Training training, Closure editAction) {
@@ -92,48 +93,46 @@ public class PnlUserlistEditor extends JPanel {
             pnlUsersearch.setLayout(new BoxLayout(pnlUsersearch, BoxLayout.PAGE_AXIS));
             add(pnlUsersearch, BorderLayout.WEST);
             lstUsersFound = new JList(new DefaultListModel());
-            lstUsersFound.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    if (e.getValueIsAdjusting()) return;
-                    if (lstUsersFound.getSelectedValue() == null) return;
+            lstUsersFound.addListSelectionListener(e -> {
+                if (e.getValueIsAdjusting()) return;
+                if (lstUsersFound.getSelectedValue() == null) return;
 
-                    final Users thisUser = (Users) lstUsersFound.getSelectedValue();
+                final Users thisUser = (Users) lstUsersFound.getSelectedValue();
 
-                    if (!Training2UsersTools.contains(training.getAttendees(), thisUser)) {
+                if (!Training2UsersTools.contains(training.getAttendees(), thisUser)) {
 
-                        Training2Users training2Users = new Training2Users(training.getStarting(), thisUser, training);
+                    Training2Users training2Users = new Training2Users(training.getStarting(), thisUser, training);
 
-                        EntityManager em = OPDE.createEM();
-                        try {
-                            em.getTransaction().begin();
-                            Training2Users myT2U = em.merge(training2Users);
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Training2Users myT2U = em.merge(training2Users);
 
-                            Training myTraining = em.merge(training);
-                            em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        Training myTraining = em.merge(training);
+                        em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                            myTraining.getAttendees().add(myT2U);
+                        myTraining.getAttendees().add(myT2U);
 
-                            em.getTransaction().commit();
+                        em.getTransaction().commit();
 
-                            editAction.execute(myTraining);
+                        editAction.execute(myTraining);
 
-                        } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
-                            OPDE.warn(ole);
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            editAction.execute(null);
-                        } catch (Exception ex) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            OPDE.fatal(ex);
-                        } finally {
-                            em.close();
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
                         }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        editAction.execute(null);
+                    } catch (Exception ex) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(ex);
+                    } finally {
+                        em.close();
+                    }
 
 //                        SwingUtilities.invokeLater(new Runnable() {
 //                            @Override
@@ -142,26 +141,17 @@ public class PnlUserlistEditor extends JPanel {
 //                                repaint();
 //                            }
 //                        });
-                    }
-
-
                 }
+
+
             });
 
             txtUsers = new JTextField(15);
-            txtUsers.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            lstUsersFound.setModel(SYSTools.list2dlm(UsersTools.getUsers(txtUsers.getText(), false)));
-                            lstUsersFound.revalidate();
-                            lstUsersFound.repaint();
-                        }
-                    });
-                }
-            });
+            txtUsers.addCaretListener(e -> SwingUtilities.invokeLater(() -> {
+                lstUsersFound.setModel(SYSTools.list2dlm(UsersTools.getUsers(txtUsers.getText(), false)));
+                lstUsersFound.revalidate();
+                lstUsersFound.repaint();
+            }));
 
             SelectAllUtils.install(txtUsers);
 
@@ -199,38 +189,35 @@ public class PnlUserlistEditor extends JPanel {
 //            btnDelUser.setForeground(SYSConst.green2[SYSConst.dark4]);
 
 
-            btnDelUser.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+            btnDelUser.addActionListener(e -> {
 
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        Training myTraining = em.merge(training);
-                        em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                        Training2Users myT2U = em.merge(training2Users);
-                        myTraining.getAttendees().remove(myT2U);
-                        em.remove(myT2U);
-                        em.getTransaction().commit();
-                        editAction.execute(myTraining);
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                        editAction.execute(null);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Training myTraining = em.merge(training);
+                    em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    Training2Users myT2U = em.merge(training2Users);
+                    myTraining.getAttendees().remove(myT2U);
+                    em.remove(myT2U);
+                    em.getTransaction().commit();
+                    editAction.execute(myTraining);
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
-
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    editAction.execute(null);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
                 }
+
             });
 
             pnlButton.add(btnDelUser);
@@ -239,43 +226,40 @@ public class PnlUserlistEditor extends JPanel {
         JButton btnState = GUITools.getTinyButton(Training2UsersTools.getTooltip(training2Users), Training2UsersTools.getIcon(training2Users));
         btnState.setPressedIcon(SYSConst.icon16Pressed);
         if (editmode) {
-            btnState.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        Training myTraining = em.merge(training);
-                        em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                        Training2Users myT2U = em.merge(training2Users);
-                        myTraining.getAttendees().remove(myT2U);
+            btnState.addActionListener(e -> {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Training myTraining = em.merge(training);
+                    em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    Training2Users myT2U = em.merge(training2Users);
+                    myTraining.getAttendees().remove(myT2U);
 
-                        byte state = myT2U.getState();
-                        state++;
-                        if (state > Training2UsersTools.STATE_REFUSED) state = Training2UsersTools.STATE_OPEN;
-                        myT2U.setState(state);
-                        myTraining.getAttendees().add(myT2U);
+                    byte state = myT2U.getState();
+                    state++;
+                    if (state > Training2UsersTools.STATE_REFUSED) state = Training2UsersTools.STATE_OPEN;
+                    myT2U.setState(state);
+                    myTraining.getAttendees().add(myT2U);
 
-                        em.getTransaction().commit();
-                        editAction.execute(myTraining);
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                        editAction.execute(null);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+                    em.getTransaction().commit();
+                    editAction.execute(myTraining);
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
-
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    editAction.execute(null);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
                 }
+
             });
         }
         pnlButton.add(btnState);
@@ -286,60 +270,54 @@ public class PnlUserlistEditor extends JPanel {
             final JButton btnDate = GUITools.getTinyButton("misc.msg.date", SYSConst.icon16date);
             btnDate.setPressedIcon(SYSConst.icon16Pressed);
             if (editmode) {
-                btnDate.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
+                btnDate.addActionListener(e -> {
 
-                        JCalendar jdc = new JCalendar(training2Users.getPit());
-                        jdc.addPropertyChangeListener("calendar", new PropertyChangeListener() {
-                            @Override
-                            public void propertyChange(PropertyChangeEvent evt) {
-                                if (evt.getNewValue() == null) return;
-                                Date date = ((GregorianCalendar) evt.getNewValue()).getTime();
+                    JCalendar jdc = new JCalendar(training2Users.getPit());
+                    jdc.addPropertyChangeListener("calendar", evt -> {
+                        if (evt.getNewValue() == null) return;
+                        Date date = ((GregorianCalendar) evt.getNewValue()).getTime();
 
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    Training myTraining = em.merge(training);
-                                    em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                    Training2Users myT2U = em.merge(training2Users);
-                                    myTraining.getAttendees().remove(myT2U);
-                                    myT2U.setPit(date);
-                                    myTraining.getAttendees().add(myT2U);
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            Training myTraining = em.merge(training);
+                            em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            Training2Users myT2U = em.merge(training2Users);
+                            myTraining.getAttendees().remove(myT2U);
+                            myT2U.setPit(date);
+                            myTraining.getAttendees().add(myT2U);
 
-                                    em.getTransaction().commit();
-                                    editAction.execute(myTraining);
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    editAction.execute(null);
-                                } catch (Exception ex) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(ex);
-                                } finally {
-                                    em.close();
-                                }
-
+                            em.getTransaction().commit();
+                            editAction.execute(myTraining);
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
                             }
-                        });
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            editAction.execute(null);
+                        } catch (Exception ex) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(ex);
+                        } finally {
+                            em.close();
+                        }
 
-                        final JidePopup popupInfo = new JidePopup();
-                        popupInfo.setMovable(false);
-                        popupInfo.setContentPane(jdc);
-                        popupInfo.removeExcludedComponent(jdc);
-                        popupInfo.setDefaultFocusComponent(jdc);
-                        popupInfo.setOwner(btnDate);
+                    });
 
-                        GUITools.showPopup(popupInfo, SwingConstants.CENTER);
+                    final JidePopup popupInfo = new JidePopup();
+                    popupInfo.setMovable(false);
+                    popupInfo.setContentPane(jdc);
+                    popupInfo.removeExcludedComponent(jdc);
+                    popupInfo.setDefaultFocusComponent(jdc);
+                    popupInfo.setOwner(btnDate);
+
+                    GUITools.showPopup(popupInfo, SwingConstants.CENTER);
 
 
-                    }
                 });
             }
             pnlButton.add(btnDate);
@@ -359,20 +337,15 @@ public class PnlUserlistEditor extends JPanel {
         btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
         btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        btnFiles.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                Closure fileHandleClosure = !editmode ? null : new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        EntityManager em = OPDE.createEM();
-                        final Training myTraining = em.find(Training.class, training2Users.getId());
-                        em.close();
-                        editAction.execute(myTraining);
-                    }
-                };
-                new DlgFiles(training2Users, fileHandleClosure);
-            }
+        btnFiles.addActionListener(actionEvent -> {
+            Closure fileHandleClosure = !editmode ? null : o -> {
+                EntityManager em = OPDE.createEM();
+                final Training myTraining = em.find(Training.class, training2Users.getId());
+                em.close();
+                editAction.execute(myTraining);
+            };
+            new DlgFiles(training2Users, fileHandleClosure);
+
         });
         btnFiles.setEnabled(OPDE.isFTPworking());
         pnlButton.add(btnFiles);

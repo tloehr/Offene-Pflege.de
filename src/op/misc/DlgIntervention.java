@@ -217,12 +217,7 @@ public class DlgIntervention extends MyJDialog {
 
             //---- txtSearch ----
             txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtSearch.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtSearchActionPerformed(e);
-                }
-            });
+            txtSearch.addActionListener(e -> txtSearchActionPerformed(e));
             panel1.add(txtSearch, CC.xy(3, 3));
 
             //======== panel2 ========
@@ -301,12 +296,7 @@ public class DlgIntervention extends MyJDialog {
                     btnCancel.setContentAreaFilled(false);
                     btnCancel.setBorder(null);
                     btnCancel.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                    btnCancel.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnCancelActionPerformed(e);
-                        }
-                    });
+                    btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
                     panel3.add(btnCancel);
 
                     //---- btnSave ----
@@ -315,12 +305,7 @@ public class DlgIntervention extends MyJDialog {
                     btnSave.setContentAreaFilled(false);
                     btnSave.setBorder(null);
                     btnSave.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                    btnSave.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnSaveActionPerformed(e);
-                        }
-                    });
+                    btnSave.addActionListener(e -> btnSaveActionPerformed(e));
                     panel3.add(btnSave);
                     panel3.add(hSpacer1);
 
@@ -330,12 +315,7 @@ public class DlgIntervention extends MyJDialog {
                     btnEject.setContentAreaFilled(false);
                     btnEject.setBorder(null);
                     btnEject.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                    btnEject.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnEjectActionPerformed(e);
-                        }
-                    });
+                    btnEject.addActionListener(e -> btnEjectActionPerformed(e));
                     panel3.add(btnEject);
                 }
                 panel2.add(panel3, CC.xywh(1, 11, 3, 1, CC.RIGHT, CC.BOTTOM));
@@ -348,12 +328,7 @@ public class DlgIntervention extends MyJDialog {
                 //---- lstInterventions ----
                 lstInterventions.setFont(new Font("Arial", Font.PLAIN, 14));
                 lstInterventions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                lstInterventions.addListSelectionListener(new ListSelectionListener() {
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-                        lstInterventionsValueChanged(e);
-                    }
-                });
+                lstInterventions.addListSelectionListener(e -> lstInterventionsValueChanged(e));
                 panel4.setViewportView(lstInterventions);
             }
             panel1.add(panel4, CC.xy(3, 5, CC.DEFAULT, CC.FILL));
@@ -369,12 +344,7 @@ public class DlgIntervention extends MyJDialog {
                 btnAdd.setContentAreaFilled(false);
                 btnAdd.setBorder(null);
                 btnAdd.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                btnAdd.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnAddActionPerformed(e);
-                    }
-                });
+                btnAdd.addActionListener(e -> btnAddActionPerformed(e));
                 panel5.add(btnAdd);
 
                 //---- btnEdit ----
@@ -383,12 +353,7 @@ public class DlgIntervention extends MyJDialog {
                 btnEdit.setContentAreaFilled(false);
                 btnEdit.setBorder(null);
                 btnEdit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                btnEdit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnEditActionPerformed(e);
-                    }
-                });
+                btnEdit.addActionListener(e -> btnEditActionPerformed(e));
                 panel5.add(btnEdit);
             }
             panel1.add(panel5, CC.xy(3, 7));

@@ -98,12 +98,7 @@ public class PnlRecipients extends JPanel {
 
         ac.setStrict(false);
         ac.setStrictCompletion(false);
-        txtRecipients.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                recipientsChanged();
-            }
-        });
+        txtRecipients.addActionListener(e -> recipientsChanged());
 
         txtRecipients.addFocusListener(new FocusAdapter() {
             @Override

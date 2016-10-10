@@ -762,17 +762,12 @@ public class GUITools {
         btnExpandAll.setContentAreaFilled(false);
         btnExpandAll.setBorder(null);
         btnExpandAll.setToolTipText(SYSTools.xx("misc.msg.expandall"));
-        btnExpandAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cp, false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
+        btnExpandAll.addActionListener(actionEvent -> {
+            try {
+                GUITools.setCollapsed(cp, false);
+            } catch (PropertyVetoException e) {
+                // bah!
             }
-
-
         });
         pane.add(btnExpandAll);
 
@@ -782,17 +777,12 @@ public class GUITools {
         btnCollapseAll.setContentAreaFilled(false);
         btnCollapseAll.setBorder(null);
         btnCollapseAll.setToolTipText(SYSTools.xx("misc.msg.collapseall"));
-        btnCollapseAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cp, true);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
+        btnCollapseAll.addActionListener(actionEvent -> {
+            try {
+                GUITools.setCollapsed(cp, true);
+            } catch (PropertyVetoException e) {
+                // bah!
             }
-
-
         });
         pane.add(btnCollapseAll);
 
@@ -813,12 +803,9 @@ public class GUITools {
         popup.getContentPane().add(new JScrollPane(editor));
         final JButton saveButton = new JButton(SYSConst.icon16apply);
 
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                popup.hidePopup();
-                saveClosure.execute(SYSTools.tidy(editor.getText()));
-            }
+        saveButton.addActionListener(e -> {
+            popup.hidePopup();
+            saveClosure.execute(SYSTools.tidy(editor.getText()));
         });
 
         saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -854,13 +841,10 @@ public class GUITools {
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
 
         JButton saveButton = new JButton(SYSConst.icon22apply);
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (myPnl.isSaveOK()) {
-                    popup.hidePopup();
-                    saveAction.execute(myPnl.getResult());
-                }
+        saveButton.addActionListener(e -> {
+            if (myPnl.isSaveOK()) {
+                popup.hidePopup();
+                saveAction.execute(myPnl.getResult());
             }
         });
         saveButton.setContentAreaFilled(false);

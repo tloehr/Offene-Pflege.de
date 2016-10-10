@@ -87,12 +87,7 @@ public class PnlExpiry extends JPanel {
 
         //---- cbExpiry ----
         cbExpiry.setText("text");
-        cbExpiry.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cbExpiryItemStateChanged(e);
-            }
-        });
+        cbExpiry.addItemListener(e -> cbExpiryItemStateChanged(e));
         add(cbExpiry, CC.xy(3, 5));
 
         //---- txtExpiry ----
@@ -102,12 +97,7 @@ public class PnlExpiry extends JPanel {
                 txtExpiryFocusLost(e);
             }
         });
-        txtExpiry.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtExpiryActionPerformed(e);
-            }
-        });
+        txtExpiry.addActionListener(e -> txtExpiryActionPerformed(e));
         add(txtExpiry, CC.xy(5, 5, CC.DEFAULT, CC.FILL));
 
         //---- btnSave ----
@@ -116,12 +106,7 @@ public class PnlExpiry extends JPanel {
         btnSave.setBorderPainted(false);
         btnSave.setBorder(null);
         btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnSaveActionPerformed(e);
-            }
-        });
+        btnSave.addActionListener(e -> btnSaveActionPerformed(e));
         add(btnSave, CC.xy(7, 5));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

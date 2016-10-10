@@ -42,12 +42,7 @@ public class PnlHospital extends JPanel {
         panel3.setLayout(new BoxLayout(panel3, BoxLayout.LINE_AXIS));
 
         cmbHospital.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbHospital.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbHospitalItemStateChanged(e);
-            }
-        });
+        cmbHospital.addItemListener(e -> cmbHospitalItemStateChanged(e));
 
         btnAdd = new JButton();
         btnAdd.setText(null);
@@ -55,12 +50,7 @@ public class PnlHospital extends JPanel {
         btnAdd.setBorderPainted(false);
         btnAdd.setContentAreaFilled(false);
         btnAdd.setBorder(null);
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnAddActionPerformed(e);
-            }
-        });
+        btnAdd.addActionListener(e -> btnAddActionPerformed(e));
         panel3.add(btnAdd);
 
         //---- btnEdit ----
@@ -70,12 +60,7 @@ public class PnlHospital extends JPanel {
         btnEdit.setBorderPainted(false);
         btnEdit.setContentAreaFilled(false);
         btnEdit.setBorder(null);
-        btnEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnEditActionPerformed(e);
-            }
-        });
+        btnEdit.addActionListener(e -> btnEditActionPerformed(e));
         panel3.add(btnEdit);
 
         add(cmbHospital, BorderLayout.CENTER);
@@ -107,26 +92,23 @@ public class PnlHospital extends JPanel {
 
     private void btnAddActionPerformed(ActionEvent e) {
         final PnlEditHospital pnlEditHospital = new PnlEditHospital(new Hospital());
-        final JidePopup popup = GUITools.createPanelPopup(pnlEditHospital, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        Hospital myHospital = em.merge((Hospital) o);
-                        em.getTransaction().commit();
-                        cmbHospital.setModel(new DefaultComboBoxModel(new Hospital[]{myHospital}));
-                        selected = myHospital;
-                        changeEvent.execute(selected);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+        final JidePopup popup = GUITools.createPanelPopup(pnlEditHospital, o -> {
+            if (o != null) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Hospital myHospital = em.merge((Hospital) o);
+                    em.getTransaction().commit();
+                    cmbHospital.setModel(new DefaultComboBoxModel(new Hospital[]{myHospital}));
+                    selected = myHospital;
+                    changeEvent.execute(selected);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
                 }
             }
         }, btnAdd);
@@ -136,26 +118,23 @@ public class PnlHospital extends JPanel {
     private void btnEditActionPerformed(ActionEvent e) {
         if (cmbHospital.getSelectedItem() == null) return;
         final PnlEditHospital pnlEditHospital = new PnlEditHospital((Hospital) cmbHospital.getSelectedItem());
-        final JidePopup popup = GUITools.createPanelPopup(pnlEditHospital, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        Hospital myHospital = em.merge((Hospital) o);
-                        em.getTransaction().commit();
-                        cmbHospital.setModel(new DefaultComboBoxModel(new Hospital[]{myHospital}));
-                        selected = myHospital;
-                        changeEvent.execute(selected);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+        final JidePopup popup = GUITools.createPanelPopup(pnlEditHospital, o -> {
+            if (o != null) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Hospital myHospital = em.merge((Hospital) o);
+                    em.getTransaction().commit();
+                    cmbHospital.setModel(new DefaultComboBoxModel(new Hospital[]{myHospital}));
+                    selected = myHospital;
+                    changeEvent.execute(selected);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
                 }
             }
         }, btnEdit);

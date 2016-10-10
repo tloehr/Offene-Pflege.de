@@ -58,10 +58,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -133,6 +130,7 @@ public class PnlAllowance extends CleanablePanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         lstResidents.clear();
         cpsCash.removeAll();
         searchPanes.removeAll();
@@ -277,14 +275,11 @@ public class PnlAllowance extends CleanablePanel {
 
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpResident.setCollapsed(!cpResident.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpResident.setCollapsed(!cpResident.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -304,14 +299,7 @@ public class PnlAllowance extends CleanablePanel {
             btnPrintResident.setContentAreaFilled(false);
             btnPrintResident.setBorder(null);
             btnPrintResident.setToolTipText(SYSTools.xx("admin.residents.cash.btnprintresident.tooltip"));
-            btnPrintResident.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, resident), true);
-                }
-
-
-            });
+            btnPrintResident.addActionListener(actionEvent -> SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, resident), true));
             cptitle.getRight().add(btnPrintResident);
         }
 
@@ -360,12 +348,9 @@ public class PnlAllowance extends CleanablePanel {
         popupTX.setDefaultFocusComponent(pnlTX);
 
         final JideButton btnNewTX = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.enterTXs"), SYSConst.icon22add, null);
-        btnNewTX.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                popupTX.setOwner(btnNewTX);
-                GUITools.showPopup(popupTX, SwingConstants.NORTH);
-            }
+        btnNewTX.addActionListener(actionEvent -> {
+            popupTX.setOwner(btnNewTX);
+            GUITools.showPopup(popupTX, SwingConstants.NORTH);
         });
         btnNewTX.setBackground(getBG(resident, 9));
         btnNewTX.setOpaque(true);
@@ -442,14 +427,11 @@ public class PnlAllowance extends CleanablePanel {
 
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpYear.setCollapsed(!cpYear.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpYear.setCollapsed(!cpYear.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -469,17 +451,12 @@ public class PnlAllowance extends CleanablePanel {
         btnPrintYear.setContentAreaFilled(false);
         btnPrintYear.setBorder(null);
         btnPrintYear.setToolTipText(SYSTools.xx("misc.tooltips.btnprintyear"));
-        btnPrintYear.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String carry4printKey = resident.getRID() + "-" + (year - 1) + "-12";
-                if (!carrySums.containsKey(carry4printKey)) {
-                    carrySums.put(carry4printKey, AllowanceTools.getSUM(resident, SYSCalendar.eoy(start.minusYears(1))));
-                }
-                SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carrySums.get(carry4printKey), resident), true);
+        btnPrintYear.addActionListener(actionEvent -> {
+            String carry4printKey = resident.getRID() + "-" + (year - 1) + "-12";
+            if (!carrySums.containsKey(carry4printKey)) {
+                carrySums.put(carry4printKey, AllowanceTools.getSUM(resident, SYSCalendar.eoy(start.minusYears(1))));
             }
-
-
+            SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carrySums.get(carry4printKey), resident), true);
         });
         cptitle.getRight().add(btnPrintYear);
 
@@ -562,14 +539,11 @@ public class PnlAllowance extends CleanablePanel {
 
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpMonth.setCollapsed(!cpMonth.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpMonth.setCollapsed(!cpMonth.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -587,16 +561,13 @@ public class PnlAllowance extends CleanablePanel {
         btnPrintMonth.setContentAreaFilled(false);
         btnPrintMonth.setBorder(null);
         btnPrintMonth.setToolTipText(SYSTools.xx("misc.tooltips.btnprintmonth"));
-        btnPrintMonth.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (!cashmap.containsKey(key)) {
-                    cashmap.put(key, AllowanceTools.getMonth(resident, month.toDate()));
-                }
-
-                final BigDecimal carry4print = AllowanceTools.getSUM(resident, SYSCalendar.eom(month.minusMonths(1)));
-                SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry4print, resident), true);
+        btnPrintMonth.addActionListener(actionEvent -> {
+            if (!cashmap.containsKey(key)) {
+                cashmap.put(key, AllowanceTools.getMonth(resident, month.toDate()));
             }
+
+            final BigDecimal carry4print = AllowanceTools.getSUM(resident, SYSCalendar.eom(month.minusMonths(1)));
+            SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry4print, resident), true);
         });
 
         cptitle.getRight().add(btnPrintMonth);
@@ -669,18 +640,15 @@ public class PnlAllowance extends CleanablePanel {
         txtSearch = new JXSearchField(SYSTools.xx("misc.msg.residentsearch"));
         txtSearch.setFont(SYSConst.ARIAL14);
         txtSearch.setInstantSearchDelay(100000);
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<Resident> listSearchResidents = ResidentTools.getBy(txtSearch.getText().trim(), OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, internalClassID));
-                if (listSearchResidents != null && !listSearchResidents.isEmpty()) {
-                    cmbResident.setModel(SYSTools.list2cmb(listSearchResidents));
-                    lstResidents = new ArrayList<Resident>();
-                    lstResidents.add((Resident) cmbResident.getSelectedItem());
-                    reloadDisplay();
-                } else {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.nodata"));
-                }
+        txtSearch.addActionListener(e -> {
+            ArrayList<Resident> listSearchResidents = ResidentTools.getBy(txtSearch.getText().trim(), OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, internalClassID));
+            if (listSearchResidents != null && !listSearchResidents.isEmpty()) {
+                cmbResident.setModel(SYSTools.list2cmb(listSearchResidents));
+                lstResidents = new ArrayList<Resident>();
+                lstResidents.add((Resident) cmbResident.getSelectedItem());
+                reloadDisplay();
+            } else {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.nodata"));
             }
         });
 
@@ -688,48 +656,36 @@ public class PnlAllowance extends CleanablePanel {
 
         cmbResident = new JComboBox();
         cmbResident.setFont(SYSConst.ARIAL14);
-        cmbResident.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    lstResidents = new ArrayList<Resident>();
-                    lstResidents.add((Resident) e.getItem());
-                    reloadDisplay();
-                }
+        cmbResident.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                lstResidents = new ArrayList<Resident>();
+                lstResidents.add((Resident) e.getItem());
+                reloadDisplay();
             }
         });
         list.add(cmbResident);
 
         final JideButton btnAllActiveResidents = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.showallactiveresidents"), SYSConst.icon22residentActive, null);
-        btnAllActiveResidents.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                lstResidents = ResidentTools.getAllActive();
-                reloadDisplay();
-            }
+        btnAllActiveResidents.addActionListener(actionEvent -> {
+            lstResidents = ResidentTools.getAllActive();
+            reloadDisplay();
         });
         list.add(btnAllActiveResidents);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, internalClassID)) {
             final JideButton btnAllInactiveResidents = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.showallinactiveresidents"), SYSConst.icon22residentInactive, null);
-            btnAllInactiveResidents.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    lstResidents = ResidentTools.getAllInactive();
-                    reloadDisplay();
-                }
+            btnAllInactiveResidents.addActionListener(actionEvent -> {
+                lstResidents = ResidentTools.getAllInactive();
+                reloadDisplay();
             });
             list.add(btnAllInactiveResidents);
 
             final JideButton btnAllResidents = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.showallresidents"), SYSConst.icon22residentBoth, null);
-            btnAllResidents.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    lstResidents = ResidentTools.getAllInactive();
-                    lstResidents.addAll(ResidentTools.getAllActive());
-                    Collections.sort(lstResidents);
-                    reloadDisplay();
-                }
+            btnAllResidents.addActionListener(actionEvent -> {
+                lstResidents = ResidentTools.getAllInactive();
+                lstResidents.addAll(ResidentTools.getAllActive());
+                Collections.sort(lstResidents);
+                reloadDisplay();
             });
             list.add(btnAllResidents);
         }
@@ -741,61 +697,25 @@ public class PnlAllowance extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         final JideButton btnNewTX = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.enterTXs"), SYSConst.icon22add, null);
-        btnNewTX.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-//                PnlTX pnlTX = new PnlTX(new Allowance(currentResident), new Closure() {
-//                    @Override
-//                    public void execute(Object o) {
-//                        //                OPDE.debug(o);
-//                        if (o != null) {
-//
-//                            EntityManager em = OPDE.createEM();
-//                            try {
-//                                em.getTransaction().begin();
-//                                final Allowance myAllowance = em.merge((Allowance) o);
-//                                em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
-//                                em.getTransaction().commit();
-//
-//
-//                            } catch (OptimisticLockException ole) {
-//                                OPDE.warn(ole);
-//                                if (em.getTransaction().isActive()) {
-//                                    em.getTransaction().rollback();
-//                                }
-//                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-//                                    OPDE.getMainframe().emptyFrame();
-//                                    OPDE.getMainframe().afterLogin();
-//                                }
-//                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-//                            } catch (Exception e) {
-//                                if (em.getTransaction().isActive()) {
-//                                    em.getTransaction().rollback();
-//                                }
-//                                OPDE.fatal(e);
-//                            } finally {
-//                                em.close();
-//                            }
-//
-//                        }
-//                    }
-//                });
-                MyJDialog myJDialog = new MyJDialog(true);
-                myJDialog.setContentPane(getPnlTX(null, null));
-                myJDialog.pack();
-                myJDialog.setVisible(true);
-            }
+        btnNewTX.addActionListener(actionEvent -> {
+            MyJDialog myJDialog = new MyJDialog(true);
+            myJDialog.setContentPane(getPnlTX(null, null));
+            myJDialog.pack();
+//            myJDialog.addWindowListener(new WindowAdapter() {
+//                @Override
+//                public void windowClosing(WindowEvent e) {
+//                    super.windowClosing(e);
+//                    currentEditor = null;
+//                }
+//            });
+//            currentEditor = myJDialog;
+            myJDialog.setVisible(true);
         });
         list.add(btnNewTX);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
             final JideButton btnPrintStat = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.printstat"), SYSConst.icon22calc, null);
-            btnPrintStat.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(AllowanceTools.getOverallSumAsHTML(12), false);
-                }
-            });
+            btnPrintStat.addActionListener(actionEvent -> SYSFilesTools.print(AllowanceTools.getOverallSumAsHTML(12), false));
             list.add(btnPrintStat);
         }
         return list;
@@ -883,11 +803,8 @@ public class PnlAllowance extends CleanablePanel {
 
                         "</font></html>";
 
-                DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
+                DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
 
-                    }
                 });
                 cptitle.getButton().setIcon(allowance.isReplaced() || allowance.isReplacement() ? SYSConst.icon22eraser : null);
 
@@ -907,21 +824,18 @@ public class PnlAllowance extends CleanablePanel {
                     btnEdit.setContentAreaFilled(false);
                     btnEdit.setBorder(null);
                     btnEdit.setToolTipText(SYSTools.xx("admin.residents.cash.btnedit.tooltip"));
-                    btnEdit.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
+                    btnEdit.addActionListener(actionEvent -> {
 
-                            final JidePopup popupTX = new JidePopup();
-                            popupTX.setMovable(false);
-                            PnlTX pnlTX = getPnlTX(resident, allowance);
-                            popupTX.setContentPane(pnlTX);
-                            popupTX.removeExcludedComponent(pnlTX);
-                            popupTX.setDefaultFocusComponent(pnlTX);
+                        final JidePopup popupTX = new JidePopup();
+                        popupTX.setMovable(false);
+                        PnlTX pnlTX = getPnlTX(resident, allowance);
+                        popupTX.setContentPane(pnlTX);
+                        popupTX.removeExcludedComponent(pnlTX);
+                        popupTX.setDefaultFocusComponent(pnlTX);
 
-                            popupTX.setOwner(btnEdit);
-                            GUITools.showPopup(popupTX, SwingConstants.WEST);
+                        popupTX.setOwner(btnEdit);
+                        GUITools.showPopup(popupTX, SwingConstants.WEST);
 
-                        }
                     });
                     cptitle.getRight().add(btnEdit);
                     // you can edit your own entries or you are a manager. once they are replaced or a replacement record, its over.
@@ -942,72 +856,67 @@ public class PnlAllowance extends CleanablePanel {
                     btnUndoTX.setContentAreaFilled(false);
                     btnUndoTX.setBorder(null);
                     btnUndoTX.setToolTipText(SYSTools.xx("admin.residents.cash.btnundotx.tooltip"));
-                    btnUndoTX.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
+                    btnUndoTX.addActionListener(actionEvent -> {
+
+                        currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.undo1") + "<br/><i>" + "<br/><i>" + allowance.getText() + "&nbsp;" + SYSTools.formatCurrency(allowance.getAmount()) + "</i><br/>" + SYSTools.xx("misc.questions.undo2"), SYSConst.icon48undo, answer -> {
+                            if (answer.equals(JOptionPane.YES_OPTION)) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+
+                                    Allowance myOldAllowance = em.merge(allowance);
+                                    Allowance myCancelAllowance = em.merge(new Allowance(myOldAllowance));
+                                    em.lock(em.merge(myOldAllowance.getResident()), LockModeType.OPTIMISTIC);
+                                    em.lock(myOldAllowance, LockModeType.OPTIMISTIC);
+                                    myOldAllowance.setReplacedBy(myCancelAllowance, em.merge(OPDE.getLogin().getUser()));
+
+                                    em.getTransaction().commit();
+
+                                    DateTime txDate = new DateTime(myCancelAllowance.getPit());
+
+                                    final String keyMonth = myCancelAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+                                    contentmap.remove(keyMonth);
+                                    cpMap.remove(keyMonth);
+                                    cashmap.get(keyMonth).remove(allowance);
+                                    cashmap.get(keyMonth).add(myOldAllowance);
+                                    cashmap.get(keyMonth).add(myCancelAllowance);
+                                    Collections.sort(cashmap.get(keyMonth));
 
 
-                            new DlgYesNo(SYSTools.xx("misc.questions.undo1") + "<br/><i>" + "<br/><i>" + allowance.getText() + "&nbsp;" + SYSTools.formatCurrency(allowance.getAmount()) + "</i><br/>" + SYSTools.xx("misc.questions.undo2"), SYSConst.icon48undo, new Closure() {
-                                @Override
-                                public void execute(Object answer) {
-                                    if (answer.equals(JOptionPane.YES_OPTION)) {
-                                        EntityManager em = OPDE.createEM();
-                                        try {
-                                            em.getTransaction().begin();
+                                    updateCarrySums(myCancelAllowance);
 
-                                            Allowance myOldAllowance = em.merge(allowance);
-                                            Allowance myCancelAllowance = em.merge(new Allowance(myOldAllowance));
-                                            em.lock(em.merge(myOldAllowance.getResident()), LockModeType.OPTIMISTIC);
-                                            em.lock(myOldAllowance, LockModeType.OPTIMISTIC);
-                                            myOldAllowance.setReplacedBy(myCancelAllowance, em.merge(OPDE.getLogin().getUser()));
+                                    createCP4(myCancelAllowance.getResident());
 
-                                            em.getTransaction().commit();
-
-                                            DateTime txDate = new DateTime(myCancelAllowance.getPit());
-
-                                            final String keyMonth = myCancelAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
-                                            contentmap.remove(keyMonth);
-                                            cpMap.remove(keyMonth);
-                                            cashmap.get(keyMonth).remove(allowance);
-                                            cashmap.get(keyMonth).add(myOldAllowance);
-                                            cashmap.get(keyMonth).add(myCancelAllowance);
-                                            Collections.sort(cashmap.get(keyMonth));
-
-
-                                            updateCarrySums(myCancelAllowance);
-
-                                            createCP4(myCancelAllowance.getResident());
-
-                                            try {
-                                                cpMap.get(keyMonth).setCollapsed(false);
-                                            } catch (PropertyVetoException e) {
-                                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                            }
-
-                                            buildPanel();
-
-                                        } catch (OptimisticLockException ole) {
-                                            OPDE.warn(ole);
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                OPDE.getMainframe().emptyFrame();
-                                                OPDE.getMainframe().afterLogin();
-                                            }
-                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                        } catch (Exception e) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            OPDE.fatal(e);
-                                        } finally {
-                                            em.close();
-                                        }
+                                    try {
+                                        cpMap.get(keyMonth).setCollapsed(false);
+                                    } catch (PropertyVetoException e) {
+                                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                     }
+
+                                    buildPanel();
+
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                    currentEditor = null;
                                 }
-                            });
-                        }
+                            }
+                        });
+                        currentEditor.setVisible(true);
                     });
                     cptitle.getRight().add(btnUndoTX);
                     btnUndoTX.setEnabled(!allowance.isReplaced() && !allowance.isReplacement());
@@ -1029,83 +938,78 @@ public class PnlAllowance extends CleanablePanel {
                     btnDelete.setContentAreaFilled(false);
                     btnDelete.setBorder(null);
                     btnDelete.setToolTipText(SYSTools.xx("admin.residents.cash.btndelete.tooltip"));
-                    btnDelete.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + allowance.getText() + "&nbsp;" + SYSTools.formatCurrency(allowance.getAmount()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                                @Override
-                                public void execute(Object answer) {
-                                    if (answer.equals(JOptionPane.YES_OPTION)) {
-                                        EntityManager em = OPDE.createEM();
-                                        try {
-                                            em.getTransaction().begin();
-                                            Allowance myAllowance = em.merge(allowance);
-                                            em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
+                    btnDelete.addActionListener(actionEvent -> {
+                        currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + allowance.getText() + "&nbsp;" + SYSTools.formatCurrency(allowance.getAmount()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
+                            if (answer.equals(JOptionPane.YES_OPTION)) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    Allowance myAllowance = em.merge(allowance);
+                                    em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
 
-                                            Allowance theOtherOne = null;
-                                            // Check for special cases
-                                            if (myAllowance.isReplacement()) {
-                                                theOtherOne = em.merge(myAllowance.getReplacementFor());
-                                                theOtherOne.setReplacedBy(null);
-                                                theOtherOne.setEditedBy(null);
-                                                myAllowance.setEditPit(null);
-                                            }
-                                            if (myAllowance.isReplaced()) {
-                                                theOtherOne = em.merge(myAllowance.getReplacedBy());
-                                                theOtherOne.setReplacementFor(null);
-                                            }
-
-                                            em.remove(myAllowance);
-                                            em.getTransaction().commit();
-
-                                            DateTime txDate = new DateTime(myAllowance.getPit());
-                                            final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
-
-                                            cpMap.remove(keyMonth);
-                                            cashmap.get(keyMonth).remove(myAllowance);
-                                            if (theOtherOne != null) {
-                                                cashmap.get(keyMonth).remove(theOtherOne);
-                                                cashmap.get(keyMonth).add(theOtherOne);
-                                                Collections.sort(cashmap.get(keyMonth));
-                                            }
-
-                                            // only to update the carrysums. myAllowance will be discarded soon.
-                                            myAllowance.setAmount(myAllowance.getAmount().negate());
-                                            updateCarrySums(myAllowance);
-
-                                            createCP4(myAllowance.getResident());
-
-                                            try {
-                                                if (cpMap.containsKey(keyMonth)) {
-                                                    cpMap.get(keyMonth).setCollapsed(false);
-                                                }
-                                            } catch (PropertyVetoException e) {
-                                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                            }
-
-                                            buildPanel();
-                                        } catch (OptimisticLockException ole) {
-                                            OPDE.warn(ole);
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                OPDE.getMainframe().emptyFrame();
-                                                OPDE.getMainframe().afterLogin();
-                                            }
-                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                        } catch (Exception e) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            OPDE.fatal(e);
-                                        } finally {
-                                            em.close();
-                                        }
+                                    Allowance theOtherOne = null;
+                                    // Check for special cases
+                                    if (myAllowance.isReplacement()) {
+                                        theOtherOne = em.merge(myAllowance.getReplacementFor());
+                                        theOtherOne.setReplacedBy(null);
+                                        theOtherOne.setEditedBy(null);
+                                        myAllowance.setEditPit(null);
                                     }
+                                    if (myAllowance.isReplaced()) {
+                                        theOtherOne = em.merge(myAllowance.getReplacedBy());
+                                        theOtherOne.setReplacementFor(null);
+                                    }
+
+                                    em.remove(myAllowance);
+                                    em.getTransaction().commit();
+
+                                    DateTime txDate = new DateTime(myAllowance.getPit());
+                                    final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+
+                                    cpMap.remove(keyMonth);
+                                    cashmap.get(keyMonth).remove(myAllowance);
+                                    if (theOtherOne != null) {
+                                        cashmap.get(keyMonth).remove(theOtherOne);
+                                        cashmap.get(keyMonth).add(theOtherOne);
+                                        Collections.sort(cashmap.get(keyMonth));
+                                    }
+
+                                    // only to update the carrysums. myAllowance will be discarded soon.
+                                    myAllowance.setAmount(myAllowance.getAmount().negate());
+                                    updateCarrySums(myAllowance);
+
+                                    createCP4(myAllowance.getResident());
+
+                                    try {
+                                        if (cpMap.containsKey(keyMonth)) {
+                                            cpMap.get(keyMonth).setCollapsed(false);
+                                        }
+                                    } catch (PropertyVetoException e) {
+                                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                    }
+
+                                    buildPanel();
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
                                 }
-                            });
-                        }
+                            }
+                        });
+                        currentEditor.setVisible(true);
                     });
                     cptitle.getRight().add(btnDelete);
                 }
@@ -1142,90 +1046,82 @@ public class PnlAllowance extends CleanablePanel {
         final BigDecimal editAmount = allowance != null ? allowance.getAmount() : null;
         final Allowance allow = (allowance == null ? new Allowance(resident) : allowance);
 
-        return new PnlTX(allow, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
+        return new PnlTX(allow, o -> {
+            if (o != null) {
 
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        final Allowance myAllowance = em.merge((Allowance) o);
-                        em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
-                        em.getTransaction().commit();
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    final Allowance myAllowance = em.merge((Allowance) o);
+                    em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
+                    em.getTransaction().commit();
 
-                        DateTime txDate = new DateTime(myAllowance.getPit());
+                    DateTime txDate = new DateTime(myAllowance.getPit());
 
-                        final String keyResident = myAllowance.getResident().getRID();
-                        final String keyYear = myAllowance.getResident().getRID() + "-" + txDate.getYear();
-                        final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+                    final String keyResident = myAllowance.getResident().getRID();
+                    final String keyYear = myAllowance.getResident().getRID() + "-" + txDate.getYear();
+                    final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
 
-                        if (!lstResidents.contains(myAllowance.getResident())) {
-                            lstResidents.add(myAllowance.getResident());
-                            Collections.sort(lstResidents);
-                        }
-
-                        if (!cashmap.containsKey(keyMonth)) {
-                            cashmap.put(keyMonth, AllowanceTools.getMonth(myAllowance.getResident(), myAllowance.getPit()));
-                        } else {
-
-                            if (cashmap.get(keyMonth).contains(myAllowance)) {
-                                cashmap.get(keyMonth).remove(myAllowance);
-                            }
-                            cashmap.get(keyMonth).add(myAllowance);
-
-                            Collections.sort(cashmap.get(keyMonth));
-                        }
-
-                        // little trick to fix the carries
-                        if (editAmount != null) {
-                            updateCarrySums(myAllowance.getResident(), new LocalDate(myAllowance.getPit()), editAmount.negate());
-                        }
-                        // add the new / edited amount
-                        updateCarrySums(myAllowance);
-
-                        createCP4(myAllowance.getResident());
-
-                        try {
-                            if (cpMap.get(keyResident).isCollapsed())
-                                cpMap.get(keyResident).setCollapsed(false);
-                            if (cpMap.get(keyYear).isCollapsed())
-                                cpMap.get(keyYear).setCollapsed(false);
-                            if (cpMap.get(keyMonth).isCollapsed())
-                                cpMap.get(keyMonth).setCollapsed(false);
-                        } catch (PropertyVetoException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                        }
-
-                        buildPanel();
-
-                        GUITools.scroll2show(jspCash, cpMap.get(keyMonth), cpsCash, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                GUITools.flashBackground(linemap.get(myAllowance), Color.YELLOW, 2);
-                            }
-                        });
-
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
+                    if (!lstResidents.contains(myAllowance.getResident())) {
+                        lstResidents.add(myAllowance.getResident());
+                        Collections.sort(lstResidents);
                     }
 
+                    if (!cashmap.containsKey(keyMonth)) {
+                        cashmap.put(keyMonth, AllowanceTools.getMonth(myAllowance.getResident(), myAllowance.getPit()));
+                    } else {
+
+                        if (cashmap.get(keyMonth).contains(myAllowance)) {
+                            cashmap.get(keyMonth).remove(myAllowance);
+                        }
+                        cashmap.get(keyMonth).add(myAllowance);
+
+                        Collections.sort(cashmap.get(keyMonth));
+                    }
+
+                    // little trick to fix the carries
+                    if (editAmount != null) {
+                        updateCarrySums(myAllowance.getResident(), new LocalDate(myAllowance.getPit()), editAmount.negate());
+                    }
+                    // add the new / edited amount
+                    updateCarrySums(myAllowance);
+
+                    createCP4(myAllowance.getResident());
+
+                    try {
+                        if (cpMap.get(keyResident).isCollapsed())
+                            cpMap.get(keyResident).setCollapsed(false);
+                        if (cpMap.get(keyYear).isCollapsed())
+                            cpMap.get(keyYear).setCollapsed(false);
+                        if (cpMap.get(keyMonth).isCollapsed())
+                            cpMap.get(keyMonth).setCollapsed(false);
+                    } catch (PropertyVetoException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+
+                    buildPanel();
+
+                    GUITools.scroll2show(jspCash, cpMap.get(keyMonth), cpsCash, o1 -> GUITools.flashBackground(linemap.get(myAllowance), Color.YELLOW, 2));
+
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
                 }
+
             }
         });
     }

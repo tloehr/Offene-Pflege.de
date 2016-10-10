@@ -108,12 +108,7 @@ public class DlgOpenStock extends MyJDialog {
             "Item 4"
         }));
         cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbBestID.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbBestIDItemStateChanged(e);
-            }
-        });
+        cmbBestID.addItemListener(e -> cmbBestIDItemStateChanged(e));
         contentPane.add(cmbBestID, CC.xy(5, 3));
 
         //---- lbl2 ----
@@ -123,22 +118,12 @@ public class DlgOpenStock extends MyJDialog {
 
         //---- btnClose ----
         btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-        btnClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCloseActionPerformed(e);
-            }
-        });
+        btnClose.addActionListener(e -> btnCloseActionPerformed(e));
         contentPane.add(btnClose, CC.xy(7, 5));
 
         //---- btnOK ----
         btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnOKActionPerformed(e);
-            }
-        });
+        btnOK.addActionListener(e -> btnOKActionPerformed(e));
         contentPane.add(btnOK, CC.xy(9, 5));
         setSize(455, 165);
         setLocationRelativeTo(getOwner());

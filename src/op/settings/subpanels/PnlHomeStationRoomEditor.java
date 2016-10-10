@@ -107,7 +107,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     @Override
     public void cleanup() {
-
+        super.cleanup();
         Iterator it = parentCPS.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, CollapsiblePanes> pair = (Map.Entry) it.next();

@@ -38,7 +38,10 @@ import op.OPDE;
 import op.system.FileDrop;
 import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
-import op.tools.*;
+import op.tools.DlgYesNo;
+import op.tools.NursingRecordsPanel;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import tablerenderer.RNDHTML;
@@ -90,6 +93,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         SYSTools.unregisterListeners(menu);
         SYSTools.unregisterListeners(this);
     }
@@ -306,72 +310,62 @@ public class PnlFiles extends NursingRecordsPanel {
 
             // SELECT
             JMenuItem itemPopupShow = new JMenuItem(SYSTools.xx("misc.commands.show"), SYSConst.icon22magnify1);
-            itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN);
-                }
-            });
+            itemPopupShow.addActionListener(evt12 -> SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN));
             menu.add(itemPopupShow);
 
 
             if (col == TMSYSFiles.COL_DESCRIPTION && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
 
                 final JMenuItem itemPopupEdit = new JMenuItem(SYSTools.xx("misc.commands.edit"), SYSConst.icon22edit3);
-                itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemPopupEdit.addActionListener(evt1 -> {
 
-                        final JidePopup popup = new JidePopup();
-                        popup.setMovable(false);
-                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    final JidePopup popup = new JidePopup();
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
-                        final JComponent editor = new JTextArea(sysfile.getBeschreibung(), 10, 40);
-                        ((JTextArea) editor).setLineWrap(true);
-                        ((JTextArea) editor).setWrapStyleWord(true);
-                        ((JTextArea) editor).setEditable(true);
+                    final JComponent editor = new JTextArea(sysfile.getBeschreibung(), 10, 40);
+                    ((JTextArea) editor).setLineWrap(true);
+                    ((JTextArea) editor).setWrapStyleWord(true);
+                    ((JTextArea) editor).setEditable(true);
 
-                        popup.getContentPane().add(new JScrollPane(editor));
-                        final JButton saveButton = new JButton(SYSConst.icon22apply);
-                        saveButton.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent actionEvent) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    popup.hidePopup();
-                                    SYSFiles mySysfile = em.merge(sysfile);
-                                    mySysfile.setBeschreibung(((JTextArea) editor).getText().trim());
-                                    em.getTransaction().commit();
-                                    tm.setSYSFile(tblFiles.convertRowIndexToModel(row), mySysfile);
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
+                    popup.getContentPane().add(new JScrollPane(editor));
+                    final JButton saveButton = new JButton(SYSConst.icon22apply);
+                    saveButton.addActionListener(actionEvent -> {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            popup.hidePopup();
+                            SYSFiles mySysfile = em.merge(sysfile);
+                            mySysfile.setBeschreibung(((JTextArea) editor).getText().trim());
+                            em.getTransaction().commit();
+                            tm.setSYSFile(tblFiles.convertRowIndexToModel(row), mySysfile);
+                        } catch (Exception e) {
+                            em.getTransaction().rollback();
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
 
-                            }
-                        });
+                    });
 
-                        saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
-                        JPanel pnl = new JPanel(new BorderLayout(10, 10));
-                        JScrollPane pnlEditor = new JScrollPane(editor);
+                    saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
+                    JPanel pnl = new JPanel(new BorderLayout(10, 10));
+                    JScrollPane pnlEditor = new JScrollPane(editor);
 
-                        pnl.add(pnlEditor, BorderLayout.CENTER);
-                        JPanel buttonPanel = new JPanel();
-                        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
-                        buttonPanel.add(saveButton);
-                        pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
-                        pnl.add(buttonPanel, BorderLayout.SOUTH);
+                    pnl.add(pnlEditor, BorderLayout.CENTER);
+                    JPanel buttonPanel = new JPanel();
+                    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+                    buttonPanel.add(saveButton);
+                    pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
+                    pnl.add(buttonPanel, BorderLayout.SOUTH);
 
-                        popup.setOwner(tblFiles);
-                        popup.removeExcludedComponent(tblFiles);
-                        popup.getContentPane().add(pnl);
-                        popup.setDefaultFocusComponent(editor);
+                    popup.setOwner(tblFiles);
+                    popup.removeExcludedComponent(tblFiles);
+                    popup.getContentPane().add(pnl);
+                    popup.setDefaultFocusComponent(editor);
 
-                        popup.showPopup(screenposition.x, screenposition.y);
+                    popup.showPopup(screenposition.x, screenposition.y);
 
-                    }
                 });
                 menu.add(itemPopupEdit);
             }
@@ -383,16 +377,14 @@ public class PnlFiles extends NursingRecordsPanel {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                        new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + sysfile.getFilename() + "</b><br/>" + SYSTools.xx("misc.questions.delete2"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                if (o.equals(JOptionPane.YES_OPTION)) {
-                                    SYSFilesTools.deleteFile(sysfile);
-                                    reloadTable();
-                                }
+                        currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + sysfile.getFilename() + "</b><br/>" + SYSTools.xx("misc.questions.delete2"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), o -> {
+                            if (o.equals(JOptionPane.YES_OPTION)) {
+                                SYSFilesTools.deleteFile(sysfile);
+                                reloadTable();
                             }
+                            currentEditor = null;
                         });
-
+                        currentEditor.setVisible(true);
                     }
                 });
                 menu.add(itemPopupDelete);
@@ -450,14 +442,12 @@ public class PnlFiles extends NursingRecordsPanel {
         }
 
 
-        mypanel.add(GUITools.getDropPanel(new FileDrop.Listener() {
-            public void filesDropped(java.io.File[] files) {
-                java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, resident);
-                if (!successful.isEmpty()) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
-                }
-                reloadTable();
+        mypanel.add(GUITools.getDropPanel(files -> {
+            java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, resident);
+            if (!successful.isEmpty()) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
             }
+            reloadTable();
         }));
 
 

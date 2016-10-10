@@ -109,14 +109,11 @@ public class DlgRegular extends MyJDialog {
     private void btnAddDosisActionPerformed(ActionEvent e) {
         final JidePopup popup = new JidePopup();
 
-        JPanel dlg = new PnlScheduleDose(new PrescriptionSchedule(prescription), new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    prescription.getPrescriptionSchedule().add(((PrescriptionSchedule) o));
-                    reloadTable();
-                    popup.hidePopup();
-                }
+        JPanel dlg = new PnlScheduleDose(new PrescriptionSchedule(prescription), o -> {
+            if (o != null) {
+                prescription.getPrescriptionSchedule().add(((PrescriptionSchedule) o));
+                reloadTable();
+                popup.hidePopup();
             }
         });
 
@@ -222,12 +219,7 @@ public class DlgRegular extends MyJDialog {
 
     private void cmbDocONKeyPressed(KeyEvent e) {
         final String searchKey = String.valueOf(e.getKeyChar());
-        GP doc = (GP) CollectionUtils.find(listAerzte, new Predicate() {
-            @Override
-            public boolean evaluate(Object o) {
-                return o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
-            }
-        });
+        GP doc = (GP) CollectionUtils.find(listAerzte, o -> o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0));
         if (doc != null) {
             cmbDocON.setSelectedItem(doc);
         }
@@ -235,12 +227,9 @@ public class DlgRegular extends MyJDialog {
 
     private void btnAddGPActionPerformed(ActionEvent e) {
         final PnlEditGP pnlGP = new PnlEditGP(new GP());
-        JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbDocON.setModel(new DefaultComboBoxModel(new GP[]{(GP) o}));
-                }
+        JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
+            if (o != null) {
+                cmbDocON.setModel(new DefaultComboBoxModel(new GP[]{(GP) o}));
             }
         }, btnAddGP);
         GUITools.showPopup(popup, SwingConstants.EAST);
@@ -248,12 +237,9 @@ public class DlgRegular extends MyJDialog {
 
     private void btnAddHospitalActionPerformed(ActionEvent e) {
         final PnlEditHospital pnlHospital = new PnlEditHospital(new Hospital());
-        JidePopup popup = GUITools.createPanelPopup(pnlHospital, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbHospitalON.setModel(new DefaultComboBoxModel(new Hospital[]{(Hospital) o}));
-                }
+        JidePopup popup = GUITools.createPanelPopup(pnlHospital, o -> {
+            if (o != null) {
+                cmbHospitalON.setModel(new DefaultComboBoxModel(new Hospital[]{(Hospital) o}));
             }
         }, btnAddHospital);
         GUITools.showPopup(popup, SwingConstants.EAST);
@@ -664,15 +650,12 @@ public class DlgRegular extends MyJDialog {
 //        String pzn = MedPackageTools.parsePZN(txtMed.getText());
         final JidePopup popup = new JidePopup();
 
-        WizardDialog wizard = new MedProductWizard(new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    MedPackage aPackage = (MedPackage) o;
-                    txtMed.setText(aPackage.getPzn());
-                }
-                popup.hidePopup();
+        WizardDialog wizard = new MedProductWizard(o -> {
+            if (o != null) {
+                MedPackage aPackage = (MedPackage) o;
+                txtMed.setText(aPackage.getPzn());
             }
+            popup.hidePopup();
         }).getWizard();
 
         popup.setMovable(false);
@@ -817,14 +800,11 @@ public class DlgRegular extends MyJDialog {
 
         //-----------------------------------------
         JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.msg.delete"), SYSConst.icon22delete);
-        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PrescriptionSchedule schedule = prescription.getPrescriptionSchedule().get(row);
-                prescription.getPrescriptionSchedule().remove(schedule);
-                schedules2delete.add(schedule);
-                reloadTable();
-            }
+        itemPopupDelete.addActionListener(evt1 -> {
+            PrescriptionSchedule schedule = prescription.getPrescriptionSchedule().get(row);
+            prescription.getPrescriptionSchedule().remove(schedule);
+            schedules2delete.add(schedule);
+            reloadTable();
         });
         menu.add(itemPopupDelete);
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());

@@ -24,7 +24,10 @@ import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
-import op.tools.*;
+import op.tools.DlgYesNo;
+import op.tools.Pair;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
@@ -86,9 +89,7 @@ public class PnlTraining extends CleanablePanel {
 
     @Override
     public void cleanup() {
-//        synchronized (userMap) {
-//            SYSTools.clear(userMap);
-//        }
+        super.cleanup();
         synchronized (cpMap) {
             SYSTools.clear(cpMap);
         }
@@ -157,14 +158,11 @@ public class PnlTraining extends CleanablePanel {
                 "<b>" + Integer.toString(year) + "</b>" +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpYear.setCollapsed(!cpYear.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpYear.setCollapsed(!cpYear.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -176,12 +174,7 @@ public class PnlTraining extends CleanablePanel {
             btnPrintYear.setContentAreaFilled(false);
             btnPrintYear.setBorder(null);
             btnPrintYear.setToolTipText(SYSTools.xx("misc.tooltips.btnprintyear"));
-            btnPrintYear.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(TrainingTools.getAsHTML(TrainingTools.getTrainings4(year, filterTag)), true);
-                }
-            });
+            btnPrintYear.addActionListener(actionEvent -> SYSFilesTools.print(TrainingTools.getAsHTML(TrainingTools.getTrainings4(year, filterTag)), true));
             cptitle.getRight().add(btnPrintYear);
         }
 
@@ -260,14 +253,11 @@ public class PnlTraining extends CleanablePanel {
         title += "</p>";
 
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpTraining.setCollapsed(!cpTraining.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), e -> {
+            try {
+                cpTraining.setCollapsed(!cpTraining.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -293,28 +283,23 @@ public class PnlTraining extends CleanablePanel {
             btnFiles.setContentAreaFilled(false);
             btnFiles.setBorder(null);
 
-            btnFiles.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            final Training myTraining = em.find(Training.class, training.getId());
-                            em.close();
+            btnFiles.addActionListener(actionEvent -> {
+                Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : o -> {
+                    EntityManager em = OPDE.createEM();
+                    final Training myTraining = em.find(Training.class, training.getId());
+                    em.close();
 
-                            final String keyYear = Integer.toString(new DateTime(myTraining.getStarting()).getYear()) + ".year";
-
-                            if (!cpMap.containsKey(keyYear)) {
-                                reload();
-                            } else {
-                                createCP4(myTraining);
-                                buildPanel();
-                            }
-                        }
-                    };
-                    new DlgFiles(training, fileHandleClosure);
-                }
+                    final String keyYear = Integer.toString(new DateTime(myTraining.getStarting()).getYear()) + ".year";
+                    currentEditor = null;
+                    if (!cpMap.containsKey(keyYear)) {
+                        reload();
+                    } else {
+                        createCP4(myTraining);
+                        buildPanel();
+                    }
+                };
+                currentEditor = new DlgFiles(training, fileHandleClosure);
+                currentEditor.setVisible(true);
             });
             btnFiles.setEnabled(OPDE.isFTPworking());
             cptitle.getRight().add(btnFiles);
@@ -336,20 +321,17 @@ public class PnlTraining extends CleanablePanel {
         btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnMenu.setContentAreaFilled(false);
         btnMenu.setBorder(null);
-        btnMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JidePopup popup = new JidePopup();
-                popup.setMovable(false);
-                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                popup.setOwner(btnMenu);
-                popup.removeExcludedComponent(btnMenu);
-                JPanel pnl = getMenu(training);
-                popup.getContentPane().add(pnl);
-                popup.setDefaultFocusComponent(pnl);
+        btnMenu.addActionListener(e -> {
+            JidePopup popup = new JidePopup();
+            popup.setMovable(false);
+            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+            popup.setOwner(btnMenu);
+            popup.removeExcludedComponent(btnMenu);
+            JPanel pnl = getMenu(training);
+            popup.getContentPane().add(pnl);
+            popup.setDefaultFocusComponent(pnl);
 
-                GUITools.showPopup(popup, SwingConstants.WEST);
-            }
+            GUITools.showPopup(popup, SwingConstants.WEST);
         });
         cptitle.getRight().add(btnMenu);
 
@@ -381,18 +363,15 @@ public class PnlTraining extends CleanablePanel {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
         contentPanel.setOpaque(false);
 
-        Closure afterEdited = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o == null) {
-                    reload();
-                } else {
-                    Training editedTraining = (Training) o;
-                    final String key = editedTraining.getId() + ".trainid";
-                    trainingMap.put(key, editedTraining);
-                    createCP4(editedTraining);
-                    prepareSearchArea();
-                }
+        Closure afterEdited = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? o -> {
+            if (o == null) {
+                reload();
+            } else {
+                Training editedTraining = (Training) o;
+                final String key = editedTraining.getId() + ".trainid";
+                trainingMap.put(key, editedTraining);
+                createCP4(editedTraining);
+                prepareSearchArea();
             }
         } : null;
 
@@ -536,50 +515,46 @@ public class PnlTraining extends CleanablePanel {
              */
             final JButton btnDelete = GUITools.createHyperlinkButton("misc.commands.delete", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnDelete.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + training.getTitle() + ", " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(training.getStarting()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                        @Override
-                        public void execute(Object answer) {
-                            if (answer.equals(JOptionPane.YES_OPTION)) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    Training myTraining = em.merge(training);
+            btnDelete.addActionListener(actionEvent -> {
+                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + training.getTitle() + ", " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(training.getStarting()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
+                    if (answer.equals(JOptionPane.YES_OPTION)) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            Training myTraining = em.merge(training);
 
-                                    for (Training2Users training2Users : myTraining.getAttendees()) {
-                                        em.remove(em.merge(training2Users));
-                                    }
-
-                                    em.remove(myTraining);
-                                    em.getTransaction().commit();
-
-                                    reload();
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    } else {
-                                        reload();
-                                    }
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-
+                            for (Training2Users training2Users : myTraining.getAttendees()) {
+                                em.remove(em.merge(training2Users));
                             }
+
+                            em.remove(myTraining);
+                            em.getTransaction().commit();
+
+                            reload();
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            } else {
+                                reload();
+                            }
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
                         }
-                    });
-                }
+
+                    }
+                });
+                currentEditor.setVisible(true);
             });
             //            btnDelete.setEnabled(NReportTools.isChangeable(nreport));
             pnlMenu.add(btnDelete);
@@ -598,29 +573,24 @@ public class PnlTraining extends CleanablePanel {
              */
             final JButton btnFiles = GUITools.createHyperlinkButton("misc.btnfiles.tooltip", SYSConst.icon22attach, null);
             btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnFiles.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    Closure fileHandleClosure = new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            final Training myTraining = em.find(Training.class, training.getId());
-                            em.close();
+            btnFiles.addActionListener(actionEvent -> {
+                Closure fileHandleClosure = o -> {
+                    EntityManager em = OPDE.createEM();
+                    final Training myTraining = em.find(Training.class, training.getId());
+                    em.close();
 
-                            final String keyYear = Integer.toString(new DateTime(myTraining.getStarting()).getYear()) + ".year";
+                    final String keyYear = Integer.toString(new DateTime(myTraining.getStarting()).getYear()) + ".year";
+                    currentEditor = null;
+                    if (!cpMap.containsKey(keyYear)) {
+                        reload();
+                    } else {
+                        createCP4(myTraining);
+                        buildPanel();
+                    }
 
-                            if (!cpMap.containsKey(keyYear)) {
-                                reload();
-                            } else {
-                                createCP4(myTraining);
-                                buildPanel();
-                            }
-
-                        }
-                    };
-                    new DlgFiles(training, fileHandleClosure);
-                }
+                };
+                currentEditor = new DlgFiles(training, fileHandleClosure);
+                currentEditor.setVisible(true);
             });
             btnFiles.setEnabled(OPDE.isFTPworking());
             pnlMenu.add(btnFiles);
@@ -635,39 +605,36 @@ public class PnlTraining extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), actionEvent -> {
 
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        final Training myTraining = em.merge(new Training());
-                        em.getTransaction().commit();
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    final Training myTraining = em.merge(new Training());
+                    em.getTransaction().commit();
 
-                        final String keyYear = Integer.toString(new DateTime(myTraining.getStarting()).getYear()) + ".year";
+                    final String keyYear = Integer.toString(new DateTime(myTraining.getStarting()).getYear()) + ".year";
 
-                        reload();
+                    reload();
 
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        } else {
-                            reload();
-                        }
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
+                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    } else {
+                        reload();
+                    }
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
                 }
             });
             list.add(addButton);
@@ -697,12 +664,7 @@ public class PnlTraining extends CleanablePanel {
 
 
             for (final Commontags commontag : listTags) {
-                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        SYSFilesTools.print(TrainingTools.getAsHTML(TrainingTools.getTrainings4(0, filterTag)), true);
-                    }
-                });
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesTools.print(TrainingTools.getAsHTML(TrainingTools.getTrainings4(0, filterTag)), true));
                 pnlTags.add(btnTag);
 
             }

@@ -191,25 +191,22 @@ public class DlgEditResidentBaseData extends MyJDialog {
 
     private void btnAddGPActionPerformed(ActionEvent e) {
         final PnlEditGP pnlGP = new PnlEditGP(new GP());
-        final JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        GP myGP = em.merge((GP) o);
-                        em.getTransaction().commit();
-                        cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
-                        resident.setGP(myGP);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+        final JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
+            if (o != null) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    GP myGP = em.merge((GP) o);
+                    em.getTransaction().commit();
+                    cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
+                    resident.setGP(myGP);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
                 }
             }
         }, btnAddGP);
@@ -219,25 +216,22 @@ public class DlgEditResidentBaseData extends MyJDialog {
     private void btnEditGPActionPerformed(ActionEvent e) {
         if (cmbGP.getSelectedItem() == null) return;
         final PnlEditGP pnlGP = new PnlEditGP((GP) cmbGP.getSelectedItem());
-        final JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        GP myGP = em.merge((GP) o);
-                        em.getTransaction().commit();
-                        cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
-                        resident.setGP(myGP);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+        final JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
+            if (o != null) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    GP myGP = em.merge((GP) o);
+                    em.getTransaction().commit();
+                    cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
+                    resident.setGP(myGP);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
                 }
             }
         }, btnEditGP);

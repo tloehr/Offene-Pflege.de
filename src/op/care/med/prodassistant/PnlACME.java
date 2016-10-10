@@ -53,14 +53,11 @@ public class PnlACME extends JPanel {
     private void btnAddActionPerformed(ActionEvent e) {
         final JidePopup popup = new JidePopup();
 
-        DlgACME dlg = new DlgACME(new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    lstHersteller.setModel(new DefaultComboBoxModel(new ACME[]{(ACME) o}));
-                    lstHersteller.setSelectedIndex(0);
-                    popup.hidePopup();
-                }
+        DlgACME dlg = new DlgACME(o -> {
+            if (o != null) {
+                lstHersteller.setModel(new DefaultComboBoxModel(new ACME[]{(ACME) o}));
+                lstHersteller.setSelectedIndex(0);
+                popup.hidePopup();
             }
         });
 
@@ -103,12 +100,7 @@ public class PnlACME extends JPanel {
 
             //---- lstHersteller ----
             lstHersteller.setFont(new Font("Arial", Font.PLAIN, 14));
-            lstHersteller.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    lstHerstellerValueChanged(e);
-                }
-            });
+            lstHersteller.addListSelectionListener(e -> lstHerstellerValueChanged(e));
             scrollPane1.setViewportView(lstHersteller);
         }
         add(scrollPane1, CC.xy(5, 3, CC.DEFAULT, CC.FILL));
@@ -120,12 +112,7 @@ public class PnlACME extends JPanel {
         btnAdd.setBorder(null);
         btnAdd.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
         btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnAddActionPerformed(e);
-            }
-        });
+        btnAdd.addActionListener(e -> btnAddActionPerformed(e));
         add(btnAdd, CC.xy(5, 5, CC.LEFT, CC.DEFAULT));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

@@ -68,13 +68,10 @@ public class DlgAnnotations extends MyJDialog {
         if (e.getValueIsAdjusting()) return;
 
         Commontags tag = (Commontags) listCommontTags.getSelectedValue();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                pnlResInfo.removeAll();
-                revalidate();
-                repaint();
-            }
+        SwingUtilities.invokeLater(() -> {
+            pnlResInfo.removeAll();
+            revalidate();
+            repaint();
         });
 
         if (!CommontagsTools.isAnnotationNecessary(tag)) return;
@@ -87,23 +84,17 @@ public class DlgAnnotations extends MyJDialog {
             mode = PnlEditResInfo.NEW;
         }
 
-        PnlEditResInfo pnl = new PnlEditResInfo(annotation, new Closure() {
-            @Override
-            public void execute(Object o) {
-                setVisible(false);
-                actionEvent.execute(o);
-            }
+        PnlEditResInfo pnl = new PnlEditResInfo(annotation, o -> {
+            setVisible(false);
+            actionEvent.execute(o);
         }, Color.WHITE);
         pnl.setEnabled(true, mode);
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                pnlResInfo.add(pnl.getPanel());
+        SwingUtilities.invokeLater(() -> {
+            pnlResInfo.add(pnl.getPanel());
 
-                revalidate();
-                repaint();
-            }
+            revalidate();
+            repaint();
         });
 
     }

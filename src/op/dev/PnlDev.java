@@ -91,12 +91,7 @@ public class PnlDev extends CleanablePanel {
 
     private void button1ActionPerformed(ActionEvent e) {
         final JidePopup popup = new JidePopup();
-        PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(txtXML.getText(), new Closure() {
-            @Override
-            public void execute(Object o) {
-                txtException.setText(SYSTools.catchNull(o));
-            }
-        });
+        PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(txtXML.getText(), o -> txtException.setText(SYSTools.catchNull(o)));
 
         if (pnlEditResInfo.getLastParsingException() == null) {
             pnlEditResInfo.setEnabled(true, PnlEditResInfo.NEW);

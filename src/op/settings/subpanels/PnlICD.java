@@ -166,15 +166,12 @@ public class PnlICD extends DefaultPanel {
     }
 
     private void btnEmptyListActionPerformed(ActionEvent e) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                dlmICDFiles.clear();
-                listICDs.clear();
-                btnImportICD.setIcon(SYSConst.icon22ledRedOn);
-                lstIcdFiles.revalidate();
-                lstIcdFiles.repaint();
-            }
+        SwingUtilities.invokeLater(() -> {
+            dlmICDFiles.clear();
+            listICDs.clear();
+            btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+            lstIcdFiles.revalidate();
+            lstIcdFiles.repaint();
         });
     }
 

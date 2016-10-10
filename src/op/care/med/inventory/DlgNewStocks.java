@@ -210,24 +210,14 @@ public class DlgNewStocks extends MyJDialog {
         questionIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.QUESTION));
 
         cmbVorrat = new OverlayComboBox();
-        cmbVorrat.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                inventory = (MedInventory) itemEvent.getItem();
-            }
-        });
+        cmbVorrat.addItemListener(itemEvent -> inventory = (MedInventory) itemEvent.getItem());
         cmbVorrat.setFont(SYSConst.ARIAL14);
         ovrVorrat = new DefaultOverlayable(cmbVorrat);
         mainPane.add(ovrVorrat, CC.xywh(5, 13, 4, 1));
 
         attentionIconBW = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         cmbBW = new OverlayComboBox();
-        cmbBW.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                cmbBWItemStateChanged(itemEvent);
-            }
-        });
+        cmbBW.addItemListener(itemEvent -> cmbBWItemStateChanged(itemEvent));
         cmbBW.setFont(SYSConst.ARIAL14);
         ovrBW = new DefaultOverlayable(cmbBW);
         mainPane.add(ovrBW, CC.xywh(7, 17, 2, 1));
@@ -631,16 +621,13 @@ public class DlgNewStocks extends MyJDialog {
 //        String pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
         final JidePopup popup = new JidePopup();
 
-        WizardDialog wizard = new MedProductWizard(new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    MedPackage aPackage = (MedPackage) o;
-                    txtMedSuche.setText(aPackage.getPzn());
-                }
-                popup.hidePopup();
-
+        WizardDialog wizard = new MedProductWizard(o -> {
+            if (o != null) {
+                MedPackage aPackage1 = (MedPackage) o;
+                txtMedSuche.setText(aPackage1.getPzn());
             }
+            popup.hidePopup();
+
         }).getWizard();
 
         popup.setMovable(false);
@@ -652,12 +639,9 @@ public class DlgNewStocks extends MyJDialog {
         popup.removeExcludedComponent(btnMed);
         popup.setTransient(true);
         popup.setDefaultFocusComponent(wizard.getContentPane());
-        popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
-                popup.getContentPane().getComponentCount();
-            }
+        popup.addPropertyChangeListener("visible", propertyChangeEvent -> {
+            OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
+            popup.getContentPane().getComponentCount();
         });
 
         GUITools.showPopup(popup, SwingConstants.WEST);

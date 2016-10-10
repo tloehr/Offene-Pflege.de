@@ -41,26 +41,23 @@ public class DosageFormTools {
      */
     public static ListCellRenderer getRenderer(int maxlen) {
         final int max = maxlen;
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTML("<i>" + SYSTools.xx("misc.commands.noselection") + "</i>");
-                } else if (o instanceof DosageForm) {
-                    DosageForm form = (DosageForm) o;
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTML("<i>" + SYSTools.xx("misc.commands.noselection") + "</i>");
+            } else if (o instanceof DosageForm) {
+                DosageForm form = (DosageForm) o;
 
-                    text = toPrettyString(form);
-                    text += ", " + SYSTools.xx("misc.msg.upr") + " " + UPR_STATES[form.getUPRState()];
+                text = toPrettyString(form);
+                text += ", " + SYSTools.xx("misc.msg.upr") + " " + UPR_STATES[form.getUPRState()];
 
-                } else {
-                    text = o.toString();
-                }
-                if (max > 0) {
-                    text = SYSTools.left(text, max);
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            } else {
+                text = o.toString();
             }
+            if (max > 0) {
+                text = SYSTools.left(text, max);
+            }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 

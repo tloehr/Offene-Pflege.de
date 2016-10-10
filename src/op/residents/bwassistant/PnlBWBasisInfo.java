@@ -169,12 +169,7 @@ public class PnlBWBasisInfo extends JPanel {
                 txtNachnameFocusLost(e);
             }
         });
-        txtNachname.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtNachnameActionPerformed(e);
-            }
-        });
+        txtNachname.addActionListener(e -> txtNachnameActionPerformed(e));
         add(txtNachname, CC.xywh(5, 3, 3, 1));
 
         //---- lblVorname ----
@@ -190,12 +185,7 @@ public class PnlBWBasisInfo extends JPanel {
                 txtVornameFocusLost(e);
             }
         });
-        txtVorname.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtVornameActionPerformed(e);
-            }
-        });
+        txtVorname.addActionListener(e -> txtVornameActionPerformed(e));
         add(txtVorname, CC.xywh(5, 5, 3, 1));
 
         //---- lblGebdatum ----
@@ -211,12 +201,7 @@ public class PnlBWBasisInfo extends JPanel {
                 txtDOBFocusLost(e);
             }
         });
-        txtDOB.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtDOBActionPerformed(e);
-            }
-        });
+        txtDOB.addActionListener(e -> txtDOBActionPerformed(e));
         add(txtDOB, CC.xy(5, 7));
 
         //---- lblAge ----
@@ -231,12 +216,7 @@ public class PnlBWBasisInfo extends JPanel {
 
         //---- cmbGender ----
         cmbGender.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbGender.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbGenderItemStateChanged(e);
-            }
-        });
+        cmbGender.addItemListener(e -> cmbGenderItemStateChanged(e));
         add(cmbGender, CC.xywh(5, 9, 3, 1));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

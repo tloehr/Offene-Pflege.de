@@ -82,12 +82,7 @@ public class PnlResOverview extends NursingRecordsPanel {
     private void initPanel() {
         txtUebersicht.setContentType("text/html");
 
-        itemListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                reloadDisplay();
-            }
-        };
+        itemListener = itemEvent -> reloadDisplay();
 
         mouseAdapter = GUITools.getHyperlinkStyleMouseAdapter();
 
@@ -95,6 +90,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         SYSTools.unregisterListeners(this);
     }
 
@@ -157,12 +153,7 @@ public class PnlResOverview extends NursingRecordsPanel {
                 protected void done() {
                     txtUebersicht.setText(html);
                     txtUebersicht.repaint();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            GUITools.scroll2show(jspHTML, 0, null);
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspHTML, 0, null));
                     initPhase = false;
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
@@ -176,19 +167,16 @@ public class PnlResOverview extends NursingRecordsPanel {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
 //            txtUebersicht.repaint();
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    String html = SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
-                    txtUebersicht.setText(html);
+            SwingUtilities.invokeLater(() -> {
+                String html = SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
+                txtUebersicht.setText(html);
 //                    jspHTML.getVerticalScrollBar().setValue(0);
 
-                    GUITools.scroll2show(jspHTML, 0, null);
+                GUITools.scroll2show(jspHTML, 0, null);
 
-                    initPhase = false;
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
-                }
+                initPhase = false;
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
             });
 
 
@@ -231,39 +219,30 @@ public class PnlResOverview extends NursingRecordsPanel {
         panelFilter.setCollapsible(false);
 
         tbMedi = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.prescription"));
-        tbMedi.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (initPhase) return;
+        tbMedi.addItemListener(e -> {
+            if (initPhase) return;
 //                SYSPropsTools.storeState(internalClassID + ":tbMedi", tbMedi);
-                reloadDisplay();
-            }
+            reloadDisplay();
         });
         tbMedi.setHorizontalAlignment(SwingConstants.LEFT);
         labelPanel.add(tbMedi);
 //        SYSPropsTools.restoreState(internalClassID + ":tbMedi", tbMedi);
 
         tbBerichte = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.reports"));
-        tbBerichte.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (initPhase) return;
+        tbBerichte.addItemListener(e -> {
+            if (initPhase) return;
 //                SYSPropsTools.storeState(internalClassID + ":tbBerichte", tbBerichte);
-                reloadDisplay();
-            }
+            reloadDisplay();
         });
         tbBerichte.setHorizontalAlignment(SwingConstants.LEFT);
         labelPanel.add(tbBerichte);
 //        SYSPropsTools.restoreState(internalClassID + ":tbBerichte", tbBerichte);
 
         tbBilanz = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.liquid.result"));
-        tbBilanz.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (initPhase) return;
+        tbBilanz.addItemListener(e -> {
+            if (initPhase) return;
 //                SYSPropsTools.storeState(internalClassID + ":tbBilanz", tbBilanz);
-                reloadDisplay();
-            }
+            reloadDisplay();
         });
         tbBilanz.setHorizontalAlignment(SwingConstants.LEFT);
         labelPanel.add(tbBilanz);
@@ -309,12 +288,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
-        JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(ResInfoTools.getTXReport(resident, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true, true), true);
-            }
-        });
+        JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, actionEvent -> SYSFilesTools.print(ResInfoTools.getTXReport(resident, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true, true), true));
         mypanel.add(printButton);
 
 

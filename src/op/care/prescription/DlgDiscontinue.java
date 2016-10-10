@@ -61,12 +61,7 @@ public class DlgDiscontinue extends MyJDialog {
      */
     private void cmbArztAbKeyPressed(KeyEvent e) {
         final String searchKey = String.valueOf(e.getKeyChar());
-        GP doc = (GP) CollectionUtils.find(listAerzte, new Predicate() {
-            @Override
-            public boolean evaluate(Object o) {
-                return o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
-            }
-        });
+        GP doc = (GP) CollectionUtils.find(listAerzte, o -> o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0));
         if (doc != null) {
             cmbArztAb.setSelectedItem(doc);
         }
@@ -144,23 +139,13 @@ public class DlgDiscontinue extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
             btnCancel.setText(null);
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnOK ----
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnOK.setText(null);
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
+            btnOK.addActionListener(e -> btnOKActionPerformed(e));
             panel1.add(btnOK);
         }
         contentPane.add(panel1, CC.xy(2, 9, CC.RIGHT, CC.DEFAULT));

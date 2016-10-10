@@ -164,12 +164,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtAnrede ----
         txtAnrede.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtAnrede.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtAnredeActionPerformed(e);
-            }
-        });
+        txtAnrede.addActionListener(e -> txtAnredeActionPerformed(e));
         add(txtAnrede, CC.xy(5, 3));
 
         //---- lblTitel ----
@@ -179,12 +174,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtTitel ----
         txtTitel.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtTitel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtTitelActionPerformed(e);
-            }
-        });
+        txtTitel.addActionListener(e -> txtTitelActionPerformed(e));
         add(txtTitel, CC.xy(5, 5));
 
         //---- lblNachname ----
@@ -194,12 +184,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtNachname ----
         txtNachname.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtNachname.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtNachnameActionPerformed(e);
-            }
-        });
+        txtNachname.addActionListener(e -> txtNachnameActionPerformed(e));
         add(txtNachname, CC.xy(5, 7));
 
         //---- lblVorname ----
@@ -209,12 +194,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtVorname ----
         txtVorname.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtVorname.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtVornameActionPerformed(e);
-            }
-        });
+        txtVorname.addActionListener(e -> txtVornameActionPerformed(e));
         add(txtVorname, CC.xy(5, 9));
 
         //---- lblStrasse ----
@@ -224,12 +204,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtStrasse ----
         txtStrasse.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtStrasse.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtStrasseActionPerformed(e);
-            }
-        });
+        txtStrasse.addActionListener(e -> txtStrasseActionPerformed(e));
         add(txtStrasse, CC.xy(5, 11));
 
         //---- lblPLZ ----
@@ -239,12 +214,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtPLZ ----
         txtPLZ.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtPLZ.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtPLZActionPerformed(e);
-            }
-        });
+        txtPLZ.addActionListener(e -> txtPLZActionPerformed(e));
         add(txtPLZ, CC.xy(5, 13));
 
         //---- lblOrt ----
@@ -254,12 +224,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtOrt ----
         txtOrt.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtOrt.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtOrtActionPerformed(e);
-            }
-        });
+        txtOrt.addActionListener(e -> txtOrtActionPerformed(e));
         add(txtOrt, CC.xy(5, 15));
 
         //---- lblTel ----
@@ -269,12 +234,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtTel ----
         txtTel.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtTel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtTelActionPerformed(e);
-            }
-        });
+        txtTel.addActionListener(e -> txtTelActionPerformed(e));
         add(txtTel, CC.xy(5, 17));
 
         //---- lblFax ----
@@ -284,12 +244,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtFax ----
         txtFax.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtFax.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtFaxActionPerformed(e);
-            }
-        });
+        txtFax.addActionListener(e -> txtFaxActionPerformed(e));
         add(txtFax, CC.xy(5, 19));
 
         //---- lblMobil ----
@@ -299,12 +254,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtMobil ----
         txtMobil.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtMobil.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtMobilActionPerformed(e);
-            }
-        });
+        txtMobil.addActionListener(e -> txtMobilActionPerformed(e));
         add(txtMobil, CC.xy(5, 21));
 
         //---- lblEMAIL ----
@@ -314,12 +264,7 @@ public class PnlEditGP extends PopupPanel {
 
         //---- txtEMAIL ----
         txtEMAIL.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtEMAIL.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtEMAILActionPerformed(e);
-            }
-        });
+        txtEMAIL.addActionListener(e -> txtEMAILActionPerformed(e));
         add(txtEMAIL, CC.xy(5, 23));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

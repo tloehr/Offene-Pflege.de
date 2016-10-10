@@ -19,20 +19,17 @@ import java.util.ArrayList;
 public class LCustodianTools {
 
     public static ListCellRenderer getRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.xx("misc.commands.>>noselection<<");
-                } else if (o instanceof LCustodian) {
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.xx("misc.commands.>>noselection<<");
+            } else if (o instanceof LCustodian) {
 //                    text = ((LCustodian) o).getName() + ", " + ((LCustodian) o).getFirstname() + ", " + ((LCustodian) o).getCity();
-                    text = getFullName((LCustodian) o);
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+                text = getFullName((LCustodian) o);
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 

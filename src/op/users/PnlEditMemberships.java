@@ -48,44 +48,41 @@ public class PnlEditMemberships extends JPanel {
             cbGroup.setToolTipText(group.getDescription());
             cbGroup.setFont(SYSConst.ARIAL14);
             cbGroup.setSelected(user.getGroups().contains(groupMap.get(gid)));
-            cbGroup.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent itemEvent) {
+            cbGroup.addItemListener(itemEvent -> {
 
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        Users myUser = em.merge(user);
-                        em.lock(myUser, LockModeType.OPTIMISTIC);
-                        Groups myGroup = em.merge(groupMap.get(gid));
-                        em.lock(myGroup, LockModeType.OPTIMISTIC);
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Users myUser = em.merge(user);
+                    em.lock(myUser, LockModeType.OPTIMISTIC);
+                    Groups myGroup = em.merge(groupMap.get(gid));
+                    em.lock(myGroup, LockModeType.OPTIMISTIC);
 
-                        if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                            myUser.getGroups().add(myGroup);
-                            myGroup.getMembers().add(myUser);
-                        } else {
-                            myUser.getGroups().remove(myGroup);
-                            myGroup.getMembers().remove(myUser);
-                        }
-
-                        em.getTransaction().commit();
-
-                        // so we won't get locking exceptions because of outdated version informations
-                        user = myUser;
-                        groupMap.put(gid, myGroup);
-                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
+                    if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                        myUser.getGroups().add(myGroup);
+                        myGroup.getMembers().add(myUser);
+                    } else {
+                        myUser.getGroups().remove(myGroup);
+                        myGroup.getMembers().remove(myUser);
                     }
+
+                    em.getTransaction().commit();
+
+                    // so we won't get locking exceptions because of outdated version informations
+                    user = myUser;
+                    groupMap.put(gid, myGroup);
+                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
                 }
             });
             add(cbGroup);

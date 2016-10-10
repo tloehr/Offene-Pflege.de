@@ -62,12 +62,7 @@ public class PnlSelectIntervention extends JPanel {
         lstInterventions.setModel(new DefaultListModel());
         tbAktiv = GUITools.getNiceToggleButton("nursingrecords.nursingprocess.pnlselectinterventions.activeIntervention");
         pnlRight.add(tbAktiv, CC.xy(1, 9));
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE);
-            }
-        });
+        SwingUtilities.invokeLater(() -> SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE));
 
         cmbType.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.interventions.CARE"), SYSTools.xx("misc.msg.interventions.PRESCRIPTION"), SYSTools.xx("misc.msg.interventions.SOCIAL")}));
         cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
@@ -278,21 +273,11 @@ public class PnlSelectIntervention extends JPanel {
 
                     //---- txtSearch ----
                     txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtSearch.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            txtSearchActionPerformed(e);
-                        }
-                    });
+                    txtSearch.addActionListener(e -> txtSearchActionPerformed(e));
                     panel2.add(txtSearch, CC.xy(1, 1));
 
                     //---- cmbCategory ----
-                    cmbCategory.addItemListener(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent e) {
-                            cmbCategoryItemStateChanged(e);
-                        }
-                    });
+                    cmbCategory.addItemListener(e -> cmbCategoryItemStateChanged(e));
                     panel2.add(cmbCategory, CC.xy(1, 3));
 
                     //======== scrollPane1 ========
@@ -306,12 +291,7 @@ public class PnlSelectIntervention extends JPanel {
                                 lstInterventionsMouseClicked(e);
                             }
                         });
-                        lstInterventions.addListSelectionListener(new ListSelectionListener() {
-                            @Override
-                            public void valueChanged(ListSelectionEvent e) {
-                                lstInterventionsValueChanged(e);
-                            }
-                        });
+                        lstInterventions.addListSelectionListener(e -> lstInterventionsValueChanged(e));
                         scrollPane1.setViewportView(lstInterventions);
                     }
                     panel2.add(scrollPane1, CC.xy(1, 5, CC.FILL, CC.FILL));
@@ -333,12 +313,7 @@ public class PnlSelectIntervention extends JPanel {
                             btnOk.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                             btnOk.setSelectedIcon(null);
                             btnOk.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                            btnOk.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    btnOkActionPerformed(e);
-                                }
-                            });
+                            btnOk.addActionListener(e -> btnOkActionPerformed(e));
                             panel5.add(btnOk);
                         }
                         panel3.add(panel5);
@@ -352,12 +327,7 @@ public class PnlSelectIntervention extends JPanel {
                         btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         btnAdd.setSelectedIcon(null);
                         btnAdd.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                        btnAdd.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnAddActionPerformed(e);
-                            }
-                        });
+                        btnAdd.addActionListener(e -> btnAddActionPerformed(e));
                         panel3.add(btnAdd);
 
                         //---- btnEdit ----
@@ -370,12 +340,7 @@ public class PnlSelectIntervention extends JPanel {
                         btnEdit.setSelectedIcon(null);
                         btnEdit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
                         btnEdit.setEnabled(false);
-                        btnEdit.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnEditActionPerformed(e);
-                            }
-                        });
+                        btnEdit.addActionListener(e -> btnEditActionPerformed(e));
                         panel3.add(btnEdit);
                     }
                     panel2.add(panel3, CC.xy(1, 7, CC.FILL, CC.DEFAULT));
@@ -459,12 +424,7 @@ public class PnlSelectIntervention extends JPanel {
                         btnSave.setContentAreaFilled(false);
                         btnSave.setSelectedIcon(null);
                         btnSave.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                        btnSave.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnSaveActionPerformed(e);
-                            }
-                        });
+                        btnSave.addActionListener(e -> btnSaveActionPerformed(e));
                         panel4.add(btnSave);
                     }
                     pnlRight.add(panel4, CC.xywh(1, 11, 3, 1, CC.RIGHT, CC.BOTTOM));

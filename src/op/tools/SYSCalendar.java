@@ -1125,11 +1125,7 @@ public class SYSCalendar {
 
             JMenuItem item = new JMenuItem(title);
             final int minutes = min;
-            item.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    action.execute(minutes);
-                }
-            });
+            item.addActionListener(evt -> action.execute(minutes));
             timemenu.add(item);
         }
 

@@ -27,7 +27,6 @@ import java.util.*;
  */
 @Entity
 @Table(name = "qprocess")
-
 public class QProcess implements Serializable, Comparable<QProcess> {
 
     private static final long serialVersionUID = 1L;
@@ -285,15 +284,14 @@ public class QProcess implements Serializable, Comparable<QProcess> {
             elements.add(att.getResValue());
         }
 
-
-//        OPDE.debug(this);
-
         Collections.sort(elements, new Comparator<QProcessElement>() {
             @Override
             public int compare(QProcessElement o1, QProcessElement o2) {
                 return new Long(o1.getPITInMillis()).compareTo(o2.getPITInMillis()) * -1;
             }
         });
+
+
         return elements;
     }
 

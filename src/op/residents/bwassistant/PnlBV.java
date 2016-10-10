@@ -58,12 +58,7 @@ public class PnlBV extends JPanel {
 
         //---- cmbBV ----
         cmbBV.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbBV.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbBVItemStateChanged(e);
-            }
-        });
+        cmbBV.addItemListener(e -> cmbBVItemStateChanged(e));
         add(cmbBV, CC.xy(1, 1));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

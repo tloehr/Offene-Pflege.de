@@ -104,13 +104,10 @@ public class DlgDiag extends MyJDialog {
 
     private void btnAddGPActionPerformed(ActionEvent e) {
         final PnlEditGP pnlGP = new PnlEditGP(new GP());
-        JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    GP gp = EntityTools.merge((GP) o);
-                    cmbArzt.setModel(new DefaultComboBoxModel(new GP[]{gp}));
-                }
+        JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
+            if (o != null) {
+                GP gp = EntityTools.merge((GP) o);
+                cmbArzt.setModel(new DefaultComboBoxModel(new GP[]{gp}));
             }
         }, btnAddGP);
         GUITools.showPopup(popup, SwingConstants.EAST);
@@ -118,13 +115,10 @@ public class DlgDiag extends MyJDialog {
 
     private void btnAddHospitalActionPerformed(ActionEvent e) {
         final PnlEditHospital pnlHospital = new PnlEditHospital(new Hospital());
-        JidePopup popup = GUITools.createPanelPopup(pnlHospital, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    Hospital hospital = EntityTools.merge((Hospital) o);
-                    cmbKH.setModel(new DefaultComboBoxModel(new Hospital[]{hospital}));
-                }
+        JidePopup popup = GUITools.createPanelPopup(pnlHospital, o -> {
+            if (o != null) {
+                Hospital hospital = EntityTools.merge((Hospital) o);
+                cmbKH.setModel(new DefaultComboBoxModel(new Hospital[]{hospital}));
             }
         }, btnAddHospital);
         GUITools.showPopup(popup, SwingConstants.EAST);
@@ -209,12 +203,7 @@ public class DlgDiag extends MyJDialog {
 
             //---- txtSuche ----
             txtSuche.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtSuche.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtSucheActionPerformed(e);
-                }
-            });
+            txtSuche.addActionListener(e -> txtSucheActionPerformed(e));
             jPanel1.add(txtSuche, CC.xywh(3, 3, 7, 1));
 
             //---- lblTX ----
@@ -253,12 +242,7 @@ public class DlgDiag extends MyJDialog {
             btnAddGP.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
             btnAddGP.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnAddGP.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-            btnAddGP.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAddGPActionPerformed(e);
-                }
-            });
+            btnAddGP.addActionListener(e -> btnAddGPActionPerformed(e));
             jPanel1.add(btnAddGP, CC.xy(11, 7));
 
             //---- cmbKH ----
@@ -279,12 +263,7 @@ public class DlgDiag extends MyJDialog {
             btnAddHospital.setBorderPainted(false);
             btnAddHospital.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnAddHospital.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-            btnAddHospital.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAddHospitalActionPerformed(e);
-                }
-            });
+            btnAddHospital.addActionListener(e -> btnAddHospitalActionPerformed(e));
             jPanel1.add(btnAddHospital, CC.xy(11, 9));
 
             //---- lblSecurity ----
@@ -340,23 +319,13 @@ public class DlgDiag extends MyJDialog {
                 //---- btnCancel ----
                 btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
                 btnCancel.setText(null);
-                btnCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCancelActionPerformed(e);
-                    }
-                });
+                btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
                 panel1.add(btnCancel);
 
                 //---- btnOK ----
                 btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
                 btnOK.setText(null);
-                btnOK.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnOKActionPerformed(e);
-                    }
-                });
+                btnOK.addActionListener(e -> btnOKActionPerformed(e));
                 panel1.add(btnOK);
             }
             jPanel1.add(panel1, CC.xywh(7, 15, 5, 1, CC.RIGHT, CC.DEFAULT));

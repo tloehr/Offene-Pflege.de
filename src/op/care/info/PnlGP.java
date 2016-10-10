@@ -80,26 +80,23 @@ public class PnlGP extends JPanel {
 
     private void btnAddGPActionPerformed(ActionEvent e) {
         final PnlEditGP pnlGP = new PnlEditGP(new GP());
-        final JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        GP myGP = em.merge((GP) o);
-                        em.getTransaction().commit();
-                        cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
-                        selected = myGP;
-                        changeEvent.execute(selected);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+        final JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
+            if (o != null) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    GP myGP = em.merge((GP) o);
+                    em.getTransaction().commit();
+                    cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
+                    selected = myGP;
+                    changeEvent.execute(selected);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
                 }
             }
         }, btnAddGP);
@@ -109,26 +106,23 @@ public class PnlGP extends JPanel {
     private void btnEditGPActionPerformed(ActionEvent e) {
         if (cmbGP.getSelectedItem() == null) return;
         final PnlEditGP pnlGP = new PnlEditGP((GP) cmbGP.getSelectedItem());
-        final JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        GP myGP = em.merge((GP) o);
-                        em.getTransaction().commit();
-                        cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
-                        selected = myGP;
-                        changeEvent.execute(selected);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+        final JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
+            if (o != null) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    GP myGP = em.merge((GP) o);
+                    em.getTransaction().commit();
+                    cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
+                    selected = myGP;
+                    changeEvent.execute(selected);
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
                     }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
                 }
             }
         }, btnEditGP);
@@ -156,12 +150,7 @@ public class PnlGP extends JPanel {
 
         //---- cmbGP ----
         cmbGP.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbGP.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbGPItemStateChanged(e);
-            }
-        });
+        cmbGP.addItemListener(e -> cmbGPItemStateChanged(e));
         add(cmbGP, BorderLayout.CENTER);
 
         //======== panel3 ========
@@ -174,12 +163,7 @@ public class PnlGP extends JPanel {
             btnAddGP.setBorderPainted(false);
             btnAddGP.setContentAreaFilled(false);
             btnAddGP.setBorder(null);
-            btnAddGP.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAddGPActionPerformed(e);
-                }
-            });
+            btnAddGP.addActionListener(e -> btnAddGPActionPerformed(e));
             panel3.add(btnAddGP);
 
             //---- btnEditGP ----
@@ -188,12 +172,7 @@ public class PnlGP extends JPanel {
             btnEditGP.setBorderPainted(false);
             btnEditGP.setContentAreaFilled(false);
             btnEditGP.setBorder(null);
-            btnEditGP.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnEditGPActionPerformed(e);
-                }
-            });
+            btnEditGP.addActionListener(e -> btnEditGPActionPerformed(e));
             panel3.add(btnEditGP);
         }
         add(panel3, BorderLayout.EAST);

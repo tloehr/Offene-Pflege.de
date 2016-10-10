@@ -113,23 +113,13 @@ public class DlgGroup extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnOK ----
             btnOK.setText(null);
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
+            btnOK.addActionListener(e -> btnOKActionPerformed(e));
             panel1.add(btnOK);
         }
         contentPane.add(panel1, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));

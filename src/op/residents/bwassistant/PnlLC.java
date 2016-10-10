@@ -55,13 +55,10 @@ public class PnlLC extends JPanel {
     private void btnAddActionPerformed(ActionEvent e) {
 
         final PnlEditLC pnlLC = new PnlEditLC(new LCustodian());
-        final JidePopup popup = GUITools.createPanelPopup(pnlLC, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbLC.setModel(new DefaultComboBoxModel(new LCustodian[]{(LCustodian) o}));
-                    validate.execute(cmbLC.getSelectedItem());
-                }
+        final JidePopup popup = GUITools.createPanelPopup(pnlLC, o -> {
+            if (o != null) {
+                cmbLC.setModel(new DefaultComboBoxModel(new LCustodian[]{(LCustodian) o}));
+                validate.execute(cmbLC.getSelectedItem());
             }
         }, btnAdd);
         GUITools.showPopup(popup, SwingConstants.EAST);
@@ -82,12 +79,7 @@ public class PnlLC extends JPanel {
                 "default"));
 
         //---- cmbLC ----
-        cmbLC.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbBetreuerItemStateChanged(e);
-            }
-        });
+        cmbLC.addItemListener(e -> cmbBetreuerItemStateChanged(e));
         add(cmbLC, CC.xy(1, 1));
 
         //---- btnAdd ----
@@ -96,12 +88,7 @@ public class PnlLC extends JPanel {
         btnAdd.setContentAreaFilled(false);
         btnAdd.setBorderPainted(false);
         btnAdd.setBorder(null);
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnAddActionPerformed(e);
-            }
-        });
+        btnAdd.addActionListener(e -> btnAddActionPerformed(e));
         add(btnAdd, CC.xy(3, 1));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

@@ -132,12 +132,7 @@ public class PnlCommonTags extends JPanel {
 
             ac.setStrict(false);
             ac.setStrictCompletion(false);
-            txtTags.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cmbTagsActionPerformed(e);
-                }
-            });
+            txtTags.addActionListener(e -> cmbTagsActionPerformed(e));
 
             txtTags.addFocusListener(new FocusAdapter() {
                 @Override
@@ -163,12 +158,10 @@ public class PnlCommonTags extends JPanel {
 
             btnPickTags = GUITools.getTinyButton("opde.tags.pnlcommontags.allTags", SYSConst.icon22checkbox);
             btnPickTags.setPressedIcon(SYSConst.icon22Pressed);
-            btnPickTags.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    final JidePopup popup = new JidePopup();
-                    JPanel pnl = new JPanel(new BorderLayout());
-                    pnl.add(new JScrollPane(getClickableTagsPanel()), BorderLayout.CENTER);
+            btnPickTags.addActionListener(e -> {
+                final JidePopup popup = new JidePopup();
+                JPanel pnl = new JPanel(new BorderLayout());
+                pnl.add(new JScrollPane(getClickableTagsPanel()), BorderLayout.CENTER);
 //                        JButton btnApply = new JButton(SYSConst.icon22apply);
 //                        pnl.add(btnApply, BorderLayout.SOUTH);
 //
@@ -179,57 +172,53 @@ public class PnlCommonTags extends JPanel {
 //                            }
 //                        });
 
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    popup.setOwner(btnPickTags);
-                    popup.removeExcludedComponent(btnPickTags);
-                    pnl.setPreferredSize(new Dimension(400, 200));
-                    popup.getContentPane().add(pnl);
-                    popup.setDefaultFocusComponent(pnl);
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(btnPickTags);
+                popup.removeExcludedComponent(btnPickTags);
+                pnl.setPreferredSize(new Dimension(400, 200));
+                popup.getContentPane().add(pnl);
+                popup.setDefaultFocusComponent(pnl);
 
-                    popup.addPopupMenuListener(new PopupMenuListener() {
-                        @Override
-                        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                            OPDE.debug("popupMenuWillBecomeVisible");
-                        }
+                popup.addPopupMenuListener(new PopupMenuListener() {
+                    @Override
+                    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                        OPDE.debug("popupMenuWillBecomeVisible");
+                    }
 
-                        @Override
-                        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    removeAll();
+                    @Override
+                    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                        SwingUtilities.invokeLater(() -> {
+                            removeAll();
 
-                                    add(txtTags);
-                                    if (btnPickTags != null) {
-                                        add(btnPickTags);
-                                    }
-                                    int tagnum = 1;
+                            add(txtTags);
+                            if (btnPickTags != null) {
+                                add(btnPickTags);
+                            }
+                            int tagnum1 = 1;
 
-                                    for (JButton btn : mapButtons.values()) {
-                                        if (tagnum % MAXLINE == 0) {
-                                            add(btn, RiverLayout.LINE_BREAK);
-                                        } else {
-                                            add(btn, RiverLayout.LEFT);
-                                        }
-                                        tagnum++;
-
-                                    }
-
-                                    revalidate();
-                                    repaint();
+                            for (JButton btn : mapButtons.values()) {
+                                if (tagnum1 % MAXLINE == 0) {
+                                    add(btn, RiverLayout.LINE_BREAK);
+                                } else {
+                                    add(btn, RiverLayout.LEFT);
                                 }
-                            });
-                        }
+                                tagnum1++;
 
-                        @Override
-                        public void popupMenuCanceled(PopupMenuEvent e) {
-                            OPDE.debug("popupMenuCanceled");
-                        }
-                    });
+                            }
 
-                    GUITools.showPopup(popup, SwingConstants.WEST);
-                }
+                            revalidate();
+                            repaint();
+                        });
+                    }
+
+                    @Override
+                    public void popupMenuCanceled(PopupMenuEvent e) {
+                        OPDE.debug("popupMenuCanceled");
+                    }
+                });
+
+                GUITools.showPopup(popup, SwingConstants.WEST);
             });
 
             add(btnPickTags);
@@ -262,21 +251,18 @@ public class PnlCommonTags extends JPanel {
         if (!listSelectedTags.contains(mapAllTags.get(enteredText))) {
             listSelectedTags.add(mapAllTags.get(enteredText));
 
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
+            SwingUtilities.invokeLater(() -> {
 
-                    if (listSelectedTags.size() % MAXLINE == 0) {
-                        add(createButton(mapAllTags.get(enteredText)), RiverLayout.LINE_BREAK);
-                    } else {
-                        add(createButton(mapAllTags.get(enteredText)), RiverLayout.LEFT);
-                    }
-
-                    txtTags.setText("");
-                    revalidate();
-                    repaint();
-                    notifyListeners(mapAllTags.get(enteredText));
+                if (listSelectedTags.size() % MAXLINE == 0) {
+                    add(createButton(mapAllTags.get(enteredText)), RiverLayout.LINE_BREAK);
+                } else {
+                    add(createButton(mapAllTags.get(enteredText)), RiverLayout.LEFT);
                 }
+
+                txtTags.setText("");
+                revalidate();
+                repaint();
+                notifyListeners(mapAllTags.get(enteredText));
             });
 
         }
@@ -299,41 +285,35 @@ public class PnlCommonTags extends JPanel {
 
         if (editmode) {
 
-            jButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+            jButton.addActionListener(e -> {
 
 
-                    listSelectedTags.remove(commontag);
-                    mapButtons.remove(commontag);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            removeAll();
+                listSelectedTags.remove(commontag);
+                mapButtons.remove(commontag);
+                SwingUtilities.invokeLater(() -> {
+                    removeAll();
 
-                            add(txtTags);
-                            if (btnPickTags != null) {
-                                add(btnPickTags);
-                            }
-                            int tagnum = 1;
+                    add(txtTags);
+                    if (btnPickTags != null) {
+                        add(btnPickTags);
+                    }
+                    int tagnum = 1;
 
-                            for (JButton btn : mapButtons.values()) {
-                                if (tagnum % MAXLINE == 0) {
-                                    add(btn, RiverLayout.LINE_BREAK);
-                                } else {
-                                    add(btn, RiverLayout.LEFT);
-                                }
-                                tagnum++;
-                            }
-
-                            remove(jButton);
-                            revalidate();
-                            repaint();
-                            notifyListeners(commontag);
+                    for (JButton btn : mapButtons.values()) {
+                        if (tagnum % MAXLINE == 0) {
+                            add(btn, RiverLayout.LINE_BREAK);
+                        } else {
+                            add(btn, RiverLayout.LEFT);
                         }
-                    });
+                        tagnum++;
+                    }
 
-                }
+                    remove(jButton);
+                    revalidate();
+                    repaint();
+                    notifyListeners(commontag);
+                });
+
             });
         }
         mapButtons.put(commontag, jButton);
@@ -359,18 +339,15 @@ public class PnlCommonTags extends JPanel {
 
             cb.setSelected(listSelectedTags.contains(ctag));
 
-            cb.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        listSelectedTags.add(ctag);
-                        add(createButton(ctag));
-                    } else {
-                        listSelectedTags.remove(ctag);
-                        mapButtons.remove(ctag);
-                    }
-                    notifyListeners(ctag);
+            cb.addItemListener(e -> {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    listSelectedTags.add(ctag);
+                    add(createButton(ctag));
+                } else {
+                    listSelectedTags.remove(ctag);
+                    mapButtons.remove(ctag);
                 }
+                notifyListeners(ctag);
             });
 
             pnl.add(cb);

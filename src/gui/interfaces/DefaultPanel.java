@@ -25,12 +25,6 @@ public abstract class DefaultPanel extends CleanablePanel {
         mainView();
     }
 
-    @Override
-       public void cleanup() {
-           // usually tidy enough
-       }
-
-
     public void mainView() {
         ((CardLayout) getLayout()).show(this, "main");
     }
@@ -40,16 +34,13 @@ public abstract class DefaultPanel extends CleanablePanel {
     }
 
     public void ask(PnlYesNo pnlYesNo) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                dialogPanel.removeAll();
-                dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.PAGE_AXIS));
-                dialogPanel.add(pnlYesNo);
-                dialogPanel.revalidate();
-                dialogPanel.repaint();
-                dialogView();
-            }
+        SwingUtilities.invokeLater(() -> {
+            dialogPanel.removeAll();
+            dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.PAGE_AXIS));
+            dialogPanel.add(pnlYesNo);
+            dialogPanel.revalidate();
+            dialogPanel.repaint();
+            dialogView();
         });
     }
 }

@@ -16,19 +16,16 @@ import java.awt.*;
 public class HospitalTools {
 
     public static ListCellRenderer getKHRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.xx("misc.commands.>>noselection<<");
-                } else if (o instanceof Hospital) {
-                    text = ((Hospital) o).getName() + ", " + ((Hospital) o).getCity();
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.xx("misc.commands.>>noselection<<");
+            } else if (o instanceof Hospital) {
+                text = ((Hospital) o).getName() + ", " + ((Hospital) o).getCity();
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 

@@ -120,14 +120,11 @@ public class DisplayManager extends Thread {
     }
 
     public void setMainMessage(final String message, final String tooltip) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
+        SwingUtilities.invokeLater(() -> {
 //                OPDE.debug("DisplayManager.setMainMessage");
-                lblMain.setText(SYSTools.xx(message));
-                lblMain.setIcon(null);
-                lblMain.setToolTipText(tooltip);
-            }
+            lblMain.setText(SYSTools.xx(message));
+            lblMain.setIcon(null);
+            lblMain.setToolTipText(tooltip);
         });
     }
 
@@ -142,70 +139,43 @@ public class DisplayManager extends Thread {
     }
 
     public void setIconDead() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                lblMain.setIcon(icondead);
-            }
-        });
+        SwingUtilities.invokeLater(() -> lblMain.setIcon(icondead));
     }
 
     public void setIconGone() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                lblMain.setIcon(icongone);
-            }
-        });
+        SwingUtilities.invokeLater(() -> lblMain.setIcon(icongone));
     }
 
     public void setIconBiohazard(final String tooltip) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                lblBiohazard.setVisible(tooltip != null && !tooltip.isEmpty());
-                lblBiohazard.setToolTipText(tooltip);
-            }
+        SwingUtilities.invokeLater(() -> {
+            lblBiohazard.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblBiohazard.setToolTipText(tooltip);
         });
     }
 
     public void setIconWarning(final String tooltip) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                lblWarning.setVisible(tooltip != null && !tooltip.isEmpty());
-                lblWarning.setToolTipText(tooltip);
-            }
+        SwingUtilities.invokeLater(() -> {
+            lblWarning.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblWarning.setToolTipText(tooltip);
         });
     }
 
     public void setIconAllergy(final String tooltip) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                lblAllergy.setVisible(tooltip != null && !tooltip.isEmpty());
-                lblAllergy.setToolTipText(tooltip);
-            }
+        SwingUtilities.invokeLater(() -> {
+            lblAllergy.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblAllergy.setToolTipText(tooltip);
         });
     }
 
     public void setIconDiabetes(final String tooltip) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                lblDiabetes.setVisible(tooltip != null && !tooltip.isEmpty());
-                lblDiabetes.setToolTipText(tooltip);
-            }
+        SwingUtilities.invokeLater(() -> {
+            lblDiabetes.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblDiabetes.setToolTipText(tooltip);
         });
     }
 
     public void setIconAway() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                lblMain.setIcon(iconaway);
-            }
-        });
+        SwingUtilities.invokeLater(() -> lblMain.setIcon(iconaway));
     }
 
     public void clearAllIcons() {
@@ -417,6 +387,15 @@ public class DisplayManager extends Thread {
                 processSubMessage();
                 check4EventsEveryMinute();
 
+                /***
+                 *      _____ _                            _
+                 *     |_   _(_)_ __ ___   ___  ___  _   _| |_
+                 *       | | | | '_ ` _ \ / _ \/ _ \| | | | __|
+                 *       | | | | | | | | |  __/ (_) | |_| | |_
+                 *       |_| |_|_| |_| |_|\___|\___/ \__,_|\__|
+                 *
+                 */
+                // https://github.com/tloehr/Offene-Pflege.de/issues/62
                 if (timeoutmins > 0 && step % 120 == 0) {
                     if (OPDE.getLogin() != null) {
                         long timeoutPeriodInMillis = timeoutmins * 60 * 1000;
@@ -456,6 +435,11 @@ public class DisplayManager extends Thread {
                 OPDE.fatal(logger, e);
             }
         }
+    }
+
+
+    public void timeoutNow(){
+        timeoutAction.execute(null);
     }
 
 

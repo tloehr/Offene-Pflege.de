@@ -29,12 +29,15 @@ package gui.interfaces;
 
 import op.OPDE;
 
+import javax.swing.*;
+
 /**
  * @author tloehr
  */
 public abstract class CleanablePanel extends javax.swing.JPanel {
     protected String helpkey = null;
     protected String internalClassID = null;
+    protected JDialog currentEditor;
 
     public CleanablePanel(String internalClassID) {
         super();
@@ -43,7 +46,14 @@ public abstract class CleanablePanel extends javax.swing.JPanel {
         OPDE.getDisplayManager().setMainMessage(internalClassID);
     }
 
-    public abstract void cleanup();
+    public void cleanup() {
+        //  https://github.com/tloehr/Offene-Pflege.de/issues/62
+        // closes an open modal dialog, if necessary.
+        // when the timeout occurs
+        if (currentEditor != null && currentEditor.isShowing()) {
+            currentEditor.dispose();
+        }
+    }
 
     public void reload() {
         OPDE.getEMF().getCache().evictAll();

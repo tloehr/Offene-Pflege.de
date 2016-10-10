@@ -1640,12 +1640,7 @@ public class ResInfoTools {
                             SYSConst.html_table_th("misc.msg.details")
             ));
 
-            Collections.sort(dataMap.get(resident), new Comparator<QProcessElement>() {
-                @Override
-                public int compare(QProcessElement o1, QProcessElement o2) {
-                    return new Long(o1.getPITInMillis()).compareTo(new Long(o2.getPITInMillis())) * -1;
-                }
-            });
+            Collections.sort(dataMap.get(resident), (o1, o2) -> new Long(o1.getPITInMillis()).compareTo(new Long(o2.getPITInMillis())) * -1);
 
             for (QProcessElement element : dataMap.get(resident)) {
                 if (element instanceof ResInfo) {

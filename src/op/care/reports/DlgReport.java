@@ -47,7 +47,7 @@ public class DlgReport extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+
     }
 
     private void initDialog() {
@@ -82,12 +82,7 @@ public class DlgReport extends MyJDialog {
         ovrDauer.setOverlayVisible(true);
         add(ovrDauer, CC.xy(2, 4));
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                txtBericht.requestFocus();
-            }
-        });
+        SwingUtilities.invokeLater(() -> txtBericht.requestFocus());
     }
 
     private void txtDauerFocusGained(FocusEvent e) {
@@ -195,22 +190,12 @@ public class DlgReport extends MyJDialog {
 
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel2.add(btnCancel);
 
             //---- btnApply ----
             btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnApply.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnApplyActionPerformed(e);
-                }
-            });
+            btnApply.addActionListener(e -> btnApplyActionPerformed(e));
             panel2.add(btnApply);
         }
         contentPane.add(panel2, CC.xy(4, 7, CC.RIGHT, CC.FILL));

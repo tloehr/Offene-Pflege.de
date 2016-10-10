@@ -76,12 +76,9 @@ public class PnlTrainingEditor extends JPanel {
 
         cmbState.setModel(new DefaultComboBoxModel(SYSTools.translate(TrainingTools.STATES)));
         cmbState.setSelectedIndex(training.getState());
-        cmbState.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() != ItemEvent.SELECTED) return;
-                cmbStateItemStateChanged(e);
-            }
+        cmbState.addItemListener(e -> {
+            if (e.getStateChange() != ItemEvent.SELECTED) return;
+            cmbStateItemStateChanged(e);
         });
 
         txtTitle.setText(training.getTitle());
@@ -91,71 +88,60 @@ public class PnlTrainingEditor extends JPanel {
         final PnlCommonTags pnlCommonTags = new PnlCommonTags(training.getCommontags(), editMode, 3);
         add(pnlCommonTags, CC.xywh(1, 13, 9, 1));
 
-        pnlCommonTags.addNotifyListeners(new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o == null) return;
-                EntityManager em = OPDE.createEM();
+        pnlCommonTags.addNotifyListeners(o -> {
+            if (o == null) return;
+            EntityManager em = OPDE.createEM();
 
-                try {
-                    em.getTransaction().begin();
+            try {
+                em.getTransaction().begin();
 
-                    Commontags changedTag = em.merge((Commontags) o);
+                Commontags changedTag = em.merge((Commontags) o);
 
-                    Training myTraining = em.merge(training);
-                    em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                Training myTraining = em.merge(training);
+                em.lock(myTraining, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
 
-                    if (myTraining.getCommontags().contains(changedTag)) {
-                        myTraining.getCommontags().remove(changedTag);
-                    } else {
-                        myTraining.getCommontags().add(changedTag);
-                    }
-
-                    em.getTransaction().commit();
-
-                    editAction.execute(myTraining);
-
-                } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
-                    OPDE.warn(ole);
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    editAction.execute(null);
-                } catch (Exception ex) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.fatal(ex);
-                } finally {
-                    em.close();
+                if (myTraining.getCommontags().contains(changedTag)) {
+                    myTraining.getCommontags().remove(changedTag);
+                } else {
+                    myTraining.getCommontags().add(changedTag);
                 }
+
+                em.getTransaction().commit();
+
+                editAction.execute(myTraining);
+
+            } catch (OptimisticLockException ole) {
+                OPDE.warn(ole);
+                OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                editAction.execute(null);
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(ex);
+            } finally {
+                em.close();
             }
         });
 
 
-        Closure afterUserlistEdited = editAction != null ? new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o == null) {
-                    editAction.execute(null);
-                } else {
-                    training = (Training) o;
-                    editAction.execute(training);
-                }
+        Closure afterUserlistEdited = editAction != null ? o -> {
+            if (o == null) {
+                editAction.execute(null);
+            } else {
+                training = (Training) o;
+                editAction.execute(training);
             }
         } : null;
         pnlUserlistEditor = new PnlUserlistEditor(training, afterUserlistEdited);
         add(pnlUserlistEditor, CC.xywh(1, 17, 9, 1));
 
-        jdcStarting.addPropertyChangeListener("date", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                jdcStartingPropertyChange(evt);
-            }
-        });
+        jdcStarting.addPropertyChangeListener("date", evt -> jdcStartingPropertyChange(evt));
 
         cbTime.setEnabled(editMode);
         txtTitle.setEditable(editMode);
@@ -510,12 +496,7 @@ public class PnlTrainingEditor extends JPanel {
 
         //---- cbTime ----
         cbTime.setText(null);
-        cbTime.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cbTimeItemStateChanged(e);
-            }
-        });
+        cbTime.addItemListener(e -> cbTimeItemStateChanged(e));
         add(cbTime, CC.xy(3, 9));
 
         //---- txtTimeStarting ----

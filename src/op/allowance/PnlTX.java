@@ -128,12 +128,7 @@ public class PnlTX extends JPanel {
         //---- cmbResident ----
         cmbResident.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbResident.setFocusable(false);
-        cmbResident.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbResidentItemStateChanged(e);
-            }
-        });
+        cmbResident.addItemListener(e -> cmbResidentItemStateChanged(e));
         add(cmbResident, CC.xy(5, 3));
 
         //---- lblDate ----
@@ -154,12 +149,7 @@ public class PnlTX extends JPanel {
                 txtDateFocusLost(e);
             }
         });
-        txtDate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtDateActionPerformed(e);
-            }
-        });
+        txtDate.addActionListener(e -> txtDateActionPerformed(e));
         add(txtDate, CC.xy(5, 5));
 
         //---- lblText ----
@@ -180,12 +170,7 @@ public class PnlTX extends JPanel {
                 txtTextFocusLost(e);
             }
         });
-        txtText.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtTextActionPerformed(e);
-            }
-        });
+        txtText.addActionListener(e -> txtTextActionPerformed(e));
         add(txtText, CC.xy(5, 7));
 
         //---- lblCash ----
@@ -206,12 +191,7 @@ public class PnlTX extends JPanel {
                 txtCashFocusLost(e);
             }
         });
-        txtCash.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtCashActionPerformed(e);
-            }
-        });
+        txtCash.addActionListener(e -> txtCashActionPerformed(e));
         add(txtCash, CC.xy(5, 9));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

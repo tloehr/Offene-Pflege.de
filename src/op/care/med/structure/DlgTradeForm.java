@@ -61,12 +61,9 @@ public class DlgTradeForm extends MyJDialog {
     private void btnEditActionPerformed(ActionEvent e) {
         PnlDosageForm pnl = new PnlDosageForm((DosageForm) cmbForm.getSelectedItem());
 
-        GUITools.showPopup(GUITools.createPanelPopup(pnl, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbForm.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
-                }
+        GUITools.showPopup(GUITools.createPanelPopup(pnl, o -> {
+            if (o != null) {
+                cmbForm.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
             }
         }, this), SwingConstants.SOUTH);
     }
@@ -74,12 +71,9 @@ public class DlgTradeForm extends MyJDialog {
     private void btnAddActionPerformed(ActionEvent e) {
         PnlDosageForm pnl = new PnlDosageForm(new DosageForm(0));
 
-        GUITools.showPopup(GUITools.createPanelPopup(pnl, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbForm.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
-                }
+        GUITools.showPopup(GUITools.createPanelPopup(pnl, o -> {
+            if (o != null) {
+                cmbForm.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
             }
         }, this), SwingConstants.SOUTH);
     }

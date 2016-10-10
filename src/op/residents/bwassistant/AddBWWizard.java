@@ -171,12 +171,9 @@ public class AddBWWizard {
 
         public BasisInfoPage(String title, String description) {
             super(title, description);
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
-                    setupWizardButtons();
-                }
+            addPageListener(pageEvent -> {
+                if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                setupWizardButtons();
             });
         }
 
@@ -193,12 +190,9 @@ public class AddBWWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(new PnlBWBasisInfo(new Closure() {
-                @Override
-                public void execute(Object o) {
-                    resident = (Resident) o;
-                    setupWizardButtons();
-                }
+            addComponent(new PnlBWBasisInfo(o -> {
+                resident = (Resident) o;
+                setupWizardButtons();
             }), true);
         }
 
@@ -210,13 +204,10 @@ public class AddBWWizard {
 
         public PNPage(String title, String description) {
             super(title, description);
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
-                    setupWizardButtons();
+            addPageListener(pageEvent -> {
+                if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                setupWizardButtons();
 //                    alreadyexecute = true;
-                }
             });
         }
 
@@ -233,12 +224,9 @@ public class AddBWWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(new PnlBV(new Closure() {
-                @Override
-                public void execute(Object o) {
-                    resident.setPN1((Users) o);
-                    setupWizardButtons();
-                }
+            addComponent(new PnlBV(o -> {
+                resident.setPN1((Users) o);
+                setupWizardButtons();
             }), true);
         }
     }
@@ -249,21 +237,15 @@ public class AddBWWizard {
 
         public GPPage(String title, String description) {
             super(title, description);
-            pnlGP = new PnlGP(new Closure() {
-                @Override
-                public void execute(Object o) {
-                    if (o != null) {
-                        resident.setGP((GP) o);
-                    }
-                    setupWizardButtons();
+            pnlGP = new PnlGP(o -> {
+                if (o != null) {
+                    resident.setGP((GP) o);
                 }
+                setupWizardButtons();
             });
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
-                    setupWizardButtons();
-                }
+            addPageListener(pageEvent -> {
+                if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                setupWizardButtons();
             });
         }
 
@@ -330,12 +312,9 @@ public class AddBWWizard {
 
         public HaufPage(String title, String description) {
             super(title, description);
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
-                    setupWizardButtons();
-                }
+            addPageListener(pageEvent -> {
+                if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                setupWizardButtons();
             });
         }
 
@@ -353,33 +332,30 @@ public class AddBWWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(new PnlHAUF(new Closure() {
-                @Override
-                public void execute(Object o) {
-                    Date hauf = ((Triplet<Date, Station, Rooms>) o).getValue0();
-                    Station station = ((Triplet<Date, Station, Rooms>) o).getValue1();
-                    Rooms room = ((Triplet<Date, Station, Rooms>) o).getValue2();
+            addComponent(new PnlHAUF(o -> {
+                Date hauf = ((Triplet<Date, Station, Rooms>) o).getValue0();
+                Station station = ((Triplet<Date, Station, Rooms>) o).getValue1();
+                Rooms room = ((Triplet<Date, Station, Rooms>) o).getValue2();
 
-                    if (hauf != null) {
-                        resinfo_hauf = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), resident);
-                        resinfo_hauf.setFrom(hauf);
-                    } else {
-                        resinfo_hauf = null;
-                    }
-                    if (room != null) {
-                        resinfo_room = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
-
-                        Properties props = new Properties();
-                        props.put("room.id", Long.toString(room.getRoomID()));
-                        props.put("room.text", room.toString());
-                        ResInfoTools.setContent(resinfo_room, props);
-                        resinfo_room.setFrom(hauf);
-                    } else {
-                        resinfo_room = null;
-                    }
-                    resident.setStation(station);
-                    setupWizardButtons();
+                if (hauf != null) {
+                    resinfo_hauf = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), resident);
+                    resinfo_hauf.setFrom(hauf);
+                } else {
+                    resinfo_hauf = null;
                 }
+                if (room != null) {
+                    resinfo_room = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
+
+                    Properties props = new Properties();
+                    props.put("room.id", Long.toString(room.getRoomID()));
+                    props.put("room.text", room.toString());
+                    ResInfoTools.setContent(resinfo_room, props);
+                    resinfo_room.setFrom(hauf);
+                } else {
+                    resinfo_room = null;
+                }
+                resident.setStation(station);
+                setupWizardButtons();
             }), true);
         }
     }
@@ -388,12 +364,9 @@ public class AddBWWizard {
     private class CompletionPage extends CompletionWizardPage {
         public CompletionPage(String title, String description) {
             super(title, description);
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
-                    setupWizardButtons();
-                }
+            addPageListener(pageEvent -> {
+                if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                setupWizardButtons();
             });
 
         }

@@ -91,6 +91,7 @@ public class PnlMed extends CleanablePanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         SYSTools.unregisterListeners(menu);
         menu = null;
         SYSTools.unregisterListeners(this);
@@ -210,23 +211,12 @@ public class PnlMed extends CleanablePanel {
                 if (dmtn.getUserObject() instanceof TradeForm) {
                     final TradeForm tradeForm = (TradeForm) dmtn.getUserObject();
                     itemedit = new JMenuItem(SYSTools.xx("misc.msg.edit"));
-                    itemedit.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgTradeForm(tradeForm);
-                            createTree();
-                        }
+                    itemedit.addActionListener(evt14 -> {
+                        new DlgTradeForm(tradeForm);
+                        createTree();
                     });
                     itemUPRedit = new JMenuItem(SYSTools.xx("upreditor.tooltip"));
-                    itemUPRedit.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgUPREditor(tradeForm, new Closure() {
-                                @Override
-                                public void execute(Object o) {
-                                    reload();
-                                }
-                            });
-                        }
-                    });
+                    itemUPRedit.addActionListener(evt13 -> new DlgUPREditor(tradeForm, o -> reload()));
                     itemUPRedit.setEnabled(tradeForm.getDosageForm().isUPRn());
 //                    itempack = new JMenuItem("Neue Verpackung");
 //                    itempack.addActionListener(new java.awt.event.ActionListener() {
@@ -240,21 +230,17 @@ public class PnlMed extends CleanablePanel {
                 } else if (dmtn.getUserObject() instanceof MedPackage) {
                     final MedPackage packung = (MedPackage) dmtn.getUserObject();
                     itemedit = new JMenuItem("Bearbeiten");
-                    itemedit.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgPack(SYSTools.xx("misc.msg.edit"), packung);
-                            createTree();
-                        }
+                    itemedit.addActionListener(evt12 -> {
+                        new DlgPack(SYSTools.xx("misc.msg.edit"), packung);
+                        createTree();
                     });
                 } else if (dmtn.getUserObject() instanceof MedProducts) {
 
                     itemedit = new JMenuItem("Bearbeiten");
-                    itemedit.addActionListener(new java.awt.event.ActionListener() {
-                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            DlgProduct dlg = new DlgProduct(SYSTools.xx("misc.msg.edit"), (MedProducts) dmtn.getUserObject());
-                            product = dlg.getProduct();
-                            createTree();
-                        }
+                    itemedit.addActionListener(evt1 -> {
+                        DlgProduct dlg = new DlgProduct(SYSTools.xx("misc.msg.edit"), (MedProducts) dmtn.getUserObject());
+                        product = dlg.getProduct();
+                        createTree();
                     });
                 }
 
@@ -386,23 +372,13 @@ public class PnlMed extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         tbIDs = GUITools.getNiceToggleButton("misc.msg.showIDs");
-        tbIDs.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                reload();
-            }
-        });
+        tbIDs.addItemListener(e -> reload());
         tbIDs.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbIDs);
 
         txtSuche = new JXSearchField("Suchen");
         txtSuche.setFont(SYSConst.ARIAL14);
-        txtSuche.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                txtSucheActionPerformed(actionEvent);
-            }
-        });
+        txtSuche.addActionListener(actionEvent -> txtSucheActionPerformed(actionEvent));
         txtSuche.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent focusEvent) {
@@ -414,12 +390,7 @@ public class PnlMed extends CleanablePanel {
         lstPraep = new JList(new DefaultListModel());
         lstPraep.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
         lstPraep.setFont(SYSConst.ARIAL14);
-        lstPraep.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                lstPraepValueChanged(listSelectionEvent);
-            }
-        });
+        lstPraep.addListSelectionListener(listSelectionEvent -> lstPraepValueChanged(listSelectionEvent));
         lstPraep.setFixedCellWidth(200);
 
         list.add(new JScrollPane(lstPraep));
@@ -433,41 +404,30 @@ public class PnlMed extends CleanablePanel {
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             final JideButton addButton = GUITools.createHyperlinkButton(MedProductWizard.internalClassID, SYSConst.icon22wizard, null);
 
-            addButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
+            addButton.addActionListener(actionEvent -> {
 
 
-                    final JidePopup popup = new JidePopup();
+                final JidePopup popup = new JidePopup();
 
 
-                    WizardDialog wizard = new MedProductWizard(new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            popup.hidePopup();
-                            // keine Maßnahme nötig
-                        }
-                    }).getWizard();
+                WizardDialog wizard = new MedProductWizard(o -> {
+                    popup.hidePopup();
+                    // keine Maßnahme nötig
+                }).getWizard();
 
 
-                    popup.setMovable(false);
-                    popup.setPreferredSize((new Dimension(800, 450)));
-                    popup.setResizable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    popup.getContentPane().add(wizard.getContentPane());
-                    popup.setOwner(addButton);
-                    popup.removeExcludedComponent(addButton);
-                    popup.setTransient(false);
-                    popup.setDefaultFocusComponent(wizard.getContentPane());
-                    popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
-                        @Override
-                        public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                            popup.getContentPane().getComponentCount();
-                        }
-                    });
+                popup.setMovable(false);
+                popup.setPreferredSize((new Dimension(800, 450)));
+                popup.setResizable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.getContentPane().add(wizard.getContentPane());
+                popup.setOwner(addButton);
+                popup.removeExcludedComponent(addButton);
+                popup.setTransient(false);
+                popup.setDefaultFocusComponent(wizard.getContentPane());
+                popup.addPropertyChangeListener("visible", propertyChangeEvent -> popup.getContentPane().getComponentCount());
 
-                    GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
-                }
+                GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
             });
 
             list.add(addButton);
@@ -483,12 +443,7 @@ public class PnlMed extends CleanablePanel {
 //        }
 
         if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.inventory.newstocks", SYSConst.icon22addrow, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgNewStocks(null);
-                }
-            });
+            JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.inventory.newstocks", SYSConst.icon22addrow, actionEvent -> new DlgNewStocks(null));
             list.add(buchenButton);
         }
 

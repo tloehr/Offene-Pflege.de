@@ -280,29 +280,23 @@ public class PnlPeriod extends JPanel {
         tbTVB = GUITools.getNiceToggleButton("misc.msg.fromTheVeryBeginning");
         tbUFN = GUITools.getNiceToggleButton("misc.msg.untilFurtherNotice");
 
-        tbTVB.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                btnMin.setEnabled(!tbTVB.isSelected());
-                btnBackFrom.setEnabled(!tbTVB.isSelected());
-                btnFwdFrom.setEnabled(!tbTVB.isSelected());
-                jdcVon.setEnabled(!tbTVB.isSelected());
-                if (e.getStateChange() != ItemEvent.SELECTED){
-                    jdcVon.setDate(min);
-                }
+        tbTVB.addItemListener(e -> {
+            btnMin.setEnabled(!tbTVB.isSelected());
+            btnBackFrom.setEnabled(!tbTVB.isSelected());
+            btnFwdFrom.setEnabled(!tbTVB.isSelected());
+            jdcVon.setEnabled(!tbTVB.isSelected());
+            if (e.getStateChange() != ItemEvent.SELECTED){
+                jdcVon.setDate(min);
             }
         });
 
-        tbUFN.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                btnMax.setEnabled(!tbUFN.isSelected());
-                btnFwdTo.setEnabled(!tbUFN.isSelected());
-                btnBackTo.setEnabled(!tbUFN.isSelected());
-                jdcBis.setEnabled(!tbUFN.isSelected());
-                if (e.getStateChange() != ItemEvent.SELECTED){
-                    jdcBis.setDate(myMax);
-                }
+        tbUFN.addItemListener(e -> {
+            btnMax.setEnabled(!tbUFN.isSelected());
+            btnFwdTo.setEnabled(!tbUFN.isSelected());
+            btnBackTo.setEnabled(!tbUFN.isSelected());
+            jdcBis.setEnabled(!tbUFN.isSelected());
+            if (e.getStateChange() != ItemEvent.SELECTED){
+                jdcBis.setDate(myMax);
             }
         });
 

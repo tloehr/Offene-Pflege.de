@@ -37,6 +37,7 @@ public class DlgUPREditor extends MyJDialog {
     private ArrayList<MedStock> listStocks;
     private HashMap<MedStock, Pair<BigDecimal, BigDecimal>> mapEffectiveUPRs;
     private Closure afterAction;
+    private JDialog currentEditor;
 
     public DlgUPREditor(TradeForm tradeForm, Closure afterAction) {
         super(false);
@@ -166,87 +167,86 @@ public class DlgUPREditor extends MyJDialog {
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
-        new DlgYesNo(SYSTools.xx("upreditor.changeupr.yesno"), SYSConst.icon48playerStop, new Closure() {
-            @Override
-            public void execute(Object answer) {
-                if (answer.equals(JOptionPane.YES_OPTION)) {
-                    SwingWorker worker = new SwingWorker() {
+        currentEditor = new DlgYesNo(SYSTools.xx("upreditor.changeupr.yesno"), SYSConst.icon48playerStop, answer -> {
+            if (answer.equals(JOptionPane.YES_OPTION)) {
+                SwingWorker worker = new SwingWorker() {
 
-                        @Override
-                        protected Object doInBackground() throws Exception {
+                    @Override
+                    protected Object doInBackground() throws Exception {
 
-                            btnSave.setEnabled(false);
-                            btnClose.setEnabled(false);
-                            rbUPRAuto.setEnabled(false);
-                            rbUPRConst.setEnabled(false);
-                            txtUPR.setEnabled(false);
-                            txtSetUPR.setEnabled(false);
+                        btnSave.setEnabled(false);
+                        btnClose.setEnabled(false);
+                        rbUPRAuto.setEnabled(false);
+                        rbUPRConst.setEnabled(false);
+                        txtUPR.setEnabled(false);
+                        txtSetUPR.setEnabled(false);
 
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                if (rbUPRAuto.isSelected()) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            if (rbUPRAuto.isSelected()) {
 
-                                    int progress = 0;
-                                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
+                                int progress = 0;
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
 
-                                    BigDecimal upr = checkUPR(txtSetUPR.getText());
-                                    TradeForm mytf = em.merge(tradeForm);
-                                    em.lock(mytf, LockModeType.OPTIMISTIC);
-                                    mytf.setUPR(null);
+                                BigDecimal upr = checkUPR(txtSetUPR.getText());
+                                TradeForm mytf = em.merge(tradeForm);
+                                em.lock(mytf, LockModeType.OPTIMISTIC);
+                                mytf.setUPR(null);
 
-                                    for (MedStock s : listStocks) {
-                                        progress++;
-                                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listStocks.size()));
-                                        MedStock stock = em.merge(s);
-                                        em.lock(stock, LockModeType.OPTIMISTIC);
-                                        em.lock(stock.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                        stock.setUPR(upr);
-                                        stock.setUPRDummyMode(MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
-                                    }
-
-                                } else {
-                                    BigDecimal upr = checkUPR(txtUPR.getText());
-                                    TradeForm mytf = em.merge(tradeForm);
-                                    em.lock(mytf, LockModeType.OPTIMISTIC);
-                                    mytf.setUPR(upr);
+                                for (MedStock s : listStocks) {
+                                    progress++;
+                                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listStocks.size()));
+                                    MedStock stock = em.merge(s);
+                                    em.lock(stock, LockModeType.OPTIMISTIC);
+                                    em.lock(stock.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    stock.setUPR(upr);
+                                    stock.setUPRDummyMode(MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
                                 }
-                                em.getTransaction().commit();
 
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (RollbackException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception ex) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(ex);
-                            } finally {
-                                em.close();
+                            } else {
+                                BigDecimal upr = checkUPR(txtUPR.getText());
+                                TradeForm mytf = em.merge(tradeForm);
+                                em.lock(mytf, LockModeType.OPTIMISTIC);
+                                mytf.setUPR(upr);
                             }
-                            return null;
-                        }
+                            em.getTransaction().commit();
 
-                        @Override
-                        protected void done() {
-                            OPDE.getDisplayManager().setProgressBarMessage(null);
-                            OPDE.getMainframe().setBlocked(false);
-                            afterAction.execute(null);
-                            dispose();
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (RollbackException ole) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception ex) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(ex);
+                        } finally {
+                            em.close();
                         }
-                    };
-                    worker.execute();
-                }
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                        afterAction.execute(null);
+                        currentEditor = null;
+                        dispose();
+                    }
+                };
+                worker.execute();
             }
         });
+        currentEditor.setVisible(true);
     }
 
     private void initComponents() {

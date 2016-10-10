@@ -31,26 +31,23 @@ public class TradeFormTools {
 
     public static ListCellRenderer getRenderer(int verbosity) {
         final int v = verbosity;
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof TradeForm) {
-                    TradeForm darreichung = (TradeForm) o;
-                    if (v == SHORT) {
-                        text = darreichung.getSubtext();
-                    } else if (v == MEDIUM) {
-                        text = toPrettyStringMedium(darreichung);
-                    } else {
-                        text = toPrettyString(darreichung);
-                    }
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+            } else if (o instanceof TradeForm) {
+                TradeForm darreichung = (TradeForm) o;
+                if (v == SHORT) {
+                    text = darreichung.getSubtext();
+                } else if (v == MEDIUM) {
+                    text = toPrettyStringMedium(darreichung);
                 } else {
-                    text = o.toString();
+                    text = toPrettyString(darreichung);
                 }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 

@@ -27,20 +27,17 @@ import java.util.Date;
 public class MedInventoryTools {
 
     public static ListCellRenderer getInventoryRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedInventory) {
-                    MedInventory inventory = (MedInventory) o;
-                    text = inventory.getText();
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+            } else if (o instanceof MedInventory) {
+                MedInventory inventory = (MedInventory) o;
+                text = inventory.getText();
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 

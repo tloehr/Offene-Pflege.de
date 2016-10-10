@@ -964,12 +964,7 @@ public class NReportTools {
             list.addAll(query2.getResultList());
 
 
-            Collections.sort(list, new Comparator() {
-                @Override
-                public int compare(Object o1, Object o2) {
-                    return new Long(((QProcessElement) o1).getPITInMillis()).compareTo(new Long(((QProcessElement) o2).getPITInMillis())) * -1;
-                }
-            });
+            Collections.sort(list, (o1, o2) -> new Long(((QProcessElement) o1).getPITInMillis()).compareTo(new Long(((QProcessElement) o2).getPITInMillis())) * -1);
 
 
         } catch (Exception se) {

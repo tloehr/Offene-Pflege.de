@@ -34,10 +34,9 @@ public class DlgYesNo extends MyJDialog {
         this.actionBlock = actionBlock;
         txtMessage.setText(SYSTools.toHTML("<div id=\"fonttext\">" + message + "</div>"));
         lblTitle.setText(null);
-//        result = JOptionPane.CANCEL_OPTION;
         lblIcon.setIcon(icon);
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     /**

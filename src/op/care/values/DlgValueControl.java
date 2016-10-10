@@ -102,54 +102,42 @@ public class DlgValueControl extends MyJDialog {
         txtDaysDrink.setText(drinkon ? props.getProperty(ResidentTools.KEY_DAYSDRINK) : "");
         txtDaysDrink.setEnabled(drinkon);
 
-        tbStool.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                txtStoolDays.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1" : "");
-                // #24
-                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                    props.setProperty(ResidentTools.KEY_DATE1, new LocalDate().toString("yyyy-MM-dd"));
-                } else {
-                    props.remove(ResidentTools.KEY_DATE1);
-                }
-                txtStoolDays.setEnabled(tbStool.isSelected());
+        tbStool.addItemListener(itemEvent -> {
+            txtStoolDays.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1" : "");
+            // #24
+            if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                props.setProperty(ResidentTools.KEY_DATE1, new LocalDate().toString("yyyy-MM-dd"));
+            } else {
+                props.remove(ResidentTools.KEY_DATE1);
             }
+            txtStoolDays.setEnabled(tbStool.isSelected());
         });
-        tbBalance.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                setTxtDaysDrink();
-                txtTargetIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1400" : "");
-                txtTargetIn.setEnabled(tbBalance.isSelected());
-            }
+        tbBalance.addItemListener(itemEvent -> {
+            setTxtDaysDrink();
+            txtTargetIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1400" : "");
+            txtTargetIn.setEnabled(tbBalance.isSelected());
         });
-        tbLowIn.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                setTxtDaysDrink();
-                // #24
-                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                    props.setProperty(ResidentTools.KEY_DATE2, new LocalDate().toString("yyyy-MM-dd"));
-                } else {
-                    props.remove(ResidentTools.KEY_DATE2);
-                }
-                txtLowIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1000" : "");
-                txtLowIn.setEnabled(tbLowIn.isSelected());
+        tbLowIn.addItemListener(itemEvent -> {
+            setTxtDaysDrink();
+            // #24
+            if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                props.setProperty(ResidentTools.KEY_DATE2, new LocalDate().toString("yyyy-MM-dd"));
+            } else {
+                props.remove(ResidentTools.KEY_DATE2);
             }
+            txtLowIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1000" : "");
+            txtLowIn.setEnabled(tbLowIn.isSelected());
         });
-        tbHighIn.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                setTxtDaysDrink();
-                // #24
-                if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
-                    props.setProperty(ResidentTools.KEY_DATE3, new LocalDate().toString("yyyy-MM-dd"));
-                } else {
-                    props.remove(ResidentTools.KEY_DATE3);
-                }
-                txtHighIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1700" : "");
-                txtHighIn.setEnabled(tbHighIn.isSelected());
+        tbHighIn.addItemListener(itemEvent -> {
+            setTxtDaysDrink();
+            // #24
+            if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
+                props.setProperty(ResidentTools.KEY_DATE3, new LocalDate().toString("yyyy-MM-dd"));
+            } else {
+                props.remove(ResidentTools.KEY_DATE3);
             }
+            txtHighIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1700" : "");
+            txtHighIn.setEnabled(tbHighIn.isSelected());
         });
     }
 

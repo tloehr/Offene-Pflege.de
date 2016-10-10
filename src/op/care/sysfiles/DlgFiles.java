@@ -61,7 +61,6 @@ public class DlgFiles extends MyJDialog {
         this.afterAttachAction = afterAttachAction;
         initComponents();
         initDialog();
-        setVisible(true);
     }
 
     private void initDialog() {
@@ -253,12 +252,7 @@ public class DlgFiles extends MyJDialog {
                 //---- btnCancel ----
                 btnCancel.setText(null);
                 btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_eject.png")));
-                btnCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCancelActionPerformed(e);
-                    }
-                });
+                btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
                 contentPanel.add(btnCancel, CC.xy(3, 3, CC.RIGHT, CC.DEFAULT));
             }
             dialogPane.add(contentPanel);

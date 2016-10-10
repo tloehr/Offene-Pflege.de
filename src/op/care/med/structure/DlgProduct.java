@@ -70,14 +70,11 @@ public class DlgProduct extends MyJDialog {
     private void btnAddActionPerformed(ActionEvent e) {
         final JidePopup popup = new JidePopup();
 
-        DlgACME dlg = new DlgACME(new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbAcme.setModel(new DefaultComboBoxModel(new ACME[]{(ACME) o}));
-                    cmbAcme.setSelectedIndex(0);
-                    popup.hidePopup();
-                }
+        DlgACME dlg = new DlgACME(o -> {
+            if (o != null) {
+                cmbAcme.setModel(new DefaultComboBoxModel(new ACME[]{(ACME) o}));
+                cmbAcme.setSelectedIndex(0);
+                popup.hidePopup();
             }
         });
 
@@ -162,12 +159,7 @@ public class DlgProduct extends MyJDialog {
             "Eintrag 4"
         }));
         cmbAcme.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbAcme.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbAcmeItemStateChanged(e);
-            }
-        });
+        cmbAcme.addItemListener(e -> cmbAcmeItemStateChanged(e));
         contentPane.add(cmbAcme, CC.xy(5, 5));
 
         //---- lblAcme ----
@@ -182,12 +174,7 @@ public class DlgProduct extends MyJDialog {
         btnAdd.setBorder(null);
         btnAdd.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
         btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnAddActionPerformed(e);
-            }
-        });
+        btnAdd.addActionListener(e -> btnAddActionPerformed(e));
         contentPane.add(btnAdd, CC.xy(7, 5, CC.LEFT, CC.DEFAULT));
 
         //---- lblSideEffects ----
@@ -211,23 +198,13 @@ public class DlgProduct extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
             btnCancel.setText(null);
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnOK ----
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
             btnOK.setText(null);
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
+            btnOK.addActionListener(e -> btnOKActionPerformed(e));
             panel1.add(btnOK);
         }
         contentPane.add(panel1, CC.xywh(5, 9, 3, 1, CC.RIGHT, CC.DEFAULT));

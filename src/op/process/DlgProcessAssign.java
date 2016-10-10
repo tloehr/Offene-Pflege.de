@@ -42,7 +42,7 @@ public class DlgProcessAssign extends MyJDialog {
         this.afterAction = afterAction;
         initComponents();
         initPanel();
-        setVisible(true);
+//        setVisible(true);
     }
 
     @Override
@@ -176,12 +176,7 @@ public class DlgProcessAssign extends MyJDialog {
             btnRight.setContentAreaFilled(false);
             btnRight.setBorder(null);
             btnRight.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1rightarrow_pressed.png")));
-            btnRight.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnRightActionPerformed(e);
-                }
-            });
+            btnRight.addActionListener(e -> btnRightActionPerformed(e));
             panel1.add(btnRight);
 
             //---- btnLeft ----
@@ -191,12 +186,7 @@ public class DlgProcessAssign extends MyJDialog {
             btnLeft.setContentAreaFilled(false);
             btnLeft.setBorder(null);
             btnLeft.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1leftarrow_pressed.png")));
-            btnLeft.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnLeftActionPerformed(e);
-                }
-            });
+            btnLeft.addActionListener(e -> btnLeftActionPerformed(e));
             panel1.add(btnLeft);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.DEFAULT, CC.CENTER));
@@ -237,12 +227,7 @@ public class DlgProcessAssign extends MyJDialog {
                 btnAddProcess.setContentAreaFilled(false);
                 btnAddProcess.setBorder(null);
                 btnAddProcess.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
-                btnAddProcess.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnAddProcessActionPerformed(e);
-                    }
-                });
+                btnAddProcess.addActionListener(e -> btnAddProcessActionPerformed(e));
                 panel3.add(btnAddProcess);
             }
             panel2.add(panel3, CC.xy(1, 5, CC.RIGHT, CC.DEFAULT));
@@ -256,23 +241,13 @@ public class DlgProcessAssign extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel5.add(btnCancel);
 
             //---- btnApply ----
             btnApply.setText(null);
             btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnApply.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnApplyActionPerformed(e);
-                }
-            });
+            btnApply.addActionListener(e -> btnApplyActionPerformed(e));
             panel5.add(btnApply);
         }
         contentPane.add(panel5, CC.xywh(3, 11, 5, 1, CC.RIGHT, CC.DEFAULT));

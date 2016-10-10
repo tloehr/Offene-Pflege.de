@@ -94,24 +94,16 @@ public class PnlAway extends JPanel {
             cmbHospital.setSelectedItem(preselect);
         }
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE);
-            }
-        });
+        SwingUtilities.invokeLater(() -> SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE));
 
     }
 
     private void btnAddKHActionPerformed(ActionEvent e) {
 //        SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSConst.SCROLL_TIME_FAST);
         final PnlEditHospital pnlHospital = new PnlEditHospital(new Hospital());
-        JidePopup popup = GUITools.createPanelPopup(pnlHospital, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    cmbHospital.setModel(new DefaultComboBoxModel(new Hospital[]{(Hospital) o}));
-                }
+        JidePopup popup = GUITools.createPanelPopup(pnlHospital, o -> {
+            if (o != null) {
+                cmbHospital.setModel(new DefaultComboBoxModel(new Hospital[]{(Hospital) o}));
             }
         }, btnAddKH);
         GUITools.showPopup(popup, SwingConstants.EAST);

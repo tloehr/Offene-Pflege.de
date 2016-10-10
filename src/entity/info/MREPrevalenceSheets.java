@@ -176,22 +176,19 @@ public class MREPrevalenceSheets {
 
         // this sorts the resident list according to their assigned rooms. if not possible according to their assigned stations.
         // and if still not possible according to their RIDs (which is always working).
-        Collections.sort(listResidents, new Comparator<Resident>() {
-            @Override
-            public int compare(Resident o1, Resident o2) {
-                int i1 = mapRooms.containsKey(o1) ? 1 : 0;
-                int i2 = mapRooms.containsKey(o2) ? 1 : 0;
-                int sort = i1 - i2; // little trick
+        Collections.sort(listResidents, (o1, o2) -> {
+            int i1 = mapRooms.containsKey(o1) ? 1 : 0;
+            int i2 = mapRooms.containsKey(o2) ? 1 : 0;
+            int sort = i1 - i2; // little trick
 
-                if (sort == 0) {
-                    if (i1 == 1) {// both residents have rooms assigned
-                        sort = mapRooms.get(o1).getFloor().getHome().getEid().compareTo(mapRooms.get(o2).getFloor().getHome().getEid());
-                        if (sort == 0) sort = Integer.compare(mapRooms.get(o1).getFloor().getLevel(), mapRooms.get(o2).getFloor().getLevel());
-                    }
+            if (sort == 0) {
+                if (i1 == 1) {// both residents have rooms assigned
+                    sort = mapRooms.get(o1).getFloor().getHome().getEid().compareTo(mapRooms.get(o2).getFloor().getHome().getEid());
+                    if (sort == 0) sort = Integer.compare(mapRooms.get(o1).getFloor().getLevel(), mapRooms.get(o2).getFloor().getLevel());
                 }
-                if (sort == 0) sort = o1.toString().compareTo(o2.toString());
-                return sort;
             }
+            if (sort == 0) sort = o1.toString().compareTo(o2.toString());
+            return sort;
         });
 
         max = listResidents.size() * MAXCOL_SHEET1 + 3; // 2 more for preparation and wrapup

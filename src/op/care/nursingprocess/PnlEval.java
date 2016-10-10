@@ -143,12 +143,7 @@ public class PnlEval extends JPanel {
             //---- btnOK ----
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnOK.setText(null);
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
+            btnOK.addActionListener(e -> btnOKActionPerformed(e));
             panel1.add(btnOK);
         }
         add(panel1, CC.xy(2, 7, CC.RIGHT, CC.DEFAULT));

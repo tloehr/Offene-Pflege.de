@@ -645,6 +645,9 @@ public class OPDE {
 
             mainframe = new FrmMain();
             mainframe.setVisible(true);
+
+            new pnldebug();
+
         } catch (Exception ioe) {
 
             if (cl.hasOption("d") || cl.hasOption("b")) {

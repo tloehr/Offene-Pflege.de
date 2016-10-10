@@ -309,23 +309,13 @@ public class DlgValue extends MyJDialog {
             //---- btnCancel ----
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
             panel1.add(btnCancel);
 
             //---- btnApply ----
             btnApply.setText(null);
             btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnApply.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnApplyActionPerformed(e);
-                }
-            });
+            btnApply.addActionListener(e -> btnApplyActionPerformed(e));
             panel1.add(btnApply);
         }
         contentPane.add(panel1, CC.xywh(7, 13, 3, 1, CC.RIGHT, CC.BOTTOM));

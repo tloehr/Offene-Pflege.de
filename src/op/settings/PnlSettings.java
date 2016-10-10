@@ -80,6 +80,7 @@ public class PnlSettings extends CleanablePanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         if (currentPanel != null) {
             currentPanel.cleanup();
             pnlSingle.remove(currentPanel);

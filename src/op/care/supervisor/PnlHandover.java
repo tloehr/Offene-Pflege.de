@@ -122,18 +122,15 @@ public class PnlHandover extends NursingRecordsPanel {
 
     private void initPanel() {
 
-        myComparator = new Comparator<NReport>() {
-            @Override
-            public int compare(NReport o1, NReport o2) {
-                if (!tbResidentFirst.isSelected()) {
-                    return o1.getPit().compareTo(o2.getPit());
-                } else {
-                    int comp = o1.getResident().getRID().compareTo(o2.getResident().getRID());
-                    if (comp == 0) {
-                        comp = o1.getPit().compareTo(o2.getPit());
-                    }
-                    return comp;
+        myComparator = (Comparator<NReport>) (o1, o2) -> {
+            if (!tbResidentFirst.isSelected()) {
+                return o1.getPit().compareTo(o2.getPit());
+            } else {
+                int comp = o1.getResident().getRID().compareTo(o2.getResident().getRID());
+                if (comp == 0) {
+                    comp = o1.getPit().compareTo(o2.getPit());
                 }
+                return comp;
             }
         };
 
@@ -207,6 +204,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
+        super.cleanup();
         cpsHandover.removeAll();
 
         synchronized (cpMap) {
@@ -324,14 +322,11 @@ public class PnlHandover extends NursingRecordsPanel {
                 "<b>" + Integer.toString(year) + "</b>" +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpYear.setCollapsed(!cpYear.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpYear.setCollapsed(!cpYear.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -408,14 +403,11 @@ public class PnlHandover extends NursingRecordsPanel {
                 "</b>" +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpMonth.setCollapsed(!cpMonth.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            try {
+                cpMonth.setCollapsed(!cpMonth.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
@@ -487,73 +479,65 @@ public class PnlHandover extends NursingRecordsPanel {
                 dayFormat.format(day.toDate()) +
                 SYSTools.catchNull(hollidays.get(day), " (", ")") +
                 "</font></html>";
-        final DefaultCPTitle titleCPDay = new DefaultCPTitle(titleDay, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpDay.setCollapsed(!cpDay.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
+        final DefaultCPTitle titleCPDay = new DefaultCPTitle(titleDay, e -> {
+            try {
+                cpDay.setCollapsed(!cpDay.isCollapsed());
+            } catch (PropertyVetoException pve) {
+                // BAH!
             }
         });
 
         final JButton btnAcknowledge = new JButton(SYSConst.icon163ledGreenOn);
         btnAcknowledge.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnAcknowledge.setToolTipText(SYSTools.xx("nursingrecords.handover.tooltips.btnAcknowledge"));
-        btnAcknowledge.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                EntityManager em = OPDE.createEM();
-                try {
-                    em.getTransaction().begin();
+        btnAcknowledge.addActionListener(actionEvent -> {
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
 
-                    synchronized (cacheHO) {
-                        ArrayList<Handovers> listHO = new ArrayList<Handovers>(cacheHO.get(key));
-                        for (final Handovers ho : listHO) {
-                            if (!Handover2UserTools.containsUser(em, ho, OPDE.getLogin().getUser())) {
-                                Handovers myHO = em.merge(ho);
-                                Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
-                                myHO.getUsersAcknowledged().add(connObj);
-                            }
+                synchronized (cacheHO) {
+                    ArrayList<Handovers> listHO = new ArrayList<Handovers>(cacheHO.get(key));
+                    for (final Handovers ho : listHO) {
+                        if (!Handover2UserTools.containsUser(em, ho, OPDE.getLogin().getUser())) {
+                            Handovers myHO = em.merge(ho);
+                            Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
+                            myHO.getUsersAcknowledged().add(connObj);
                         }
                     }
-
-                    synchronized (cacheNR) {
-                        ArrayList<NReport> listNR = new ArrayList<NReport>(cacheNR.get(key));
-                        for (final NReport nreport : listNR) {
-                            if (!NR2UserTools.containsUser(em, nreport, OPDE.getLogin().getUser())) {
-                                NReport myNR = em.merge(nreport);
-                                NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
-                                myNR.getUsersAcknowledged().add(connObj);
-                            }
-                        }
-                    }
-
-                    em.getTransaction().commit();
-                    createCP4Day(day);
-                    buildPanel();
-                } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                        OPDE.getMainframe().emptyFrame();
-                        OPDE.getMainframe().afterLogin();
-                    }
-                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.fatal(e);
-                } finally {
-                    em.close();
                 }
 
-            }
+                synchronized (cacheNR) {
+                    ArrayList<NReport> listNR = new ArrayList<NReport>(cacheNR.get(key));
+                    for (final NReport nreport : listNR) {
+                        if (!NR2UserTools.containsUser(em, nreport, OPDE.getLogin().getUser())) {
+                            NReport myNR = em.merge(nreport);
+                            NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
+                            myNR.getUsersAcknowledged().add(connObj);
+                        }
+                    }
+                }
 
+                em.getTransaction().commit();
+                createCP4Day(day);
+                buildPanel();
+            } catch (OptimisticLockException ole) {
+                OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(e);
+            } finally {
+                em.close();
+            }
 
         });
         titleCPDay.getRight().add(btnAcknowledge);
@@ -635,42 +619,39 @@ public class PnlHandover extends NursingRecordsPanel {
                             "</table>" +
                             "</html>";
 
-                    final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent evt) {
-                            EntityManager em = OPDE.createEM();
-                            if (Handover2UserTools.containsUser(em, handover, OPDE.getLogin().getUser())) {
-                                em.close();
-                                return;
-                            }
-                            try {
-                                em.getTransaction().begin();
-                                Handovers myHO = em.merge(handover);
-                                Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
-                                myHO.getUsersAcknowledged().add(connObj);
-                                em.getTransaction().commit();
+                    final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), evt -> {
+                        EntityManager em = OPDE.createEM();
+                        if (Handover2UserTools.containsUser(em, handover, OPDE.getLogin().getUser())) {
+                            em.close();
+                            return;
+                        }
+                        try {
+                            em.getTransaction().begin();
+                            Handovers myHO = em.merge(handover);
+                            Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
+                            myHO.getUsersAcknowledged().add(connObj);
+                            em.getTransaction().commit();
 
-                                createCP4Day(day);
-                                buildPanel();
+                            createCP4Day(day);
+                            buildPanel();
 
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
                             }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
                         }
                     });
 
@@ -681,35 +662,32 @@ public class PnlHandover extends NursingRecordsPanel {
                     btnInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnInfo.setContentAreaFilled(false);
                     btnInfo.setBorder(null);
-                    btnInfo.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
-                            OPDE.getMainframe().setBlocked(true);
+                    btnInfo.addActionListener(e -> {
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
+                        OPDE.getMainframe().setBlocked(true);
 
-                            SwingWorker worker = new SwingWorker() {
+                        SwingWorker worker1 = new SwingWorker() {
 
-                                @Override
-                                protected Object doInBackground() throws Exception {
-                                    SYSFilesTools.print(Handover2UserTools.getAsHTML(handover), false);
-                                    return null;
+                            @Override
+                            protected Object doInBackground() throws Exception {
+                                SYSFilesTools.print(Handover2UserTools.getAsHTML(handover), false);
+                                return null;
+                            }
+
+                            @Override
+                            protected void done() {
+                                try {
+                                    get();
+                                } catch (Exception ex1) {
+                                    OPDE.fatal(ex1);
                                 }
+                                OPDE.getDisplayManager().setProgressBarMessage(null);
+                                OPDE.getMainframe().setBlocked(false);
+                            }
 
-                                @Override
-                                protected void done() {
-                                    try {
-                                        get();
-                                    } catch (Exception ex1) {
-                                        OPDE.fatal(ex1);
-                                    }
-                                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                                    OPDE.getMainframe().setBlocked(false);
-                                }
+                        };
+                        worker1.execute();
 
-                            };
-                            worker.execute();
-
-                        }
                     });
                     pnlSingle.getRight().add(btnInfo);
 
@@ -752,41 +730,38 @@ public class PnlHandover extends NursingRecordsPanel {
                             "</html>";
 
 
-                    final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent evt) {
-                            EntityManager em = OPDE.createEM();
-                            if (NR2UserTools.containsUser(em, nreport, OPDE.getLogin().getUser())) {
-                                em.close();
-                                return;
-                            }
+                    final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), evt -> {
+                        EntityManager em = OPDE.createEM();
+                        if (NR2UserTools.containsUser(em, nreport, OPDE.getLogin().getUser())) {
+                            em.close();
+                            return;
+                        }
 
-                            try {
-                                em.getTransaction().begin();
-                                NReport myNR = em.merge(nreport);
-                                NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
-                                myNR.getUsersAcknowledged().add(connObj);
-                                em.getTransaction().commit();
-                                createCP4Day(day);
-                                buildPanel();
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
+                        try {
+                            em.getTransaction().begin();
+                            NReport myNR = em.merge(nreport);
+                            NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
+                            myNR.getUsersAcknowledged().add(connObj);
+                            em.getTransaction().commit();
+                            createCP4Day(day);
+                            buildPanel();
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
                             }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
                         }
                     });
 
@@ -797,11 +772,9 @@ public class PnlHandover extends NursingRecordsPanel {
                     btnInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnInfo.setContentAreaFilled(false);
                     btnInfo.setBorder(null);
-                    btnInfo.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
+                    btnInfo.addActionListener(e -> {
 
-                            SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
+                        SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
 
 //                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 //                            OPDE.getMainframe().setBlocked(true);
@@ -823,7 +796,6 @@ public class PnlHandover extends NursingRecordsPanel {
 //                            };
 //                            worker.execute();
 
-                        }
                     });
                     pnlSingle.getRight().add(btnInfo);
 
@@ -911,135 +883,105 @@ public class PnlHandover extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnadd"), SYSConst.icon22add, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgHOReport(new Handovers((Homes) cmbHomes.getSelectedItem()), new Closure() {
-                        @Override
-                        public void execute(Object report) {
-                            if (report != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    final Handovers myHO = em.merge((Handovers) report);
-                                    myHO.getUsersAcknowledged().add(em.merge(new Handover2User(myHO, OPDE.getLogin().getUser())));
-                                    em.getTransaction().commit();
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnadd"), SYSConst.icon22add, actionEvent -> new DlgHOReport(new Handovers((Homes) cmbHomes.getSelectedItem()), report -> {
+                if (report != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        final Handovers myHO = em.merge((Handovers) report);
+                        myHO.getUsersAcknowledged().add(em.merge(new Handover2User(myHO, OPDE.getLogin().getUser())));
+                        em.getTransaction().commit();
 
-                                    LocalDate day = new LocalDate(myHO.getPit());
+                        LocalDate day = new LocalDate(myHO.getPit());
 
-                                    final String key = DateFormat.getDateInstance().format(myHO.getPit());
+                        final String key = DateFormat.getDateInstance().format(myHO.getPit());
 
-                                    createCP4Day(day);
-                                    expandDay(day);
+                        createCP4Day(day);
+                        expandDay(day);
 
-                                    buildPanel();
-                                    GUITools.scroll2show(jspHandover, cpMap.get(key), cpsHandover, new Closure() {
-                                        @Override
-                                        public void execute(Object o) {
+                        buildPanel();
+                        GUITools.scroll2show(jspHandover, cpMap.get(key), cpsHandover, o -> {
 //                                            GUITools.flashBackground(linemapHO.get(myHO), Color.YELLOW, 2);
-                                        }
-                                    });
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-                            }
+                        });
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
                         }
-                    });
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
                 }
-            });
+            }));
             list.add(addButton);
         }
 
 
         //https://github.com/tloehr/Offene-Pflege.de/issues/43
         final JideButton btnFindOpenHandovers = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnFindOpenHandovers"), SYSConst.icon22RedFlag, null);
-        btnFindOpenHandovers.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        btnFindOpenHandovers.addActionListener(actionEvent -> {
 
 //                OPDE.getMainframe().setBlocked(true);
 //                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
-                final long time = System.currentTimeMillis();
+            final long time = System.currentTimeMillis();
 
-                SwingWorker worker = new SwingWorker() {
-                    Date max = null;
+            SwingWorker worker = new SwingWorker() {
+                Date max = null;
 
-                    @Override
-                    protected Object doInBackground() throws Exception {
+                @Override
+                protected Object doInBackground() throws Exception {
 
-                        LocalDate start = new LocalDate().minusWeeks(checkWeeksbackForNewReports);
-                        LocalDate end = new LocalDate();
-                        int maxdays = checkWeeksbackForNewReports * 7;
-                        int running = 0;
+                    LocalDate start = new LocalDate().minusWeeks(checkWeeksbackForNewReports);
+                    LocalDate end = new LocalDate();
+                    int maxdays = checkWeeksbackForNewReports * 7;
+                    int running = 0;
 
-                        for (LocalDate day = start; day.compareTo(end) <= 0; day = day.plusDays(1)) {
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), running, maxdays));
-                            running++;
+                    for (LocalDate day = start; day.compareTo(end) <= 0; day = day.plusDays(1)) {
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), running, maxdays));
+                        running++;
 
-                            if (NR2UserTools.hasOpenReports(day, OPDE.getLogin().getUser(), (Homes) cmbHomes.getSelectedItem())) {
-                                expandDay(day);
-                            }
+                        if (NR2UserTools.hasOpenReports(day, OPDE.getLogin().getUser(), (Homes) cmbHomes.getSelectedItem())) {
+                            expandDay(day);
                         }
-
-                        return null;
                     }
 
-                    @Override
-                    protected void done() {
+                    return null;
+                }
 
-                        OPDE.getDisplayManager().setProgressBarMessage(null);
-                        OPDE.getMainframe().setBlocked(false);
+                @Override
+                protected void done() {
 
-                    }
-                };
-                worker.execute();
-            }
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+
+                }
+            };
+            worker.execute();
         });
         list.add(btnFindOpenHandovers);
 
 
         final JideButton btnControllingToday = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
-        btnControllingToday.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                btnControllingToday.setEnabled(false);
-                HandoversTools.printSupervision(new LocalDate(), (Homes) cmbHomes.getSelectedItem(), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        btnControllingToday.setEnabled(true);
-                    }
-                });
-            }
+        btnControllingToday.addActionListener(actionEvent -> {
+            btnControllingToday.setEnabled(false);
+            HandoversTools.printSupervision(new LocalDate(), (Homes) cmbHomes.getSelectedItem(), o -> btnControllingToday.setEnabled(true));
         });
         list.add(btnControllingToday);
 
         final JideButton btnControllingYesterday = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnControllingYesterday"), SYSConst.icon22magnify1, null);
-        btnControllingYesterday.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                btnControllingYesterday.setEnabled(false);
-                HandoversTools.printSupervision(new LocalDate().minusDays(1), (Homes) cmbHomes.getSelectedItem(), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        btnControllingYesterday.setEnabled(true);
-                    }
-                });
-            }
+        btnControllingYesterday.addActionListener(actionEvent -> {
+            btnControllingYesterday.setEnabled(false);
+            HandoversTools.printSupervision(new LocalDate().minusDays(1), (Homes) cmbHomes.getSelectedItem(), o -> btnControllingYesterday.setEnabled(true));
         });
         list.add(btnControllingYesterday);
 
@@ -1063,31 +1005,20 @@ public class PnlHandover extends NursingRecordsPanel {
             txtSearch = new JXSearchField(SYSTools.xx("misc.msg.searchphrase"));
             txtSearch.setInstantSearchDelay(100000);
             txtSearch.setFont(SYSConst.ARIAL14);
-            txtSearch.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
-                        SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(NReportTools.getNReports4Handover((Homes) cmbHomes.getSelectedItem(), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), false);
-                    }
+            txtSearch.addActionListener(e -> {
+                if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
+                    SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(NReportTools.getNReports4Handover((Homes) cmbHomes.getSelectedItem(), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), false);
                 }
             });
             innerPanel.add(txtSearch);
             JButton btnSearchGeneralReports = GUITools.createHyperlinkButton("nursingrecords.handover.searchHandovers", null, null);
-            btnSearchGeneralReports.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    List listHandovers = HandoversTools.getBy(Integer.parseInt(yearModel.getSelectedItem().toString()), (Homes) cmbHomes.getSelectedItem());
-                    SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(listHandovers, "", Integer.parseInt(yearModel.getSelectedItem().toString())), false);
-                }
+            btnSearchGeneralReports.addActionListener(e -> {
+                List listHandovers = HandoversTools.getBy(Integer.parseInt(yearModel.getSelectedItem().toString()), (Homes) cmbHomes.getSelectedItem());
+                SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(listHandovers, "", Integer.parseInt(yearModel.getSelectedItem().toString())), false);
             });
             innerPanel.add(btnSearchGeneralReports);
             yearCombo = new JXComboBox(yearModel);
-            yearCombo.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    txtSearch.postActionEvent();
-                }
-            });
+            yearCombo.addItemListener(e -> txtSearch.postActionEvent());
 
             JPanel myPanel = new JPanel();
             myPanel.setOpaque(false);
@@ -1100,23 +1031,17 @@ public class PnlHandover extends NursingRecordsPanel {
         cmbHomes = new JComboBox();
         cmbHomes.setFont(SYSConst.ARIAL14);
         HomesTools.setComboBox(cmbHomes);
-        cmbHomes.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (itemEvent.getStateChange() != ItemEvent.SELECTED) return;
-                reloadDisplay();
-            }
+        cmbHomes.addItemListener(itemEvent -> {
+            if (itemEvent.getStateChange() != ItemEvent.SELECTED) return;
+            reloadDisplay();
         });
         list.add(cmbHomes);
 
         tbResidentFirst = GUITools.getNiceToggleButton("nursingrecords.handover.residentFirst");
         SYSPropsTools.restoreState("nursingrecords.handover.tbResidentFirst", tbResidentFirst);
-        tbResidentFirst.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState("nursingrecords.handover.tbResidentFirst", tbResidentFirst);
-                reload();
-            }
+        tbResidentFirst.addItemListener(e -> {
+            SYSPropsTools.storeState("nursingrecords.handover.tbResidentFirst", tbResidentFirst);
+            reload();
         });
         tbResidentFirst.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbResidentFirst);

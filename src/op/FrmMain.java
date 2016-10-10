@@ -156,7 +156,6 @@ public class FrmMain extends JFrame {
         setTitle(SYSTools.getWindowTitle(""));
 
         displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, pnlIcons, pbTimeout, o -> {
-            OPDE.debug("TIMEOUT");
             logout();
             showLogin();
         });
@@ -202,6 +201,7 @@ public class FrmMain extends JFrame {
 
     public void emptyFrame() {
         if (currentVisiblePanel != null) {
+            currentVisiblePanel.cleanup();
             pnlCard.remove(currentVisiblePanel);
             lblWait.setVisible(false);
         }
@@ -309,12 +309,7 @@ public class FrmMain extends JFrame {
         synchronized (iconPanels) {
             setIconPanel(iconPanels.get(resident), resident);
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                iconPanels.get(resident).repaint();
-            }
-        });
+        SwingUtilities.invokeLater(() -> iconPanels.get(resident).repaint());
     }
 
     public void addSpeciality(ResInfoType type, final Resident resident) {
@@ -327,12 +322,7 @@ public class FrmMain extends JFrame {
         synchronized (iconPanels) {
             setIconPanel(iconPanels.get(resident), resident);
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                iconPanels.get(resident).repaint();
-            }
-        });
+        SwingUtilities.invokeLater(() -> iconPanels.get(resident).repaint());
 
     }
 
@@ -349,8 +339,6 @@ public class FrmMain extends JFrame {
         mailIconToggled = !mailIconToggled;
         btnMail.setIcon(mailIconToggled ? SYSConst.icon22mailGeneric : SYSConst.icon22mailGet);
     }
-
-
 
     public void afterLogin() {
         OPDE.getDisplayManager().touch();
@@ -630,22 +618,19 @@ public class FrmMain extends JFrame {
         panesApps.setLayout(new JideBoxLayout(panesApps, JideBoxLayout.Y_AXIS));
 
 
-        homeButton = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome"), SYSConst.icon22home, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (previousProgButton != null) {
-                    previousProgButton.setBackground(Color.WHITE);
-                    previousProgButton.setOpaque(false);
-                }
-                currentResident = null;
-                previousProgButton = (JideButton) actionEvent.getSource();
-                previousProgButton.setBackground(Color.YELLOW);
-                previousProgButton.setOpaque(true);
-                displayManager.setMainMessage(SYSTools.xx("opde.welcome"));
-                displayManager.addSubMessage(new DisplayMessage(SYSTools.xx("opde.welcome.longDescription")));
-                displayManager.clearAllIcons();
-                setPanelTo(new PnlWelcome(jspSearch));
+        homeButton = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome"), SYSConst.icon22home, actionEvent -> {
+            if (previousProgButton != null) {
+                previousProgButton.setBackground(Color.WHITE);
+                previousProgButton.setOpaque(false);
             }
+            currentResident = null;
+            previousProgButton = (JideButton) actionEvent.getSource();
+            previousProgButton.setBackground(Color.YELLOW);
+            previousProgButton.setOpaque(true);
+            displayManager.setMainMessage(SYSTools.xx("opde.welcome"));
+            displayManager.addSubMessage(new DisplayMessage(SYSTools.xx("opde.welcome.longDescription")));
+            displayManager.clearAllIcons();
+            setPanelTo(new PnlWelcome(jspSearch));
         });
         panesApps.add(homeButton);
 
@@ -761,40 +746,32 @@ public class FrmMain extends JFrame {
         }
 
         if (!residentList.isEmpty() && station != null) {
-            JideButton button = GUITools.createHyperlinkButton("opde.mainframe.printdailyplan", SYSConst.icon22print2, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    PrescriptionTools.printDailyPlan(station);
-                }
-            });
+            JideButton button = GUITools.createHyperlinkButton("opde.mainframe.printdailyplan", SYSConst.icon22print2, e -> PrescriptionTools.printDailyPlan(station));
             button.setBackground(Color.WHITE);
             labelPanel.add(button);
         }
 
         for (final Resident resident : residentList) {
-            ActionListener actionListener = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (currentResident != resident) {
+            ActionListener actionListener = actionEvent -> {
+                if (currentResident != resident) {
 
-                        if (previousProgButton != null) {
-                            previousProgButton.setBackground(Color.WHITE);
-                            previousProgButton.setOpaque(false);
-                        }
-
-                        previousProgButton = (JideButton) actionEvent.getSource();
-                        previousProgButton.setBackground(Color.YELLOW);
-                        previousProgButton.setOpaque(true);
-
-                        currentResident = resident;
-
-                        if (currentVisiblePanel instanceof PnlCare) {
-                            ((NursingRecordsPanel) currentVisiblePanel).switchResident(resident);
-                        } else {
-                            setPanelTo(new PnlCare(resident, jspSearch));
-                        }
-
+                    if (previousProgButton != null) {
+                        previousProgButton.setBackground(Color.WHITE);
+                        previousProgButton.setOpaque(false);
                     }
+
+                    previousProgButton = (JideButton) actionEvent.getSource();
+                    previousProgButton.setBackground(Color.YELLOW);
+                    previousProgButton.setOpaque(true);
+
+                    currentResident = resident;
+
+                    if (currentVisiblePanel instanceof PnlCare) {
+                        ((NursingRecordsPanel) currentVisiblePanel).switchResident(resident);
+                    } else {
+                        setPanelTo(new PnlCare(resident, jspSearch));
+                    }
+
                 }
             };
 
@@ -929,16 +906,13 @@ public class FrmMain extends JFrame {
     }
 
     private void showLogin() {
-        dlgLogin = new DlgLogin(new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    afterLogin();
-                } else {
-                    //todo: remove after install4j
-                    FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
-                    System.exit(0);
-                }
+        dlgLogin = new DlgLogin(o -> {
+            if (o != null) {
+                afterLogin();
+            } else {
+                //todo: remove after install4j
+                FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
+                System.exit(0);
             }
         });
     }
@@ -970,12 +944,7 @@ public class FrmMain extends JFrame {
     }
 
     public void setMailIconOff() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                btnMail.setIcon( SYSConst.icon22mailGeneric );
-            }
-        });
+        SwingUtilities.invokeLater(() -> btnMail.setIcon( SYSConst.icon22mailGeneric ));
 
     }
 

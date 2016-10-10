@@ -155,12 +155,7 @@ public class PnlPIT extends JPanel {
                 txtDateFocusLost(e);
             }
         });
-        txtDate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtDateActionPerformed(e);
-            }
-        });
+        txtDate.addActionListener(e -> txtDateActionPerformed(e));
         add(txtDate, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
 
         //---- txtUhrzeit ----
@@ -175,12 +170,7 @@ public class PnlPIT extends JPanel {
                 txtUhrzeitFocusLost(e);
             }
         });
-        txtUhrzeit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtUhrzeitActionPerformed(e);
-            }
-        });
+        txtUhrzeit.addActionListener(e -> txtUhrzeitActionPerformed(e));
         add(txtUhrzeit, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
 
         //---- labelUhrzeit ----

@@ -204,15 +204,12 @@ public class HandoversTools {
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 2, 4));
                 html += "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.handover.openBHPs") + "</h2>";
 
-                Collections.sort(listOpenBHPs, new Comparator<BHP>() {
-                    @Override
-                    public int compare(BHP o1, BHP o2) {
-                        int result = o1.getResident().compareTo(o2.getResident());
-                        if (result == 0) {
-                            result = o1.getShift().compareTo(o2.getShift());
-                        }
-                        return result;
+                Collections.sort(listOpenBHPs, (o1, o2) -> {
+                    int result = o1.getResident().compareTo(o2.getResident());
+                    if (result == 0) {
+                        result = o1.getShift().compareTo(o2.getShift());
                     }
+                    return result;
                 });
 
                 // resident -> shift -> num of empty BHPs

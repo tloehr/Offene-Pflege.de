@@ -20,21 +20,18 @@ public class MedPackageTools {
     public static final String GROESSE[] = {"N1", "N2", "N3", "AP", "OP"};
 
     public static ListCellRenderer getMedPackungRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedPackage) {
-                    MedPackage aPackage = (MedPackage) o;
+        return (jList, o, i, b, b1) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+            } else if (o instanceof MedPackage) {
+                MedPackage aPackage = (MedPackage) o;
 
-                    text = toPrettyString(aPackage);
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
+                text = toPrettyString(aPackage);
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, b, b1);
         };
     }
 

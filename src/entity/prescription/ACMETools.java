@@ -15,22 +15,19 @@ import java.awt.*;
 public class ACMETools {
     public static ListCellRenderer getRenderer(int maxlen) {
         final int max = maxlen;
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof ACME) {
-                    text = toPrettyStringShort((ACME) o);
-                } else {
-                    text = o.toString();
-                }
-                if (max > 0) {
-                    text = SYSTools.left(text, max);
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+            } else if (o instanceof ACME) {
+                text = toPrettyStringShort((ACME) o);
+            } else {
+                text = o.toString();
             }
+            if (max > 0) {
+                text = SYSTools.left(text, max);
+            }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 

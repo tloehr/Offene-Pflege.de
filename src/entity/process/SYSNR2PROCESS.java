@@ -15,7 +15,6 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "sysnr2process")
-
 public class SYSNR2PROCESS {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

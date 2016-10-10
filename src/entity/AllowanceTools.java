@@ -34,15 +34,12 @@ public class AllowanceTools {
 
     public static String getAsHTML(List<Allowance> lstCash, BigDecimal carry, Resident resident) {
 
-        Collections.sort(lstCash, new Comparator<Allowance>() {
-            @Override
-            public int compare(Allowance o1, Allowance o2) {
-                int result = o1.getPit().compareTo(o2.getPit());
-                if (result == 0) {
-                    result = o1.getId().compareTo(o2.getId());
-                }
-                return result;
+        Collections.sort(lstCash, (o1, o2) -> {
+            int result = o1.getPit().compareTo(o2.getPit());
+            if (result == 0) {
+                result = o1.getId().compareTo(o2.getId());
             }
+            return result;
         });
 
 //        DecimalFormat cf = new DecimalFormat("######.00");

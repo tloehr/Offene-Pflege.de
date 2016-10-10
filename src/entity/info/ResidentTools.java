@@ -64,19 +64,16 @@ public class ResidentTools {
 //    }
 
     public static ListCellRenderer getRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTMLForScreen(SYSTools.xx("misc.commands.>>noselection<<"));
-                } else if (o instanceof Resident) {
-                    text = o.toString();
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.toHTMLForScreen(SYSTools.xx("misc.commands.>>noselection<<"));
+            } else if (o instanceof Resident) {
+                text = o.toString();
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
     }
 

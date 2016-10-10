@@ -135,25 +135,22 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private ListCellRenderer getRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public java.awt.Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = "<i>" + SYSTools.xx("nursingrecords.prescription.dlgOnDemand.noOutcomeCheck") + "</i>";
-                } else if (o instanceof BigDecimal) {
-                    if (o.equals(new BigDecimal("0.5"))) {
-                        text = "&frac12; " + SYSTools.xx("misc.msg.Hour");
-                    } else if (o.equals(BigDecimal.ONE)) {
-                        text = "1 " + SYSTools.xx("misc.msg.Hour");
-                    } else {
-                        text = o.toString() + " " + SYSTools.xx("misc.msg.Hours");
-                    }
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = "<i>" + SYSTools.xx("nursingrecords.prescription.dlgOnDemand.noOutcomeCheck") + "</i>";
+            } else if (o instanceof BigDecimal) {
+                if (o.equals(new BigDecimal("0.5"))) {
+                    text = "&frac12; " + SYSTools.xx("misc.msg.Hour");
+                } else if (o.equals(BigDecimal.ONE)) {
+                    text = "1 " + SYSTools.xx("misc.msg.Hour");
                 } else {
-                    text = o.toString();
+                    text = o.toString() + " " + SYSTools.xx("misc.msg.Hours");
                 }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.toHTMLForScreen(text), i, isSelected, cellHasFocus);
+            } else {
+                text = o.toString();
             }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.toHTMLForScreen(text), i, isSelected, cellHasFocus);
         };
     }
 
@@ -163,22 +160,16 @@ public class DlgOnDemand extends MyJDialog {
         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
         final JTextField editor = new JTextField(txtSit.getText(), 30);
-        editor.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                saveSituation(editor.getText());
-                popup.hidePopup();
-            }
+        editor.addActionListener(actionEvent -> {
+            saveSituation(editor.getText());
+            popup.hidePopup();
         });
 
         popup.getContentPane().add(new JScrollPane(editor));
         JButton saveButton = new JButton(SYSConst.icon22apply);
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                saveSituation(editor.getText());
-                popup.hidePopup();
-            }
+        saveButton.addActionListener(actionEvent -> {
+            saveSituation(editor.getText());
+            popup.hidePopup();
         });
 
         popup.setMovable(false);
@@ -297,12 +288,7 @@ public class DlgOnDemand extends MyJDialog {
 
     private void cmbDocONKeyPressed(KeyEvent e) {
         final String searchKey = String.valueOf(e.getKeyChar());
-        GP doc = (GP) CollectionUtils.find(listAerzte, new Predicate() {
-            @Override
-            public boolean evaluate(Object o) {
-                return o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
-            }
-        });
+        GP doc = (GP) CollectionUtils.find(listAerzte, o -> o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0));
         if (doc != null) {
             cmbDocON.setSelectedItem(doc);
         }
@@ -716,15 +702,12 @@ public class DlgOnDemand extends MyJDialog {
 //        String pzan = MedPackageTools.parsePZN(txtMed.getText());
         final JidePopup popup = new JidePopup();
 
-        WizardDialog wizard = new MedProductWizard(new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    MedPackage aPackage = (MedPackage) o;
-                    txtMed.setText(aPackage.getPzn());
-                }
-                popup.hidePopup();
+        WizardDialog wizard = new MedProductWizard(o -> {
+            if (o != null) {
+                MedPackage aPackage = (MedPackage) o;
+                txtMed.setText(aPackage.getPzn());
             }
+            popup.hidePopup();
         }).getWizard();
 
         popup.setMovable(false);

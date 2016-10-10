@@ -232,12 +232,7 @@ public class PnlCare extends NursingRecordsPanel {
             //======== jtpPflegeakte ========
             {
                 jtpPflegeakte.setTabPlacement(SwingConstants.BOTTOM);
-                jtpPflegeakte.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        jtpPflegeakteStateChanged(e);
-                    }
-                });
+                jtpPflegeakte.addChangeListener(e -> jtpPflegeakteStateChanged(e));
             }
             panel1.add(jtpPflegeakte, CC.xy(1, 1, CC.FILL, CC.FILL));
         }
