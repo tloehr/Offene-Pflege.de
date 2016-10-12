@@ -28,13 +28,9 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.RollbackException;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -865,47 +861,52 @@ public class PnlQMSPlan extends CleanablePanel {
             btnText.setBorder(null);
             btnText.setToolTipText(SYSTools.xx("misc.msg.edit.text"));
 
-            btnText.addActionListener(actionEvent -> new DlgYesNo(SYSConst.icon48comment, o -> {
+            btnText.addActionListener(actionEvent -> {
+                currentEditor = new DlgYesNo(SYSConst.icon48comment, o -> {
 
-                if (o == null) return;
+                    if (o != null) {
 
-                EntityManager em = OPDE.createEM();
-                try {
+                        EntityManager em = OPDE.createEM();
+                        try {
 
-                    em.getTransaction().begin();
-                    Qms myQms = em.merge(qms);
-                    myQms.setText(SYSTools.catchNull(o));
-                    Qmssched myQmssched = em.merge(myQms.getQmssched());
-                    Qmsplan myQmsplan = em.merge(myQms.getQmsplan());
+                            em.getTransaction().begin();
+                            Qms myQms = em.merge(qms);
+                            myQms.setText(SYSTools.catchNull(o));
+                            Qmssched myQmssched = em.merge(myQms.getQmssched());
+                            Qmsplan myQmsplan = em.merge(myQms.getQmsplan());
 
-                    em.lock(myQmssched, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                    em.lock(myQmsplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(myQmssched, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(myQmsplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                    em.getTransaction().commit();
+                            em.getTransaction().commit();
 
 //                                listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
-                    mapQms2Panel.remove(qms);
-                    createCP4(myQmsplan);
-                    reloadData();
-                    buildPanel();
+                            mapQms2Panel.remove(qms);
+                            createCP4(myQmsplan);
+                            reloadData();
+                            buildPanel();
 
-                } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
 
-                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    reload();
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            reload();
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
                     }
-                    OPDE.fatal(e);
-                } finally {
-                    em.close();
-                }
-            }, "misc.msg.comment", qms.getText(), null));
+                    currentEditor = null;
+                }, "misc.msg.comment", qms.getText(), null);
+                currentEditor.setVisible(true);
+            });
             btnText.setEnabled(!qms.isOpen() && qms.getQmssched().isActive());
             if (qms.isOpen()) {
                 btnText.setToolTipText(SYSTools.xx("opde.controlling.qms.pnlqmsplan.cant.comment"));
@@ -947,7 +948,7 @@ public class PnlQMSPlan extends CleanablePanel {
                     currentEditor = null;
                     buildPanel();
                 };
-                currentEditor =  new DlgFiles(qms, fileHandleClosure);
+                currentEditor = new DlgFiles(qms, fileHandleClosure);
                 currentEditor.setVisible(true);
             });
             btnFiles.setEnabled(!qms.isOpen() && OPDE.isFTPworking());
@@ -1011,36 +1012,40 @@ public class PnlQMSPlan extends CleanablePanel {
              */
             JButton btnEdit = GUITools.createHyperlinkButton("misc.commands.edit", SYSConst.icon22edit, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnEdit.addActionListener(actionEvent -> new DlgQMSPlan(qmsplan, qmsplan1 -> {
-                if (qmsplan1 != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan1);
-                        em.lock(myQMSPlan, LockModeType.OPTIMISTIC);
-                        em.getTransaction().commit();
+            btnEdit.addActionListener(actionEvent -> {
+                currentEditor = new DlgQMSPlan(qmsplan, qmsplan1 -> {
+                    if (qmsplan1 != null) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan1);
+                            em.lock(myQMSPlan, LockModeType.OPTIMISTIC);
+                            em.getTransaction().commit();
 
-                        reloadData();
-                        createCP4(myQMSPlan);
-                        buildPanel();
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
+                            reloadData();
+                            createCP4(myQMSPlan);
+                            buildPanel();
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
 
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                        reload();
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            reload();
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
                         }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
                     }
-                }
-            }));
+                    currentEditor = null;
+                });
+                currentEditor.setVisible(true);
+            });
             btnEdit.setEnabled(qmsplan.isActive());
             pnlMenu.add(btnEdit);
         }

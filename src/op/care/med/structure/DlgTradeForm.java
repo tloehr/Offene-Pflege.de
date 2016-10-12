@@ -129,7 +129,7 @@ public class DlgTradeForm extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     public TradeForm getTradeForm() {

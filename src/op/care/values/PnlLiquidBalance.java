@@ -519,7 +519,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                 return;
             }
-            new DlgValue(new ResValue(resident, LIQUIDBALANCE), DlgValue.MODE_NEW, o -> {
+            currentEditor = new DlgValue(new ResValue(resident, LIQUIDBALANCE), DlgValue.MODE_NEW, o -> {
                 ResValue myValue = null;
 
                 if (o != null) {
@@ -555,9 +555,9 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                     loadRightTable(startDay, startDay);
 
                 }
-
+                currentEditor = null;
             });
-
+            currentEditor.setVisible(true);
         });
         list.add(addButton);
 
@@ -567,7 +567,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                 return;
             }
-            new DlgValueControl(resident, o -> {
+            currentEditor = new DlgValueControl(resident, o -> {
                 if (o != null) {
                     EntityManager em = OPDE.createEM();
                     try {
@@ -597,9 +597,10 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                     }
                     parseControlling();
                     loadLeftTable();
-
+                    currentEditor = null;
                 }
             });
+            currentEditor.setVisible(true);
         });
         list.add(controlButton);
 

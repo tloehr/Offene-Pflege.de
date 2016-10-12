@@ -28,7 +28,7 @@ import java.awt.event.MouseEvent;
  * @author Torsten Löhr
  */
 public class PnlProduct extends JPanel {
-    public static final String internalClassID = MedProductWizard.internalClassID + ".product";
+    public static final String internalClassID = "opde.medication.medproduct.wizard.product";
     private java.util.List listProd;
     private MedProducts produkt;
     private Closure validate;

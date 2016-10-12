@@ -1455,37 +1455,41 @@ public class PnlControlling extends CleanablePanel {
         if (tabMain.getSelectedIndex() == TAB_QMSPLAN) {
 
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-                JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), actionEvent -> new DlgQMSPlan(new Qmsplan(""), qmsplan -> {
-                    if (qmsplan != null) {
-                        EntityManager em = OPDE.createEM();
-                        try {
-                            em.getTransaction().begin();
-                            final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
-                            em.getTransaction().commit();
+                JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), actionEvent -> {
+                    currentEditor = new DlgQMSPlan(new Qmsplan(""), qmsplan -> {
+                        if (qmsplan != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
+                                em.getTransaction().commit();
 //                                        pnlQMSPlan.getListQMSPlans().add(myQMSPlan);
-                            pnlQMSPlan.reload();
-                            prepareSearchArea();
-                        } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
+                                pnlQMSPlan.reload();
+                                prepareSearchArea();
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                } else {
+                                    reload();
+                                }
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
                             }
-                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                OPDE.getMainframe().emptyFrame();
-                                OPDE.getMainframe().afterLogin();
-                            } else {
-                                reload();
-                            }
-                        } catch (Exception e) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            OPDE.fatal(e);
-                        } finally {
-                            em.close();
                         }
-                    }
-                }));
+                        currentEditor = null;
+                    });
+                    currentEditor.setVisible(true);
+                });
                 list.add(addButton);
             }
         }

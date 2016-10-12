@@ -74,7 +74,7 @@ public class DlgDiscontinue extends MyJDialog {
         initComponents();
         lblQuestion.setText(SYSTools.xx( "nursingrecords.prescription.dlgDiscontinue.question"));
         fillCMBs();
-        setVisible(true);
+//        setVisible(true);
     }
 
     /**

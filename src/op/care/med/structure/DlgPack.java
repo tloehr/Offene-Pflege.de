@@ -71,7 +71,7 @@ public class DlgPack extends MyJDialog {
         lblPackEinheit.setText(TradeFormTools.getPackUnit(aPackage.getTradeForm()));
 //        SYSTools.centerOnParent(parent, this);
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     /**

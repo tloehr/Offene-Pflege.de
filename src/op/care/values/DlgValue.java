@@ -46,7 +46,7 @@ public class DlgValue extends MyJDialog {
         initComponents();
         initPanel();
         setTitle(resValue.getType().getText());
-        setVisible(true);
+//        setVisible(true);
 
     }
 

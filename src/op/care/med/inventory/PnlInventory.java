@@ -58,10 +58,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -249,7 +246,15 @@ public class PnlInventory extends NursingRecordsPanel {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.inactiveCalcMed"));
                     return;
                 }
-                new DlgNewStocks(resident);
+                currentEditor = new DlgNewStocks(resident);
+                currentEditor.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        super.windowClosing(e);
+                        currentEditor = null;
+                    }
+                });
+                currentEditor.setVisible(true);
                 reload();
             });
             list.add(buchenButton);
@@ -1123,42 +1128,46 @@ public class PnlInventory extends NursingRecordsPanel {
          *     /_/   \_\__,_|\__,_| |_| /_/\_\
          *
          */
-        JideButton btnAddTX = GUITools.createHyperlinkButton("nursingrecords.inventory.newmedstocktx", SYSConst.icon22add, e -> new DlgTX(new MedStockTransaction(stock, BigDecimal.ONE, MedStockTransactionTools.STATE_EDIT_MANUAL), o -> {
-            if (o != null) {
-                EntityManager em = OPDE.createEM();
-                try {
-                    em.getTransaction().begin();
+        JideButton btnAddTX = GUITools.createHyperlinkButton("nursingrecords.inventory.newmedstocktx", SYSConst.icon22add, e -> {
+            currentEditor = new DlgTX(new MedStockTransaction(stock, BigDecimal.ONE, MedStockTransactionTools.STATE_EDIT_MANUAL), o -> {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
 
-                    final MedStockTransaction myTX = (MedStockTransaction) em.merge(o);
-                    MedStock myStock = em.merge(stock);
-                    em.lock(myStock, LockModeType.OPTIMISTIC);
-                    em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
-                    em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
-                    em.getTransaction().commit();
+                        final MedStockTransaction myTX = (MedStockTransaction) em.merge(o);
+                        MedStock myStock = em.merge(stock);
+                        em.lock(myStock, LockModeType.OPTIMISTIC);
+                        em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
+                        em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
+                        em.getTransaction().commit();
 
-                    createCP4(myStock.getInventory());
+                        createCP4(myStock.getInventory());
 
-                    buildPanel();
-                } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
+                        buildPanel();
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e1) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e1);
+                    } finally {
+                        em.close();
                     }
-                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                        OPDE.getMainframe().emptyFrame();
-                        OPDE.getMainframe().afterLogin();
-                    }
-                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                } catch (Exception e1) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.fatal(e1);
-                } finally {
-                    em.close();
                 }
-            }
-        }));
+                currentEditor = null;
+            });
+            currentEditor.setVisible(true);
+        });
         btnAddTX.setEnabled(!stock.isClosed());
         pnlTX.add(btnAddTX);
 
@@ -1402,7 +1411,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
                             BigDecimal weight;
-                            new DlgYesNo(SYSConst.icon48scales, o -> {
+                            currentEditor =  new DlgYesNo(SYSConst.icon48scales, o -> {
                                 if (!SYSTools.catchNull(o).isEmpty()) {
                                     BigDecimal weight1 = (BigDecimal) o;
 
@@ -1439,6 +1448,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                         em.close();
                                     }
                                 }
+                                currentEditor = null;
                             }, "nursingrecords.bhp.weight", SYSTools.formatBigDecimal(tx.getWeight()), new Validator<BigDecimal>() {
                                 @Override
                                 public boolean isValid(String value) {
@@ -1452,6 +1462,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                     return SYSTools.parseDecimal(text);
                                 }
                             });
+                            currentEditor.setVisible(true);
 
 
                         });

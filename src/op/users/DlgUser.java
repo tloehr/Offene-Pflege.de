@@ -37,7 +37,7 @@ public class DlgUser extends MyJDialog {
         initComponents();
         initPanel();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void initPanel() {

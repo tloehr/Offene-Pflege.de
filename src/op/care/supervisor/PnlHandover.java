@@ -883,46 +883,50 @@ public class PnlHandover extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnadd"), SYSConst.icon22add, actionEvent -> new DlgHOReport(new Handovers((Homes) cmbHomes.getSelectedItem()), report -> {
-                if (report != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        final Handovers myHO = em.merge((Handovers) report);
-                        myHO.getUsersAcknowledged().add(em.merge(new Handover2User(myHO, OPDE.getLogin().getUser())));
-                        em.getTransaction().commit();
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.handover.tooltips.btnadd"), SYSConst.icon22add, actionEvent -> {
+                currentEditor = new DlgHOReport(new Handovers((Homes) cmbHomes.getSelectedItem()), report -> {
+                    if (report != null) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            final Handovers myHO = em.merge((Handovers) report);
+                            myHO.getUsersAcknowledged().add(em.merge(new Handover2User(myHO, OPDE.getLogin().getUser())));
+                            em.getTransaction().commit();
 
-                        LocalDate day = new LocalDate(myHO.getPit());
+                            LocalDate day = new LocalDate(myHO.getPit());
 
-                        final String key = DateFormat.getDateInstance().format(myHO.getPit());
+                            final String key = DateFormat.getDateInstance().format(myHO.getPit());
 
-                        createCP4Day(day);
-                        expandDay(day);
+                            createCP4Day(day);
+                            expandDay(day);
 
-                        buildPanel();
-                        GUITools.scroll2show(jspHandover, cpMap.get(key), cpsHandover, o -> {
+                            buildPanel();
+                            GUITools.scroll2show(jspHandover, cpMap.get(key), cpsHandover, o -> {
 //                                            GUITools.flashBackground(linemapHO.get(myHO), Color.YELLOW, 2);
-                        });
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
+                            });
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
                         }
-                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
                     }
-                }
-            }));
+                    currentEditor = null;
+                });
+                currentEditor.setVisible(true);
+            });
             list.add(addButton);
         }
 

@@ -601,13 +601,15 @@ public class PnlBHP extends NursingRecordsPanel {
             if (BHPTools.isChangeable(bhp)) {
                 outcomeText = null;
                 if (bhp.getNeedsText()) {
-                    new DlgYesNo(SYSConst.icon48comment, o -> {
+                    currentEditor = new DlgYesNo(SYSConst.icon48comment, o -> {
                         if (SYSTools.catchNull(o).isEmpty()) {
                             outcomeText = null;
                         } else {
                             outcomeText = o.toString();
                         }
+                        currentEditor = null;
                     }, "nursingrecords.bhp.describe.outcome", null, null);
+                    currentEditor.setVisible(true);
 
                 }
 
@@ -618,12 +620,13 @@ public class PnlBHP extends NursingRecordsPanel {
 
 
                 if (bhp.getPrescription().isWeightControlled()) {
-                    new DlgYesNo(SYSConst.icon48scales, o -> {
+                    currentEditor = new DlgYesNo(SYSConst.icon48scales, o -> {
                         if (SYSTools.catchNull(o).isEmpty()) {
                             weight = null;
                         } else {
                             weight = (BigDecimal) o;
                         }
+                        currentEditor = null;
                     }, "nursingrecords.bhp.weight", null, new Validator<BigDecimal>() {
                         @Override
                         public boolean isValid(String value) {
@@ -637,6 +640,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             return SYSTools.parseDecimal(text);
                         }
                     });
+                    currentEditor.setVisible(true);
 
                 }
 
@@ -1006,12 +1010,13 @@ public class PnlBHP extends NursingRecordsPanel {
 
                         if (BHPTools.isChangeable(bhp)) {
                             if (bhp.getPrescription().isWeightControlled()) {
-                                new DlgYesNo(SYSConst.icon48scales, o -> {
+                                currentEditor = new DlgYesNo(SYSConst.icon48scales, o -> {
                                     if (SYSTools.catchNull(o).isEmpty()) {
                                         weight = null;
                                     } else {
                                         weight = (BigDecimal) o;
                                     }
+                                    currentEditor = null;
                                 }, "nursingrecords.bhp.weight", null, new Validator<BigDecimal>() {
                                     @Override
                                     public boolean isValid(String value) {
@@ -1025,7 +1030,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                         return SYSTools.parseDecimal(text);
                                     }
                                 });
-
+                                currentEditor.setVisible(true);
                             }
 
                             if (bhp.getPrescription().isWeightControlled() && weight == null) {

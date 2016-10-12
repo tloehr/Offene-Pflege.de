@@ -46,7 +46,6 @@ import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
-import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
@@ -58,12 +57,13 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.Format;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,7 +74,7 @@ import java.util.HashMap;
  */
 public class PnlAllowance extends CleanablePanel {
 
-//    NumberFormat cf = NumberFormat.getCurrencyInstance();
+    //    NumberFormat cf = NumberFormat.getCurrencyInstance();
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
 
     private JScrollPane jspSearch;
@@ -701,14 +701,14 @@ public class PnlAllowance extends CleanablePanel {
             MyJDialog myJDialog = new MyJDialog(true);
             myJDialog.setContentPane(getPnlTX(null, null));
             myJDialog.pack();
-//            myJDialog.addWindowListener(new WindowAdapter() {
-//                @Override
-//                public void windowClosing(WindowEvent e) {
-//                    super.windowClosing(e);
-//                    currentEditor = null;
-//                }
-//            });
-//            currentEditor = myJDialog;
+            myJDialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    super.windowClosing(e);
+                    currentEditor = null;
+                }
+            });
+            currentEditor = myJDialog;
             myJDialog.setVisible(true);
         });
         list.add(btnNewTX);
@@ -1056,6 +1056,10 @@ public class PnlAllowance extends CleanablePanel {
                     em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
                     em.getTransaction().commit();
 
+                    if (!minmax.containsKey(myAllowance.getResident())) {
+                        minmax.put(myAllowance.getResident(), AllowanceTools.getMinMax(myAllowance.getResident()));
+                    }
+
                     DateTime txDate = new DateTime(myAllowance.getPit());
 
                     final String keyResident = myAllowance.getResident().getRID();
@@ -1172,9 +1176,9 @@ public class PnlAllowance extends CleanablePanel {
 
         // fix minmax interval
         Interval myMinMax = new Interval(minmax.get(resident).getFirst().toDateTimeAtStartOfDay(), SYSCalendar.eod(minmax.get(resident).getSecond()));
-        if (myMinMax.isBefore(pit.toDateTimeAtCurrentTime())){
+        if (myMinMax.isBefore(pit.toDateTimeAtCurrentTime())) {
             minmax.put(resident, new Pair(minmax.get(resident).getFirst(), SYSCalendar.eom(pit)));
-        } else if (myMinMax.isAfter(pit.toDateTimeAtCurrentTime())){
+        } else if (myMinMax.isAfter(pit.toDateTimeAtCurrentTime())) {
             minmax.put(resident, new Pair(SYSCalendar.bom(pit), minmax.get(resident).getSecond()));
         }
 

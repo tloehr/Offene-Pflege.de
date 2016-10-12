@@ -64,7 +64,7 @@ public class DlgProduct extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void btnAddActionPerformed(ActionEvent e) {

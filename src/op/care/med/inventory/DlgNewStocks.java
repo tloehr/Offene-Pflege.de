@@ -262,7 +262,7 @@ public class DlgNewStocks extends MyJDialog {
         lblWeightControl.setVisible(false);
 
         ignoreEvent = false;
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void txtWeightControlCaretUpdate(CaretEvent evt) {
@@ -629,6 +629,7 @@ public class DlgNewStocks extends MyJDialog {
             popup.hidePopup();
 
         }).getWizard();
+
 
         popup.setMovable(false);
         popup.setPreferredSize((new Dimension(800, 450)));

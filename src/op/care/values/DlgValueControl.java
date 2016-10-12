@@ -41,7 +41,7 @@ public class DlgValueControl extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     @Override

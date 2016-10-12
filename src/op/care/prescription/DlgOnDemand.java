@@ -105,7 +105,7 @@ public class DlgOnDemand extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
 

@@ -65,7 +65,7 @@ public class DlgCloseStock extends MyJDialog {
         this.medStock = medStock;
         initComponents();
         initDialog();
-        setVisible(true);
+//        setVisible(true);
     }
 
     /**

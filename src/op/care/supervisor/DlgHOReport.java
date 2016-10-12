@@ -61,7 +61,7 @@ public class DlgHOReport extends MyJDialog {
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void thisWindowClosing(WindowEvent e) {

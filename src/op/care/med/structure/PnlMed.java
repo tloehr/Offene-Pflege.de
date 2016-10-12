@@ -35,31 +35,26 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
 import entity.prescription.*;
+import gui.GUITools;
+import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.care.med.inventory.DlgNewStocks;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.InternalClassACL;
-import gui.interfaces.CleanablePanel;
-import gui.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 
@@ -77,7 +72,7 @@ public class PnlMed extends CleanablePanel {
     private JXSearchField txtSuche;
     private JList lstPraep;
     private JToggleButton tbIDs;
-
+    private JidePopup currentPopup;
 
     /**
      * Creates new form FrmMed
@@ -92,6 +87,12 @@ public class PnlMed extends CleanablePanel {
     @Override
     public void cleanup() {
         super.cleanup();
+        //  https://github.com/tloehr/Offene-Pflege.de/issues/62
+        // closes an open modal dialog, if necessary.
+        // when the timeout occurs
+        if (currentPopup != null && currentPopup.isShowing()) {
+            currentPopup.hidePopup();
+        }
         SYSTools.unregisterListeners(menu);
         menu = null;
         SYSTools.unregisterListeners(this);
@@ -188,58 +189,60 @@ public class PnlMed extends CleanablePanel {
             // Dieses Popupmenu für den Table
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
-//            JMenuItem itemdaf = new JMenuItem("Neue Darreichungsform");
-//            itemdaf.addActionListener(new java.awt.event.ActionListener() {
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                    btnNeuDAF(evt);
-//                }
-//            });
-//            menu.add(itemdaf);
-
+            // hier stimmt was nicht
             if (treeMed.getRowForLocation(evt.getX(), evt.getY()) != -1 && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
                 JMenuItem itemedit = null;
                 JMenuItem itemUPRedit = null;
-//                JMenuItem itemnew = null;
-//                JMenuItem itempack = null;
                 TreePath curPath = treeMed.getPathForLocation(evt.getX(), evt.getY());
                 final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) curPath.getLastPathComponent();
                 treeMed.setSelectionPath(curPath);
-//                final ListElement le = (ListElement) dmtn.getUserObject();
-//                int nodetype = ((Integer) le.getObject()).intValue();
-
 
                 if (dmtn.getUserObject() instanceof TradeForm) {
                     final TradeForm tradeForm = (TradeForm) dmtn.getUserObject();
                     itemedit = new JMenuItem(SYSTools.xx("misc.msg.edit"));
                     itemedit.addActionListener(evt14 -> {
-                        new DlgTradeForm(tradeForm);
+                        currentEditor = new DlgTradeForm(tradeForm);
+                        currentEditor.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowClosing(WindowEvent e) {
+                                super.windowClosing(e);
+                                currentEditor = null;
+                            }
+                        });
+                        currentEditor.setVisible(true);
                         createTree();
                     });
                     itemUPRedit = new JMenuItem(SYSTools.xx("upreditor.tooltip"));
                     itemUPRedit.addActionListener(evt13 -> new DlgUPREditor(tradeForm, o -> reload()));
                     itemUPRedit.setEnabled(tradeForm.getDosageForm().isUPRn());
-//                    itempack = new JMenuItem("Neue Verpackung");
-//                    itempack.addActionListener(new java.awt.event.ActionListener() {
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            MedPackage mypack = new MedPackage(tradeForm);
-//                            new DlgPack(OPDE.getMainframe(), "Neu", mypack);
-////                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getID());
-//                            createTree();
-//                        }
-//                    });
                 } else if (dmtn.getUserObject() instanceof MedPackage) {
                     final MedPackage packung = (MedPackage) dmtn.getUserObject();
-                    itemedit = new JMenuItem("Bearbeiten");
+                    itemedit = new JMenuItem(SYSTools.xx("misc.msg.edit"));
                     itemedit.addActionListener(evt12 -> {
-                        new DlgPack(SYSTools.xx("misc.msg.edit"), packung);
+                        currentEditor = new DlgPack(SYSTools.xx("misc.msg.edit"), packung);
+                        currentEditor.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowClosing(WindowEvent e) {
+                                super.windowClosing(e);
+                                currentEditor = null;
+                            }
+                        });
+                        currentEditor.setVisible(true);
                         createTree();
                     });
                 } else if (dmtn.getUserObject() instanceof MedProducts) {
-
-                    itemedit = new JMenuItem("Bearbeiten");
+                    itemedit = new JMenuItem(SYSTools.xx("misc.msg.edit"));
                     itemedit.addActionListener(evt1 -> {
-                        DlgProduct dlg = new DlgProduct(SYSTools.xx("misc.msg.edit"), (MedProducts) dmtn.getUserObject());
-                        product = dlg.getProduct();
+                        currentEditor = new DlgProduct(SYSTools.xx("misc.msg.edit"), (MedProducts) dmtn.getUserObject());
+                        currentEditor.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowClosing(WindowEvent e) {
+                                super.windowClosing(e);
+                                product = ((DlgProduct) currentEditor).getProduct();
+                                currentEditor = null;
+                            }
+                        });
+                        currentEditor.setVisible(true);
                         createTree();
                     });
                 }
@@ -406,44 +409,43 @@ public class PnlMed extends CleanablePanel {
 
             addButton.addActionListener(actionEvent -> {
 
-
-                final JidePopup popup = new JidePopup();
-
+                currentPopup = new JidePopup();
 
                 WizardDialog wizard = new MedProductWizard(o -> {
-                    popup.hidePopup();
+
+                    currentPopup.hidePopup();
                     // keine Maßnahme nötig
                 }).getWizard();
 
+                currentPopup.setMovable(false);
+                currentPopup.setPreferredSize((new Dimension(800, 450)));
+                currentPopup.setResizable(false);
+                currentPopup.getContentPane().setLayout(new BoxLayout(currentPopup.getContentPane(), BoxLayout.LINE_AXIS));
+                currentPopup.getContentPane().add(wizard.getContentPane());
+                currentPopup.setOwner(addButton);
+                currentPopup.removeExcludedComponent(addButton);
+                currentPopup.setTransient(false);
+                currentPopup.setDefaultFocusComponent(wizard.getContentPane());
+//                currentPopup.addPropertyChangeListener("visible", propertyChangeEvent -> currentPopup.getContentPane().getComponentCount());
 
-                popup.setMovable(false);
-                popup.setPreferredSize((new Dimension(800, 450)));
-                popup.setResizable(false);
-                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                popup.getContentPane().add(wizard.getContentPane());
-                popup.setOwner(addButton);
-                popup.removeExcludedComponent(addButton);
-                popup.setTransient(false);
-                popup.setDefaultFocusComponent(wizard.getContentPane());
-                popup.addPropertyChangeListener("visible", propertyChangeEvent -> popup.getContentPane().getComponentCount());
-
-                GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
+                GUITools.showPopup(currentPopup, SwingConstants.NORTH_EAST);
             });
 
             list.add(addButton);
         }
 
-//       OPDE.debug("isCalcMediUPR1: " + OPDE.isCalcMediUPR1());
-//
-//        if (OPDE.isDebug()) {
-//            Iterator it = OPDE.getProps().entrySet().iterator();
-//            while (it.hasNext()) {
-//                OPDE.debug(it.next().toString());
-//            }
-//        }
-
         if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.inventory.newstocks", SYSConst.icon22addrow, actionEvent -> new DlgNewStocks(null));
+            JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.inventory.newstocks", SYSConst.icon22addrow, actionEvent -> {
+                currentEditor = new DlgNewStocks(null);
+                currentEditor.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        super.windowClosing(e);
+                        currentEditor = null;
+                    }
+                });
+                currentEditor.setVisible(true);
+            });
             list.add(buchenButton);
         }
 

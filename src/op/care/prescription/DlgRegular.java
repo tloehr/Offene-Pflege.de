@@ -103,7 +103,7 @@ public class DlgRegular extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void btnAddDosisActionPerformed(ActionEvent e) {

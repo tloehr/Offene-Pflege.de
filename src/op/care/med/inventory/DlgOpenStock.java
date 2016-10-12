@@ -69,7 +69,7 @@ public class DlgOpenStock extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     /**

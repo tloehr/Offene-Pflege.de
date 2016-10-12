@@ -36,7 +36,7 @@ public class DlgGroup extends MyJDialog {
         initComponents();
         initPanel();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
 

@@ -69,13 +69,13 @@ public class DlgQMSPlan extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void initDialog() {
 
         pnlCommonTags = new PnlCommonTags(qmsplan.getCommontags(), true, 4);
-        pnlLeft.add(new JScrollPane(pnlCommonTags), CC.xywh(3, 7, 5, 1, CC.DEFAULT, CC.FILL));
+        pnlLeft.add(new JScrollPane(pnlCommonTags), CC.xywh(3, 7, 1, 1, CC.DEFAULT, CC.FILL));
 
 
         lblTitle.setText(SYSTools.xx("misc.msg.title"));

@@ -61,7 +61,7 @@ public class DlgYesNo extends MyJDialog {
         txtMessage.setText(SYSTools.catchNull(preset));
         lblIcon.setIcon(icon);
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void cancelButtonActionPerformed(ActionEvent e) {
