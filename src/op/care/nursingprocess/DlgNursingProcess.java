@@ -75,7 +75,7 @@ public class DlgNursingProcess extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void initDialog() {

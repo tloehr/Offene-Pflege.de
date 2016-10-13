@@ -719,7 +719,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                     return;
                 }
-                new DlgNursingProcess(new NursingProcess(resident), np -> {
+                currentEditor = new DlgNursingProcess(new NursingProcess(resident), np -> {
                     if (np != null) {
                         EntityManager em = OPDE.createEM();
                         try {
@@ -776,7 +776,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             em.close();
                         }
                     }
+                    currentEditor = null;
                 });
+                currentEditor.setVisible(true);
             });
             list.add(addButton);
 
@@ -799,8 +801,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 // first a template is selected
                 MyJDialog dlg = new PnlTemplate(o -> {
                     if (o != null) {
-//                                popup.hidePopup();
-
                         // that selected template is cloned and handed over to the DlgNursingProcess for further editing
                         NursingProcess template = ((NursingProcess) o).clone();
                         template.setNPSeries(-2); // so the next dialog knows thats a template
@@ -811,7 +811,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         template.setUserON(OPDE.getLogin().getUser());
                         template.setNextEval(new DateTime().plusWeeks(4).toDate());
 
-                        new DlgNursingProcess(template, np -> {
+                        currentEditor = new DlgNursingProcess(template, np -> {
                             if (np != null) {
                                 EntityManager em = OPDE.createEM();
                                 try {
@@ -868,8 +868,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     em.close();
                                 }
                             }
+                            currentEditor = null;
                         });
-
+                        currentEditor.setVisible(true);
                     }
                 });
 
@@ -938,7 +939,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 template.setUserOFF(null);
                 template.setUserON(OPDE.getLogin().getUser());
                 template.setNextEval(new DateTime().plusWeeks(4).toDate());
-                new DlgNursingProcess(template, o -> {
+                currentEditor = new DlgNursingProcess(template, o -> {
                     if (o != null) {
                         EntityManager em = OPDE.createEM();
                         try {
@@ -1004,9 +1005,10 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         } finally {
                             em.close();
                         }
-//                                reloadTable();
                     }
+                    currentEditor = null;
                 });
+                currentEditor.setVisible(true);
 
             });
             btnChange.setEnabled(!np.isClosed() && numDFNs != 0);
@@ -1106,68 +1108,71 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
             JButton btnEdit = GUITools.createHyperlinkButton("nursingrecords.nursingprocess.btnedit.tooltip", SYSConst.icon22edit, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnEdit.addActionListener(actionEvent -> new DlgNursingProcess(np, o -> {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                        NursingProcess mynp = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getFirst());
-                        em.lock(mynp, LockModeType.OPTIMISTIC);
-                        // Schedules to delete
-                        for (InterventionSchedule is : ((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getSecond()) {
-                            em.remove(em.merge(is));
-                        }
-                        // No unused DFNs to delete
-                        Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess ");
-                        delQuery.setParameter("nursingprocess", mynp);
-                        delQuery.executeUpdate();
-                        // Create new DFNs according to plan
-                        DFNTools.generate(em, mynp.getInterventionSchedule(), new LocalDate(), true);
-                        em.getTransaction().commit();
-
-                        boolean reloadSearch = false;
-                        for (Commontags ctag : mynp.getCommontags()) {
-                            if (!listUsedCommontags.contains(ctag)) {
-                                listUsedCommontags.add(ctag);
-                                reloadSearch = true;
+            btnEdit.addActionListener(actionEvent -> {
+                currentEditor = new DlgNursingProcess(np, o -> {
+                    if (o != null) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                            NursingProcess mynp = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getFirst());
+                            em.lock(mynp, LockModeType.OPTIMISTIC);
+                            // Schedules to delete
+                            for (InterventionSchedule is : ((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getSecond()) {
+                                em.remove(em.merge(is));
                             }
-                        }
-                        if (reloadSearch) {
-                            prepareSearchArea();
-                        }
+                            // No unused DFNs to delete
+                            Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess ");
+                            delQuery.setParameter("nursingprocess", mynp);
+                            delQuery.executeUpdate();
+                            // Create new DFNs according to plan
+                            DFNTools.generate(em, mynp.getInterventionSchedule(), new LocalDate(), true);
+                            em.getTransaction().commit();
 
-                        // Refresh Display
-                        valuecache.get(np.getCategory()).remove(np);
-                        contenPanelMap.remove(np);
-                        valuecache.get(mynp.getCategory()).add(mynp);
-                        Collections.sort(valuecache.get(mynp.getCategory()));
+                            boolean reloadSearch = false;
+                            for (Commontags ctag : mynp.getCommontags()) {
+                                if (!listUsedCommontags.contains(ctag)) {
+                                    listUsedCommontags.add(ctag);
+                                    reloadSearch = true;
+                                }
+                            }
+                            if (reloadSearch) {
+                                prepareSearchArea();
+                            }
 
-                        createCP4(mynp.getCategory());
-                        buildPanel();
-                        GUITools.flashBackground(contenPanelMap.get(mynp), Color.YELLOW, 2);
+                            // Refresh Display
+                            valuecache.get(np.getCategory()).remove(np);
+                            contenPanelMap.remove(np);
+                            valuecache.get(mynp.getCategory()).add(mynp);
+                            Collections.sort(valuecache.get(mynp.getCategory()));
 
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
+                            createCP4(mynp.getCategory());
+                            buildPanel();
+                            GUITools.flashBackground(contenPanelMap.get(mynp), Color.YELLOW, 2);
+
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
                         }
-                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
                     }
-//                                reloadTable();
-                }
-            }));
+                    currentEditor = null;
+                });
+                currentEditor.setVisible(true);
+            });
             btnEdit.setEnabled(!np.isClosed() && numDFNs == 0);
             pnlMenu.add(btnEdit);
         }

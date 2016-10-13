@@ -51,7 +51,7 @@ import java.awt.event.KeyEvent;
  * @author root
  */
 public class DlgDiscontinue extends MyJDialog {
-    private Prescription prescription;
+    private Prescription prescription, resultPrescription;
     private Closure actionBlock;
     private java.util.List<GP> listAerzte;
     private java.util.List<Hospital> listKH;
@@ -154,13 +154,13 @@ public class DlgDiscontinue extends MyJDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        prescription = null;
+        resultPrescription = null;
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     @Override
     public void dispose() {
-        actionBlock.execute(prescription);
+        actionBlock.execute(resultPrescription);
         super.dispose();
     }
 
@@ -175,6 +175,7 @@ public class DlgDiscontinue extends MyJDialog {
             prescription.setDocOFF(doc);
             prescription.setHospitalOFF(hospital);
             prescription.setUserOFF(OPDE.getLogin().getUser());
+            resultPrescription = prescription;
             dispose();
         }
     }//GEN-LAST:event_btnOKActionPerformed

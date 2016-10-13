@@ -55,6 +55,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -68,13 +69,14 @@ import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author tloehr
  */
 public class PnlPrescription extends NursingRecordsPanel {
 
-
+    private Logger logger = Logger.getLogger(getClass());
     private Resident resident;
 
     private ArrayList<Prescription> lstPrescriptions, lstVisiblePrescriptions; // <= the latter is only for the zebra pattern
@@ -170,9 +172,15 @@ public class PnlPrescription extends NursingRecordsPanel {
 
                 @Override
                 protected void done() {
-                    buildPanel();
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
+                    try {
+                        get();
+                        buildPanel();
+                    } catch (Exception e) {
+                        OPDE.fatal(e);
+                    } finally {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
                 }
             };
             worker.execute();
@@ -599,12 +607,12 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
                 currentEditor = new DlgRegular(new Prescription(resident), DlgRegular.MODE_NEW, o -> {
                     if (o != null) {
-                        Pair<Prescription, List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
+                        Prescription prescription = (Prescription) o;
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                            Prescription myPrescription = em.merge(returnPackage.getFirst());
+                            Prescription myPrescription = em.merge(prescription);
                             myPrescription.setRelation(UniqueTools.getNewUID(em, "__verkenn").getUid());
                             BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
@@ -739,14 +747,10 @@ public class PnlPrescription extends NursingRecordsPanel {
         int i = 0;
         // for the zebra coloring
         for (Prescription prescription : lstPrescriptions) {
-//            if (tbClosed.isSelected() || !prescription.isClosed()) {
             OPDE.debug(prescription.getID() + ".xprescription");
-
-
             cpMap.get(prescription.getID() + ".xprescription").setBackground(getColor(SYSConst.medium1, i % 2 == 1));
             cpsPrescription.add(cpMap.get(prescription.getID() + ".xprescription"));
             i++;
-//            }
         }
         cpsPrescription.addExpansion();
     }
@@ -776,15 +780,13 @@ public class PnlPrescription extends NursingRecordsPanel {
                 currentEditor = new DlgRegular(prescription.clone(), DlgRegular.MODE_CHANGE, o -> {
                     if (o != null) {
 
-                        Pair<Prescription, List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
 
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
 
-                            // Fetch the new prescription from the PAIR
-                            Prescription newPrescription = em.merge(returnPackage.getFirst());
+                            Prescription newPrescription = em.merge((Prescription) o);
                             Prescription oldPrescription = em.merge(prescription);
                             em.lock(oldPrescription, LockModeType.OPTIMISTIC);
 
@@ -969,19 +971,17 @@ public class PnlPrescription extends NursingRecordsPanel {
                     currentEditor = new DlgRegular(prescription, DlgRegular.MODE_EDIT, o -> {
                         if (o != null) {
 
-                            Pair<Prescription, List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
-
                             EntityManager em = OPDE.createEM();
                             try {
                                 em.getTransaction().begin();
                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                Prescription myPrescription = em.merge(returnPackage.getFirst());
+                                Prescription myPrescription = em.merge((Prescription) o);
                                 em.lock(myPrescription, LockModeType.OPTIMISTIC);
 
-                                // delete whats not in the new prescription anymore
-                                for (PrescriptionSchedule schedule : returnPackage.getSecond()) {
-                                    em.remove(em.merge(schedule));
-                                }
+//                                // delete whats not in the new prescription anymore
+//                                for (PrescriptionSchedule schedule : returnPackage.getSecond()) {
+//                                    em.remove(em.merge(schedule));
+//                                }
 
                                 Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.prescription = :prescription");
                                 queryDELBHP.setParameter("prescription", myPrescription);

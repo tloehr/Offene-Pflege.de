@@ -74,10 +74,8 @@ public class DlgOnDemand extends MyJDialog {
     private boolean ignoreEvent;
 
     private Closure actionBlock;
-    private Prescription prescription;
+    private Prescription prescription, resultPrescription;
     private PrescriptionSchedule schedule;
-    private List<PrescriptionSchedule> schedules2delete = null;
-    private Pair<Prescription, PrescriptionSchedule> returnPackage = null;
     private List<GP> listAerzte;
     private List<Hospital> listKH;
     private PnlCommonTags pnlCommonTags;
@@ -100,7 +98,7 @@ public class DlgOnDemand extends MyJDialog {
         schedule = prescription.getPrescriptionSchedule().get(0);
         this.actionBlock = actionBlock;
         this.prescription = prescription;
-        schedules2delete = new ArrayList<PrescriptionSchedule>();
+//        schedules2delete = new ArrayList<PrescriptionSchedule>();
 
         initComponents();
         initDialog();
@@ -771,13 +769,14 @@ public class DlgOnDemand extends MyJDialog {
 
     private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (save()) {
+            resultPrescription = prescription;
             dispose();
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     @Override
     public void dispose() {
-        actionBlock.execute(prescription);
+        actionBlock.execute(resultPrescription);
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
@@ -858,7 +857,7 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        prescription = null;
+        resultPrescription = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 

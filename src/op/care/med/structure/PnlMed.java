@@ -189,7 +189,7 @@ public class PnlMed extends CleanablePanel {
             // Dieses Popupmenu für den Table
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
-            // hier stimmt was nicht
+
             if (treeMed.getRowForLocation(evt.getX(), evt.getY()) != -1 && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
                 JMenuItem itemedit = null;
                 JMenuItem itemUPRedit = null;

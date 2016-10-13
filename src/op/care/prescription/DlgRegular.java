@@ -83,9 +83,9 @@ public class DlgRegular extends MyJDialog {
     private JPopupMenu menu;
     private int editMode;
     private Closure actionBlock;
-    private Prescription prescription;
+    private Prescription prescription, resultPrescription;
     private List<PrescriptionSchedule> schedules2delete = null;
-    private Pair<Prescription, List<PrescriptionSchedule>> returnPackage = null;
+//    private Pair<Prescription, List<PrescriptionSchedule>> returnPackage = null;
 
     private JToggleButton tbDailyPlan;
     private PnlCommonTags pnlCommonTags;
@@ -246,7 +246,7 @@ public class DlgRegular extends MyJDialog {
     }
 
     private void thisWindowClosing(WindowEvent e) {
-        returnPackage = null;
+        resultPrescription = null;
         // the red button was pressed
         // fixes #22
     }
@@ -717,14 +717,14 @@ public class DlgRegular extends MyJDialog {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (save()) {
-            returnPackage = new Pair(prescription, schedules2delete);
+            resultPrescription = prescription;
             dispose();
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     @Override
     public void dispose() {
-        actionBlock.execute(returnPackage);
+        actionBlock.execute(resultPrescription);
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
@@ -812,7 +812,7 @@ public class DlgRegular extends MyJDialog {
     }//GEN-LAST:event_tblDosisMousePressed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        returnPackage = null;
+        resultPrescription = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 

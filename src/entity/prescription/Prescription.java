@@ -125,11 +125,11 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2FILE> attachedFilesConnections;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2PROCESS> attachedProcessConnections;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private Collection<ResInfo> annotations;

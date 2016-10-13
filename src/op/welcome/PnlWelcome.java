@@ -52,6 +52,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -681,15 +683,23 @@ public class PnlWelcome extends CleanablePanel {
 
             addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
             addbw.addActionListener(actionEvent -> {
-                final MyJDialog dlg = new MyJDialog(false);
+                currentEditor = new MyJDialog(false);
                 WizardDialog wizard = new AddBWWizard(o -> {
-                    dlg.dispose();
+                    currentEditor.dispose();
                     OPDE.getMainframe().completeRefresh();
                 }).getWizard();
-                dlg.setContentPane(wizard.getContentPane());
-                dlg.pack();
-                dlg.setSize(new Dimension(800, 550));
-                dlg.setVisible(true);
+                currentEditor.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        super.windowClosing(e);
+                        currentEditor = null;
+                    }
+                });
+
+                currentEditor.setContentPane(wizard.getContentPane());
+                currentEditor.pack();
+                currentEditor.setSize(new Dimension(800, 550));
+                currentEditor.setVisible(true);
             });
             list.add(addbw);
         }
@@ -700,8 +710,15 @@ public class PnlWelcome extends CleanablePanel {
             editInterventions.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editInterventions.setAlignmentX(Component.LEFT_ALIGNMENT);
             editInterventions.addActionListener(actionEvent -> {
-                DlgIntervention dlgIntervention = new DlgIntervention();
-                dlgIntervention.setVisible(true);
+                currentEditor = new DlgIntervention();
+                currentEditor.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        super.windowClosing(e);
+                        currentEditor = null;
+                    }
+                });
+                currentEditor.setVisible(true);
             });
             list.add(editInterventions);
         }
