@@ -58,7 +58,9 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -405,73 +407,70 @@ public class PnlInventory extends NursingRecordsPanel {
             // https://github.com/tloehr/Offene-Pflege.de/issues/42
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "nursingrecords.inventory")) {
                 /***
-                 *       ____ _                ___                      _
-                 *      / ___| | ___  ___  ___|_ _|_ ____   _____ _ __ | |_ ___  _ __ _   _
-                 *     | |   | |/ _ \/ __|/ _ \| || '_ \ \ / / _ \ '_ \| __/ _ \| '__| | | |
-                 *     | |___| | (_) \__ \  __/| || | | \ V /  __/ | | | || (_) | |  | |_| |
-                 *      \____|_|\___/|___/\___|___|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, |
-                 *                                                                    |___/
+                 *      _____    _ _ _     _   _
+                 *     | ____|__| (_) |_  | \ | | __ _ _ __ ___   ___
+                 *     |  _| / _` | | __| |  \| |/ _` | '_ ` _ \ / _ \
+                 *     | |__| (_| | | |_  | |\  | (_| | | | | | |  __/
+                 *     |_____\__,_|_|\__| |_| \_|\__,_|_| |_| |_|\___|
+                 *
                  */
-                final JButton btnCloseInventory = new JButton(SYSConst.icon22playerStop);
-                btnCloseInventory.setPressedIcon(SYSConst.icon22playerStopPressed);
-                btnCloseInventory.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnCloseInventory.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnCloseInventory.setContentAreaFilled(false);
-                btnCloseInventory.setBorder(null);
-                btnCloseInventory.setToolTipText(SYSTools.xx("nursingrecords.inventory.btncloseinventory.tooltip"));
-                btnCloseInventory.addActionListener(actionEvent -> {
-                    currentEditor = new DlgYesNo(SYSTools.xx("nursingrecords.inventory.question.close1") + "<br/><b>" + inventory.getText() + "</b>" +
-                            "<br/>" + SYSTools.xx("nursingrecords.inventory.question.close2"), SYSConst.icon48playerStop, answer -> {
-                                if (answer.equals(JOptionPane.YES_OPTION)) {
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
+                final JButton btnEditInvName = new JButton(SYSConst.icon22edit3);
+                btnEditInvName.setPressedIcon(SYSConst.icon22edit3);
+                btnEditInvName.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnEditInvName.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnEditInvName.setContentAreaFilled(false);
+                btnEditInvName.setBorder(null);
+                btnEditInvName.setToolTipText(SYSTools.xx("nursingrecords.inventory.btnEditInvName.tooltip"));
+                btnEditInvName.addActionListener(actionEvent -> {
+                    currentEditor = new DlgYesNo(SYSConst.icon48edit, answer -> {
+                        if (answer != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                MedInventory myInventory = em.merge(inventory);
+                                em.lock(myInventory, LockModeType.OPTIMISTIC);
+                                em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
+                                myInventory.setText(answer.toString());
+                                em.getTransaction().commit();
 
-                                        MedInventory myInventory = em.merge(inventory);
-                                        em.lock(myInventory, LockModeType.OPTIMISTIC);
-                                        em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
-
-                                        // close all stocks
-                                        for (MedStock stock : MedStockTools.getAll(myInventory)) {
-                                            if (!stock.isClosed()) {
-                                                MedStock mystock = em.merge(stock);
-                                                em.lock(mystock, LockModeType.OPTIMISTIC);
-                                                mystock.setNextStock(null);
-                                                MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
-                                            }
-                                        }
-                                        // close inventory
-                                        myInventory.setTo(new Date());
-
-                                        em.getTransaction().commit();
-
-                                        createCP4(myInventory);
-                                        buildPanel();
-                                    } catch (OptimisticLockException ole) {
-                                        OPDE.warn(ole);
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                        currentEditor = null;
-                                    }
+                                createCP4(myInventory);
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
                                 }
-                            });
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+
+                            }
+                        }
+                        currentEditor = null;
+                    }, "nursingrecords.inventory.btnEditInvName.tooltip", inventory.getText(), new Validator() {
+                        @Override
+                        public boolean isValid(String value) {
+                            return !value.trim().isEmpty();
+                        }
+
+                        @Override
+                        public Object parse(String text) {
+                            return text;
+                        }
+                    });
                     currentEditor.setVisible(true);
                 });
-                btnCloseInventory.setEnabled(!inventory.isClosed());
-                cptitle.getRight().add(btnCloseInventory);
+                btnEditInvName.setEnabled(!inventory.isClosed());
+                cptitle.getRight().add(btnEditInvName);
             }
 
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "nursingrecords.inventory")) {
@@ -493,57 +492,58 @@ public class PnlInventory extends NursingRecordsPanel {
                 btnCloseInventory.addActionListener(actionEvent -> {
                     currentEditor = new DlgYesNo(SYSTools.xx("nursingrecords.inventory.question.close1") + "<br/><b>" + inventory.getText() + "</b>" +
                             "<br/>" + SYSTools.xx("nursingrecords.inventory.question.close2"), SYSConst.icon48playerStop, answer -> {
-                                if (answer.equals(JOptionPane.YES_OPTION)) {
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
+                        if (answer.equals(JOptionPane.YES_OPTION)) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
 
-                                        MedInventory myInventory = em.merge(inventory);
-                                        em.lock(myInventory, LockModeType.OPTIMISTIC);
-                                        em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
+                                MedInventory myInventory = em.merge(inventory);
+                                em.lock(myInventory, LockModeType.OPTIMISTIC);
+                                em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
 
-                                        // close all stocks
-                                        for (MedStock stock : MedStockTools.getAll(myInventory)) {
-                                            if (!stock.isClosed()) {
-                                                MedStock mystock = em.merge(stock);
-                                                em.lock(mystock, LockModeType.OPTIMISTIC);
-                                                mystock.setNextStock(null);
-                                                MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
-                                            }
-                                        }
-                                        // close inventory
-                                        myInventory.setTo(new Date());
-
-                                        em.getTransaction().commit();
-
-                                        createCP4(myInventory);
-                                        buildPanel();
-                                    } catch (OptimisticLockException ole) {
-                                        OPDE.warn(ole);
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                        currentEditor = null;
+                                // close all stocks
+                                for (MedStock stock : MedStockTools.getAll(myInventory)) {
+                                    if (!stock.isClosed()) {
+                                        MedStock mystock = em.merge(stock);
+                                        em.lock(mystock, LockModeType.OPTIMISTIC);
+                                        mystock.setNextStock(null);
+                                        MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
                                     }
                                 }
-                            });
+                                // close inventory
+                                myInventory.setTo(new Date());
+
+                                em.getTransaction().commit();
+
+                                createCP4(myInventory);
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                        currentEditor = null;
+                    });
                     currentEditor.setVisible(true);
                 });
                 btnCloseInventory.setEnabled(!inventory.isClosed());
                 cptitle.getRight().add(btnCloseInventory);
             }
+
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, "nursingrecords.inventory")) {
                 /***
                  *      ____       _ ___                      _
@@ -563,42 +563,42 @@ public class PnlInventory extends NursingRecordsPanel {
                 btnDelInventory.addActionListener(actionEvent -> {
                     currentEditor = new DlgYesNo(SYSTools.xx("nursingrecords.inventory.question.delete1") + "<br/><b>" + inventory.getText() + "</b>" +
                             "<br/>" + SYSTools.xx("nursingrecords.inventory.question.delete2"), SYSConst.icon48delete, answer -> {
-                                if (answer.equals(JOptionPane.YES_OPTION)) {
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
+                        if (answer.equals(JOptionPane.YES_OPTION)) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
 
-                                        MedInventory myInventory = em.merge(inventory);
-                                        em.lock(myInventory, LockModeType.OPTIMISTIC);
-                                        em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
+                                MedInventory myInventory = em.merge(inventory);
+                                em.lock(myInventory, LockModeType.OPTIMISTIC);
+                                em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
 
-                                        em.remove(myInventory);
+                                em.remove(myInventory);
 
-                                        em.getTransaction().commit();
+                                em.getTransaction().commit();
 
 //                                        lstInventories.remove(inventory);
-                                        buildPanel();
-                                    } catch (OptimisticLockException ole) {
-                                        OPDE.warn(ole);
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                        currentEditor = null;
-                                    }
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
                                 }
-                            });
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                                currentEditor = null;
+                            }
+                        }
+                    });
                     currentEditor.setVisible(true);
                 });
                 cptitle.getRight().add(btnDelInventory);
@@ -1256,44 +1256,44 @@ public class PnlInventory extends NursingRecordsPanel {
                         btnDelTX.addActionListener(actionEvent -> {
                             currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
                                     "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
-                                        if (answer.equals(JOptionPane.YES_OPTION)) {
-                                            EntityManager em = OPDE.createEM();
-                                            try {
-                                                em.getTransaction().begin();
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
 
-                                                MedStockTransaction myTX = em.merge(tx);
-                                                MedStock myStock = em.merge(stock);
-                                                em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                                em.lock(myStock, LockModeType.OPTIMISTIC);
-                                                em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
-                                                em.remove(myTX);
+                                        MedStockTransaction myTX = em.merge(tx);
+                                        MedStock myStock = em.merge(stock);
+                                        em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                        em.lock(myStock, LockModeType.OPTIMISTIC);
+                                        em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
+                                        em.remove(myTX);
 //                                                myStock.getStockTransaction().remove(myTX);
-                                                em.getTransaction().commit();
+                                        em.getTransaction().commit();
 
-                                                createCP4(myStock.getInventory());
+                                        createCP4(myStock.getInventory());
 
-                                                buildPanel();
-                                            } catch (OptimisticLockException ole) {
-                                                OPDE.warn(ole);
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                    OPDE.getMainframe().emptyFrame();
-                                                    OPDE.getMainframe().afterLogin();
-                                                }
-                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                            } catch (Exception e) {
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                OPDE.fatal(e);
-                                            } finally {
-                                                em.close();
-                                                currentEditor = null;
-                                            }
+                                        buildPanel();
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.warn(ole);
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
                                         }
-                                    });
+                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                        currentEditor = null;
+                                    }
+                                }
+                            });
                             currentEditor.setVisible(true);
 
 
@@ -1321,27 +1321,27 @@ public class PnlInventory extends NursingRecordsPanel {
                     btnUndoTX.addActionListener(actionEvent -> {
                         currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.undo1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
                                 "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + SYSTools.xx("misc.questions.undo2"), SYSConst.icon48undo, answer -> {
-                                    if (answer.equals(JOptionPane.YES_OPTION)) {
-                                        EntityManager em = OPDE.createEM();
-                                        try {
-                                            em.getTransaction().begin();
-                                            MedStock myStock = em.merge(stock);
-                                            final MedStockTransaction myOldTX = em.merge(tx);
+                            if (answer.equals(JOptionPane.YES_OPTION)) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    MedStock myStock = em.merge(stock);
+                                    final MedStockTransaction myOldTX = em.merge(tx);
 
-                                            myOldTX.setState(MedStockTransactionTools.STATE_CANCELLED);
-                                            final MedStockTransaction myNewTX = em.merge(new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC));
-                                            myOldTX.setText(SYSTools.xx("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
-                                            myNewTX.setText(SYSTools.xx("misc.msg.reversalFor") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myOldTX.getPit()));
+                                    myOldTX.setState(MedStockTransactionTools.STATE_CANCELLED);
+                                    final MedStockTransaction myNewTX = em.merge(new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC));
+                                    myOldTX.setText(SYSTools.xx("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
+                                    myNewTX.setText(SYSTools.xx("misc.msg.reversalFor") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myOldTX.getPit()));
 
 //                                            myStock.getStockTransaction().add(myNewTX);
 //                                            myStock.getStockTransaction().remove(tx);
 //                                            myStock.getStockTransaction().add(myOldTX);
 
-                                            em.lock(em.merge(myNewTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                            em.lock(myStock, LockModeType.OPTIMISTIC);
-                                            em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
+                                    em.lock(em.merge(myNewTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                    em.lock(myStock, LockModeType.OPTIMISTIC);
+                                    em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
 
-                                            em.getTransaction().commit();
+                                    em.getTransaction().commit();
 
 //                                            synchronized (lstInventories) {
 //                                                int indexInventory = lstInventories.indexOf(stock.getInventory());
@@ -1353,8 +1353,8 @@ public class PnlInventory extends NursingRecordsPanel {
 //                                            synchronized (linemap) {
 //                                                linemap.remove(tx);
 //                                            }
-                                            createCP4(myStock.getInventory());
-                                            buildPanel();
+                                    createCP4(myStock.getInventory());
+                                    buildPanel();
 //                                            SwingUtilities.invokeLater(new Runnable() {
 //                                                @Override
 //                                                public void run() {
@@ -1364,27 +1364,27 @@ public class PnlInventory extends NursingRecordsPanel {
 //                                                    }
 //                                                }
 //                                            });
-                                        } catch (OptimisticLockException ole) {
-                                            OPDE.warn(ole);
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                OPDE.getMainframe().emptyFrame();
-                                                OPDE.getMainframe().afterLogin();
-                                            }
-                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                        } catch (Exception e) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            OPDE.fatal(e);
-                                        } finally {
-                                            em.close();
-                                            currentEditor = null;
-                                        }
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
                                     }
-                                });
+                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                    currentEditor = null;
+                                }
+                            }
+                        });
                         currentEditor.setVisible(true);
 
                     });
@@ -1411,7 +1411,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
                             BigDecimal weight;
-                            currentEditor =  new DlgYesNo(SYSConst.icon48scales, o -> {
+                            currentEditor = new DlgYesNo(SYSConst.icon48scales, o -> {
                                 if (!SYSTools.catchNull(o).isEmpty()) {
                                     BigDecimal weight1 = (BigDecimal) o;
 
@@ -1638,46 +1638,46 @@ public class PnlInventory extends NursingRecordsPanel {
             btnDelete.addActionListener(actionEvent -> {
                 currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + SYSTools.xx("nursingrecords.inventory.search.stockid") + ": " + stock.getID() + "</b>" +
                         "<br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
-                            if (answer.equals(JOptionPane.YES_OPTION)) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    MedStock myStock = em.merge(stock);
-                                    em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                    em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
+                    if (answer.equals(JOptionPane.YES_OPTION)) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            MedStock myStock = em.merge(stock);
+                            em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
+                            em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
 //                                    synchronized (lstInventories) {
 //                                        int index = lstInventories.indexOf(myStock.getInventory());
 //                                        lstInventories.get(index).getMedStocks().remove(myStock);
 //                                    }
-                                    em.remove(myStock);
-                                    em.getTransaction().commit();
+                            em.remove(myStock);
+                            em.getTransaction().commit();
 
-                                    synchronized (cpMap) {
-                                        cpMap.remove(key);
-                                    }
-                                    createCP4(myStock.getInventory());
-                                    buildPanel();
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                    currentEditor = null;
-                                }
+                            synchronized (cpMap) {
+                                cpMap.remove(key);
                             }
-                        });
+                            createCP4(myStock.getInventory());
+                            buildPanel();
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            currentEditor = null;
+                        }
+                    }
+                });
                 currentEditor.setVisible(true);
 
             });

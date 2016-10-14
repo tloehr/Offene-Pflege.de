@@ -168,7 +168,7 @@ public class PnlValues extends NursingRecordsPanel {
                     try {
                         em.getTransaction().begin();
                         Resident myResident = em.merge(resident);
-                        em.lock(myResident, LockModeType.OPTIMISTIC);
+//                        em.lock(myResident, LockModeType.OPTIMISTIC);
                         myResident.setControlling((Properties) o);
                         em.getTransaction().commit();
 

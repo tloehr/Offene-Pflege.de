@@ -1237,6 +1237,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             em.lock(myverordnung, LockModeType.OPTIMISTIC);
                             em.remove(myverordnung);
 
+                            // we have to delete those BHPs ourselfs, because I didn't connect them to the prescription entity out of performance reasons
                             Query delQuery = em.createQuery("DELETE FROM BHP b WHERE b.prescription = :prescription");
                             delQuery.setParameter("prescription", myverordnung);
                             delQuery.executeUpdate();

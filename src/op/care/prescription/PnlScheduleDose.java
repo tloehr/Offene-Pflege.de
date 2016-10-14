@@ -54,7 +54,7 @@ import java.util.Date;
 /**
  * @author tloehr
  */
-public class PnlScheduleDose extends CleanablePanel {
+public class PnlScheduleDose extends JPanel {
 
     private int MIN = 0;
     private int MAX = 1;
@@ -77,7 +77,8 @@ public class PnlScheduleDose extends CleanablePanel {
     private final int TAB_MONTHLY = 2;
 
     public PnlScheduleDose(PrescriptionSchedule schedule, Closure actionBlock) {
-        super("nursingrecords.prescription.pnlscheduledose");
+//        super("nursingrecords.prescription.pnlscheduledose");
+        super();
         this.actionBlock = actionBlock;
 //        this.currentSelectedTime = null;
 
@@ -100,11 +101,6 @@ public class PnlScheduleDose extends CleanablePanel {
         }
     }
 
-    @Override
-    public void reload() {
-
-    }
-
     private void panelMainComponentResized(ComponentEvent e) {
         SYSTools.showSide(splitRegular, splitRegularPos);
     }
@@ -124,11 +120,6 @@ public class PnlScheduleDose extends CleanablePanel {
 
     private void btnJedenMonatActionPerformed(ActionEvent e) {
         txtEveryMonth.setText("1");
-    }
-
-    @Override
-    public String getInternalClassID() {
-        return null;
     }
 
     private void txtLDateFocusLost(FocusEvent evt) {
@@ -893,14 +884,6 @@ public class PnlScheduleDose extends CleanablePanel {
         add(panelMain, BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-
-    @Override
-    public void cleanup() {
-        super.cleanup();
-        SYSTools.unregisterListeners(this);
-//        jdcLDatum.removePropertyChangeListener(jdcpcl);
-//        jdcLDatum.cleanup();
-    }
 
     private void cbSunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSunActionPerformed
 

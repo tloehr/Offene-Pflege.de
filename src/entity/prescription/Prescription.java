@@ -131,7 +131,8 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     private List<SYSPRE2PROCESS> attachedProcessConnections;
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+    // these are the annotations for a prescription. currently only used for the MRE studies
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private Collection<ResInfo> annotations;
 
     //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
