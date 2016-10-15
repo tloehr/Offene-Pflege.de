@@ -74,11 +74,7 @@ public class RNDHTML implements TableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus, int row, int column) {
 
-
-//        logger.debug("txt: "+txt);
-//        logger.debug("obj:"+obj);
-
-        txt.setText(SYSTools.catchNull(obj));
+        txt.setText(SYSTools.catchNull(obj)); //https://github.com/tloehr/Offene-Pflege.de/issues/68
 
         // This line was very important to get it working with JDK1.4
         TableColumnModel columnModel = table.getColumnModel();

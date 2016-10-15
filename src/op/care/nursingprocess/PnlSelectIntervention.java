@@ -128,7 +128,7 @@ public class PnlSelectIntervention extends JPanel {
     }
 
     private void btnOkActionPerformed(ActionEvent e) {
-        actionBlock.execute(lstInterventions.getSelectedValues());
+        actionBlock.execute(lstInterventions.getSelectedValuesList());
     }
 
     private boolean saveok() {
@@ -245,9 +245,9 @@ public class PnlSelectIntervention extends JPanel {
         txtText = new JTextField();
         txtLength = new JTextField();
         lblCat = new JLabel();
-        cmbCat = new JComboBox();
+        cmbCat = new JComboBox<>();
         lblType = new JLabel();
-        cmbType = new JComboBox();
+        cmbType = new JComboBox<>();
         panel4 = new JPanel();
         btnSave = new JButton();
 
@@ -387,7 +387,7 @@ public class PnlSelectIntervention extends JPanel {
                     pnlRight.add(lblCat, CC.xy(1, 5));
 
                     //---- cmbCat ----
-                    cmbCat.setModel(new DefaultComboBoxModel(new String[] {
+                    cmbCat.setModel(new DefaultComboBoxModel<>(new String[] {
                         "Item 1",
                         "Item 2",
                         "Item 3",
@@ -402,7 +402,7 @@ public class PnlSelectIntervention extends JPanel {
                     pnlRight.add(lblType, CC.xy(1, 7));
 
                     //---- cmbType ----
-                    cmbType.setModel(new DefaultComboBoxModel(new String[] {
+                    cmbType.setModel(new DefaultComboBoxModel<>(new String[] {
                         "Item 1",
                         "Item 2",
                         "Item 3",
@@ -456,9 +456,9 @@ public class PnlSelectIntervention extends JPanel {
     private JTextField txtText;
     private JTextField txtLength;
     private JLabel lblCat;
-    private JComboBox cmbCat;
+    private JComboBox<String> cmbCat;
     private JLabel lblType;
-    private JComboBox cmbType;
+    private JComboBox<String> cmbType;
     private JPanel panel4;
     private JButton btnSave;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

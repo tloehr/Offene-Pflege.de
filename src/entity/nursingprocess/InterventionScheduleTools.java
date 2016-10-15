@@ -237,4 +237,9 @@ public class InterventionScheduleTools {
         return result;
     }
 
+    public static void copySchedule(InterventionSchedule source, NursingProcess nursingProcess){
+        // hier gehts weiter
+        // Reference prüfen!!
+    }
+
 }

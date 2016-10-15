@@ -40,7 +40,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.javatuples.Triplet;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -443,63 +442,67 @@ public class PnlInformation extends NursingRecordsPanel {
                                         ) {
                                     if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
                                         final JideButton btnAdd = GUITools.createHyperlinkButton("nursingrecords.info.noconstraints", SYSConst.icon22add, null);
-                                        btnAdd.addActionListener(e -> new DlgDiag(new ResInfo(resInfoType, resident), o -> {
-                                            if (o != null) {
-                                                EntityManager em = OPDE.createEM();
-                                                try {
-                                                    em.getTransaction().begin();
-                                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                                    // so that no conflicts can occur if another user enters a new info at the same time
+                                        btnAdd.addActionListener(e -> {
+                                            currentEditor = new DlgDiag(new ResInfo(resInfoType, resident), o -> {
+                                                if (o != null) {
+                                                    EntityManager em = OPDE.createEM();
+                                                    try {
+                                                        em.getTransaction().begin();
+                                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                                        // so that no conflicts can occur if another user enters a new info at the same time
 //                                                                ResInfoType myType = em.merge(resInfoType);
 //                                                                em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                                    final ResInfo newinfo = em.merge((ResInfo) o);
+                                                        final ResInfo newinfo = em.merge((ResInfo) o);
 
-                                                    em.getTransaction().commit();
-                                                    synchronized (mapType2ResInfos) {
-                                                        mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
-                                                        Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
-                                                    }
+                                                        em.getTransaction().commit();
+                                                        synchronized (mapType2ResInfos) {
+                                                            mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
+                                                            Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
+                                                        }
 
 //                                                                synchronized (listAllTypes) {
 //                                                                    listAllTypes.remove(resInfoType);
 //                                                                    listAllTypes.add(myType);
 //                                                                }
 
-                                                    synchronized (listAllInfos) {
-                                                        listAllInfos.add(newinfo);
-                                                    }
+                                                        synchronized (listAllInfos) {
+                                                            listAllInfos.add(newinfo);
+                                                        }
 
-                                                    reload();
+                                                        reload();
 
-                                                } catch (OptimisticLockException ole) {
-                                                    OPDE.warn(ole);
-                                                    if (em.getTransaction().isActive()) {
-                                                        em.getTransaction().rollback();
+                                                    } catch (OptimisticLockException ole) {
+                                                        OPDE.warn(ole);
+                                                        if (em.getTransaction().isActive()) {
+                                                            em.getTransaction().rollback();
+                                                        }
+                                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                                            OPDE.getMainframe().emptyFrame();
+                                                            OPDE.getMainframe().afterLogin();
+                                                        }
+                                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                    } catch (RollbackException ole) {
+                                                        if (em.getTransaction().isActive()) {
+                                                            em.getTransaction().rollback();
+                                                        }
+                                                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                                            OPDE.getMainframe().emptyFrame();
+                                                            OPDE.getMainframe().afterLogin();
+                                                        }
+                                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                    } catch (Exception e1) {
+                                                        if (em.getTransaction().isActive()) {
+                                                            em.getTransaction().rollback();
+                                                        }
+                                                        OPDE.fatal(e1);
+                                                    } finally {
+                                                        em.close();
                                                     }
-                                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                        OPDE.getMainframe().emptyFrame();
-                                                        OPDE.getMainframe().afterLogin();
-                                                    }
-                                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                } catch (RollbackException ole) {
-                                                    if (em.getTransaction().isActive()) {
-                                                        em.getTransaction().rollback();
-                                                    }
-                                                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                                        OPDE.getMainframe().emptyFrame();
-                                                        OPDE.getMainframe().afterLogin();
-                                                    }
-                                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                } catch (Exception e1) {
-                                                    if (em.getTransaction().isActive()) {
-                                                        em.getTransaction().rollback();
-                                                    }
-                                                    OPDE.fatal(e1);
-                                                } finally {
-                                                    em.close();
                                                 }
-                                            }
-                                        }));
+                                                currentEditor = null;
+                                            });
+                                            currentEditor.setVisible(true);
+                                        });
                                         cpsType.add(btnAdd);
                                     } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_ABSENCE) {
                                         cpsType.add(new JLabel(SYSTools.xx("nursingrecords.info.cant.add.absence.here")));
@@ -1144,7 +1147,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
         // Only active ones can be edited, and only by the same user that started it or the admin.
         btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
-                (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
+                (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new LocalDate(resInfo.getFrom()).equals(new LocalDate()))  // The same user only on the same day.
         ));
 
 
@@ -2026,55 +2029,56 @@ public class PnlInformation extends NursingRecordsPanel {
                 minDate = SYSCalendar.min(new LocalDate(), minDate);
 
 
-                DlgResidentReturns dlg = new DlgResidentReturns(minDate.toDateTimeAtStartOfDay().toDate(), o -> {
-                    if (o == null) return;
-                    Date stay = ((Triplet<Date, Station, Rooms>) o).getValue0();
-                    Station station = ((Triplet<Date, Station, Rooms>) o).getValue1();
-                    Rooms room = ((Triplet<Date, Station, Rooms>) o).getValue2();
+                currentEditor = new DlgResidentReturns(minDate.toDateTimeAtStartOfDay().toDate(), o -> {
+                    if (o != null) {
+                        Date stay = ((Triplet<Date, Station, Rooms>) o).getValue0();
+                        Station station = ((Triplet<Date, Station, Rooms>) o).getValue1();
+                        Rooms room = ((Triplet<Date, Station, Rooms>) o).getValue2();
 
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
 
-                        Resident myResident = em.merge(resident);
-                        myResident.setStation(station);
-                        ResInfo resinfo_stay = em.merge(new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), myResident));
-                        resinfo_stay.setFrom(stay);
+                            Resident myResident = em.merge(resident);
+                            myResident.setStation(station);
+                            ResInfo resinfo_stay = em.merge(new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), myResident));
+                            resinfo_stay.setFrom(stay);
 
-                        if (room != null) {
-                            ResInfo resinfo_room = em.merge(new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident));
-                            Properties props = new Properties();
-                            props.put("room.id", Long.toString(room.getRoomID()));
-                            props.put("room.text", room.toString());
-                            ResInfoTools.setContent(resinfo_room, props);
-                            resinfo_room.setFrom(stay);
+                            if (room != null) {
+                                ResInfo resinfo_room = em.merge(new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident));
+                                Properties props = new Properties();
+                                props.put("room.id", Long.toString(room.getRoomID()));
+                                props.put("room.text", room.toString());
+                                ResInfoTools.setContent(resinfo_room, props);
+                                resinfo_room.setFrom(stay);
+                            }
+
+                            em.getTransaction().commit();
+
+                            resident = myResident;
+
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
+
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                            SwingUtilities.invokeLater(() -> {
+                                OPDE.getMainframe().emptySearchArea();
+                                jspSearch = OPDE.getMainframe().prepareSearchArea();
+                                prepareSearchArea();
+                                GUITools.setResidentDisplay(resident);
+                                reload();
+                            });
                         }
-
-                        em.getTransaction().commit();
-
-                        resident = myResident;
-
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
-
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
-                        SwingUtilities.invokeLater(() -> {
-                            OPDE.getMainframe().emptySearchArea();
-                            jspSearch = OPDE.getMainframe().prepareSearchArea();
-                            prepareSearchArea();
-                            GUITools.setResidentDisplay(resident);
-                            reload();
-                        });
                     }
-
+                    currentEditor = null;
                 });
 
-                dlg.setVisible(true);
+                currentEditor.setVisible(true);
             });
             list.add(resComesback);
 
@@ -2086,7 +2090,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                     return;
                 }
-                new DlgEditResidentBaseData(resident, o -> {
+                currentEditor = new DlgEditResidentBaseData(resident, o -> {
                     if (o != null) {
                         EntityManager em = OPDE.createEM();
                         try {
@@ -2120,7 +2124,9 @@ public class PnlInformation extends NursingRecordsPanel {
                             em.close();
                         }
                     }
+                    currentEditor = null;
                 });
+                currentEditor.setVisible(true);
             });
             list.add(editRes);
 

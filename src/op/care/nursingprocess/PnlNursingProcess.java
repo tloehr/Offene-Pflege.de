@@ -726,7 +726,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                             Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
-                            final NursingProcess newNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) np).getFirst());
+                            final NursingProcess newNP = em.merge((NursingProcess) np);
                             newNP.setNPSeries(unique.getUid());
                             DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
@@ -947,7 +947,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
 
                             // Fetch the new Plan from the PAIR
-                            NursingProcess myNewNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getFirst());
+                            NursingProcess myNewNP = em.merge((NursingProcess) o);
                             NursingProcess myOldNP = em.merge(np);
                             em.lock(myOldNP, LockModeType.OPTIMISTIC);
 
@@ -1115,16 +1115,14 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         try {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                            NursingProcess mynp = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getFirst());
+                            NursingProcess mynp = em.merge((NursingProcess) o);
                             em.lock(mynp, LockModeType.OPTIMISTIC);
-                            // Schedules to delete
-                            for (InterventionSchedule is : ((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getSecond()) {
-                                em.remove(em.merge(is));
-                            }
+
                             // No unused DFNs to delete
                             Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess ");
                             delQuery.setParameter("nursingprocess", mynp);
                             delQuery.executeUpdate();
+
                             // Create new DFNs according to plan
                             DFNTools.generate(em, mynp.getInterventionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
@@ -1136,6 +1134,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     reloadSearch = true;
                                 }
                             }
+
                             if (reloadSearch) {
                                 prepareSearchArea();
                             }

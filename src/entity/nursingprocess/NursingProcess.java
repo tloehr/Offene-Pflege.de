@@ -83,14 +83,14 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<SYSNP2FILE> attachedFilesConnections;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<SYSNP2PROCESS> attachedQProcessConnections;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     @OrderBy("datum DESC")
     private List<NPControl> npControls;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess", fetch = FetchType.EAGER)
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nursingProcess", fetch = FetchType.EAGER)
     private List<InterventionSchedule> interventionSchedules;
 
 

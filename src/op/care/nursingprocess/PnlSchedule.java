@@ -79,16 +79,10 @@ public class PnlSchedule extends JPanel {
 
     private void btnToTimeActionPerformed(ActionEvent e) {
         splitRegularPos = SYSTools.showSide(splitRegular, SYSTools.RIGHT_LOWER_SIDE, SYSTools.SPEED_NORMAL);
-//        if (Double.parseDouble(txtUhrzeit.getText()) == 0) {
-//            txtUhrzeit.setText("1");
-//        }
     }
 
     private void btnToTimeOfDayActionPerformed(ActionEvent e) {
         splitRegularPos = SYSTools.showSide(splitRegular, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
-//        if (!isAtLeastOneTxtFieldNotZero()) {
-//            txtMorgens.setText("1");
-//        }
     }
 
     private void panelMainComponentResized(ComponentEvent e) {
@@ -130,7 +124,7 @@ public class PnlSchedule extends JPanel {
 
     private void initPanel() {
 
-        pnlBemerkung.setBorder(new TitledBorder(SYSTools.xx(internalClassID + ".bordertitle4textfield")));
+        pnlBemerkung.setBorder(new TitledBorder(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.pnlschedule.bordertitle4textfield")));
 
         ArrayList<Date> timelist = SYSCalendar.getTimeList();
         cmbUhrzeit.setModel(new DefaultComboBoxModel(timelist.toArray()));
@@ -229,7 +223,7 @@ public class PnlSchedule extends JPanel {
         lblMinutes.setText(SYSTools.xx("misc.msg.Minute(s)"));
         txtMinutes.setText(SYSTools.formatBigDecimal(is.getDauer())); // https://github.com/tloehr/Offene-Pflege.de/issues/31
 
-        tbFloating = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID + ".floatinginterventions"));
+        tbFloating = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.pnlschedule.floatinginterventions"));
         tbFloating.setSelected(is.isFloating());
         panelMain.add(tbFloating, CC.xy(3, 5));
 
@@ -924,7 +918,7 @@ public class PnlSchedule extends JPanel {
             save();
             actionBlock.execute(is);
         } catch (NumberFormatException nfe) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".parseerror") + nfe.getLocalizedMessage(), 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.pnlschedule.parseerror") + nfe.getLocalizedMessage(), 2));
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 

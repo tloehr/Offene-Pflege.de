@@ -58,6 +58,9 @@ import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import scala.Int;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -1062,20 +1065,17 @@ public class PnlDFN extends NursingRecordsPanel {
                 PnlSelectIntervention pnl = new PnlSelectIntervention(o -> {
                     popup.hidePopup();
                     if (o != null) {
-                        Object[] objects = (Object[]) o;
+
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
 
-                            for (Object obj : objects) {
-                                Intervention intervention = em.merge((Intervention) obj);
+                            for (Intervention inv : (List<Intervention>) o) {
+                                Intervention intervention = em.merge(inv);
                                 DFN dfn = em.merge(new DFN(resident, intervention));
 
-                                // Set Target and Actual according to the setting of JDCDate
-                                DateTime now = new DateTime();
-                                DateMidnight onDemandPIT = new DateMidnight(jdcDate.getDate());
-                                DateTime newDateTime = onDemandPIT.toDateTime().plusHours(now.getHourOfDay()).plusMinutes(now.getMinuteOfHour()).plusSeconds(now.getSecondOfMinute());
+                                DateTime newDateTime = new LocalDate(jdcDate.getDate()).toDateTime(new LocalTime());
                                 dfn.setSoll(newDateTime.toDate());
                                 dfn.setIst(newDateTime.toDate());
 

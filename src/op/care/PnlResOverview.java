@@ -34,10 +34,9 @@ import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
-import op.OPDE;
-import op.care.reports.PnlReport;
-import op.threads.DisplayMessage;
 import gui.GUITools;
+import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -45,8 +44,10 @@ import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
 import java.beans.PropertyVetoException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author tloehr
@@ -141,22 +142,27 @@ public class PnlResOverview extends NursingRecordsPanel {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
             SwingWorker worker = new SwingWorker() {
-                String html = "";
+
 
                 @Override
                 protected Object doInBackground() throws Exception {
-                    html = SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
-                    return null;
+                    return SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                 }
 
                 @Override
                 protected void done() {
-                    txtUebersicht.setText(html);
-                    txtUebersicht.repaint();
-                    SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspHTML, 0, null));
-                    initPhase = false;
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
+                    try {
+                        txtUebersicht.setText(get().toString());
+                        txtUebersicht.repaint();
+                        SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspHTML, 0, null));
+                        initPhase = false;
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    } catch (InterruptedException e) {
+                        OPDE.fatal(e);
+                    } catch (ExecutionException e) {
+                        OPDE.fatal(e);
+                    }
                 }
             };
             worker.execute();

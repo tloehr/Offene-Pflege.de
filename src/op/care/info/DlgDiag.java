@@ -79,7 +79,7 @@ public class DlgDiag extends MyJDialog {
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void initDialog() {

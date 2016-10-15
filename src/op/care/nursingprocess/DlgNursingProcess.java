@@ -49,9 +49,8 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author root
@@ -59,9 +58,9 @@ import java.util.Date;
 public class DlgNursingProcess extends MyJDialog {
     public static final String internalClassID = "nursingrecords.nursingprocess.dlgplanung";
     private Closure actionBlock;
-    private NursingProcess nursingProcess;
+    private NursingProcess nursingProcess, resultNursingProcess;
     private JPopupMenu menu;
-    private ArrayList<InterventionSchedule> listInterventionSchedule2Remove = new ArrayList();
+//    private ArrayList<InterventionSchedule> listInterventionSchedule2Remove = new ArrayList();
     private PnlCommonTags pnlCommonTags;
     protected JDialog currentEditor;
 
@@ -124,11 +123,7 @@ public class DlgNursingProcess extends MyJDialog {
         }
         super.dispose();
 
-        if (nursingProcess == null) {
-            actionBlock.execute(null);
-        } else {
-            actionBlock.execute(new Pair<NursingProcess, ArrayList<InterventionSchedule>>(nursingProcess, listInterventionSchedule2Remove));
-        }
+        actionBlock.execute(resultNursingProcess);
     }
 
     private void reloadInterventions() {
@@ -151,8 +146,7 @@ public class DlgNursingProcess extends MyJDialog {
         PnlSelectIntervention pnlSelectIntervention = new PnlSelectIntervention(o -> {
             popup.hidePopup();
             if (o != null) {
-                for (Object obj : (Object[]) o) {
-                    Intervention intervention = (Intervention) obj;
+                for (Intervention intervention : (List<Intervention>) o) {
                     nursingProcess.getInterventionSchedule().add(new InterventionSchedule(nursingProcess, intervention));
                 }
                 reloadInterventions();
@@ -491,7 +485,7 @@ public class DlgNursingProcess extends MyJDialog {
 
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        nursingProcess = null;
+        resultNursingProcess = null;
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
@@ -510,6 +504,7 @@ public class DlgNursingProcess extends MyJDialog {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (saveOK()) {
             save();
+            resultNursingProcess = nursingProcess;
             dispose();
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -539,7 +534,7 @@ public class DlgNursingProcess extends MyJDialog {
         JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
         itemPopupDelete.addActionListener(evt12 -> {
             for (int row13 : tblPlanung.getSelectedRows()) {
-                listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row13));
+//                listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row13));
                 nursingProcess.getInterventionSchedule().remove(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row13));
             }
             ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
@@ -563,23 +558,30 @@ public class DlgNursingProcess extends MyJDialog {
              * the schedule. After the edit it clones this "template", removes the original
              * InterventionSchedules (copying the apropriate Intervention of every single
              * Schedule first) and finally creates new schedules and adds them to
-             * the CareProcess in question.
+             * the NursingProcess.
+             *
+             * The user can select more than one schedule (for deleting), but this makes no sense
+             * for the editing function. Therefore we only use the first selection and ignore the rest.
              */
-            int row12 = tblPlanung.getSelectedRows()[0];
-            InterventionSchedule firstInterventionScheduleWillBeTemplate = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row12);
-            JPanel dlg = new PnlSchedule(firstInterventionScheduleWillBeTemplate, o -> {
+            int myRow = tblPlanung.getSelectedRows()[0];
+            InterventionSchedule firstSelection = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(myRow).clone();
+
+            JPanel dlg = new PnlSchedule(firstSelection, o -> {
                 if (o != null) {
-                    InterventionSchedule template = (InterventionSchedule) o;
-                    ArrayList<InterventionSchedule> listInterventionSchedule2Add = new ArrayList();
+                    InterventionSchedule template = (InterventionSchedule) o; //contains the template to be copied over to the others
+//                    ArrayList<InterventionSchedule> listInterventionSchedule2Add = new ArrayList();
                     for (int row1 : tblPlanung.getSelectedRows()) {
                         InterventionSchedule oldTermin = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row1);
                         InterventionSchedule newTermin = template.clone();
                         newTermin.setIntervention(oldTermin.getIntervention());
-                        listInterventionSchedule2Remove.add(oldTermin);
-                        listInterventionSchedule2Add.add(newTermin);
+
+                        nursingProcess.getInterventionSchedule().remove(oldTermin);
+                        nursingProcess.getInterventionSchedule().add(newTermin);
+
+//                        listInterventionSchedule2Remove.add(oldTermin);
+//                        listInterventionSchedule2Add.add(newTermin);
                     }
-                    nursingProcess.getInterventionSchedule().removeAll(listInterventionSchedule2Remove);
-                    nursingProcess.getInterventionSchedule().addAll(listInterventionSchedule2Add);
+
                     popup.hidePopup();
                     Collections.sort(nursingProcess.getInterventionSchedule());
                     ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
