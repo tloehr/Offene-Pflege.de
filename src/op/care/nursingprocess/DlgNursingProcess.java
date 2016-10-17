@@ -34,6 +34,7 @@ import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionSchedule;
+import entity.nursingprocess.InterventionScheduleTools;
 import entity.nursingprocess.NursingProcess;
 import gui.GUITools;
 import op.OPDE;
@@ -49,7 +50,9 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,7 +63,7 @@ public class DlgNursingProcess extends MyJDialog {
     private Closure actionBlock;
     private NursingProcess nursingProcess, resultNursingProcess;
     private JPopupMenu menu;
-//    private ArrayList<InterventionSchedule> listInterventionSchedule2Remove = new ArrayList();
+    //    private ArrayList<InterventionSchedule> listInterventionSchedule2Remove = new ArrayList();
     private PnlCommonTags pnlCommonTags;
     protected JDialog currentEditor;
 
@@ -569,18 +572,12 @@ public class DlgNursingProcess extends MyJDialog {
             JPanel dlg = new PnlSchedule(firstSelection, o -> {
                 if (o != null) {
                     InterventionSchedule template = (InterventionSchedule) o; //contains the template to be copied over to the others
-//                    ArrayList<InterventionSchedule> listInterventionSchedule2Add = new ArrayList();
+                    ArrayList<InterventionSchedule> selected = new ArrayList<>();
                     for (int row1 : tblPlanung.getSelectedRows()) {
-                        InterventionSchedule oldTermin = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row1);
-                        InterventionSchedule newTermin = template.clone();
-                        newTermin.setIntervention(oldTermin.getIntervention());
-
-                        nursingProcess.getInterventionSchedule().remove(oldTermin);
-                        nursingProcess.getInterventionSchedule().add(newTermin);
-
-//                        listInterventionSchedule2Remove.add(oldTermin);
-//                        listInterventionSchedule2Add.add(newTermin);
+                        selected.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row1));
                     }
+
+                    InterventionScheduleTools.copySchedule(template, selected, nursingProcess);
 
                     popup.hidePopup();
                     Collections.sort(nursingProcess.getInterventionSchedule());

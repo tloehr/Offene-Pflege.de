@@ -87,6 +87,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private Color[] color1, color2;
     private List<Commontags> listUsedCommontags;
     private JToggleButton tbShowClosed;
+    private PnlTemplate templateDialog;
 
 
     /**
@@ -117,6 +118,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     @Override
     public void cleanup() {
         super.cleanup();
+        if (templateDialog != null && templateDialog.isShowing()) {
+            templateDialog.dispose();
+        }
         SYSTools.clear(cpMap);
         SYSTools.clear(valuecache);
         SYSTools.clear(contenPanelMap);
@@ -799,7 +803,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 //                    final JidePopup popup = new JidePopup();
 
                 // first a template is selected
-                MyJDialog dlg = new PnlTemplate(o -> {
+                templateDialog = new PnlTemplate(o -> {
                     if (o != null) {
                         // that selected template is cloned and handed over to the DlgNursingProcess for further editing
                         NursingProcess template = ((NursingProcess) o).clone();
@@ -872,9 +876,10 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         });
                         currentEditor.setVisible(true);
                     }
+                    templateDialog = null;
                 });
 
-                dlg.setVisible(true);
+                templateDialog.setVisible(true);
             });
 
 

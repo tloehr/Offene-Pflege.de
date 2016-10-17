@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * @author Torsten Löhr
  */
 public class DlgProcess extends MyJDialog {
-    private QProcess qProcess;
+    private QProcess qProcess, resultingQProcess;
     private Closure actionBlock;
 
     public DlgProcess(QProcess qProcess, Closure actionBlock) {
@@ -39,7 +39,7 @@ public class DlgProcess extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-        setVisible(true);
+//        setVisible(true);
     }
 
     private void initDialog() {
@@ -75,12 +75,13 @@ public class DlgProcess extends MyJDialog {
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
-        qProcess = null;
+        resultingQProcess = null;
         dispose();
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
         save();
+        resultingQProcess = qProcess;
         dispose();
     }
 
@@ -93,7 +94,7 @@ public class DlgProcess extends MyJDialog {
 
     @Override
     public void dispose() {
-        actionBlock.execute(qProcess);
+        actionBlock.execute(resultingQProcess);
         super.dispose();
     }
 

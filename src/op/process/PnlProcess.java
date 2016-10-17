@@ -35,6 +35,7 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -807,28 +808,33 @@ public class PnlProcess extends NursingRecordsPanel {
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             final JideButton btnAdd = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnadd"), SYSConst.icon22add, null);
-            btnAdd.addActionListener(actionEvent -> new DlgProcess(new QProcess(resident), o -> {
-                if (resident != null && !resident.isActive()) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
-                    return;
-                }
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        QProcess qProcess = em.merge((QProcess) o);
-                        em.getTransaction().commit();
-                        processList.add(qProcess);
-                        Collections.sort(processList);
-                        createCP4(qProcess);
-                        buildPanel();
-                    } catch (Exception e) {
-                        em.getTransaction().rollback();
-                    } finally {
-                        em.close();
+            btnAdd.addActionListener(actionEvent -> {
+                currentEditor = new DlgProcess(new QProcess(resident), o -> {
+                    if (resident != null && !resident.isActive()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                        currentEditor = null;
+                        return;
                     }
-                }
-            }));
+                    if (o != null) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            QProcess qProcess = em.merge((QProcess) o);
+                            em.getTransaction().commit();
+                            processList.add(qProcess);
+                            Collections.sort(processList);
+                            createCP4(qProcess);
+                            buildPanel();
+                        } catch (Exception e) {
+                            em.getTransaction().rollback();
+                        } finally {
+                            em.close();
+                        }
+                    }
+                    currentEditor = null;
+                });
+                currentEditor.setVisible(true);
+            });
             list.add(btnAdd);
             btnAdd.setEnabled(resident == null || resident.isActive());
         }
@@ -1048,9 +1054,9 @@ public class PnlProcess extends NursingRecordsPanel {
                 popup.setMovable(false);
                 popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                 final JButton btnSave = new JButton(SYSConst.icon16apply);
-                final JDateChooser editor = new JDateChooser(new DateMidnight().plusWeeks(2).toDate());
+                final JDateChooser editor = new JDateChooser(new LocalDate().plusWeeks(2).toDate());
                 editor.setFont(SYSConst.ARIAL14);
-                editor.setMinSelectableDate(new DateMidnight().plusDays(1).toDate());
+                editor.setMinSelectableDate(new LocalDate().plusDays(1).toDate());
                 btnSave.addActionListener(evt -> {
 
                     if (editor.getDate() == null) {

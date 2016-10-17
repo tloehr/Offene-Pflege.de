@@ -2,7 +2,6 @@ package entity.nursingprocess;
 
 import entity.info.Resident;
 import op.OPDE;
-import op.care.nursingprocess.PnlNursingProcess;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
@@ -12,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -94,7 +94,7 @@ public class InterventionScheduleTools {
         result += SYSTools.catchNull(termin.getBemerkung(), "<div id=\"fonttext\"><b>" + SYSTools.xx("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
 
         if (termin.isFloating()) {
-            result += "<div id=\"fonttext\"><font color=\"blue\">" + SYSTools.xx( "nursingrecords.nursingprocess.floatinginterventions") + "</font></div>";
+            result += "<div id=\"fonttext\"><font color=\"blue\">" + SYSTools.xx("nursingrecords.nursingprocess.floatinginterventions") + "</font></div>";
         }
 
         return result;
@@ -213,10 +213,10 @@ public class InterventionScheduleTools {
                     (schedule.getAbends() > 0 ? SYSTools.xx("misc.msg.evening.medium") + ", " : "") +
                     (schedule.getNachtAb() > 0 ? SYSTools.xx("misc.msg.lateatnight.medium") + ", " : "");
 
-            if (schedule.getTaeglich() != 1){
+            if (schedule.getTaeglich() != 1) {
                 result += getRepeatPattern(schedule);
             } else {
-                result = result.substring(0, result.length()-2);
+                result = result.substring(0, result.length() - 2);
             }
 
 //            result += (schedule.getTaeglich() != 1 ? getRepeatPattern(schedule) : "");
@@ -237,9 +237,40 @@ public class InterventionScheduleTools {
         return result;
     }
 
-    public static void copySchedule(InterventionSchedule source, NursingProcess nursingProcess){
-        // hier gehts weiter
-        // Reference prüfen!!
+    /**
+     * this copies the sheduling part of the template Schedule to every InterventionSchedule of the provided nursing process.
+     *
+     * @param source
+     * @param nursingProcess
+     */
+    public static void copySchedule(InterventionSchedule source, List<InterventionSchedule> selected, NursingProcess nursingProcess) {
+        for (InterventionSchedule is : selected) {
+            int index = nursingProcess.getInterventionSchedule().indexOf(is);
+
+            nursingProcess.getInterventionSchedule().get(index).setNachtMo(source.getNachtMo());
+            nursingProcess.getInterventionSchedule().get(index).setMorgens(source.getMorgens());
+            nursingProcess.getInterventionSchedule().get(index).setMittags(source.getMittags());
+            nursingProcess.getInterventionSchedule().get(index).setNachmittags(source.getNachmittags());
+            nursingProcess.getInterventionSchedule().get(index).setAbends(source.getAbends());
+            nursingProcess.getInterventionSchedule().get(index).setNachtAb(source.getNachtAb());
+            nursingProcess.getInterventionSchedule().get(index).setUhrzeitAnzahl(source.getUhrzeitAnzahl());
+            nursingProcess.getInterventionSchedule().get(index).setUhrzeit(source.getUhrzeit());
+            nursingProcess.getInterventionSchedule().get(index).setTaeglich(source.getTaeglich());
+            nursingProcess.getInterventionSchedule().get(index).setWoechentlich(source.getWoechentlich());
+            nursingProcess.getInterventionSchedule().get(index).setMonatlich(source.getMonatlich());
+            nursingProcess.getInterventionSchedule().get(index).setTagNum(source.getTagNum());
+            nursingProcess.getInterventionSchedule().get(index).setMon(source.getMon());
+            nursingProcess.getInterventionSchedule().get(index).setDie(source.getDie());
+            nursingProcess.getInterventionSchedule().get(index).setMit(source.getMit());
+            nursingProcess.getInterventionSchedule().get(index).setDon(source.getDon());
+            nursingProcess.getInterventionSchedule().get(index).setFre(source.getFre());
+            nursingProcess.getInterventionSchedule().get(index).setSam(source.getSam());
+            nursingProcess.getInterventionSchedule().get(index).setSon(source.getSon());
+            nursingProcess.getInterventionSchedule().get(index).setFloating(source.isFloating());
+            nursingProcess.getInterventionSchedule().get(index).setLDatum(source.getLDatum());
+            nursingProcess.getInterventionSchedule().get(index).setDauer(source.getDauer());
+            nursingProcess.getInterventionSchedule().get(index).setBemerkung(source.getBemerkung());
+        }
     }
 
 }

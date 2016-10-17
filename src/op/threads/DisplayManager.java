@@ -270,6 +270,7 @@ public class DisplayManager extends Thread {
 
     public void mailCheck() {
         // Check 4 new mails ?
+        if (OPDE.getLogin() == null) return; // bad timing
         if (MXmsgTools.hasUnread(OPDE.getLogin().getUser())) {
             addSubMessage(new DisplayMessage("mx.you.have.mail", 5));
             if (mailIconFlasher == null) {

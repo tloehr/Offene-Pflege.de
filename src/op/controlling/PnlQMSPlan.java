@@ -102,6 +102,10 @@ public class PnlQMSPlan extends CleanablePanel {
 
     @Override
     public void reload() {
+
+        helpkey = OPDE.getAppInfo().getInternalClasses().containsKey(internalClassID) ? OPDE.getAppInfo().getInternalClasses().get(internalClassID).getHelpurl() : null;
+        OPDE.getDisplayManager().setMainMessage(internalClassID);
+
         cpMap.clear();
         mapQms2Panel.clear();
         reloadData();

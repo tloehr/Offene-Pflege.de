@@ -71,7 +71,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
@@ -417,7 +416,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        MREPrevalenceSheets mre = new MREPrevalenceSheets(new LocalDate(), cbAnonymous.isSelected(), progressClosure);
+                        MREPrevalenceSheets mre = new MREPrevalenceSheets(new LocalDate(jdc.getDate()), cbAnonymous.isSelected(), progressClosure);
                         return mre.createSheet();
                     }
 
@@ -1260,6 +1259,11 @@ public class PnlControlling extends CleanablePanel {
 
         switch (tabMain.getSelectedIndex()) {
             case TAB_CONTROLLING: {
+
+
+                helpkey = OPDE.getAppInfo().getInternalClasses().containsKey(internalClassID) ? OPDE.getAppInfo().getInternalClasses().get(internalClassID).getHelpurl() : null;
+                OPDE.getDisplayManager().setMainMessage(internalClassID);
+
                 cpsControlling.removeAll();
                 cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
 

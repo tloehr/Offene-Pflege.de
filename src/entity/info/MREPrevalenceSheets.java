@@ -138,10 +138,10 @@ public class MREPrevalenceSheets {
         this.targetDate = targetDate;
         this.anonymous = anonymous;
         this.progressClosure = progressClosure;
-        mapID2Info = new HashMap<Integer, ResInfo>();
-        mapInfo2Properties = new HashMap<ResInfo, Properties>();
+        mapID2Info = new HashMap<>();
+        mapInfo2Properties = new HashMap<>();
         mapResInfoType = new HashMap<>();
-        mapRooms = new HashMap<Resident, Rooms>();
+        mapRooms = new HashMap<>();
         listResidents = ResidentTools.getAllActive(targetDate.minusDays(1), targetDate);
         antibiotics = CommontagsTools.getType(CommontagsTools.TYPE_SYS_ANTIBIOTICS);
         mapBedsTotal = new HashMap<>();
@@ -255,11 +255,6 @@ public class MREPrevalenceSheets {
 
         for (int col = 0; col < MAXCOL_SHEET1; col++) {
             sheet1.autoSizeColumn(col);
-//            for (int row = 0; row < sheet1.getLastRowNum()){
-//                sheet1.getRow(col).getCell(row).set
-//            }
-
-
         }
 
         if (sheet2 != null) {
