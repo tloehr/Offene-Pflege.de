@@ -430,6 +430,17 @@ public class ResInfoTools {
         return absentSince(resident) != null;
     }
 
+    /**
+     * checks if a resident was present on a specific day. away means also, that he left or came back on that day.
+     * @param resident
+     * @param targetDate
+     * @return
+     */
+    public static boolean wasAway(Resident resident, LocalDate targetDate) {
+        ArrayList<ResInfo> listAbsence = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE), targetDate, targetDate);
+        return !listAbsence.isEmpty();
+    }
+
     public static boolean isBiohazard(Resident resident) {
         ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_INFECTION));
         return biohazard != null;

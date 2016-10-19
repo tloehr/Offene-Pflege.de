@@ -21,7 +21,6 @@ import org.joda.time.Years;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.awt.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -219,6 +218,12 @@ public class ResidentTools {
     }
 
 
+
+    public static ArrayList<Resident> getAllActive(LocalDate start, LocalDate end) {
+        return getAllActive(start.toDateTimeAtStartOfDay(), SYSCalendar.eod(end));
+    }
+
+
     /**
      * retrieves a list of all residents who were staying in the home during that specified
      * interval.
@@ -227,9 +232,7 @@ public class ResidentTools {
      * @param end
      * @return
      */
-    public static ArrayList<Resident> getAllActive(LocalDate start, LocalDate end) {
-        DateTime from = start.toDateTimeAtStartOfDay();
-        DateTime to = SYSCalendar.eod(end);
+    public static ArrayList<Resident> getAllActive(DateTime start, DateTime end) {
         ArrayList<Resident> list = null;
         EntityManager em = OPDE.createEM();
         try {
@@ -245,8 +248,8 @@ public class ResidentTools {
                     " (rinfo.from > :from AND rinfo.to < :to)) " +
                     " ORDER BY b.name, b.firstname");
             query.setParameter("type", ResInfoTypeTools.TYPE_STAY);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
+            query.setParameter("from", start.toDate());
+            query.setParameter("to", end.toDate());
             list = new ArrayList<Resident>(query.getResultList());
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -254,6 +257,19 @@ public class ResidentTools {
             em.close();
         }
         return list;
+    }
+
+
+    public static ArrayList<Resident> getAllActiveAndPresent(LocalDate day) {
+        ArrayList<Resident> list = getAllActive(day, day);
+        ArrayList<Resident> listOnlyPresent = new ArrayList<>();
+        for (Resident resident : list){
+            if (!ResInfoTools.wasAway(resident, day)){
+                listOnlyPresent.add(resident);
+            }
+        }
+        list.clear();
+        return listOnlyPresent;
     }
 
     /**

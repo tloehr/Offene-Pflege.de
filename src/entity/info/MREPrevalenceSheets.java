@@ -13,17 +13,25 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import org.joda.time.Period;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,6 +142,8 @@ public class MREPrevalenceSheets {
     private Sheet sheet1, sheet2;
     private Workbook wb;
 
+    private final Logger logger = Logger.getLogger(getClass());
+
     public MREPrevalenceSheets(final LocalDate targetDate, boolean anonymous, Closure progressClosure) {
         this.targetDate = targetDate;
         this.anonymous = anonymous;
@@ -142,7 +152,12 @@ public class MREPrevalenceSheets {
         mapInfo2Properties = new HashMap<>();
         mapResInfoType = new HashMap<>();
         mapRooms = new HashMap<>();
-        listResidents = ResidentTools.getAllActive(targetDate.minusDays(1), targetDate);
+
+
+        // todo: the selection of residents and their away times need to be studied more.
+        // All residents, who were living in the resthome at 8 in the morning on the targetDate
+        LocalTime morning8 = new LocalTime(8, 0); // eight o'clock
+        listResidents = ResidentTools.getAllActive(targetDate.toDateTime(morning8), SYSCalendar.eod(targetDate));
         antibiotics = CommontagsTools.getType(CommontagsTools.TYPE_SYS_ANTIBIOTICS);
         mapBedsTotal = new HashMap<>();
         mapBedsInUse = new HashMap<>();
@@ -184,7 +199,8 @@ public class MREPrevalenceSheets {
             if (sort == 0) {
                 if (i1 == 1) {// both residents have rooms assigned
                     sort = mapRooms.get(o1).getFloor().getHome().getEid().compareTo(mapRooms.get(o2).getFloor().getHome().getEid());
-                    if (sort == 0) sort = Integer.compare(mapRooms.get(o1).getFloor().getLevel(), mapRooms.get(o2).getFloor().getLevel());
+                    if (sort == 0)
+                        sort = Integer.compare(mapRooms.get(o1).getFloor().getLevel(), mapRooms.get(o2).getFloor().getLevel());
                 }
             }
             if (sort == 0) sort = o1.toString().compareTo(o2.toString());
@@ -205,6 +221,15 @@ public class MREPrevalenceSheets {
         boolean lastForThisLevel = false;
 
         for (Resident resident : listResidents) {
+
+
+//            ResInfo lastHauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.TYPE_STAY);
+//
+//            LocalDate since = new LocalDate(lastHauf.getFrom());
+//            Period interval = new Period(since, targetDate);
+//
+//            logger.debug(resident.getRID() + ": " + ResidentTools.getAge(resident) + "; " + interval);
+
             progress++;
             progressClosure.execute(new Pair<Integer, Integer>(progress, max));
 
@@ -219,6 +244,7 @@ public class MREPrevalenceSheets {
                 }
             }
 
+            // the whole sheet is sorted by the levels of the floors.
             if (runningNumber != 0) {
                 Resident next = runningNumber + 1 >= listResidents.size() ? null : listResidents.get(runningNumber + 1);
                 if (next == null) {
@@ -346,12 +372,12 @@ public class MREPrevalenceSheets {
 
         content[ROOM_NO] = getValue(ResInfoTypeTools.TYPE_ROOM, "room.text").isEmpty() ? "--" : getValue(ResInfoTypeTools.TYPE_ROOM, "room.text");
         content[RESIDENT_NAME_OR_RESID] = anonymous ? resident.getRID() : ResidentTools.getLabelText(resident);
-//        content[RESIDENT_STATION] = SYSTools.catchNull(resident.getStation(), "--");
         content[RUNNING_NO] = Integer.toString(runningNumber);
 
         // absent yesterday ?
-        ArrayList<ResInfo> listAbsence = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ABSENCE), targetDate.minusDays(1), targetDate);
-        content[PRESENT_DAY_BEFORE] = listAbsence.isEmpty() ? "X" : "";
+        ArrayList<ResInfo> listAbsence = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ABSENCE), targetDate.minusDays(1), targetDate.minusDays(1));
+        ArrayList<ResInfo> listStay = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_STAY), targetDate.minusDays(1), targetDate.minusDays(1));
+        content[PRESENT_DAY_BEFORE] = listAbsence.isEmpty() && !listStay.isEmpty() ? "X" : "";
         listAbsence.clear();
 
         content[YEAR_OF_BIRTH] = Integer.toString(new LocalDate(resident.getDOB()).getYear());

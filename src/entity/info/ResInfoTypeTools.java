@@ -67,8 +67,8 @@ public class ResInfoTypeTools {
     public static final int TYPE_WOUND8 = 149;
     public static final int TYPE_WOUND9 = 150;
     public static final int TYPE_WOUND10 = 151;
-    public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5};
-//    public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5, TYPE_WOUND6, TYPE_WOUND7, TYPE_WOUND8, TYPE_WOUND9, TYPE_WOUND10};
+//    public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5};
+    public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5, TYPE_WOUND6, TYPE_WOUND7, TYPE_WOUND8, TYPE_WOUND9, TYPE_WOUND10};
     public static final int TYPE_WOUNDHISTORY1 = 122;
     public static final int TYPE_WOUNDHISTORY2 = 123;
     public static final int TYPE_WOUNDHISTORY3 = 124;

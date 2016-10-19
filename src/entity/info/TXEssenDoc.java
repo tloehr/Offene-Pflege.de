@@ -19,7 +19,6 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,6 +40,7 @@ public class TXEssenDoc {
     public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
+    public static final String SOURCEWOUND = "anlage_wunden_161020.pdf";
 
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
@@ -50,17 +50,24 @@ public class TXEssenDoc {
 
 
     private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 8);
-//    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
+    //    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
 //    private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
 //    private PdfContentByte over = null;
 //    private PdfWriter writer = null;
 //
     ByteArrayOutputStream medListStream = null, icdListStream = null;
-    boolean mre, psych = false;int progress, max;
+    boolean mre, psych = false;
+    int progress, max;
 
 
     String generalComment = "";
 
+
+    /**
+     * generates a transfer document when the resident needs to go to hospital
+     *
+     * @param res
+     */
     public TXEssenDoc(Resident res) {
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
@@ -173,6 +180,27 @@ public class TXEssenDoc {
         return outfileMRE;
     }
 
+    private File createDocWounds() throws Exception {
+        File outfileWOUND = File.createTempFile("TXE", ".pdf");
+        outfileWOUND.deleteOnExit();
+//            PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileMRE));
+        PdfStamper stamper = new PdfStamper(new PdfReader(new File("/local/" + SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileWOUND));
+
+        AcroFields form = stamper.getAcroFields();
+        for (String key : content.keySet()) {
+            form.setField(key, content.get(key));
+        }
+        stamper.setFormFlattening(true);
+        stamper.close();
+        return outfileWOUND;
+    }
+
+    /**
+     * the main section of tx document.
+     *
+     * @return
+     * @throws Exception
+     */
     private File createDoc1() throws Exception {
         File outfile1 = File.createTempFile("TXE", ".pdf");//new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX1_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
         outfile1.deleteOnExit();
@@ -280,15 +308,6 @@ public class TXEssenDoc {
                 form.setField(key, content.get(key));
             }
         }
-
-//        TextField tf = new TextField(stamper.getWriter(), new Rectangle(Utilities.millimetersToPoints(1.3696f), Utilities.millimetersToPoints(2.4f), Utilities.millimetersToPoints(1.3696f + 9.25f), Utilities.millimetersToPoints(5.8f)), "asd");
-//        tf.setText("Eine alte Dame geht fische essen.");
-//        tf.setFont(pdf_font_normal_bold.getBaseFont());
-//        tf.set
-//        tf.setFontSize(0f);
-//        stamper.addAnnotation(tf.getTextField(), 2);
-//        tf.setVisibility(BaseField.VISIBLE);
-//        tf.setBackgroundColor(BaseColor.RED);
 
         stamper.setFormFlattening(true);
 
