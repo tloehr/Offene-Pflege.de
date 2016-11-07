@@ -659,7 +659,16 @@ public class PnlReport extends NursingRecordsPanel {
         boolean sameMonth = now.dayOfMonth().withMaximumValue().equals(month.dayOfMonth().withMaximumValue());
 
         final LocalDate start = sameMonth ? now : SYSCalendar.eom(month);
-        final LocalDate end = SYSCalendar.bom(month);
+
+
+        // the end is usually the bom(of the current month). But there are some odd
+        // circumstances (when the resident moved in during the first week within that month)
+        // and the first day of that week belongs to the prior month, when this
+        // would fail otherwise. So I had to change the end calculation a little bit
+        // https://github.com/tloehr/Offene-Pflege.de/issues/69
+        // old one: final LocalDate end = SYSCalendar.bom(month);
+        final LocalDate end = SYSCalendar.bow(SYSCalendar.bom(month));
+
 
         for (LocalDate week = start; end.compareTo(week) <= 0; week = week.minusWeeks(1)) {
             pnlMonth.add(createCP4Week(week));

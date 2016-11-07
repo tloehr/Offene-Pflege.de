@@ -1,5 +1,6 @@
 package entity.info;
 
+import com.enterprisedt.util.debug.Logger;
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.*;
@@ -38,9 +39,10 @@ import java.util.*;
 public class TXEssenDoc {
 
     public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
+    public static final String SOURCEDOC2 = "ueberleitungsbogen_161016.pdf";
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
-    public static final String SOURCEWOUND = "anlage_wunden_161020.pdf";
+    public static final String SOURCEWOUND = "anlage_wunden_161016.pdf";
 
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
@@ -48,6 +50,7 @@ public class TXEssenDoc {
     private HashMap<String, String> content;
     private ArrayList<ResInfo> listICD;
 
+    private Logger logger = Logger.getLogger(getClass());
 
     private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 8);
     //    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
@@ -184,7 +187,7 @@ public class TXEssenDoc {
         File outfileWOUND = File.createTempFile("TXE", ".pdf");
         outfileWOUND.deleteOnExit();
 //            PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileMRE));
-        PdfStamper stamper = new PdfStamper(new PdfReader(new File("/local/" + SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileWOUND));
+        PdfStamper stamper = new PdfStamper(new PdfReader(new File("/Volumes/install/" + SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileWOUND));
 
         AcroFields form = stamper.getAcroFields();
         for (String key : content.keySet()) {
@@ -304,7 +307,7 @@ public class TXEssenDoc {
         AcroFields form = stamper.getAcroFields();
         for (String key : content.keySet()) {
             if (!ArrayUtils.contains(PnlBodyScheme.PARTS, key)) { // this is a special case. The bodyparts and the pdfkeys have the same name.
-                OPDE.debug(key);
+                logger.debug(key);
                 form.setField(key, content.get(key));
             }
         }
@@ -1101,8 +1104,12 @@ public class TXEssenDoc {
     }
 
     private void createContent4Section19(PdfStamper stamper) throws Exception {
-        ArrayList<String> bodyParts = new ArrayList<String>(Arrays.asList(PnlBodyScheme.PARTS));
-        String[] pdfbody = new String[]{TXEAF.BODY1_DESCRIPTION, TXEAF.BODY2_DESCRIPTION, TXEAF.BODY3_DESCRIPTION, TXEAF.BODY4_DESCRIPTION, TXEAF.BODY5_DESCRIPTION, TXEAF.BODY6_DESCRIPTION};
+        // to find the names for the several bodyparts in the resinfo
+        // but its not about the keynames. its about the number in the list. the list of pdfbodyparts may use different keynames, but the order no for every single
+        // bodypart is the same. so we can have a mapping between the two lists
+                ArrayList<String> bodyParts = new ArrayList<>(Arrays.asList(PnlBodyScheme.PARTS));
+
+        String[] pdfwounddescription = new String[]{TXEAF.WOUND_BODY1_DESCRIPTION, TXEAF.WOUND_BODY2_DESCRIPTION, TXEAF.WOUND_BODY3_DESCRIPTION, TXEAF.WOUND_BODY4_DESCRIPTION, TXEAF.WOUND_BODY5_DESCRIPTION, TXEAF.WOUND_BODY6_DESCRIPTION};
         int lineno = -1;
         AcroFields form = stamper.getAcroFields();
         PdfContentByte directcontent = stamper.getOverContent(2);
@@ -1115,9 +1122,9 @@ public class TXEssenDoc {
                 ResInfo currentWound = mapID2Info.get(type);
                 lineno++;
 
-                content.put(pdfbody[lineno], SYSTools.xx(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
+                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
 
-                AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfbody[lineno]).get(0);
+                AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfwounddescription[lineno]).get(0);
                 directcontent.saveState();
 
                 directcontent.rectangle(pos1.position.getLeft(), pos1.position.getBottom(), pos1.position.getWidth(), pos1.position.getHeight());
@@ -1129,13 +1136,15 @@ public class TXEssenDoc {
                  *     | (_| | | | (_| |\ V  V /  | |_| | | |  __/ | | | | | |  __/\__ \
                  *      \__,_|_|  \__,_| \_/\_/    \__|_| |_|\___| |_|_|_| |_|\___||___/
                  *
+                 *
                  */
                 for (String key : mapInfo2Properties.get(currentWound).stringPropertyNames()) {
                     if (key.startsWith("bs1.")) {
-                        String bodykey = key.substring(4);
-                        OPDE.debug(bodykey);
+                        String bodykey = key.substring(4); // hiermit wird zwischen der Datestellung von PnlBodyScheme und dem PDF Dokument abgebildet.
+                        // dabei ist die position innerhalb der Liste immer gleich.
+                        logger.debug(bodykey);
                         int listpos = bodyParts.indexOf(bodykey);
-                        OPDE.debug(listpos);
+                        logger.debug(Integer.toString(listpos));
                         // does this property denote a body part AND is it clicked ?
                         if (bodyParts.contains(bodykey) && mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
                             // set the pointer to the middle right part of the frame
@@ -1435,13 +1444,13 @@ public class TXEssenDoc {
         content.put(TXEAF.MRE_TX_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TXEAF.MRE_TX_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
 
-        ArrayList<String> bodyParts = new ArrayList<String>(Arrays.asList(PnlBodyScheme.PARTS));
+        ArrayList<String> bodyParts = new ArrayList<>(Arrays.asList(PnlBodyScheme.PARTS));
         for (String key : mapInfo2Properties.get(mapID2Info.get(ResInfoTypeTools.TYPE_INFECTION)).stringPropertyNames()) {
-            if (key.startsWith("bs1.")) {
+            if (key.startsWith("bs1.")) { // this is a key the resinfos NOT from the PDF
                 String bodykey = key.substring(4);
-                OPDE.debug(bodykey);
+                logger.debug(bodykey);
                 int listpos = bodyParts.indexOf(bodykey);
-                OPDE.debug(listpos);
+                logger.debug(Integer.toString(listpos));
                 // does this property denote a body part AND is it clicked ?
                 content.put(TXEAF.PDFPARTSMRE[listpos], setCheckbox(bodyParts.contains(bodykey) && mapInfo2Properties.get(mapID2Info.get(ResInfoTypeTools.TYPE_INFECTION)).getProperty(key).equalsIgnoreCase("true")));
             }
