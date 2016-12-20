@@ -1098,6 +1098,10 @@ public class SYSCalendar {
             hm.put(new LocalDate(year, 12, 25), "1. Weihnachtstag");
             hm.put(new LocalDate(year, 12, 26), "2. Weihnachtstag");
 
+            // Ausnahmsweise Feiertage (Was es alles gibt).
+            // https://github.com/tloehr/Offene-Pflege.de/issues/70
+            hm.put(new LocalDate(2017, 10, 31), "Reformationstag"); // aus Anlass des 500-jährigen Jubiläums
+
             // Bewegliche Feiertage
             hm.put(new LocalDate(Karfreitag(year)), "Karfreitag");
             hm.put(new LocalDate(Ostersonntag(year)), "Ostersonntag");
