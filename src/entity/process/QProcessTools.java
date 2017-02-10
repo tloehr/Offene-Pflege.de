@@ -13,7 +13,6 @@ import entity.reports.NReport;
 import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
-import op.process.PnlProcess;
 import gui.GUITools;
 import op.tools.Pair;
 import op.tools.SYSConst;

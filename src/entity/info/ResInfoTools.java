@@ -1015,7 +1015,7 @@ public class ResInfoTools {
 
         ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.TYPE_NURSING_INSURANCE);
         if (bwinfo_pstf != null) {
-            result += "<tr><td valign=\"top\">" + SYSTools.xx("misc.msg.ps") + "</td><td valign=\"top\">";
+            result += "<tr><td valign=\"top\">" + SYSTools.xx("ninsurance.grade") + "</td><td valign=\"top\">";
             result += bwinfo_pstf.getHtml();
             result += "</td></tr>";
         }

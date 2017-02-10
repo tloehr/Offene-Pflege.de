@@ -1,7 +1,6 @@
 package entity.files;
 
 import entity.qms.Qms;
-import entity.qms.Qmsplan;
 import entity.system.Users;
 
 import javax.persistence.*;

@@ -1,10 +1,7 @@
 package entity.prescription;
 
-import entity.Ownable;
 import entity.info.Resident;
 import entity.system.Users;
-import op.OPDE;
-import gui.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 //import org.eclipse.persistence.annotations.OptimisticLocking;
@@ -13,7 +10,6 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 
-import java.awt.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;

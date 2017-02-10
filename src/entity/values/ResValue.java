@@ -11,7 +11,6 @@ import entity.process.QProcessElement;
 import entity.process.SYSVAL2PROCESS;
 import entity.system.Users;
 import op.OPDE;
-import op.care.values.PnlValues;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;

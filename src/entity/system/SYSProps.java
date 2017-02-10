@@ -6,7 +6,6 @@ package entity.system;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author tloehr

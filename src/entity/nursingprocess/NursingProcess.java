@@ -13,7 +13,6 @@ import entity.process.SYSNP2PROCESS;
 import entity.system.Commontags;
 import entity.system.Users;
 import op.OPDE;
-import op.care.nursingprocess.PnlNursingProcess;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;

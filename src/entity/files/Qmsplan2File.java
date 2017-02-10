@@ -4,7 +4,6 @@ import entity.qms.Qmsplan;
 import entity.system.Users;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.Date;
 
 /**

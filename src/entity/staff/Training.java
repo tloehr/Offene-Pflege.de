@@ -1,6 +1,5 @@
 package entity.staff;
 
-import entity.files.Qms2File;
 import entity.files.Training2File;
 import entity.system.Commontags;
 import entity.system.Users;

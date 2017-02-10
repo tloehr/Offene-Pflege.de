@@ -34,7 +34,6 @@ import entity.system.Commontags;
 import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
-import op.care.info.PnlInformation;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

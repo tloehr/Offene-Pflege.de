@@ -26,7 +26,6 @@
 package entity.files;
 
 import entity.nursingprocess.NursingProcess;
-import entity.reports.NReport;
 import entity.system.Users;
 
 import javax.persistence.*;

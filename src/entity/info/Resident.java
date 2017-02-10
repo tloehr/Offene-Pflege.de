@@ -26,7 +26,6 @@
 package entity.info;
 
 import entity.Allowance;
-import entity.building.Rooms;
 import entity.building.Station;
 import entity.files.Resident2File;
 import entity.prescription.GP;

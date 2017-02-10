@@ -3,12 +3,10 @@ package entity.nursingprocess;
 import entity.info.Resident;
 import entity.system.Users;
 import op.OPDE;
-import gui.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
-import java.awt.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;

@@ -4,7 +4,6 @@ import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
 import op.system.EMailSystem;
-import op.system.Recipient;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;

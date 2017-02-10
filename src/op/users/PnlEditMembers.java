@@ -4,7 +4,6 @@ import entity.system.Groups;
 import entity.system.Users;
 import op.OPDE;
 import op.threads.DisplayManager;
-import op.tools.RiverLayout;
 import op.tools.SYSConst;
 
 import javax.persistence.EntityManager;
@@ -13,7 +12,6 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 

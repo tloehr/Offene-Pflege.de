@@ -10,7 +10,6 @@ import op.OPDE;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 
 /**
  * Created by tloehr on 17.07.14.
