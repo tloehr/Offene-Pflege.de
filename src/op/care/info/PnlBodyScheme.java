@@ -66,14 +66,6 @@ public class PnlBodyScheme extends JPanel {
 
     private void initPanel() {
 
-//        cbTooltips = new String[]{"Kopf, linke Seite", "Schulter, links", "Rücken, linke Seite, oben", "Ellenbogen, links", "Hand, links", "Hüfte, links", "Gesäß, linke Seite", "Oberschenkel, links",
-//                "Unterschenkel, links", "Wade, links", "Ferse, links", "Gesicht", "Schulter, rechts, vorne (aus Pat. Sicht)", "Schulter, links, vorne (aus Pat. Sicht)", "Bauch, oben", "Armbeuge, rechts",
-//                "Armbeuge, links", "Bauch, unten", "Genitalbereich", "Oberschenkel, rechts, vorne", "Oberschenkel, links, vorne", "Knie, rechts", "Knie, links", "Schienbein, rechts, vorne", "Schienbein, links, vorne",
-//                "Fuß, rechts, vorne", "Fuß, links, vorne", "Hinterkopf", "Schulter, links, hinten (aus Pat. Sicht)", "Schulter, rechts, hinten (aus Pat. Sicht)", "Rücken, mitte", "Ellenbogen, links",
-//                "Ellenbogen, rechts", "Rücken, unten", "Gesäß", "Oberschenkel, links, hinten", "Oberschenkel, rechts, hinten", "Kniekehle, links", "Kniekehle, rechts", "Wade, links",
-//                "Wade, rechts", "Fuß, rechts, hinten", "Fuß, links, hinten", "Kopf, rechte Seite", "Schulter, rechte Seite", "Rücken, oben, rechte Seite", "Ellenbogen, rechte Seite",
-//                "Hand, rechte Seite", "Hüfte, rechte Seite", "Gesäß, rechte Seite", "Oberschenkel, rechte Seite", "Unterschenkel, rechte Seite", "Wade, rechte Seite", "Ferse, rechte Seite"};
-
 
         cbPositions = new Point[]{
                 /* left side */

@@ -817,6 +817,7 @@ public class PnlEditResInfo {
 
         @Override
         public void itemStateChanged(ItemEvent e) {
+            OPDE.debug(((JCheckBox) e.getSource()).getName() + " clicked");
             content.put(name + "." + ((JCheckBox) e.getSource()).getName(), Boolean.toString(((JCheckBox) e.getSource()).isSelected()));
             changed = true;
         }

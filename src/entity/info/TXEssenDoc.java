@@ -34,15 +34,17 @@ import java.util.*;
  * User: tloehr
  * Date: 03.06.13
  * Time: 17:18
- * To change this template use File | Settings | File Templates.
+ * <p>
+ * <p>
+ * Nur die PDF Formulare, die als STATIC aus dem ES4 exportiert wurden liefern die Felder beim Stamper.
  */
 public class TXEssenDoc {
 
     public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
-    public static final String SOURCEDOC2 = "ueberleitungsbogen_161016.pdf";
+    public static final String SOURCEDOC2 = "ueberleitungsbogen_160208.pdf";
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
-    public static final String SOURCEWOUND = "anlage_wunden_161016.pdf";
+    public static final String SOURCEWOUND = "anlage_wunden_161016_static.pdf";
 
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
@@ -58,8 +60,8 @@ public class TXEssenDoc {
 //    private PdfContentByte over = null;
 //    private PdfWriter writer = null;
 //
-    ByteArrayOutputStream medListStream = null, icdListStream = null;
-    boolean mre, psych = false;
+    ByteArrayOutputStream medListStream = null, icdListStream = null, woundsListStream = null;
+    boolean mre, psych = false, wounds = false;
     int progress, max;
 
 
@@ -91,7 +93,10 @@ public class TXEssenDoc {
             @Override
             protected Object doInBackground() throws Exception {
 
+                // Alle aktiven Infos laden
                 for (ResInfo info : ResInfoTools.getAllActive(resident)) {
+
+                    // dann auf die entsprechenden Maps aufteilen. Für schnelleren Zugriff.
 
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
 
@@ -106,12 +111,21 @@ public class TXEssenDoc {
                 }
 
                 try {
-
+                    wounds = hasWounds() || hasMycosis();
                     psych = mapID2Info.containsKey(ResInfoTypeTools.TYPE_PSYCH);
 
                     File file1 = createDoc1();
                     content.clear();
                     listICD.clear();
+
+
+                    progress++;
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+                    File filewounds = null;
+                    if (wounds) {
+                        filewounds = createDocWounds();
+                        content.clear();
+                    }
 
                     progress++;
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
@@ -132,7 +146,7 @@ public class TXEssenDoc {
                     mapInfo2Properties.clear();
 
 
-                    SYSFilesTools.handleFile(concatPDFFiles(file1, filemre, filepsych), Desktop.Action.OPEN);
+                    SYSFilesTools.handleFile(concatPDFFiles(file1, filewounds, filemre, filepsych), Desktop.Action.OPEN);
                 } catch (Exception e) {
                     OPDE.fatal(e);
                 }
@@ -186,10 +200,16 @@ public class TXEssenDoc {
     private File createDocWounds() throws Exception {
         File outfileWOUND = File.createTempFile("TXE", ".pdf");
         outfileWOUND.deleteOnExit();
-//            PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileMRE));
-        PdfStamper stamper = new PdfStamper(new PdfReader(new File("/Volumes/install/" + SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileWOUND));
+        PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileWOUND));
 
         AcroFields form = stamper.getAcroFields();
+        for (String key : form.getFields().keySet()) {
+            System.out.println(key);
+        }
+
+        createContent4Wounds(stamper);
+
+//        AcroFields form = stamper.getAcroFields();
         for (String key : content.keySet()) {
             form.setField(key, content.get(key));
         }
@@ -207,7 +227,8 @@ public class TXEssenDoc {
     private File createDoc1() throws Exception {
         File outfile1 = File.createTempFile("TXE", ".pdf");//new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX1_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
         outfile1.deleteOnExit();
-        PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEDOC1).getAbsolutePath()), new FileOutputStream(outfile1));
+
+        PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEDOC2).getAbsolutePath()), new FileOutputStream(outfile1));
 
         progress++;
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
@@ -283,7 +304,7 @@ public class TXEssenDoc {
 
         progress++;
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
-        createContent4Section19(stamper);
+        createContent4Section19();
 
         progress++;
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
@@ -323,7 +344,7 @@ public class TXEssenDoc {
      *
      * @throws Exception
      */
-    private File concatPDFFiles(File file1, File filemre, File filepsych) throws Exception {
+    private File concatPDFFiles(File file1, File filewounds, File filemre, File filepsych) throws Exception {
         File outfileMain = File.createTempFile("TXE", ".pdf");
         outfileMain.deleteOnExit();
 //        file1.deleteOnExit();
@@ -339,6 +360,9 @@ public class TXEssenDoc {
 
         PdfReader readerAdditionalMeds = medListStream == null ? null : new PdfReader(new ByteArrayInputStream(medListStream.toByteArray()));
         maxpages += readerAdditionalMeds == null ? 0 : readerAdditionalMeds.getNumberOfPages();
+
+        PdfReader readerWounds = filewounds == null ? null : new PdfReader(new FileInputStream(filewounds));
+        maxpages += readerWounds == null ? 0 : readerWounds.getNumberOfPages();
 
         PdfReader readerICD = icdListStream == null ? null : new PdfReader(new ByteArrayInputStream(icdListStream.toByteArray()));
         maxpages += readerICD == null ? 0 : readerICD.getNumberOfPages();
@@ -381,6 +405,22 @@ public class TXEssenDoc {
                 copy.addPage(page);
             }
         }
+
+        if (readerWounds != null) {
+            for (int p = 1; p <= readerWounds.getNumberOfPages(); p++) {
+                runningPage++;
+                page = copy.getImportedPage(readerWounds, p);
+                stamp = copy.createPageStamp(page);
+                String sidenote = SYSTools.xx("pdf.pagefooter", runningPage, maxpages)
+                        + " // " + ResidentTools.getLabelText(resident)
+                        + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
+                ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
+                stamp.alterContents();
+                copy.addPage(page);
+            }
+        }
+
 
         if (readerICD != null) {
             for (int p = 1; p <= readerICD.getNumberOfPages(); p++) {
@@ -428,6 +468,7 @@ public class TXEssenDoc {
                 copy.addPage(page);
             }
         }
+
 
         document.close();
         return outfileMain;
@@ -1103,18 +1144,23 @@ public class TXEssenDoc {
         content.put(TXEAF.COMMENTS_GENERAL, generalComment + (mapID2Info.containsKey(ResInfoTypeTools.TYPE_WARNING) ? getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung") + SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_WARNING).getText(), "\n", "") : ""));
     }
 
-    private void createContent4Section19(PdfStamper stamper) throws Exception {
+    private void createContent4Section19() {
+        content.put(TXEAF.WoundCommentsSection19, hasWounds() ? SYSTools.xx("") : SYSTools.xx(""));
+    }
+
+    private void createContent4Wounds(PdfStamper stamper) throws Exception {
         // to find the names for the several bodyparts in the resinfo
         // but its not about the keynames. its about the number in the list. the list of pdfbodyparts may use different keynames, but the order no for every single
         // bodypart is the same. so we can have a mapping between the two lists
-                ArrayList<String> bodyParts = new ArrayList<>(Arrays.asList(PnlBodyScheme.PARTS));
+        ArrayList<String> bodyParts = new ArrayList<>(Arrays.asList(PnlBodyScheme.PARTS));
 
-        String[] pdfwounddescription = new String[]{TXEAF.WOUND_BODY1_DESCRIPTION, TXEAF.WOUND_BODY2_DESCRIPTION, TXEAF.WOUND_BODY3_DESCRIPTION, TXEAF.WOUND_BODY4_DESCRIPTION, TXEAF.WOUND_BODY5_DESCRIPTION, TXEAF.WOUND_BODY6_DESCRIPTION};
+        String[] pdfwounddescription = new String[]{TXEAF.WOUND_BODY1_DESCRIPTION, TXEAF.WOUND_BODY2_DESCRIPTION, TXEAF.WOUND_BODY3_DESCRIPTION, TXEAF.WOUND_BODY4_DESCRIPTION, TXEAF.WOUND_BODY5_DESCRIPTION, TXEAF.WOUND_BODY6_DESCRIPTION, TXEAF.WOUND_BODY7_DESCRIPTION, TXEAF.WOUND_BODY8_DESCRIPTION, TXEAF.WOUND_BODY9_DESCRIPTION, TXEAF.WOUND_BODY10_DESCRIPTION};
         int lineno = -1;
         AcroFields form = stamper.getAcroFields();
-        PdfContentByte directcontent = stamper.getOverContent(2);
+        PdfContentByte directcontent = stamper.getOverContent(1);
 
-        for (int type : ArrayUtils.add(ResInfoTypeTools.TYPE_ALL_WOUNDS, ResInfoTypeTools.TYPE_MYCOSIS)) {
+        for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) { //ArrayUtils.add(ResInfoTypeTools.TYPE_ALL_WOUNDS, ResInfoTypeTools.TYPE_MYCOSIS)
+
             if (mapID2Info.containsKey(type)) {
 
                 String descriptionKey = (type == ResInfoTypeTools.TYPE_MYCOSIS ? "misc.msg.mycosis" : "misc.msg.wound.documentation");
@@ -1122,8 +1168,12 @@ public class TXEssenDoc {
                 ResInfo currentWound = mapID2Info.get(type);
                 lineno++;
 
-                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
+                logger.debug(currentWound.getResInfoType().getID());
+                logger.debug(Integer.toString(lineno));
 
+                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + "//" + currentWound.getResInfoType().getID() + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
+
+                // liest die koordinaten auf der pdf seite für ein bestimmtes feld
                 AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfwounddescription[lineno]).get(0);
                 directcontent.saveState();
 
@@ -1139,20 +1189,29 @@ public class TXEssenDoc {
                  *
                  */
                 for (String key : mapInfo2Properties.get(currentWound).stringPropertyNames()) {
-                    if (key.startsWith("bs1.")) {
-                        String bodykey = key.substring(4); // hiermit wird zwischen der Datestellung von PnlBodyScheme und dem PDF Dokument abgebildet.
+                    if (key.startsWith("bs1.")) { // steht für "bodyscheme" und ist teil der resinfo formulars für die Wunden.
+                        String bodykey = key.substring(4); // hiermit wird zwischen der Darstellung von PnlBodyScheme und dem PDF Dokument abgebildet.
                         // dabei ist die position innerhalb der Liste immer gleich.
-                        logger.debug(bodykey);
+                        OPDE.debug(bodykey);
                         int listpos = bodyParts.indexOf(bodykey);
-                        logger.debug(Integer.toString(listpos));
-                        // does this property denote a body part AND is it clicked ?
-                        if (bodyParts.contains(bodykey) && mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
-                            // set the pointer to the middle right part of the frame
-                            directcontent.moveTo(pos1.position.getRight(), pos1.position.getTop() - (pos1.position.getHeight() / 2f));
-                            // find the position of the checkbox representing the bodypart.
-                            AcroFields.FieldPosition pos2 = form.getFieldPositions(TXEAF.PDFPARTS[listpos]).get(0);
-                            // draw a line from the right side of the frame into the middle of the checkbox.
-                            directcontent.lineTo(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2));
+                        OPDE.debug(Integer.toString(listpos));
+                        // nur wenn dieses property ein körperteil ist und auch angeklickt wurde.
+                        if (bodyParts.contains(bodykey)) {
+                            OPDE.debug(TXEAF.PDFPARTSWOUND_U[listpos]);
+                            OPDE.debug(form.getFieldPositions(TXEAF.PDFPARTSWOUND_U[listpos]));
+                            OPDE.debug(TXEAF.PDFPARTSWOUND_L[listpos]);
+                            OPDE.debug(form.getFieldPositions(TXEAF.PDFPARTSWOUND_L[listpos]));
+
+
+                            if (mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
+                                // set the pointer to the middle right part of the frame
+                                directcontent.moveTo(pos1.position.getRight(), pos1.position.getTop() - (pos1.position.getHeight() / 2f));
+                                // find the position of the checkbox representing the bodypart.
+                                // die ersten fünf auf der oberen seite, die zweiten fünf auf der unteren
+                                AcroFields.FieldPosition pos2 = form.getFieldPositions(lineno < 5 ? TXEAF.PDFPARTSWOUND_U[listpos] : TXEAF.PDFPARTSWOUND_L[listpos]).get(0);
+                                // draw a line from the right side of the frame into the middle of the checkbox.
+                                directcontent.lineTo(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2));
+                            }
                         }
                     }
                 }
@@ -1177,9 +1236,11 @@ public class TXEssenDoc {
                         int listpos = bodyParts.indexOf(bodykey);
 
                         // does this property denote a body part AND is it clicked ?
-                        if (bodyParts.contains(bodykey) && mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
-                            AcroFields.FieldPosition pos2 = form.getFieldPositions(TXEAF.PDFPARTS[listpos]).get(0);
-                            directcontent.circle(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2), 2f);
+                        if (bodyParts.contains(bodykey)) {
+                            if (mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
+                                AcroFields.FieldPosition pos2 = form.getFieldPositions(lineno < 5 ? TXEAF.PDFPARTSWOUND_U[listpos] : TXEAF.PDFPARTSWOUND_L[listpos]).get(0);
+                                directcontent.circle(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2), 2f);
+                            }
                         }
                     }
                 }
@@ -1370,6 +1431,11 @@ public class TXEssenDoc {
         }
         return wounds;
     }
+
+    private boolean hasMycosis() {
+        return mapID2Info.containsKey(ResInfoTypeTools.TYPE_MYCOSIS);
+    }
+
 
     private boolean hasWoundPain() {
         boolean pain = false;

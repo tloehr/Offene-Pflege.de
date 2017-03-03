@@ -307,6 +307,10 @@ public class AppInfo {
         File user = new File(userTemplatePath);
         File sys = new File(systemTemplatePath);
 
+        OPDE.debug(user.getAbsoluteFile() + " " + user.exists());
+        OPDE.debug(sys.getAbsoluteFile() + " " + sys.exists());
+
+
         return user.exists() ? user : sys;
     }
 

@@ -675,6 +675,12 @@ public class TXEAF {
                WOUND_L_CALF_RIGHTBACK, WOUND_L_FOOT_LEFTBACK, WOUND_L_FOOT_RIGHTBACK, WOUND_L_HEAD_RIGHT_SIDE, WOUND_L_SHOULDER_RIGHT_SIDE, WOUND_L_BACK_UPPER_LEFT_SIDE, WOUND_L_ELLBOW_RIGHTSIDE,
                WOUND_L_HAND_RIGHT_SIDE, WOUND_L_HIP_RIGHT_SIDE, WOUND_L_BOTTOM_RIGHT_SIDE, WOUND_L_UPPER_LEG_RIGHT_SIDE, WOUND_L_LOWER_LEG_RIGHT_SIDE, WOUND_L_CALF_RIGHT_SIDE, WOUND_L_HEEL_RIGHT_SIDE};
    
-     
+    public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
+             "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
+             "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",
+             "foot.right.front", "foot.left.front", "back.of.the.head", "shoulder.back.left", "shoulder.back.right", "back.mid", "ellbow.left",
+             "ellbow.right", "back.low", "bottom.back", "upper.leftleg.back", "upper.rightleg.back", "knee.hollowleft", "knee.hollowright", "calf.leftback",
+             "calf.rightback", "foot.leftback", "foot.rightback", "head.right.side", "shoulder.right.side", "back.upper.left.side", "ellbow.rightside",
+             "hand.right.side", "hip.right.side", "bottom.right.side", "upper.leg.right.side", "lower.leg.right.side", "calf.right.side", "heel.right.side"};
     
 }
