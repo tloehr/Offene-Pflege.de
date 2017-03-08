@@ -475,206 +475,211 @@ public class TXEAF {
     public static final String WoundCommentsSection19 = "Formular1[0].#subform[1].TextField1[0]";
 
     // Body parts as used in the 2012 tx document template. not in use anymore.
-    public static final String BACK_LOW = "Formular1[0].#subform[1].Kontrollkästchen[15]";
-    public static final String BACK_MID = "Formular1[0].#subform[1].Kontrollkästchen[14]";
-    public static final String BACK_OF_THE_HEAD = "Formular1[0].#subform[1].GrafikKopf_hinten[0]";
-    public static final String BACK_UPPER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[3]";
-    public static final String BACK_UPPER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[24]";
-    public static final String BOTTOM_BACK = "Formular1[0].#subform[1].Kontrollkästchen[11]";
-    public static final String BOTTOM_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[26]";
-    public static final String BOTTOM_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[5]";
-    public static final String CALF_LEFTBACK = "Formular1[0].#subform[1].Kontrollkästchen[34]";
-    public static final String CALF_LEFTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[28]";
-    public static final String CALF_RIGHTBACK = "Formular1[0].#subform[1].Kontrollkästchen[32]";
-    public static final String CALF_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[7]";
-    public static final String CROOK_ARM_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[37]";
-    public static final String CROOK_ARM_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[38]";
-    public static final String ELLBOW_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[19]";
-    public static final String ELLBOW_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[20]";
-    public static final String ELLBOW_RIGHTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[10]";
-    public static final String ELLBOW_SIDE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[31]";
-    public static final String FACE = "Formular1[0].#subform[1].Kontrollkästchen[40]";
-    public static final String FOOT_LEFTBACK = "Formular1[0].#subform[1].Kontrollkästchen[35]";
-    public static final String FOOT_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[52]";
-    public static final String FOOT_RIGHTBACK = "Formular1[0].#subform[1].Kontrollkästchen[36]";
-    public static final String FOOT_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[51]";
-    public static final String GROIN = "Formular1[0].#subform[1].Kontrollkästchen[39]";
-    public static final String HAND_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[30]";
-    public static final String HAND_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[9]";
-    public static final String HEAD_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[22]";
-    public static final String HEAD_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[1]";
-    public static final String HEEL_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[29]";
-    public static final String HEEL_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[8]";
-    public static final String HIP_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[25]";
-    public static final String HIP_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[4]";
-    public static final String KNEE_HOLLOWLEFT = "Formular1[0].#subform[1].Kontrollkästchen[33]";
-    public static final String KNEE_HOLLOWRIGHT = "Formular1[0].#subform[1].Kontrollkästchen[18]";
-    public static final String KNEE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[47]";
-    public static final String KNEE_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[49]";
-    public static final String LOWER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[44]";
-    public static final String LOWER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[27]";
-    public static final String LOWER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[6]";
-    public static final String SHIN_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[48]";
-    public static final String SHIN_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[50]";
-    public static final String SHOULDER_BACK_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[12]";
-    public static final String SHOULDER_BACK_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[13]";
-    public static final String SHOULDER_FRONT_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[42]";
-    public static final String SHOULDER_FRONT_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[41]";
-    public static final String SHOULDER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[23]";
-    public static final String SHOULDER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[2]";
-    public static final String UPPER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[43]";
-    public static final String UPPER_LEFTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[17]";
-    public static final String UPPER_LEG_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[45]";
-    public static final String UPPER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[21]";
-    public static final String UPPER_LEG_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[46]";
-    public static final String UPPER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[0]";
-    public static final String UPPER_RIGHTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[16]";
+//    public static final String BACK_LOW = "Formular1[0].#subform[1].Kontrollkästchen[15]";
+//    public static final String BACK_MID = "Formular1[0].#subform[1].Kontrollkästchen[14]";
+//    public static final String BACK_OF_THE_HEAD = "Formular1[0].#subform[1].GrafikKopf_hinten[0]";
+//    public static final String BACK_UPPER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[3]";
+//    public static final String BACK_UPPER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[24]";
+//    public static final String BOTTOM_BACK = "Formular1[0].#subform[1].Kontrollkästchen[11]";
+//    public static final String BOTTOM_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[26]";
+//    public static final String BOTTOM_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[5]";
+//    public static final String CALF_LEFTBACK = "Formular1[0].#subform[1].Kontrollkästchen[34]";
+//    public static final String CALF_LEFTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[28]";
+//    public static final String CALF_RIGHTBACK = "Formular1[0].#subform[1].Kontrollkästchen[32]";
+//    public static final String CALF_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[7]";
+//    public static final String CROOK_ARM_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[37]";
+//    public static final String CROOK_ARM_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[38]";
+//    public static final String ELLBOW_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[19]";
+//    public static final String ELLBOW_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[20]";
+//    public static final String ELLBOW_RIGHTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[10]";
+//    public static final String ELLBOW_SIDE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[31]";
+//    public static final String FACE = "Formular1[0].#subform[1].Kontrollkästchen[40]";
+//    public static final String FOOT_LEFTBACK = "Formular1[0].#subform[1].Kontrollkästchen[35]";
+//    public static final String FOOT_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[52]";
+//    public static final String FOOT_RIGHTBACK = "Formular1[0].#subform[1].Kontrollkästchen[36]";
+//    public static final String FOOT_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[51]";
+//    public static final String GROIN = "Formular1[0].#subform[1].Kontrollkästchen[39]";
+//    public static final String HAND_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[30]";
+//    public static final String HAND_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[9]";
+//    public static final String HEAD_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[22]";
+//    public static final String HEAD_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[1]";
+//    public static final String HEEL_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[29]";
+//    public static final String HEEL_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[8]";
+//    public static final String HIP_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[25]";
+//    public static final String HIP_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[4]";
+//    public static final String KNEE_HOLLOWLEFT = "Formular1[0].#subform[1].Kontrollkästchen[33]";
+//    public static final String KNEE_HOLLOWRIGHT = "Formular1[0].#subform[1].Kontrollkästchen[18]";
+//    public static final String KNEE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[47]";
+//    public static final String KNEE_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[49]";
+//    public static final String LOWER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[44]";
+//    public static final String LOWER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[27]";
+//    public static final String LOWER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[6]";
+//    public static final String SHIN_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[48]";
+//    public static final String SHIN_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[50]";
+//    public static final String SHOULDER_BACK_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[12]";
+//    public static final String SHOULDER_BACK_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[13]";
+//    public static final String SHOULDER_FRONT_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[42]";
+//    public static final String SHOULDER_FRONT_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[41]";
+//    public static final String SHOULDER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[23]";
+//    public static final String SHOULDER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[2]";
+//    public static final String UPPER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[43]";
+//    public static final String UPPER_LEFTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[17]";
+//    public static final String UPPER_LEG_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[45]";
+//    public static final String UPPER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[21]";
+//    public static final String UPPER_LEG_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[46]";
+//    public static final String UPPER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[0]";
+//    public static final String UPPER_RIGHTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[16]";
 
-    // names of the upper 5 wounds on the separate wound page
-    public static final String WOUND_U_BACK_LOW = "Formular1[0].#subform[1].BACK_LOW[0]";
-    public static final String WOUND_U_BACK_MID = "Formular1[0].#subform[1].BACK_MID[0]";
-    public static final String WOUND_U_BACK_OF_THE_HEAD = "Formular1[0].#subform[1].BACK_OF_THE_HEAD[0]";
-    public static final String WOUND_U_BACK_UPPER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[3]";
-    public static final String WOUND_U_BACK_UPPER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[24]";
-    public static final String WOUND_U_BOTTOM_BACK = "Formular1[0].#subform[1].BOTTOM_BACK[0]";
-    public static final String WOUND_U_BOTTOM_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[26]";
-    public static final String WOUND_U_BOTTOM_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[5]";
-    public static final String WOUND_U_CALF_LEFTBACK = "Formular1[0].#subform[1].CALF_LEFTBACK[0]";
-    public static final String WOUND_U_CALF_LEFTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[28]";
-    public static final String WOUND_U_CALF_RIGHTBACK = "Formular1[0].#subform[1].CALF_RIGHTBACK[0]";
-    public static final String WOUND_U_CALF_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[7]";
-    public static final String WOUND_U_CROOK_ARM_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[37]";
-    public static final String WOUND_U_CROOK_ARM_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[38]";
-    public static final String WOUND_U_ELLBOW_LEFT = "Formular1[0].#subform[1].ELLBOW_LEFT[0]";
-    public static final String WOUND_U_ELLBOW_RIGHT = "Formular1[0].#subform[1].ELLBOW_RIGHT[0]";
-    public static final String WOUND_U_ELLBOW_RIGHTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[10]";
-    public static final String WOUND_U_ELLBOW_SIDE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[31]";
-    public static final String WOUND_U_FACE = "Formular1[0].#subform[1].FACE[0]";
-    public static final String WOUND_U_FOOT_LEFTBACK = "Formular1[0].#subform[1].FOOT_LEFTBACK[0]";
-    public static final String WOUND_U_FOOT_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[52]";
-    public static final String WOUND_U_FOOT_RIGHTBACK = "Formular1[0].#subform[1].FOOT_RIGHTBACK[0]";
+    // Die PDF Formular Schlüssel der oberen 5 Wunden auf der Anlage Wundversorgung
+    public static final String WOUND_U_BACK_LOW = "form1[0].subform1[0].#area[0].u\\.back\\.low[0]";
+    public static final String WOUND_U_BACK_MID = "form1[0].subform1[0].#area[0].u\\.back\\.mid[0]";
+    public static final String WOUND_U_BACK_OF_THE_HEAD = "form1[0].subform1[0].#area[0].u\\.back\\.of\\.the\\.head[0]";
+    public static final String WOUND_U_BACK_UPPER_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.back\\.upper\\.left\\.side[0]";
+    public static final String WOUND_U_BACK_UPPER_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.back\\.upper\\.right\\.side[0]";
+    public static final String WOUND_U_BOTTOM_BACK = "form1[0].subform1[0].#area[0].u\\.bottom\\.back[0]";
+    public static final String WOUND_U_BOTTOM_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.bottom\\.left\\.side[0]";
+    public static final String WOUND_U_BOTTOM_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.bottom\\.right\\.side[0]";
+    public static final String WOUND_U_CALF_LEFTBACK = "form1[0].subform1[0].#area[0].u\\.calf\\.leftback[0]";
+    public static final String WOUND_U_CALF_LEFTSIDE = "form1[0].subform1[0].#area[0].u\\.calf\\.left\\.side[0]";
+    public static final String WOUND_U_CALF_RIGHTBACK = "form1[0].subform1[0].#area[0].u\\.calf\\.rightback[0]";
+    public static final String WOUND_U_CALF_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.calf\\.right\\.side[0]";
+    public static final String WOUND_U_CROOK_ARM_LEFT = "form1[0].subform1[0].#area[0].u\\.crook\\.arm\\.left[0]";
+    public static final String WOUND_U_CROOK_ARM_RIGHT = "form1[0].subform1[0].#area[0].u\\.crook\\.arm\\.right[0]";
+    public static final String WOUND_U_ELLBOW_LEFT = "form1[0].subform1[0].#area[0].u\\.ellbow\\.left[0]";
+    public static final String WOUND_U_ELLBOW_RIGHT = "form1[0].subform1[0].#area[0].u\\.ellbow\\.right[0]";
+    public static final String WOUND_U_ELLBOW_RIGHTSIDE = "form1[0].subform1[0].#area[0].u\\.ellbow\\.rightside[0]";
+    public static final String WOUND_U_ELLBOW_SIDE_LEFT = "form1[0].subform1[0].#area[0].u\\.ellbow\\.side\\.left[0]";
+    public static final String WOUND_U_FACE = "form1[0].subform1[0].#area[0].u\\.face[0]";
+    public static final String WOUND_U_FOOT_LEFTBACK = "form1[0].subform1[0].#area[0].u\\.foot\\.leftback[0]";
+    public static final String WOUND_U_FOOT_LEFT_FRONT = "form1[0].subform1[0].#area[0].u\\.foot\\.right\\.front[0]";
+    public static final String WOUND_U_FOOT_RIGHTBACK = "form1[0].subform1[0].#area[0].u\\.foot\\.rightback[0]";
     public static final String WOUND_U_FOOT_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[51]";
-    public static final String WOUND_U_GROIN = "Formular1[0].#subform[1].Kontrollkästchen[39]";
-    public static final String WOUND_U_HAND_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[30]";
-    public static final String WOUND_U_HAND_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[9]";
-    public static final String WOUND_U_HEAD_LEFT_SIDE = "Formular1[0].#subform[1].HEAD_LEFT_SIDE[0]";
-    public static final String WOUND_U_HEAD_RIGHT_SIDE = "Formular1[0].#subform[1].HEAD_RIGHT_SIDE[0]";
-    public static final String WOUND_U_HEEL_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[29]";
-    public static final String WOUND_U_HEEL_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[8]";
-    public static final String WOUND_U_HIP_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[25]";
-    public static final String WOUND_U_HIP_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[4]";
-    public static final String WOUND_U_KNEE_HOLLOWLEFT = "Formular1[0].#subform[1].KNEE_HOLLOWLEFT[0]";
-    public static final String WOUND_U_KNEE_HOLLOWRIGHT = "Formular1[0].#subform[1].KNEE_HOLLOWRIGHT[0]";
-    public static final String WOUND_U_KNEE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[47]";
-    public static final String WOUND_U_KNEE_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[49]";
-    public static final String WOUND_U_LOWER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[44]";
-    public static final String WOUND_U_LOWER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[27]";
-    public static final String WOUND_U_LOWER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[6]";
-    public static final String WOUND_U_SHIN_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[48]";
-    public static final String WOUND_U_SHIN_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[50]";
-    public static final String WOUND_U_SHOULDER_BACK_LEFT = "Formular1[0].#subform[1].SHOULDER_BACK_LEFT[0]";
-    public static final String WOUND_U_SHOULDER_BACK_RIGHT = "Formular1[0].#subform[1].SHOULDER_BACK_RIGHT[0]";
-    public static final String WOUND_U_SHOULDER_FRONT_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[42]";
-    public static final String WOUND_U_SHOULDER_FRONT_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[41]";
-    public static final String WOUND_U_SHOULDER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[23]";
+    public static final String WOUND_U_GROIN = "form1[0].subform1[0].#area[0].u\\.groin[0]";
+    public static final String WOUND_U_HAND_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.hand\\.left\\.side[0]";
+    public static final String WOUND_U_HAND_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.hand\\.right\\.side[0]";
+    public static final String WOUND_U_HEAD_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.head\\.left\\.side[0]";
+    public static final String WOUND_U_HEAD_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.head\\.right\\.side[0]";
+    public static final String WOUND_U_HEEL_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.heel\\.left\\.side[0]";
+    public static final String WOUND_U_HEEL_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.heel\\.right\\.side[0]";
+    public static final String WOUND_U_HIP_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.hip\\.left\\.side[0]";
+    public static final String WOUND_U_HIP_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.hip\\.right\\.side[0]";
+    public static final String WOUND_U_KNEE_HOLLOWLEFT = "form1[0].subform1[0].#area[0].u\\.knee\\.hollowleft[0]";
+    public static final String WOUND_U_KNEE_HOLLOWRIGHT = "form1[0].subform1[0].#area[0].u\\.knee\\.hollowright[0]";
+    public static final String WOUND_U_KNEE_LEFT = "form1[0].subform1[0].#area[0].u\\.knee\\.left[0]";
+    public static final String WOUND_U_KNEE_RIGHT = "form1[0].subform1[0].#area[0].u\\.knee\\.right[0]";
+    public static final String WOUND_U_LOWER_BELLY = "form1[0].subform1[0].#area[0].u\\.lower\\.belly[0]";
+    public static final String WOUND_U_LOWER_LEG_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.lower\\.leg\\.left\\.side[0]";
+    public static final String WOUND_U_LOWER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.lower\\.leg\\.right\\.side[0]";
+    public static final String WOUND_U_SHIN_LEFT_FRONT = "form1[0].subform1[0].#area[0].u\\.shin\\.left\\.front[0]";
+    public static final String WOUND_U_SHIN_RIGHT_FRONT = "form1[0].subform1[0].#area[0].u\\.shin\\.right\\.front[0]";
+    public static final String WOUND_U_SHOULDER_BACK_LEFT = "form1[0].subform1[0].#area[0].u\\.shoulder\\.back\\.left[0]";
+    public static final String WOUND_U_SHOULDER_BACK_RIGHT = "form1[0].subform1[0].#area[0].u\\.shoulder\\.back\\.right[0]";
+    public static final String WOUND_U_SHOULDER_FRONT_LEFT = "form1[0].subform1[0].#area[0].u\\.shoulder\\.front\\.left[0]";
+    public static final String WOUND_U_SHOULDER_FRONT_RIGHT = "form1[0].subform1[0].#area[0].u\\.shoulder\\.front\\.right[0]";
+    public static final String WOUND_U_SHOULDER_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.shoulder\\.left\\.side[0]";
     public static final String WOUND_U_SHOULDER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[2]";
-    public static final String WOUND_U_UPPER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[43]";
-    public static final String WOUND_U_UPPER_LEFTLEG_BACK = "Formular1[0].#subform[1].UPPER_LEFTLEG_BACK[0]";
-    public static final String WOUND_U_UPPER_LEG_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[45]";
-    public static final String WOUND_U_UPPER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[21]";
-    public static final String WOUND_U_UPPER_LEG_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[46]";
-    public static final String WOUND_U_UPPER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[0]";
-    public static final String WOUND_U_UPPER_RIGHTLEG_BACK = "Formular1[0].#subform[1].UPPER_RIGHTLEG_BACK[0]";
+    public static final String WOUND_U_UPPER_BELLY = "form1[0].subform1[0].#area[0].u\\.upper\\.belly[0]";
+    public static final String WOUND_U_UPPER_LEFTLEG_BACK = "form1[0].subform1[0].#area[0].u\\.upper\\.leftleg\\.back[0]";
+    public static final String WOUND_U_UPPER_LEG_LEFT_FRONT = "form1[0].subform1[0].#area[0].u\\.upper\\.leg\\.left\\.front[0]";
+    public static final String WOUND_U_UPPER_LEG_LEFT_SIDE = "form1[0].subform1[0].#area[0].u\\.upper\\.leg\\.left\\.side[0]";
+    public static final String WOUND_U_UPPER_LEG_RIGHT_FRONT = "form1[0].subform1[0].#area[0].u\\.upper\\.leg\\.right\\.front[0]";
+    public static final String WOUND_U_UPPER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.upper\\.leg\\.right\\.side[0]";
+    public static final String WOUND_U_UPPER_RIGHTLEG_BACK = "form1[0].subform1[0].#area[0].u\\.upper\\.rightleg\\.back[0]";
 
-    // names of the upper 5 wounds on the separate wound page
-    public static final String WOUND_L_BACK_LOW = "Formular1[0].#subform[1].Kontrollkästchen[67]";
-    public static final String WOUND_L_BACK_MID = "Formular1[0].#subform[1].Kontrollkästchen[66]";
-    public static final String WOUND_L_BACK_OF_THE_HEAD = "Formular1[0].#subform[1].GrafikKopf_hinten[1]";
-    public static final String WOUND_L_BACK_UPPER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[55]";
-    public static final String WOUND_L_BACK_UPPER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[76]";
-    public static final String WOUND_L_BOTTOM_BACK = "Formular1[0].#subform[1].Kontrollkästchen[63]";
-    public static final String WOUND_L_BOTTOM_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[78]";
-    public static final String WOUND_L_BOTTOM_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[57]";
-    public static final String WOUND_L_CALF_LEFTBACK = "Formular1[0].#subform[1].Kontrollkästchen[86]";
-    public static final String WOUND_L_CALF_LEFTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[80]";
-    public static final String WOUND_L_CALF_RIGHTBACK = "Formular1[0].#subform[1].Kontrollkästchen[84]";
-    public static final String WOUND_L_CALF_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[59]";
-    public static final String WOUND_L_CROOK_ARM_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[89]";
-    public static final String WOUND_L_CROOK_ARM_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[90]";
-    public static final String WOUND_L_ELLBOW_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[71]";
-    public static final String WOUND_L_ELLBOW_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[72]";
-    public static final String WOUND_L_ELLBOW_RIGHTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[62]";
-    public static final String WOUND_L_ELLBOW_SIDE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[83]";
-    public static final String WOUND_L_FACE = "Formular1[0].#subform[1].Kontrollkästchen[92]";
-    public static final String WOUND_L_FOOT_LEFTBACK = "Formular1[0].#subform[1].Kontrollkästchen[87]";
-    public static final String WOUND_L_FOOT_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[52]";
-    public static final String WOUND_L_FOOT_RIGHTBACK = "Formular1[0].#subform[1].Kontrollkästchen[36]";
-    public static final String WOUND_L_FOOT_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[51]";
-    public static final String WOUND_L_GROIN = "Formular1[0].#subform[1].Kontrollkästchen[39]";
-    public static final String WOUND_L_HAND_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[30]";
-    public static final String WOUND_L_HAND_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[9]";
-    public static final String WOUND_L_HEAD_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[22]";
-    public static final String WOUND_L_HEAD_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[1]";
-    public static final String WOUND_L_HEEL_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[29]";
-    public static final String WOUND_L_HEEL_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[8]";
-    public static final String WOUND_L_HIP_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[25]";
-    public static final String WOUND_L_HIP_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[4]";
-    public static final String WOUND_L_KNEE_HOLLOWLEFT = "Formular1[0].#subform[1].Kontrollkästchen[33]";
-    public static final String WOUND_L_KNEE_HOLLOWRIGHT = "Formular1[0].#subform[1].Kontrollkästchen[18]";
-    public static final String WOUND_L_KNEE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[47]";
-    public static final String WOUND_L_KNEE_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[49]";
-    public static final String WOUND_L_LOWER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[44]";
-    public static final String WOUND_L_LOWER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[27]";
-    public static final String WOUND_L_LOWER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[6]";
-    public static final String WOUND_L_SHIN_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[48]";
-    public static final String WOUND_L_SHIN_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[50]";
-    public static final String WOUND_L_SHOULDER_BACK_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[12]";
-    public static final String WOUND_L_SHOULDER_BACK_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[13]";
-    public static final String WOUND_L_SHOULDER_FRONT_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[42]";
-    public static final String WOUND_L_SHOULDER_FRONT_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[41]";
-    public static final String WOUND_L_SHOULDER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[23]";
-    public static final String WOUND_L_SHOULDER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[2]";
-    public static final String WOUND_L_UPPER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[43]";
-    public static final String WOUND_L_UPPER_LEFTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[17]";
-    public static final String WOUND_L_UPPER_LEG_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[45]";
-    public static final String WOUND_L_UPPER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[21]";
-    public static final String WOUND_L_UPPER_LEG_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[46]";
-    public static final String WOUND_L_UPPER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[0]";
-    public static final String WOUND_L_UPPER_RIGHTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[16]";
+    
+    // Die PDF Formular Schlüssel der oberen 5 Wunden auf der Anlage Wundversorgung
+      public static final String WOUND_L_BACK_LOW = "form1[0].subform1[0].#area[1].l\\.back\\.low[0]";
+      public static final String WOUND_L_BACK_MID = "form1[0].subform1[0].#area[1].l\\.back\\.mid[0]";
+      public static final String WOUND_L_BACK_OF_THE_HEAD = "form1[0].subform1[0].#area[1].l\\.back\\.of\\.the\\.head[0]";
+      public static final String WOUND_L_BACK_UPPER_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.back\\.upper\\.left\\.side[0]";
+      public static final String WOUND_L_BACK_UPPER_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.back\\.upper\\.right\\.side[0]";
+      public static final String WOUND_L_BOTTOM_BACK = "form1[0].subform1[0].#area[1].l\\.bottom\\.back[0]";
+      public static final String WOUND_L_BOTTOM_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.bottom\\.left\\.side[0]";
+      public static final String WOUND_L_BOTTOM_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.bottom\\.right\\.side[0]";
+      public static final String WOUND_L_CALF_LEFTBACK = "form1[0].subform1[0].#area[1].l\\.calf\\.leftback[0]";
+      public static final String WOUND_L_CALF_LEFTSIDE = "form1[0].subform1[0].#area[1].l\\.calf\\.left\\.side[0]";
+      public static final String WOUND_L_CALF_RIGHTBACK = "form1[0].subform1[0].#area[1].l\\.calf\\.rightback[0]";
+      public static final String WOUND_L_CALF_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.calf\\.right\\.side[0]";
+      public static final String WOUND_L_CROOK_ARM_LEFT = "form1[0].subform1[0].#area[1].l\\.crook\\.arm\\.left[0]";
+      public static final String WOUND_L_CROOK_ARM_RIGHT = "form1[0].subform1[0].#area[1].l\\.crook\\.arm\\.right[0]";
+      public static final String WOUND_L_ELLBOW_LEFT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.left[0]";
+      public static final String WOUND_L_ELLBOW_RIGHT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.right[0]";
+      public static final String WOUND_L_ELLBOW_RIGHTSIDE = "form1[0].subform1[0].#area[1].l\\.ellbow\\.rightside[0]";
+      public static final String WOUND_L_ELLBOW_SIDE_LEFT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.side\\.left[0]";
+      public static final String WOUND_L_FACE = "form1[0].subform1[0].#area[1].l\\.face[0]";
+      public static final String WOUND_L_FOOT_LEFTBACK = "form1[0].subform1[0].#area[1].l\\.foot\\.leftback[0]";
+      public static final String WOUND_L_FOOT_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.foot\\.right\\.front[0]";
+      public static final String WOUND_L_FOOT_RIGHTBACK = "form1[0].subform1[0].#area[1].l\\.foot\\.rightback[0]";
+      public static final String WOUND_L_FOOT_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[51]";
+      public static final String WOUND_L_GROIN = "form1[0].subform1[0].#area[1].l\\.groin[0]";
+      public static final String WOUND_L_HAND_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.hand\\.left\\.side[0]";
+      public static final String WOUND_L_HAND_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.hand\\.right\\.side[0]";
+      public static final String WOUND_L_HEAD_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.head\\.left\\.side[0]";
+      public static final String WOUND_L_HEAD_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.head\\.right\\.side[0]";
+      public static final String WOUND_L_HEEL_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.heel\\.left\\.side[0]";
+      public static final String WOUND_L_HEEL_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.heel\\.right\\.side[0]";
+      public static final String WOUND_L_HIP_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.hip\\.left\\.side[0]";
+      public static final String WOUND_L_HIP_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.hip\\.right\\.side[0]";
+      public static final String WOUND_L_KNEE_HOLLOWLEFT = "form1[0].subform1[0].#area[1].l\\.knee\\.hollowleft[0]";
+      public static final String WOUND_L_KNEE_HOLLOWRIGHT = "form1[0].subform1[0].#area[1].l\\.knee\\.hollowright[0]";
+      public static final String WOUND_L_KNEE_LEFT = "form1[0].subform1[0].#area[1].l\\.knee\\.left[0]";
+      public static final String WOUND_L_KNEE_RIGHT = "form1[0].subform1[0].#area[1].l\\.knee\\.right[0]";
+      public static final String WOUND_L_LOWER_BELLY = "form1[0].subform1[0].#area[1].l\\.lower\\.belly[0]";
+      public static final String WOUND_L_LOWER_LEG_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.lower\\.leg\\.left\\.side[0]";
+      public static final String WOUND_L_LOWER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.lower\\.leg\\.right\\.side[0]";
+      public static final String WOUND_L_SHIN_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.shin\\.left\\.front[0]";
+      public static final String WOUND_L_SHIN_RIGHT_FRONT = "form1[0].subform1[0].#area[1].l\\.shin\\.right\\.front[0]";
+      public static final String WOUND_L_SHOULDER_BACK_LEFT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.back\\.left[0]";
+      public static final String WOUND_L_SHOULDER_BACK_RIGHT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.back\\.right[0]";
+      public static final String WOUND_L_SHOULDER_FRONT_LEFT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.front\\.left[0]";
+      public static final String WOUND_L_SHOULDER_FRONT_RIGHT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.front\\.right[0]";
+      public static final String WOUND_L_SHOULDER_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.shoulder\\.left\\.side[0]";
+      public static final String WOUND_L_SHOULDER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[2]";
+      public static final String WOUND_L_UPPER_BELLY = "form1[0].subform1[0].#area[1].l\\.upper\\.belly[0]";
+      public static final String WOUND_L_UPPER_LEFTLEG_BACK = "form1[0].subform1[0].#area[1].l\\.upper\\.leftleg\\.back[0]";
+      public static final String WOUND_L_UPPER_LEG_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.left\\.front[0]";
+      public static final String WOUND_L_UPPER_LEG_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.left\\.side[0]";
+      public static final String WOUND_L_UPPER_LEG_RIGHT_FRONT = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.right\\.front[0]";
+      public static final String WOUND_L_UPPER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.right\\.side[0]";
+      public static final String WOUND_L_UPPER_RIGHTLEG_BACK = "form1[0].subform1[0].#area[1].l\\.upper\\.rightleg\\.back[0]";
 
+//    public static final String[] PDFPARTS = new String[]{HEAD_LEFT_SIDE, SHOULDER_LEFT_SIDE, BACK_UPPER_RIGHT_SIDE, ELLBOW_SIDE_LEFT, HAND_LEFT_SIDE, HIP_LEFT_SIDE, BOTTOM_LEFT_SIDE, UPPER_LEG_LEFT_SIDE,
+//            LOWER_LEG_LEFT_SIDE, CALF_LEFTSIDE, HEEL_LEFT_SIDE, FACE, SHOULDER_FRONT_RIGHT, SHOULDER_FRONT_LEFT, UPPER_BELLY, CROOK_ARM_RIGHT,
+//            CROOK_ARM_LEFT, LOWER_BELLY, GROIN, UPPER_LEG_RIGHT_FRONT, UPPER_LEG_LEFT_FRONT, KNEE_RIGHT, KNEE_LEFT, SHIN_RIGHT_FRONT, SHIN_LEFT_FRONT,
+//            FOOT_RIGHT_FRONT, FOOT_LEFT_FRONT, BACK_OF_THE_HEAD, SHOULDER_BACK_LEFT, SHOULDER_BACK_RIGHT, BACK_MID, ELLBOW_LEFT,
+//            ELLBOW_RIGHT, BACK_LOW, BOTTOM_BACK, UPPER_LEFTLEG_BACK, UPPER_RIGHTLEG_BACK, KNEE_HOLLOWLEFT, KNEE_HOLLOWRIGHT, CALF_LEFTBACK,
+//            CALF_RIGHTBACK, FOOT_LEFTBACK, FOOT_RIGHTBACK, HEAD_RIGHT_SIDE, SHOULDER_RIGHT_SIDE, BACK_UPPER_LEFT_SIDE, ELLBOW_RIGHTSIDE,
+//            HAND_RIGHT_SIDE, HIP_RIGHT_SIDE, BOTTOM_RIGHT_SIDE, UPPER_LEG_RIGHT_SIDE, LOWER_LEG_RIGHT_SIDE, CALF_RIGHT_SIDE, HEEL_RIGHT_SIDE};
 
-    public static final String[] PDFPARTS = new String[]{HEAD_LEFT_SIDE, SHOULDER_LEFT_SIDE, BACK_UPPER_RIGHT_SIDE, ELLBOW_SIDE_LEFT, HAND_LEFT_SIDE, HIP_LEFT_SIDE, BOTTOM_LEFT_SIDE, UPPER_LEG_LEFT_SIDE,
-            LOWER_LEG_LEFT_SIDE, CALF_LEFTSIDE, HEEL_LEFT_SIDE, FACE, SHOULDER_FRONT_RIGHT, SHOULDER_FRONT_LEFT, UPPER_BELLY, CROOK_ARM_RIGHT,
-            CROOK_ARM_LEFT, LOWER_BELLY, GROIN, UPPER_LEG_RIGHT_FRONT, UPPER_LEG_LEFT_FRONT, KNEE_RIGHT, KNEE_LEFT, SHIN_RIGHT_FRONT, SHIN_LEFT_FRONT,
-            FOOT_RIGHT_FRONT, FOOT_LEFT_FRONT, BACK_OF_THE_HEAD, SHOULDER_BACK_LEFT, SHOULDER_BACK_RIGHT, BACK_MID, ELLBOW_LEFT,
-            ELLBOW_RIGHT, BACK_LOW, BOTTOM_BACK, UPPER_LEFTLEG_BACK, UPPER_RIGHTLEG_BACK, KNEE_HOLLOWLEFT, KNEE_HOLLOWRIGHT, CALF_LEFTBACK,
-            CALF_RIGHTBACK, FOOT_LEFTBACK, FOOT_RIGHTBACK, HEAD_RIGHT_SIDE, SHOULDER_RIGHT_SIDE, BACK_UPPER_LEFT_SIDE, ELLBOW_RIGHTSIDE,
-            HAND_RIGHT_SIDE, HIP_RIGHT_SIDE, BOTTOM_RIGHT_SIDE, UPPER_LEG_RIGHT_SIDE, LOWER_LEG_RIGHT_SIDE, CALF_RIGHT_SIDE, HEEL_RIGHT_SIDE};
-
-    public static final String[] PDFPARTSMRE = new String[]{MRE_HEAD_LEFT_SIDE, MRE_SHOULDER_LEFT_SIDE, MRE_BACK_UPPER_RIGHT_SIDE, MRE_ELLBOW_SIDE_LEFT, MRE_HAND_LEFT_SIDE, MRE_HIP_LEFT_SIDE, MRE_BOTTOM_LEFT_SIDE, MRE_UPPER_LEG_LEFT_SIDE,
+    public static final String[] PDFPARTSMRE = new String[]{MRE_HEAD_LEFT_SIDE, MRE_SHOULDER_LEFT_SIDE, MRE_BACK_UPPER_LEFT_SIDE, MRE_ELLBOW_SIDE_LEFT, MRE_HAND_LEFT_SIDE, MRE_HIP_LEFT_SIDE, MRE_BOTTOM_LEFT_SIDE, MRE_UPPER_LEG_LEFT_SIDE,
             MRE_LOWER_LEG_LEFT_SIDE, MRE_CALF_LEFTSIDE, MRE_HEEL_LEFT_SIDE, MRE_FACE, MRE_SHOULDER_FRONT_RIGHT, MRE_SHOULDER_FRONT_LEFT, MRE_UPPER_BELLY, MRE_CROOK_ARM_RIGHT,
             MRE_CROOK_ARM_LEFT, MRE_LOWER_BELLY, MRE_GROIN, MRE_UPPER_LEG_RIGHT_FRONT, MRE_UPPER_LEG_LEFT_FRONT, MRE_KNEE_RIGHT, MRE_KNEE_LEFT, MRE_SHIN_RIGHT_FRONT, MRE_SHIN_LEFT_FRONT,
             MRE_FOOT_RIGHT_FRONT, MRE_FOOT_LEFT_FRONT, MRE_BACK_OF_THE_HEAD, MRE_SHOULDER_BACK_LEFT, MRE_SHOULDER_BACK_RIGHT, MRE_BACK_MID, MRE_ELLBOW_LEFT,
             MRE_ELLBOW_RIGHT, MRE_BACK_LOW, MRE_BOTTOM_BACK, MRE_UPPER_LEFTLEG_BACK, MRE_UPPER_RIGHTLEG_BACK, MRE_KNEE_HOLLOWLEFT, MRE_KNEE_HOLLOWRIGHT, MRE_CALF_LEFTBACK,
-            MRE_CALF_RIGHTBACK, MRE_FOOT_LEFTBACK, MRE_FOOT_RIGHTBACK, MRE_HEAD_RIGHT_SIDE, MRE_SHOULDER_RIGHT_SIDE, MRE_BACK_UPPER_LEFT_SIDE, MRE_ELLBOW_RIGHTSIDE,
+            MRE_CALF_RIGHTBACK, MRE_FOOT_LEFTBACK, MRE_FOOT_RIGHTBACK, MRE_HEAD_RIGHT_SIDE, MRE_SHOULDER_RIGHT_SIDE, MRE_BACK_UPPER_RIGHT_SIDE, MRE_ELLBOW_RIGHTSIDE,
             MRE_HAND_RIGHT_SIDE, MRE_HIP_RIGHT_SIDE, MRE_BOTTOM_RIGHT_SIDE, MRE_UPPER_LEG_RIGHT_SIDE, MRE_LOWER_LEG_RIGHT_SIDE, MRE_CALF_RIGHT_SIDE, MRE_HEEL_RIGHT_SIDE};
 
-    public static final String[] PDFPARTSWOUND_U = new String[]{WOUND_U_HEAD_LEFT_SIDE, WOUND_U_SHOULDER_LEFT_SIDE, WOUND_U_BACK_UPPER_RIGHT_SIDE, WOUND_U_ELLBOW_SIDE_LEFT, WOUND_U_HAND_LEFT_SIDE, WOUND_U_HIP_LEFT_SIDE, WOUND_U_BOTTOM_LEFT_SIDE, WOUND_U_UPPER_LEG_LEFT_SIDE,
+    public static final String[] PDFPARTSWOUND_U = new String[]{WOUND_U_HEAD_LEFT_SIDE, WOUND_U_SHOULDER_LEFT_SIDE, WOUND_U_BACK_UPPER_LEFT_SIDE, WOUND_U_ELLBOW_SIDE_LEFT, WOUND_U_HAND_LEFT_SIDE, WOUND_U_HIP_LEFT_SIDE, WOUND_U_BOTTOM_LEFT_SIDE, WOUND_U_UPPER_LEG_LEFT_SIDE,
             WOUND_U_LOWER_LEG_LEFT_SIDE, WOUND_U_CALF_LEFTSIDE, WOUND_U_HEEL_LEFT_SIDE, WOUND_U_FACE, WOUND_U_SHOULDER_FRONT_RIGHT, WOUND_U_SHOULDER_FRONT_LEFT, WOUND_U_UPPER_BELLY, WOUND_U_CROOK_ARM_RIGHT,
             WOUND_U_CROOK_ARM_LEFT, WOUND_U_LOWER_BELLY, WOUND_U_GROIN, WOUND_U_UPPER_LEG_RIGHT_FRONT, WOUND_U_UPPER_LEG_LEFT_FRONT, WOUND_U_KNEE_RIGHT, WOUND_U_KNEE_LEFT, WOUND_U_SHIN_RIGHT_FRONT, WOUND_U_SHIN_LEFT_FRONT,
             WOUND_U_FOOT_RIGHT_FRONT, WOUND_U_FOOT_LEFT_FRONT, WOUND_U_BACK_OF_THE_HEAD, WOUND_U_SHOULDER_BACK_LEFT, WOUND_U_SHOULDER_BACK_RIGHT, WOUND_U_BACK_MID, WOUND_U_ELLBOW_LEFT,
             WOUND_U_ELLBOW_RIGHT, WOUND_U_BACK_LOW, WOUND_U_BOTTOM_BACK, WOUND_U_UPPER_LEFTLEG_BACK, WOUND_U_UPPER_RIGHTLEG_BACK, WOUND_U_KNEE_HOLLOWLEFT, WOUND_U_KNEE_HOLLOWRIGHT, WOUND_U_CALF_LEFTBACK,
-            WOUND_U_CALF_RIGHTBACK, WOUND_U_FOOT_LEFTBACK, WOUND_U_FOOT_RIGHTBACK, WOUND_U_HEAD_RIGHT_SIDE, WOUND_U_SHOULDER_RIGHT_SIDE, WOUND_U_BACK_UPPER_LEFT_SIDE, WOUND_U_ELLBOW_RIGHTSIDE,
+            WOUND_U_CALF_RIGHTBACK, WOUND_U_FOOT_LEFTBACK, WOUND_U_FOOT_RIGHTBACK, WOUND_U_HEAD_RIGHT_SIDE, WOUND_U_SHOULDER_RIGHT_SIDE, WOUND_U_BACK_UPPER_RIGHT_SIDE, WOUND_U_ELLBOW_RIGHTSIDE,
             WOUND_U_HAND_RIGHT_SIDE, WOUND_U_HIP_RIGHT_SIDE, WOUND_U_BOTTOM_RIGHT_SIDE, WOUND_U_UPPER_LEG_RIGHT_SIDE, WOUND_U_LOWER_LEG_RIGHT_SIDE, WOUND_U_CALF_RIGHT_SIDE, WOUND_U_HEEL_RIGHT_SIDE};
 
-    public static final String[] PDFPARTSWOUND_L = new String[]{WOUND_L_HEAD_LEFT_SIDE, WOUND_L_SHOULDER_LEFT_SIDE, WOUND_L_BACK_UPPER_RIGHT_SIDE, WOUND_L_ELLBOW_SIDE_LEFT, WOUND_L_HAND_LEFT_SIDE, WOUND_L_HIP_LEFT_SIDE, WOUND_L_BOTTOM_LEFT_SIDE, WOUND_L_UPPER_LEG_LEFT_SIDE,
+    public static final String[] PDFPARTSWOUND_L = new String[]{WOUND_L_HEAD_LEFT_SIDE, WOUND_L_SHOULDER_LEFT_SIDE, WOUND_L_BACK_UPPER_LEFT_SIDE, WOUND_L_ELLBOW_SIDE_LEFT, WOUND_L_HAND_LEFT_SIDE, WOUND_L_HIP_LEFT_SIDE, WOUND_L_BOTTOM_LEFT_SIDE, WOUND_L_UPPER_LEG_LEFT_SIDE,
                WOUND_L_LOWER_LEG_LEFT_SIDE, WOUND_L_CALF_LEFTSIDE, WOUND_L_HEEL_LEFT_SIDE, WOUND_L_FACE, WOUND_L_SHOULDER_FRONT_RIGHT, WOUND_L_SHOULDER_FRONT_LEFT, WOUND_L_UPPER_BELLY, WOUND_L_CROOK_ARM_RIGHT,
                WOUND_L_CROOK_ARM_LEFT, WOUND_L_LOWER_BELLY, WOUND_L_GROIN, WOUND_L_UPPER_LEG_RIGHT_FRONT, WOUND_L_UPPER_LEG_LEFT_FRONT, WOUND_L_KNEE_RIGHT, WOUND_L_KNEE_LEFT, WOUND_L_SHIN_RIGHT_FRONT, WOUND_L_SHIN_LEFT_FRONT,
                WOUND_L_FOOT_RIGHT_FRONT, WOUND_L_FOOT_LEFT_FRONT, WOUND_L_BACK_OF_THE_HEAD, WOUND_L_SHOULDER_BACK_LEFT, WOUND_L_SHOULDER_BACK_RIGHT, WOUND_L_BACK_MID, WOUND_L_ELLBOW_LEFT,
                WOUND_L_ELLBOW_RIGHT, WOUND_L_BACK_LOW, WOUND_L_BOTTOM_BACK, WOUND_L_UPPER_LEFTLEG_BACK, WOUND_L_UPPER_RIGHTLEG_BACK, WOUND_L_KNEE_HOLLOWLEFT, WOUND_L_KNEE_HOLLOWRIGHT, WOUND_L_CALF_LEFTBACK,
-               WOUND_L_CALF_RIGHTBACK, WOUND_L_FOOT_LEFTBACK, WOUND_L_FOOT_RIGHTBACK, WOUND_L_HEAD_RIGHT_SIDE, WOUND_L_SHOULDER_RIGHT_SIDE, WOUND_L_BACK_UPPER_LEFT_SIDE, WOUND_L_ELLBOW_RIGHTSIDE,
+               WOUND_L_CALF_RIGHTBACK, WOUND_L_FOOT_LEFTBACK, WOUND_L_FOOT_RIGHTBACK, WOUND_L_HEAD_RIGHT_SIDE, WOUND_L_SHOULDER_RIGHT_SIDE, WOUND_L_BACK_UPPER_RIGHT_SIDE, WOUND_L_ELLBOW_RIGHTSIDE,
                WOUND_L_HAND_RIGHT_SIDE, WOUND_L_HIP_RIGHT_SIDE, WOUND_L_BOTTOM_RIGHT_SIDE, WOUND_L_UPPER_LEG_RIGHT_SIDE, WOUND_L_LOWER_LEG_RIGHT_SIDE, WOUND_L_CALF_RIGHT_SIDE, WOUND_L_HEEL_RIGHT_SIDE};
-   
+
+    // "upper.back.left.side"
+    // "back.upper.left.side"
+    // diese Schlüssel sind falsch benannt. Ein Fehler aus den Anfangstagen. Das ist die rechte Seite, nicht die linke. Ist aber nur intern, spielt somit keine Rolle.
+    // bei den PDF Formular schlüsseln habe ich sie richtig genannt
+    // ich kann das aber nicht mehr ändern, weil diese Schüssel in der Datenbank resinfo tabelle verwendet wurden. Daher muss ich mit diesen Schlüsseln weiter machen.
     public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
              "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
              "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",

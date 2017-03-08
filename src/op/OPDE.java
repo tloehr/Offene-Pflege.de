@@ -646,7 +646,7 @@ public class OPDE {
             mainframe = new FrmMain();
             mainframe.setVisible(true);
 
-            new pnldebug();
+//            new pnldebug();
 
         } catch (Exception ioe) {
 
