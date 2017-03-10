@@ -535,7 +535,9 @@ public class ResInfoTools {
                     if (infonode.getTagName().equalsIgnoreCase("bodyscheme")) {
                         ArrayList<String> bodyparts = new ArrayList<String>();
                         for (String key : content.stringPropertyNames()) {
-                            if (key.startsWith(infonode.getName())) {
+                            // nur die Körperteile, die angewählt wurden.
+                            //https://github.com/tloehr/Offene-Pflege.de/issues/73
+                            if (key.startsWith(infonode.getName()) && content.get(key).toString().equalsIgnoreCase("true")) {
                                 bodyparts.add(key.substring(4));
                             }
                         }
@@ -611,9 +613,7 @@ public class ResInfoTools {
                                     String text = SYSTools.catchNull(thisNode.getLabel());
                                     if (infonode.getTagName().equalsIgnoreCase("scalegroup")) {
                                         scalesum = scalesum == null ? thisNode.getScore() : scalesum.add(thisNode.getScore());
-                                        //                                        Double score = (Double) ((Object[]) thisNode.getUserObject())[3];
                                         plaintext += infonode.getLabel() + ": " + text + " (" + SYSTools.xx("misc.msg.scaleriskvalue") + ": " + SYSTools.formatBigDecimal(thisNode.getScore().setScale(2, BigDecimal.ROUND_UP)) + "); ";
-                                        //                                        scalesum += score;
                                     } else {
                                         plaintext += infonode.getLabel() + ": " + text + "; ";
                                     }

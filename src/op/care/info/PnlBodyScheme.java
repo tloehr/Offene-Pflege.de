@@ -22,6 +22,11 @@ import java.util.Properties;
  */
 public class PnlBodyScheme extends JPanel {
 
+    // "upper.back.left.side"
+    // "back.upper.left.side"
+    // diese Schlüssel sind falsch benannt. Ein Fehler aus den Anfangstagen. Das ist die rechte Seite, nicht die linke. Ist aber nur intern, spielt somit keine Rolle.
+    // bei den PDF Formular schlüsseln habe ich sie richtig genannt
+    // ich kann das aber nicht mehr ändern, weil diese Schüssel in der Datenbank resinfo tabelle verwendet wurden. Daher muss ich mit diesen Schlüsseln weiter machen.
     public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
             "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
             "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",

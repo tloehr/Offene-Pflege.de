@@ -587,7 +587,7 @@ public class TXEAF {
     public static final String WOUND_U_UPPER_RIGHTLEG_BACK = "form1[0].subform1[0].#area[0].u\\.upper\\.rightleg\\.back[0]";
 
     
-    // Die PDF Formular Schlüssel der oberen 5 Wunden auf der Anlage Wundversorgung
+    // Die PDF Formular Schlüssel der unteren 5 Wunden auf der Anlage Wundversorgung
       public static final String WOUND_L_BACK_LOW = "form1[0].subform1[0].#area[1].l\\.back\\.low[0]";
       public static final String WOUND_L_BACK_MID = "form1[0].subform1[0].#area[1].l\\.back\\.mid[0]";
       public static final String WOUND_L_BACK_OF_THE_HEAD = "form1[0].subform1[0].#area[1].l\\.back\\.of\\.the\\.head[0]";
@@ -675,17 +675,7 @@ public class TXEAF {
                WOUND_L_CALF_RIGHTBACK, WOUND_L_FOOT_LEFTBACK, WOUND_L_FOOT_RIGHTBACK, WOUND_L_HEAD_RIGHT_SIDE, WOUND_L_SHOULDER_RIGHT_SIDE, WOUND_L_BACK_UPPER_RIGHT_SIDE, WOUND_L_ELLBOW_RIGHTSIDE,
                WOUND_L_HAND_RIGHT_SIDE, WOUND_L_HIP_RIGHT_SIDE, WOUND_L_BOTTOM_RIGHT_SIDE, WOUND_L_UPPER_LEG_RIGHT_SIDE, WOUND_L_LOWER_LEG_RIGHT_SIDE, WOUND_L_CALF_RIGHT_SIDE, WOUND_L_HEEL_RIGHT_SIDE};
 
-    // "upper.back.left.side"
-    // "back.upper.left.side"
-    // diese Schlüssel sind falsch benannt. Ein Fehler aus den Anfangstagen. Das ist die rechte Seite, nicht die linke. Ist aber nur intern, spielt somit keine Rolle.
-    // bei den PDF Formular schlüsseln habe ich sie richtig genannt
-    // ich kann das aber nicht mehr ändern, weil diese Schüssel in der Datenbank resinfo tabelle verwendet wurden. Daher muss ich mit diesen Schlüsseln weiter machen.
-    public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
-             "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
-             "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",
-             "foot.right.front", "foot.left.front", "back.of.the.head", "shoulder.back.left", "shoulder.back.right", "back.mid", "ellbow.left",
-             "ellbow.right", "back.low", "bottom.back", "upper.leftleg.back", "upper.rightleg.back", "knee.hollowleft", "knee.hollowright", "calf.leftback",
-             "calf.rightback", "foot.leftback", "foot.rightback", "head.right.side", "shoulder.right.side", "back.upper.left.side", "ellbow.rightside",
-             "hand.right.side", "hip.right.side", "bottom.right.side", "upper.leg.right.side", "lower.leg.right.side", "calf.right.side", "heel.right.side"};
+
+
     
 }
