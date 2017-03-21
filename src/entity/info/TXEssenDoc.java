@@ -1149,29 +1149,37 @@ public class TXEssenDoc {
     }
 
     private void createContent4Wounds(PdfStamper stamper) throws Exception {
+
+        // zuerst die persönlichen Daten eintragen
+        content.put(TXEAF.WOUND_PATFIRSTNAME, resident.getName());
+        content.put(TXEAF.WOUND_PATNAME, resident.getName());
+        content.put(TXEAF.WOUND_PATDOB, DateFormat.getDateInstance().format(resident.getDOB()));
+
+
         // to find the names for the several bodyparts in the resinfo
         // but its not about the keynames. its about the number in the list. the list of pdfbodyparts may use different keynames, but the order no for every single
         // bodypart is the same. so we can have a mapping between the two lists
         ArrayList<String> bodyParts = new ArrayList<>(Arrays.asList(PnlBodyScheme.PARTS));
 
-        String[] pdfwounddescription = new String[]{TXEAF.WOUND_BODY1_DESCRIPTION, TXEAF.WOUND_BODY2_DESCRIPTION, TXEAF.WOUND_BODY3_DESCRIPTION, TXEAF.WOUND_BODY4_DESCRIPTION, TXEAF.WOUND_BODY5_DESCRIPTION, TXEAF.WOUND_BODY6_DESCRIPTION, TXEAF.WOUND_BODY7_DESCRIPTION, TXEAF.WOUND_BODY8_DESCRIPTION, TXEAF.WOUND_BODY9_DESCRIPTION, TXEAF.WOUND_BODY10_DESCRIPTION};
+        String[] pdfwounddescription = new String[]{TXEAF.WOUND_BODY1_DESCRIPTION, TXEAF.WOUND_BODY2_DESCRIPTION, TXEAF.WOUND_BODY3_DESCRIPTION, TXEAF.WOUND_BODY4_DESCRIPTION, TXEAF.WOUND_BODY5_DESCRIPTION, TXEAF.WOUND_BODY6_DESCRIPTION, TXEAF.WOUND_BODY7_DESCRIPTION, TXEAF.WOUND_BODY8_DESCRIPTION, TXEAF.WOUND_BODY9_DESCRIPTION, TXEAF.WOUND_BODY10_DESCRIPTION, TXEAF.WOUND_MYCOSIS_DESCRIPTION};
         int lineno = -1;
         AcroFields form = stamper.getAcroFields();
         PdfContentByte directcontent = stamper.getOverContent(1);
 
-        for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) { //ArrayUtils.add(ResInfoTypeTools.TYPE_ALL_WOUNDS, ResInfoTypeTools.TYPE_MYCOSIS)
+        for (int type : ArrayUtils.add(ResInfoTypeTools.TYPE_ALL_WOUNDS, ResInfoTypeTools.TYPE_MYCOSIS)) { //ArrayUtils.add(ResInfoTypeTools.TYPE_ALL_WOUNDS, ResInfoTypeTools.TYPE_MYCOSIS)
+            lineno++;
 
             if (mapID2Info.containsKey(type)) {
 
                 String descriptionKey = (type == ResInfoTypeTools.TYPE_MYCOSIS ? "misc.msg.mycosis" : "misc.msg.wound.documentation");
 
                 ResInfo currentWound = mapID2Info.get(type);
-                lineno++;
-
-                logger.debug(currentWound.getResInfoType().getID());
-                logger.debug(Integer.toString(lineno));
 
                 content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + "//" + currentWound.getResInfoType().getID() + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
+
+                if (type == ResInfoTypeTools.TYPE_MYCOSIS) {
+                    content.put(TXEAF.WOUND_MYCOSIS_HEADLINE, "misc.msg.mycosis");
+                }
 
                 // liest die koordinaten auf der pdf seite für ein bestimmtes feld
                 AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfwounddescription[lineno]).get(0);
@@ -1197,6 +1205,7 @@ public class TXEssenDoc {
                         OPDE.debug(Integer.toString(listpos));
                         // nur wenn dieses property ein körperteil ist und auch angeklickt wurde.
                         if (bodyParts.contains(bodykey)) {
+                            OPDE.debug("==================================================================");
                             OPDE.debug(TXEAF.PDFPARTSWOUND_U[listpos]);
                             OPDE.debug(form.getFieldPositions(TXEAF.PDFPARTSWOUND_U[listpos]));
                             OPDE.debug(TXEAF.PDFPARTSWOUND_L[listpos]);
@@ -1204,8 +1213,13 @@ public class TXEssenDoc {
 
 
                             if (mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
-                                // set the pointer to the middle right part of the frame
-                                directcontent.moveTo(pos1.position.getRight(), pos1.position.getTop() - (pos1.position.getHeight() / 2f));
+                                // bei wunden wird die Mitte der rechten Seite als Ausgangspunkt der Linien angenommen
+                                // bei Pilzen die untere Mitte des Kommentarkastens
+                                if (type == ResInfoTypeTools.TYPE_MYCOSIS) {
+                                    directcontent.moveTo(pos1.position.getRight() - (pos1.position.getWidth() / 2f), pos1.position.getBottom());
+                                } else {
+                                    directcontent.moveTo(pos1.position.getRight(), pos1.position.getTop() - (pos1.position.getHeight() / 2f));
+                                }
                                 // find the position of the checkbox representing the bodypart.
                                 // die ersten fünf auf der oberen seite, die zweiten fünf auf der unteren
                                 AcroFields.FieldPosition pos2 = form.getFieldPositions(lineno < 5 ? TXEAF.PDFPARTSWOUND_U[listpos] : TXEAF.PDFPARTSWOUND_L[listpos]).get(0);
