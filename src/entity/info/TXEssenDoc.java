@@ -3,6 +3,7 @@ package entity.info;
 import com.enterprisedt.util.debug.Logger;
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.*;
 import entity.building.HomesTools;
 import entity.files.SYSFilesTools;
@@ -40,7 +41,7 @@ import java.util.*;
  */
 public class TXEssenDoc {
 
-    public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
+    //    public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
     public static final String SOURCEDOC2 = "ueberleitungsbogen_160208.pdf";
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
@@ -56,12 +57,12 @@ public class TXEssenDoc {
 
     private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 8);
     //    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
-//    private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
-//    private PdfContentByte over = null;
+    private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD, BaseColor.YELLOW);
+    //    private PdfContentByte over = null;
 //    private PdfWriter writer = null;
 //
     ByteArrayOutputStream medListStream = null, icdListStream = null, woundsListStream = null;
-    boolean mre, psych = false, wounds = false;
+    boolean mre, psych = false, wounds = false, infection = false;
     int progress, max;
 
 
@@ -387,6 +388,12 @@ public class TXEssenDoc {
                     + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
 
             ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
+
+            if (p == 1 && infection) { // nur auf der ersten Seite und nur wenn ein MRE Bogen erstellt wird.
+                Image biohazard = Image.getInstance(SYSConst.class.getResource("/artwork/other/biohazard.png"));
+                stamp.getOverContent().addImage(biohazard, biohazard.getWidth(), 0, 0, biohazard.getHeight(), 485, 730);
+                ColumnText.showTextAligned(stamp.getOverContent(), Element.ALIGN_LEFT, new Phrase("!!Siehe Seite 2/Abs.18!!", pdf_font_normal_bold), 500, 740, 0);
+            }
             stamp.alterContents();
             copy.addPage(page);
         }
@@ -487,7 +494,7 @@ public class TXEssenDoc {
         content.put(TXEAF.PAGE2_RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(TXEAF.RESIDENT_NAME, resident.getName());
         content.put(TXEAF.PAGE2_RESIDENT_NAME, resident.getName());
-        content.put(TXEAF.PAGE3_RESIDENT_FULLNAME, ResidentTools.getFullName(resident));
+        content.put(TXEAF.PAGE3_RESIDENT_FULLNAME, resident.getName() + ", "+resident.getFirstname());
         content.put(TXEAF.RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
         content.put(TXEAF.PAGE2_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
         content.put(TXEAF.PAGE3_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
@@ -964,6 +971,13 @@ public class TXEssenDoc {
         boolean confirmed = getValue(ResInfoTypeTools.TYPE_INFECTION, "confirmed").equalsIgnoreCase("true");
         boolean notchecked = getValue(ResInfoTypeTools.TYPE_INFECTION, "notchecked").equalsIgnoreCase("true");
 
+        if (!getValue(ResInfoTypeTools.TYPE_INFECTION, "other").equalsIgnoreCase("--")){
+            generalComment += "ACHTUNG INFEKTION: "+ getValue(ResInfoTypeTools.TYPE_INFECTION, "other")+"\n";
+            infection = true;
+        }
+
+
+
         String rb = "1";
         if (confirmed) {
             rb = "2";
@@ -1150,8 +1164,12 @@ public class TXEssenDoc {
 
     private void createContent4Wounds(PdfStamper stamper) throws Exception {
 
+        // jede der 5 wunden hat eine andere hintergrund und linienfarbe. Pilzinfektionen sind immer schwarz.
+        //                                         wound01          wound02          wound03                    wound04            wound05               wound06         wound07        wound08                   wound09             wound10                 mycosis
+        BaseColor[] baseColors = new BaseColor[]{CMYKColor.BLUE, CMYKColor.RED, CMYKColor.YELLOW.darker(), CMYKColor.GREEN, CMYKColor.CYAN.darker(), CMYKColor.BLUE, CMYKColor.RED, CMYKColor.YELLOW.darker(), CMYKColor.GREEN, CMYKColor.CYAN.darker(), CMYKColor.BLACK};
+
         // zuerst die persönlichen Daten eintragen
-        content.put(TXEAF.WOUND_PATFIRSTNAME, resident.getName());
+        content.put(TXEAF.WOUND_PATFIRSTNAME, resident.getFirstname());
         content.put(TXEAF.WOUND_PATNAME, resident.getName());
         content.put(TXEAF.WOUND_PATDOB, DateFormat.getDateInstance().format(resident.getDOB()));
 
@@ -1175,7 +1193,7 @@ public class TXEssenDoc {
 
                 ResInfo currentWound = mapID2Info.get(type);
 
-                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + "//" + currentWound.getResInfoType().getID() + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
+                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
 
                 if (type == ResInfoTypeTools.TYPE_MYCOSIS) {
                     content.put(TXEAF.WOUND_MYCOSIS_HEADLINE, "misc.msg.mycosis");
@@ -1185,6 +1203,7 @@ public class TXEssenDoc {
                 AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfwounddescription[lineno]).get(0);
                 directcontent.saveState();
 
+                // zieht eine farbige linie um die jeweiligen Textfelder
                 directcontent.rectangle(pos1.position.getLeft(), pos1.position.getBottom(), pos1.position.getWidth(), pos1.position.getHeight());
 
                 /***
@@ -1224,14 +1243,17 @@ public class TXEssenDoc {
                                 // die ersten fünf auf der oberen seite, die zweiten fünf auf der unteren
                                 AcroFields.FieldPosition pos2 = form.getFieldPositions(lineno < 5 ? TXEAF.PDFPARTSWOUND_U[listpos] : TXEAF.PDFPARTSWOUND_L[listpos]).get(0);
                                 // draw a line from the right side of the frame into the middle of the checkbox.
+
                                 directcontent.lineTo(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2));
+
                             }
                         }
                     }
                 }
 
                 directcontent.setLineWidth(1f);
-                directcontent.setColorStroke(BaseColor.GRAY);
+//                directcontent.setColorStroke(BaseColor.GRAY);
+                directcontent.setColorStroke(baseColors[lineno]);
                 directcontent.stroke();
                 directcontent.restoreState();
 
@@ -1258,7 +1280,7 @@ public class TXEssenDoc {
                         }
                     }
                 }
-                directcontent.setColorFill(BaseColor.GRAY);
+                directcontent.setColorFill(baseColors[lineno]);
                 directcontent.fill();
                 directcontent.restoreState();
             }

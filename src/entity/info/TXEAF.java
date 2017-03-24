@@ -326,7 +326,7 @@ public class TXEAF {
     public static final String PAGE3_DOCS_WITHPATIENT = "Formular1[0].Patientenüberleitung-Seite3[0].Kontrollkästchen1[0]";
     public static final String PAGE3_LOGO_TEXTFIELD = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].TextField3[0]";
     public static final String PAGE3_RESIDENT_DOB = "Formular1[0].Patientenüberleitung-Seite3[0].Pat-Geburtsdatum[0]";
-    public static final String PAGE3_RESIDENT_FULLNAME = "Formular1[0].Patientenüberleitung-Seite3[0].Pat-Name[0]";
+    public static final String PAGE3_RESIDENT_FULLNAME = "Formular1[0].Patientenüberleitung-Seite3[0].Pat-Name3[0]";
     public static final String PAGE3_RESIDENT_GP = "Formular1[0].Patientenüberleitung-Seite3[0].AdressederweiterbehandelndenPraxis[0]";
     public static final String PAGE3_RESIDENT_HINSURANCE = "Formular1[0].Patientenüberleitung-Seite3[0].Krankenkasse[0]";
     public static final String PAGE3_TX2_DATE = "Formular1[0].Patientenüberleitung-Seite3[0].Textfeld27[3]";
