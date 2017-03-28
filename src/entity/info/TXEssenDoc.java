@@ -494,7 +494,7 @@ public class TXEssenDoc {
         content.put(TXEAF.PAGE2_RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(TXEAF.RESIDENT_NAME, resident.getName());
         content.put(TXEAF.PAGE2_RESIDENT_NAME, resident.getName());
-        content.put(TXEAF.PAGE3_RESIDENT_FULLNAME, resident.getName() + ", "+resident.getFirstname());
+        content.put(TXEAF.PAGE3_RESIDENT_FULLNAME, resident.getName() + ", " + resident.getFirstname());
         content.put(TXEAF.RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
         content.put(TXEAF.PAGE2_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
         content.put(TXEAF.PAGE3_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
@@ -907,7 +907,7 @@ public class TXEssenDoc {
 
         String tubetype = "--";
         if (!getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "bitesize").equals("--")) {
-            //todo: this is horrible
+            //todo: das ist so schlecht gemacht. mach was besseres!
             String langKey = "misc.msg." + getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "tubetype");
             tubetype = SYSTools.xx(langKey);
         }
@@ -928,6 +928,9 @@ public class TXEssenDoc {
         ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
         ResValue height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
 
+        //https://github.com/tloehr/Offene-Pflege.de/issues/72
+        content.put(TXEAF.FOOD_WEIGHT, weight == null ? "--" : SYSTools.formatBigDecimal(weight.getVal1()) + weight.getType().getUnit1() + "/" + DateFormat.getDateInstance().format(weight.getPit()));
+        content.put(TXEAF.FOOD_HEIGHT, height == null ? "--" : SYSTools.formatBigDecimal(height.getVal1()) + height.getType().getUnit1());
 
 //        String bmi = "--";
         BigDecimal bmi = null;
@@ -971,11 +974,10 @@ public class TXEssenDoc {
         boolean confirmed = getValue(ResInfoTypeTools.TYPE_INFECTION, "confirmed").equalsIgnoreCase("true");
         boolean notchecked = getValue(ResInfoTypeTools.TYPE_INFECTION, "notchecked").equalsIgnoreCase("true");
 
-        if (!getValue(ResInfoTypeTools.TYPE_INFECTION, "other").equalsIgnoreCase("--")){
-            generalComment += "ACHTUNG INFEKTION: "+ getValue(ResInfoTypeTools.TYPE_INFECTION, "other")+"\n";
+        if (!getValue(ResInfoTypeTools.TYPE_INFECTION, "other").equalsIgnoreCase("--")) {
+            generalComment += "ACHTUNG INFEKTION: " + getValue(ResInfoTypeTools.TYPE_INFECTION, "other") + "\n";
             infection = true;
         }
-
 
 
         String rb = "1";
@@ -1189,7 +1191,7 @@ public class TXEssenDoc {
 
             if (mapID2Info.containsKey(type)) {
 
-                String descriptionKey = (type == ResInfoTypeTools.TYPE_MYCOSIS ? "misc.msg.mycosis" : "misc.msg.wound.documentation");
+                String descriptionKey = (type == ResInfoTypeTools.TYPE_MYCOSIS ? "misc.msg.mycosis" : "");   // Bei Wunden reicht einfach das Datum.
 
                 ResInfo currentWound = mapID2Info.get(type);
 

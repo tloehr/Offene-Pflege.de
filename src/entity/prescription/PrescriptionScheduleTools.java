@@ -376,7 +376,7 @@ public class PrescriptionScheduleTools {
             }
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             result += "    <tr>" +
-                    "      <td align=\"center\">" + sdf.format(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</td>" +
+                    "      <td align=\"center\">" + SYSTools.catchNull(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</td>" +
                     "      <td align=\"center\">" + SYSTools.formatBigDecimal(schedule.getUhrzeitDosis()) + "</td>" +
                     "      <td>" + getRepeatPattern(schedule, true) + "</td>" +
                     "    </tr>";

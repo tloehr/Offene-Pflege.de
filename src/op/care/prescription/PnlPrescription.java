@@ -208,6 +208,8 @@ public class PnlPrescription extends NursingRecordsPanel {
 
 
     private CollapsiblePane createCP4(final Prescription prescription) {
+        logger.debug(prescription.getID());
+        
         /***
          *                          _        ____ ____  _  _    ______                          _       _   _           __
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /  _ \ _ __ ___  ___  ___ _ __(_)_ __ | |_(_) ___  _ __\ \
@@ -747,7 +749,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         int i = 0;
         // for the zebra coloring
         for (Prescription prescription : lstPrescriptions) {
-            OPDE.debug(prescription.getID() + ".xprescription");
+            logger.debug(prescription.getID() + ".xprescription");
             cpMap.get(prescription.getID() + ".xprescription").setBackground(getColor(SYSConst.medium1, i % 2 == 1));
             cpsPrescription.add(cpMap.get(prescription.getID() + ".xprescription"));
             i++;

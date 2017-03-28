@@ -219,6 +219,8 @@ public class TXEAF {
     public static final String FOOD_BMI = "Formular1[0].#subform[1].Bodymaßindex[0]";
     public static final String FOOD_BREADUNTIS = "Formular1[0].#subform[1].täglicheBE[0]";
     public static final String FOOD_DAILY_KCAL = "Formular1[0].#subform[1].#area[12].Kalorienzufuhr_kcal[0]";
+    public static final String FOOD_WEIGHT = "Formular1[0].#subform[1].#area[12].gewicht[0]";
+    public static final String FOOD_HEIGHT = "Formular1[0].#subform[1].#area[12].groesse[0]";
     public static final String FOOD_DAILY_ML = "Formular1[0].#subform[1].#area[12].Sondenkost_ml[0]";
     public static final String FOOD_DRINKINGMOTIVATION = "Formular1[0].#subform[1].AnhaltenzumTrinken[0]";
     public static final String FOOD_DRINKSALONE = "Formular1[0].#subform[1].Trinkverhalten_selbständig[0]";
