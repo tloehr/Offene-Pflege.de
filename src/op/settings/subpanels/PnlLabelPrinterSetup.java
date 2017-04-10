@@ -45,6 +45,7 @@ public class PnlLabelPrinterSetup extends DefaultPanel {
         cmbForm.setModel(new DefaultComboBoxModel());
         cmbLogicalPrinters.setModel(new DefaultComboBoxModel());
 
+        //todo: seit macos sierra funktioniert das so gut wie nicht mehr.
         PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null);
 
         // this prevents exceptions when there are no printers installed on the OS yet

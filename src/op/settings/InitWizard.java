@@ -42,7 +42,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -507,7 +506,6 @@ public class InitWizard extends WizardDialog {
                 try {
 //                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(new String(txtPassword.getPassword()).trim()));
 //                    jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, new String(OPDE.getEncryption().encrypt(new String(txtPassword.getPassword()).getBytes("UTF-8")), Charset.forName("UTF-8")));
-
                     jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getEncryption().encrypt(new String(txtPassword.getPassword())));
 
                 } catch (Exception e) {
@@ -1018,10 +1016,8 @@ public class InitWizard extends WizardDialog {
                     btnCreateDB.setEnabled(false);
 
                     try {
-//                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getDesEncrypter().encrypt(generatedPassword4DBUser));
-//                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, new String(OPDE.getEncryption().encrypt(new String(txtPassword.getPassword()).getBytes("UTF-8")), Charset.forName("UTF-8")));
-
-                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getEncryption().encrypt(new String(txtPassword.getPassword())));
+                        // https://github.com/tloehr/Offene-Pflege.de/issues/52
+                        jdbcProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, OPDE.getEncryption().encrypt(generatedPassword4DBUser));
 
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
@@ -1105,8 +1101,10 @@ public class InitWizard extends WizardDialog {
                         stmt = jdbcConnection.prepareStatement(queryGrant2);
                         stmt.executeUpdate();
                         stmt.close();
-                        summary.add(SYSTools.xx("opde.initwizard.summary.createdb.grant", catalog));
+                        summary.add(SYSTools.xx("opde.initwizard.summary.createdb.grant", dbuser, generatedPassword4DBUser));
 
+
+                        // "Flush Privileges" ist nicht nötig. http://stackoverflow.com/a/36464093
 
                         jdbcConnection.setCatalog(catalog);
 

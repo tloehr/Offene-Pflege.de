@@ -1269,7 +1269,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 });
                 currentEditor.setVisible(true);
             });
-            btnDelete.setEnabled(prescription.isMine() && numBHPs == 0 && !prescription.isClosed());
+            btnDelete.setEnabled( (OPDE.isAdmin() || prescription.isMine()) && numBHPs == 0 && !prescription.isClosed());
             pnlMenu.add(btnDelete);
         }
         // checked for acls
