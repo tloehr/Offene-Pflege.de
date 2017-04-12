@@ -13,7 +13,6 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.log4j.Logger;
@@ -21,10 +20,8 @@ import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-import org.joda.time.Period;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @see <a href="https://github.com/tloehr/Offene-Pflege.de/issues/11">GitHub #11</a>
@@ -72,13 +67,14 @@ public class MREPrevalenceSheets {
     public static final int CARELEVEL1 = 22; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS1" || "1" || "Pflegestufe1"
     public static final int CARELEVEL2 = 23; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS2" || "2" || "Pflegestufe2"
     public static final int CARELEVEL3 = 24; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3" || "3" || "Pflegestufe3"
-    public static final int CARELEVEL3p = 25; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3+" || "3+" || "Pflegestufe3+" || "PS3p" || "3p" || "Pflegestufe3p" || "PS3plus" || "3plus" || "Pflegestufe3plus"
-    public static final int PNEUMOCOCCAL_VACCINE = 26; // resinfotype "VACCIN1",TYPE_VACCINE = 144,vaccinetype == 9
-    public static final int RUNNING_ANTIBIOTICS = 27; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
-    public static final int BEDS_IN_USE = 28; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
-    public static final int BEDS_TOTAL = 29; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+    public static final int CARELEVEL4 = 25; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3+" || "3+" || "Pflegestufe3+" || "PS3p" || "3p" || "Pflegestufe3p" || "PS3plus" || "3plus" || "Pflegestufe3plus"
+    public static final int CARELEVEL5 = 26; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3+" || "3+" || "Pflegestufe3+" || "PS3p" || "3p" || "Pflegestufe3p" || "PS3plus" || "3plus" || "Pflegestufe3plus"
+    public static final int PNEUMOCOCCAL_VACCINE = 27; // resinfotype "VACCIN1",TYPE_VACCINE = 144,vaccinetype == 9
+    public static final int RUNNING_ANTIBIOTICS = 28; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+    public static final int BEDS_IN_USE = 29; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+    public static final int BEDS_TOTAL = 30; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
 
-    public static final int MAXCOL_SHEET1 = 30;
+    public static final int MAXCOL_SHEET1 = 31; //https://github.com/tloehr/Offene-Pflege.de/issues/71
     public static final int SHEET1_START_OF_LIST = ROW_SHEET1_TITLE + 6;
 
     public static final int SHEET2_RUNNING_NO = ROW_SHEET2_TITLE + 3;
@@ -223,13 +219,6 @@ public class MREPrevalenceSheets {
         for (Resident resident : listResidents) {
 
 
-//            ResInfo lastHauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.TYPE_STAY);
-//
-//            LocalDate since = new LocalDate(lastHauf.getFrom());
-//            Period interval = new Period(since, targetDate);
-//
-//            logger.debug(resident.getRID() + ": " + ResidentTools.getAge(resident) + "; " + interval);
-
             progress++;
             progressClosure.execute(new Pair<Integer, Integer>(progress, max));
 
@@ -312,6 +301,10 @@ public class MREPrevalenceSheets {
         return mapID2Info.containsKey(type) &&
                 mapInfo2Properties.containsKey(mapID2Info.get(type)) &&
                 mapInfo2Properties.get(mapID2Info.get(type)).containsKey(key) ? mapInfo2Properties.get(mapID2Info.get(type)).getProperty(key) : "";
+    }
+
+    private boolean isCellContent(int type, String key, String value) {
+        return getCellContent(type, key, value).equals("X");
     }
 
     private String getCellContent(int type, String key, String value) {
@@ -428,31 +421,23 @@ public class MREPrevalenceSheets {
         boolean insuline = mapID2Info.containsKey(ResInfoTypeTools.TYPE_DIABETES) && !getCellContent(ResInfoTypeTools.TYPE_DIABETES, "application", "none").equalsIgnoreCase("X");
         content[DIABETES_INSULINE] = insuline ? "X" : "";
 
-        if (!getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "assigned").equalsIgnoreCase("X")) {
+        // alle die nicht mindestens "pg1" oder höher haben gelten als "pg0". Auch diejenigen, die nie beantragt haben oder abgelehnt wurden.
+        boolean pg1andabove = isCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg1") ||
+                isCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg2") ||
+                isCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg3") ||
+                isCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg4") ||
+                isCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg5");
+
+
+        if (!pg1andabove) {
             content[CARELEVEL0] = "X";
         } else {
-            String text = getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "result").replaceAll("\\s", "");
+            content[CARELEVEL1] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg1");
+            content[CARELEVEL2] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg2");
+            content[CARELEVEL3] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg3");
+            content[CARELEVEL4] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg4");
+            content[CARELEVEL5] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg5");
 
-            Pattern p0 = Pattern.compile("(PS0|0|Pflegestufe0)", Pattern.CASE_INSENSITIVE);
-            Matcher m0 = p0.matcher(text);
-
-            Pattern p1 = Pattern.compile("(PS1|1|Pflegestufe1)", Pattern.CASE_INSENSITIVE);
-            Matcher m1 = p1.matcher(text);
-
-            Pattern p2 = Pattern.compile("(PS2|2|Pflegestufe2)", Pattern.CASE_INSENSITIVE);
-            Matcher m2 = p2.matcher(text);
-
-            Pattern p3 = Pattern.compile("(PS3|3|Pflegestufe3)", Pattern.CASE_INSENSITIVE);
-            Matcher m3 = p3.matcher(text);
-
-            Pattern p3p = Pattern.compile("(PS3p|3p|Pflegestufe3p|PS3\\+|3\\+|Pflegestufe3\\+)", Pattern.CASE_INSENSITIVE);
-            Matcher m3p = p3p.matcher(text);
-
-            content[CARELEVEL0] = m0.matches() ? "X" : "";
-            content[CARELEVEL1] = m1.matches() ? "X" : "";
-            content[CARELEVEL2] = m2.matches() ? "X" : "";
-            content[CARELEVEL3] = m3.matches() ? "X" : "";
-            content[CARELEVEL3p] = m3p.matches() ? "X" : "";
         }
 
         content[PNEUMOCOCCAL_VACCINE] = getCellContent(ResInfoTypeTools.TYPE_VACCINE, "vaccinetype", "9");
@@ -656,14 +641,6 @@ public class MREPrevalenceSheets {
 
         sheet1.getRow(ROW_SHEET1_TITLE).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("prevalence.sheet1.title"));
         sheet1.getRow(ROW_SHEET1_TITLE).getCell(COL_SHEET1_TITLE).setCellStyle(titleStyle);
-/*
-//        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("home.name"));
-        sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("num.of.beds"));
-        sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("beds.in.use"));
-
-//        sheet1.getRow(ROW_SHEET1_TITLE + 2).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("home.name"));
-        sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE + 1).setCellValue(38);
-        sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE + 1).setCellValue(37);*/
 
         sheet1.getRow(ROW_SHEET1_TITLE + 3).createCell(COL_SHEET1_TITLE).setCellValue(SYSTools.xx("day.of.elicitation"));
         sheet1.getRow(ROW_SHEET1_TITLE + 4).createCell(COL_SHEET1_TITLE).setCellValue(targetDate.toString("dd.MM.yyyy"));
@@ -671,16 +648,8 @@ public class MREPrevalenceSheets {
         for (int i = 0; i < MAXCOL_SHEET1; i++) {
             sheet1.getRow(SHEET1_START_OF_LIST).createCell(i).setCellValue(SYSTools.xx("prevalence.sheet1.col" + String.format("%02d", i + 1) + ".title"));
             sheet1.getRow(SHEET1_START_OF_LIST).getCell(i).setCellStyle(rotatedStyle);
-
         }
     }
-//
-//    private void addStatLine(Resident resident, boolean anon) {
-//        String room = resident.getRoom() != null ? resident.getRoom().toString() : "--";
-//        String rid = anon ? resident.getRID() : ResidentTools.getLabelText(resident);
-//        String resident_away_yesterday = mapID2Info
-//    }
-
 
     private void createRows(Sheet sheet, int num) {
         int offset = sheet.getLastRowNum();

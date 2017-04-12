@@ -57,8 +57,10 @@ public class ResInfoType implements Serializable {
     @Version
     @Column(name = "version")
     private Long version;
-    // this column tells us which form was replaced by which other form. In fact it means, that every ResInfoType with the same equiv has
-    // evolved over the time. All ResInfoTypes with the same Equiv are listed in the same CollapsiblePane in PnlInformation.
+    // diese Spalte wird verwendet, wenn sich die Formulare ändern. Alle Vorgängerversionen eines Formulars haben dann die gleiche EQUIV Zahl.
+    // wenn ein neues Formular (das bisher noch nicht aktualisiert wurde) hinzu kommt, nimmt man einfach die höchste EQUIV + 1.
+    // So weiss OPDE aber hinterher was zusammengehört.
+    // Diese Änderungen werden aber nur bei der Entwicklung vorgenommen und nicht während der Laufzeit.
     @Column(name = "equiv")
     private Integer equiv;
 

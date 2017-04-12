@@ -806,6 +806,7 @@ public class PnlControlling extends CleanablePanel {
 
 
         // ResInfoTypeTools.TYPE_NURSING_INSURANCE
+        // https://github.com/tloehr/Offene-Pflege.de/issues/71
         JPanel pnlInsuranceGrade = new JPanel(new BorderLayout());
         final JButton btnIG = GUITools.createHyperlinkButton("misc.msg.InsuranceGrades", null, null);
 
