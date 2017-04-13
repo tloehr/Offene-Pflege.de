@@ -21,10 +21,8 @@ import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.care.info.PnlEditResInfo;
 import op.threads.DisplayManager;
-import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +32,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
@@ -49,10 +48,7 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
@@ -130,15 +126,6 @@ public class PnlDev extends CleanablePanel {
 
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
 
-//        System.out.println("Pflegestufen-Auswertung für " + sdf.format(((DateMidnight) cmbMonth.getSelectedItem()).toDate()));
-//        System.out.println("-------------------------------------------------------");
-//        System.out.println("-------------------------------------------------------");
-
-//        String priorResident = "";
-
-//        ResInfo ps = null;
-//        BigDecimal essen = BigDecimal.ZERO;
-//        BigDecimal mobil = BigDecimal.ZERO;
         BigDecimal grundpf = BigDecimal.ZERO;
         BigDecimal behand = BigDecimal.ZERO;
         BigDecimal hausw = BigDecimal.ZERO;
@@ -531,7 +518,83 @@ public class PnlDev extends CleanablePanel {
     }
 
     private void button3ActionPerformed(ActionEvent e) {
-//        new MREPrevalenceSheets(new LocalDate(), false);
+
+        // batch upgrade für NINSURANCE nach NINSUR02
+
+        EntityManager em = OPDE.createEM();
+        try {
+
+            ResInfoType ninsurance = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_NURSING_INSURANCE);
+
+            Query q1 = em.createQuery(" SELECT ri FROM ResInfo ri WHERE ri.bwinfotyp.bwinftyp = :id AND ri.to = :forever ");
+            q1.setParameter("id", "NINSURANCE");
+            q1.setParameter("forever", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+
+            ArrayList<ResInfo> list = new ArrayList<>(q1.getResultList());
+
+
+            em.getTransaction().begin();
+
+            for (ResInfo info : list) {
+                ResInfo oldinfo = em.merge(info);
+
+                resident = oldinfo.getResident();
+
+                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                em.lock(oldinfo, LockModeType.OPTIMISTIC);
+                oldinfo.setTo(new Date());
+                oldinfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+
+                Properties content = new Properties();
+
+                try {
+                    StringReader reader = new StringReader(oldinfo.getProperties());
+                    content.load(reader);
+                    reader.close();
+                } catch (IOException ex) {
+                    OPDE.fatal(ex);
+                }
+
+                String result = content.getProperty("result").replaceAll("\\s+", "");
+
+                if (result.toUpperCase().startsWith("PG")) {
+                    result = "pg" + result.substring(2);
+                } else {
+                    result = content.getProperty("grade");
+                }
+
+                content.remove("pea");
+                content.remove("peadate");
+                content.remove("result");
+
+                content.setProperty("grade", result);
+
+                ResInfo newInfo = em.merge(new ResInfo(ninsurance, resident));
+                ResInfoTools.setContent(newInfo, content);
+                newInfo.setHtml(ResInfoTools.getContentAsHTML(newInfo));
+
+            }
+
+            em.getTransaction().commit();
+
+        } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+        } catch (Exception ex1) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(ex1);
+        } finally {
+            em.close();
+        }
     }
 
     private void txtResSearchActionPerformed(ActionEvent e) {
@@ -660,8 +723,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                    "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
-                    "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
+                        "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //======== scrollPane1 ========
                 {
@@ -698,25 +761,25 @@ public class PnlDev extends CleanablePanel {
             //======== panel3 ========
             {
                 panel3.setLayout(new FormLayout(
-                    "pref, 9*($lcgap, default)",
-                    "pref, 7*($lgap, default)"));
+                        "pref, 9*($lcgap, default)",
+                        "pref, 7*($lgap, default)"));
 
                 //---- label1 ----
                 label1.setText("text");
                 panel3.add(label1, CC.xy(15, 9));
 
                 //---- button3 ----
-                button3.setText("Create xlsx");
+                button3.setText("update NINSURANCE -> NINSUR02");
                 button3.addActionListener(e -> button3ActionPerformed(e));
                 panel3.add(button3, CC.xy(19, 15));
             }
-            tabbedPane1.addTab("test1", panel3);
+            tabbedPane1.addTab("NINSUNRANCE", panel3);
 
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "left:default:grow",
-                    "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
+                        "left:default:grow",
+                        "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----
@@ -750,8 +813,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel4 ========
             {
                 panel4.setLayout(new FormLayout(
-                    "default, $lcgap, default",
-                    "6*(default, $lgap), default"));
+                        "default, $lcgap, default",
+                        "6*(default, $lgap), default"));
 
                 //---- txtResSearch ----
                 txtResSearch.addActionListener(e -> txtResSearchActionPerformed(e));
@@ -781,8 +844,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel5 ========
             {
                 panel5.setLayout(new FormLayout(
-                    "default, $rgap, default:grow",
-                    "fill:default, $lgap, default:grow"));
+                        "default, $rgap, default:grow",
+                        "fill:default, $lgap, default:grow"));
 
                 //======== scrollPane3 ========
                 {

@@ -1124,7 +1124,6 @@ public class PnlEditResInfo {
                 j.setOpaque(false);
                 focusTraversal.add(j);
 
-//                j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String compName = attributes.getValue("name");
                 String layout = attributes.getValue("layout");
                 if (SYSTools.catchNull(layout).isEmpty()) {

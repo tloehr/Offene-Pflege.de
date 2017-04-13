@@ -558,9 +558,22 @@ public class TXEssenDoc {
         content.put(TXEAF.DATE_REQUESTED_INSURANCE_GRADE, getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "requestdate"));
         content.put(TXEAF.ASSIGNED_INSURANCE_GRADE, getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "result"));
 
+        // https://github.com/tloehr/Offene-Pflege.de/issues/71
         String grade = getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade");
-        grade = grade.equalsIgnoreCase("refused") ? "none" : grade; // there is no such thing as refused request in this document.
-        content.put(TXEAF.ASSIGNED_INSURANCE_GRADE, getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "result"));
+        boolean pg1andabove = grade.equalsIgnoreCase("pg1") ||
+                grade.equalsIgnoreCase("pg2") ||
+                grade.equalsIgnoreCase("pg3") ||
+                grade.equalsIgnoreCase("pg4") ||
+                grade.equalsIgnoreCase("pg5");
+
+        if (pg1andabove) {
+            // das pickt sich einfach die Zahl aus dem z.B. p1 und hängt setzt ein Wort wie "Pflegegrad 1" zusammen.
+            grade = SYSTools.xx("ninsurance.grade") + " " + grade.substring(2);
+        } else {
+            grade = "--";
+        }
+
+        content.put(TXEAF.ASSIGNED_INSURANCE_GRADE, grade);
         content.put(TXEAF.INSURANCE_GRADE_NO, setCheckbox(grade.equalsIgnoreCase("none")));
         content.put(TXEAF.INSURANCE_GRADE_YES, setCheckbox(grade.equalsIgnoreCase("assigned")));
         content.put(TXEAF.INSURANCE_GRADE_REQUESTED, setCheckbox(grade.equalsIgnoreCase("requested")));
