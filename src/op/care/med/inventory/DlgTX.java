@@ -27,7 +27,6 @@
 
 package op.care.med.inventory;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.MedStockTools;
@@ -35,18 +34,19 @@ import entity.prescription.MedStockTransaction;
 import entity.prescription.MedStockTransactionTools;
 import entity.prescription.TradeFormTools;
 import op.OPDE;
+import op.tools.DocumentSizeFilter;
 import op.tools.MyJDialog;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.DefaultStyledDocument;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 
 /**
  *
@@ -63,7 +63,7 @@ public class DlgTX extends MyJDialog {
         this.tx = tx;
         this.actionBlock = actionBlock;
         initDialog();
-        pack();
+//        pack();
     }
 
     private void txtMengeFocusGained(FocusEvent e) {
@@ -125,9 +125,41 @@ public class DlgTX extends MyJDialog {
         tx = null;
     }
 
+    private void updateCount(DefaultStyledDocument doc) {
+        // http://stackoverflow.com/questions/13863795/enforce-max-characters-on-swing-jtextarea-with-a-few-curve-balls
+        // https://github.com/tloehr/Offene-Pflege.de/issues/76
+        lblLen.setText((100 - doc.getLength()) + " " + SYSTools.xx("misc.msg.characters.remaining"));
+    }
+
     private void initDialog() {
         initComponents();
         lblText.setText(SYSTools.xx("opde.medication.tx.text"));
+
+        // http://stackoverflow.com/questions/13863795/enforce-max-characters-on-swing-jtextarea-with-a-few-curve-balls
+        // https://github.com/tloehr/Offene-Pflege.de/issues/76
+        DefaultStyledDocument doc = new DefaultStyledDocument();
+        doc.setDocumentFilter(new DocumentSizeFilter(100));
+
+        doc.addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateCount(doc);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateCount(doc);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateCount(doc);
+            }
+        });
+
+        txtText.setDocument(doc);
+        updateCount(doc);
+
         lblValue.setText(SYSTools.xx("misc.msg.amount"));
         lblWeightControl.setText(SYSTools.xx("opde.medication.tx.controlWeight"));
         lblUnit2.setText("g");
@@ -161,8 +193,11 @@ public class DlgTX extends MyJDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
+        panel2 = new JPanel();
         lblText = new JLabel();
-        txtText = new JTextField();
+        lblLen = new JLabel();
+        scrollPane1 = new JScrollPane();
+        txtText = new JTextArea();
         txtValue = new JTextField();
         lblValue = new JLabel();
         lblUnit = new JLabel();
@@ -182,18 +217,33 @@ public class DlgTX extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
-            "2*(default, $lgap), fill:default, $lgap, default, $lgap, fill:default"));
+            "$ugap, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, $ugap",
+            "$ugap, $lgap, 34dlu, $lgap, fill:default, $lgap, default, $lgap, fill:default, $ugap"));
 
-        //---- lblText ----
-        lblText.setText("Buchungstext");
-        lblText.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblText, CC.xy(3, 3, CC.DEFAULT, CC.TOP));
+        //======== panel2 ========
+        {
+            panel2.setLayout(new BoxLayout(panel2, BoxLayout.PAGE_AXIS));
 
-        //---- txtText ----
-        txtText.setColumns(100);
-        txtText.addActionListener(e -> txtTextActionPerformed(e));
-        contentPane.add(txtText, CC.xywh(5, 3, 3, 1));
+            //---- lblText ----
+            lblText.setText("Buchungstext");
+            lblText.setFont(new Font("Arial", Font.PLAIN, 14));
+            panel2.add(lblText);
+
+            //---- lblLen ----
+            lblLen.setText("12");
+            lblLen.setFont(new Font("Arial", Font.PLAIN, 14));
+            panel2.add(lblLen);
+        }
+        contentPane.add(panel2, CC.xy(3, 3, CC.DEFAULT, CC.TOP));
+
+        //======== scrollPane1 ========
+        {
+
+            //---- txtText ----
+            txtText.setLineWrap(true);
+            scrollPane1.setViewportView(txtText);
+        }
+        contentPane.add(scrollPane1, CC.xywh(5, 3, 3, 1, CC.FILL, CC.FILL));
 
         //---- txtValue ----
         txtValue.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -259,7 +309,7 @@ public class DlgTX extends MyJDialog {
             panel1.add(btnBuchung);
         }
         contentPane.add(panel1, CC.xywh(5, 9, 3, 1, CC.RIGHT, CC.DEFAULT));
-        setSize(600, 165);
+        setSize(600, 195);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -292,8 +342,11 @@ public class DlgTX extends MyJDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private JPanel panel2;
     private JLabel lblText;
-    private JTextField txtText;
+    private JLabel lblLen;
+    private JScrollPane scrollPane1;
+    private JTextArea txtText;
     private JTextField txtValue;
     private JLabel lblValue;
     private JLabel lblUnit;

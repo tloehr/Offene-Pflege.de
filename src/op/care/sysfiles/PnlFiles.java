@@ -43,6 +43,7 @@ import op.tools.NursingRecordsPanel;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import tablerenderer.RNDHTML;
 
@@ -74,6 +75,8 @@ public class PnlFiles extends NursingRecordsPanel {
     //    private RowFilter<TMSYSFiles, Integer> textFilter;
     private TableRowSorter<TMSYSFiles> sorter;
     private TMSYSFiles tmSYSFiles;
+
+    private Logger logger = Logger.getLogger(getClass());
 
     /**
      * Creates new form PnlFiles
@@ -171,7 +174,8 @@ public class PnlFiles extends NursingRecordsPanel {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-                return super.getTableCellRendererComponent(table, sdf.format((Date) value), isSelected, hasFocus, row, column);
+                // https://github.com/tloehr/Offene-Pflege.de/issues/68
+                return super.getTableCellRendererComponent(table, value == null ? "--" : sdf.format((Date) value), isSelected, hasFocus, row, column);
             }
         });
         tblFiles.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
@@ -388,7 +392,7 @@ public class PnlFiles extends NursingRecordsPanel {
                     }
                 });
                 menu.add(itemPopupDelete);
-                itemPopupDelete.setEnabled(singleRowSelected);
+                itemPopupDelete.setEnabled(resident.isActive() && singleRowSelected);
             }
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
@@ -441,7 +445,8 @@ public class PnlFiles extends NursingRecordsPanel {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-
+        // Das hier bleibt bewusst auch bei archivierten BWs offen.
+        // Es kann ja sein, dass man hinterher noch was hinzufügen muss.
         mypanel.add(GUITools.getDropPanel(files -> {
             java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, resident);
             if (!successful.isEmpty()) {

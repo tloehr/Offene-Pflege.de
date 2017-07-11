@@ -15,6 +15,7 @@ import entity.process.QProcessElement;
 import entity.process.SYSPRE2PROCESS;
 import entity.system.Commontags;
 import entity.system.Users;
+import interfaces.Attachable;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -89,7 +90,7 @@ import java.util.List;
 @Entity
 @Table(name = "prescription")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class Prescription extends Ownable implements Serializable, QProcessElement, Cloneable, Comparable<Prescription> {
+public class Prescription extends Ownable implements Serializable, QProcessElement, Cloneable, Comparable<Prescription>, Attachable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -611,5 +612,10 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     public String toString() {
         return "Prescription{" +
                 "verid=" + id;
+    }
+
+    @Override
+    public boolean isActive() {
+        return resident.isActive() && !isClosed();
     }
 }

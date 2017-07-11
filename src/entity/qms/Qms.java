@@ -2,6 +2,7 @@ package entity.qms;
 
 import entity.files.Qms2File;
 import entity.system.Users;
+import interfaces.Attachable;
 import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
@@ -14,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "qms")
-public class Qms implements Comparable<Qms> {
+public class Qms implements Comparable<Qms>, Attachable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -218,5 +219,10 @@ public class Qms implements Comparable<Qms> {
     public int compareTo(Qms o) {
 
         return target.compareTo(o.getTarget());
+    }
+
+    @Override
+    public boolean isActive() {
+        return isOpen();
     }
 }

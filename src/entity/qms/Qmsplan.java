@@ -3,6 +3,7 @@ package entity.qms;
 import entity.files.Qmsplan2File;
 import entity.system.Commontags;
 import entity.system.Users;
+import interfaces.Attachable;
 import op.OPDE;
 import gui.GUITools;
 
@@ -18,7 +19,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "qmsplan")
-public class Qmsplan {
+public class Qmsplan implements Attachable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -136,7 +137,7 @@ public class Qmsplan {
         return attachedFilesConnections;
     }
 
-
+    @Override
     public boolean isActive() {
         return state == QmsplanTools.STATE_ACTIVE;
     }

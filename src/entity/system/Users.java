@@ -28,6 +28,7 @@ package entity.system;
 import entity.files.*;
 import entity.reports.NReport;
 import entity.staff.Training2Users;
+import interfaces.Attachable;
 import op.tools.SYSTools;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
@@ -43,7 +44,7 @@ import java.util.Collection;
 @Entity
 @Table(name = "users")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class Users implements Serializable, Comparable<Users> {
+public class Users implements Serializable, Comparable<Users>, Attachable {
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "UKennung")
@@ -184,6 +185,7 @@ public class Users implements Serializable, Comparable<Users> {
      *
      * @return true, wenn ja; false, sonst.
      */
+    @Override
     public boolean isActive() {
         return status == UsersTools.STATUS_ACTIVE;
     }

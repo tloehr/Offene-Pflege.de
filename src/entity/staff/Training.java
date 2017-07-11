@@ -3,6 +3,7 @@ package entity.staff;
 import entity.files.Training2File;
 import entity.system.Commontags;
 import entity.system.Users;
+import interfaces.Attachable;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
@@ -15,7 +16,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "training")
-public class Training {
+public class Training implements Attachable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -163,5 +164,10 @@ public class Training {
         result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public boolean isActive() {
+        return true;
     }
 }

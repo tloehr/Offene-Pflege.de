@@ -33,6 +33,7 @@ import entity.process.SYSINF2PROCESS;
 import entity.system.Commontags;
 import entity.system.Users;
 import entity.values.ResValue;
+import interfaces.Attachable;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -52,7 +53,7 @@ import org.joda.time.LocalDate;
  */
 @Entity
 @Table(name = "resinfo")
-public class ResInfo implements Serializable, QProcessElement, Cloneable, Comparable<ResInfo> {
+public class ResInfo implements Serializable, QProcessElement, Cloneable, Comparable<ResInfo>, Attachable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -463,5 +464,10 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
                 ", attachedFilesConnections=" + attachedFilesConnections.size() +
                 ", attachedProcessConnections=" + attachedProcessConnections.size() +
                 '}';
+    }
+
+    @Override
+    public boolean isActive() {
+        return resident.isActive() && !isClosed();
     }
 }

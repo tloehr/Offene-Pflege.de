@@ -10,6 +10,7 @@ import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSVAL2PROCESS;
 import entity.system.Users;
+import interfaces.Attachable;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -28,7 +29,7 @@ import java.util.Date;
 @Entity
 @Table(name = "resvalue")
 
-public class ResValue implements Serializable, QProcessElement, Cloneable, Comparable<ResValue> {
+public class ResValue implements Serializable, QProcessElement, Cloneable, Comparable<ResValue>, Attachable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -401,5 +402,10 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     @Override
     public String toString() {
         return "entity.values.ResValue[bwid=" + id + "]";
+    }
+
+    @Override
+    public boolean isActive() {
+        return resident.isActive() && !isObsolete();
     }
 }

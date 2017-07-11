@@ -434,11 +434,13 @@ public class PnlInformation extends NursingRecordsPanel {
                                  *      \__,_|\__,_|\__,_|
                                  *
                                  */
-                                if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS ||
-                                        resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS ||
-                                        mapType2ResInfos.get(resInfoType).isEmpty() ||
-                                        ResInfoTypeTools.containsOnlyClosedInfos(mapType2ResInfos.get(resInfoType)) ||
-                                        ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType))
+                                if (resident.isActive() &&
+                                        (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS ||
+                                                resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS ||
+                                                mapType2ResInfos.get(resInfoType).isEmpty() ||
+                                                ResInfoTypeTools.containsOnlyClosedInfos(mapType2ResInfos.get(resInfoType)) ||
+                                                ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType))
+                                        )
                                         ) {
                                     if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
                                         final JideButton btnAdd = GUITools.createHyperlinkButton("nursingrecords.info.noconstraints", SYSConst.icon22add, null);
@@ -861,7 +863,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo)  && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             cptitle.getRight().add(btnProcess);
         }
 
@@ -927,7 +929,7 @@ public class PnlInformation extends NursingRecordsPanel {
             }
             btnPrint.setEnabled(false);
             btnMenu.setEnabled(false);
-            boolean canBeEnabled = resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints();
+            boolean canBeEnabled = resident.isActive() && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints();
 
             if (canBeEnabled) {
                 CollectionUtils.forAllDo(mapInfo2Editor.entrySet(), o -> {
@@ -1490,6 +1492,7 @@ public class PnlInformation extends NursingRecordsPanel {
                      *
                      */
                     final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.info.btnDelete.tooltip", SYSConst.icon22delete, null);
+                    btnDelete.setEnabled(resident.isActive());
                     btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnDelete.addActionListener(actionEvent -> {
                         currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + resInfo.getPITAsHTML() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
@@ -1816,7 +1819,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 // If the closure is null, only attached files can be viewed but no new ones can be attached.
                 Closure closure = o -> currentEditor = null;
 
-                if (!resInfo.isClosed() && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD) {
+                if ( !resInfo.isClosed() && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD) {
                     closure = o -> {
                         EntityManager em = OPDE.createEM();
                         final ResInfo editinfo = em.find(ResInfo.class, resInfo.getID());
@@ -1942,7 +1945,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo) && resInfo.getPrescription() == null);
+            btnProcess.setEnabled( ResInfoTools.isEditable(resInfo)  && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
 
             if (!resInfo.getAttachedQProcessConnections().isEmpty()) {
                 JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedQProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);

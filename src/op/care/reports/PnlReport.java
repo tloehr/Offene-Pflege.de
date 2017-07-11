@@ -514,6 +514,18 @@ public class PnlReport extends NursingRecordsPanel {
         });
 
 
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+            final JButton btnPrintMonth = new JButton(SYSConst.icon22print2);
+            btnPrintMonth.setPressedIcon(SYSConst.icon22print2Pressed);
+            btnPrintMonth.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnPrintMonth.setContentAreaFilled(false);
+            btnPrintMonth.setBorder(null);
+            btnPrintMonth.setToolTipText(SYSTools.xx("misc.tooltips.btnprintmonth"));
+            btnPrintMonth.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, start, end), true, null, null), false));
+            cptitle.getRight().add(btnPrintMonth);
+        }
+
+
         cpYear.setTitleLabelComponent(cptitle.getMain());
         cpYear.setSlidingDirection(SwingConstants.SOUTH);
         cpYear.setBackground(SYSConst.orange1[SYSConst.medium3]);
@@ -1059,7 +1071,7 @@ public class PnlReport extends NursingRecordsPanel {
                             });
                             currentEditor.setVisible(true);
                         });
-                        btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+                        btnProcess.setEnabled(nreport.isActive() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
                         pnlSingle.getRight().add(btnProcess);
                     }
 
@@ -1550,7 +1562,7 @@ public class PnlReport extends NursingRecordsPanel {
             final JButton btnFiles = GUITools.createHyperlinkButton("misc.btnfiles.tooltip", SYSConst.icon22attach, null);
             btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnFiles.addActionListener(actionEvent -> {
-                Closure fileHandleClosure = nreport.isObsolete() ? null : o -> {
+                Closure fileHandleClosure = nreport.isObsolete() || !resident.isActive() ? null : o -> {
                     EntityManager em = OPDE.createEM();
                     final NReport myReport = em.find(NReport.class, nreport.getID());
                     em.close();
@@ -1593,6 +1605,7 @@ public class PnlReport extends NursingRecordsPanel {
              */
             final JButton btnProcess = GUITools.createHyperlinkButton("misc.btnprocess.tooltip", SYSConst.icon22link, null);
             btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnProcess.setEnabled(nreport.isActive() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             btnProcess.addActionListener(actionEvent -> {
                 currentEditor = new DlgProcessAssign(nreport, o -> {
                     if (o == null) {

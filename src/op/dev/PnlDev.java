@@ -21,6 +21,7 @@ import gui.interfaces.CleanablePanel;
 import op.OPDE;
 import op.care.info.PnlEditResInfo;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.io.FileUtils;
@@ -532,51 +533,57 @@ public class PnlDev extends CleanablePanel {
 
             ArrayList<ResInfo> list = new ArrayList<>(q1.getResultList());
 
+            if (!list.isEmpty()) {
 
-            em.getTransaction().begin();
+                em.getTransaction().begin();
 
-            for (ResInfo info : list) {
-                ResInfo oldinfo = em.merge(info);
+                for (ResInfo info : list) {
+                    ResInfo oldinfo = em.merge(info);
 
-                resident = oldinfo.getResident();
+                    resident = oldinfo.getResident();
 
-                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                em.lock(oldinfo, LockModeType.OPTIMISTIC);
-                oldinfo.setTo(new Date());
-                oldinfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                    em.lock(oldinfo, LockModeType.OPTIMISTIC);
+                    oldinfo.setTo(new Date());
+                    oldinfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
 
-                Properties content = new Properties();
+                    Properties content = new Properties();
 
-                try {
-                    StringReader reader = new StringReader(oldinfo.getProperties());
-                    content.load(reader);
-                    reader.close();
-                } catch (IOException ex) {
-                    OPDE.fatal(ex);
+                    try {
+                        StringReader reader = new StringReader(oldinfo.getProperties());
+                        content.load(reader);
+                        reader.close();
+                    } catch (IOException ex) {
+                        OPDE.fatal(ex);
+                    }
+
+                    String result = content.getProperty("result").replaceAll("\\s+", "");
+
+                    if (result.toUpperCase().startsWith("PG")) {
+                        result = "pg" + result.substring(2);
+                    } else {
+                        result = content.getProperty("grade");
+                    }
+
+                    content.remove("pea");
+                    content.remove("peadate");
+                    content.remove("result");
+
+                    content.setProperty("grade", result);
+
+                    ResInfo newInfo = em.merge(new ResInfo(ninsurance, resident));
+                    ResInfoTools.setContent(newInfo, content);
+                    newInfo.setHtml(ResInfoTools.getContentAsHTML(newInfo));
+
                 }
 
-                String result = content.getProperty("result").replaceAll("\\s+", "");
+                em.getTransaction().commit();
 
-                if (result.toUpperCase().startsWith("PG")) {
-                    result = "pg" + result.substring(2);
-                } else {
-                    result = content.getProperty("grade");
-                }
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Ok. "+ list.size()  +" Datensätze geändert."));
 
-                content.remove("pea");
-                content.remove("peadate");
-                content.remove("result");
-
-                content.setProperty("grade", result);
-
-                ResInfo newInfo = em.merge(new ResInfo(ninsurance, resident));
-                ResInfoTools.setContent(newInfo, content);
-                newInfo.setHtml(ResInfoTools.getContentAsHTML(newInfo));
-
+            } else {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Nichts mehr zu tun. Keine offenen NINSURANCE gefunden."));
             }
-
-            em.getTransaction().commit();
-
         } catch (OptimisticLockException ole) {
             OPDE.warn(ole);
             if (em.getTransaction().isActive()) {

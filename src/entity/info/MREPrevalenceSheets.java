@@ -63,12 +63,12 @@ public class MREPrevalenceSheets {
     public static final int URINARY_INCONTINENCE = 18; // resinfotype "HINKO" OR "HINKON",TYPE_INCO_PROFILE_DAY = 113 OR TYPE_INCO_PROFILE_NIGHT = 114, inkoprofil != kontinenz
     public static final int FAECAL_INCONTINENCE = 19; // resinfotype "FINCO1",TYPE_INCO_FAECAL = 115,incolevel > 0
     public static final int DIABETES_INSULINE = 20; // resinfotype "DIABETES1",TYPE_DIABETES = 98,application != none
-    public static final int CARELEVEL0 = 21; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS0" || "0" || "Pflegestufe0"
-    public static final int CARELEVEL1 = 22; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS1" || "1" || "Pflegestufe1"
-    public static final int CARELEVEL2 = 23; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS2" || "2" || "Pflegestufe2"
-    public static final int CARELEVEL3 = 24; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3" || "3" || "Pflegestufe3"
-    public static final int CARELEVEL4 = 25; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3+" || "3+" || "Pflegestufe3+" || "PS3p" || "3p" || "Pflegestufe3p" || "PS3plus" || "3plus" || "Pflegestufe3plus"
-    public static final int CARELEVEL5 = 26; // resinfotype "NINSURANCE",TYPE_NURSING_INSURANCE = 105,grade == assigned & result.replaceAll("\\s","") == "PS3+" || "3+" || "Pflegestufe3+" || "PS3p" || "3p" || "Pflegestufe3p" || "PS3plus" || "3plus" || "Pflegestufe3plus"
+    public static final int CARELEVEL0 = 21;
+    public static final int CARELEVEL1 = 22;
+    public static final int CARELEVEL2 = 23;
+    public static final int CARELEVEL3 = 24;
+    public static final int CARELEVEL4 = 25;
+    public static final int CARELEVEL5 = 26;
     public static final int PNEUMOCOCCAL_VACCINE = 27; // resinfotype "VACCIN1",TYPE_VACCINE = 144,vaccinetype == 9
     public static final int RUNNING_ANTIBIOTICS = 28; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
     public static final int BEDS_IN_USE = 29; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".

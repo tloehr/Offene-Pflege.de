@@ -559,6 +559,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 btnDelInventory.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnDelInventory.setContentAreaFilled(false);
                 btnDelInventory.setBorder(null);
+                btnDelInventory.setEnabled(resident.isActive());
                 btnDelInventory.setToolTipText(SYSTools.xx("nursingrecords.inventory.btndelinventory.tooltip"));
                 btnDelInventory.addActionListener(actionEvent -> {
                     currentEditor = new DlgYesNo(SYSTools.xx("nursingrecords.inventory.question.delete1") + "<br/><b>" + inventory.getText() + "</b>" +
@@ -823,6 +824,7 @@ public class PnlInventory extends NursingRecordsPanel {
             red.setBorderPainted(false);
             red.setBorder(null);
             red.setOpaque(false);
+            red.setEnabled(resident.isActive());
             bg.add(red);
 
 
@@ -834,6 +836,7 @@ public class PnlInventory extends NursingRecordsPanel {
             yellow.setBorderPainted(false);
             yellow.setBorder(null);
             yellow.setOpaque(false);
+            yellow.setEnabled(resident.isActive());
             bg.add(yellow);
 
             green = new JRadioButton(SYSConst.icon22ledGreenOff);
@@ -844,6 +847,7 @@ public class PnlInventory extends NursingRecordsPanel {
             green.setBorderPainted(false);
             green.setBorder(null);
             green.setOpaque(false);
+            green.setEnabled(resident.isActive());
             bg.add(green);
             /***
              *                   _
@@ -1166,7 +1170,6 @@ public class PnlInventory extends NursingRecordsPanel {
                 }
                 currentEditor = null;
             });
-            currentEditor.setVisible(true);
         });
         btnAddTX.setEnabled(!stock.isClosed());
         pnlTX.add(btnAddTX);
@@ -1604,23 +1607,6 @@ public class PnlInventory extends NursingRecordsPanel {
         cpsInventory.addExpansion();
     }
 
-//    private void colorize(Component component, int depth, boolean odd) {
-//
-//        if (component instanceof CollapsiblePane) {
-//            OPDE.debug("Depth: " + depth);
-//            component.setBackground(getColor(depth + 4, odd));
-//        }
-//        if (component instanceof JPanel) {
-//            component.setBackground(getColor(depth + 6, odd));
-//        }
-//
-//        if (component instanceof Container) {
-//            depth++;
-//            for (Component comp : ((Container) component).getComponents()) {
-//                colorize(comp, depth, odd);
-//            }
-//        }
-//    }
 
     private JPanel getMenu(final MedStock stock) {
         final String key = stock.getID() + ".xstock";
@@ -1645,10 +1631,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             MedStock myStock = em.merge(stock);
                             em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
                             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
-//                                    synchronized (lstInventories) {
-//                                        int index = lstInventories.indexOf(myStock.getInventory());
-//                                        lstInventories.get(index).getMedStocks().remove(myStock);
-//                                    }
+
                             em.remove(myStock);
                             em.getTransaction().commit();
 

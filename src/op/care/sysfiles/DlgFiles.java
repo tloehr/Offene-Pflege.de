@@ -18,6 +18,7 @@ import entity.staff.Training;
 import entity.staff.Training2Users;
 import entity.system.Users;
 import entity.values.ResValue;
+import interfaces.Attachable;
 import op.OPDE;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
@@ -42,8 +43,8 @@ import java.util.Collections;
  * @author Torsten Löhr
  */
 public class DlgFiles extends MyJDialog {
-    private Object attachable;
-    private boolean filesAttached = false;
+    private Attachable attachable;
+//    private boolean filesAttached = false;
     private Closure afterAttachAction;
     private JList list;
 
@@ -51,9 +52,9 @@ public class DlgFiles extends MyJDialog {
      * Creates a generic file attachment dialog to show existing files and add new ones.
      *
      * @param attachable        object to add the files to
-     * @param afterAttachAction what to do, after files have been attached. if this is <code>null</code>, file drops are not possible.
-     */
-    public DlgFiles(Object attachable, Closure afterAttachAction) {
+         * @param afterAttachAction what to do, after files have been attached. if this is <code>null</code>, file drops are not possible.
+         */
+        public DlgFiles(Attachable attachable, Closure afterAttachAction) {
         super(false);
         this.attachable = attachable;
         this.afterAttachAction = afterAttachAction;
@@ -62,7 +63,7 @@ public class DlgFiles extends MyJDialog {
     }
 
     private void initDialog() {
-        if (afterAttachAction == null) {
+        if (!attachable.isActive()) {
             contentPanel.add(getFileListPanel(), CC.xywh(1, 1, 3, 1));
         } else {
             contentPanel.add(getFileDropPanel(), CC.xy(1, 1));
@@ -85,7 +86,7 @@ public class DlgFiles extends MyJDialog {
             if (!successful.isEmpty()) {
                 list.setModel(SYSTools.list2dlm(getAttachedFilesList(attachable)));
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
-                filesAttached = true;
+
             }
         });
         return dropPanel;
@@ -93,7 +94,7 @@ public class DlgFiles extends MyJDialog {
 
     @Override
     public void dispose() {
-        if (filesAttached) {
+        if (afterAttachAction != null) {
             afterAttachAction.execute(null);
         }
         super.dispose();
@@ -157,7 +158,7 @@ public class DlgFiles extends MyJDialog {
         return pnlFilesList;
     }
 
-    private ArrayList<SYSFiles> getAttachedFilesList(Object attachable) {
+    private ArrayList<SYSFiles> getAttachedFilesList(Attachable attachable) {
         ArrayList<SYSFiles> files = null;
         EntityManager em = OPDE.createEM();
         if (attachable instanceof NReport) {
@@ -200,10 +201,6 @@ public class DlgFiles extends MyJDialog {
         } else if (attachable instanceof Qmsplan) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.qmsplanAssignCollection ac WHERE ac.qmsplan = :qmsplan ");
             query.setParameter("qmsplan", attachable);
-            files = new ArrayList<SYSFiles>(query.getResultList());
-        } else if (attachable instanceof Training) {
-            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.trainingAssignCollection tac WHERE tac.training = :training ");
-            query.setParameter("training", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof Qms) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.qmsAssignCollection ac WHERE ac.qms = :qms ");

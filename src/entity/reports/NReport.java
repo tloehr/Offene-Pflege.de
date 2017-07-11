@@ -8,6 +8,7 @@ import entity.process.QProcessElement;
 import entity.process.SYSNR2PROCESS;
 import entity.system.Commontags;
 import entity.system.Users;
+import interfaces.Attachable;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -23,29 +24,29 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This is the entity class responsible for the storage of nursing reports. As this is a documentation, there are some features
- * with this database table that guarantees the correct handling, even when reports are deleted or changed.
- * <p>
- * The reports are <b>never</b> really deleted or altered. They are <b>marked</b> as deleted or altered.
- * <p>
+ * Diese Entity Klasse ist für die Speicherung von der Pflegeberichte zuständig.
+ * Da OPDE dokumentenecht sein soll, werden hier ein paar Besonderheit gewährleistet.
+ * So werden Pflegeberichte nicht gelöscht, sondern als gelöscht markiert. Ebenso bei den
+ * Änderungen eines Berichtes. Der alte Bericht bleibt erhalten und der neue Bericht ersetzt den alten.
  * <ul>
- * <li><b>DELETE</b> - see remarks for delPit</li>
- * <li><b>CHANGE</b> - when a report is changed:
+ * <li><b>LÖSCHEN</b> - bedeutet, dass das Attribut <B>delPit</B> nicht mehr null ist, sondern den Zeitpunkt der Löschung enthält. Das Attribut {@code deletedBy} enthält die Information über den Benutzer, der die Löschung vorgenommen hat. </li>
+ * <li><b>ÄNDERUNG</b> - wenn ein Bericht geändert wird, dann passiert folgendes:
+ * <li>der alte Bericht wird geklont, also haben wir jetzt einen alten und einen neuen Bericht</li>
+ * <li>der neue Bericht wird als Ersatz für den alten markiert. Das bedeutet konkret
  * <ol>
- * <li>a new report is cloned from the old one.</li>
- * <li>the new one is marked as replacement for the old one</li>
- * <li>the old report is marked as replaced by the new report</li>
- * <li>the old report looses all attached files and qprocess connections (which the new one inherited of course)</li>
- * <li>the old report is marked with the editor and the PIT (editedBy, editedPIT)</li>
+ * <li>Im Attribut replacedBy steht der key des neuen Berichtes</li>
+ * <li>Alle verknüpften Dateien und Qualitätsprocesse werden entfernt und dem neuen Bericht zugeordnet.</li>
+ * <li>Die Attribute editedBy und editedPit werden entsprechend gesetzt</li>
  * </ol>
  * </li>
+ * <li>der neue Bericht wird als Ersatz für den alten markiert. Das bedeutet konkret
  * </ul>
  *
  * @author tloehr
  */
 @Entity
 @Table(name = "nreports")
-public class NReport extends Ownable implements Serializable, QProcessElement, Comparable<NReport>, Cloneable {
+public class NReport extends Ownable implements Serializable, QProcessElement, Comparable<NReport>, Cloneable, Attachable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -497,5 +498,10 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     @Override
     public int compareTo(NReport other) {
         return pit.compareTo(other.getPit()) * -1;
+    }
+
+    @Override
+    public boolean isActive() {
+        return resident.isActive() && !isObsolete();
     }
 }

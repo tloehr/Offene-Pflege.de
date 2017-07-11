@@ -463,7 +463,7 @@ public class NReportTools {
      */
     public static String getAsHTML(NReport nReport, String highlight) {
         String result = "<div id=\"fonttext\">";
-
+        logger.debug(nReport.getPbid());
 //        result += getDateAndUser(nReport, false, true);
 
 //        result += SYSTools.catchNull(getTagsAsHTML(nReport), " [", "]") + " ";

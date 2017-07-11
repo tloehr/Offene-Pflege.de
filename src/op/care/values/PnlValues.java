@@ -625,7 +625,7 @@ public class PnlValues extends NursingRecordsPanel {
                     });
                     currentEditor.setVisible(true);
                 });
-                btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+                btnProcess.setEnabled(resValue.isActive() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
                 pnlTitle.getRight().add(btnProcess);
             }
             /***
@@ -1020,7 +1020,7 @@ public class PnlValues extends NursingRecordsPanel {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(!resValue.isObsolete());
+            btnProcess.setEnabled(resValue.isActive() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             pnlMenu.add(btnProcess);
         }
         return pnlMenu;

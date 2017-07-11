@@ -5,6 +5,7 @@ import entity.files.SYSFilesContainer;
 import entity.files.SYSFilesLink;
 import entity.files.TrainingAttendee2File;
 import entity.system.Users;
+import interfaces.Attachable;
 import op.OPDE;
 
 import javax.persistence.*;
@@ -16,7 +17,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "training2users")
-public class Training2Users implements Comparable<Training2Users>, SYSFilesContainer {
+public class Training2Users implements Comparable<Training2Users>, SYSFilesContainer, Attachable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -138,5 +139,10 @@ public class Training2Users implements Comparable<Training2Users>, SYSFilesConta
     @Override
     public int compareTo(Training2Users o) {
         return attendee.getUID().compareTo(o.getAttendee().getUID());
+    }
+
+    @Override
+    public boolean isActive() {
+        return true;
     }
 }

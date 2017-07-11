@@ -414,7 +414,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 currentEditor.setVisible(true);
             });
             // checked for acls
-            btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            btnProcess.setEnabled(prescription.isActive() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             cptitle.getRight().add(btnProcess);
         }
 
@@ -1577,7 +1577,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(!prescription.isClosed());
+            btnProcess.setEnabled(prescription.isActive() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
 
 //            if (!prescription.getAttachedProcessConnections().isEmpty()) {
 //                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);

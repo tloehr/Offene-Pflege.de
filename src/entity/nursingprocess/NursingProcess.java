@@ -12,6 +12,7 @@ import entity.process.QProcessElement;
 import entity.process.SYSNP2PROCESS;
 import entity.system.Commontags;
 import entity.system.Users;
+import interfaces.Attachable;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -28,7 +29,7 @@ import java.util.*;
 @Entity
 @Table(name = "nursingprocess")
 
-public class NursingProcess implements Serializable, QProcessElement, Comparable<NursingProcess>, Cloneable {
+public class NursingProcess implements Serializable, QProcessElement, Comparable<NursingProcess>, Cloneable, Attachable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -427,5 +428,10 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @Override
     public String toString() {
         return "entity.nursingprocess.Planung[planID=" + id + "]";
+    }
+
+    @Override
+    public boolean isActive() {
+        return resident.isActive() && !isClosed();
     }
 }
