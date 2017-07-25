@@ -678,7 +678,7 @@ public class TXEssenDoc {
     }
 
     /**
-     * excretiions
+     * excretions
      */
     private void createContent4Section5() {
 
@@ -1174,7 +1174,7 @@ public class TXEssenDoc {
     }
 
     private void createContent4Section19() {
-        content.put(TXEAF.WoundCommentsSection19, hasWounds() ? SYSTools.xx("") : SYSTools.xx(""));
+        content.put(TXEAF.WoundCommentsSection19, hasWounds() ? SYSTools.xx("txe.wounds.see.attached") : "");
     }
 
     private void createContent4Wounds(PdfStamper stamper) throws Exception {
@@ -1204,11 +1204,15 @@ public class TXEssenDoc {
 
             if (mapID2Info.containsKey(type)) {
 
-                String descriptionKey = (type == ResInfoTypeTools.TYPE_MYCOSIS ? "misc.msg.mycosis" : "");   // Bei Wunden reicht einfach das Datum.
-
                 ResInfo currentWound = mapID2Info.get(type);
 
-                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
+
+                String descriptionKey = (type == ResInfoTypeTools.TYPE_MYCOSIS ? "misc.msg.mycosis" : SYSTools.xx(currentWound.getResInfoType().getShortDescription()));   // Bei Wunden reicht einfach das Datum.
+
+
+                // hier wird der inhalt der farbigen Kästen gesetzt, der für jede Wunde eine Beschreibung enthält.
+                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + ", " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true) + (currentWound.getText().isEmpty() ? "" : ", \"" + currentWound.getText() +"\""))
+                ;
 
                 if (type == ResInfoTypeTools.TYPE_MYCOSIS) {
                     content.put(TXEAF.WOUND_MYCOSIS_HEADLINE, "misc.msg.mycosis");

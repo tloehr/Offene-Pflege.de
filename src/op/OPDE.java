@@ -1,6 +1,6 @@
 /*
  * OffenePflege
- * Copyright (C) 2006-2015 Torsten Löhr
+ * Copyright (C) 2006-2017 Torsten Löhr
  * This program is free software; you can redistribute it and/or modify it under the terms of the 
  * GNU General Public License V2 as published by the Free Software Foundation
  * 
@@ -63,6 +63,18 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 
+/*! \mainpage My Personal Index Page
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation
+ *
+ * \subsection step1 Step 1: Opening the box
+ *
+ * etc...
+ */
 public class OPDE {
     public static final String internalClassID = "opde";
 
@@ -308,7 +320,7 @@ public class OPDE {
         return login;
     }
 
-    public static Users getMe(){
+    public static Users getMe() {
         if (login == null) return null;
         return login.getUser();
     }

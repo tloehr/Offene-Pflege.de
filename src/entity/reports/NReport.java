@@ -24,12 +24,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Diese Entity Klasse ist für die Speicherung von der Pflegeberichte zuständig.
+ * Diese Entity Klasse ist für die Speicherung von Pflegeberichten zuständig.
  * Da OPDE dokumentenecht sein soll, werden hier ein paar Besonderheit gewährleistet.
  * So werden Pflegeberichte nicht gelöscht, sondern als gelöscht markiert. Ebenso bei den
  * Änderungen eines Berichtes. Der alte Bericht bleibt erhalten und der neue Bericht ersetzt den alten.
  * <ul>
- * <li><b>LÖSCHEN</b> - bedeutet, dass das Attribut <B>delPit</B> nicht mehr null ist, sondern den Zeitpunkt der Löschung enthält. Das Attribut {@code deletedBy} enthält die Information über den Benutzer, der die Löschung vorgenommen hat. </li>
+ * <li><b>LÖSCHEN</b> - bedeutet, dass das Attribut <B>delPit</B> nicht mehr null ist, sondern den Zeitpunkt der Löschung enthält.
+ * Das Attribut {@code deletedBy} enthält die Information über den Benutzer, der die Löschung vorgenommen hat. </li>
  * <li><b>ÄNDERUNG</b> - wenn ein Bericht geändert wird, dann passiert folgendes:
  * <li>der alte Bericht wird geklont, also haben wir jetzt einen alten und einen neuen Bericht</li>
  * <li>der neue Bericht wird als Ersatz für den alten markiert. Das bedeutet konkret
@@ -40,6 +41,10 @@ import java.util.List;
  * </ol>
  * </li>
  * <li>der neue Bericht wird als Ersatz für den alten markiert. Das bedeutet konkret
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * </ul>
  *
  * @author tloehr
@@ -58,7 +63,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Long version;
 
     /**
-     * When did the event depicted in this report really happen ?
+     * Hier steht der Zeitpunkt, an dem das beschriebene Ereignis stattgefunden hat.
      */
     @Basic(optional = false)
     @Column(name = "PIT")
@@ -75,7 +80,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Date newPIT;
 
     /**
-     * The time when this report was edited. null if it wasn't.
+     * Falls dieser Bericht nachbearbeitet wurde, dann steht hier der entsprechende Zeitpunkt drin. `null` wenn nicht.
      */
     @Basic(optional = true)
     @Column(name = "EditedPIT")
@@ -83,7 +88,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Date editedPIT;
 
     /**
-     * The time when this report was deleted. null if it wasn't.
+     * Ein Bericht gilt als gelöscht, wenn das Löschdatum hier steht. `null` wenn der Bericht **nicht** gelöscht ist.
      */
     @Basic(optional = true)
     @Column(name = "DelPIT")
@@ -91,21 +96,22 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private Date delPIT;
 
     /**
-     * the text of the report
+     * Der eigentliche Text des Berichtes.
      */
     @Lob
     @Column(name = "Text")
     private String text;
 
     /**
-     * the amount of time the events in this text took to happen. (how much work was it ?)
+     * Das hier ist ein Relikt aus der Zeit als alle in der Pflege so auf den Minuten herumgeritten sind. Man kann hier angeben, wie lange
+     * die Tätigkeit, die in dem Bericht beschrieben wurde, gedauert hat.
      */
     @Basic(optional = false)
     @Column(name = "Dauer")
     private int minutes;
 
     /**
-     * the user who entered this report.
+     * Die Kennung des Benutzers, der diesen Bericht eingetragen hat.
      */
     @JoinColumn(name = "NewBy", referencedColumnName = "UKennung")
     @ManyToOne
@@ -113,60 +119,60 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
 
 
     /**
-     * The user who deleted this report. null if its not deleted.
+     * Bei gelöschten Berichten steht hier der User, der die Löschung vorgenommen hat.
      */
     @JoinColumn(name = "DeletedBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users deletedBy;
 
     /**
-     * the resident who <i>owns</i> this report
+     * Das ist der BW, dem der Bericht zugeordnet wurde.
      */
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Resident resident;
 
     /**
-     * the user who edited this report. null, if it is still unchanged.
+     * Das ist der User, der den Bericht bearbeitet hat. `null` wenn nicht.
      */
     @JoinColumn(name = "EditedBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editedBy;
 
     /**
-     * if this report has been replaced by another one, it is stored here. null, if its not replaced.
+     * Falls der Bericht ersetzt wurde, dann steht der Bericht, der ihn ersetzt hat. `null` wenn nicht.
      */
     @JoinColumn(name = "ReplacedBy", referencedColumnName = "PBID")
     @OneToOne
     private NReport replacedBy;
 
     /**
-     * if this report is a replacement for another report, then this report is stored here. null, if its no replacement.
+     * Falls dieser Bericht einen anderen ersetzt hat, dann steht hier der ersetzte Bericht drin. `null` wenn nicht.
      */
     @JoinColumn(name = "ReplacementFor", referencedColumnName = "PBID")
     @OneToOne
     private NReport replacementFor;
 
     /**
-     * the list of attached files.
+     * Die Liste von angehangenen Dateien.
      */
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nReport")
     private Collection<SYSNR2FILE> attachedFilesConnections;
 
     /**
-     * for handovers only. the list of users who acknowledged this report.
+     * Das hier gilt nur für Übergabe Berichte. Es enthält alle User, die diesen Berichte zur Kenntnis genommen haben.
      */
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht", fetch = FetchType.EAGER)
     private List<NR2User> usersAcknowledged;
 
     /**
-     * the list of processes which this report was attached to
+     * die Liste alles Qualitätsprozesse, zu dem dieser Bericht zugeordnet wurde.
      */
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nreport")
     private Collection<SYSNR2PROCESS> attachedProcessConnections;
 
     /**
-     * the list of tags which were sticked to this report.
+     * Die Liste aller TAGs für diesen Bericht.
      */
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "nreports2tags", joinColumns =
@@ -177,6 +183,10 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     public NReport() {
     }
 
+    /**
+     * Der Standard Konstuktor. Hier drüber werden fast alle Berichte erstellt.
+     * @param resident das ist die Kennung des BWs für den der neue Bericht erstellt wird.
+     */
     public NReport(Resident resident) {
         this.pit = new Date();
         this.newPIT = new Date();
@@ -192,7 +202,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     /**
-     * private constructor for the cloning only
+     * Hilfs Konstruktor zum Clonen der Objekte
      *
      * @param pit
      * @param newPIT
@@ -321,6 +331,10 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.replacedBy = replacedBy;
     }
 
+    /**
+     *
+     * @return je nachdem ob der Bericht ersetzt wurde `true` oder `false`
+     */
     public boolean isReplaced() {
         return replacedBy != null;
     }
@@ -333,12 +347,18 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         return Seconds.secondsBetween(new DateTime(pit), new DateTime(newPIT)).isGreaterThan(Seconds.seconds(NReportTools.IGNORED_AMOUNT_SECONDS_TILL_THE_CLOCK_TURNS_UP));
     }
 
+    /**
+     * die Entscheidung ob ein Pflegebericht gelöscht wurde hängt ausschließlich vom Attribut `delPit` ab.
+     * @return je nachdem ob der Bericht gelöscht wurde `true` oder `false`
+     */
     public boolean isDeleted() {
         return delPIT != null;
     }
 
     /**
-     * @return true if and only if the report is deleted or replaced
+     * Ein Bericht gilt als *veraltet*, wenn er entweder gelöscht wurde oder ersetzt.
+     *
+     * @return je nachdem ob der Bericht veraltet ist `true` oder `false`
      */
     public boolean isObsolete() {
         return isDeleted() || isReplaced();
