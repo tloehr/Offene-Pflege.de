@@ -1532,7 +1532,7 @@ public class ResInfoTools {
         em.close();
 
         // virtual station. is never persisted
-        Station exResident = new Station(SYSTools.xx("opde.controlling.nursing.falls.exResidents"), null);
+        Station exResident = new Station(SYSTools.xx("opde.controlling.exResidents"), null);
 
         // Init Maps
         HashMap<LocalDate, HashMap<Station, Integer>> statMap = new HashMap<LocalDate, HashMap<Station, Integer>>();

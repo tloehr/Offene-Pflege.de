@@ -1160,12 +1160,12 @@ public class PnlControlling extends CleanablePanel {
 
 
         /***
-         *      _ _             _     _   _           _
-         *     | (_) __ _ _   _(_) __| | | |__   __ _| | __ _ _ __   ___ ___
-         *     | | |/ _` | | | | |/ _` | | '_ \ / _` | |/ _` | '_ \ / __/ _ \
-         *     | | | (_| | |_| | | (_| | | |_) | (_| | | (_| | | | | (_|  __/
-         *     |_|_|\__, |\__,_|_|\__,_| |_.__/ \__,_|_|\__,_|_| |_|\___\___|
-         *             |_|
+         *      _____ _               _              __       _               ____  _ _
+         *     | ____(_)_ __         / \  _   _ ___ / _|_   _| |__  _ __     | __ )(_) | __ _ _ __  ____
+         *     |  _| | | '_ \ _____ / _ \| | | / __| |_| | | | '_ \| '__|____|  _ \| | |/ _` | '_ \|_  /
+         *     | |___| | | | |_____/ ___ \ |_| \__ \  _| |_| | | | | | |_____| |_) | | | (_| | | | |/ /
+         *     |_____|_|_| |_|    /_/   \_\__,_|___/_|  \__,_|_| |_|_|       |____/|_|_|\__,_|_| |_/___|
+         *
          */
         JPanel pnlLiquidBalance = new JPanel(new BorderLayout());
         final JButton btnLiquidBalance = GUITools.createHyperlinkButton("opde.controlling.nutrition.liquidbalance", null, null);
@@ -1195,14 +1195,16 @@ public class PnlControlling extends CleanablePanel {
         pnlContent.add(pnlLiquidBalance);
 
         /***
-         *                   _       _     _         _        _   _     _   _
-         *     __      _____(_) __ _| |__ | |_   ___| |_ __ _| |_(_)___| |_(_) ___ ___
-         *     \ \ /\ / / _ \ |/ _` | '_ \| __| / __| __/ _` | __| / __| __| |/ __/ __|
-         *      \ V  V /  __/ | (_| | | | | |_  \__ \ || (_| | |_| \__ \ |_| | (__\__ \
-         *       \_/\_/ \___|_|\__, |_| |_|\__| |___/\__\__,_|\__|_|___/\__|_|\___|___/
-         *                     |___/
+         *       ____               _      _     _      ______  __  __ ___    ______  _        _   _     _   _ _
+         *      / ___| _____      _(_) ___| |__ | |_   / / __ )|  \/  |_ _|  / / ___|| |_ __ _| |_(_)___| |_(_) | __
+         *     | |  _ / _ \ \ /\ / / |/ __| '_ \| __| / /|  _ \| |\/| || |  / /\___ \| __/ _` | __| / __| __| | |/ /
+         *     | |_| |  __/\ V  V /| | (__| | | | |_ / / | |_) | |  | || | / /  ___) | || (_| | |_| \__ \ |_| |   <
+         *      \____|\___| \_/\_/ |_|\___|_| |_|\__/_/  |____/|_|  |_|___/_/  |____/ \__\__,_|\__|_|___/\__|_|_|\_\
+         *
          */
         JPanel pnlWeight = new JPanel(new BorderLayout());
+
+
         final JButton btnWeightStats = GUITools.createHyperlinkButton("opde.controlling.nutrition.weightstats", null, null);
         int wsMonthsBack;
         try {
@@ -1212,13 +1214,19 @@ public class PnlControlling extends CleanablePanel {
         }
         final JTextField txtWSMonthsBack = GUITools.createIntegerTextField(1, 24, wsMonthsBack);
         txtWSMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
+
+        boolean wsRetiredToo;
+        wsRetiredToo = Boolean.parseBoolean(OPDE.getProps().getProperty("opde.controlling::wsRetiredToo"));
+        final JCheckBox cbWSRetiredToo = new JCheckBox(SYSTools.xx("opde.controlling.exResidents"), wsRetiredToo);
+
         btnWeightStats.addActionListener(e -> {
             OPDE.getMainframe().setBlocked(true);
             SwingWorker worker = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
                     SYSPropsTools.storeProp("opde.controlling::wsMonthsBack", txtWSMonthsBack.getText(), OPDE.getLogin().getUser());
-                    SYSFilesTools.print(ResValueTools.getWeightStats(Integer.parseInt(txtWSMonthsBack.getText()), progressClosure), false);
+                    SYSPropsTools.storeProp("opde.controlling::wsRetiredToo", Boolean.toString(cbWSRetiredToo.isSelected()), OPDE.getLogin().getUser());
+                    SYSFilesTools.print(ResValueTools.getWeightStats(Integer.parseInt(txtWSMonthsBack.getText()), cbWSRetiredToo.isSelected(), progressClosure), false);
                     return null;
                 }
 
@@ -1230,8 +1238,18 @@ public class PnlControlling extends CleanablePanel {
             };
             worker.execute();
         });
-        pnlWeight.add(btnWeightStats, BorderLayout.WEST);
-        pnlWeight.add(txtWSMonthsBack, BorderLayout.EAST);
+        // https://github.com/tloehr/Offene-Pflege.de/issues/79
+
+
+        JPanel pnlParams = new JPanel();
+        BoxLayout layout = new BoxLayout(pnlParams, BoxLayout.LINE_AXIS);
+        pnlParams.setLayout(layout);
+        pnlParams.add(cbWSRetiredToo);
+        pnlParams.add(txtWSMonthsBack);
+
+        pnlWeight.add(btnWeightStats, BorderLayout.CENTER);
+        pnlWeight.add(pnlParams, BorderLayout.EAST);
+
         pnlContent.add(pnlWeight);
 
 

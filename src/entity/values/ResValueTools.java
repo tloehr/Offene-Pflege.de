@@ -12,7 +12,6 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -530,22 +529,24 @@ public class ResValueTools {
     }
 
     /**
-     * creates a combined weight and bmi statistics for the given period in html. bmi is only calculated if there is a height available for the particular resident.
+     * erstellt eine kombinierte gewichts und bmi statistik in html. ein bmi wert kann nur ermittelt werden, wenn es eine größenangabe für den betroffenen BW gibt.
      *
-     * @param monthsback number of months from now on. starts always at the beginning of that month.
-     * @param progress
+     * @param monthsback die Anzahl von Monaten (vom aktuellen Zeitpunkt aus gerechnet) die betrachtet werden sollen.
+     * @param retiredToo gibt an, ob auch ehemalige BWs mit in die Liste aufgenommen werden sollen. Ehemalig wird nur vom aktuellen Zeitpunkt aus berücksichtigt.
+     *                   Also ob jemand **jetzt** noch in der Einrichtung ist. Nicht ob er zum Zeitpunkt der Datenerhebung bei uns war.
+     * @param progress   die progress closure, die während der ausführung ausgeführt werden soll.
      * @return
      */
-    public static String getWeightStats(int monthsback, Closure progress) {
+    public static String getWeightStats(int monthsback, boolean retiredToo, Closure progress) {
         StringBuffer html = new StringBuffer(1000);
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
-        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        LocalDate from = new LocalDate().minusMonths(monthsback).dayOfMonth().withMinimumValue();
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
 
-        String jpql = " " +
+        String jpqlWithRetired = " " +
                 " SELECT rv " +
                 " FROM ResValue rv " +
                 " WHERE rv.vtype.valType = :valType " +
@@ -553,10 +554,18 @@ public class ResValueTools {
                 " AND rv.pit >= :from " +
                 " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
 
+        String jpqlWithoutRetired = " " +
+                " SELECT rv " +
+                " FROM ResValue rv " +
+                " WHERE rv.vtype.valType = :valType " +
+                " AND rv.resident.adminonly <> 2 " +
+                " AND rv.pit >= :from " +
+                " AND rv.resident.station IS NOT NULL" +
+                " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
 
-        Query query = em.createQuery(jpql);
+        Query query = em.createQuery(retiredToo ? jpqlWithRetired : jpqlWithoutRetired);
         query.setParameter("valType", ResValueTypesTools.WEIGHT);
-        query.setParameter("from", from.toDate());
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<ResValue> listVal = new ArrayList<ResValue>(query.getResultList());
         em.close();
 
