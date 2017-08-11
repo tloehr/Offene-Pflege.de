@@ -42,7 +42,8 @@ import java.util.*;
 public class TXEssenDoc {
 
     //    public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
-    public static final String SOURCEDOC2 = "ueberleitungsbogen_160208.pdf";
+//    public static final String SOURCEDOC2 = "ueberleitungsbogen_160208.pdf";
+    public static final String SOURCEDOC3 = "ueberleitungsbogen_20170810.pdf";
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
     public static final String SOURCEWOUND = "anlage_wunden_161016_static.pdf";
@@ -229,7 +230,7 @@ public class TXEssenDoc {
         File outfile1 = File.createTempFile("TXE", ".pdf");//new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX1_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
         outfile1.deleteOnExit();
 
-        PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEDOC2).getAbsolutePath()), new FileOutputStream(outfile1));
+        PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEDOC3).getAbsolutePath()), new FileOutputStream(outfile1));
 
         progress++;
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
@@ -538,19 +539,20 @@ public class TXEssenDoc {
         content.put(TXEAF.LC_FINANCE, setCheckbox(getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "finance")));
         content.put(TXEAF.LC_HEALTH, setCheckbox(getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "health")));
         content.put(TXEAF.LC_CUSTODY, setCheckbox(getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "confinement")));
-        content.put(TXEAF.LC_NAME, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "name"));
-        content.put(TXEAF.LC_FIRSTNAME, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "firstname"));
-        content.put(TXEAF.LC_PHONE, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "tel"));
-        content.put(TXEAF.LC_STREET, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "street"));
-        content.put(TXEAF.LC_ZIP, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "zip"));
-        content.put(TXEAF.LC_CITY, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "city"));
 
-        content.put(TXEAF.CONFIDANT_NAME, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1name"));
-        content.put(TXEAF.CONFIDANT_FIRSTNAME, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1firstname"));
-        content.put(TXEAF.CONFIDANT_STREET, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1street"));
-        content.put(TXEAF.CONFIDANT_ZIP, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1zip"));
-        content.put(TXEAF.CONFIDANT_CITY, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1city"));
-        content.put(TXEAF.CONFIDANT_PHONE, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1tel"));
+
+        String lc = getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "name") + ", " + getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "firstname") + "; " +
+                getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "tel") + "; " + getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "street") + ", " +
+                getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "zip") + " " + getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "city");
+        content.put(TXEAF.LC_NAME, lc);
+
+
+        String confidant = getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1name") + ", " + getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1firstname") + "; " +
+                getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1tel") + "; " + getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1street") + ", " +
+                getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1zip") + " " + getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1city");
+        content.put(TXEAF.CONFIDANT_NAME, confidant);
+
+        
         content.put(TXEAF.SOCIAL_CONFIDANT_CARE, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1ready2nurse")));
 
         content.put(TXEAF.SOCIAL_CURRENT_RESTHOME, "1");
@@ -1211,7 +1213,7 @@ public class TXEssenDoc {
 
 
                 // hier wird der inhalt der farbigen Kästen gesetzt, der für jede Wunde eine Beschreibung enthält.
-                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + ", " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true) + (currentWound.getText().isEmpty() ? "" : ", \"" + currentWound.getText() +"\""))
+                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + ", " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true) + (currentWound.getText().isEmpty() ? "" : ", \"" + currentWound.getText() + "\""))
                 ;
 
                 if (type == ResInfoTypeTools.TYPE_MYCOSIS) {

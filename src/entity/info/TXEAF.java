@@ -150,12 +150,12 @@ public class TXEAF {
     public static final String COMMS_SPEECH_ABILITY = "Formular1[0].#subform[1].Sprache[0]";
     public static final String COMMS_UNDERSTANDING_ABILITY = "Formular1[0].#subform[1].Sprachverständnis[0]";
     public static final String COMMS_WRITING_ABILITY = "Formular1[0].#subform[1].Schrift[0]";
-    public static final String CONFIDANT_CITY = "Formular1[0].#subform[0].#area[2].OrtZugehörige[1]";
-    public static final String CONFIDANT_FIRSTNAME = "Formular1[0].#subform[0].#area[2].VornameZugehörige[1]";
-    public static final String CONFIDANT_NAME = "Formular1[0].#subform[0].#area[2].NameZugehörige[1]";
-    public static final String CONFIDANT_PHONE = "Formular1[0].#subform[0].#area[2].TelefonZugehörige[1]";
-    public static final String CONFIDANT_STREET = "Formular1[0].#subform[0].#area[2].StraßeZugehörige[1]";
-    public static final String CONFIDANT_ZIP = "Formular1[0].#subform[0].#area[2].PLZZugehörige[1]";
+//    public static final String CONFIDANT_CITY = "Formular1[0].#subform[0].#area[2].OrtZugehörige[1]";
+//    public static final String CONFIDANT_FIRSTNAME = "Formular1[0].#subform[0].#area[2].VornameZugehörige[1]";
+    public static final String CONFIDANT_NAME = "Formular1[0].#subform[0].#area[2].Hauptbezugsperson[0]";
+//    public static final String CONFIDANT_PHONE = "Formular1[0].#subform[0].#area[2].TelefonZugehörige[1]";
+//    public static final String CONFIDANT_STREET = "Formular1[0].#subform[0].#area[2].StraßeZugehörige[1]";
+//    public static final String CONFIDANT_ZIP = "Formular1[0].#subform[0].#area[2].PLZZugehörige[1]";
     public static final String CONSCIOUSNESS_AWAKE = "Formular1[0].#subform[1].BewußtseinslageWach[0]";
     public static final String CONSCIOUSNESS_COMA = "Formular1[0].#subform[1].BewußtseinslageKomatös[0]";
     public static final String CONSCIOUSNESS_SOMNOLENT = "Formular1[0].#subform[1].BewußtseinslageBlanko[0]";
@@ -240,17 +240,16 @@ public class TXEAF {
     public static final String INSURANCE_GRADE_NO = "Formular1[0].#subform[0].#area[2].#area[3].Einstufung_nein[0]";
     public static final String INSURANCE_GRADE_REQUESTED = "Formular1[0].#subform[0].#area[2].#area[3].Einstufung_beantragt[0]";
     public static final String INSURANCE_GRADE_YES = "Formular1[0].#subform[0].#area[2].#area[3].Einstufung_ja[0]";
-
-    public static final String LC_CITY = "Formular1[0].#subform[0].#area[2].OrtZugehörige[0]";
     public static final String LC_CUSTODY = "Formular1[0].#subform[0].#area[2].Aufenthaltsbestimmung[0]";
     public static final String LC_FINANCE = "Formular1[0].#subform[0].#area[2].Vermögensverwaltung[0]";
-    public static final String LC_FIRSTNAME = "Formular1[0].#subform[0].#area[2].VornameZugehörige[0]";
     public static final String LC_GENERAL = "Formular1[0].#subform[0].#area[2].gesetzl\\.Betreuer[0]";
     public static final String LC_HEALTH = "Formular1[0].#subform[0].#area[2].Gesundheitsfürsorge[0]";
-    public static final String LC_NAME = "Formular1[0].#subform[0].#area[2].NameZugehörige[0]";
-    public static final String LC_PHONE = "Formular1[0].#subform[0].#area[2].TelefonZugehörige[0]";
-    public static final String LC_STREET = "Formular1[0].#subform[0].#area[2].StraßeZugehörige[0]";
-    public static final String LC_ZIP = "Formular1[0].#subform[0].#area[2].PLZZugehörige[0]";
+    public static final String LC_NAME = "Formular1[0].#subform[0].#area[2].Betreuer[0]";
+    //    public static final String LC_FIRSTNAME = "Formular1[0].#subform[0].#area[2].VornameZugehörige[0]";
+//    public static final String LC_PHONE = "Formular1[0].#subform[0].#area[2].TelefonZugehörige[0]";
+//    public static final String LC_STREET = "Formular1[0].#subform[0].#area[2].StraßeZugehörige[0]";
+//    public static final String LC_ZIP = "Formular1[0].#subform[0].#area[2].PLZZugehörige[0]";
+//    public static final String LC_CITY = "Formular1[0].#subform[0].#area[2].OrtZugehörige[0]";
     public static final String LEGAL_MINOR = "Formular1[0].#subform[0].#area[2].minderjährig[0]";
     public static final String LEGAL_SINGLE = "Formular1[0].#subform[0].#area[2].alleinstehend[0]";
 
@@ -588,62 +587,62 @@ public class TXEAF {
     public static final String WOUND_U_UPPER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[0].u\\.upper\\.leg\\.right\\.side[0]";
     public static final String WOUND_U_UPPER_RIGHTLEG_BACK = "form1[0].subform1[0].#area[0].u\\.upper\\.rightleg\\.back[0]";
 
-    
+
     // Die PDF Formular Schlüssel der unteren 5 Wunden auf der Anlage Wundversorgung
-      public static final String WOUND_L_BACK_LOW = "form1[0].subform1[0].#area[1].l\\.back\\.low[0]";
-      public static final String WOUND_L_BACK_MID = "form1[0].subform1[0].#area[1].l\\.back\\.mid[0]";
-      public static final String WOUND_L_BACK_OF_THE_HEAD = "form1[0].subform1[0].#area[1].l\\.back\\.of\\.the\\.head[0]";
-      public static final String WOUND_L_BACK_UPPER_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.back\\.upper\\.left\\.side[0]";
-      public static final String WOUND_L_BACK_UPPER_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.back\\.upper\\.right\\.side[0]";
-      public static final String WOUND_L_BOTTOM_BACK = "form1[0].subform1[0].#area[1].l\\.bottom\\.back[0]";
-      public static final String WOUND_L_BOTTOM_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.bottom\\.left\\.side[0]";
-      public static final String WOUND_L_BOTTOM_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.bottom\\.right\\.side[0]";
-      public static final String WOUND_L_CALF_LEFTBACK = "form1[0].subform1[0].#area[1].l\\.calf\\.leftback[0]";
-      public static final String WOUND_L_CALF_LEFTSIDE = "form1[0].subform1[0].#area[1].l\\.calf\\.left\\.side[0]";
-      public static final String WOUND_L_CALF_RIGHTBACK = "form1[0].subform1[0].#area[1].l\\.calf\\.rightback[0]";
-      public static final String WOUND_L_CALF_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.calf\\.right\\.side[0]";
-      public static final String WOUND_L_CROOK_ARM_LEFT = "form1[0].subform1[0].#area[1].l\\.crook\\.arm\\.left[0]";
-      public static final String WOUND_L_CROOK_ARM_RIGHT = "form1[0].subform1[0].#area[1].l\\.crook\\.arm\\.right[0]";
-      public static final String WOUND_L_ELLBOW_LEFT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.left[0]";
-      public static final String WOUND_L_ELLBOW_RIGHT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.right[0]";
-      public static final String WOUND_L_ELLBOW_RIGHTSIDE = "form1[0].subform1[0].#area[1].l\\.ellbow\\.rightside[0]";
-      public static final String WOUND_L_ELLBOW_SIDE_LEFT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.side\\.left[0]";
-      public static final String WOUND_L_FACE = "form1[0].subform1[0].#area[1].l\\.face[0]";
-      public static final String WOUND_L_FOOT_LEFTBACK = "form1[0].subform1[0].#area[1].l\\.foot\\.leftback[0]";
-      public static final String WOUND_L_FOOT_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.foot\\.left\\.front[0]";
-      public static final String WOUND_L_FOOT_RIGHTBACK = "form1[0].subform1[0].#area[1].l\\.foot\\.rightback[0]";
-      public static final String WOUND_L_FOOT_RIGHT_FRONT = "form1[0].subform1[0].#area[1].l\\.foot\\.right\\.front[0]";
-      public static final String WOUND_L_GROIN = "form1[0].subform1[0].#area[1].l\\.groin[0]";
-      public static final String WOUND_L_HAND_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.hand\\.left\\.side[0]";
-      public static final String WOUND_L_HAND_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.hand\\.right\\.side[0]";
-      public static final String WOUND_L_HEAD_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.head\\.left\\.side[0]";
-      public static final String WOUND_L_HEAD_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.head\\.right\\.side[0]";
-      public static final String WOUND_L_HEEL_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.heel\\.left\\.side[0]";
-      public static final String WOUND_L_HEEL_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.heel\\.right\\.side[0]";
-      public static final String WOUND_L_HIP_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.hip\\.left\\.side[0]";
-      public static final String WOUND_L_HIP_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.hip\\.right\\.side[0]";
-      public static final String WOUND_L_KNEE_HOLLOWLEFT = "form1[0].subform1[0].#area[1].l\\.knee\\.hollowleft[0]";
-      public static final String WOUND_L_KNEE_HOLLOWRIGHT = "form1[0].subform1[0].#area[1].l\\.knee\\.hollowright[0]";
-      public static final String WOUND_L_KNEE_LEFT = "form1[0].subform1[0].#area[1].l\\.knee\\.left[0]";
-      public static final String WOUND_L_KNEE_RIGHT = "form1[0].subform1[0].#area[1].l\\.knee\\.right[0]";
-      public static final String WOUND_L_LOWER_BELLY = "form1[0].subform1[0].#area[1].l\\.lower\\.belly[0]";
-      public static final String WOUND_L_LOWER_LEG_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.lower\\.leg\\.left\\.side[0]";
-      public static final String WOUND_L_LOWER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.lower\\.leg\\.right\\.side[0]";
-      public static final String WOUND_L_SHIN_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.shin\\.left\\.front[0]";
-      public static final String WOUND_L_SHIN_RIGHT_FRONT = "form1[0].subform1[0].#area[1].l\\.shin\\.right\\.front[0]";
-      public static final String WOUND_L_SHOULDER_BACK_LEFT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.back\\.left[0]";
-      public static final String WOUND_L_SHOULDER_BACK_RIGHT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.back\\.right[0]";
-      public static final String WOUND_L_SHOULDER_FRONT_LEFT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.front\\.left[0]";
-      public static final String WOUND_L_SHOULDER_FRONT_RIGHT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.front\\.right[0]";
-      public static final String WOUND_L_SHOULDER_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.shoulder\\.left\\.side[0]";
-      public static final String WOUND_L_SHOULDER_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.shoulder\\.right\\.side[0]";
-      public static final String WOUND_L_UPPER_BELLY = "form1[0].subform1[0].#area[1].l\\.upper\\.belly[0]";
-      public static final String WOUND_L_UPPER_LEFTLEG_BACK = "form1[0].subform1[0].#area[1].l\\.upper\\.leftleg\\.back[0]";
-      public static final String WOUND_L_UPPER_LEG_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.left\\.front[0]";
-      public static final String WOUND_L_UPPER_LEG_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.left\\.side[0]";
-      public static final String WOUND_L_UPPER_LEG_RIGHT_FRONT = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.right\\.front[0]";
-      public static final String WOUND_L_UPPER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.right\\.side[0]";
-      public static final String WOUND_L_UPPER_RIGHTLEG_BACK = "form1[0].subform1[0].#area[1].l\\.upper\\.rightleg\\.back[0]";
+    public static final String WOUND_L_BACK_LOW = "form1[0].subform1[0].#area[1].l\\.back\\.low[0]";
+    public static final String WOUND_L_BACK_MID = "form1[0].subform1[0].#area[1].l\\.back\\.mid[0]";
+    public static final String WOUND_L_BACK_OF_THE_HEAD = "form1[0].subform1[0].#area[1].l\\.back\\.of\\.the\\.head[0]";
+    public static final String WOUND_L_BACK_UPPER_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.back\\.upper\\.left\\.side[0]";
+    public static final String WOUND_L_BACK_UPPER_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.back\\.upper\\.right\\.side[0]";
+    public static final String WOUND_L_BOTTOM_BACK = "form1[0].subform1[0].#area[1].l\\.bottom\\.back[0]";
+    public static final String WOUND_L_BOTTOM_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.bottom\\.left\\.side[0]";
+    public static final String WOUND_L_BOTTOM_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.bottom\\.right\\.side[0]";
+    public static final String WOUND_L_CALF_LEFTBACK = "form1[0].subform1[0].#area[1].l\\.calf\\.leftback[0]";
+    public static final String WOUND_L_CALF_LEFTSIDE = "form1[0].subform1[0].#area[1].l\\.calf\\.left\\.side[0]";
+    public static final String WOUND_L_CALF_RIGHTBACK = "form1[0].subform1[0].#area[1].l\\.calf\\.rightback[0]";
+    public static final String WOUND_L_CALF_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.calf\\.right\\.side[0]";
+    public static final String WOUND_L_CROOK_ARM_LEFT = "form1[0].subform1[0].#area[1].l\\.crook\\.arm\\.left[0]";
+    public static final String WOUND_L_CROOK_ARM_RIGHT = "form1[0].subform1[0].#area[1].l\\.crook\\.arm\\.right[0]";
+    public static final String WOUND_L_ELLBOW_LEFT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.left[0]";
+    public static final String WOUND_L_ELLBOW_RIGHT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.right[0]";
+    public static final String WOUND_L_ELLBOW_RIGHTSIDE = "form1[0].subform1[0].#area[1].l\\.ellbow\\.rightside[0]";
+    public static final String WOUND_L_ELLBOW_SIDE_LEFT = "form1[0].subform1[0].#area[1].l\\.ellbow\\.side\\.left[0]";
+    public static final String WOUND_L_FACE = "form1[0].subform1[0].#area[1].l\\.face[0]";
+    public static final String WOUND_L_FOOT_LEFTBACK = "form1[0].subform1[0].#area[1].l\\.foot\\.leftback[0]";
+    public static final String WOUND_L_FOOT_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.foot\\.left\\.front[0]";
+    public static final String WOUND_L_FOOT_RIGHTBACK = "form1[0].subform1[0].#area[1].l\\.foot\\.rightback[0]";
+    public static final String WOUND_L_FOOT_RIGHT_FRONT = "form1[0].subform1[0].#area[1].l\\.foot\\.right\\.front[0]";
+    public static final String WOUND_L_GROIN = "form1[0].subform1[0].#area[1].l\\.groin[0]";
+    public static final String WOUND_L_HAND_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.hand\\.left\\.side[0]";
+    public static final String WOUND_L_HAND_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.hand\\.right\\.side[0]";
+    public static final String WOUND_L_HEAD_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.head\\.left\\.side[0]";
+    public static final String WOUND_L_HEAD_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.head\\.right\\.side[0]";
+    public static final String WOUND_L_HEEL_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.heel\\.left\\.side[0]";
+    public static final String WOUND_L_HEEL_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.heel\\.right\\.side[0]";
+    public static final String WOUND_L_HIP_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.hip\\.left\\.side[0]";
+    public static final String WOUND_L_HIP_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.hip\\.right\\.side[0]";
+    public static final String WOUND_L_KNEE_HOLLOWLEFT = "form1[0].subform1[0].#area[1].l\\.knee\\.hollowleft[0]";
+    public static final String WOUND_L_KNEE_HOLLOWRIGHT = "form1[0].subform1[0].#area[1].l\\.knee\\.hollowright[0]";
+    public static final String WOUND_L_KNEE_LEFT = "form1[0].subform1[0].#area[1].l\\.knee\\.left[0]";
+    public static final String WOUND_L_KNEE_RIGHT = "form1[0].subform1[0].#area[1].l\\.knee\\.right[0]";
+    public static final String WOUND_L_LOWER_BELLY = "form1[0].subform1[0].#area[1].l\\.lower\\.belly[0]";
+    public static final String WOUND_L_LOWER_LEG_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.lower\\.leg\\.left\\.side[0]";
+    public static final String WOUND_L_LOWER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.lower\\.leg\\.right\\.side[0]";
+    public static final String WOUND_L_SHIN_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.shin\\.left\\.front[0]";
+    public static final String WOUND_L_SHIN_RIGHT_FRONT = "form1[0].subform1[0].#area[1].l\\.shin\\.right\\.front[0]";
+    public static final String WOUND_L_SHOULDER_BACK_LEFT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.back\\.left[0]";
+    public static final String WOUND_L_SHOULDER_BACK_RIGHT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.back\\.right[0]";
+    public static final String WOUND_L_SHOULDER_FRONT_LEFT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.front\\.left[0]";
+    public static final String WOUND_L_SHOULDER_FRONT_RIGHT = "form1[0].subform1[0].#area[1].l\\.shoulder\\.front\\.right[0]";
+    public static final String WOUND_L_SHOULDER_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.shoulder\\.left\\.side[0]";
+    public static final String WOUND_L_SHOULDER_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.shoulder\\.right\\.side[0]";
+    public static final String WOUND_L_UPPER_BELLY = "form1[0].subform1[0].#area[1].l\\.upper\\.belly[0]";
+    public static final String WOUND_L_UPPER_LEFTLEG_BACK = "form1[0].subform1[0].#area[1].l\\.upper\\.leftleg\\.back[0]";
+    public static final String WOUND_L_UPPER_LEG_LEFT_FRONT = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.left\\.front[0]";
+    public static final String WOUND_L_UPPER_LEG_LEFT_SIDE = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.left\\.side[0]";
+    public static final String WOUND_L_UPPER_LEG_RIGHT_FRONT = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.right\\.front[0]";
+    public static final String WOUND_L_UPPER_LEG_RIGHT_SIDE = "form1[0].subform1[0].#area[1].l\\.upper\\.leg\\.right\\.side[0]";
+    public static final String WOUND_L_UPPER_RIGHTLEG_BACK = "form1[0].subform1[0].#area[1].l\\.upper\\.rightleg\\.back[0]";
 
 //    public static final String[] PDFPARTS = new String[]{HEAD_LEFT_SIDE, SHOULDER_LEFT_SIDE, BACK_UPPER_RIGHT_SIDE, ELLBOW_SIDE_LEFT, HAND_LEFT_SIDE, HIP_LEFT_SIDE, BOTTOM_LEFT_SIDE, UPPER_LEG_LEFT_SIDE,
 //            LOWER_LEG_LEFT_SIDE, CALF_LEFTSIDE, HEEL_LEFT_SIDE, FACE, SHOULDER_FRONT_RIGHT, SHOULDER_FRONT_LEFT, UPPER_BELLY, CROOK_ARM_RIGHT,
@@ -670,14 +669,12 @@ public class TXEAF {
             WOUND_U_HAND_RIGHT_SIDE, WOUND_U_HIP_RIGHT_SIDE, WOUND_U_BOTTOM_RIGHT_SIDE, WOUND_U_UPPER_LEG_RIGHT_SIDE, WOUND_U_LOWER_LEG_RIGHT_SIDE, WOUND_U_CALF_RIGHT_SIDE, WOUND_U_HEEL_RIGHT_SIDE};
 
     public static final String[] PDFPARTSWOUND_L = new String[]{WOUND_L_HEAD_LEFT_SIDE, WOUND_L_SHOULDER_LEFT_SIDE, WOUND_L_BACK_UPPER_LEFT_SIDE, WOUND_L_ELLBOW_SIDE_LEFT, WOUND_L_HAND_LEFT_SIDE, WOUND_L_HIP_LEFT_SIDE, WOUND_L_BOTTOM_LEFT_SIDE, WOUND_L_UPPER_LEG_LEFT_SIDE,
-               WOUND_L_LOWER_LEG_LEFT_SIDE, WOUND_L_CALF_LEFTSIDE, WOUND_L_HEEL_LEFT_SIDE, WOUND_L_FACE, WOUND_L_SHOULDER_FRONT_RIGHT, WOUND_L_SHOULDER_FRONT_LEFT, WOUND_L_UPPER_BELLY, WOUND_L_CROOK_ARM_RIGHT,
-               WOUND_L_CROOK_ARM_LEFT, WOUND_L_LOWER_BELLY, WOUND_L_GROIN, WOUND_L_UPPER_LEG_RIGHT_FRONT, WOUND_L_UPPER_LEG_LEFT_FRONT, WOUND_L_KNEE_RIGHT, WOUND_L_KNEE_LEFT, WOUND_L_SHIN_RIGHT_FRONT, WOUND_L_SHIN_LEFT_FRONT,
-               WOUND_L_FOOT_RIGHT_FRONT, WOUND_L_FOOT_LEFT_FRONT, WOUND_L_BACK_OF_THE_HEAD, WOUND_L_SHOULDER_BACK_LEFT, WOUND_L_SHOULDER_BACK_RIGHT, WOUND_L_BACK_MID, WOUND_L_ELLBOW_LEFT,
-               WOUND_L_ELLBOW_RIGHT, WOUND_L_BACK_LOW, WOUND_L_BOTTOM_BACK, WOUND_L_UPPER_LEFTLEG_BACK, WOUND_L_UPPER_RIGHTLEG_BACK, WOUND_L_KNEE_HOLLOWLEFT, WOUND_L_KNEE_HOLLOWRIGHT, WOUND_L_CALF_LEFTBACK,
-               WOUND_L_CALF_RIGHTBACK, WOUND_L_FOOT_LEFTBACK, WOUND_L_FOOT_RIGHTBACK, WOUND_L_HEAD_RIGHT_SIDE, WOUND_L_SHOULDER_RIGHT_SIDE, WOUND_L_BACK_UPPER_RIGHT_SIDE, WOUND_L_ELLBOW_RIGHTSIDE,
-               WOUND_L_HAND_RIGHT_SIDE, WOUND_L_HIP_RIGHT_SIDE, WOUND_L_BOTTOM_RIGHT_SIDE, WOUND_L_UPPER_LEG_RIGHT_SIDE, WOUND_L_LOWER_LEG_RIGHT_SIDE, WOUND_L_CALF_RIGHT_SIDE, WOUND_L_HEEL_RIGHT_SIDE};
+            WOUND_L_LOWER_LEG_LEFT_SIDE, WOUND_L_CALF_LEFTSIDE, WOUND_L_HEEL_LEFT_SIDE, WOUND_L_FACE, WOUND_L_SHOULDER_FRONT_RIGHT, WOUND_L_SHOULDER_FRONT_LEFT, WOUND_L_UPPER_BELLY, WOUND_L_CROOK_ARM_RIGHT,
+            WOUND_L_CROOK_ARM_LEFT, WOUND_L_LOWER_BELLY, WOUND_L_GROIN, WOUND_L_UPPER_LEG_RIGHT_FRONT, WOUND_L_UPPER_LEG_LEFT_FRONT, WOUND_L_KNEE_RIGHT, WOUND_L_KNEE_LEFT, WOUND_L_SHIN_RIGHT_FRONT, WOUND_L_SHIN_LEFT_FRONT,
+            WOUND_L_FOOT_RIGHT_FRONT, WOUND_L_FOOT_LEFT_FRONT, WOUND_L_BACK_OF_THE_HEAD, WOUND_L_SHOULDER_BACK_LEFT, WOUND_L_SHOULDER_BACK_RIGHT, WOUND_L_BACK_MID, WOUND_L_ELLBOW_LEFT,
+            WOUND_L_ELLBOW_RIGHT, WOUND_L_BACK_LOW, WOUND_L_BOTTOM_BACK, WOUND_L_UPPER_LEFTLEG_BACK, WOUND_L_UPPER_RIGHTLEG_BACK, WOUND_L_KNEE_HOLLOWLEFT, WOUND_L_KNEE_HOLLOWRIGHT, WOUND_L_CALF_LEFTBACK,
+            WOUND_L_CALF_RIGHTBACK, WOUND_L_FOOT_LEFTBACK, WOUND_L_FOOT_RIGHTBACK, WOUND_L_HEAD_RIGHT_SIDE, WOUND_L_SHOULDER_RIGHT_SIDE, WOUND_L_BACK_UPPER_RIGHT_SIDE, WOUND_L_ELLBOW_RIGHTSIDE,
+            WOUND_L_HAND_RIGHT_SIDE, WOUND_L_HIP_RIGHT_SIDE, WOUND_L_BOTTOM_RIGHT_SIDE, WOUND_L_UPPER_LEG_RIGHT_SIDE, WOUND_L_LOWER_LEG_RIGHT_SIDE, WOUND_L_CALF_RIGHT_SIDE, WOUND_L_HEEL_RIGHT_SIDE};
 
 
-
-    
 }
