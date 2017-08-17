@@ -704,46 +704,6 @@ public class PrescriptionTools {
         return false;
     }
 
-//    public static String getON(Prescription verordnung) {
-//        String result = "<div id=\"fonttext\">";
-//        String datum = DateFormat.getDateInstance().format(verordnung.getFrom());
-//
-//        result += "<font color=\"green\">" + datum + "; ";
-//        if (verordnung.getHospitalON() != null) {
-//            result += verordnung.getHospitalON().getName();
-//        }
-//        if (verordnung.getDocON() != null) {
-//            if (verordnung.getHospitalON() != null) {
-//                result += " <i>" + SYSTools.xx("misc.msg.confirmedby") + ":</i> ";
-//            }
-//            result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_LASTNAME);
-//        }
-//        result += "; " + verordnung.getUserON().getFullname() + "</font>";
-//
-//        return result + "</div>";
-//    }
-//
-//    public static String getOFF(Prescription verordnung) {
-//        String result = "<div id=\"fonttext\">";
-//
-//        if (verordnung.isLimited()) {
-//            String datum = DateFormat.getDateInstance().format(verordnung.getTo());
-//
-//            result += "<font color=\"" + (verordnung.isClosed() ? "red" : "lime") + "\">" + datum + "; ";
-//
-//            result += verordnung.getHospitalOFF() != null ? verordnung.getHospitalOFF().getName() : "";
-//
-//            if (verordnung.getDocOFF() != null) {
-//                if (verordnung.getHospitalOFF() != null) {
-//                    result += " <i>" + SYSTools.xx("misc.msg.confirmedby") + ":</i> ";
-//                }
-//                result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_LASTNAME);
-//            }
-//            result += "; " + verordnung.getUserOFF().getFullname() + "</font>";
-//
-//        }
-//        return result + "</div>";
-//    }
 
     public static String getDoseAsHTML(Prescription prescription) {
         return getDoseAsHTML(prescription, false);
@@ -754,9 +714,7 @@ public class PrescriptionTools {
 
 
         ArrayList<PrescriptionSchedule> listSchedules = new ArrayList<>(prescription.getPrescriptionSchedule());
-//        if (listSchedules.size() > 1)
         Collections.sort(listSchedules);
-
 
         if (listSchedules.isEmpty()) {
             result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
@@ -767,15 +725,6 @@ public class PrescriptionTools {
             result = result.substring(0, result.length() - 2);
         }
 
-//        if (schedules.hasNext()) {
-//            while (schedules.hasNext()) {
-//                PrescriptionSchedule schedule = schedules.next();
-//                result += PrescriptionScheduleTools.getDoseAsCompactText(schedule) + "; ";
-//            }
-//            result = result.substring(0, result.length() - 2);
-//        } else {
-//            result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
-//        }
 
         return result;
     }

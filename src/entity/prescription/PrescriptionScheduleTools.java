@@ -12,10 +12,7 @@ import op.tools.SYSTools;
 import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 
 /**
@@ -376,7 +373,7 @@ public class PrescriptionScheduleTools {
             }
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             result += "    <tr>" +
-                    "      <td align=\"center\">" + SYSTools.catchNull(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</td>" +
+                    "      <td align=\"center\">" + sdf.format(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</td>" +
                     "      <td align=\"center\">" + SYSTools.formatBigDecimal(schedule.getUhrzeitDosis()) + "</td>" +
                     "      <td>" + getRepeatPattern(schedule, true) + "</td>" +
                     "    </tr>";
@@ -392,21 +389,14 @@ public class PrescriptionScheduleTools {
 
     public static String getDoseAsCompactText(PrescriptionSchedule schedule) {
         String result = "";
-
-//        NumberFormat df = DecimalFormat.getNumberInstance();
-//        df.setMaximumFractionDigits(2);
-//        df.setMinimumFractionDigits(0);
-//
-//        df.setRoundingMode(RoundingMode.HALF_UP);
-
         if (getTerminStatus(schedule) == ROUGHLY) {
 
-            result += schedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.earlyinthemorning.medium") + ". " + SYSTools.formatBigDecimal(schedule.getNachtMo()) + "; " : "";
-            result += schedule.getMorgens().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.morning.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getMorgens()) + "; " : "";
-            result += schedule.getMittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.noon.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getMittags()) + "; " : "";
-            result += schedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.afternoon.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getNachmittags()) + "; " : "";
-            result += schedule.getAbends().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.evening.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getAbends()) + "; " : "";
-            result += schedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.lateatnight.medium") + ". " +  SYSTools.formatBigDecimal(schedule.getNachtAb()) + "; " : "";
+            result += schedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.earlyinthemorning.medium") + ". " + SYSTools.formatBigDecimal(schedule.getNachtMo()) + "x; " : "";
+            result += schedule.getMorgens().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.morning.medium") + ". " + SYSTools.formatBigDecimal(schedule.getMorgens()) + "x; " : "";
+            result += schedule.getMittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.noon.medium") + ". " + SYSTools.formatBigDecimal(schedule.getMittags()) + "x; " : "";
+            result += schedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.afternoon.medium") + ". " + SYSTools.formatBigDecimal(schedule.getNachmittags()) + "x; " : "";
+            result += schedule.getAbends().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.evening.medium") + ". " + SYSTools.formatBigDecimal(schedule.getAbends()) + "x; " : "";
+            result += schedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.lateatnight.medium") + ". " + SYSTools.formatBigDecimal(schedule.getNachtAb()) + "x; " : "";
 
             result = result.substring(0, result.length() - 2);
 
@@ -426,12 +416,12 @@ public class PrescriptionScheduleTools {
             DateTime dt = new DateTime(schedule.getUhrzeit());
 
             if (dt.getMinuteOfHour() == 0) {
-                result += dt.getHourOfDay() + "h";
+                result += dt.getHourOfDay();
             } else {
-                result += DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + "h";
+                result += DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit());
             }
 
-            result += " " +  SYSTools.formatBigDecimal(schedule.getUhrzeitDosis());
+            result += SYSTools.xx("misc.msg.Time.short") + " " + SYSTools.formatBigDecimal(schedule.getUhrzeitDosis()) + "x";
             String repeat = getRepeatPatternAsCompactText(schedule);
             if (!repeat.isEmpty()) {
                 result = "(" + result + " => " + repeat + ")";
