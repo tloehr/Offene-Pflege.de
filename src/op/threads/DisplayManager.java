@@ -1,7 +1,6 @@
 package op.threads;
 
 import entity.files.SYSFilesTools;
-import entity.mx.MXmsgTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -268,42 +267,6 @@ public class DisplayManager extends Thread {
         }
     }
 
-    public void mailCheck() {
-        // Check 4 new mails ?
-        if (OPDE.getLogin() == null) return; // bad timing
-        if (MXmsgTools.hasUnread(OPDE.getLogin().getUser())) {
-            addSubMessage(new DisplayMessage("mx.you.have.mail", 5));
-            if (mailIconFlasher == null) {
-                mailIconFlasher = new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        while (!interrupted) {
-                            OPDE.getMainframe().toggleMailIcon();
-                            currentThread().sleep(1000);
-                            OPDE.getMainframe().toggleMailIcon();
-                            currentThread().sleep(1000);
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
-                        OPDE.getMainframe().toggleMailIcon();
-                    }
-                };
-                mailIconFlasher.execute();
-            }
-        } else {
-            if (mailIconFlasher != null) {
-                if (!mailIconFlasher.isDone()) {
-                    mailIconFlasher.cancel(true);
-                    mailIconFlasher = null;
-                    OPDE.getMainframe().setMailIconOff();
-                }
-            }
-        }
-    }
-
     private void check4EventsEveryMinute() {
         if (OPDE.getLogin() == null) {
             return;
@@ -318,8 +281,6 @@ public class DisplayManager extends Thread {
                 SYSLoginTools.logout();
                 System.exit(0);
             }
-
-            mailCheck();
 
         }
     }

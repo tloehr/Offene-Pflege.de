@@ -42,11 +42,6 @@
             <manager langbundle="opde.settings.acl.manager"/>
             <user1 langbundle="opde.settings.acl.user1"/>
         </class>
-        <class name="opde.mx" short="opde.mx.appinfo.short"
-               long="opde.mx.appinfo.long" main="true"
-               javaclass="op.mx.PnlMX" icon="mail.png">
-            <execute langbundle="opde.mx.acl.execute"/>
-        </class>
         <class name="admin.residents.cash" short="admin.residents.cash.appinfo.short"
                long="admin.residents.cash.appinfo.long" main="true"
                javaclass="op.allowance.PnlAllowance" icon="coins.png">

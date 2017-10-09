@@ -900,7 +900,7 @@ public class BHPTools {
         // this can only happen, when the morning part of the night shift is still active, and the BHP in question
         // belongs to the same shift on the day before. (in the late evening)
 
-        logger.debug(bhp.getShift());
+//        logger.debug(bhp.getShift());
 
         if (bhp.getShift() == SYSCalendar.SHIFT_VERY_LATE && SYSCalendar.whatShiftIs(now.toDate()) == SYSCalendar.SHIFT_VERY_EARLY)
             return false;

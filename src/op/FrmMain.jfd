@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<java version="1.8.0_76-release" class="java.beans.XMLDecoder">
+<java version="1.8.0_152-release" class="java.beans.XMLDecoder">
  <object class="com.jformdesigner.model.FormModel">
   <void property="contentType">
    <string>form/swing</string>
@@ -756,37 +756,6 @@
               <string>java.awt.event.ActionListener</string>
               <string>actionPerformed</string>
               <string>btnResetSplitpaneActionPerformed</string>
-              <boolean>true</boolean>
-             </object>
-            </void>
-           </object>
-          </void>
-          <void method="add">
-           <object class="com.jformdesigner.model.FormComponent">
-            <string>javax.swing.JButton</string>
-            <void method="setProperty">
-             <string>text</string>
-             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/>
-            </void>
-            <void method="setProperty">
-             <string>icon</string>
-             <object class="com.jformdesigner.model.SwingIcon">
-              <int>0</int>
-              <string>/artwork/22x22/mail_generic.png</string>
-             </object>
-            </void>
-            <void method="setProperty">
-             <string>alignmentY</string>
-             <float>1.0</float>
-            </void>
-            <void property="name">
-             <string>btnMail</string>
-            </void>
-            <void method="addEvent">
-             <object class="com.jformdesigner.model.FormEvent">
-              <string>java.awt.event.ActionListener</string>
-              <string>actionPerformed</string>
-              <string>btnMailActionPerformed</string>
               <boolean>true</boolean>
              </object>
             </void>

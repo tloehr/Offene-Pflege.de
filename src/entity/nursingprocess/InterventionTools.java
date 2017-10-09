@@ -117,6 +117,7 @@ public class InterventionTools {
             query.setParameter("search", EntityTools.getMySQLsearchPattern(suche));
         }
 
+        // https://github.com/tloehr/Offene-Pflege.de/issues/82
         List<Intervention> list = query.getResultList();
 
         em.close();

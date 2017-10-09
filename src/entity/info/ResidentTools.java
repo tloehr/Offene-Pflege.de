@@ -130,8 +130,11 @@ public class ResidentTools {
         result += getAge(resident).getYears() + " " + SYSTools.xx("misc.msg.Years") + " [" + resident.getRIDAnonymous() + "]";
 
         if (dead || gone) {
-            result += "  " + SYSTools.xx("misc.msg.movein") + ": " + df.format(stay1.getFrom()) + ", ";
-            result += (dead ? SYSTools.xx("misc.msg.late") : SYSTools.xx("misc.msg.movedout")) + ": " + df.format(stay2.getTo());
+            // https://github.com/tloehr/Offene-Pflege.de/issues/81
+            if (stay1 != null && stay2 != null) {
+                result += "  " + SYSTools.xx("misc.msg.movein") + ": " + df.format(stay1.getFrom()) + ", ";
+                result += (dead ? SYSTools.xx("misc.msg.late") : SYSTools.xx("misc.msg.movedout")) + ": " + df.format(stay2.getTo());
+            } 
         }
 
         return result;
@@ -218,7 +221,6 @@ public class ResidentTools {
     }
 
 
-
     public static ArrayList<Resident> getAllActive(LocalDate start, LocalDate end) {
         return getAllActive(start.toDateTimeAtStartOfDay(), SYSCalendar.eod(end));
     }
@@ -263,8 +265,8 @@ public class ResidentTools {
     public static ArrayList<Resident> getAllActiveAndPresent(LocalDate day) {
         ArrayList<Resident> list = getAllActive(day, day);
         ArrayList<Resident> listOnlyPresent = new ArrayList<>();
-        for (Resident resident : list){
-            if (!ResInfoTools.wasAway(resident, day)){
+        for (Resident resident : list) {
+            if (!ResInfoTools.wasAway(resident, day)) {
                 listOnlyPresent.add(resident);
             }
         }

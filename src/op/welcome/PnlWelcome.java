@@ -15,8 +15,6 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.mx.MXmsg;
-import entity.mx.MXmsgTools;
 import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
 import entity.process.QProcess;
@@ -74,7 +72,6 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<QProcess> processList;
     private java.util.List<MedStock> expiryList;
     private java.util.List<Object[]> birthdayList;
-    private java.util.List<MXmsg> unreadMsgList;
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
     private ArrayList<Qms> dueQMSes;
@@ -96,7 +93,6 @@ public class PnlWelcome extends CleanablePanel {
         super.cleanup();
         cpsWelcome.removeAll();
 
-        SYSTools.clear(unreadMsgList);
         SYSTools.clear(processList);
         SYSTools.clear(birthdayList);
         SYSTools.clear(noStoolList);
@@ -196,27 +192,11 @@ public class PnlWelcome extends CleanablePanel {
                 processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
                 birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
                 expiryList = MedStockTools.getExpiryList(7);
-                unreadMsgList = MXmsgTools.getAllUnreadFor(OPDE.getMe());
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
                 dueQMSes = QmsTools.getDueList(OPDE.getLogin().getUser());
                 Collections.sort(processList);
-                int max = unreadMsgList.size() + processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size();
-
-                if (!unreadMsgList.isEmpty()) {
-                    String title = "<html><font size=+1>" +
-                            SYSTools.xx("mx.unread.msg.list") +
-                            "</font></html>";
-                    CollapsiblePane cp = new CollapsiblePane(title);
-                    JPanel pnlContent = new JPanel(new VerticalLayout());
-                    for (MXmsg msg : unreadMsgList) {
-                        progress++;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
-                        pnlContent.add(createCP4(msg).getMain());
-                    }
-                    cp.setContentPane(pnlContent);
-                    cpsWelcome.add(cp);
-                }
+                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size();
 
                 if (!processList.isEmpty()) {
                     String title = "<html><font size=+1>" +
@@ -546,26 +526,6 @@ public class PnlWelcome extends CleanablePanel {
             OPDE.getMainframe().clearPreviousProgbutton();
             OPDE.getMainframe().setCurrentResident(stock.getInventory().getResident());
             OPDE.getMainframe().setPanelTo(new PnlCare(stock.getInventory().getResident(), jspSearch));
-        });
-
-        return cptitle;
-    }
-
-    private DefaultCPTitle createCP4(final MXmsg msg) {
-
-        String subject = SYSTools.catchNull(msg.getSubject(), SYSConst.html_italic("mx.no.subject"));
-
-        String title = "<html><table border=\"0\">" +
-                "<tr>" +
-                "<td width=\"600\" align=\"left\">" + subject + " (" + SYSTools.xx("misc.msg.from") + ": " + UsersTools.getFullnameWithID(msg.getSender()) + ", " + DateFormat.getDateTimeInstance().format(msg.getPit()) + ")</td>" +
-                "</tr>" +
-                "</table>" +
-
-                "</html>";
-
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
-            OPDE.getMainframe().clearPreviousProgbutton();
-            OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel("op.mx.PnlMX"));
         });
 
         return cptitle;

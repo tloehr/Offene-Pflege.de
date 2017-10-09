@@ -163,7 +163,8 @@ public class DlgIntervention extends MyJDialog {
             }
 
             set2EditMode(false);
-            lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy(txtSearch.getText())));
+            // https://github.com/tloehr/Offene-Pflege.de/issues/82
+            lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy(txtText.getText().trim())));
         }
     }
 
@@ -191,9 +192,9 @@ public class DlgIntervention extends MyJDialog {
         lblLength = new JLabel();
         txtLength = new JTextField();
         lblCat = new JLabel();
-        cmbCat = new JComboBox();
+        cmbCat = new JComboBox<>();
         lblType = new JLabel();
-        cmbType = new JComboBox();
+        cmbType = new JComboBox<>();
         panel3 = new JPanel();
         btnCancel = new JButton();
         btnSave = new JButton();
@@ -212,8 +213,8 @@ public class DlgIntervention extends MyJDialog {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default, $lcgap, 87dlu:grow, $lcgap, default:grow, $lcgap, default",
-                    "2*(default, $lgap), default:grow, 2*($lgap, default)"));
+                "default, $lcgap, 87dlu:grow, $lcgap, default:grow, $lcgap, default",
+                "2*(default, $lgap), default:grow, 2*($lgap, default)"));
 
             //---- txtSearch ----
             txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -223,8 +224,8 @@ public class DlgIntervention extends MyJDialog {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                        "default, $lcgap, 63dlu:grow",
-                        "5*(default, $lgap), fill:default:grow"));
+                    "default, $lcgap, 63dlu:grow",
+                    "5*(default, $lgap), fill:default:grow"));
 
                 //---- lblText ----
                 lblText.setText("Bezeichnung");
@@ -260,11 +261,11 @@ public class DlgIntervention extends MyJDialog {
                 panel2.add(lblCat, CC.xy(1, 5));
 
                 //---- cmbCat ----
-                cmbCat.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbCat.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbCat.setFont(new Font("Arial", Font.PLAIN, 14));
                 cmbCat.setEnabled(false);
@@ -276,11 +277,11 @@ public class DlgIntervention extends MyJDialog {
                 panel2.add(lblType, CC.xy(1, 7));
 
                 //---- cmbType ----
-                cmbType.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbType.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbType.setFont(new Font("Arial", Font.PLAIN, 14));
                 cmbType.setEnabled(false);
@@ -373,9 +374,9 @@ public class DlgIntervention extends MyJDialog {
     private JLabel lblLength;
     private JTextField txtLength;
     private JLabel lblCat;
-    private JComboBox cmbCat;
+    private JComboBox<String> cmbCat;
     private JLabel lblType;
-    private JComboBox cmbType;
+    private JComboBox<String> cmbType;
     private JPanel panel3;
     private JButton btnCancel;
     private JButton btnSave;
