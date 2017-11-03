@@ -2,9 +2,7 @@ package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.combobox.FileChooserPanel;
 import com.jidesoft.dialog.*;
-import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.AbstractWizardPage;
 import com.jidesoft.wizard.CompletionWizardPage;
 import com.jidesoft.wizard.DefaultWizardPage;
@@ -19,9 +17,6 @@ import op.OPDE;
 import op.system.AppInfo;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -30,7 +25,6 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
@@ -39,8 +33,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Files;
 import java.security.SecureRandom;
@@ -1377,6 +1373,7 @@ public class InitWizard extends WizardDialog {
                                 }
                             } catch (IOException e12) {
                                 e12.printStackTrace();
+                                logger.error(e12);
                             }
                         }).start();
                     }
@@ -1393,36 +1390,6 @@ public class InitWizard extends WizardDialog {
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.CANCEL);
 
-//                        Map map = new HashMap();
-//
-//                        map.put("host", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
-//                        map.put("port", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT));
-//                        map.put("user", txtAdmin.getText().trim());
-//                        map.put("pw", new String(txtPassword.getPassword()).trim());
-//                        map.put("file", sBackupFile);
-//                        map.put("catalog", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
-//
-//                        String execFilename = txtMysqldump.getText();
-//                        if (SYSTools.isWindows()) {
-//                            // Oh mein Gott. Was ist Windows bloss für ein Müll.
-//
-//                        }
-//
-//                        ProcessBuilder builder = new ProcessBuilder(execFilename,
-//                                "-v",
-//                                "--opt",
-//                                String.format("-h%s", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST)),
-//                                String.format("-u%s", txtAdmin.getText().trim()),
-//                                String.format("-P%s", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT)),
-//                                String.format("-p%s", new String(txtPassword.getPassword()).trim()),
-//                                String.format("-r%s", sBackupFile),
-//                                jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG)
-//                        );
-//                        builder.redirectErrorStream(true);
-//                        final Process process = builder.start();
-//                        watch(process);
-
-
                         Map map = new HashMap();
 
                         map.put("host", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST));
@@ -1431,28 +1398,35 @@ public class InitWizard extends WizardDialog {
                         map.put("pw", new String(txtPassword.getPassword()).trim());
                         map.put("file", sBackupFile);
                         map.put("catalog", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
-                        CommandLine cmdLine = CommandLine.parse(txtMysqldump.getText().trim() + " -v --opt -h${host} -u${user} -P${port} -p${pw} -r'${file}' ${catalog}");
 
-                        cmdLine.setSubstitutionMap(map);
-                        DefaultExecutor executor = new DefaultExecutor();
-                        executor.setExitValue(0);
+                        String execFilename = txtMysqldump.getText();
+                        if (SYSTools.isWindows()) {
+                            // Oh mein Gott. Was ist Windows bloss für ein Müll.
 
-                        OutputStream output = new OutputStream() {
-                            private StringBuilder string = new StringBuilder();
+                        }
 
-                            @Override
-                            public void write(int b) throws IOException {
-                                String str = Character.toString((char) b);
-                                if (str.equals(System.lineSeparator())) {
-                                    logger.info(string);
-                                    string = new StringBuilder();
-                                } else {
-                                    string.append(str);
-                                }
-                            }
-                        };
-                        executor.setStreamHandler(new PumpStreamHandler(output));
-                        return executor.execute(cmdLine);
+                        ProcessBuilder builder = new ProcessBuilder(execFilename,
+                                "-v",
+                                "--opt",
+                                String.format("-h%s", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST)),
+                                String.format("-u%s", txtAdmin.getText().trim()),
+                                String.format("-P%s", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT)),
+                                String.format("-p%s", new String(txtPassword.getPassword()).trim()),
+                                String.format("-r%s", sBackupFile),
+                                jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG)
+                        );
+
+                        builder.redirectErrorStream(true);
+                        final Process process = builder.start();
+                        watch(process);
+
+                        while (process.isAlive()) {
+                            Thread.sleep(1000);
+                        }
+
+                        //todo: wenn z.B. ein falsches PW eingegeben wird, dann hängt der Prozess.
+
+                        return process.exitValue();
 
                     }
 
@@ -1461,8 +1435,16 @@ public class InitWizard extends WizardDialog {
                         try {
                             int exitValue = (int) get();
                             logger.info("Exit Value: " + exitValue);
-                            logger.info(SYSTools.xx("opde.initwizard.page.backup.targetfile", sBackupFile));
-                            summary.add(SYSTools.xx("opde.initwizard.page.backup.targetfile", sBackupFile));
+
+                            if (exitValue == 0) {
+
+                                logger.info(SYSTools.xx("opde.initwizard.page.backup.targetfile", sBackupFile));
+                                summary.add(SYSTools.xx("opde.initwizard.page.backup.targetfile", sBackupFile));
+                            } else {
+                                logger.info(SYSTools.xx("misc.msg.error"));
+                                logger.info(SYSTools.xx("!! Datenbank wurde nicht gesichert."));
+                                summary.add(SYSTools.xx("!! Datenbank wurde nicht gesichert."));
+                            }
                         } catch (Exception e1) {
                             logger.error(e1);
                         } finally {
@@ -1481,81 +1463,45 @@ public class InitWizard extends WizardDialog {
             btnSearchMysqlDump = GUITools.getTinyButton("opde.initwizard.page.backup.mysqldump", SYSConst.icon22exec);
             btnSearchMysqlDump.addActionListener(e -> {
                 if (worker != null && !worker.isDone()) return;
-                final JidePopup popup = new JidePopup();
-                final FileChooserPanel fcp = new FileChooserPanel(jdbcProps.getProperty(SYSPropsTools.KEY_MYSQLDUMP_EXEC));
-                fcp.addItemListener(e1 -> {
-                    if (e1.getStateChange() == ItemEvent.SELECTED) {
-                        String mysqldump = e1.getItem().toString();
 
-                        if (new File(mysqldump).exists()) {
-                            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MYSQLDUMP_EXEC, mysqldump);
-                            txtMysqldump.setText(mysqldump);
-                            logger.info(SYSTools.xx("opde.initwizard.page.backup.current.mysqldump", mysqldump));
-                        } else {
-                            txtMysqldump.setText("");
-                        }
+
+                JFileChooser jfc = new JFileChooser(jdbcProps.getProperty(SYSPropsTools.KEY_MYSQLDUMP_EXEC));
+                jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                jfc.setMultiSelectionEnabled(false);
+                if (jfc.showOpenDialog(pnlMain) == JFileChooser.APPROVE_OPTION) {
+                    File mysqldump = jfc.getSelectedFile();
+
+                    if (mysqldump.exists()) {
+                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MYSQLDUMP_EXEC, mysqldump.getAbsolutePath());
+                        txtMysqldump.setText(mysqldump.getAbsolutePath());
+                        logger.info(SYSTools.xx("opde.initwizard.page.backup.current.mysqldump", mysqldump));
+                    } else {
+                        txtMysqldump.setText("");
                     }
-                    popup.hidePopup();
-                });
+                }
 
-                popup.setMovable(false);
-                JPanel pnl = new JPanel(new BorderLayout(10, 10));
-                pnl.setBorder(new EmptyBorder(5, 5, 5, 5));
-                pnl.add(fcp, BorderLayout.CENTER);
-
-                popup.setContentPane(pnl);
-                popup.setPreferredSize(pnl.getPreferredSize());
-                pnl.revalidate();
-                popup.setOwner(btnSearchMysqlDump);
-                popup.removeExcludedComponent(thisWizard);
-                popup.setDefaultFocusComponent(pnl);
-                popup.showPopup();
             });
 
             btnSearchBackupdir = GUITools.getTinyButton("opde.initwizard.page.backup.backupdir", SYSConst.icon22exec);
             btnSearchBackupdir.addActionListener(e -> {
                 if (worker != null && !worker.isDone()) return;
-                final JidePopup popup = new JidePopup();
-                final FileChooserPanel fcp = new FileChooserPanel(jdbcProps.getProperty(SYSPropsTools.KEY_MYSQLDUMP_DIRECTORY));
-                fcp.addItemListener(e1 -> {
-                    if (e1.getStateChange() == ItemEvent.SELECTED) {
-                        //todo: diese auswahl klappt nicht.
-                        String mysqldumpdir = e1.getItem().toString();
 
-                        if (new File(mysqldumpdir).exists()) {
-                            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MYSQLDUMP_DIRECTORY, mysqldumpdir);
-                            txtBackupdir.setText(mysqldumpdir);
-                            logger.info(SYSTools.xx("opde.initwizard.page.backup.backupdir", mysqldumpdir));
-                        } else {
-                            txtMysqldump.setText(System.getProperty("java.io.tmp"));
-                        }
+                JFileChooser jfc = new JFileChooser(jdbcProps.getProperty(SYSPropsTools.KEY_MYSQLDUMP_DIRECTORY));
+                jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                jfc.setMultiSelectionEnabled(false);
+                if (jfc.showOpenDialog(pnlMain) == JFileChooser.APPROVE_OPTION) {
+                    File mysqldumpdir = jfc.getSelectedFile();
+
+                    if (mysqldumpdir.exists()) {
+                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MYSQLDUMP_DIRECTORY, mysqldumpdir.getAbsolutePath());
+                        txtBackupdir.setText(mysqldumpdir.getAbsolutePath());
+                        logger.info(SYSTools.xx("opde.initwizard.page.backup.backupdir", mysqldumpdir));
+                    } else {
+                        txtBackupdir.setText("");
                     }
-                    popup.hidePopup();
-                });
+                }
 
-                popup.setMovable(false);
-                JPanel pnl = new JPanel(new BorderLayout(10, 10));
-                pnl.setBorder(new EmptyBorder(5, 5, 5, 5));
-                pnl.add(fcp, BorderLayout.CENTER);
-
-                popup.setContentPane(pnl);
-                popup.setPreferredSize(pnl.getPreferredSize());
-                pnl.revalidate();
-                popup.setOwner(btnSearchMysqlDump);
-                popup.removeExcludedComponent(thisWizard);
-                popup.setDefaultFocusComponent(pnl);
-                popup.showPopup();
             });
-//                    .addActionListener(e -> {
-//                if (worker != null && !worker.isDone()) return;
-//                try {
-//                    if (Desktop.isDesktopSupported()) {
-//                        Desktop.getDesktop().open(new File(txtBackupdir.getText()));
-//                    }
-//                } catch (IOException ioe) {
-//                    logger.error(ioe.getMessage());
-//                }
-//            });
 
 
             pnlMain.setLayout(new FormLayout(
