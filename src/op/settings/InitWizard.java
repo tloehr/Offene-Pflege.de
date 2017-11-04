@@ -1383,8 +1383,12 @@ public class InitWizard extends WizardDialog {
 
                         txtAdmin.setEnabled(false);
                         txtPassword.setEnabled(false);
+                        txtMysqldump.setEnabled(false);
+                        txtBackupdir.setEnabled(false);
+                        txtCatalog.setEnabled(false);
                         btnDBBackup.setEnabled(false);
                         btnSearchMysqlDump.setEnabled(false);
+                        btnSearchBackupdir.setEnabled(false);
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.BACK);
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.NEXT);
                         fireButtonEvent(ButtonEvent.DISABLE_BUTTON, ButtonNames.FINISH);
@@ -1400,10 +1404,8 @@ public class InitWizard extends WizardDialog {
                         map.put("catalog", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
 
                         String execFilename = txtMysqldump.getText();
-                        if (SYSTools.isWindows()) {
-                            // Oh mein Gott. Was ist Windows bloss für ein Müll.
 
-                        }
+                        String password = new String(txtPassword.getPassword()).trim();
 
                         ProcessBuilder builder = new ProcessBuilder(execFilename,
                                 "-v",
@@ -1411,7 +1413,8 @@ public class InitWizard extends WizardDialog {
                                 String.format("-h%s", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_HOST)),
                                 String.format("-u%s", txtAdmin.getText().trim()),
                                 String.format("-P%s", jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_PORT)),
-                                String.format("-p%s", new String(txtPassword.getPassword()).trim()),
+                                // damit provoziere ich eine Fehlermeldung. Wenn das Passwort leer ist, geht mysqldump in den interaktiven Modus und fragt ein PW ab. Dann hängt der Process.
+                                String.format("-p%s", password.isEmpty() ? "adksjdks112d" : password),
                                 String.format("-r%s", sBackupFile),
                                 jdbcProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG)
                         );
@@ -1423,8 +1426,6 @@ public class InitWizard extends WizardDialog {
                         while (process.isAlive()) {
                             Thread.sleep(1000);
                         }
-
-                        //todo: wenn z.B. ein falsches PW eingegeben wird, dann hängt der Prozess.
 
                         return process.exitValue();
 
@@ -1452,6 +1453,10 @@ public class InitWizard extends WizardDialog {
                             txtPassword.setEnabled(true);
                             btnDBBackup.setEnabled(true);
                             btnSearchMysqlDump.setEnabled(true);
+                            txtMysqldump.setEnabled(true);
+                            txtBackupdir.setEnabled(true);
+                            txtCatalog.setEnabled(true);
+                            btnSearchBackupdir.setEnabled(true);
                             setupWizardButtons();
                         }
                         super.done();
