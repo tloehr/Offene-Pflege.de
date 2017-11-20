@@ -24,6 +24,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.MutableInterval;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -48,11 +49,13 @@ public class NReportTools {
      * retrieves the PITs of the first and the last entries in the NReports and Handovers table.
      * The values are combined, so that the maximum span is calculated.
      *
+     * https://github.com/tloehr/Offene-Pflege.de/issues/83
+     *
      * @return
      */
     public static MutableInterval getMinMax() {
         MutableInterval result = null;
-        DateTime min, max;
+
 
         EntityManager em = OPDE.createEM();
         Query queryMin1 = em.createQuery("SELECT nr FROM NReport nr ORDER BY nr.pit ASC");
@@ -64,29 +67,40 @@ public class NReportTools {
         Query queryMax2 = em.createQuery("SELECT nr FROM Handovers nr ORDER BY nr.pit DESC");
         queryMax2.setMaxResults(1);
 
-        try {
+        DateTime dmin1 = null, dmax1 = null, dmin2 = null, dmax2 = null;
 
+
+        try {
             NReport min1 = (NReport) queryMin1.getSingleResult();
             NReport max1 = (NReport) queryMax1.getSingleResult();
-            Handovers min2 = (Handovers) queryMin2.getSingleResult();
-            Handovers max2 = (Handovers) queryMax2.getSingleResult();
-
-            if (min1 == null && min2 == null) { // that means, that there is now report at all
-                result = null;
-            } else {
-                DateTime mi1 = min1 == null ? new DateTime() : new DateTime(min1.getPit());
-                DateTime mi2 = min2 == null ? new DateTime() : new DateTime(min2.getPit());
-                min = SYSCalendar.min(mi1, mi2);
-
-                DateTime ma1 = max1 == null ? new DateTime() : new DateTime(max1.getPit());
-                DateTime ma2 = max2 == null ? new DateTime() : new DateTime(max2.getPit());
-                max = SYSCalendar.max(ma1, ma2);
-
-                result = new MutableInterval(min, max);
-
-            }
+            dmin1 = min1 == null ? new DateTime() : new DateTime(min1.getPit());
+            dmax1 = max1 == null ? new DateTime() : new DateTime(max1.getPit());
+        } catch (NoResultException nre) {
+            dmin1 = null;
+            dmax1 = null;
         } catch (Exception e) {
             OPDE.fatal(e);
+        }
+
+        try {
+            Handovers min2 = (Handovers) queryMin2.getSingleResult();
+            Handovers max2 = (Handovers) queryMax2.getSingleResult();
+            dmin2 = min2 == null ? new DateTime() : new DateTime(min2.getPit());
+            dmax2 = max2 == null ? new DateTime() : new DateTime(max2.getPit());
+        } catch (NoResultException nre) {
+            dmin2 = null;
+            dmax2 = null;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+        DateTime min = SYSCalendar.min(dmin1, dmin2);
+        DateTime max = SYSCalendar.max(dmax1, dmax2);
+
+        if (min != null && max != null){
+            result = new MutableInterval(min, max);
+        } else {
+            result = null;
         }
 
         em.close();

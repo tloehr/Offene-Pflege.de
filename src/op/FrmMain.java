@@ -894,8 +894,8 @@ public class FrmMain extends JFrame {
             if (o != null) {
                 afterLogin();
             } else {
-                //todo: remove after install4j
-                FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
+                // nicht mehr nötig durch install4j
+                //FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
                 System.exit(0);
             }
         });

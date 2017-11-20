@@ -315,6 +315,7 @@ public class AppInfo {
     }
 
     public static String getSQLScriptPath() {
+//        return "/Volumes/Volume1/Dropbox/opde/install4j/dbscripts";
         return LocalMachine.getProgrammPath() + File.separator + dirSql;
     }
 

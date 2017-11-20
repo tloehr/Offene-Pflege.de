@@ -138,7 +138,6 @@ public class LocalMachine {
      * @return
      */
     public static final String getProgrammPath() {
-
         // usually the installer saves this information in response.varfile, but not necessarily
         String install4jDir = SYSTools.catchNull(Variables.getInstallerVariable("sys.installationDir"));
 

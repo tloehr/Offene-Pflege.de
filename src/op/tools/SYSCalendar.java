@@ -1264,10 +1264,14 @@ public class SYSCalendar {
     }
 
     public static DateTime max(DateTime a, DateTime b) {
+        if (a == null) return b;
+        if (b == null) return a;
         return a.compareTo(b) > 0 ? a : b;
     }
 
     public static DateTime min(DateTime a, DateTime b) {
+        if (a == null) return b;
+        if (b == null) return a;
         return a.compareTo(b) < 0 ? a : b;
     }
 
