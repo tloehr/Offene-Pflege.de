@@ -1,0 +1,14 @@
+<!--
+Cat: 15 (Medizinisch/Ärztlich)
+BWINFTYP: SURGERY1
+Chirurgischer Eingriff
+06.03.2015
+since-db-version: 8
+deprecated-since: 
+replaced-by: 
+MODE_INTERVAL_SINGLE_INCIDENTS = 3
+TYPE_SURGERY = 145
+-->
+<textfield name="surgerytext" label="Art der OP" hfill="true"/>
+<gpselect name="gp1" label="Ambulant durchgeführt"/>
+<hospitalselect name="hospital1" label="im KH durchgeführt"/>

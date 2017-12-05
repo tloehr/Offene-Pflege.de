@@ -1,0 +1,58 @@
+<!--
+Cat: 5 (Orintierung/Psyche)
+BWINFTYP: PSYCH1
+Psychiatrie/Sucht
+21.06.2013
+since-db-version: 
+deprecated-since: 
+replaced-by: 
+MODE_INTERVAL_BYSECOND = 0
+TYPE_PSYCH = 136
+-->
+
+<label size="16" fontstyle="bold" label="Allgemeines"/>
+<gpselect name="gp1" label="Facharzt"/>
+<tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Dadurch wird die Anlage 'PSYCH' erstellt und beigefügt.[br/]Der Bemerkungstext zu dieser Information wird unter 'Empfehlung/Status' eingetragen."/>
+<optiongroup name="accomodation" label="Wohnsituation"><option label="eigene Wohnung" name="apartment"/> <option label="betreutes Wohnen" name="assistedliving" default="true"/><option label="ohne festen Wohnsitz" name="homeless"/></optiongroup>
+<optiongroup name="socialcontacts" label="Sozialkontakte"><option label="unterstützend" name="supportive" default="true"/> <option label="problematisch" name="problem"/><option label="fehlend" name="missing"/></optiongroup>
+
+<label size="12" fontstyle="bold" label="Tätigkeiten"/>
+<checkbox name="job" label="berufstätig"/>
+<checkbox name="volunteer" label="ehrenamtlich tätig" layout="left"/>
+
+<separator/>
+<label size="16" fontstyle="bold" label="Psychosoziale Aspekte"/>
+<optiongroup name="aggressive" label="Aggressives Verhalten"><option label="ja" name="yes1"/> <option label="nein" name="no1" default="true"/><option label="zeitweise" name="intermittent1"/></optiongroup>
+<optiongroup name="selfdestructive" label="Selbstgefährdung"><option label="ja" name="yes2"/> <option label="nein" default="true" name="no2"/><option label="zeitweise" name="intermittent2"/></optiongroup>
+<optiongroup name="manicdepressive" label="Depression / Manisches Verhalten"><option label="ja" name="yes3"/> <option label="nein" default="true" name="no3"/><option label="zeitweise" name="intermittent3"/></optiongroup>
+<optiongroup name="delusion" label="Wahn"><option label="ja" name="yes4"/> <option label="nein" default="true" name="no4"/><option label="zeitweise" name="intermittent4"/></optiongroup>
+<optiongroup name="hallucination" label="Halluzinationen / Wahrnehmungsstörungen"><option label="ja" name="yes5"/> <option label="nein" default="true" name="no5"/><option label="zeitweise" name="intermittent5"/></optiongroup>
+<optiongroup name="passive" label="Antriebsminderung"><option label="ja" name="yes6"/> <option label="nein" default="true" name="no6"/><option label="zeitweise" name="intermittent6"/></optiongroup>
+<optiongroup name="restless" label="Umtriebigkeit (Psychomotorische Unruhe)"><option label="ja" name="yes7"/> <option label="nein" default="true" name="no7"/><option label="zeitweise" name="intermittent7"/></optiongroup>
+<optiongroup name="regressive" label="Regressives Verhalten" tooltip="[h2]Symptome regressiven Verhaltens[/h2]
+[ol]
+[li][b]Resignation:[/b] PatientInnen zeigen keinen eigenen Willen, sind völlig unkritisch, übernehmen keine Verantwortung für sich selbst sondern übertragen sie auf die Pflegekräfte, lassen sich hängen, sind extrem anhänglich und völlig angepasst. Im Allgemeinen sind dies für den Krankenhausalltag „gute“ PatientInnen.[/li]
+[li][b]oberflächliche Anpassung:[/b] scheinbar lassen sich die PatientInnen auf alles ein, heimlich jedoch rauchen sie oder werfen Medikamente weg. Sie nässen/koten ein.[/li]
+[li][b]Protest:[/b] PatientInnen beschweren sich, sind rebellisch, weisen auf Fehler hin und wissen alles besser. Diese PatientInnen ziehen oftmals den Ärger des Pflegepersonals auf sich.[/li]
+[/ol]"><option label="ja" name="yes8"/> <option label="nein" default="true" name="no8"/><option label="zeitweise" name="intermittent8"/></optiongroup>
+<optiongroup name="faecal" label="Kotschmieren / Kotessen"><option label="ja" name="yes9"/> <option label="nein" default="true" name="no9"/><option label="zeitweise" name="intermittent9"/></optiongroup>
+<optiongroup name="apraxia" label="Apraxie" tooltip="Als Apraxie (gr. „Untätigkeit“) bezeichnet man eine Störung der Ausführung willkürlicher zielgerichteter und geordneter Bewegungen bei intakter motorischer Funktion."><option label="ja" name="yes10"/> <option label="nein" default="true" name="no10"/><option label="zeitweise" name="intermittent10"/></optiongroup>
+<optiongroup name="agnosia" label="Agnosie" tooltip="Die Agnosie ist ein relativ seltenes neuropsychologisches Symptom, das nach bi- oder unilateralen (sub)kortikalen Läsionen auftritt. Es wird definiert als eine Störung des Erkennens, ohne dass elementare sensorische Defizite, kognitive Ausfälle, Aufmerksamkeitsstörungen, aphasische Benennstörungen oder die Unkenntnis des zu erkennenden Stimulus vorliegt."><option label="ja" name="yes11"/> <option label="nein" default="true" name="no11"/><option label="zeitweise" name="intermittent11"/></optiongroup>
+<optiongroup name="fear" label="Angst"><option label="ja" name="yes12"/> <option label="nein" default="true" name="no12"/><option label="zeitweise" name="intermittent12"/></optiongroup>
+<textfield length="30" name="feartext" label="Angst wovor"/>
+
+<separator/>
+<label size="16" fontstyle="bold" label="Sucht"/>
+<checkbox label="aktueller Konsum" name="consuming"/>
+<optiongroup name="treatmentsymptoms" label="Entzugssymptome"><option label="ja" name="yes13"/> <option label="nein" default="true" name="no13"/><option label="zeitweise" name="intermittent13"/></optiongroup>
+<label size="12" fontstyle="bold" label="Art"/>
+<checkbox name="alcohol" label="Alkohol"/>
+<checkbox name="drugs" label="Drogen" layout="left"/>
+<checkbox name="meds" label="Medikamente" layout="left"/>
+<checkbox name="nicotin" label="Nikotin" layout="left"/>
+<checkbox name="gambling" label="Spielsucht" layout="left"/>
+<textfield name="otheraddiction" length="30"  label="sonstiges"/>
+
+<textfield length="30" name="substitution" label="Substitution"/>
+<textfield  length="30" name="substlocation" label="Vergabestelle"/>
+<textfield length="30" name="substcontact" label="Ansprechpartner"/>

@@ -1,0 +1,67 @@
+<!--
+Cat: 13 (Verwaltung)
+BWINFTYP: NINSUR02
+Pflegekasse
+12.04.2017
+since-db-version: 9
+deprecated-since: 
+replaces: NINSURANCE
+replaced-by: 
+equivalence-id: 15
+MODE_INTERVAL_BYSECOND = 0
+TYPE_NURSING_INSURANCE = 105
+
+Änderung nötig aufgrund der Einführung der Pflegegrade. Denn PEA gibts nicht mehr.
+
+-->
+<copyfromtemplate/>
+<textfield label="Name" name="niname" innerlayout="tab"/>
+<textfield label="Strasse" name="nistreet" innerlayout="tab"/>
+<textfield label="PLZ" name="nizip" innerlayout="tab"/>
+<textfield label="Ort" name="nicity" innerlayout="tab"/>
+<textfield label="Tel" name="nitel" innerlayout="tab"/>
+<textfield label="Fax" name="nifax" innerlayout="tab"/>
+<textfield label="Zuständig" name="nicontact" innerlayout="tab"/>
+<separator/>
+<textfield label="Versicherten Nr." name="personno" innerlayout="tab"/>
+<textfield label="Krankenkassen Nr." name="insuranceno" innerlayout="tab"/>
+<separator/>
+<optiongroup name="grade" label="Einstufung" tx="Wird auf Seite 1 eingetragen.">
+<option label="nicht eingestuft" name="none" default="true"/>
+<option label="beantragt" name="requested"/>
+<option label="abgelehnt" name="refused"/>
+<option label="alte 0+" name="alte0p" layout="br"/>
+<option label="Pflegegrad 1" name="pg1"/>
+<option label="Pflegegrad 2" name="pg2"/>
+<option label="Pflegegrad 3" name="pg3" layout="br"/>
+<option label="Pflegegrad 4" name="pg4"/>
+<option label="Pflegegrad 5" name="pg5"/>
+<option label="andere (bitte in Beschreibung)" name="other"/>
+</optiongroup>
+<textfield label="Beantragt am" name="requestdate" length="12" type="date" innerlayout="tab" tx="Wird auf Seite 1 eingetragen."/>
+
+--
+INSERT INTO `opde`.`resinfotype` (`BWINFTYP`, `XML`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`) VALUES ('NINSUR02', '<textfield label="Name" name="niname" innerlayout="tab"/>
+<textfield label="Strasse" name="nistreet" innerlayout="tab"/>
+<textfield label="PLZ" name="nizip" innerlayout="tab"/>
+<textfield label="Ort" name="nicity" innerlayout="tab"/>
+<textfield label="Tel" name="nitel" innerlayout="tab"/>
+<textfield label="Fax" name="nifax" innerlayout="tab"/>
+<textfield label="Zuständig" name="nicontact" innerlayout="tab"/>
+<separator/>
+<textfield label="Versicherten Nr." name="personno" innerlayout="tab"/>
+<textfield label="Krankenkassen Nr." name="insuranceno" innerlayout="tab"/>
+<separator/>
+<optiongroup name="grade" label="Einstufung" tx="Wird auf Seite 1 eingetragen.">
+<option label="nicht eingestuft" name="none" default="true"/>
+<option label="beantragt" name="requested"/>
+<option label="abgelehnt" name="refused"/>
+<option label="alte 0+" name="alte0p" layout="br"/>
+<option label="Pflegegrad 1" name="pg1"/>
+<option label="Pflegegrad 2" name="pg2"/>
+<option label="Pflegegrad 3" name="pg3" layout="br"/>
+<option label="Pflegegrad 4" name="pg4"/>
+<option label="Pflegegrad 5" name="pg5"/>
+<option label="andere (bitte in Beschreibung)" name="other"/>
+</optiongroup>
+<textfield label="Beantragt am" name="requestdate" length="12" type="date" innerlayout="tab" tx="Wird auf Seite 1 eingetragen."/>', 'Pflegekasse', NULL, '13', '105', '0', '15');

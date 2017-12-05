@@ -1,0 +1,24 @@
+<!--
+Cat: 2 (Ausscheidungen)
+BWINFTYP: FINCO1
+Stuhlinkontinenz
+20.06.2013
+since-db-version: 
+deprecated-since: 
+replaces: 
+replaced-by: 
+equivalence-id: 14
+MODE_INTERVAL_BYSECOND = 0
+TYPE_INCO_FAECAL = 115
+-->
+<tx tooltip="Sobald das Inkontinenzprofil nicht mehr auf 'Nicht inkontinent' steht, wird im Überleitbogen die Markierung für 'Harninkontinenz' gesetzt."/>
+<combobox label="Grad der Inkontinenz" name="incolevel" tooltip="[ul]
+[li][b]Teilinkontinenz 1[/b]: Es kommt zu geringen Stuhlabgängen bei Belastung und Diarrhö.[br/]Daraus resultieren geringe Verunreinigungen der Unterwäsche.[/li]
+[li][b]Teilinkontinenz 2[/b]: Hierbei tritt Inkontinenz für Winde und dünnen Stuhl auf.[br/]Diese führt zu häufigen  Wäscheverschmutzungen und unkontrolliertem Abgang von Darmgasen.[br/]Mitunter kommt es auch zu einem Abgang von flüssigem Stuhl.[/li]
+[li][b]Totalinkontinenz[/b]: Diese liegt vor bei völligem Kontrollverlust.[br/]Der Abgang von Stuhl und Gasen kann nicht mehr gesteuert werden.[/li]
+[/ul]">
+<item label="Nicht inkontinent" name="0"/>
+<item label="Teilinkontinenz 1" name="1"/>
+<item label="Teilinkontinenz 2" name="2"/>
+<item label="Totalinkontinenz" name="3"/>
+</combobox>

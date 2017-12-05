@@ -1,0 +1,78 @@
+<!--
+Cat: 15 (Medizinisch/Ärztlich)
+BWINFTYP: SPECIAL1
+Facharzt
+09.11.2017
+since-db-version: 8
+deprecated-since: 
+replaces: 
+replaced-by: 
+equivalence-id: 
+MODE_INTERVAL_NOCONSTRAINTS = 2
+
+MAX-NAME = 51
+-->
+
+<combobox label="Facharztrichtung" name="specialist">
+<item label="Allgemeinchirurgie" name="02"/>
+<item label="Allgemeinmedizin" name="00"/>
+<item label="Angiologie" name="22"/>
+<item label="Anästhesiologie" name="01"/>
+<item label="Chirurgie" name="10"/>
+<item label="Dermatologie und Venerologie" name="11"/>
+<item label="Endokrinologie und Diabetologie" name="23"/>
+<item label="Fachärztlicher Internist" name="21"/>
+<item label="Gastroenterologie" name="24"/>
+<item label="Gefäßchirurgie" name="03"/>
+<item label="Geriatrie" name="30"/>
+<item label="Gynäkologie und Geburtshilfe" name="12"/>
+<item label="Gynäkologische Endokrinologie und Reproduktionsmedizin" name="13"/>
+<item label="Gynäkologische Onkologie" name="14"/>
+<item label="Hals-Nasen-Ohren-Heilkunde" name="16"/>
+<item label="Hausärztlicher Internist" name="20"/>
+<item label="Herzchirurgie" name="04"/>
+<item label="Hämatologie und Onkologie" name="25"/>
+<item label="Innere Medizin" name="19"/>
+<item label="Kardiologie" name="26"/>
+<item label="Kinder- und Jugendpsychiatrie und -psychotherapie" name="36"/>
+<item label="Kinder-Hämatologie und -Onkologie" name="32"/>
+<item label="Kinderchirurgie" name="05"/>
+<item label="Kinderkardiologie" name="33"/>
+<item label="Klinische Pharmakologie" name="37"/>
+<item label="Mund-Kiefer-Gesichtschirurgie" name="38"/>
+<item label="Neonatologie" name="34"/>
+<item label="Nephrologie" name="27"/>
+<item label="Neurochirurgie" name="39"/>
+<item label="Neurologie" name="40"/>
+<item label="Neuropädiatrie" name="35"/>
+<item label="Nuklearmedizin" name="41"/>
+<item label="Ophthalmologie" name="42"/>
+<item label="Orthopädie und Unfallchirurgie" name="06"/>
+<item label="Orthopädie" name="43"/>
+<item label="Phoniatrie" name="17"/>
+<item label="Physikalische und Rehabilitative Medizin" name="44"/>
+<item label="Plastische und ästhetische Chirurgie" name="07"/>
+<item label="Pneumologie" name="28"/>
+<item label="Psychiatrie und Psychotherapie" name="45"/>
+<item label="Psychosomatische Medizin und Psychotherapie" name="46"/>
+<item label="Pädaudiologie" name="18"/>
+<item label="Pädiatrie (Kinderheilkunde)" name="31"/>
+<item label="Radiologie" name="47"/>
+<item label="Rheumatologie" name="29"/>
+<item label="Spezielle Geburtshilfe und Perinatalmedizin" name="15"/>
+<item label="Strahlentherapie" name="48"/>
+<item label="Thoraxchirurgie" name="08"/>
+<item label="Transfusionsmedizin" name="49"/>
+<item label="Urologie" name="50"/>
+<item label="Visceralchirurgie" name="09"/>
+<item label="Zahnmedizin" name="51"/>
+</combobox>
+<textfield label="Anrede" name="c1title" length="25" hfill="false" innerlayout="tab"/>
+<textfield label="Name" name="c1name" length="25" hfill="false" innerlayout="tab"/>
+<textfield label="Vorname" name="c1firstname" length="25" hfill="false" innerlayout="tab"/>
+<textfield label="Strasse" name="c1street"  length="25" hfill="false" innerlayout="tab"/>
+<textfield label="PLZ" name="c1zip"  length="25" hfill="false" innerlayout="tab"/>
+<textfield label="Ort" name="c1city"  length="25" hfill="false" innerlayout="tab"/>
+<textfield label="Tel" name="c1tel"  length="25" hfill="false" innerlayout="tab"/>
+<textfield label="Mobil" name="c1mobile"  length="25" hfill="false" innerlayout="tab"/>
+<textfield label="E-Mail" name="c1email"  length="25" hfill="false" innerlayout="tab"/>

@@ -1,0 +1,53 @@
+<!--
+Cat: 2 (Ausscheidungen)
+BWINFTYP: INKOAID
+Inko-Hilfsmittel
+20.06.2013
+since-db-version: 
+deprecated-since: 8
+replaced-by: INKOAID2
+MODE_INTERVAL_BYSECOND = 0
+TYPE_INCOAID = 112
+-->
+<checkbox name="needshelp" label="Bewohner[in] benötigt Hilfe beim Wechsel der Inko-Materialien" tx="Seite 1, Abschnitt 5"/>
+<separator/>
+<checkbox name="windel" label="Windelhosen" tx="Seite 1, Abschnitt 5"/>
+<textfield name="windel.size" label="Größe" layout="tab" length="3" hfill="false"/>
+<textfield name="hwf" label="Anzahl Windel, früh" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="hws" label="Anzahl Windel, spät" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="hwn" label="Anzahl Windel, nacht" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<checkbox name="vorlagen1" label="Vorlagen, Typ 1" tx="Seite 1, Abschnitt 5"/>
+<textfield name="vorlagen1.size" label="Größe" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="v1f" label="Anzahl, früh" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="v1s" label="Anzahl, spät" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="v1n" label="Anzahl, nacht" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<checkbox name="vorlagen2" label="Vorlagen, Typ 2" tx="Seite 1, Abschnitt 5"/>
+<textfield name="vorlagen2.size" label="Größe" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="v2f" label="Anzahl, früh" layout="tab" innerlayout="left"  length="3" hfill="false"/>
+<textfield name="v2s" label="Anzahl, spät" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="v2n" label="Anzahl, nacht" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<checkbox name="vorlagen3" label="Vorlagen, Typ 3" tx="Seite 1, Abschnitt 5"/>
+<textfield name="vorlagen3.size" label="Größe" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="v3f" label="Anzahl, früh" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="v3s" label="Anzahl, spät" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="v3n" label="Anzahl, nacht" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<checkbox name="dbinden" label="Damenbinden" tx="Seite 1, Abschnitt 5"/>
+<textfield name="dbinden.size" label="Größe" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="dbf" label="Damenbinden, früh" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="dbs" label="Damenbinden, spät" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="dbn" label="Damenbinden, nacht" layout="tab" innerlayout="left"  length="3" hfill="false"/>
+<checkbox name="krunterlagen" label="Krankenunterlagen" tx="Seite 1, Abschnitt 5"/>
+<textfield name="krunterlagen.size" label="Größe" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="kuf" label="Krankenunterlagen, früh" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<textfield name="kus" label="Krankenunterlagen, spät" layout="tab"   innerlayout="left" length="3" hfill="false"/>
+<textfield name="kun" label="Krankenunterlagen, nacht" layout="tab"  innerlayout="left" length="3" hfill="false"/>
+<separator/>
+<checkbox name="commode.aid" label="Toilettenstuhl" tx="Seite 1, Abschnitt 4 und 5"/>
+<checkbox name="urinal.aid" label="Urinflasche"  layout="left" tx="Seite 1, Abschnitt 5"/>
+<checkbox name="bedpan.aid" label="Steckbecken" layout="left" tx="Seite 1, Abschnitt 5"/>
+<checkbox name="seat.aid" label="Toilettensitzerhöhung" layout="left"/>
+<separator/>
+<checkbox name="dk.aid" label="Blasenverweilkatheter (DK)"/>
+<checkbox name="sup.aid" label="Suprapubischer Katheter" layout="left" tx="Seite 1, Abschnitt 5"/>
+<checkbox name="trans.aid" label="Transurethraler Blasenkatheter" layout="left" tx="Seite 1, Abschnitt 5"/>
+<textfield label="CH" name="tubesize" length="5" hfill="false" innerlayout="left" layout="left" tx="Seite 1, Abschnitt 5"/>

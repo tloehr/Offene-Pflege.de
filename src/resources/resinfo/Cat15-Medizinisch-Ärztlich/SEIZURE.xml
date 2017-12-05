@@ -1,0 +1,66 @@
+<!--
+Cat: 15 (Medizinisch/Ärztlich)
+BWINFTYP: SEIZURE
+Anfallsbeschreibung
+Beschreibung eines Anfalls bzw. eines vermuteten Anfalls
+30.06.2016
+since-db-version: 9
+deprecated-since: 
+replaces: 
+replaced-by: 
+equivalence-id: 
+MODE_INTERVAL_SINGLE_INCIDENTS = 3
+TYPE_MOBILITY = 110
+
+
+INSERT IGNORE INTO `resinfotype` (`BWINFTYP`, `XML`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `version`, `IntervalMode`, `equiv`) VALUES('SEIZURE','<checkbox name=\"face\" label=\"Gesichtausdruck hat sich verändert\"/>\r\n\r\n<checkbox name=\"eyes\" label=\"Augen waren offen\"/>\r\n\r\n<optiongroup name=\"eyesroll\" label=\"Augen zur Seite gedreht\">\r\n<option label=\"nein\" name=\"no\"  default=\"true\" />\r\n<option label=\"links\" name=\"left\"/>\r\n<option label=\"rechts\" name=\"right\"/>\r\n</optiongroup>\r\n\r\n<checkbox name=\"handmovement\" label=\"nestelnde Bewegungen der Hände (Reiben, Streicheln, Wischen, Klopfen)\"/>\r\n\r\n<optiongroup name=\"headroll\" label=\"Kopf zur Seite gedreht\">\r\n<option label=\"nein\" name=\"no\"  default=\"true\" />\r\n<option label=\"links\" name=\"left\"/>\r\n<option label=\"rechts\" name=\"right\"/>\r\n</optiongroup>\r\n\r\n<textfield label=\"Wie häufig ?\" name=\"headroll.frequency\" innerlayout=\"left\"/>\r\n\r\n<optiongroup name=\"headroll.speed\" label=\"Geschwindidkeit der Kopfbewegung\">\r\n<option label=\"gar nicht\" name=\"noneatall\"  default=\"true\" />\r\n<option label=\"langsam\" name=\"slow\"/>\r\n<option label=\"schnell\" name=\"fast\"/>\r\n</optiongroup>\r\n\r\n<textfield label=\"folgten Zuckungen ?\" name=\"headroll.frequency\" innerlayout=\"left\" tooltip=\"Wenn ja, wie lange ?\"/>\r\n\r\n<optiongroup name=\"falling\" label=\"Wie fiel der Bewohner um ?\">\r\n<option label=\"steiff\" name=\"stiff\"  default=\"true\"  tooltip=\"wie ein Baum\" />\r\n<option label=\"sackte langsam zu Boden\" name=\"slow\"/>\r\n</optiongroup>\r\n\r\n<checkbox name=\"scream\" label=\"Schrei bzw. gepresstes, rasselndes, röchelndes Atemgeräusch\"/>\r\n\r\n<textfield label=\"Falls Lähmungen nach dem Anfall auftraten: wie lange dauerten sie an ?\" name=\"paralyze.time\" innerlayout=\"left\"/>\r\n\r\n<textfield label=\"War der Betroffene sofort ansprechbar ? Wenn nein, wie lange nicht ?\" name=\"knockout.time\" innerlayout=\"left\"/>\r\n\r\n<checkbox name=\"restless\" label=\"erneute motorische Äußerungen, bevor der Bewohner wieder ansprechbar war\"/>\r\n\r\n<textfield label=\"Falls es Nachschlaf gab, wie lange\" name=\"sleeping.time\" innerlayout=\"left\"/>\r\n\r\n<label label=\"Falls der Anfall außergewöhnlich war, beschreiben Sie bitte was anders war.\" fontstyle=\"plain\" name=\"lab2\"/>\r\n\r\n<label label=\"Vermerken Sie, ob Sie den Anfall vollständig selbst beobachtet haben bzw. welche Teile Sie und welche Mitarbeiter, Mitbewohner, Passanten usw. beobachtet haben.\" fontstyle=\"plain\" name=\"lab3\"/>','Anfall','','15','0','0','3','0');
+
+
+
+-->
+<checkbox name="face" label="Gesichtausdruck hat sich verändert"/>
+
+<checkbox name="eyes" label="Augen waren offen"/>
+
+<optiongroup name="eyesroll" label="Augen zur Seite gedreht">
+<option label="nein" name="no"  default="true" />
+<option label="links" name="left"/>
+<option label="rechts" name="right"/>
+</optiongroup>
+
+<checkbox name="handmovement" label="nestelnde Bewegungen der Hände (Reiben, Streicheln, Wischen, Klopfen)"/>
+
+<optiongroup name="headroll" label="Kopf zur Seite gedreht">
+<option label="nein" name="no"  default="true" />
+<option label="links" name="left"/>
+<option label="rechts" name="right"/>
+</optiongroup>
+
+<textfield label="Wie häufig ?" name="headroll.frequency" innerlayout="left"/>
+
+<optiongroup name="headroll.speed" label="Geschwindidkeit der Kopfbewegung">
+<option label="gar nicht" name="noneatall"  default="true" />
+<option label="langsam" name="slow"/>
+<option label="schnell" name="fast"/>
+</optiongroup>
+
+<textfield label="folgten Zuckungen ?" name="headroll.frequency" innerlayout="left" tooltip="Wenn ja, wie lange ?"/>
+
+<optiongroup name="falling" label="Wie fiel der Bewohner um ?">
+<option label="steiff" name="stiff"  default="true"  tooltip="wie ein Baum" />
+<option label="sackte langsam zu Boden" name="slow"/>
+</optiongroup>
+
+<checkbox name="scream" label="Schrei bzw. gepresstes, rasselndes, röchelndes Atemgeräusch"/>
+
+<textfield label="Falls Lähmungen nach dem Anfall auftraten: wie lange dauerten sie an ?" name="paralyze.time" innerlayout="left"/>
+
+<textfield label="War der Betroffene sofort ansprechbar ? Wenn nein, wie lange nicht ?" name="knockout.time" innerlayout="left"/>
+
+<checkbox name="restless" label="erneute motorische Äußerungen, bevor der Bewohner wieder ansprechbar war"/>
+
+<textfield label="Falls es Nachschlaf gab, wie lange" name="sleeping.time" innerlayout="left"/>
+
+<label label="Falls der Anfall außergewöhnlich war, beschreiben Sie bitte was anders war." fontstyle="plain" name="lab2"/>
+
+<label label="Vermerken Sie, ob Sie den Anfall vollständig selbst beobachtet haben bzw. welche Teile Sie und welche Mitarbeiter, Mitbewohner, Passanten usw. beobachtet haben." fontstyle="plain" name="lab3"/>

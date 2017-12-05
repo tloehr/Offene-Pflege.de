@@ -1,0 +1,29 @@
+<!--
+Cat: 2 (Ausscheidungen)
+BWINFTYP: ARTNUTRIT
+Künstliche Ernährung
+21.06.2013
+since-db-version: 
+deprecated-since: 
+replaced-by: 
+MODE_INTERVAL_BYSECOND = 0
+-->
+<tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 9."/>
+<combobox label="Sondentyp" name="tubetype" >
+<item label="PEG (Perkutane endoskopische Gastrostomie)" name="peg"/>
+<item label="PEG/J (PEG mit duodenalem Schenkel)" name="pej"/>
+<item label="Transnasale Ernährungssonde" name="nose"/>
+</combobox>
+<textfield name="tubesince" label="Sonde gelegt am" length="12" type="date"/>
+<textfield name="tubereason" label="Warum wurde die PEG gelegt ?" hfill="false" length="40" innerlayout="br"/>
+
+<label size="12" fontstyle="bold" label="Verabreichung"/>
+<checkbox label="Ernährungspumpe" name="pump"/>
+<checkbox label="Schwerkraft" name="gravity" layout="left"/>
+<checkbox label="Spritze" name="syringe" layout="left"/>
+
+<label size="12" fontstyle="bold" label="Sonstiges"/>
+<checkbox label="Orale Ernährung zusätzlich" name="oralnutrition"/>
+<checkbox label="Parenterale Ernährung" name="parenteral" layout="left"/>
+
+<textfield name="calories" label="Kalorien (in 24h)" hfill="false" length="12" />

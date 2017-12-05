@@ -1,0 +1,36 @@
+<!--
+Cat: 13 (Verwaltung)
+BWINFTYP: NINSURANCE
+Pflegekasse
+23.09.2014
+since-db-version: 
+deprecated-since: 9
+replaces: 
+replaced-by: NINSURANCE2
+equivalence-id: 15
+MODE_INTERVAL_BYSECOND = 0
+TYPE_NURSING_INSURANCE = 105
+-->
+<copyfromtemplate/>
+<textfield label="Name" name="niname" innerlayout="tab"/>
+<textfield label="Strasse" name="nistreet" innerlayout="tab"/>
+<textfield label="PLZ" name="nizip" innerlayout="tab"/>
+<textfield label="Ort" name="nicity" innerlayout="tab"/>
+<textfield label="Tel" name="nitel" innerlayout="tab"/>
+<textfield label="Fax" name="nifax" innerlayout="tab"/>
+<textfield label="Zuständig" name="nicontact" innerlayout="tab"/>
+<separator/>
+<textfield label="Versicherten Nr." name="personno" innerlayout="tab"/>
+<textfield label="Krankenkassen Nr." name="insuranceno" innerlayout="tab"/>
+<separator/>
+<optiongroup name="grade" label="Einstufung" tx="Wird auf Seite 1 eingetragen.">
+<option label="nicht eingestuft" name="none" default="true"/>
+<option label="beantragt" name="requested"/>
+<option label="abgelehnt" name="refused"/>
+<option label="eingestuft" name="assigned"/>
+</optiongroup>
+<textfield label="Beantragt am" name="requestdate" length="12" type="date" innerlayout="tab" tx="Wird auf Seite 1 eingetragen."/>
+<textfield label="Ergebnis des Einstufung" name="result" innerlayout="tab" tx="Wird auf Seite 1 eingetragen."/>
+<separator/>
+<checkbox name="pea" label="Erheblich eingeschränkte Alltagskompetenz nach §87b SGB11" enables="peadate" lockedforchanges="false" default="false"/>
+<textfield label="Genehmigt seit" name="peadate" length="12" type="date" innerlayout="tab"/>
