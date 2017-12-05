@@ -246,8 +246,8 @@ public class PnlICD extends DefaultPanel {
         //======== pnlICD ========
         {
             pnlICD.setLayout(new FormLayout(
-                    "default:grow, default",
-                    "fill:default:grow, $lgap, pref, $lgap, default"));
+                "default:grow, default",
+                "fill:default:grow, $lgap, pref, $lgap, default"));
 
             //======== scrollPane1 ========
             {

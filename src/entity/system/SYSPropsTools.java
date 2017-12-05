@@ -75,6 +75,9 @@ public class SYSPropsTools {
     public static final String KEY_MAINTENANCE_MODE = "system.maintenance.mode";
     public static final String KEY_CALC_MEDI_UPR_CORRIDOR = "apv_korridor";
 
+    public static final String KEY_USERS_CIPHERED = "users.ciphered";
+    public static final String KEY_RESIDENTS_ANONYMIZED = "residents.anonymized";
+
     public static final String KEY_VERY_EARLY_FGSHIFT = "VERY_EARLY_FGSHIFT";
     public static final String KEY_VERY_EARLY_BGSHIFT = "VERY_EARLY_BGSHIFT";
     public static final String KEY_VERY_EARLY_FGITEM = "VERY_EARLY_FGITEM";

@@ -92,7 +92,6 @@ public class OPDE {
     protected static String url;
     protected static LogicalPrinters printers;
     protected static Properties props;
-    protected static boolean anonym;
     protected static SortedProperties localProps;
     private static Logger logger;
     public static HashMap[] anonymize = null;
@@ -108,10 +107,6 @@ public class OPDE {
     protected static final String sep = System.getProperty("file.separator");
     private static boolean customJDBCUrl;
     private static boolean runningInstanceDetected;
-
-    // todo: das hier ist nur ein provisorium
-    // https://github.com/tloehr/Offene-Pflege.de/issues/84
-    private static boolean userCipher = false;
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -152,7 +147,7 @@ public class OPDE {
     }
 
     public static boolean isAnonym() {
-        return anonym;
+        return SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_RESIDENTS_ANONYMIZED)).equalsIgnoreCase("true");
     }
 
     /**
@@ -160,7 +155,7 @@ public class OPDE {
      * @return
      */
     public static boolean isUserCipher() {
-            return userCipher;
+        return SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_USERS_CIPHERED)).equalsIgnoreCase("true");
         }
 
     public static void setProp(String key, String value) {
@@ -414,6 +409,9 @@ public class OPDE {
         Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
         WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
 
+        // anonmyous
+        anonymize = new HashMap[]{SYSConst.getNachnamenAnonym(), SYSConst.getVornamenFrauAnonym(), SYSConst.getVornamenMannAnonym()};
+
 
         /***
          *       ____                                          _   _     _               ___        _   _
@@ -427,7 +425,6 @@ public class OPDE {
         opts.addOption("h", "help", false, SYSTools.xx("cmdline.help.description"));
         opts.addOption("v", "version", false, SYSTools.xx("cmdline.version.description"));
         opts.addOption("x", "experimental", false, SYSTools.xx("cmdline.experimental.description"));
-        opts.addOption("a", "anonymous", false, SYSTools.xx("cmdline.anonymous.description"));
         opts.addOption("l", "debug", false, SYSTools.xx("cmdline.debug.description"));
         opts.addOption("t", "setup-database", false, SYSTools.xx("cmdline.setup-database.description"));
         opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
@@ -486,22 +483,6 @@ public class OPDE {
             System.out.println(footer);
             System.exit(0);
         }
-
-        /***
-         *                                                                ___
-         *       __ _ _ __   ___  _ __  _   _ _ __ ___   ___  _   _ ___  |__ \
-         *      / _` | '_ \ / _ \| '_ \| | | | '_ ` _ \ / _ \| | | / __|   / /
-         *     | (_| | | | | (_) | | | | |_| | | | | | | (_) | |_| \__ \  |_|
-         *      \__,_|_| |_|\___/|_| |_|\__, |_| |_| |_|\___/ \__,_|___/  (_)
-         *                              |___/
-         */
-        if (cl.hasOption("a")) { // anonym Modus
-            anonym = true;
-            anonymize = new HashMap[]{SYSConst.getNachnamenAnonym(), SYSConst.getVornamenFrauAnonym(), SYSConst.getVornamenMannAnonym()};
-        } else {
-            anonym = false;
-        }
-
 
         try {
 

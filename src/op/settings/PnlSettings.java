@@ -50,6 +50,7 @@ public class PnlSettings extends CleanablePanel {
         btnTimeout.setEnabled(admin);
         btnTags.setEnabled(admin);
         btnHomes.setEnabled(admin);
+        btnAnonymous.setEnabled(admin);
         btnGlobalEMail.setEnabled(admin);
         btnModel.setEnabled(admin);
         btnICD.setEnabled(admin);
@@ -68,6 +69,7 @@ public class PnlSettings extends CleanablePanel {
         lblLabelPrinter.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.labelPrinters")));
         lblTimeout.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.local.timeout")));
         lblHomes.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.homes")));
+        lblAnonymous.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.anonymous")));
         lblStation.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.default.station")));
         lblICD.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.icd")));
         lblGlobalEMail.setText(SYSTools.toHTMLForScreen(SYSConst.center("opde.settings.global.mail")));
@@ -171,6 +173,10 @@ public class PnlSettings extends CleanablePanel {
         genericButtonAction(new PnlLanguage(), ((JButton) e.getSource()).getIcon());
     }
 
+    private void btnAnonymousActionPerformed(ActionEvent e) {
+        genericButtonAction(new PnlAnonymous(), ((JButton) e.getSource()).getIcon());
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JScrollPane();
@@ -185,9 +191,11 @@ public class PnlSettings extends CleanablePanel {
         btnLabelPrinter = new JButton();
         btnTimeout = new JButton();
         btnStation = new JButton();
+        btnAnonymous = new JButton();
         lblLabelPrinter = new JLabel();
         lblTimeout = new JLabel();
         lblStation = new JLabel();
+        lblAnonymous = new JLabel();
         separator2 = new JSeparator();
         lblGlobal = new JLabel();
         btnHomes = new JButton();
@@ -276,6 +284,12 @@ public class PnlSettings extends CleanablePanel {
                 btnStation.addActionListener(e -> btnStationActionPerformed(e));
                 pnlAll.add(btnStation, CC.xy(7, 13));
 
+                //---- btnAnonymous ----
+                btnAnonymous.setText(null);
+                btnAnonymous.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/if_anonymous_45050_48.png")));
+                btnAnonymous.addActionListener(e -> btnAnonymousActionPerformed(e));
+                pnlAll.add(btnAnonymous, CC.xy(9, 13));
+
                 //---- lblLabelPrinter ----
                 lblLabelPrinter.setText("text");
                 lblLabelPrinter.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -291,6 +305,12 @@ public class PnlSettings extends CleanablePanel {
                 lblStation.setHorizontalAlignment(SwingConstants.CENTER);
                 lblStation.setFont(new Font("Arial", Font.PLAIN, 14));
                 pnlAll.add(lblStation, CC.xy(7, 15));
+
+                //---- lblAnonymous ----
+                lblAnonymous.setText("text");
+                lblAnonymous.setHorizontalAlignment(SwingConstants.CENTER);
+                lblAnonymous.setFont(new Font("Arial", Font.PLAIN, 14));
+                pnlAll.add(lblAnonymous, CC.xy(9, 15));
                 pnlAll.add(separator2, CC.xywh(3, 17, 17, 1));
 
                 //---- lblGlobal ----
@@ -428,9 +448,11 @@ public class PnlSettings extends CleanablePanel {
     private JButton btnLabelPrinter;
     private JButton btnTimeout;
     private JButton btnStation;
+    private JButton btnAnonymous;
     private JLabel lblLabelPrinter;
     private JLabel lblTimeout;
     private JLabel lblStation;
+    private JLabel lblAnonymous;
     private JSeparator separator2;
     private JLabel lblGlobal;
     private JButton btnHomes;
