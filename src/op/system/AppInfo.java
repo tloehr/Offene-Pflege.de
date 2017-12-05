@@ -348,7 +348,7 @@ public class AppInfo {
     }
 
     public String getSignature() {
-        return (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "") + "; " + DateFormat.getDateTimeInstance().format(new Date())
+        return (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUIDCiphered()) : "") + "; " + DateFormat.getDateTimeInstance().format(new Date())
                 + "; " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion();
     }
 

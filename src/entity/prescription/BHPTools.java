@@ -846,14 +846,14 @@ public class BHPTools {
 
                     table += SYSConst.html_table_tr(
                             SYSConst.html_table_td(text, "top"),
-                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center"),
+                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUIDCiphered() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center"),
                             SYSConst.html_table_td(outcomeText, "center")
                     );
 
                 } else {
                     table += SYSConst.html_table_tr(
                             SYSConst.html_table_td(text, "top"),
-                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center")
+                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUIDCiphered() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center")
                     );
                 }
 

@@ -570,13 +570,13 @@ public class SYSFilesTools {
         return ready;
     }
 
-    public static String getDatumUndUser(SYSFiles sysFiles) {
-        String result = "";
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-        result = sdf.format(sysFiles.getPit()) + "; " + sysFiles.getUser().getFullname();
-
-        return SYSConst.html_fontface + result + "</font>";
-    }
+//    public static String getDatumUndUser(SYSFiles sysFiles) {
+//        String result = "";
+//        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
+//        result = sdf.format(sysFiles.getPit()) + "; " + sysFiles.getUser().getFullname();
+//
+//        return SYSConst.html_fontface + result + "</font>";
+//    }
 
     public static File print(String html, boolean addPrintJScript) {
         return print(html, addPrintJScript, true);

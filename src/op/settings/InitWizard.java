@@ -1500,7 +1500,7 @@ public class InitWizard extends WizardDialog {
                     if (mysqldumpdir.exists()) {
                         OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MYSQLDUMP_DIRECTORY, mysqldumpdir.getAbsolutePath());
                         txtBackupdir.setText(mysqldumpdir.getAbsolutePath());
-                        logger.info(SYSTools.xx("opde.initwizard.page.backup.backupdir", mysqldumpdir));
+                        logger.info(SYSTools.xx("opde.initwizard.page.backup.backupdir") + ": "+ mysqldumpdir);
                     } else {
                         txtBackupdir.setText("");
                     }

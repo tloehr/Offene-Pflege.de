@@ -376,7 +376,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             data[row][0] = df.format(val.getPit());
             data[row][1] = nf.format(val.getVal1());
             data[row][2] = val.getText();
-            data[row][3] = SYSTools.anonymizeUser(val.getUser().getUID());
+            data[row][3] = SYSTools.anonymizeUser(val.getUser());
             data[row][4] = SYSConst.icon22delete;
             row++;
         }

@@ -109,6 +109,10 @@ public class OPDE {
     private static boolean customJDBCUrl;
     private static boolean runningInstanceDetected;
 
+    // todo: das hier ist nur ein provisorium
+    // https://github.com/tloehr/Offene-Pflege.de/issues/84
+    private static boolean userCipher = false;
+
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
      */
@@ -150,6 +154,14 @@ public class OPDE {
     public static boolean isAnonym() {
         return anonym;
     }
+
+    /**
+     * Sollen die Namen der Benutzer durch die Chiffre ersetzt werden ?
+     * @return
+     */
+    public static boolean isUserCipher() {
+            return userCipher;
+        }
 
     public static void setProp(String key, String value) {
         props.put(key, value);

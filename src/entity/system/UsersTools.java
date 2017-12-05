@@ -47,9 +47,9 @@ public class UsersTools {
 
     }
 
-    public static String getFullnameWithID(Users user) {
-        return user.getName() + ", " + user.getVorname() + " [" + user.getUID() + "]";
-    }
+//    public static String getFullnameWithID(Users user) {
+//        return user.getName() + ", " + user.getVorname() + " [" + user.getUIDCiphered() + "]";
+//    }
 
 
     public static ArrayList<Users> getUsers(String searchPattern, boolean inactiveToo) {

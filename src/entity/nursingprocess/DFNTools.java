@@ -553,7 +553,7 @@ public class DFNTools {
                         (dfn.isOnDemand() || SYSTools.catchNull(dfn.getInterventionSchedule().getBemerkung()).isEmpty() ? "" : " <i>(" + dfn.getInterventionSchedule().getBemerkung() + ")</i>")
                         + "</td>";
                 result += "<td valign=\"top\">" + getScheduleText(dfn, " [", "]") + getStateAsHTML(dfn) + "<br/>";
-                result += "<td valign=\"top\">" + (dfn.isOpen() ? "" : dfn.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(dfn.getIst())) + "</td>";
+                result += "<td valign=\"top\">" + (dfn.isOpen() ? "" : dfn.getUser().getUIDCiphered() + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(dfn.getIst())) + "</td>";
 //                result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
 
                 result += "</td>";

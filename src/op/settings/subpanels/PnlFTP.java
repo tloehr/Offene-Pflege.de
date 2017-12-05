@@ -65,8 +65,6 @@ public class PnlFTP extends DefaultPanel {
                     boolean success = false;
                     try {
 
-
-
                         FileTransferClient ftp = SYSFilesTools.getFTPClient(OPDE.getProps());
 
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.creating.testfile", 1));

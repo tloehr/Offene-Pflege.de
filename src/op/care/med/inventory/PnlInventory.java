@@ -1225,7 +1225,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                             "</td>" : "") +
 
                             "<td width=\"100\" align=\"left\">" +
-                            SYSTools.anonymizeUser(tx.getUser().getUID()) +
+                            SYSTools.anonymizeUser(tx.getUser()) +
                             "</td>" +
                             "</tr>" +
                             "</table>" +

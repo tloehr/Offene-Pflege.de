@@ -29,6 +29,7 @@ import entity.files.*;
 import entity.reports.NReport;
 import entity.staff.Training2Users;
 import interfaces.Attachable;
+import op.OPDE;
 import op.tools.SYSTools;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
@@ -37,6 +38,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
 /**
  * @author tloehr
@@ -68,6 +70,9 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
     @Basic(optional = false)
     @Column(name = "mailconfirmed")
     private int mailConfirmed;
+    @Basic(optional = false)
+    @Column(name = "cipherid")
+    private int cipherid; // zum chiffrierten ausdrucken der Pflegedoku. Datenschutz für die MitarbeiterInnen
 
     @ManyToMany
     @JoinTable(name = "member", joinColumns =
@@ -105,8 +110,16 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
         groups = new ArrayList<Groups>();
         status = UsersTools.STATUS_ACTIVE;
         mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
+        cipherid = 12;  //todo: berechnen
     }
 
+    public int getCipherid() {
+        return cipherid;
+    }
+
+    public void setCipherid(int cipherid) {
+        this.cipherid = cipherid;
+    }
 
     public int getMailConfirmed() {
         return mailConfirmed;
@@ -120,6 +133,10 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
     public String getUID() {
         return uid;
     }
+
+    public String getUIDCiphered() {
+            return OPDE.isUserCipher() ? "#"+cipherid : uid;
+        }
 
     public void setUID(String uid) {
         this.uid = uid;
@@ -246,7 +263,13 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
     }
 
     public String getFullname() {
-        return getName() + ", " + getVorname();
+        String fullname = "";
+        if (OPDE.isUserCipher()){
+            fullname = "#"+cipherid;
+        } else {
+            fullname = getName() + ", " + getVorname();
+        }
+        return fullname;
     }
 
 }

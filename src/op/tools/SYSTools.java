@@ -417,12 +417,12 @@ public class SYSTools {
     }
 
 
-    public static String anonymizeUser(String name) {
+    public static String anonymizeUser(Users user) {
         String result;
-        if (OPDE.isAnonym()) {
-            result = name.substring(0, 1) + "***";
+        if (OPDE.isAnonym() || OPDE.isUserCipher()) {
+            result = "#"+user.getCipherid();
         } else {
-            result = name;
+            result = user.getUID();
         }
         return result;
     }

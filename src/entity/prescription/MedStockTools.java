@@ -157,7 +157,7 @@ public class MedStockTools {
             hm.put("medstock.tradeform.expires.after.opened", "!!" + exp);
         }
 
-        hm.put("medstock.usershort", bestand.getUser().getUID());
+        hm.put("medstock.usershort", bestand.getUser().getUIDCiphered());
         hm.put("medstock.userlong", bestand.getUser().getFullname());
         hm.put("medstock.inventory.resident.name", ResidentTools.getNameAndFirstname(bestand.getInventory().getResident()));
         hm.put("medstock.inventory.resident.dob", bestand.getInventory().getResident().getDOB());

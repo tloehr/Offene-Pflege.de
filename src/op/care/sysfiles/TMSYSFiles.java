@@ -138,7 +138,7 @@ public class TMSYSFiles extends AbstractTableModel {
                 break;
             }
             case COL_USER: {
-                value = SYSTools.anonymizeUser(mymodel.get(row).getUser().getUID());
+                value = SYSTools.anonymizeUser(mymodel.get(row).getUser());
                 break;
             }
             case COL_FILE: {

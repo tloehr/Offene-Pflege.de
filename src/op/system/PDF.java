@@ -180,26 +180,26 @@ public class PDF {
         return cell;
     }
 
-    public static Paragraph getEndOfReport() {
-        Paragraph endofreport = new Paragraph();
-        endofreport.setFont(plain());
-
-        Chunk c = chunk("misc.msg.endofreport");
-        c.setFont(bold());
-        endofreport.add(c);
-        endofreport.add(" ");
-
-        if (OPDE.getLogin() != null) {
-            endofreport.add(OPDE.getLogin().getUser().getUID());
-        }
-        endofreport.add(Chunk.NEWLINE);
-        endofreport.add(DateFormat.getDateTimeInstance().format(new Date()));
-
-        endofreport.add(Chunk.NEWLINE);
-        endofreport.add(OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion());
-
-        return endofreport;
-    }
+//    public static Paragraph getEndOfReport() {
+//        Paragraph endofreport = new Paragraph();
+//        endofreport.setFont(plain());
+//
+//        Chunk c = chunk("misc.msg.endofreport");
+//        c.setFont(bold());
+//        endofreport.add(c);
+//        endofreport.add(" ");
+//
+//        if (OPDE.getLogin() != null) {
+//            endofreport.add(OPDE.getLogin().getUser().getUID());
+//        }
+//        endofreport.add(Chunk.NEWLINE);
+//        endofreport.add(DateFormat.getDateTimeInstance().format(new Date()));
+//
+//        endofreport.add(Chunk.NEWLINE);
+//        endofreport.add(OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion());
+//
+//        return endofreport;
+//    }
 
     public static Phrase getAsPhrase(BigDecimal bd) {
 

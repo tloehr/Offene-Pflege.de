@@ -781,7 +781,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     // https://github.com/tloehr/Offene-Pflege.de/issues/63
                     + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + (bhp.isOpen() ? "--" : DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + SYSTools.xx("misc.msg.Time.short")) +
                     (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
-                    (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
+                    (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "") +
 
                     "</font></html>";
         } else {
@@ -791,7 +791,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                     BHPTools.getScheduleText(bhp, ", ", "") +
                     (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
-                    (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
+                    (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "") +
                     "</font></html>";
         }
 

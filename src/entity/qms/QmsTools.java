@@ -131,7 +131,7 @@ public class QmsTools {
         }
 
         if (!qms.isOpen()) {
-            result += " // " + DateFormat.getDateInstance().format(qms.getActual()) + "; " + qms.getUser().getUID();
+            result += " // " + DateFormat.getDateInstance().format(qms.getActual()) + "; " + qms.getUser().getUIDCiphered();
         }
 
 
