@@ -101,8 +101,6 @@ public class PnlHandover extends NursingRecordsPanel {
         initComponents();
         initPanel();
 
-//        jdcDatum.setDate(SYSCalendar.today_date());
-
         reloadDisplay();
     }
 

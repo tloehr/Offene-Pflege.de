@@ -511,7 +511,8 @@ public class OPDE {
 
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_DEBUG)).equalsIgnoreCase("true")) {
                 debug = true;
-                logger.setLevel(Level.DEBUG);
+                Logger.getRootLogger().setLevel(Level.DEBUG);
+//                logger.setLevel(Level.DEBUG);
             }
 
 //            for (Map.Entry<String, Object> obj : com.install4j.api.launcher.Variables.getInstallerVariables().entrySet()) {
@@ -782,6 +783,10 @@ public class OPDE {
 //
 //        return true;
 //    }
+
+    public static Level getLogLevel(){
+        return Logger.getRootLogger().getLevel();
+    }
 
     public static boolean isAdmin() {
         return UsersTools.isAdmin(login.getUser());

@@ -27,6 +27,7 @@
 package op;
 
 import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
@@ -66,8 +67,7 @@ import op.tools.SYSTools;
 import op.training.PnlTraining;
 import op.users.PnlUser;
 import op.welcome.PnlWelcome;
-import org.apache.commons.collections.Closure;
-import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -78,7 +78,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
-import java.io.File;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
@@ -116,11 +115,13 @@ public class FrmMain extends JFrame {
     private CollapsiblePanes panesSearch, panesApps;
     //    private HashMap<Resident, JideButton> bwButtonMap;
     private JideButton homeButton;
-
-    boolean mailIconToggled = true; // just a little helper
+    private Logger logger;
 
     public FrmMain() {
         initPhase = true;
+
+        logger = Logger.getLogger(getClass());
+
         initComponents();
 
 
@@ -147,7 +148,7 @@ public class FrmMain extends JFrame {
         iconPanels = Collections.synchronizedMap(new HashMap<Resident, JPanel>());
 
         if (OPDE.isDebug()) {
-            setSize(1366, 768);
+            setSize(1280, 800); // Macbook White 13"
         } else {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
@@ -329,9 +330,23 @@ public class FrmMain extends JFrame {
         splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, 0.5d));
     }
 
-    private void btnMailActionPerformed(ActionEvent e) {
-        clearPreviousProgbutton();
-        setPanelTo(OPDE.getMainframe().loadPanel("op.mx.PnlMX"));
+    private void pnlMainComponentResized(ComponentEvent e) {
+//        logger.debug(e.getComponent().getSize().width + "x" + e.getComponent().getSize().height);
+
+        // Anpassung für kleine Bildschirme
+        // https://github.com/tloehr/Offene-Pflege.de/issues/85
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                FormLayout layout =  (FormLayout) pnlMain.getLayout();
+                layout.setColumnSpec(3, ColumnSpec.decode((e.getComponent().getSize().width < 1440 ? "[50dlu,default,130dlu]" : "pref")));
+
+                pnlMain.validate();
+                pnlMain.repaint();
+            }
+        });
+
+
     }
 
     public void afterLogin() {
@@ -429,17 +444,23 @@ public class FrmMain extends JFrame {
 
         //======== pnlMain ========
         {
+            pnlMain.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    pnlMainComponentResized(e);
+                }
+            });
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -701,8 +722,6 @@ public class FrmMain extends JFrame {
 //    }
 
     private CollapsiblePane addNursingRecords(final Station station) {
-//        bwButtonMap = new HashMap<Resident, JideButton>();
-
         EntityManager em = OPDE.createEM();
         Query query;
         if (station == null) {
@@ -927,15 +946,13 @@ public class FrmMain extends JFrame {
 //        SYSTools.checkForSoftwareupdates();
     }
 
-   
+
     /**
      * this class is only used for resident names that are so long, that the icons are not visible anymore.
      * it simply tells Swing, that this particular scroll pane is 16 pixels wider than it really is.
      * dirty trick, but works.
      */
     private class myAppsScrollPane extends JScrollPane {
-
-
         private myAppsScrollPane(Component view) {
             super(view);
         }

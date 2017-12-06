@@ -54,6 +54,8 @@ import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author tloehr
@@ -302,6 +304,13 @@ public class PnlUser extends CleanablePanel {
                         user.getGroups().add(everyone);
                         everyone.getMembers().add(user);
 
+                        // create a cipherid for the new user. If it already exists, the operation is rolled back.
+                        // not neat but worls. And the chances are very low, that you would have to re-enter the user.
+
+                        // https://stackoverflow.com/questions/363681/how-do-i-generate-random-integers-within-a-specific-range-in-java
+                        int randomNum = ThreadLocalRandom.current().nextInt(10000, 10000000 + 1);
+                        user.setCipherid(randomNum);
+                        
                         em.getTransaction().commit();
                         lstUsers.add(user);
                         reloadDisplay();
@@ -313,7 +322,7 @@ public class PnlUser extends CleanablePanel {
                 }
                 currentEditor = null;
             });
-            currentEditor.setEnabled(true);
+            currentEditor.setVisible(true);
 
         });
         list.add(btnAddUser);

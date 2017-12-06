@@ -53,10 +53,13 @@ public class DlgUser extends MyJDialog {
 
         txtPW.setEnabled(user.getUID() == null);
         txtUID.setEnabled(user.getUID() == null);
+
+//        txtName.requestFocus();
+
     }
 
     private void txtNameFocusLost(FocusEvent e) {
-        if (txtPW.isEnabled() && txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
+        if (txtPW.isEnabled() && !txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
             txtPW.setText(SYSTools.generatePassword(txtVorname.getText(), txtName.getText()));
         }
     }
