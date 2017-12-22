@@ -730,7 +730,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                             Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
-                            final NursingProcess newNP = em.merge((NursingProcess) np);
+                            final NursingProcess newNP = em.merge((NursingProcess) np); // https://github.com/tloehr/Offene-Pflege.de/issues/89
                             newNP.setNPSeries(unique.getUid());
                             DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
@@ -822,7 +822,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
-                                    final NursingProcess newNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) np).getFirst());
+                                    final NursingProcess newNP = em.merge((NursingProcess) np);
                                     newNP.setNPSeries(unique.getUid());
                                     DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
                                     em.getTransaction().commit();

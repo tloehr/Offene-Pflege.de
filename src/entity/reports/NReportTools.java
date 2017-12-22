@@ -50,6 +50,7 @@ public class NReportTools {
      * The values are combined, so that the maximum span is calculated.
      *
      * https://github.com/tloehr/Offene-Pflege.de/issues/83
+     * https://github.com/tloehr/Offene-Pflege.de/issues/88
      *
      * @return
      */
@@ -68,8 +69,7 @@ public class NReportTools {
         queryMax2.setMaxResults(1);
 
         DateTime dmin1 = null, dmax1 = null, dmin2 = null, dmax2 = null;
-
-
+        
         try {
             NReport min1 = (NReport) queryMin1.getSingleResult();
             NReport max1 = (NReport) queryMax1.getSingleResult();
