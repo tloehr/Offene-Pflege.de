@@ -22,7 +22,6 @@ import entity.process.QProcessTools;
 import entity.qms.Qms;
 import entity.qms.QmsTools;
 import entity.system.CommontagsTools;
-import entity.system.UsersTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import gui.GUITools;
@@ -40,7 +39,6 @@ import op.tools.MyJDialog;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
@@ -49,7 +47,6 @@ import javax.persistence.EntityManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
@@ -108,21 +105,22 @@ public class PnlWelcome extends CleanablePanel {
 
     private void initPanel() {
 
+        try {
 
-        // todo: conflicts with the new website
-               /*
 
-                try {
-                updateDescriptor = UpdateChecker.getUpdateDescriptor("https://www.offene-pflege.de/updates/updates.xml", ApplicationDisplayMode.GUI);
-                // this may rise an uncritical java.io.FileNotFoundException, usually during development not in production.
-                btnAbout.setText(updateDescriptor.getPossibleUpdateEntry() != null ? SYSTools.xx("misc.msg.updateAvailable") : null);
-                } catch (Exception e) {
-                logger.warn(e);
-                updateDescriptor = null;
-                btnAbout.setText(null);
-                }
+//             logger.debug(Variables.getCompilerVariable("sys.applicationId"));
 
-                */
+//            updateDescriptor = UpdateChecker.getUpdateDescriptor("https://www.offene-pflege.de/updates/updates.xml", ApplicationDisplayMode.GUI);
+            // this may rise an uncritical java.io.FileNotFoundException, usually during development not in production.
+
+//            ApplicationRegistry.getApplicationInfoById(applicationID);
+
+//            btnAbout.setText(updateDescriptor.getPossibleUpdateEntry() != null ? SYSTools.xx("misc.msg.updateAvailable") : null);
+        } catch (Exception e) {
+            logger.warn(e);
+            updateDescriptor = null;
+            btnAbout.setText(null);
+        }
 
 
         addApps();
@@ -564,6 +562,7 @@ public class PnlWelcome extends CleanablePanel {
     }
 
     private void btnAboutActionPerformed(ActionEvent e) {
+        if (updateDescriptor == null) return; // https://github.com/tloehr/Offene-Pflege.de/issues/91
         Desktop desktop = Desktop.getDesktop();
         try {
             desktop.browse(new URI(updateDescriptor.getPossibleUpdateEntry() == null ? SYSTools.xx("opde.general.website.url") : SYSTools.xx("opde.general.versions.url")));
