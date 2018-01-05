@@ -55,9 +55,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -420,7 +418,7 @@ public class SYSTools {
     public static String anonymizeUser(Users user) {
         String result;
         if (OPDE.isAnonym() || OPDE.isUserCipher()) {
-            result = "#"+user.getCipherid();
+            result = "#" + user.getCipherid();
         } else {
             result = user.getUID();
         }
@@ -1002,19 +1000,19 @@ public class SYSTools {
 
 
     public static Double getDividerInRelativePosition(JSplitPane mysplit) {
-            int max;
-            int pos = mysplit.getDividerLocation();
+        int max;
+        int pos = mysplit.getDividerLocation();
 
-            if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
-                max = mysplit.getWidth();
-            } else {
-                max = mysplit.getHeight();
-            }
-            OPDE.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
-            OPDE.debug("DIVIDER MAX POSITION: " + max);
-            OPDE.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
-            return new Double(pos) / new Double(max);
+        if (mysplit.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
+            max = mysplit.getWidth();
+        } else {
+            max = mysplit.getHeight();
         }
+        OPDE.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
+        OPDE.debug("DIVIDER MAX POSITION: " + max);
+        OPDE.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
+        return new Double(pos) / new Double(max);
+    }
 
     // http://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
     public static boolean isWindows() {
@@ -1208,8 +1206,6 @@ public class SYSTools {
 
         return num;
     }
-
-
 
 
     public static BigDecimal parseCurrency(String test) {
@@ -1426,53 +1422,27 @@ public class SYSTools {
         OPDE.debug("packColumn/3: col=" + vColIndex + "  width=" + width);
     }
 
-//    public static void checkForSoftwareupdates() {
-////        final String FTPServer = "ftp.offene-pflege.de";
-//        final int FTPPort = 21;
-//        final String FTPUser = "anonymous";
-//        final String FTPPassword = Integer.toString(OPDE.getAppInfo().getBuildnum());
-//        final String FTPWorkingDirectory = "/pub/opde";
-//        final String FILENAME = "buildnum";
-//
-//        int remoteBuildnum = -1;
-//        String descriptionURL = "";
-//        int mybuildnum = OPDE.getAppInfo().getBuildnum();
-//        FileTransferClient ftp = null;
-//        try {
-//            File target = File.createTempFile("opde", ".txt");
-//            target.deleteOnExit();
-//            ftp = new FileTransferClient();
-//
-//            ftp.setRemoteHost(OPDE.UPDATE_FTPSERVER);
-//            ftp.setUserName(FTPUser);
-//            ftp.setPassword(FTPPassword);
-//            ftp.setRemotePort(FTPPort);
-//            ftp.setTimeout(5000);
-//            ftp.connect();
-//            ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
-//            ftp.changeDirectory(FTPWorkingDirectory);
-//            ftp.downloadFile(target.getPath(), FILENAME);
-//
-//            String strRemoteBuildnum = FileUtils.readLines(target).get(0);
-//            remoteBuildnum = Integer.parseInt(strRemoteBuildnum);
-//
-//            descriptionURL = FileUtils.readLines(target).get(1);
-//
-//            ftp.disconnect();
-//        } catch (Exception e) {
-//            if (ftp != null && ftp.isConnected()) {
-//                try {
-//                    ftp.disconnect();
-//                } catch (FTPException e1) {
-//                    OPDE.error(e1);
-//                } catch (IOException e1) {
-//                    OPDE.error(e1);
-//                }
-//            }
-//            OPDE.warn(e);
-//        }
-//
-//        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum, descriptionURL);
-//    }
+    public static boolean isUpdateAvailable() throws IOException {
+        long remoteBuilddate = 0, localBuilddate = 0;
+
+        URL url = new URL(OPDE.getAppInfo().getProperty("program.remotebuilddatedurl"));
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+
+        StringBuilder remotebuildnum = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null)
+            remotebuildnum.append(inputLine);
+        in.close();
+
+        try {
+            remoteBuilddate = Long.parseLong(remotebuildnum.toString());
+            localBuilddate = Long.parseLong(OPDE.getAppInfo().getProperty("program.BUILDDATE"));
+        } catch (Exception e){
+            return false;
+        }
+
+        return remoteBuilddate > localBuilddate;
+    }
 
 }

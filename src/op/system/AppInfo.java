@@ -291,6 +291,10 @@ public class AppInfo {
 
     }
 
+    public String getProperty(String key){
+        return appinfo.getProperty(key);
+    }
+
 
     public static String getUserTemplatePath() throws IOException {
         return LocalMachine.getAppDataPath() + File.separator + dirTemplates;

@@ -4,7 +4,6 @@
 
 package op.welcome;
 
-import com.install4j.api.update.UpdateDescriptor;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
@@ -74,7 +73,6 @@ public class PnlWelcome extends CleanablePanel {
     private ArrayList<Qms> dueQMSes;
     private final int BIRTHDAY = 4;
     private Logger logger = Logger.getLogger(getClass());
-    private UpdateDescriptor updateDescriptor = null;
 
     public PnlWelcome(JScrollPane jspSearch) {
         super("opde.welcome");
@@ -106,22 +104,11 @@ public class PnlWelcome extends CleanablePanel {
     private void initPanel() {
 
         try {
-
-
-//             logger.debug(Variables.getCompilerVariable("sys.applicationId"));
-
-//            updateDescriptor = UpdateChecker.getUpdateDescriptor("https://www.offene-pflege.de/updates/updates.xml", ApplicationDisplayMode.GUI);
-            // this may rise an uncritical java.io.FileNotFoundException, usually during development not in production.
-
-//            ApplicationRegistry.getApplicationInfoById(applicationID);
-
-//            btnAbout.setText(updateDescriptor.getPossibleUpdateEntry() != null ? SYSTools.xx("misc.msg.updateAvailable") : null);
-        } catch (Exception e) {
+            btnAbout.setText(SYSTools.isUpdateAvailable() ? SYSTools.xx("misc.msg.updateAvailable") : null);
+        } catch (IOException e) {
             logger.warn(e);
-            updateDescriptor = null;
             btnAbout.setText(null);
         }
-
 
         addApps();
         prepareSearchArea();
@@ -562,10 +549,9 @@ public class PnlWelcome extends CleanablePanel {
     }
 
     private void btnAboutActionPerformed(ActionEvent e) {
-        if (updateDescriptor == null) return; // https://github.com/tloehr/Offene-Pflege.de/issues/91
         Desktop desktop = Desktop.getDesktop();
         try {
-            desktop.browse(new URI(updateDescriptor.getPossibleUpdateEntry() == null ? SYSTools.xx("opde.general.website.url") : SYSTools.xx("opde.general.versions.url")));
+            desktop.browse(new URI(SYSTools.xx("opde.general.website.url")));
         } catch (IOException ioe) {
             logger.warn(ioe);
         } catch (URISyntaxException use) {
