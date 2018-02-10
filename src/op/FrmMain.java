@@ -651,6 +651,7 @@ public class FrmMain extends JFrame {
 
 
         // May see the archive
+        // https://github.com/tloehr/Offene-Pflege.de/issues/92
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, "nursingrecords.info")) {
             panesApps.add(addNursingRecords(null));
         }
