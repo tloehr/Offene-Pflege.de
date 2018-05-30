@@ -2,7 +2,6 @@ package op.settings.databeans;
 
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.tools.DesEncrypter;
 import op.tools.SYSTools;
 import org.apache.log4j.Logger;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -10,7 +9,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.Properties;
 import java.util.StringTokenizer;
 

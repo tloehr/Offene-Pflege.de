@@ -1,7 +1,5 @@
 package entity.building;
 
-
-import com.sun.istack.internal.NotNull;
 import gui.interfaces.EditorComponent;
 import gui.interfaces.NotRemovableUnlessEmpty;
 import op.tools.SYSTools;
@@ -10,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;

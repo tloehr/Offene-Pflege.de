@@ -4,9 +4,7 @@ import entity.system.SYSPropsTools;
 import op.OPDE;
 import org.apache.log4j.Logger;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
@@ -99,20 +97,7 @@ public class Encryption {
             OPDE.fatal(logger, e);
         }
 
-        // could still be encoded with the old algorithm. trying.
-        // i moved from the old standard (which was using the NIC as part of the key) to a new one (which is based on some sort of a calculated Machine ID) in 2015.
-        if (jdbcpassword.isEmpty()) {
-            DesEncrypter oldDesEncrypter = new DesEncrypter(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_HOSTKEY)));
-            try {
-                jdbcpassword = oldDesEncrypter.decrypt(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_JDBC_PASSWORD)));
-            } catch (BadPaddingException e) {
-                jdbcpassword = "";
-            } catch (IllegalBlockSizeException e) {
-                jdbcpassword = "";
-            } catch (Exception e) {
-                OPDE.fatal(logger, e);
-            }
-        }
+
         return jdbcpassword;
     }
 

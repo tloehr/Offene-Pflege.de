@@ -27,7 +27,6 @@
 package op.tools;
 
 import com.jidesoft.swing.JideSplitPane;
-import com.sun.istack.internal.Nullable;
 import entity.files.SYSFilesTools;
 import entity.system.Users;
 import op.OPDE;
@@ -1362,7 +1361,7 @@ public class SYSTools {
      * @param message
      * @return replaced message or the original message if there is no appropriate language key.
      */
-    public static String xx(String message, @Nullable Object... args) {
+    public static String xx(String message, Object... args) {
         if (message == null || message.isEmpty()) return "";
 
         String title = message;
