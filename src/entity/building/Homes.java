@@ -32,7 +32,7 @@ public class Homes implements Serializable {
     @EditorComponent(label = "misc.msg.primary.key", component = {"textfield"}, readonly = "true")
     private String eid;
     @Column(name = "Name", length = 30)
-    @Size(min = 1, max = 30, message="Die Anzahl der Zeichen stimmt nicht")
+    @Size(min = 1, max = 30, message = "Die Anzahl der Zeichen stimmt nicht")
     @NotEmpty
     @EditorComponent(label = "misc.msg.nameOfElement", component = {"textfield"})
     private String name;
@@ -64,6 +64,9 @@ public class Homes implements Serializable {
     @Column(name = "color", length = 6)
     @EditorComponent(label = "misc.msg.colorset", component = {"colorset"})
     private String color;
+    @Column(name = "active")
+    @EditorComponent(label = "misc.msg.active", component = {"onoffswitch", "misc.msg.active", "misc.msg.inactive"})
+    private Boolean active;
     @Version
     @Column(name = "version")
     private Long version;
@@ -174,6 +177,13 @@ public class Homes implements Serializable {
         return zip;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 
     public Collection<Handovers> getHandovers() {
         return handovers;

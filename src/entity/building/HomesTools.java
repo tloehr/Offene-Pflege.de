@@ -40,7 +40,7 @@ public class HomesTools {
      */
     public static void setComboBox(JComboBox cmb) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT e FROM Homes e ORDER BY e.eid");
+        Query query = em.createQuery("SELECT e FROM Homes e WHERE e.active = true ORDER BY e.eid");
         cmb.setModel(new DefaultComboBoxModel(new Vector<Homes>(query.getResultList())));
 
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
@@ -56,7 +56,7 @@ public class HomesTools {
 
     public static ArrayList<Homes> getAll() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT e FROM Homes e ORDER BY e.eid");
+        Query query = em.createQuery("SELECT e FROM Homes e WHERE e.active = true ORDER BY e.eid");
 
         ArrayList<Homes> list = new ArrayList<Homes>(query.getResultList());
         em.close();

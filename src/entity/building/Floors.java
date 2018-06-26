@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "floors")
-public class Floors {
+public class Floors implements Comparable<Floors> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "floorid")
@@ -159,6 +159,11 @@ public class Floors {
                 ", home=" + home +
                 ", rooms=" + rooms +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Floors o) {
+        return level.compareTo(o.getLevel());
     }
 //
 //    public String getKey(){

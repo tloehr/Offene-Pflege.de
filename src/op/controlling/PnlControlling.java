@@ -1,28 +1,28 @@
 /*
  * OffenePflege
  * Copyright (C) 2006-2012 Torsten Löhr
- * This program is free software; you can redistribute it and/or modify it under the terms of the 
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program; if not, write to 
+ *
+ * You should have received a copy of the GNU General Public License along with this program; if not, write to
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
- * ------------------------ 
+ * ------------------------
  * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
+ * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
  * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
- * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
+ * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
- * 
+ *
  */
 package op.controlling;
 
@@ -34,6 +34,8 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
+import entity.building.Homes;
+import entity.building.HomesTools;
 import entity.building.Station;
 import entity.building.StationTools;
 import entity.files.SYSFilesTools;
@@ -400,11 +402,13 @@ public class PnlControlling extends CleanablePanel {
     private JPanel createContentPanel4Hygiene() {
         JPanel pnlContent = new JPanel(new VerticalLayout());
 
-
         JPanel pnlPrevalence = new JPanel(new BorderLayout());
         final JButton btnPrevalence = GUITools.createHyperlinkButton("opde.controlling.hygiene.prevalence", null, null);
         final JDateChooser jdc = new JDateChooser(new Date());
         final JCheckBox cbAnonymous = new JCheckBox(SYSTools.xx("misc.msg.anon"));
+        final JComboBox<Homes> cmbHomes = new JComboBox<>();
+        HomesTools.setComboBox(cmbHomes);
+
         cbAnonymous.setSelected(true);
 
         jdc.setMaxSelectableDate(new Date());
@@ -416,7 +420,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        MREPrevalenceSheets mre = new MREPrevalenceSheets(new LocalDate(jdc.getDate()), cbAnonymous.isSelected(), progressClosure);
+                        MREPrevalenceSheets mre = new MREPrevalenceSheets(new LocalDate(jdc.getDate()), (Homes) cmbHomes.getSelectedItem(), cbAnonymous.isSelected(), progressClosure);
                         return mre.createSheet();
                     }
 
@@ -482,10 +486,12 @@ public class PnlControlling extends CleanablePanel {
         optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.LINE_AXIS));
 
         optionPanel.add(cbAnonymous);
+        optionPanel.add(cmbHomes);
         optionPanel.add(jdc);
 
         pnlPrevalence.add(optionPanel, BorderLayout.EAST);
         pnlContent.add(pnlPrevalence);
+
 
 
         return pnlContent;
