@@ -11,11 +11,11 @@ import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
+import op.tools.HasLogger;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
@@ -30,10 +30,10 @@ import java.util.*;
 /**
  * Erzeugt eine Exceltabelle zur Prävalenzmessung im Rahmen des Hygienesiegels des mre-netz regio rhein-ahr.
  */
-public class MREPrevalenceSheets {
+public class MREPrevalenceSheets implements HasLogger {
 
     public static final int ROW_SHEET0_FIRST_LINE_FOR_HEADER = 1; // Deckblatt
-    
+
     public static final int ROW_SHEET1_TITLE = 1; // Prävalenzdaten
     public static final int COL_SHEET1_TITLE = 0;
     public static final int ROW_SHEET2_TITLE = 1; // Antibiotika
@@ -92,7 +92,7 @@ public class MREPrevalenceSheets {
 
     public static final int SHEET0_START_OF_LIST = ROW_SHEET0_FIRST_LINE_FOR_HEADER + 13;
 
-
+    public static final int MAXCOL_SHEET0 = 2; //https://github.com/tloehr/Offene-Pflege.de/issues/71
     public static final int MAXCOL_SHEET1 = 31; //https://github.com/tloehr/Offene-Pflege.de/issues/71
     public static final int SHEET1_START_OF_LIST = ROW_SHEET1_TITLE + 6;
 
@@ -151,15 +151,12 @@ public class MREPrevalenceSheets {
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private final HashMap<Integer, ResInfoType> mapResInfoType;
-    private final int[] mapBedsTotal;
-    private final int[] mapBedsInUse;
+    private final int[] bedsTotalPerLevel, bedsInUserPerLevel;
     private final Commontags antibiotics;
     private Font titleFont, boldFont;
-    private CellStyle titleStyle, dateStyle, grayStyle, blueGrayStyle;
+    private CellStyle titleStyle, dateStyle, grayStyle, blueGrayStyle, blueStyle, orangeStyle, rotatedStyle;
     private Sheet sheet0, sheet1, sheet2;
     private Workbook wb;
-
-    private final Logger logger = Logger.getLogger(getClass());
 
 
     public MREPrevalenceSheets(final LocalDate targetDate, Homes home, boolean anonymous, Closure progressClosure) {
@@ -172,22 +169,37 @@ public class MREPrevalenceSheets {
         mapResInfoType = new HashMap<>();
         mapRooms = new HashMap<>();
 
-
-        // todo: the selection of residents and their away times need to be studied more.
-        // All residents, who were living in the resthome at 8 in the morning on the targetDate
-        LocalTime morning8 = new LocalTime(8, 0); // eight o'clock
-        listResidents = ResidentTools.getAllActive(targetDate.toDateTime(morning8), SYSCalendar.eod(targetDate));
         antibiotics = CommontagsTools.getType(CommontagsTools.TYPE_SYS_ANTIBIOTICS);
+
+        // Belegung wird ermittelt. Alle BW die um 08 Uhr morgens anwesend waren.
+        LocalTime morning8 = new LocalTime(8, 0); // eight o'clock
         int maxLevel = RoomsTools.getMaxLevel(home);
-        mapBedsTotal = new int[maxLevel + 1];
-        mapBedsInUse = new int[maxLevel + 1];
-
-
+        bedsTotalPerLevel = new int[maxLevel + 1];
+        bedsInUserPerLevel = new int[maxLevel + 1];
         for (short level = 0; level <= maxLevel; level++) {
-            mapBedsTotal[level] = RoomsTools.getBedsTotal(home, level);
-            mapBedsInUse[level] = 0;
+            bedsTotalPerLevel[level] = RoomsTools.getBedsTotal(home, level);
+            bedsInUserPerLevel[level] = 0;
         }
 
+        listResidents = ResidentTools.getAllActive(targetDate.toDateTime(morning8), SYSCalendar.eod(targetDate));
+        ArrayList<Resident> removeResidents = new ArrayList<>();
+        for (Resident resident : listResidents) {
+            for (ResInfo resInfo : ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay(targetDate), SYSCalendar.midOfDay(targetDate))) {
+                Properties p1 = SYSTools.load(resInfo.getProperties());
+                long rid1 = Long.parseLong(SYSTools.catchNull(p1.getProperty("room.id"), "-1"));
+                Rooms room1 = EntityTools.find(Rooms.class, rid1);
+                if (room1.getFloor().getHome().equals(home)) { // nur die aus der gewünschten Einrichtung
+                    mapRooms.put(resInfo.getResident(), room1);
+                    bedsInUserPerLevel[room1.getFloor().getLevel()]++;
+                } else {
+                    removeResidents.add(resident);
+                }
+            }
+        }
+        // Hab nichts eleganteres gefunden, da die Zugehörigkeit zur einer Einrichtung an den Räumen hängt und das
+        // ist bei der Datenbank Abfrage zu kompliziert. Wenn überhaupt möglich.
+        listResidents.removeAll(removeResidents);
+        removeResidents.clear();
     }
 
 
@@ -195,15 +207,6 @@ public class MREPrevalenceSheets {
         progress = 1;
         sheet2_col_index = COL_SHEET2_TITLE + 2;
 
-        for (Resident resident : listResidents) {
-            for (ResInfo resInfo : ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay(targetDate), SYSCalendar.midOfDay(targetDate))) {
-                Properties p1 = SYSTools.load(resInfo.getProperties());
-                long rid1 = Long.parseLong(SYSTools.catchNull(p1.getProperty("room.id"), "-1"));
-                Rooms room1 = EntityTools.find(Rooms.class, rid1);
-                mapRooms.put(resInfo.getResident(), room1);
-                mapBedsInUse[room1.getFloor().getLevel()]++;
-            }
-        }
 
         // this sorts the resident list according to their assigned rooms. if not possible according to their assigned stations.
         // and if still not possible according to their RIDs (which is always working).
@@ -230,10 +233,10 @@ public class MREPrevalenceSheets {
         progressClosure.execute(new Pair<Integer, Integer>(progress, max));
 
 
-        // prepare a vanilla workbook to fill
+        // leere Excel Tabelle vorbereiten.
         prepareWorkbook();
 
-        // get all residents who were at least living here yesterday, even they may have been away on those two days
+        // alle BW die im Zeitraum da waren, auch wenn sie abwesend waren.
         boolean lastForThisLevel = false;
 
         for (Resident resident : listResidents) {
@@ -272,7 +275,7 @@ public class MREPrevalenceSheets {
 
 
             runningNumber++;
-            ArrayList<Prescription> listAntibiotics = fillLineSheet1(resident, lastForThisLevel);
+            ArrayList<Prescription> listAntibiotics = fillALineInSheet1(resident, lastForThisLevel);
             lastForThisLevel = false;
 
             if (!listAntibiotics.isEmpty()) {
@@ -286,6 +289,10 @@ public class MREPrevalenceSheets {
                 }
             }
 
+        }
+
+        for (int col = 0; col < MAXCOL_SHEET0; col++) {
+            sheet0.autoSizeColumn(col);
         }
 
         for (int col = 0; col < MAXCOL_SHEET1; col++) {
@@ -335,7 +342,7 @@ public class MREPrevalenceSheets {
         return properties.containsKey(key) && properties.getProperty(key).equalsIgnoreCase(value) ? "X" : "";
     }
 
-    private void fillColSheet2(Prescription prescription) throws Exception {
+    private void fillColSheet2(Prescription prescription) {
         ResInfo resInfo = ResInfoTools.getAnnotation4Prescription(prescription, antibiotics);
         Properties properties = resInfo != null ? SYSTools.load(resInfo.getProperties()) : new Properties();
 
@@ -387,7 +394,7 @@ public class MREPrevalenceSheets {
      * @param lastForThisLevel
      * @return
      */
-    private ArrayList<Prescription> fillLineSheet1(Resident resident, boolean lastForThisLevel) {
+    private ArrayList<Prescription> fillALineInSheet1(Resident resident, boolean lastForThisLevel) {
         String[] content = new String[MAXCOL_SHEET1];
 
         content[ROOM_NO] = getValue(ResInfoTypeTools.TYPE_ROOM, "room.text").isEmpty() ? "--" : getValue(ResInfoTypeTools.TYPE_ROOM, "room.text");
@@ -489,8 +496,8 @@ public class MREPrevalenceSheets {
         progress += 2; // for the additional 2 columns;
 
         if (lastForThisLevel && mapRooms.containsKey(resident)) {
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 2).setCellValue(mapBedsInUse[mapRooms.get(resident).getFloor().getLevel()]);
-            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 1).setCellValue(mapBedsTotal[mapRooms.get(resident).getFloor().getLevel()]);
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 2).setCellValue(bedsInUserPerLevel[mapRooms.get(resident).getFloor().getLevel()]);
+            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 1).setCellValue(bedsTotalPerLevel[mapRooms.get(resident).getFloor().getLevel()]);
 
             for (int col = 0; col < MAXCOL_SHEET1; col++) {
                 sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).getCell(col).setCellStyle(blueGrayStyle);
@@ -625,7 +632,7 @@ public class MREPrevalenceSheets {
         boldFont = wb.createFont();
         boldFont.setFontHeightInPoints((short) 12);
 //        boldFont.setFontName("Arial");
-        boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        boldFont.setBold(true);
         CellStyle boldStyle = wb.createCellStyle();
         boldStyle.setFont(boldFont);
 
@@ -634,77 +641,46 @@ public class MREPrevalenceSheets {
         dateStyle.setDataFormat(df);
         dateStyle.setFont(boldFont);
 
-        CellStyle rotatedStyle = wb.createCellStyle();
+        rotatedStyle = wb.createCellStyle();
         rotatedStyle.setFont(boldFont);
         rotatedStyle.setRotation((short) 90);
-        rotatedStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-        rotatedStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        rotatedStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        rotatedStyle.setAlignment(HorizontalAlignment.CENTER);
         rotatedStyle.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
-        rotatedStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        rotatedStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         Font f0 = wb.createFont();
         f0.setColor(IndexedColors.WHITE.getIndex());
         rotatedStyle.setFont(f0);
 
         grayStyle = wb.createCellStyle();
         grayStyle.setFillForegroundColor(IndexedColors.GREY_40_PERCENT.getIndex());
-        grayStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        grayStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         Font f = wb.createFont();
         f.setColor(IndexedColors.WHITE.getIndex());
         grayStyle.setFont(f);
 
         blueGrayStyle = wb.createCellStyle();
         blueGrayStyle.setFillForegroundColor(IndexedColors.BLUE_GREY.getIndex());
-        blueGrayStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        blueGrayStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         Font f1 = wb.createFont();
         f1.setColor(IndexedColors.WHITE.getIndex());
         blueGrayStyle.setFont(f1);
 
-        // sheet0
-        sheet0 = wb.createSheet(WorkbookUtil.createSafeSheetName(SYSTools.xx("prevalence.sheet0.tab.title")));
-        sheet0.getPrintSetup().setLandscape(false);
-        sheet0.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
 
-        // Header bis einschl. "Anzahl Einzelzimmer"
-        // und je 4 Zeilen für jede Plfegestation, die aktiv ist
-        createRows(sheet0, 100);
+        blueStyle = wb.createCellStyle();
+        blueStyle.setFillForegroundColor(IndexedColors.BLUE.getIndex());
+        blueStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        sheet0.getRow(ROW_SHEET0_FIRST_LINE_FOR_HEADER).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("prevalence.sheet0.title"));
-        sheet0.getRow(ROW_SHEET0_FIRST_LINE_FOR_HEADER).getCell(COL_SHEET0_TITLES).setCellStyle(titleStyle);
+        orangeStyle = wb.createCellStyle();
+        orangeStyle.setFillForegroundColor(IndexedColors.LIGHT_ORANGE.getIndex());
+        orangeStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        sheet0.getRow(SHEET0_ROW_TARGETDATE).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("day.of.elicitation"));
+        prepareAndFillSheet0();
+        prepareSheet1();
 
-        sheet0.getRow(SHEET0_ROW_FACILITY_NAME).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Name des Pflegeeinrichtung"));
-        sheet0.getRow(SHEET0_ROW_FACILITY_SHORTNAME).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Kurzbezeichnung"));
-        sheet0.getRow(SHEET0_ROW_FACILITY_STREET).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Straße, Hausnr."));
-        sheet0.getRow(SHEET0_ROW_FACILITY_ZIPCODE).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Postleitzahl"));
-        sheet0.getRow(SHEET0_ROW_FACILITY_CITY).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Ort"));
+    }
 
-        sheet0.getRow(SHEET0_ROW_BEDS_TOTAL).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Gesamtzahl Betten Pflegeeinrichtung"));
-        sheet0.getRow(SHEET0_ROW_BEDS_IN_USE).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Belegte Betten am Tag der Erhebung"));
-        sheet0.getRow(SHEET0_ROW_NUM_ROOMS).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Anzahl Patientenzimmer"));
-        sheet0.getRow(SHEET0_ROW_NUM_SINGLE_ROOMS).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Anzahl Einzelzimmer"));
-
-
-
-        sheet0.getRow(SHEET0_ROW_TARGETDATE).createCell(COL_SHEET0_TITLES + 1).setCellValue(targetDate.toString("dd.MM.yyyy"));
-
-
-        List<Floors> floors = home.getFloors();
-        Collections.sort(floors);
-
-        int index = 0;
-        for (Floors floor : floors) {
-            sheet0.getRow(SHEET0_START_OF_LIST + index).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Wohnbereich / Station"));
-            sheet0.getRow(SHEET0_START_OF_LIST + index).createCell(COL_SHEET0_TITLES + 1).setCellValue(floor.getName());
-            sheet0.getRow(SHEET0_ROW_BEDS_IN_USE + index + 1).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Anzahl Betten Wohnbereich / Station"));
-            sheet0.getRow(SHEET0_ROW_BEDS_IN_USE + index + 1).createCell(COL_SHEET0_TITLES + 1).setCellValue(mapBedsTotal[floor.getLevel()]);
-            sheet0.getRow(SHEET0_ROW_NUM_ROOMS + index + 2).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Belegte Betten am Tag der Erhebung"));
-            sheet0.getRow(SHEET0_ROW_NUM_ROOMS + index + 2).createCell(COL_SHEET0_TITLES+1).setCellValue(mapBedsInUse[floor.getLevel()]);
-
-            index += 4;
-        }
-
-        //endfor
+    private void prepareSheet1() {
 
 
         // sheet1
@@ -724,6 +700,76 @@ public class MREPrevalenceSheets {
             sheet1.getRow(SHEET1_START_OF_LIST).createCell(i).setCellValue(SYSTools.xx("prevalence.sheet1.col" + String.format("%02d", i + 1) + ".title"));
             sheet1.getRow(SHEET1_START_OF_LIST).getCell(i).setCellStyle(rotatedStyle);
         }
+    }
+
+    private void prepareAndFillSheet0() {
+        // sheet0
+        sheet0 = wb.createSheet(WorkbookUtil.createSafeSheetName(SYSTools.xx("prevalence.sheet0.tab.title")));
+        sheet0.getPrintSetup().setLandscape(false);
+        sheet0.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
+
+        // Header bis einschl. "Anzahl Einzelzimmer"
+        // und je 4 Zeilen für jede Plfegestation, die aktiv ist
+        createRows(sheet0, 100);
+
+        sheet0.getRow(ROW_SHEET0_FIRST_LINE_FOR_HEADER).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("prevalence.sheet0.title"));
+        sheet0.getRow(ROW_SHEET0_FIRST_LINE_FOR_HEADER).getCell(COL_SHEET0_TITLES).setCellStyle(titleStyle);
+
+        sheet0.getRow(SHEET0_ROW_TARGETDATE).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("day.of.elicitation"));
+        sheet0.getRow(SHEET0_ROW_TARGETDATE).createCell(COL_SHEET0_TITLES + 1).setCellValue(targetDate.toString("dd.MM.yyyy"));
+        sheet0.getRow(SHEET0_ROW_TARGETDATE).getCell(COL_SHEET0_TITLES).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_TARGETDATE).getCell(COL_SHEET0_TITLES + 1).setCellStyle(blueStyle);
+
+        sheet0.getRow(SHEET0_ROW_FACILITY_NAME).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Name des Pflegeeinrichtung"));
+        sheet0.getRow(SHEET0_ROW_FACILITY_NAME).createCell(COL_SHEET0_TITLES + 1).setCellValue(home.getName());
+        sheet0.getRow(SHEET0_ROW_FACILITY_NAME).getCell(COL_SHEET0_TITLES).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_NAME).getCell(COL_SHEET0_TITLES + 1).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_SHORTNAME).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Kurzbezeichnung"));
+        sheet0.getRow(SHEET0_ROW_FACILITY_SHORTNAME).createCell(COL_SHEET0_TITLES + 1).setCellValue(home.getEid());
+        sheet0.getRow(SHEET0_ROW_FACILITY_SHORTNAME).getCell(COL_SHEET0_TITLES).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_SHORTNAME).getCell(COL_SHEET0_TITLES + 1).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_STREET).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Straße, Hausnr."));
+        sheet0.getRow(SHEET0_ROW_FACILITY_STREET).createCell(COL_SHEET0_TITLES + 1).setCellValue(home.getStreet());
+        sheet0.getRow(SHEET0_ROW_FACILITY_STREET).getCell(COL_SHEET0_TITLES).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_STREET).getCell(COL_SHEET0_TITLES + 1).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_ZIPCODE).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Postleitzahl"));
+        sheet0.getRow(SHEET0_ROW_FACILITY_ZIPCODE).createCell(COL_SHEET0_TITLES + 1).setCellValue(home.getZIP());
+        sheet0.getRow(SHEET0_ROW_FACILITY_ZIPCODE).getCell(COL_SHEET0_TITLES).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_ZIPCODE).getCell(COL_SHEET0_TITLES + 1).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_CITY).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Ort"));
+        sheet0.getRow(SHEET0_ROW_FACILITY_CITY).createCell(COL_SHEET0_TITLES + 1).setCellValue(home.getCity());
+        sheet0.getRow(SHEET0_ROW_FACILITY_CITY).getCell(COL_SHEET0_TITLES).setCellStyle(blueStyle);
+        sheet0.getRow(SHEET0_ROW_FACILITY_CITY).getCell(COL_SHEET0_TITLES + 1).setCellStyle(blueStyle);
+
+        sheet0.getRow(SHEET0_ROW_BEDS_TOTAL).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Gesamtzahl Betten Pflegeeinrichtung"));
+        sheet0.getRow(SHEET0_ROW_BEDS_IN_USE).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Belegte Betten am Tag der Erhebung"));
+        sheet0.getRow(SHEET0_ROW_NUM_ROOMS).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Anzahl Patientenzimmer"));
+        sheet0.getRow(SHEET0_ROW_NUM_SINGLE_ROOMS).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Anzahl Einzelzimmer"));
+
+        List<Floors> floors = home.getFloors();
+        Collections.sort(floors);
+
+        int index = 0;
+        int runningStationIndex = 1; // einfach eine laufende Nummer, die das "Deckblatt" mit den "Prävalenzdaten" verbindet.
+        for (Floors floor : floors) {
+            sheet0.getRow(SHEET0_START_OF_LIST + index).createCell(COL_SHEET0_TITLES).setCellValue(home.getEid() + " , " + floor.getName());
+            sheet0.getRow(SHEET0_START_OF_LIST + index).getCell(COL_SHEET0_TITLES).setCellStyle(orangeStyle);
+            sheet0.getRow(SHEET0_START_OF_LIST + index).createCell(COL_SHEET0_TITLES + 1).setCellValue(runningStationIndex);
+            sheet0.getRow(SHEET0_START_OF_LIST + index).getCell(COL_SHEET0_TITLES + 1).setCellStyle(orangeStyle);
+
+            sheet0.getRow(SHEET0_START_OF_LIST + index + 1).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Anzahl Betten"));
+            sheet0.getRow(SHEET0_START_OF_LIST + index + 1).getCell(COL_SHEET0_TITLES).setCellStyle(orangeStyle);
+            sheet0.getRow(SHEET0_START_OF_LIST + index + 1).createCell(COL_SHEET0_TITLES + 1).setCellValue(bedsTotalPerLevel[floor.getLevel()]);
+            sheet0.getRow(SHEET0_START_OF_LIST + index + 1).getCell(COL_SHEET0_TITLES+1).setCellStyle(orangeStyle);
+
+            sheet0.getRow(SHEET0_START_OF_LIST + index + 2).createCell(COL_SHEET0_TITLES).setCellValue(SYSTools.xx("Belegte Betten am Tag der Erhebung"));
+            sheet0.getRow(SHEET0_START_OF_LIST + index + 2).getCell(COL_SHEET0_TITLES).setCellStyle(orangeStyle);
+            sheet0.getRow(SHEET0_START_OF_LIST + index + 2).createCell(COL_SHEET0_TITLES + 1).setCellValue(bedsInUserPerLevel[floor.getLevel()]);
+            sheet0.getRow(SHEET0_START_OF_LIST + index + 2).getCell(COL_SHEET0_TITLES + 1).setCellStyle(orangeStyle);
+            index += 4;
+            runningStationIndex++;
+        }
+
     }
 
     private void createRows(Sheet sheet, int num) {

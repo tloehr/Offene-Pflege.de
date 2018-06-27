@@ -227,8 +227,7 @@ public class ResidentTools {
 
 
     /**
-     * retrieves a list of all residents who were staying in the home during that specified
-     * interval.
+     * Alle BW die in der Einrichtung wohnen, innerhalb eines bestimmten Intervals.
      *
      * @param start
      * @param end
@@ -262,17 +261,17 @@ public class ResidentTools {
     }
 
 
-    public static ArrayList<Resident> getAllActiveAndPresent(LocalDate day) {
-        ArrayList<Resident> list = getAllActive(day, day);
-        ArrayList<Resident> listOnlyPresent = new ArrayList<>();
-        for (Resident resident : list) {
-            if (!ResInfoTools.wasAway(resident, day)) {
-                listOnlyPresent.add(resident);
-            }
-        }
-        list.clear();
-        return listOnlyPresent;
-    }
+//    public static ArrayList<Resident> getAllActiveAndPresent(LocalDate day) {
+//        ArrayList<Resident> list = getAllActive(day, day);
+//        ArrayList<Resident> listOnlyPresent = new ArrayList<>();
+//        for (Resident resident : list) {
+//            if (!ResInfoTools.wasAway(resident, day)) {
+//                listOnlyPresent.add(resident);
+//            }
+//        }
+//        list.clear();
+//        return listOnlyPresent;
+//    }
 
     /**
      * retrieves a list of all residents who were staying in the home during that particular

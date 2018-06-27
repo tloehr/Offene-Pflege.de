@@ -409,7 +409,9 @@ public class PnlControlling extends CleanablePanel {
         final JComboBox<Homes> cmbHomes = new JComboBox<>();
         HomesTools.setComboBox(cmbHomes);
 
-        cbAnonymous.setSelected(true);
+
+        SYSPropsTools.restoreState("opde.controlling:prevalence::cbAnonymous", cbAnonymous);
+        cbAnonymous.addItemListener(e -> SYSPropsTools.storeState("opde.controlling:prevalence::cbAnonymous", cbAnonymous));
 
         jdc.setMaxSelectableDate(new Date());
 
@@ -491,7 +493,6 @@ public class PnlControlling extends CleanablePanel {
 
         pnlPrevalence.add(optionPanel, BorderLayout.EAST);
         pnlContent.add(pnlPrevalence);
-
 
 
         return pnlContent;
