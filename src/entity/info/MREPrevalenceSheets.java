@@ -56,9 +56,10 @@ public class MREPrevalenceSheets implements HasLogger {
 
 
     // Spalten-Nummern für das Sheet1
-    public static final int ROOM_NO = 0;
+    public static final int FLOOR_INDEX = 0;
+//    public static final int ROOM_NO = 0;
     public static final int RESIDENT_NAME_OR_RESID = 1; // resident name or just the id (when anonymous is selected)
-    //    public static final int RESIDENT_STATION = 2; // resident name or just the id (when anonymous is selected)
+
     public static final int RUNNING_NO = 2; // running number
     public static final int PRESENT_DAY_BEFORE = 3; // resinfotype "ABWE1", TYPE_ABSENCE, presence with a interval overlapping the PIT of the day in question
     public static final int YEAR_OF_BIRTH = 4; // resident "dob"
@@ -70,24 +71,32 @@ public class MREPrevalenceSheets implements HasLogger {
     public static final int TRACHEOSTOMA = 10; // resinfotype "respi", TYPE_RESPIRATION
     public static final int OTHER_WOUNDS = 11; // resinfotype "wound[1..5]", ResInfoTypeTools.TYPE_WOUND1..5
     public static final int PEG = 12; // resinfotype "ARTNUTRIT", TYPE_ARTIFICIAL_NUTRTITION, tubetype=peg
-    public static final int MRSA = 13; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
-    public static final int SURGERY_LAST_30_DAYS = 14; // resinfotype "SURGERY1",  TYPE_SURGERY, presence with a PIT within the last 30 days
-    public static final int HOSPITAL_STAY_LAST_3_MONTHS = 15; // resinfotype "ABWE1", presence with a interval overlapping a PIT within the last 30 days. type=HOSPITAL
-    public static final int DESORIENTED_TIME_LOCATION = 16; // resinfotype "ORIENT1", TYPE_ORIENTATION, time != yes1 || location != yes3
-    public static final int BEDRIDDEN_WHEELCHAIR = 17; // resinfotype "MOBILITY",bedridden=true || wheel.aid=true
-    public static final int URINARY_INCONTINENCE = 18; // resinfotype "HINKO" OR "HINKON",TYPE_INCO_PROFILE_DAY = 113 OR TYPE_INCO_PROFILE_NIGHT = 114, inkoprofil != kontinenz
-    public static final int FAECAL_INCONTINENCE = 19; // resinfotype "FINCO1",TYPE_INCO_FAECAL = 115,incolevel > 0
-    public static final int DIABETES_INSULINE = 20; // resinfotype "DIABETES1",TYPE_DIABETES = 98,application != none
-    public static final int CARELEVEL0 = 21;
-    public static final int CARELEVEL1 = 22;
-    public static final int CARELEVEL2 = 23;
-    public static final int CARELEVEL3 = 24;
-    public static final int CARELEVEL4 = 25;
-    public static final int CARELEVEL5 = 26;
-    public static final int PNEUMOCOCCAL_VACCINE = 27; // resinfotype "VACCIN1",TYPE_VACCINE = 144,vaccinetype == 9
-    public static final int RUNNING_ANTIBIOTICS = 28; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
-    public static final int BEDS_IN_USE = 29; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
-    public static final int BEDS_TOTAL = 30; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+    public static final int SURGERY_LAST_30_DAYS = 13; // resinfotype "SURGERY1",  TYPE_SURGERY, presence with a PIT within the last 30 days
+    public static final int HOSPITAL_STAY_LAST_3_MONTHS = 14; // resinfotype "ABWE1", presence with a interval overlapping a PIT within the last 30 days. type=HOSPITAL
+    public static final int DESORIENTED_TIME_LOCATION = 15; // resinfotype "ORIENT1", TYPE_ORIENTATION, time != yes1 || location != yes3
+    public static final int BEDRIDDEN_WHEELCHAIR = 16; // resinfotype "MOBILITY",bedridden=true || wheel.aid=true
+    public static final int URINARY_INCONTINENCE = 17; // resinfotype "HINKO" OR "HINKON",TYPE_INCO_PROFILE_DAY = 113 OR TYPE_INCO_PROFILE_NIGHT = 114, inkoprofil != kontinenz
+    public static final int FAECAL_INCONTINENCE = 18; // resinfotype "FINCO1",TYPE_INCO_FAECAL = 115,incolevel > 0
+    public static final int DIABETES_INSULINE = 19; // resinfotype "DIABETES1",TYPE_DIABETES = 98,application != none
+    public static final int CARELEVEL0 = 20;
+    public static final int CARELEVEL1 = 21;
+    public static final int CARELEVEL2 = 22;
+    public static final int CARELEVEL3 = 23;
+    public static final int CARELEVEL4 = 24;
+    public static final int CARELEVEL5 = 25;
+//    public static final int PNEUMOCOCCAL_VACCINE = 27; // resinfotype "VACCIN1",TYPE_VACCINE = 144,vaccinetype == 9
+    public static final int RUNNING_ANTIBIOTICS = 27; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+    public static final int MRSA = 28; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
+    public static final int VRE = 29; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
+    public static final int _3MRGN = 30; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
+    public static final int _4MRGN = 31; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
+//    public static final int BEDS_IN_USE = 29; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+//    public static final int BEDS_TOTAL = 30; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+
+    // https://github.com/tloehr/Offene-Pflege.de/issues/96
+    
+
+
 
 
     public static final int SHEET0_START_OF_LIST = ROW_SHEET0_FIRST_LINE_FOR_HEADER + 13;
@@ -327,19 +336,19 @@ public class MREPrevalenceSheets implements HasLogger {
     private String getValue(int type, String key) {
         return mapID2Info.containsKey(type) &&
                 mapInfo2Properties.containsKey(mapID2Info.get(type)) &&
-                mapInfo2Properties.get(mapID2Info.get(type)).containsKey(key) ? mapInfo2Properties.get(mapID2Info.get(type)).getProperty(key) : "";
+                mapInfo2Properties.get(mapID2Info.get(type)).containsKey(key) ? mapInfo2Properties.get(mapID2Info.get(type)).getProperty(key) : "0";
     }
 
     private boolean isCellContent(int type, String key, String value) {
-        return getCellContent(type, key, value).equals("X");
+        return getCellContent(type, key, value).equals("1");
     }
 
     private String getCellContent(int type, String key, String value) {
-        return getValue(type, key).equalsIgnoreCase(value) ? "X" : "";
+        return getValue(type, key).equalsIgnoreCase(value) ? "1" : "0";
     }
 
     private String getCellContent(Properties properties, String key, String value) {
-        return properties.containsKey(key) && properties.getProperty(key).equalsIgnoreCase(value) ? "X" : "";
+        return properties.containsKey(key) && properties.getProperty(key).equalsIgnoreCase(value) ? "1" : "0";
     }
 
     private void fillColSheet2(Prescription prescription) {
@@ -397,36 +406,38 @@ public class MREPrevalenceSheets implements HasLogger {
     private ArrayList<Prescription> fillALineInSheet1(Resident resident, boolean lastForThisLevel) {
         String[] content = new String[MAXCOL_SHEET1];
 
-        content[ROOM_NO] = getValue(ResInfoTypeTools.TYPE_ROOM, "room.text").isEmpty() ? "--" : getValue(ResInfoTypeTools.TYPE_ROOM, "room.text");
+//        content[ROOM_NO] = getValue(ResInfoTypeTools.TYPE_ROOM, "room.text").isEmpty() ? "--" : getValue(ResInfoTypeTools.TYPE_ROOM, "room.text");
         content[RESIDENT_NAME_OR_RESID] = anonymous ? resident.getRID() : ResidentTools.getLabelText(resident);
         content[RUNNING_NO] = Integer.toString(runningNumber);
 
         // absent yesterday ?
         ArrayList<ResInfo> listAbsence = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ABSENCE), targetDate.minusDays(1), targetDate.minusDays(1));
         ArrayList<ResInfo> listStay = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_STAY), targetDate.minusDays(1), targetDate.minusDays(1));
-        content[PRESENT_DAY_BEFORE] = listAbsence.isEmpty() && !listStay.isEmpty() ? "X" : "";
+        content[PRESENT_DAY_BEFORE] = listAbsence.isEmpty() && !listStay.isEmpty() ? "1" : "0";
         listAbsence.clear();
 
         content[YEAR_OF_BIRTH] = Integer.toString(new LocalDate(resident.getDOB()).getYear());
-        content[MALE] = resident.getGender() == ResidentTools.MALE ? "X" : "";
-        content[FEMALE] = resident.getGender() == ResidentTools.FEMALE ? "X" : "";
+        content[MALE] = resident.getGender() == ResidentTools.MALE ? "1" : "0";
+        content[FEMALE] = resident.getGender() == ResidentTools.FEMALE ? "1" : "0";
         content[URINE_CATHETER] = getCellContent(ResInfoTypeTools.TYPE_INCOAID, "trans.aid", "true");
         content[VESSEL_CATHETER] = getCellContent(ResInfoTypeTools.TYPE_VESSEL_CATHETER, "vessel.catheter", "true");
 
         boolean bedsore = false;
         boolean wounds = false;
         for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) {
-            bedsore |= getCellContent(type, "bedsore", "true").equals("X");
+            bedsore |= getCellContent(type, "bedsore", "true").equals("1");
             wounds |= mapID2Info.containsKey(type);
         }
-        content[BEDSORE] = bedsore ? "X" : "";
-        content[OTHER_WOUNDS] = wounds ? "X" : "";
+        content[BEDSORE] = bedsore ? "1" : "0";
+        content[OTHER_WOUNDS] = wounds ? "1" : "0";
         content[TRACHEOSTOMA] = getCellContent(ResInfoTypeTools.TYPE_RESPIRATION, "stoma", "true");
         content[PEG] = getCellContent(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "tubetype", "peg");
         content[MRSA] = getCellContent(ResInfoTypeTools.TYPE_INFECTION, "mrsa", "true");
+        content[_3MRGN] = getCellContent(ResInfoTypeTools.TYPE_INFECTION, "3mrgn", "true");
+        content[_4MRGN] = getCellContent(ResInfoTypeTools.TYPE_INFECTION, "4mrgn", "true");
 
         ArrayList<ResInfo> listSurgery = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_SURGERY), targetDate.minusDays(30), targetDate);
-        content[SURGERY_LAST_30_DAYS] = listSurgery.isEmpty() ? "" : "X";
+        content[SURGERY_LAST_30_DAYS] = listSurgery.isEmpty() ? "0" : "1";
         listSurgery.clear();
 
         ArrayList<ResInfo> listHospital = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ABSENCE), targetDate.minusMonths(3), targetDate);
@@ -436,24 +447,24 @@ public class MREPrevalenceSheets implements HasLogger {
             hospital |= p.containsKey("type") && p.getProperty("type").equalsIgnoreCase(ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL);
             p.clear();
         }
-        content[HOSPITAL_STAY_LAST_3_MONTHS] = hospital ? "X" : "";
+        content[HOSPITAL_STAY_LAST_3_MONTHS] = hospital ? "1" : "0";
         listHospital.clear();
 
-        //desoriented = !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "time", "yes1").equalsIgnoreCase("X") && !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "location", "yes3").equalsIgnoreCase("X");
-        boolean desoriented = mapID2Info.containsKey(ResInfoTypeTools.TYPE_ORIENTATION) && (!getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "time", "yes1").equalsIgnoreCase("X") || !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "location", "yes3").equalsIgnoreCase("X"));
-        content[DESORIENTED_TIME_LOCATION] = desoriented ? "X" : "";
+        //desoriented = !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "time", "yes1").equalsIgnoreCase("1") && !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "location", "yes3").equalsIgnoreCase("1");
+        boolean desoriented = mapID2Info.containsKey(ResInfoTypeTools.TYPE_ORIENTATION) && (!getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "time", "yes1").equalsIgnoreCase("1") || !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "location", "yes3").equalsIgnoreCase("1"));
+        content[DESORIENTED_TIME_LOCATION] = desoriented ? "1" : "0";
 
-        boolean immobile = getCellContent(ResInfoTypeTools.TYPE_MOBILITY, "bedridden", "true").equalsIgnoreCase("X") || getCellContent(ResInfoTypeTools.TYPE_MOBILITY, "wheel.aid", "true").equalsIgnoreCase("X");
-        content[BEDRIDDEN_WHEELCHAIR] = immobile ? "X" : "";
+        boolean immobile = getCellContent(ResInfoTypeTools.TYPE_MOBILITY, "bedridden", "true").equalsIgnoreCase("1") || getCellContent(ResInfoTypeTools.TYPE_MOBILITY, "wheel.aid", "true").equalsIgnoreCase("1");
+        content[BEDRIDDEN_WHEELCHAIR] = immobile ? "1" : "0";
 
-        boolean urine = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY) && !getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil", "kontinenz").equalsIgnoreCase("X")) || (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT) && !getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil", "kontinenz").equalsIgnoreCase("X"));
-        content[URINARY_INCONTINENCE] = urine ? "X" : "";
+        boolean urine = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY) && !getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil", "kontinenz").equalsIgnoreCase("1")) || (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT) && !getCellContent(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil", "kontinenz").equalsIgnoreCase("1"));
+        content[URINARY_INCONTINENCE] = urine ? "1" : "0";
 
-        boolean faecal = mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_FAECAL) && !getCellContent(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel", "0").equalsIgnoreCase("X");
-        content[FAECAL_INCONTINENCE] = faecal ? "X" : "";
+        boolean faecal = mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_FAECAL) && !getCellContent(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel", "0").equalsIgnoreCase("1");
+        content[FAECAL_INCONTINENCE] = faecal ? "1" : "0";
 
-        boolean insuline = mapID2Info.containsKey(ResInfoTypeTools.TYPE_DIABETES) && !getCellContent(ResInfoTypeTools.TYPE_DIABETES, "application", "none").equalsIgnoreCase("X");
-        content[DIABETES_INSULINE] = insuline ? "X" : "";
+        boolean insuline = mapID2Info.containsKey(ResInfoTypeTools.TYPE_DIABETES) && !getCellContent(ResInfoTypeTools.TYPE_DIABETES, "application", "none").equalsIgnoreCase("1");
+        content[DIABETES_INSULINE] = insuline ? "1" : "0";
 
         // alle die nicht mindestens "pg1" oder höher haben gelten als "pg0". Auch diejenigen, die nie beantragt haben oder abgelehnt wurden.
         boolean pg1andabove = isCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg1") ||
@@ -464,7 +475,7 @@ public class MREPrevalenceSheets implements HasLogger {
 
 
         if (!pg1andabove) {
-            content[CARELEVEL0] = "X";
+            content[CARELEVEL0] = "1";
         } else {
             content[CARELEVEL1] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg1");
             content[CARELEVEL2] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg2");
@@ -474,7 +485,7 @@ public class MREPrevalenceSheets implements HasLogger {
 
         }
 
-        content[PNEUMOCOCCAL_VACCINE] = getCellContent(ResInfoTypeTools.TYPE_VACCINE, "vaccinetype", "9");
+//        content[PNEUMOCOCCAL_VACCINE] = getCellContent(ResInfoTypeTools.TYPE_VACCINE, "vaccinetype", "9");
 
         ArrayList<Prescription> listPrescripitons = PrescriptionTools.getPrescriptions4Tags(resident, antibiotics);
         ArrayList<Prescription> listAntibiotics = new ArrayList<>();
@@ -483,7 +494,7 @@ public class MREPrevalenceSheets implements HasLogger {
                 listAntibiotics.add(prescription);
             }
         }
-        content[RUNNING_ANTIBIOTICS] = !listAntibiotics.isEmpty() ? "X" : "";
+        content[RUNNING_ANTIBIOTICS] = !listAntibiotics.isEmpty() ? "1" : "0";
 
         createRows(sheet1, 1);
         for (int col = 0; col < MAXCOL_SHEET1 - 2; col++) {
@@ -509,7 +520,7 @@ public class MREPrevalenceSheets implements HasLogger {
     }
 
 
-    private void prepareSheet2() throws Exception {
+    private void prepareSheet2() {
         sheet2 = wb.createSheet(WorkbookUtil.createSafeSheetName(SYSTools.xx("prevalence.sheet2.tab.title")));
         sheet2.getPrintSetup().setLandscape(true);
         sheet2.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
