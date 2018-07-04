@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -56,9 +55,9 @@ public class RoomsTools {
             query.setParameter("home", home);
             total = (Integer) query.getSingleResult();
             em.close();
-        } catch (NoResultException nre){
+        } catch (NoResultException nre) {
             total = 0;
-        } catch (Exception e){
+        } catch (Exception e) {
             OPDE.fatal(e);
         }
         return total;
@@ -97,6 +96,19 @@ public class RoomsTools {
 //        }
 
         return total;
+    }
+
+
+    public static ArrayList<Rooms> getRooms(Homes home) {
+
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM Rooms b WHERE b.floor.home = :home AND b.active = TRUE");
+        query.setParameter("home", home);
+        ArrayList<Rooms> listRooms = new ArrayList(query.getResultList());
+        em.close();
+
+        return listRooms;
     }
 
 //    /**

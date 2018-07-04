@@ -1,11 +1,17 @@
-UPDATE `sysprops` SET `V` = '11' WHERE `K` = 'dbstructure';
+UPDATE `opde`.`sysprops`
+SET `V` = '11'
+WHERE `K` = 'dbstructure';
 --
 -- Wenn eine Einrichtung stillgelegt wird.
-ALTER TABLE `homes` ADD active TINYINT DEFAULT 1 NOT NULL;
+ALTER TABLE `opde`.`homes`
+  ADD active TINYINT DEFAULT 1 NOT NULL;
 --
 -- Neue Felder bei den Infektionen
-UPDATE `resinfotype` SET `type` = '-1' WHERE `BWINFTYP` = 'INFECT1';
-INSERT INTO `opde`.`resinfotype` (`BWINFTYP`, `XML`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`) VALUES ('INFECT2', '<imagelabel image="/artwork/48x48/biohazard.png"/>
+UPDATE `opde`.`resinfotype`
+SET `type` = '-1'
+WHERE `BWINFTYP` = 'INFECT1';
+INSERT INTO `opde`.`resinfotype` (`BWINFTYP`, `XML`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`)
+VALUES ('INFECT2', '<imagelabel image="/artwork/48x48/biohazard.png"/>
 <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 10.[br/]Ausserdem führt eine [b]multiresistente Infektion[/b] dazu, dass die Anlage ''MRE'' erstellt und beigefügt wird."/>
 <checkbox label="MRSA" tooltip="Methicillin-resistenter Staphylococcus aureus" name="mrsa"/>
 <checkbox label="VRE" tooltip="Vancomycin-resistente Enterokokken" name="vre" layout="left"/>
@@ -62,4 +68,24 @@ INSERT INTO `opde`.`resinfotype` (`BWINFTYP`, `XML`, `BWInfoKurz`, `BWInfoLang`,
 <textfield name="med4" label="Wirkstoff" length="30" hfill="false" layout="p" innerlayout="tab"/>
 <textfield name="dose4" label="Dosierung" length="30" hfill="false" innerlayout="tab"/>
 <textfield name="from4" label="Von" length="10" hfill="false" type="date" optional="true" innerlayout="tab"/>
-<textfield name="to4" label="Bis" length="10" type="date" optional="true" layout="left" innerlayout="left"/>', 'Ansteckende Infektionen', NULL, '15','99','0','12');
+<textfield name="to4" label="Bis" length="10" type="date" optional="true" layout="left" innerlayout="left"/>',
+        'Ansteckende Infektionen', NULL, '15', '99', '0', '12');
+--
+-- Alte "INFECT1" anpassen
+SET @now = now();
+INSERT INTO `opde`.`resinfo` (AnUKennung, AbUKennung, BWKennung, BWINFTYP, Von, Bis, Bemerkung, Properties, HTML)
+  SELECT
+    AnUKennung,
+    AbUKennung,
+    BWKennung,
+    "INFECT2",
+    @now,
+    '9999-12-31 23:59:59',
+    CONCAT(Bemerkung, "\n","Automatisch erstellt während des Software-Updates auf 1.14.3. Original BWINFOID: ",BWINFOID),
+    Properties,
+    HTML
+  FROM resinfo
+  WHERE BWINFTYP = "INFECT1" AND Bis = "9999-12-31 23:59:59";
+UPDATE `opde`.`resinfo`
+SET AbUKennung = AnUKennung, Bis = DATE_ADD(@now, INTERVAL -1 SECOND)
+WHERE BWINFTYP = "INFECT1" AND Bis = "9999-12-31 23:59:59";
