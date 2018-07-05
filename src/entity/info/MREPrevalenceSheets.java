@@ -38,7 +38,7 @@ public class MREPrevalenceSheets implements HasLogger {
     public static final int ROW_SHEET0_FIRST_LINE_FOR_HEADER = 0; // Deckblatt
 
     public static final int ROW_SHEET1_TITLE = 2; // Prävalenzdaten
-    public static final int ROW_SHEET2_TITLE = 1; // Antibiotika
+    //    public static final int ROW_SHEET2_TITLE = 1; // Antibiotika
     public static final int COL_SHEET2_TITLE = 0;
 //    private static final int SHEET1_START_OF_LIST = ROW_SHEET1_TITLE + 1;
 
@@ -60,9 +60,7 @@ public class MREPrevalenceSheets implements HasLogger {
 
     // Spalten-Nummern für das Sheet1
     public static final int FLOOR_INDEX = 0;
-    //    public static final int ROOM_NO = 0;
     public static final int RESIDENT_NAME_OR_RESID = 1; // resident name or just the id (when anonymous is selected)
-
     public static final int RUNNING_NO = 2; // running number
     public static final int PRESENT_DAY_BEFORE = 3; // resinfotype "ABWE1", TYPE_ABSENCE, presence with a interval overlapping the PIT of the day in question
     public static final int YEAR_OF_BIRTH = 4; // resident "dob"
@@ -92,57 +90,44 @@ public class MREPrevalenceSheets implements HasLogger {
     public static final int VRE = 28; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
     public static final int _3MRGN = 29; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
     public static final int _4MRGN = 30; // resinfotype "INFECT1", ResInfoTypeTools.TYPE_INFECTION, mrsa=true
-//    public static final int BEDS_IN_USE = 29; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
-//    public static final int BEDS_TOTAL = 30; // active prescription with assigned commontag of type  == TYPE_SYS_ANTIBIOTICS = 14. Create subsheet out of attached resinfo "ANTIBIO1".
+
+
+    // Spalten-Nummern für das Sheet2
+    public static final int SHEET2_RUNNING_NO = 0;
+    public static final int SHEET2_MED = 1;
+    public static final int SHEET2_STRENGTH = 2;
+    public static final int SHEET2_DOSE = 3;
+    public static final int SHEET2_APPLICATION_LOCAL = 4;
+    public static final int SHEET2_APPLICATION_SYSTEM = 5;
+    public static final int SHEET2_TREATMENT_PROPHYLACTIC = 6;
+    public static final int SHEET2_TREATMENT_THERAPEUTIC = 7;
+    public static final int SHEET2_BECAUSE_OF_URINAL = 8;
+    public static final int SHEET2_BECAUSE_OF_RESP = 9;
+    public static final int SHEET2_BECAUSE_OF_DIGESTIVE = 10;
+    public static final int SHEET2_BECAUSE_OF_EYES = 11;
+    public static final int SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH = 12;
+    public static final int SHEET2_BECAUSE_OF_SYSTEMIC = 13;
+    public static final int SHEET2_BECAUSE_OF_FEVER = 14;
+    public static final int SHEET2_BECAUSE_OF_OTHER = 15;
+    public static final int SHEET2_STARTED_HOME = 16;
+    public static final int SHEET2_STARTED_HOSPITAL = 17;
+    public static final int SHEET2_STARTED_ELSEWHERE = 18;
+    public static final int SHEET2_BY_GP = 19;
+    public static final int SHEET2_BY_SPECIALIST = 20;
+    public static final int SHEET2_BY_EMERGENCY = 21;
+    public static final int SHEET2_ADDTIONAL_URINETEST = 22;
+    public static final int SHEET2_ADDTIONAL_MICROBIOLOGY = 23;
+    public static final int SHEET2_ADDTIONAL_ISOLATED = 24;
+    public static final int SHEET2_ADDTIONAL_RESISTANT = 25;
+
 
     // https://github.com/tloehr/Offene-Pflege.de/issues/96
-
-
     public static final int SHEET0_START_OF_LIST = ROW_SHEET0_FIRST_LINE_FOR_HEADER + 13;
 
-    public static final int MAXCOL_SHEET0 = 2; //https://github.com/tloehr/Offene-Pflege.de/issues/71
-    public static final int MAXCOL_SHEET1 = 31; //https://github.com/tloehr/Offene-Pflege.de/issues/71
-//    public static final int SHEET1_START_OF_LIST = ROW_SHEET1_TITLE + 4;
-
-
-    public static final int SHEET2_RUNNING_NO = ROW_SHEET2_TITLE + 3;
-    public static final int SHEET2_MED = ROW_SHEET2_TITLE + 4;
-    public static final int SHEET2_STRENGTH = ROW_SHEET2_TITLE + 5;
-    public static final int SHEET2_DOSE = ROW_SHEET2_TITLE + 6;
-
-    public static final int SHEET2_APPLICATION_LOCAL = ROW_SHEET2_TITLE + 8;
-    public static final int SHEET2_APPLICATION_SYSTEM = ROW_SHEET2_TITLE + 9;
-
-    public static final int SHEET2_TREATMENT_PROPHYLACTIC = ROW_SHEET2_TITLE + 11;
-    public static final int SHEET2_TREATMENT_THERAPEUTIC = ROW_SHEET2_TITLE + 12;
-
-    public static final int SHEET2_BECAUSE_OF_URINAL = ROW_SHEET2_TITLE + 14;
-    public static final int SHEET2_BECAUSE_OF_WOUND = ROW_SHEET2_TITLE + 15;
-    public static final int SHEET2_BECAUSE_OF_RESP = ROW_SHEET2_TITLE + 16;
-    public static final int SHEET2_BECAUSE_OF_DIGESTIVE = ROW_SHEET2_TITLE + 17;
-    public static final int SHEET2_BECAUSE_OF_EYES = ROW_SHEET2_TITLE + 18;
-    public static final int SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH = ROW_SHEET2_TITLE + 19;
-    public static final int SHEET2_BECAUSE_OF_SYSTEMIC = ROW_SHEET2_TITLE + 20;
-    public static final int SHEET2_BECAUSE_OF_FEVER = ROW_SHEET2_TITLE + 21;
-    public static final int SHEET2_BECAUSE_OF_OTHER = ROW_SHEET2_TITLE + 22;
-
-    public static final int SHEET2_STARTED_HOME = ROW_SHEET2_TITLE + 24;
-    public static final int SHEET2_STARTED_HOSPITAL = ROW_SHEET2_TITLE + 25;
-    public static final int SHEET2_STARTED_ELSEWHERE = ROW_SHEET2_TITLE + 26;
-
-    public static final int SHEET2_BY_GP = ROW_SHEET2_TITLE + 28;
-    public static final int SHEET2_BY_SPECIALIST = ROW_SHEET2_TITLE + 29;
-    public static final int SHEET2_BY_EMERGENCY = ROW_SHEET2_TITLE + 30;
-
-    public static final int SHEET2_ADDTIONAL_URINETEST = ROW_SHEET2_TITLE + 32;
-    public static final int SHEET2_ADDTIONAL_MICROBIOLOGY = ROW_SHEET2_TITLE + 33;
-    public static final int SHEET2_ADDTIONAL_ISOLATED = ROW_SHEET2_TITLE + 34;
-    public static final int SHEET2_ADDTIONAL_RESISTANT = ROW_SHEET2_TITLE + 35;
-
-    public static final int[] SHEET2_INDEX = new int[]{SHEET2_RUNNING_NO, SHEET2_MED, SHEET2_STRENGTH, SHEET2_DOSE, SHEET2_APPLICATION_LOCAL, SHEET2_APPLICATION_SYSTEM, SHEET2_TREATMENT_PROPHYLACTIC,
-            SHEET2_TREATMENT_THERAPEUTIC, SHEET2_BECAUSE_OF_URINAL, SHEET2_BECAUSE_OF_WOUND, SHEET2_BECAUSE_OF_RESP, SHEET2_BECAUSE_OF_DIGESTIVE,
-            SHEET2_BECAUSE_OF_EYES, SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH, SHEET2_BECAUSE_OF_SYSTEMIC, SHEET2_BECAUSE_OF_OTHER, SHEET2_STARTED_HOME, SHEET2_STARTED_HOSPITAL, SHEET2_STARTED_ELSEWHERE,
-            SHEET2_BY_GP, SHEET2_BY_SPECIALIST, SHEET2_BY_EMERGENCY, SHEET2_ADDTIONAL_URINETEST, SHEET2_ADDTIONAL_MICROBIOLOGY, SHEET2_ADDTIONAL_ISOLATED, SHEET2_ADDTIONAL_RESISTANT};
+    //https://github.com/tloehr/Offene-Pflege.de/issues/71
+    public static final int MAXCOL_SHEET0 = 2;
+    public static final int MAXCOL_SHEET1 = 31;
+    public static final int MAXCOL_SHEET2 = 26;
 
     private final int[] NEEDED_TYPES = new int[]{ResInfoTypeTools.TYPE_INCOAID, ResInfoTypeTools.TYPE_INCO_FAECAL, ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT,
             ResInfoTypeTools.TYPE_WOUND1, ResInfoTypeTools.TYPE_WOUND2, ResInfoTypeTools.TYPE_WOUND3, ResInfoTypeTools.TYPE_WOUND4, ResInfoTypeTools.TYPE_WOUND5, ResInfoTypeTools.TYPE_RESPIRATION,
@@ -155,7 +140,7 @@ public class MREPrevalenceSheets implements HasLogger {
     private final boolean anonymous;
     private final Closure progressClosure;
     private final HashMap<Resident, Rooms> mapRooms;
-    private int progress, max, runningNumber, sheet2_col_index;
+    private int progress, max, runningNumber;
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private final HashMap<Integer, ResInfoType> mapResInfoType;
@@ -224,7 +209,6 @@ public class MREPrevalenceSheets implements HasLogger {
 
     public File createSheet() throws Exception {
         progress = 1;
-        sheet2_col_index = COL_SHEET2_TITLE + 2;
 
 
         // this sorts the resident list according to their assigned rooms. if not possible according to their assigned stations.
@@ -281,9 +265,10 @@ public class MREPrevalenceSheets implements HasLogger {
                     prepareSheet2();
                 }
 
+                int sheet2_runningRow = 1;
                 for (Prescription prescription : listAntibiotics) {
-                    fillColSheet2(prescription);
-                    sheet2_col_index++;
+                    fillALineInSheet2(prescription, sheet2_runningRow);
+                    sheet2_runningRow++;
                 }
             }
 
@@ -301,8 +286,8 @@ public class MREPrevalenceSheets implements HasLogger {
         }
 
         if (sheet2 != null) {
-            for (int i = 0; i < COL_SHEET2_TITLE + runningNumber; i++) {
-                sheet2.autoSizeColumn(i);
+            for (int col = 0; col < MAXCOL_SHEET2; col++) {
+                sheet2.autoSizeColumn(col);
             }
         }
 
@@ -367,7 +352,7 @@ public class MREPrevalenceSheets implements HasLogger {
         return properties.containsKey(key) && properties.getProperty(key).equalsIgnoreCase(value) ? "1" : "0";
     }
 
-    private void fillColSheet2(Prescription prescription) {
+    private void fillALineInSheet2(Prescription prescription, int runningRow) {
         ResInfo resInfo = ResInfoTools.getAnnotation4Prescription(prescription, antibiotics);
         Properties properties = resInfo != null ? SYSTools.load(resInfo.getProperties()) : new Properties();
 
@@ -385,14 +370,14 @@ public class MREPrevalenceSheets implements HasLogger {
         content[SHEET2_TREATMENT_THERAPEUTIC] = getCellContent(properties, "treatment", "therapeutic");
 
         content[SHEET2_BECAUSE_OF_URINAL] = getCellContent(properties, "inf.urethra", "true");
-        content[SHEET2_BECAUSE_OF_WOUND] = getCellContent(properties, "inf.skin.wound", "true");
+//        content[SHEET2_BECAUSE_OF_WOUND] = getCellContent(properties, "inf.skin.wound", "true");
         content[SHEET2_BECAUSE_OF_RESP] = getCellContent(properties, "inf.respiratoric", "true");
         content[SHEET2_BECAUSE_OF_DIGESTIVE] = getCellContent(properties, "inf.digestive", "true");
         content[SHEET2_BECAUSE_OF_EYES] = getCellContent(properties, "inf.eyes", "true");
         content[SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH] = getCellContent(properties, "inf.ear.nose.mouth", "true");
         content[SHEET2_BECAUSE_OF_SYSTEMIC] = getCellContent(properties, "inf.systemic", "true");
         content[SHEET2_BECAUSE_OF_FEVER] = getCellContent(properties, "inf.fever", "true");
-        content[SHEET2_BECAUSE_OF_OTHER] = SYSTools.catchNull(properties.getProperty("inf.other"), "--");
+        content[SHEET2_BECAUSE_OF_OTHER] = SYSTools.catchNull(properties.getProperty("inf.other"), "0");
 
         content[SHEET2_STARTED_HOME] = getCellContent(properties, "therapy.start", "here");
         content[SHEET2_STARTED_HOSPITAL] = getCellContent(properties, "therapy.start", "hospital");
@@ -404,11 +389,23 @@ public class MREPrevalenceSheets implements HasLogger {
 
         content[SHEET2_ADDTIONAL_URINETEST] = getCellContent(properties, "diag.urinetest", "true");
         content[SHEET2_ADDTIONAL_MICROBIOLOGY] = getCellContent(properties, "diag.microbiology", "true");
-        content[SHEET2_ADDTIONAL_ISOLATED] = SYSTools.catchNull(properties.getProperty("diag.result"), "--");
-        content[SHEET2_ADDTIONAL_RESISTANT] = SYSTools.catchNull(properties.getProperty("diag.resistent"), "--");
+        content[SHEET2_ADDTIONAL_ISOLATED] = SYSTools.catchNull(properties.getProperty("diag.result"), "0");
+        content[SHEET2_ADDTIONAL_RESISTANT] = SYSTools.catchNull(properties.getProperty("diag.resistent"), "0");
 
-        for (int row : SHEET2_INDEX) {
-            sheet2.getRow(row).createCell(sheet2_col_index).setCellValue(SYSTools.catchNull(content[row]));
+        createRows(sheet2, 1);
+        for (int col = 0; col < MAXCOL_SHEET2; col++) {
+            // damit Zahlen auch als Zahlen in den Zellen erscheinen und nicht als Zahlen mit Anführungszeichen
+            Object d = parseCellContent(SYSTools.catchNull(content[col]));
+
+            if (d instanceof Double) {
+                sheet2.getRow(runningRow).createCell(col).setCellValue((Double) d);
+            } else {
+                sheet2.getRow(runningRow).createCell(col).setCellValue((String) d);
+            }
+
+            // alle lieben Zebras
+            if (runningRow % 2 == 1)
+                sheet2.getRow(runningRow).getCell(col).setCellStyle(blue2Style);
         }
     }
 
@@ -537,18 +534,6 @@ public class MREPrevalenceSheets implements HasLogger {
                 sheet1.getRow(ROW_SHEET1_TITLE + runningNumber).getCell(col).setCellStyle(blue2Style);
         }
 
-//        progress += 2; // for the additional 2 columns;
-
-//        if (lastForThisLevel && mapRooms.containsKey(resident)) {
-//            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 2).setCellValue(bedsInUserPerLevel[mapRooms.get(resident).getFloor().getLevel()]);
-//            sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).createCell(MAXCOL_SHEET1 - 1).setCellValue(bedsTotalPerLevel[mapRooms.get(resident).getFloor().getLevel()]);
-//
-//            for (int col = 0; col < MAXCOL_SHEET1; col++) {
-//                sheet1.getRow(SHEET1_START_OF_LIST + runningNumber).getCell(col).setCellStyle(blueGrayStyle);
-//            }
-//
-//        }
-
         return listAntibiotics;
     }
 
@@ -568,109 +553,12 @@ public class MREPrevalenceSheets implements HasLogger {
         sheet2.getPrintSetup().setLandscape(true);
         sheet2.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
 
-        createRows(sheet2, ROW_SHEET2_TITLE + 35);
+        createRows(sheet2, 1);
+        for (int i = 0; i < MAXCOL_SHEET2; i++) {
+            sheet2.getRow(0).createCell(i).setCellValue(SYSTools.xx("prevalence.sheet2.col" + String.format("%02d", i + 1) + ".title"));
+            sheet2.getRow(0).getCell(i).setCellStyle(rotatedStyle);
+        }
 
-        sheet2.getRow(ROW_SHEET2_TITLE).createCell(COL_SHEET2_TITLE).setCellValue(SYSTools.xx("prevalence.sheet2.title"));
-        sheet2.getRow(ROW_SHEET2_TITLE).getCell(COL_SHEET2_TITLE).setCellStyle(titleStyle);
-
-        sheet2.getRow(ROW_SHEET2_TITLE + 1).createCell(COL_SHEET2_TITLE).setCellValue(SYSTools.xx("day.of.elicitation"));
-        sheet2.getRow(ROW_SHEET2_TITLE + 1).createCell(COL_SHEET2_TITLE + 1).setCellValue(targetDate.toDate());
-        sheet2.getRow(ROW_SHEET2_TITLE + 1).getCell(COL_SHEET2_TITLE + 1).setCellStyle(dateStyle);
-
-        sheet2.getRow(SHEET2_RUNNING_NO).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block1"));
-        sheet2.getRow(SHEET2_RUNNING_NO).getCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_RUNNING_NO).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block1.row1") + " " + SYSTools.xx("prevalence.sheet1.title"));
-        sheet2.getRow(SHEET2_RUNNING_NO).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_MED).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block1.row2"));
-        sheet2.getRow(SHEET2_MED).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_MED).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_STRENGTH).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block1.row3"));
-        sheet2.getRow(SHEET2_STRENGTH).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_STRENGTH).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_DOSE).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block1.row4"));
-        sheet2.getRow(SHEET2_DOSE).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_DOSE).getCell(1).setCellStyle(gray1Style);
-
-        sheet2.getRow(SHEET2_APPLICATION_LOCAL).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block2"));
-        sheet2.getRow(SHEET2_APPLICATION_LOCAL).getCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_APPLICATION_LOCAL).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block2.row1"));
-        sheet2.getRow(SHEET2_APPLICATION_LOCAL).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_APPLICATION_SYSTEM).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_APPLICATION_SYSTEM).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block2.row2"));
-        sheet2.getRow(SHEET2_APPLICATION_SYSTEM).getCell(1).setCellStyle(gray1Style);
-
-        sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block3"));
-        sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).getCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block3.row1"));
-        sheet2.getRow(SHEET2_TREATMENT_PROPHYLACTIC).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_TREATMENT_THERAPEUTIC).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_TREATMENT_THERAPEUTIC).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block3.row2"));
-        sheet2.getRow(SHEET2_TREATMENT_THERAPEUTIC).getCell(1).setCellStyle(gray1Style);
-
-        sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block4"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).getCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row1"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_URINAL).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_WOUND).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_WOUND).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row2"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_WOUND).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_RESP).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_RESP).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row3"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_RESP).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_DIGESTIVE).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_DIGESTIVE).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row4"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_DIGESTIVE).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_EYES).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_EYES).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row5"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_EYES).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row6"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_SYSTEMIC).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_SYSTEMIC).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row7"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_SYSTEMIC).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_FEVER).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_FEVER).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row8"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_FEVER).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block4.row9"));
-        sheet2.getRow(SHEET2_BECAUSE_OF_OTHER).getCell(1).setCellStyle(gray1Style);
-
-        sheet2.getRow(SHEET2_STARTED_HOME).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block5"));
-        sheet2.getRow(SHEET2_STARTED_HOME).getCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_STARTED_HOME).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block5.row1"));
-        sheet2.getRow(SHEET2_STARTED_HOME).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_STARTED_HOSPITAL).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_STARTED_HOSPITAL).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block5.row2"));
-        sheet2.getRow(SHEET2_STARTED_HOSPITAL).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_STARTED_ELSEWHERE).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_STARTED_ELSEWHERE).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block5.row3"));
-        sheet2.getRow(SHEET2_STARTED_ELSEWHERE).getCell(1).setCellStyle(gray1Style);
-
-        sheet2.getRow(SHEET2_BY_GP).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block6"));
-        sheet2.getRow(SHEET2_BY_GP).getCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BY_GP).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block6.row1"));
-        sheet2.getRow(SHEET2_BY_GP).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BY_SPECIALIST).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BY_SPECIALIST).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block6.row2"));
-        sheet2.getRow(SHEET2_BY_SPECIALIST).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BY_EMERGENCY).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_BY_EMERGENCY).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block6.row3"));
-        sheet2.getRow(SHEET2_BY_EMERGENCY).getCell(1).setCellStyle(gray1Style);
-
-        sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).createCell(0).setCellValue(SYSTools.xx("prevalence.sheet2.block7"));
-        sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).getCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row1"));
-        sheet2.getRow(SHEET2_ADDTIONAL_URINETEST).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_ADDTIONAL_MICROBIOLOGY).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_ADDTIONAL_MICROBIOLOGY).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row2"));
-        sheet2.getRow(SHEET2_ADDTIONAL_MICROBIOLOGY).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_ADDTIONAL_ISOLATED).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_ADDTIONAL_ISOLATED).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row3"));
-        sheet2.getRow(SHEET2_ADDTIONAL_ISOLATED).getCell(1).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).createCell(0).setCellStyle(gray1Style);
-        sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).createCell(1).setCellValue(SYSTools.xx("prevalence.sheet2.block7.row4"));
-        sheet2.getRow(SHEET2_ADDTIONAL_RESISTANT).getCell(1).setCellStyle(gray1Style);
     }
 
 
