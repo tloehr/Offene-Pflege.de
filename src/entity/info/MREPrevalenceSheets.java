@@ -17,12 +17,11 @@ import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
@@ -102,32 +101,33 @@ public class MREPrevalenceSheets implements HasLogger {
     public static final int SHEET2_TREATMENT_PROPHYLACTIC = 6;
     public static final int SHEET2_TREATMENT_THERAPEUTIC = 7;
     public static final int SHEET2_BECAUSE_OF_URINAL = 8;
-    public static final int SHEET2_BECAUSE_OF_RESP = 9;
-    public static final int SHEET2_BECAUSE_OF_DIGESTIVE = 10;
-    public static final int SHEET2_BECAUSE_OF_EYES = 11;
-    public static final int SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH = 12;
-    public static final int SHEET2_BECAUSE_OF_SYSTEMIC = 13;
-    public static final int SHEET2_BECAUSE_OF_FEVER = 14;
-    public static final int SHEET2_BECAUSE_OF_OTHER = 15;
-    public static final int SHEET2_STARTED_HOME = 16;
-    public static final int SHEET2_STARTED_HOSPITAL = 17;
-    public static final int SHEET2_STARTED_ELSEWHERE = 18;
-    public static final int SHEET2_BY_GP = 19;
-    public static final int SHEET2_BY_SPECIALIST = 20;
-    public static final int SHEET2_BY_EMERGENCY = 21;
-    public static final int SHEET2_ADDTIONAL_URINETEST = 22;
-    public static final int SHEET2_ADDTIONAL_MICROBIOLOGY = 23;
-    public static final int SHEET2_ADDTIONAL_ISOLATED = 24;
-    public static final int SHEET2_ADDTIONAL_RESISTANT = 25;
+    public static final int SHEET2_BECAUSE_OF_WOUND = 9;
+    public static final int SHEET2_BECAUSE_OF_RESP = 10;
+    public static final int SHEET2_BECAUSE_OF_DIGESTIVE = 11;
+    public static final int SHEET2_BECAUSE_OF_EYES = 12;
+    public static final int SHEET2_BECAUSE_OF_EARS_NOSE_MOUTH = 13;
+    public static final int SHEET2_BECAUSE_OF_SYSTEMIC = 14;
+    public static final int SHEET2_BECAUSE_OF_FEVER = 15;
+    public static final int SHEET2_BECAUSE_OF_OTHER = 16;
+    public static final int SHEET2_STARTED_HOME = 17;
+    public static final int SHEET2_STARTED_HOSPITAL = 18;
+    public static final int SHEET2_STARTED_ELSEWHERE = 19;
+    public static final int SHEET2_BY_GP = 20;
+    public static final int SHEET2_BY_SPECIALIST = 21;
+    public static final int SHEET2_BY_EMERGENCY = 22;
+    public static final int SHEET2_ADDTIONAL_URINETEST = 23;
+    public static final int SHEET2_ADDTIONAL_MICROBIOLOGY = 24;
+    public static final int SHEET2_ADDTIONAL_ISOLATED = 25;
+    public static final int SHEET2_ADDTIONAL_RESISTANT = 26;
 
 
     // https://github.com/tloehr/Offene-Pflege.de/issues/96
     public static final int SHEET0_START_OF_LIST = ROW_SHEET0_FIRST_LINE_FOR_HEADER + 13;
 
     //https://github.com/tloehr/Offene-Pflege.de/issues/71
-    public static final int MAXCOL_SHEET0 = 2;
+    public static final int MAXCOL_SHEET0 = 5;
     public static final int MAXCOL_SHEET1 = 31;
-    public static final int MAXCOL_SHEET2 = 26;
+    public static final int MAXCOL_SHEET2 = 27;
 
     private final int[] NEEDED_TYPES = new int[]{ResInfoTypeTools.TYPE_INCOAID, ResInfoTypeTools.TYPE_INCO_FAECAL, ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT,
             ResInfoTypeTools.TYPE_WOUND1, ResInfoTypeTools.TYPE_WOUND2, ResInfoTypeTools.TYPE_WOUND3, ResInfoTypeTools.TYPE_WOUND4, ResInfoTypeTools.TYPE_WOUND5, ResInfoTypeTools.TYPE_RESPIRATION,
@@ -148,8 +148,8 @@ public class MREPrevalenceSheets implements HasLogger {
     private final int[] bedsTotalPerLevel, bedsInUserPerLevel;
     private int roomsTotal, singleRooms, minDOB = 5000, maxDOB = 0;
     private final Commontags antibiotics;
-    private Font titleFont, boldFont;
-    private XSSFCellStyle titleStyle, dateStyle, gray1Style, blue2Style, blue1Style, orange1Style, rotatedStyle;
+
+    private XSSFCellStyle titleStyle, dateStyle, gray1Style, blue2Style, blue1Style, orange1Style, rotatedStyle, strikeStyle, blue2StyleStrike;
     private Sheet sheet0, sheet1, sheet2;
     private XSSFWorkbook wb;
 
@@ -183,7 +183,9 @@ public class MREPrevalenceSheets implements HasLogger {
             if (room.getSingle()) singleRooms++;
         }
 
-        listResidents = ResidentTools.getAllActive(targetDate.toDateTime(morning8), SYSCalendar.eod(targetDate));
+        // Gemäß der Definition aus den Erläuterungen des MRE-Netzwerkes
+
+        listResidents = ResidentTools.getAllActive(targetDate.toDateTimeAtStartOfDay(), SYSCalendar.eod(targetDate));
         ArrayList<Resident> removeResidents = new ArrayList<>();
         for (Resident resident : listResidents) {
             for (ResInfo resInfo : ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay(targetDate), SYSCalendar.midOfDay(targetDate))) {
@@ -370,7 +372,7 @@ public class MREPrevalenceSheets implements HasLogger {
         content[SHEET2_TREATMENT_THERAPEUTIC] = getCellContent(properties, "treatment", "therapeutic");
 
         content[SHEET2_BECAUSE_OF_URINAL] = getCellContent(properties, "inf.urethra", "true");
-//        content[SHEET2_BECAUSE_OF_WOUND] = getCellContent(properties, "inf.skin.wound", "true");
+        content[SHEET2_BECAUSE_OF_WOUND] = getCellContent(properties, "inf.skin.wound", "true");
         content[SHEET2_BECAUSE_OF_RESP] = getCellContent(properties, "inf.respiratoric", "true");
         content[SHEET2_BECAUSE_OF_DIGESTIVE] = getCellContent(properties, "inf.digestive", "true");
         content[SHEET2_BECAUSE_OF_EYES] = getCellContent(properties, "inf.eyes", "true");
@@ -419,13 +421,14 @@ public class MREPrevalenceSheets implements HasLogger {
         String[] content = new String[MAXCOL_SHEET1];
 
         content[FLOOR_INDEX] = stationIndex.get(mapRooms.get(resident).getFloor()).toString();
-        content[RESIDENT_NAME_OR_RESID] = anonymous ? resident.getRID() : ResidentTools.getLabelText(resident);
+        content[RESIDENT_NAME_OR_RESID] = anonymous ? resident.getRIDAnonymous() : ResidentTools.getLabelText(resident);
         content[RUNNING_NO] = Integer.toString(runningNumber);
 
-        // absent yesterday ?
+        // War er gestern abwesend ?
         ArrayList<ResInfo> listAbsence = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ABSENCE), targetDate.minusDays(1), targetDate.minusDays(1));
         ArrayList<ResInfo> listStay = ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_STAY), targetDate.minusDays(1), targetDate.minusDays(1));
-        content[PRESENT_DAY_BEFORE] = listAbsence.isEmpty() && !listStay.isEmpty() ? "1" : "0";
+        boolean presentOnDayBefore = listAbsence.isEmpty() && !listStay.isEmpty();
+        content[PRESENT_DAY_BEFORE] = presentOnDayBefore ? "1" : "0";
         listAbsence.clear();
 
         int dob = new LocalDate(resident.getDOB()).getYear();
@@ -501,13 +504,12 @@ public class MREPrevalenceSheets implements HasLogger {
         content[CARELEVEL4] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg4");
         content[CARELEVEL5] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg5");
 
-
-//        content[PNEUMOCOCCAL_VACCINE] = getCellContent(ResInfoTypeTools.TYPE_VACCINE, "vaccinetype", "9");
-
         ArrayList<Prescription> listPrescripitons = PrescriptionTools.getPrescriptions4Tags(resident, antibiotics);
+        // Gemäß Definition vom MRE Netzwerk
+        // "Für die Erhebung der Antibiotika muss der Bewohner an dem Tag und am Vortag anwesend sein und ein Antibiotikum an dem Tag erhalten haben."
         ArrayList<Prescription> listAntibiotics = new ArrayList<>();
         for (Prescription prescription : listPrescripitons) {
-            if (prescription.isActiveOn(targetDate) && prescription.hasMed()) {
+            if (prescription.isActiveOn(targetDate) && presentOnDayBefore && prescription.hasMed()) {
                 listAntibiotics.add(prescription);
             }
         }
@@ -521,17 +523,25 @@ public class MREPrevalenceSheets implements HasLogger {
             // damit Zahlen auch als Zahlen in den Zellen erscheinen und nicht als Zahlen mit Anführungszeichen
             Object d = parseCellContent(SYSTools.catchNull(content[col]));
 
-//            getLogger().debug("col:" + col + " value" + d);
-
             if (d instanceof Double) {
                 sheet1.getRow(ROW_SHEET1_TITLE + runningNumber).createCell(col).setCellValue((Double) d);
             } else {
                 sheet1.getRow(ROW_SHEET1_TITLE + runningNumber).createCell(col).setCellValue((String) d);
             }
 
-            // alle lieben Zebras
-            if (runningNumber % 2 == 1)
-                sheet1.getRow(ROW_SHEET1_TITLE + runningNumber).getCell(col).setCellStyle(blue2Style);
+
+            if (presentOnDayBefore) {
+                // alle lieben Zebras
+                if (runningNumber % 2 == 1)
+                    sheet1.getRow(ROW_SHEET1_TITLE + runningNumber).getCell(col).setCellStyle(blue2Style);
+            } else {
+                // alle lieben Zebras
+                if (runningNumber % 2 == 1)
+                    sheet1.getRow(ROW_SHEET1_TITLE + runningNumber).getCell(col).setCellStyle(blue2StyleStrike);
+                else
+                    sheet1.getRow(ROW_SHEET1_TITLE + runningNumber).getCell(col).setCellStyle(strikeStyle);
+            }
+
         }
 
         return listAntibiotics;
@@ -571,16 +581,22 @@ public class MREPrevalenceSheets implements HasLogger {
         XSSFColor orange1 = new XSSFColor(GUITools.getColor("FFD3B7"));
         XSSFColor gray1 = new XSSFColor(GUITools.getColor("F2F2F2"));
 
-        titleFont = wb.createFont();
+        Font titleFont = wb.createFont();
         titleFont.setFontHeightInPoints((short) 18);
         titleStyle = wb.createCellStyle();
         titleStyle.setFont(titleFont);
 
-        boldFont = wb.createFont();
+        Font boldFont = wb.createFont();
         boldFont.setFontHeightInPoints((short) 12);
         boldFont.setBold(true);
         CellStyle boldStyle = wb.createCellStyle();
         boldStyle.setFont(boldFont);
+
+        strikeStyle = wb.createCellStyle();
+        Font strikeThroughFont = wb.createFont();
+        strikeThroughFont.setStrikeout(true);
+        strikeStyle.setFont(strikeThroughFont);
+
 
         short df = wb.createDataFormat().getFormat("dd.MM.yyyy");
         dateStyle = wb.createCellStyle();
@@ -599,7 +615,6 @@ public class MREPrevalenceSheets implements HasLogger {
         gray1Style.setFillForegroundColor(gray1);
         gray1Style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-
         blue1Style = wb.createCellStyle();
         blue1Style.setFillForegroundColor(blue1);
         blue1Style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -607,6 +622,16 @@ public class MREPrevalenceSheets implements HasLogger {
         blue2Style = wb.createCellStyle();
         blue2Style.setFillForegroundColor(blue2);
         blue2Style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        blue2Style = wb.createCellStyle();
+        blue2Style.setFillForegroundColor(blue2);
+        blue2Style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+
+        blue2StyleStrike = wb.createCellStyle();
+        blue2StyleStrike.setFillForegroundColor(blue2);
+        blue2StyleStrike.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        blue2StyleStrike.setFont(strikeThroughFont);
 
         orange1Style = wb.createCellStyle();
         orange1Style.setFillForegroundColor(orange1);
@@ -687,6 +712,19 @@ public class MREPrevalenceSheets implements HasLogger {
 
         sheet0.getRow(SHEET0_ROW_NUM_ROOMS).createCell(COL_SHEET0_TITLES + 1).setCellValue(roomsTotal);
         sheet0.getRow(SHEET0_ROW_NUM_SINGLE_ROOMS).createCell(COL_SHEET0_TITLES + 1).setCellValue(singleRooms);
+
+
+        sheet0.getRow(SHEET0_ROW_TARGETDATE).createCell(COL_SHEET0_TITLES + 4).setCellValue(SYSTools.xx("prevalence.sheet0.opderef.line1"));
+        sheet0.getRow(SHEET0_ROW_TARGETDATE + 1).createCell(COL_SHEET0_TITLES + 4).setCellValue(SYSTools.xx("prevalence.sheet0.opderef.line2"));
+        sheet0.getRow(SHEET0_ROW_TARGETDATE + 2).createCell(COL_SHEET0_TITLES + 4).setCellValue(SYSTools.xx("prevalence.sheet0.opderef.line3"));
+        sheet0.getRow(SHEET0_ROW_TARGETDATE + 3).createCell(COL_SHEET0_TITLES + 4).setCellValue(SYSTools.xx("prevalence.sheet0.opderef.line4"));
+
+        XSSFCell linkcell = (XSSFCell) sheet0.getRow(SHEET0_ROW_TARGETDATE + 3).getCell(COL_SHEET0_TITLES + 4);
+        CreationHelper createHelper = wb.getCreationHelper();
+
+        XSSFHyperlink link = (XSSFHyperlink) createHelper.createHyperlink(HyperlinkType.URL);
+        link.setAddress(SYSTools.xx("prevalence.sheet0.opderef.line4"));
+        linkcell.setHyperlink(link);
 
         List<Floors> floors = home.getFloors();
         Collections.sort(floors);

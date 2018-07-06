@@ -1,26 +1,26 @@
 /*
  * OffenePflege
  * Copyright (C) 2006-2017 Torsten Löhr
- * This program is free software; you can redistribute it and/or modify it under the terms of the 
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program; if not, write to 
+ *
+ * You should have received a copy of the GNU General Public License along with this program; if not, write to
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
- * ------------------------ 
+ * ------------------------
  * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
+ * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
  * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
- * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
+ * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
 package op;
@@ -107,6 +107,7 @@ public class OPDE {
     protected static final String sep = System.getProperty("file.separator");
     private static boolean customJDBCUrl;
     private static boolean runningInstanceDetected;
+    private static boolean anonym;
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -147,16 +148,18 @@ public class OPDE {
     }
 
     public static boolean isAnonym() {
-        return SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_RESIDENTS_ANONYMIZED)).equalsIgnoreCase("true");
+        //return SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_RESIDENTS_ANONYMIZED)).equalsIgnoreCase("true");
+        return anonym;
     }
 
     /**
      * Sollen die Namen der Benutzer durch die Chiffre ersetzt werden ?
+     *
      * @return
      */
     public static boolean isUserCipher() {
         return SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_USERS_CIPHERED)).equalsIgnoreCase("true");
-        }
+    }
 
     public static void setProp(String key, String value) {
         props.put(key, value);
@@ -426,6 +429,7 @@ public class OPDE {
         opts.addOption("v", "version", false, SYSTools.xx("cmdline.version.description"));
         opts.addOption("x", "experimental", false, SYSTools.xx("cmdline.experimental.description"));
         opts.addOption("l", "debug", false, SYSTools.xx("cmdline.debug.description"));
+        opts.addOption("a", "anonymous", false, SYSTools.xx("cmdline.anonymous.description"));
         opts.addOption("t", "setup-database", false, SYSTools.xx("cmdline.setup-database.description"));
         opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
         opts.addOption("p", "keyphrase", true, SYSTools.xx("cmdline.keyphrase.description"));
@@ -483,6 +487,22 @@ public class OPDE {
             System.out.println(footer);
             System.exit(0);
         }
+
+        /***
+         *                                                                ___
+         *       __ _ _ __   ___  _ __  _   _ _ __ ___   ___  _   _ ___  |__ \
+         *      / _` | '_ \ / _ \| '_ \| | | | '_ ` _ \ / _ \| | | / __|   / /
+         *     | (_| | | | | (_) | | | | |_| | | | | | | (_) | |_| \__ \  |_|
+         *      \__,_|_| |_|\___/|_| |_|\__, |_| |_| |_|\___/ \__,_|___/  (_)
+         *                              |___/
+         */
+        if (cl.hasOption("a")) { // anonym Modus
+            anonym = true;
+            anonymize = new HashMap[]{SYSConst.getNachnamenAnonym(), SYSConst.getVornamenFrauAnonym(), SYSConst.getVornamenMannAnonym()};
+        } else {
+            anonym = false;
+        }
+
 
         try {
 
@@ -784,7 +804,7 @@ public class OPDE {
 //        return true;
 //    }
 
-    public static Level getLogLevel(){
+    public static Level getLogLevel() {
         return Logger.getRootLogger().getLevel();
     }
 

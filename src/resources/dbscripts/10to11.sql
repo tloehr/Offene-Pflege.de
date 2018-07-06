@@ -15,7 +15,7 @@ VALUES ('INFECT2', '<imagelabel image="/artwork/48x48/biohazard.png"/>
 <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 10.[br/]Ausserdem führt eine [b]multiresistente Infektion[/b] dazu, dass die Anlage ''MRE'' erstellt und beigefügt wird."/>
 <checkbox label="MRSA" tooltip="Methicillin-resistenter Staphylococcus aureus" name="mrsa"/>
 <checkbox label="VRE" tooltip="Vancomycin-resistente Enterokokken" name="vre" layout="left"/>
-<checkbox label="ESBL" tooltip="Extended Spectrum Beta-Lactamasen" name="esbl" layout="left"/>
+<checkbox label="2-MRGN" tooltip="Multiresistente, gramnegative Bakterien (resistent gegen 2 Antibiotikaklassen)" name="2mrgn" layout="left"/>
 <checkbox label="3-MRGN" tooltip="Multiresistente, gramnegative Bakterien (resistent gegen 3 Antibiotikaklassen)" name="3mrgn" layout="left"/>
 <checkbox label="4-MRGN" tooltip="Multiresistente, gramnegative Bakterien (resistent gegen 4 Antibiotikaklassen)" name="4mrgn" layout="left"/>
 <textfield name="other" label="Andere Infektion" length="40" hfill="false" innerlayout="tab"/>
@@ -72,6 +72,7 @@ VALUES ('INFECT2', '<imagelabel image="/artwork/48x48/biohazard.png"/>
         'Ansteckende Infektionen', NULL, '15', '99', '0', '12');
 --
 -- Alte "INFECT1" anpassen
+-- Achtung, die Infektionen müssen geprüft werden. ESBL taucht im Formular nicht mehr auf. Falls das gesetzt war müssen diese Einträge korrigiert werden.
 SET @now = now();
 INSERT INTO `opde`.`resinfo` (AnUKennung, AbUKennung, BWKennung, BWINFTYP, Von, Bis, Bemerkung, Properties, HTML)
   SELECT
@@ -81,7 +82,7 @@ INSERT INTO `opde`.`resinfo` (AnUKennung, AbUKennung, BWKennung, BWINFTYP, Von, 
     "INFECT2",
     @now,
     '9999-12-31 23:59:59',
-    CONCAT(Bemerkung, "\n","Automatisch erstellt während des Software-Updates auf 1.14.3. Original BWINFOID: ",BWINFOID),
+    CONCAT(Bemerkung, "\n","Automatisch erstellt während des Software-Updates auf 1.14.3. Original BWINFOID: ",BWINFOID,"\n","ESBL taucht im Formular nicht mehr auf. Falls das vorher gesetzt war, müssen diese Einträge korrigiert werden. (2MRGN, 3MRGN, 4MRGN)"),
     Properties,
     HTML
   FROM resinfo
