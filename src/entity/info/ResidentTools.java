@@ -221,8 +221,8 @@ public class ResidentTools {
     }
 
 
-    public static ArrayList<Resident> getAllActive(LocalDate start, LocalDate end) {
-        return getAllActive(start.toDateTimeAtStartOfDay(), SYSCalendar.eod(end));
+    public static ArrayList<Resident> getAll(LocalDate start, LocalDate end) {
+        return getAll(start.toDateTimeAtStartOfDay(), SYSCalendar.eod(end));
     }
 
 
@@ -233,7 +233,7 @@ public class ResidentTools {
      * @param end
      * @return
      */
-    public static ArrayList<Resident> getAllActive(DateTime start, DateTime end) {
+    public static ArrayList<Resident> getAll(DateTime start, DateTime end) {
         ArrayList<Resident> list = null;
         EntityManager em = OPDE.createEM();
         try {
@@ -243,7 +243,6 @@ public class ResidentTools {
                     " JOIN b.resInfoCollection rinfo " +
                     " WHERE rinfo.bwinfotyp.type = :type " +
                     " AND b.adminonly <> 2 " +
-                    " AND b.station IS NOT NULL " +
                     " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
                     " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
                     " (rinfo.from > :from AND rinfo.to < :to)) " +

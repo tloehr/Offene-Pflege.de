@@ -185,10 +185,10 @@ public class MREPrevalenceSheets implements HasLogger {
 
         // Gemäß der Definition aus den Erläuterungen des MRE-Netzwerkes
 
-        listResidents = ResidentTools.getAllActive(targetDate.toDateTimeAtStartOfDay(), SYSCalendar.eod(targetDate));
+        listResidents = ResidentTools.getAll(targetDate.toDateTimeAtStartOfDay(), SYSCalendar.eod(targetDate));
         ArrayList<Resident> removeResidents = new ArrayList<>();
         for (Resident resident : listResidents) {
-            for (ResInfo resInfo : ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay(targetDate), SYSCalendar.midOfDay(targetDate))) {
+            for (ResInfo resInfo : ResInfoTools.getAll(resident, getResInfoTypeByType(ResInfoTypeTools.TYPE_ROOM), targetDate.toDateTimeAtStartOfDay(), SYSCalendar.eod(targetDate))) {
                 Properties p1 = SYSTools.load(resInfo.getProperties());
                 long rid1 = Long.parseLong(SYSTools.catchNull(p1.getProperty("room.id"), "-1"));
                 Rooms room1 = EntityTools.find(Rooms.class, rid1);
@@ -420,6 +420,7 @@ public class MREPrevalenceSheets implements HasLogger {
     private ArrayList<Prescription> fillALineInSheet1(Resident resident) {
         String[] content = new String[MAXCOL_SHEET1];
 
+        getLogger().debug(resident);
         content[FLOOR_INDEX] = stationIndex.get(mapRooms.get(resident).getFloor()).toString();
         content[RESIDENT_NAME_OR_RESID] = anonymous ? resident.getRIDAnonymous() : ResidentTools.getLabelText(resident);
         content[RUNNING_NO] = Integer.toString(runningNumber);
@@ -471,7 +472,6 @@ public class MREPrevalenceSheets implements HasLogger {
         content[HOSPITAL_STAY_LAST_3_MONTHS] = hospital ? "1" : "0";
         listHospital.clear();
 
-        //desoriented = !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "time", "yes1").equalsIgnoreCase("1") && !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "location", "yes3").equalsIgnoreCase("1");
         boolean desoriented = mapID2Info.containsKey(ResInfoTypeTools.TYPE_ORIENTATION) && (!getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "time", "yes1").equalsIgnoreCase("1") || !getCellContent(ResInfoTypeTools.TYPE_ORIENTATION, "location", "yes3").equalsIgnoreCase("1"));
         content[DESORIENTED_TIME_LOCATION] = desoriented ? "1" : "0";
 
@@ -494,10 +494,7 @@ public class MREPrevalenceSheets implements HasLogger {
                 isCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg4") ||
                 isCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg5");
 
-
         content[CARELEVEL0] = pg1andabove ? "0" : "1";
-
-
         content[CARELEVEL1] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg1");
         content[CARELEVEL2] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg2");
         content[CARELEVEL3] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg3");

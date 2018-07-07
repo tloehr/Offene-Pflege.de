@@ -1898,7 +1898,7 @@ public class ResInfoTools {
 
     public static int getOccupantDays(LocalDate from, LocalDate to) {
         int daysPresent = 0;
-        for (Resident resident : ResidentTools.getAllActive(from, to)) {
+        for (Resident resident : ResidentTools.getAll(from, to)) {
             daysPresent += getOccupantDays(resident, from, to);
         }
         return daysPresent;
