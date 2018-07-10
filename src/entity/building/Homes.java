@@ -62,7 +62,7 @@ public class Homes implements Serializable {
     @EditorComponent(label = "misc.msg.fax", component = {"textfield"})
     private String fax;
     @Column(name = "color", length = 6)
-    @EditorComponent(label = "misc.msg.colorset", component = {"colorset"})
+    @EditorComponent(label = "misc.msg.colorset", component = {"colorset"}, triggersReload = "true")
     private String color;
     @Column(name = "active")
     @EditorComponent(label = "misc.msg.active", component = {"onoffswitch", "misc.msg.active", "misc.msg.inactive"})

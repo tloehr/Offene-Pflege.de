@@ -11,7 +11,6 @@ import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.Converter;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.ArrayUtils;
@@ -36,22 +35,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.util.HashSet;
-import java.util.Properties;
 
 /**
- *
  * This Panel accepts annotated Beans which describe a form that needs to be entered.
  * It uses the annotations from the class gui.interfaces.EditorComponent to tell this editor
  * how to handle the values of the Bean Class. Only fields which are annotated as EditorComponent
  * are handled here. The others are ignored.
- *
+ * <p>
  * there is a data object in the parent class which is automatically initialized by the constructor
- *
- *
+ * <p>
+ * <p>
  * So why all this fuss ? This class makes the creation of an editor very easy. We simply define a Bean class
  * with all the constraints we want to be obeyed during the edit phase. And this class handles it in no time.
  * All the constraints are taken care of by the javax.validation framework.
- *
  */
 public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private final Class<T> clazz;
@@ -71,8 +67,8 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
      * constructor
      *
      * @param dataProvider is the implementation of the DataProvider which is used every time this editor needs the data to display
-     * @param clazz is the class object of the bound class for this editor. technical reasons. no big deal.
-     * @param saveMode tells the editor when to save its contents to the ancestor's data object
+     * @param clazz        is the class object of the bound class for this editor. technical reasons. no big deal.
+     * @param saveMode     tells the editor when to save its contents to the ancestor's data object
      * @throws IllegalAccessException
      * @throws NoSuchMethodException
      * @throws InvocationTargetException
@@ -383,8 +379,12 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             reload();
                         try {
                             PropertyUtils.setProperty(data, field.getName(), new Boolean(e.getStateChange() == ItemEvent.SELECTED));
-                            if (saveMode == SAVE_MODE_IMMEDIATE)
-                                broadcast();
+                            if (saveMode == SAVE_MODE_IMMEDIATE) {
+                                DataChangeEvent<T> dce = new DataChangeEvent(thisPanel, data);
+                                if (editorComponent.triggersReload().equalsIgnoreCase("true"))
+                                    dce.setTriggersReload(true);
+                                broadcast(dce);
+                            }
                         } catch (Exception e1) {
                             logger.debug(e1);
                         }
@@ -397,10 +397,13 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             reload();
                         try {
                             PropertyUtils.setProperty(data, field.getName(), GUITools.getHTMLColor(((ColorSelectionModel) e.getSource()).getSelectedColor()));
-                            DataChangeEvent<T> dce = new DataChangeEvent(thisPanel, data);
-                            dce.setTriggersReload(true);
-                            if (saveMode == SAVE_MODE_IMMEDIATE)
-                                broadcast();
+
+                            if (saveMode == SAVE_MODE_IMMEDIATE) {
+                                DataChangeEvent<T> dce = new DataChangeEvent(thisPanel, data);
+                                if (editorComponent.triggersReload().equalsIgnoreCase("true"))
+                                    dce.setTriggersReload(true);
+                                broadcast(dce);
+                            }
                         } catch (Exception e1) {
                             logger.debug(e1);
                         }
@@ -502,8 +505,14 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
      * @throws NoSuchMethodException
      * @throws InvocationTargetException
      */
-    public void broadcast() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, SQLIntegrityConstraintViolationException {
-        super.broadcast(new DataChangeEvent(thisPanel, data));
+    public void broadcast() throws
+            IllegalAccessException, NoSuchMethodException, InvocationTargetException, SQLIntegrityConstraintViolationException {
+        broadcast(new DataChangeEvent(thisPanel, data));
+    }
+
+    public void broadcast(DataChangeEvent dce) throws
+            IllegalAccessException, NoSuchMethodException, InvocationTargetException, SQLIntegrityConstraintViolationException {
+        super.broadcast(dce);
     }
 
 //    @Override

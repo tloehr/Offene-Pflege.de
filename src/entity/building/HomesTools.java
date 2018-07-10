@@ -56,7 +56,7 @@ public class HomesTools {
 
     public static ArrayList<Homes> getAll() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT e FROM Homes e WHERE e.active = true ORDER BY e.eid");
+        Query query = em.createQuery("SELECT e FROM Homes e  ORDER BY e.eid");
 
         ArrayList<Homes> list = new ArrayList<Homes>(query.getResultList());
         em.close();

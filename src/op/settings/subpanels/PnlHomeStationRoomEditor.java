@@ -33,6 +33,7 @@ import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
+import java.awt.font.TextAttribute;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -102,6 +103,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             }
         };
         worker.execute();
+
     }
 
 
@@ -119,11 +121,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     }
 
     private void loadAllData() {
-
         cpsHomes.removeAll();
-
         cpsHomes.add(createAddHomeButton());
-
 
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 0, -1));
@@ -163,7 +162,16 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             dcp.setTitleButtonText(myHome.getName());
             dcp.getTitleButton().setForeground(GUITools.blend(myHome.getColor(), Color.BLACK, 0.85f));
             dcp.setBackground(GUITools.blend(myHome.getColor(), Color.WHITE, 0.05f));
-            dcp.getTitleButton().setFont(SYSConst.ARIAL24);
+
+            Font font = SYSConst.ARIAL24;
+
+            if (myHome.getActive().equals(Boolean.FALSE)) {
+                Map attributes = font.getAttributes();
+                attributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+                font = new Font(attributes);
+            }
+
+            dcp.getTitleButton().setFont(font);
         };
 
         ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
@@ -181,9 +189,10 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     private DefaultCollapsiblePanes createContent(final Homes home, DataChangeListener<Homes> dcl) {
         DefaultCollapsiblePanes dcps = new DefaultCollapsiblePanes();
         dcps.setBackground(GUITools.blend(home.getColor(), Color.WHITE, 0.08f));
+
         try {
             PnlBeanEditor<Homes> pnlBeanEditor = new PnlBeanEditor<>(() -> EntityTools.find(Homes.class, home.getEid()), Homes.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
-            pnlBeanEditor.addDataChangeListener(new JPADataChangeListener<>((DataChangeListener<Homes>) evt -> {
+            pnlBeanEditor.addDataChangeListener(new JPADataChangeListener<>(evt -> {
                 if (evt.isTriggersReload()) {
                     reload();
                 } else {
@@ -191,8 +200,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                     dcl.dataChanged(new DataChangeEvent<>(pnlBeanEditor, evt.getData()));
                 }
             }));
-//            pnlBeanEditor.setOpaque(false);
-//            pnlBeanEditor.setBackground(GUITools.blend(home.getColor(), Color.WHITE, 0.25f));
+
             dcps.add(pnlBeanEditor);
 
             ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate1 = cre -> {
