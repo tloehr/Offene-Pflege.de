@@ -280,7 +280,9 @@ public class DlgCloseStock extends MyJDialog {
 
     private void txtLetzteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtLetzteFocusLost
         BigDecimal inhalt = SYSTools.parseDecimal(txtLetzte.getText());
-        if (inhalt == null && inhalt.compareTo(BigDecimal.ZERO) <= 0) {
+        // https://github.com/tloehr/Offene-Pflege.de/issues/30
+        // || statt &&
+        if (inhalt == null || inhalt.compareTo(BigDecimal.ZERO) <= 0) {
             txtLetzte.setText("1");
         }
     }//GEN-LAST:event_txtLetzteFocusLost
