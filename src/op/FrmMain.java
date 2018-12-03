@@ -353,17 +353,6 @@ public class FrmMain extends JFrame {
         OPDE.getDisplayManager().touch();
         dlgLogin = null;
 
-
-//        if (OPDE.isTraining()) {
-//            JTextPane txtMessage = new JTextPane();
-//            txtMessage.setFont(new Font("Arial", Font.PLAIN, 18));
-//            txtMessage.setEditable(false);
-//            txtMessage.setContentType("text/html");
-//            txtMessage.setText(SYSTools.toHTMLForScreen(SYSTools.xx("opde.general.training.version.message")));
-//
-//            JOptionPane.showConfirmDialog(this, txtMessage, SYSTools.xx("opde.general.training.version.title"), JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
-//        }
-
         if (specialities != null) {
             synchronized (specialities) {
                 SYSTools.clear(specialities);
@@ -642,7 +631,7 @@ public class FrmMain extends JFrame {
         panesApps.add(homeButton);
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.name");
+        Query query = em.createQuery("SELECT s FROM Station s WHERE s.home.active = TRUE ORDER BY s.name");
         ArrayList<Station> stationen = new ArrayList<Station>(query.getResultList());
         em.close();
         for (Station station : stationen) {

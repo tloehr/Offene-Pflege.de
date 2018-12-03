@@ -28,7 +28,6 @@ import op.tools.SYSTools;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * @author Torsten Löhr
@@ -79,16 +78,6 @@ public class PnlCare extends NursingRecordsPanel {
         initPanel();
         initPhase = false;
         jtpPflegeakteStateChanged(null);
-
-
-//        EntityManager em = OPDE.createEM();
-//        ResInfo info = em.find(ResInfo.class, 20149l);
-//        em.close();
-//
-//        OPDE.debug(ResInfoTools.getContentAsHTML(info));
-//
-//
-
     }
 
     @Override
@@ -226,8 +215,8 @@ public class PnlCare extends NursingRecordsPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow",
-                    "default:grow"));
+                "default:grow",
+                "default:grow"));
 
             //======== jtpPflegeakte ========
             {

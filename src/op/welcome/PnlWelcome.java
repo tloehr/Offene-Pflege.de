@@ -103,12 +103,13 @@ public class PnlWelcome extends CleanablePanel {
 
     private void initPanel() {
 
-        try {
-            btnAbout.setText(SYSTools.isUpdateAvailable() ? SYSTools.xx("misc.msg.updateAvailable") : null);
-        } catch (IOException e) {
-            logger.warn(e);
-            btnAbout.setText(null);
-        }
+        // Das kann große Probleme verursachen, wenn der Webserver nicht erreichbar ist.
+//        try {
+//            btnAbout.setText(SYSTools.isUpdateAvailable() ? SYSTools.xx("misc.msg.updateAvailable") : null);
+//        } catch (IOException e) {
+//            logger.warn(e);
+//            btnAbout.setText(null);
+//        }
 
         addApps();
         prepareSearchArea();

@@ -82,11 +82,8 @@ public class PnlResOverview extends NursingRecordsPanel {
 
     private void initPanel() {
         txtUebersicht.setContentType("text/html");
-
         itemListener = itemEvent -> reloadDisplay();
-
         mouseAdapter = GUITools.getHyperlinkStyleMouseAdapter();
-
     }
 
     @Override
