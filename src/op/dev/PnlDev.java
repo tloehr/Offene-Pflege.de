@@ -60,6 +60,8 @@ public class PnlDev extends CleanablePanel {
     public PnlDev() {
         super("opde.dev");
         initComponents();
+        txtCountry.setText( Locale.getDefault().getCountry().toLowerCase());
+
 
 //        cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
 //
@@ -293,7 +295,12 @@ public class PnlDev extends CleanablePanel {
     }
 
     private void txtPZNCaretUpdate(CaretEvent e) {
-        OPDE.debug(MedPackageTools.parsePZN(txtPZN.getText().trim()));
+        try {
+            OPDE.debug(MedPackageTools.parsePZN(txtPZN.getText().trim(), txtCountry.getText().trim()));
+        } catch (NumberFormatException e1) {
+            OPDE.error(e1);
+        }
+
     }
 
     private void btnMod11ActionPerformed(ActionEvent e) {
@@ -702,6 +709,7 @@ public class PnlDev extends CleanablePanel {
         cmbMonth = new JComboBox();
         button2 = new JButton();
         txtPZN = new JTextField();
+        txtCountry = new JTextField();
         btnMod11 = new JButton();
         btnImportMedDB = new JButton();
         panel4 = new JPanel();
@@ -785,7 +793,7 @@ public class PnlDev extends CleanablePanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "left:default:grow",
+                    "left:default:grow, $ugap, default",
                     "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
@@ -803,6 +811,7 @@ public class PnlDev extends CleanablePanel {
                 txtPZN.setToolTipText("PZN Check");
                 txtPZN.addCaretListener(e -> txtPZNCaretUpdate(e));
                 panel2.add(txtPZN, CC.xy(1, 11, CC.FILL, CC.DEFAULT));
+                panel2.add(txtCountry, CC.xy(3, 11));
 
                 //---- btnMod11 ----
                 btnMod11.setText("calc mod11");
@@ -899,6 +908,7 @@ public class PnlDev extends CleanablePanel {
     private JComboBox cmbMonth;
     private JButton button2;
     private JTextField txtPZN;
+    private JTextField txtCountry;
     private JButton btnMod11;
     private JButton btnImportMedDB;
     private JPanel panel4;

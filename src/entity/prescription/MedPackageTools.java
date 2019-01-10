@@ -6,7 +6,6 @@ import op.tools.SYSTools;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.awt.*;
 import java.util.Locale;
 
 /**
@@ -73,22 +72,27 @@ public class MedPackageTools {
     }
 
     /**
-     * This method checks if a given string represents a valid german PZN, which may (as of 2013) have a length
-     * of 7 or 8 chars. It must also be conform to the checksum algorithm defined by SecurPharm.
-     * <p>
-     * Extension for the <b>austrian</b> PZN system. In austria the PZN as a fixed size of 7 (well, 6 + the checkdigit).
-     * It is integrated into an EAN13 of a special structure.
-     * <p>
-     * All the barcode scanners that came across added a "ß" at the front of the scanned number. So this
-     * has to be removed if present.
-     *
-     * @param pzn the string to be checked
-     * @return the cleaned and checked string. PZN7's are always added up to PZN8's (by puttin a zero to the head). If the PZN was invalid you will only get NULL.
-     */
+       * This method checks if a given string represents a valid german PZN, which may (as of 2013) have a length
+       * of 7 or 8 chars. It must also be conform to the checksum algorithm defined by SecurPharm.
+       * <p>
+       * Extension for the <b>austrian</b> PZN system. In austria the PZN as a fixed size of 7 (well, 6 + the checkdigit).
+       * It is integrated into an EAN13 of a special structure.
+       * <p>
+       * All the barcode scanners that came across added a "ß" at the front of the scanned number. So this
+       * has to be removed if present.
+       *
+       * @param pzn the string to be checked
+       * @return the cleaned and checked string. PZN7's are always added up to PZN8's (by puttin a zero to the head). If the PZN was invalid you will only get NULL.
+       */
     public static String parsePZN(String pzn) throws NumberFormatException {
+        return parsePZN(pzn, Locale.getDefault().getCountry().toLowerCase());
+    }
+
+
+    public static String parsePZN(String pzn, String countrycode) throws NumberFormatException {
         pzn = pzn.trim();
         pzn = pzn.replaceAll("[^\\d]", "");
-        String countrycode = Locale.getDefault().getCountry().toLowerCase();
+
 
         if (!countrycode.matches("de|at|ch"))
             countrycode = "de";
@@ -178,7 +182,7 @@ public class MedPackageTools {
     /**
      * http://www.gs1.ch/docs/default-source/gs1-system-document/genspecs/genspec-kapitel9.pdf?sfvrsn=2
      * Page 21
-     *
+     * Stichwort: Modulo 10 Verfahren.
      * @param pzn
      * @return
      */
@@ -196,7 +200,9 @@ public class MedPackageTools {
         // next complete decade to the partsum
         int nextDecade = (partsum / 10 + 1) * 10;
 
-        return nextDecade - partsum;
+        // Abstand 10 ist die Checksumme 0 nicht 10.
+        // https://github.com/tloehr/Offene-Pflege.de/issues/99
+        return (nextDecade - partsum == 10 ? 0 : nextDecade - partsum);
 
     }
 
