@@ -1,4 +1,5 @@
-UPDATE `sysprops` SET `V` = '10' WHERE `K` = 'dbstructure'; 
+-- Ab Version 1.14.2.x
+UPDATE `sysprops` SET `V` = '10' WHERE `K` = 'dbstructure';
 --
 -- Chiffre Werte für Mitarbeiter setzen einmalig.
 -- nicht bei uns, da hab ich das schon mal gemacht.

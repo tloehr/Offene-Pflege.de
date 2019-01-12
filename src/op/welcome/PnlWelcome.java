@@ -103,6 +103,8 @@ public class PnlWelcome extends CleanablePanel {
 
     private void initPanel() {
 
+        //https://github.com/tloehr/Offene-Pflege.de/issues/100
+        // noch nicht weiter bearbeitet. Nur schonmal rausgenommen.
         // Das kann große Probleme verursachen, wenn der Webserver nicht erreichbar ist.
 //        try {
 //            btnAbout.setText(SYSTools.isUpdateAvailable() ? SYSTools.xx("misc.msg.updateAvailable") : null);
@@ -576,8 +578,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow, $lcgap, pref",
-                    "default, default:grow"));
+                "default:grow, $lcgap, pref",
+                "default, default:grow"));
 
             //---- btnAbout ----
             btnAbout.setText(null);

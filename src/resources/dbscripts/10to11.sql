@@ -1,17 +1,17 @@
-UPDATE `opde`.`sysprops`
+-- Ab Version 1.14.3.x
+UPDATE `sysprops`
 SET `V` = '11'
 WHERE `K` = 'dbstructure';
 --
 -- Wenn eine Einrichtung stillgelegt wird.
-ALTER TABLE `opde`.`homes`
+ALTER TABLE `homes`
   ADD active TINYINT DEFAULT 1 NOT NULL;
 --
 -- Neue Felder bei den Infektionen
-UPDATE `opde`.`resinfotype`
+UPDATE `resinfotype`
 SET `type` = '-1'
 WHERE `BWINFTYP` = 'INFECT1';
-INSERT INTO `opde`.`resinfotype` (`BWINFTYP`, `XML`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`)
-VALUES ('INFECT2', '<imagelabel image="/artwork/48x48/biohazard.png"/>
+INSERT INTO `resinfotype` (`BWINFTYP`, `XML`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`) VALUES ('INFECT2', '<imagelabel image="/artwork/48x48/biohazard.png"/>
 <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 10.[br/]Ausserdem führt eine [b]multiresistente Infektion[/b] dazu, dass die Anlage ''MRE'' erstellt und beigefügt wird."/>
 <checkbox label="MRSA" tooltip="Methicillin-resistenter Staphylococcus aureus" name="mrsa"/>
 <checkbox label="VRE" tooltip="Vancomycin-resistente Enterokokken" name="vre" layout="left"/>
@@ -74,19 +74,5 @@ VALUES ('INFECT2', '<imagelabel image="/artwork/48x48/biohazard.png"/>
 -- Alte "INFECT1" anpassen
 -- Achtung, die Infektionen müssen geprüft werden. ESBL taucht im Formular nicht mehr auf. Falls das gesetzt war müssen diese Einträge korrigiert werden.
 SET @now = now();
-INSERT INTO `opde`.`resinfo` (AnUKennung, AbUKennung, BWKennung, BWINFTYP, Von, Bis, Bemerkung, Properties, HTML)
-  SELECT
-    AnUKennung,
-    AbUKennung,
-    BWKennung,
-    "INFECT2",
-    @now,
-    '9999-12-31 23:59:59',
-    CONCAT(Bemerkung, "\n","Automatisch erstellt während des Software-Updates auf 1.14.3. Original BWINFOID: ",BWINFOID,"\n","ESBL taucht im Formular nicht mehr auf. Falls das vorher gesetzt war, müssen diese Einträge korrigiert werden. (2MRGN, 3MRGN, 4MRGN)"),
-    Properties,
-    HTML
-  FROM resinfo
-  WHERE BWINFTYP = "INFECT1" AND Bis = "9999-12-31 23:59:59";
-UPDATE `opde`.`resinfo`
-SET AbUKennung = AnUKennung, Bis = DATE_ADD(@now, INTERVAL -1 SECOND)
-WHERE BWINFTYP = "INFECT1" AND Bis = "9999-12-31 23:59:59";
+INSERT INTO `resinfo` (AnUKennung, AbUKennung, BWKennung, BWINFTYP, Von, Bis, Bemerkung, Properties, HTML) SELECT AnUKennung, AbUKennung, BWKennung, "INFECT2", @now, '9999-12-31 23:59:59', CONCAT(Bemerkung, "\n","Automatisch erstellt während des Software-Updates auf 1.14.3. Original BWINFOID: ",BWINFOID,"\n","ESBL taucht im Formular nicht mehr auf. Falls das vorher gesetzt war, müssen diese Einträge korrigiert werden. (2MRGN, 3MRGN, 4MRGN)"), Properties, HTML FROM resinfo WHERE BWINFTYP = "INFECT1" AND Bis = "9999-12-31 23:59:59";
+UPDATE `resinfo` SET AbUKennung = AnUKennung, Bis = DATE_ADD(@now, INTERVAL -1 SECOND) WHERE BWINFTYP = "INFECT1" AND Bis = "9999-12-31 23:59:59";

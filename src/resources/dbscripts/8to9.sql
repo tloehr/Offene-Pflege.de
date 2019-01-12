@@ -1,4 +1,5 @@
-UPDATE `sysprops` SET `V` = '9' WHERE `K` = 'dbstructure'; 
+-- Ab Version 1.14.1.x
+UPDATE `sysprops` SET `V` = '9' WHERE `K` = 'dbstructure';
 --
 -- https://github.com/tloehr/Offene-Pflege.de/issues/39
 --
