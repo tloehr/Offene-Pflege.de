@@ -68,12 +68,13 @@ public class ResInfoTools {
 
     public static List<ResInfo> getSpecialInfos() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident.station IS NOT NULL AND b.bwinfotyp.type IN (:absence, :infection, :warning, :diabetes, :allergy) AND b.to > :now ");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident.station IS NOT NULL AND b.bwinfotyp.type IN (:absence, :infection, :warning, :diabetes, :allergy, :fallrisk) AND b.to > :now ");
         query.setParameter("absence", ResInfoTypeTools.TYPE_ABSENCE);
         query.setParameter("infection", ResInfoTypeTools.TYPE_INFECTION);
         query.setParameter("warning", ResInfoTypeTools.TYPE_WARNING);
         query.setParameter("allergy", ResInfoTypeTools.TYPE_ALLERGY);
         query.setParameter("diabetes", ResInfoTypeTools.TYPE_DIABETES);
+        query.setParameter("fallrisk", ResInfoTypeTools.TYPE_FALLRISK);
         query.setParameter("now", new Date());
         List<ResInfo> resinfos = query.getResultList();
         em.close();

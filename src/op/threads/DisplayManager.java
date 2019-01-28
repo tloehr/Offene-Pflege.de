@@ -36,8 +36,8 @@ public class DisplayManager extends Thread {
     // a pair for the text and the value for the progressbar.
     private Pair<String, Integer> progressBarMessage;
     private final Color defaultColor = new Color(105, 80, 69);
-    private Icon icondead, iconaway, icongone, iconbiohazard;
-    private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
+    private Icon icondead, iconaway, icongone, iconbiohazard, iconfall;
+    private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning, lblFallRisk;
     private long step = 0;
     private int lastMinute;
     private long lastoperation; // used for the timeout function to automatically log out idle users
@@ -102,11 +102,15 @@ public class DisplayManager extends Thread {
         lblDiabetes = new JLabel(SYSConst.icon22diabetes);
         lblDiabetes.setVisible(false);
         lblDiabetes.setOpaque(false);
+        lblFallRisk = new JLabel(SYSConst.icon22falling);
+        lblFallRisk.setVisible(false);
+        lblFallRisk.setOpaque(false);
 
         pnlIcons.add(lblWarning);
         pnlIcons.add(lblBiohazard);
         pnlIcons.add(lblDiabetes);
         pnlIcons.add(lblAllergy);
+        pnlIcons.add(lblFallRisk);
 
         lblMain.setText(" ");
         lblSub.setText(" ");
@@ -173,6 +177,13 @@ public class DisplayManager extends Thread {
         });
     }
 
+    public void setIconFalling(final String tooltip) {
+        SwingUtilities.invokeLater(() -> {
+            lblFallRisk.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblFallRisk.setToolTipText(tooltip);
+        });
+    }
+
     public void setIconAway() {
         SwingUtilities.invokeLater(() -> lblMain.setIcon(iconaway));
     }
@@ -183,6 +194,7 @@ public class DisplayManager extends Thread {
         lblWarning.setVisible(false);
         lblDiabetes.setVisible(false);
         lblAllergy.setVisible(false);
+        lblFallRisk.setVisible(false);
     }
 
     public void setProgressBarMessage(DisplayMessage pbMessage) {
@@ -400,7 +412,7 @@ public class DisplayManager extends Thread {
     }
 
 
-    public void timeoutNow(){
+    public void timeoutNow() {
         timeoutAction.execute(null);
     }
 
