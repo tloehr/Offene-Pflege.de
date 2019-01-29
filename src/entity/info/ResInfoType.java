@@ -140,7 +140,7 @@ public class ResInfoType implements Serializable {
     }
 
     public boolean isAlertType() {
-        return type == ResInfoTypeTools.TYPE_ALLERGY || type == ResInfoTypeTools.TYPE_INFECTION || type == ResInfoTypeTools.TYPE_DIABETES || type == ResInfoTypeTools.TYPE_WARNING;
+        return type == ResInfoTypeTools.TYPE_ALLERGY || type == ResInfoTypeTools.TYPE_INFECTION || type == ResInfoTypeTools.TYPE_DIABETES || type == ResInfoTypeTools.TYPE_WARNING || type == ResInfoTypeTools.TYPE_FALLRISK;
     }
 
     /**

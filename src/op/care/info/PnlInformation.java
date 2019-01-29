@@ -51,8 +51,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
@@ -267,6 +267,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                             html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
                                             html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                                             html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+                                            html += type.getType() == ResInfoTypeTools.TYPE_FALLRISK ? SYSConst.html_48x48_warning : "";
 
                                             html += ResInfoTools.getResInfosAsHTML(mapType2ResInfos.get(type), true, null);
                                         }
@@ -400,6 +401,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                             html += resInfoType.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
                                             html += resInfoType.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                                             html += resInfoType.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+                                            html += resInfoType.getType() == ResInfoTypeTools.TYPE_FALLRISK ? SYSConst.html_48x48_warning : "";
 
                                             html += ResInfoTools.getResInfosAsHTML(mapType2ResInfos.get(resInfoType), true, null);
                                         }
@@ -441,7 +443,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                 ResInfoTypeTools.containsOnlyClosedInfos(mapType2ResInfos.get(resInfoType)) ||
                                                 ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType))
                                         )
-                                        ) {
+                                ) {
                                     if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
                                         final JideButton btnAdd = GUITools.createHyperlinkButton("nursingrecords.info.noconstraints", SYSConst.icon22add, null);
                                         btnAdd.addActionListener(e -> {
@@ -461,11 +463,6 @@ public class PnlInformation extends NursingRecordsPanel {
                                                             mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
                                                             Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
                                                         }
-
-//                                                                synchronized (listAllTypes) {
-//                                                                    listAllTypes.remove(resInfoType);
-//                                                                    listAllTypes.add(myType);
-//                                                                }
 
                                                         synchronized (listAllInfos) {
                                                             listAllInfos.add(newinfo);
@@ -512,7 +509,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                         cpsType.add(new JLabel(SYSTools.xx("nursingrecords.info.cant.add.stays.here")));
                                     } else if (ResInfoTypeTools.is4Annotations(resInfoType)) {
                                         cpsType.add(new JLabel(SYSTools.xx("nursingrecords.info.cant.add.annotations.here")));
-                                    } else {// if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfoType.getType() != ResInfoTypeTools.TYPE_STAY)
+                                    } else {
 
                                         String buttonText = "nursingrecords.info.no.entry.yet";
                                         if (!mapType2ResInfos.get(resInfoType).isEmpty()) {
@@ -863,7 +860,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo)  && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             cptitle.getRight().add(btnProcess);
         }
 
@@ -994,6 +991,17 @@ public class PnlInformation extends NursingRecordsPanel {
                                 listAllInfos.add(oldinfo);
                                 listAllInfos.add(newinfo);
                             }
+
+                            if (newinfo.getResInfoType().isAlertType()) {
+                                GUITools.setResidentDisplay(resident);
+                                if (newinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_FALLRISK) {
+                                    if (ResInfoTools.hasSevereFallRisk(newinfo)) {
+                                        OPDE.getMainframe().addSpeciality(newinfo.getResInfoType(), resident);
+                                    } else {
+                                        OPDE.getMainframe().removeSpeciality(newinfo.getResInfoType(), resident);
+                                    }
+                                }
+                            }
                         } catch (OptimisticLockException ole) {
                             OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
@@ -1117,6 +1125,20 @@ public class PnlInformation extends NursingRecordsPanel {
                                 listAllInfos.remove(resInfo);
                                 listAllInfos.add(editinfo);
                             }
+
+                            if (editinfo.getResInfoType().isAlertType()) {
+                                GUITools.setResidentDisplay(resident);
+
+                                if (editinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_FALLRISK) {
+                                    if (ResInfoTools.hasSevereFallRisk(editinfo)) {
+                                        OPDE.getMainframe().addSpeciality(editinfo.getResInfoType(), resident);
+                                    } else {
+                                        OPDE.getMainframe().removeSpeciality(editinfo.getResInfoType(), resident);
+                                    }
+                                }
+                            }
+
+
                         } catch (OptimisticLockException ole) {
                             OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
@@ -1350,6 +1372,7 @@ public class PnlInformation extends NursingRecordsPanel {
                             html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
                             html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                             html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+                            html += type.getType() == ResInfoTypeTools.TYPE_FALLRISK ? SYSConst.html_48x48_warning : "";
 
                             html += ResInfoTools.getResInfosAsHTML(mapType2ResInfos.get(type), true, null);
                         }
@@ -1819,7 +1842,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 // If the closure is null, only attached files can be viewed but no new ones can be attached.
                 Closure closure = o -> currentEditor = null;
 
-                if ( !resInfo.isClosed() && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD) {
+                if (!resInfo.isClosed() && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD) {
                     closure = o -> {
                         EntityManager em = OPDE.createEM();
                         final ResInfo editinfo = em.find(ResInfo.class, resInfo.getID());
@@ -1945,7 +1968,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled( ResInfoTools.isEditable(resInfo)  && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
 
             if (!resInfo.getAttachedQProcessConnections().isEmpty()) {
                 JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedQProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);

@@ -433,6 +433,7 @@ public class ResInfoTools {
 
     /**
      * checks if a resident was present on a specific day. away means also, that he left or came back on that day.
+     *
      * @param resident
      * @param targetDate
      * @return
@@ -1941,6 +1942,24 @@ public class ResInfoTools {
         return listData;
     }
 
+
+    public static boolean hasSevereFallRisk(ResInfo resinfo) {
+        boolean riskDetected = false;
+
+        // eine Sturzeinschätzung alleine reicht noch nicht aus, damit es als Symbol auftauchen soll. Nur ab bei
+        // sturzrisiko = mittel und sturzrisiko = ja (was stark heisst)
+
+        if (resinfo != null && resinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_FALLRISK && resinfo.isCurrentlyValid()) {
+            Properties myprops = SYSTools.load(resinfo.getProperties());
+            riskDetected = myprops.getProperty("sturzrisiko").equalsIgnoreCase("ja") || myprops.getProperty("sturzrisiko").equalsIgnoreCase("mittel");
+        }
+
+        return riskDetected;
+    }
+
+    public static boolean hasSevereFallRisk(Resident resident) {
+        return hasSevereFallRisk(getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALLRISK)));
+    }
 
     public static String getPrevalenceAntibioticUse(LocalDate day, Closure progress) {
         return "";

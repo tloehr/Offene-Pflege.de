@@ -38,6 +38,7 @@ import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -46,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import org.joda.time.LocalDate;
 
 /**
  * @author tloehr
@@ -223,7 +223,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     }
 
     public String getHtml() {
-        return SYSTools.anonymizeString(html);
+        return html;
     }
 
     public void setHtml(String html) {

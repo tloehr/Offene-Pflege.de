@@ -405,13 +405,14 @@ public class GUITools {
         ResInfo diabetes = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIABETES));
         ResInfo warning = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_WARNING));
         ResInfo allergy = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ALLERGY));
-        ResInfo falling = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALLRISK));
+        ResInfo fall_risk = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALLRISK));
 
         OPDE.getDisplayManager().setIconBiohazard(biohazard != null && biohazard.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(biohazard.getHtml())) : null);
         OPDE.getDisplayManager().setIconDiabetes(diabetes != null && diabetes.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(diabetes.getHtml())) : null);
         OPDE.getDisplayManager().setIconWarning(warning != null && warning.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(warning.getHtml())) : null);
         OPDE.getDisplayManager().setIconAllergy(allergy != null && allergy.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(allergy.getHtml())) : null);
-        OPDE.getDisplayManager().setIconFalling(falling != null && falling.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(falling.getHtml())) : null);
+        OPDE.getDisplayManager().setIconFalling(ResInfoTools.hasSevereFallRisk(fall_risk) ? SYSTools.toHTML(SYSConst.html_div(fall_risk.getHtml())) : null);
+
 
         if (ResInfoTools.isAway(resident)) {
             OPDE.getDisplayManager().setIconAway();

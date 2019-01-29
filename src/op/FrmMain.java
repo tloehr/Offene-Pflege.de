@@ -316,6 +316,11 @@ public class FrmMain extends JFrame {
         if (!type.isAlertType() && type.getType() != ResInfoTypeTools.TYPE_ABSENCE) {
             return;
         }
+
+        if (type.getType() == ResInfoTypeTools.TYPE_FALLRISK && !ResInfoTools.hasSevereFallRisk(resident)) {
+            return;
+        }
+
         synchronized (specialities) {
             specialities.get(type.getType()).add(resident);
         }
@@ -325,6 +330,7 @@ public class FrmMain extends JFrame {
         SwingUtilities.invokeLater(() -> iconPanels.get(resident).repaint());
 
     }
+
 
     private void btnResetSplitpaneActionPerformed(ActionEvent e) {
         splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, 0.5d));
@@ -369,7 +375,15 @@ public class FrmMain extends JFrame {
             specialities.put(ResInfoTypeTools.TYPE_FALLRISK, new HashSet<Resident>());
 
             for (ResInfo info : ResInfoTools.getSpecialInfos()) {
-                specialities.get(info.getResInfoType().getType()).add(info.getResident());
+                // eine Sturzeinschätzung alleine reicht noch nicht aus, damit es als Symbol auftauchen soll. Nur ab bei
+                // sturzrisiko = mittel und sturzrisiko = ja (was stark heisst)
+                if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_FALLRISK) {
+                    if (ResInfoTools.hasSevereFallRisk(info)) {
+                        specialities.get(info.getResInfoType().getType()).add(info.getResident());
+                    }
+                } else { // alle anderen Specialities können ruhig dabei
+                    specialities.get(info.getResInfoType().getType()).add(info.getResident());
+                }
             }
         }
 

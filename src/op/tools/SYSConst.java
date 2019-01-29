@@ -84,6 +84,7 @@ public class SYSConst {
     public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/warning.png\" border=\"0\">";
     public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/diabetes.png\" border=\"0\">";
     public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
+    public static String html_48x48_fallrisk = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
     public static String html_22x22_tagPurple = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/tag_purple.png\" border=\"0\">";
     public static String html_16x16_Eraser = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/eraser.png\" border=\"0\">";
     public static String html_16x16_Edited = "<img src=\"" + SYSTools.replace(LocalMachine.getProgrammPath(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/edited.png\" border=\"0\">";
