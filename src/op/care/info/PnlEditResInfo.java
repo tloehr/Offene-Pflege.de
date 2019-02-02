@@ -1,7 +1,7 @@
 package op.care.info;
 
-import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.*;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideButton;
@@ -41,11 +41,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
 import java.awt.Font;
+import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
 import java.io.IOException;
@@ -1590,6 +1588,7 @@ public class PnlEditResInfo {
                 JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));
                 jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
+                jl.setText(attributes.getValue("text"));
                 outerpanel.add(layout, jl);
             }
             /***

@@ -1,0 +1,25 @@
+<copyfromtemplate/>
+<tx tooltip="Diese Angaben werden auf Seite 1, Abschnitt 1 eingetragen. Sobald dieser Eintrag vorhanden ist, wird auch 'Gesetzlicher Betreuer' gesetzt."/>
+<textfield label="Anrede" name="title" innerlayout="tab"/>
+<textfield label="Name" name="name" innerlayout="tab"/>
+<textfield label="Vorname" name="firstname" innerlayout="tab"/>
+<textfield label="Organisation" name="orga" innerlayout="tab"/>
+<textfield label="Strasse" name="street" innerlayout="tab"/>
+<textfield label="PLZ" name="zip" innerlayout="tab"/>
+<textfield label="Ort" name="city" innerlayout="tab"/>
+<textfield label="Tel" name="tel" innerlayout="tab"/>
+<textfield label="Mobil" name="mobile" innerlayout="tab"/>
+<textfield label="Fax" name="fax" innerlayout="tab"/>
+<textfield label="E-Mail" name="email" innerlayout="tab"/>
+<label size="16" fontstyle="bold" label="Aufgabenkreis" layout="p"/>
+<checkbox name="finance" label="Vermögenssorge" tooltip="check" tx="Setzt 'Vermögensverwaltung'"/>
+<checkbox name="health" label="Gesundheitssorge" layout="left" tx="Setzt 'Gesundheitsvorsorge'"/>
+<checkbox name="confinement" label="Aufenthaltsbestimmung" layout="left" tx="Setzt 'Aufenthaltsbestimmung'"/>
+<checkbox name="residence" label="Wohnungsangelegenheiten" layout="br"/>
+<checkbox name="legal" label="Vertretung des Betroffenen in gerichtlichen Verfahren" layout="left"/>
+<checkbox name="official" label="Vertretung gegenüber Behörden" layout="br"/>
+<checkbox name="postal" label="Post (siehe Erläuterung)" tooltip="Entscheidung über den Fernmeldeverkehr des Betroffenen und über die Entgegennahme, das Öffnen und Anhalten seiner Post" layout="left"/>
+<checkbox name="welfare" label="Sozialhilfeangelegenheiten" layout="br"/>
+<checkbox name="pension" label="Rentenangelegenheiten" layout="left"/>
+<textfield label="Sonstiges" innerlayout="tab" name="other"/>
+<textfield label="Einwilligungsvorbehalt" tooltip="Schreibe hier die Bereiche auf, in denen die Willenserklärung des Betroffenen eingeschränkt wurde." innerlayout="tab" name="veto" layout="p"/>

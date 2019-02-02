@@ -1,9 +1,9 @@
 package entity.info;
 
 import com.enterprisedt.util.debug.Logger;
-import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import entity.building.HomesTools;
 import entity.files.SYSFilesTools;
@@ -58,7 +58,7 @@ public class TXEssenDoc {
 
     private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 8);
     //    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
-    private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD, BaseColor.YELLOW);
+    private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD, BaseColor.BLACK);
     //    private PdfContentByte over = null;
 //    private PdfWriter writer = null;
 //
@@ -390,11 +390,23 @@ public class TXEssenDoc {
 
             ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
 
+
+            // Symbole starten bei diesen Koordinaten.
+            float x = 510;
+            float y = 770;
             if (p == 1 && infection) { // nur auf der ersten Seite und nur wenn ein MRE Bogen erstellt wird.
                 Image biohazard = Image.getInstance(SYSConst.class.getResource("/artwork/other/biohazard.png"));
-                stamp.getOverContent().addImage(biohazard, biohazard.getWidth(), 0, 0, biohazard.getHeight(), 485, 730);
-                ColumnText.showTextAligned(stamp.getOverContent(), Element.ALIGN_LEFT, new Phrase("!!Siehe Seite 2/Abs.18!!", pdf_font_normal_bold), 500, 740, 0);
+                stamp.getOverContent().addImage(biohazard, 64, 0, 0, 64, x, y);
+                ColumnText.showTextAligned(stamp.getOverContent(), Element.ALIGN_LEFT, new Phrase("!!Siehe Seite 2/Abs.18!!", pdf_font_normal_bold), x - 7, y - 8, 0);
+                y -= 80; // falls noch ein Symbol kommt.
             }
+
+            if (p == 1 && ResInfoTools.hasSevereFallRisk(resident)) { // nur auf der ersten Seite und nur wenn ein Sturzrisiko besteht.
+                Image fallrisk = Image.getInstance(SYSConst.class.getResource("/artwork/other/hillslope-99173_640.png"));
+                stamp.getOverContent().addImage(fallrisk, 64, 0, 0, 64, x, y);
+                ColumnText.showTextAligned(stamp.getOverContent(), Element.ALIGN_LEFT, new Phrase("!!BW ist sturzgefährdet!!", pdf_font_normal_bold), x - 7, y - 8, 0);
+            }
+
             stamp.alterContents();
             copy.addPage(page);
         }
@@ -542,8 +554,13 @@ public class TXEssenDoc {
 
 
         String lc = getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "name") + ", " + getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "firstname") + "; " +
-                getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "tel") + "; " + getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "street") + ", " +
+                getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "street") + ", " +
                 getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "zip") + " " + getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "city");
+
+        lc += "\nTel.: " + getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "tel") +
+                (getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "mobile").equals("--") ? "" : "; " + getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "mobile")); // https://github.com/tloehr/Offene-Pflege.de/issues/101
+
+
         content.put(TXEAF.LC_NAME, lc);
 
 
@@ -552,7 +569,7 @@ public class TXEssenDoc {
                 getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1zip") + " " + getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1city");
         content.put(TXEAF.CONFIDANT_NAME, confidant);
 
-        
+
         content.put(TXEAF.SOCIAL_CONFIDANT_CARE, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1ready2nurse")));
 
         content.put(TXEAF.SOCIAL_CURRENT_RESTHOME, "1");
