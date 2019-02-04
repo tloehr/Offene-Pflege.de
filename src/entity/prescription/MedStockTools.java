@@ -10,7 +10,6 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -90,6 +89,21 @@ public class MedStockTools {
         List<MedStock> list = query.getResultList();
         em.close();
         return list;
+    }
+
+
+    public static MedStock getStockInUse(EntityManager em, MedInventory inventory) throws Exception{
+        String jpql = " " +
+                " SELECT b FROM MedStock b " +
+                " WHERE b.inventory = :inventory " +
+                " AND b.opened < :tfn AND b.out = :tfn";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("inventory", inventory);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        List<MedStock> list = query.getResultList();
+
+        return list.isEmpty() ? null : list.get(0);
     }
 
     public static MedStock getStockInUse(MedInventory inventory) {

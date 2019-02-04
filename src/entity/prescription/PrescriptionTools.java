@@ -4,8 +4,8 @@
  */
 package entity.prescription;
 
-import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
@@ -24,7 +24,6 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -36,8 +35,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -824,13 +823,13 @@ public class PrescriptionTools {
                         if (stockInUse.getExpires() != null) {
                             // only abbreviate on the first of a month
                             String expiryString;
-                            if (new LocalDate(stockInUse.getExpires()).getDayOfMonth() == 1){
+                            if (new LocalDate(stockInUse.getExpires()).getDayOfMonth() == 1) {
                                 expiryString = new SimpleDateFormat("MM/yy").format(stockInUse.getExpires());
                             } else {
                                 expiryString = df.format(stockInUse.getExpires());
                             }
 
-                            result += "<br/><font color=\"" +  MedStockTools.getHTMLColor(stockInUse) + "\">" + SYSTools.xx("misc.msg.expires") + ": " + expiryString + "</font>";
+                            result += "<br/><font color=\"" + MedStockTools.getHTMLColor(stockInUse) + "\">" + SYSTools.xx("misc.msg.expires") + ": " + expiryString + "</font>";
                         }
 
 
@@ -925,6 +924,49 @@ public class PrescriptionTools {
         result = new ArrayList<Prescription>(query.getResultList());
 
         em.close();
+        return result;
+    }
+
+
+    /**
+     * Diese Methode wird nach der Anmeldung benutzt um festzustellen ob wir leere Vorräte haben.
+     * https://github.com/tloehr/Offene-Pflege.de/issues/102
+     *
+     * @return
+     */
+    public static ArrayList<Prescription> getAllActiveWithEmptyInventories() {
+        ArrayList<Prescription> result = new ArrayList<>();
+
+        try {
+
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.to >= :now AND p.tradeform IS NOT NULL");
+            query.setParameter("now", new Date());
+            ArrayList<Prescription> listPrescriptions = new ArrayList<Prescription>(query.getResultList());
+
+            for (Prescription p : listPrescriptions) {
+                try {
+                    MedInventory inventory = TradeFormTools.getInventory4TradeForm(em, p.getResident(), p.getTradeForm());
+
+                    MedStock stockInUse = MedStockTools.getStockInUse(em, inventory);
+                    if (stockInUse == null) { //leeren Vorrat gefunden
+                        result.add(p);
+                    }
+
+                } catch (javax.persistence.NoResultException nre) {
+                    result.add(p);
+                }
+            }
+
+            em.close();
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+        for (Prescription p : result) {
+            OPDE.debug(toPrettyString(p));
+        }
+
         return result;
     }
 
@@ -1028,13 +1070,6 @@ public class PrescriptionTools {
                     result += "<td valign=\"top\">" + getDoseAsHTML(myprescription, withmed) + "<br/>";
                     result += getRemark(myprescription);
 
-//                    if (prescription.isOnDailyPlan()) {
-//                        result += "<br/>" + SYSConst.html_italic(SYSTools.xx("nursingrecords.prescription.addedToDailyPlan"));
-//                    }
-//                    if (prescription.isWeightControl()) {
-//                        result += "<br/>" + SYSConst.html_italic(SYSTools.xx("nursingrecords.prescription.weightControlled"));
-//                    }
-
                     result += "</td>";
                     result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
 
@@ -1131,6 +1166,20 @@ public class PrescriptionTools {
         }
 
         myPretty += verordnung.isOnDemand() ? " (" + SYSTools.xx("misc.msg.ondemand") + ": " + verordnung.getSituation().getText() + ")" : "";
+
+        return myPretty;
+    }
+
+    public static String toPrettyHTML(Prescription verordnung) {
+        String myPretty = "";
+
+        if (verordnung.hasMed()) {
+            myPretty = "[" + verordnung.getID() + "] " + SYSConst.html_bold(TradeFormTools.toPrettyString(verordnung.getTradeForm()));
+        } else {
+            myPretty = SYSConst.html_bold(verordnung.getIntervention().getBezeichnung());
+        }
+
+        myPretty += verordnung.isOnDemand() ? " (" + SYSTools.xx("misc.msg.ondemand") + ": " + SYSConst.html_color(Color.blue, verordnung.getSituation().getText()) + ")" : "";
 
         return myPretty;
     }

@@ -3,7 +3,6 @@ package entity.prescription;
 import entity.EntityTools;
 import entity.info.Resident;
 import op.OPDE;
-import op.care.prescription.PnlPrescription;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -13,7 +12,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -186,7 +184,7 @@ public class TradeFormTools {
     }
 
 
-    public static MedInventory getInventory4TradeForm(EntityManager em, Resident resident, TradeForm tradeform) throws Exception {
+    public static MedInventory getInventory4TradeForm(EntityManager em, Resident resident, TradeForm tradeform) throws javax.persistence.NoResultException {
         Query query = em.createQuery(" SELECT DISTINCT inv FROM MedInventory inv " +
                 " JOIN inv.medStocks stock " +
                 " WHERE inv.resident = :resident AND stock.tradeform = :tradeform " +

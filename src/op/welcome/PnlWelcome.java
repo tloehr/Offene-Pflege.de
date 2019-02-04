@@ -16,6 +16,8 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
+import entity.prescription.Prescription;
+import entity.prescription.PrescriptionTools;
 import entity.process.QProcess;
 import entity.process.QProcessTools;
 import entity.qms.Qms;
@@ -28,6 +30,7 @@ import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.care.PnlCare;
+import op.care.prescription.PnlPrescription;
 import op.controlling.PnlControlling;
 import op.misc.DlgIntervention;
 import op.residents.bwassistant.AddBWWizard;
@@ -57,6 +60,7 @@ import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Properties;
 
 /**
@@ -68,6 +72,8 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<QProcess> processList;
     private java.util.List<MedStock> expiryList;
     private java.util.List<Object[]> birthdayList;
+    private java.util.List<Prescription> emptyStocksList;  //https://github.com/tloehr/Offene-Pflege.de/issues/102
+    private java.util.List<Prescription> strangeWeightList;  //https://github.com/tloehr/Offene-Pflege.de/issues/98
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
     private ArrayList<Qms> dueQMSes;
@@ -106,6 +112,7 @@ public class PnlWelcome extends CleanablePanel {
         //https://github.com/tloehr/Offene-Pflege.de/issues/100
         // noch nicht weiter bearbeitet. Nur schonmal rausgenommen.
         // Das kann große Probleme verursachen, wenn der Webserver nicht erreichbar ist.
+        // Bzw. Opfer eines DDOS Angriffes ist
 //        try {
 //            btnAbout.setText(SYSTools.isUpdateAvailable() ? SYSTools.xx("misc.msg.updateAvailable") : null);
 //        } catch (IOException e) {
@@ -177,6 +184,7 @@ public class PnlWelcome extends CleanablePanel {
             protected Object doInBackground() throws Exception {
                 int progress = -1;
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
+                emptyStocksList = PrescriptionTools.getAllActiveWithEmptyInventories();
                 processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
                 birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
                 expiryList = MedStockTools.getExpiryList(7);
@@ -184,7 +192,7 @@ public class PnlWelcome extends CleanablePanel {
                 violatingLiquidValues = ResValueTools.getHighLowIn();
                 dueQMSes = QmsTools.getDueList(OPDE.getLogin().getUser());
                 Collections.sort(processList);
-                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size();
+                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size() + emptyStocksList.size();
 
                 if (!processList.isEmpty()) {
                     String title = "<html><font size=+1>" +
@@ -211,6 +219,23 @@ public class PnlWelcome extends CleanablePanel {
                         progress++;
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4(process).getMain());
+                    }
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
+                }
+
+                if (!emptyStocksList.isEmpty()) {
+                    Collections.sort(emptyStocksList, Comparator.comparing(Prescription::getResident));
+                    String title = "<html><font size=+1>" +
+                            SYSTools.xx("nursingrecords.handover.emptyInventories") +
+                            "</font></html>";
+
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    for (Prescription prescription : emptyStocksList) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4(prescription).getMain());
                     }
                     cp.setContentPane(pnlContent);
                     cpsWelcome.add(cp);
@@ -519,6 +544,24 @@ public class PnlWelcome extends CleanablePanel {
         return cptitle;
     }
 
+    private DefaultCPTitle createCP4(final Prescription prescription) {
+
+        String title = "<html><table border=\"0\">" +
+                "<tr>" +
+                "<td width=\"600\" align=\"left\">" + PrescriptionTools.toPrettyHTML(prescription) + " (" + ResidentTools.getNameAndFirstname(prescription.getResident()) + ")</td>" +
+                "</tr>" +
+                "</table>" +
+                "</html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setCurrentResident(prescription.getResident());
+            OPDE.getMainframe().setPanelTo(new PnlPrescription(prescription.getResident(), jspSearch));
+        });
+
+        return cptitle;
+    }
+
     private void prepareSearchArea() {
 
         searchPanes = new CollapsiblePanes();
@@ -578,8 +621,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow, $lcgap, pref",
-                "default, default:grow"));
+                    "default:grow, $lcgap, pref",
+                    "default, default:grow"));
 
             //---- btnAbout ----
             btnAbout.setText(null);
