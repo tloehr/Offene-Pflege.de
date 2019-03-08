@@ -408,6 +408,7 @@ public class PrescriptionScheduleTools {
             result += SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + SYSTools.formatBigDecimal(schedule.getMaxEDosis());
             if (schedule.getCheckAfterHours() != null) {
+                result += "\n";
                 result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
                 result += schedule.getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)");
             }

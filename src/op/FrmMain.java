@@ -64,7 +64,6 @@ import op.threads.PrintProcessor;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import op.training.PnlTraining;
 import op.users.PnlUser;
 import op.welcome.PnlWelcome;
 import org.apache.log4j.Logger;
@@ -712,8 +711,6 @@ public class FrmMain extends JFrame {
             panel = new PnlSettings(jspSearch);
         } else if (classname.equals("op.dev.PnlDev")) {
             panel = new PnlDev();
-        } else if (classname.equals("op.training.PnlTraining")) {
-            panel = new PnlTraining(jspSearch);
         }
         return panel;
     }

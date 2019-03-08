@@ -48,6 +48,8 @@ public class TXEssenDoc {
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
     public static final String SOURCEWOUND = "anlage_wunden_161016_static.pdf";
 
+    private final int MAX_VERORDNUNGEN_AUF_BOGEN = 8;
+
     private HashMap<Integer, ResInfo> mapID2Info;
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private Resident resident;
@@ -1332,7 +1334,8 @@ public class TXEssenDoc {
     }
 
     /**
-     * creates the medications list. Max length of this list 15 entries. Which is medical overkill anyways.
+     * Das hier füllt die Verordnungsliste auf dem Orignal PDF. Das sind aber nur 8 Zeilen. Falls mehr benötigt werden,
+     * erstellt OPDE eine weitere Seite.
      */
     private void createContent4Meds() {
         ArrayList<Pair<String, String>> listFieldsOnPage3 = new ArrayList<Pair<String, String>>();
@@ -1345,21 +1348,29 @@ public class TXEssenDoc {
         listFieldsOnPage3.add(new Pair(TXEAF.MEDS7, TXEAF.DOSAGE7));
         listFieldsOnPage3.add(new Pair(TXEAF.MEDS8, TXEAF.DOSAGE8));
 
-        ArrayList<Prescription> listRegularMeds = PrescriptionTools.getAllActiveRegularMedsOnly(resident);
+        // https://github.com/tloehr/Offene-Pflege.de/issues/103
+        ArrayList<Prescription> listMeds = PrescriptionTools.getAllActiveRegularMedsOnly(resident);
+        listMeds.addAll(PrescriptionTools.getAllActiveOnDemandMedsOnly(resident));
 
-//        int line = 0;
-
-        int MAXLINESONPDF = 8;
-
-        for (int line = 0; line < Math.min(listRegularMeds.size(), MAXLINESONPDF); line++) {
-            Prescription pres = listRegularMeds.get(line);
+        for (int line = 0; line < Math.min(listMeds.size(), MAX_VERORDNUNGEN_AUF_BOGEN); line++) {
+            Prescription pres = listMeds.get(line);
             content.put(listFieldsOnPage3.get(line).getFirst(), PrescriptionTools.getShortDescriptionAsCompactText(pres));
-            content.put(listFieldsOnPage3.get(line).getSecond(), PrescriptionTools.getDoseAsCompactText(pres));
+
+            String secondline;
+            if (pres.isOnDemand()) {
+                secondline = SYSTools.xx("misc.msg.ondemand") + ": " + pres.getSituation().getText() + "\n";
+                secondline += PrescriptionTools.getDoseAsCompactText(pres);
+            } else {
+                secondline = PrescriptionTools.getDoseAsCompactText(pres);
+            }
+            content.put(listFieldsOnPage3.get(line).getSecond(), secondline);
+
         }
 
-        if (listRegularMeds.size() > MAXLINESONPDF) {
-            content.put(TXEAF.MEDS_WARNINGTEXT, listRegularMeds.size() - MAXLINESONPDF + " " + SYSTools.xx("nursingrecords.info.tx.more.meds.to.follow"));
-            getAdditionMeds(listRegularMeds, MAXLINESONPDF);
+
+        if (listMeds.size() > MAX_VERORDNUNGEN_AUF_BOGEN) {
+            content.put(TXEAF.MEDS_WARNINGTEXT, listMeds.size() - MAX_VERORDNUNGEN_AUF_BOGEN + " " + SYSTools.xx("nursingrecords.info.tx.more.meds.to.follow"));
+            getAdditionMeds(listMeds, MAX_VERORDNUNGEN_AUF_BOGEN);
         }
 
         content.put(TXEAF.DOCS_MEDS_LIST, setCheckbox(medListStream != null));
@@ -1369,9 +1380,15 @@ public class TXEssenDoc {
 
     }
 
-    private void getAdditionMeds(ArrayList<Prescription> listRegularMeds, int startAt) {
-        if (listRegularMeds.size() - 1 < startAt) return;
-
+    /**
+     * Falls mehr Verordnungen exisiteren, als auf die Hauptseite passen, erstelle ich hier ein weiteres Document.
+     * Dabei wird dann kein vorhandenes Template ausgefüllt, sondern ein komplett neues PDF Document erstellt.
+     *
+     * @param listMeds
+     * @param startAt
+     */
+    private void getAdditionMeds(ArrayList<Prescription> listMeds, int startAt) {
+        if (listMeds.size() - 1 < startAt) return;
 
         try {
             Document document = new Document(PageSize.A4, Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(20), Utilities.millimetersToPoints(20));
@@ -1401,12 +1418,19 @@ public class TXEssenDoc {
             table.getDefaultCell().setVerticalAlignment(Element.ALIGN_TOP);
             table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
 
-            for (int pr = startAt; pr < listRegularMeds.size(); pr++) {
+            for (int pr = startAt; pr < listMeds.size(); pr++) {
+                Prescription pres = listMeds.get(pr);
+                table.addCell(new Phrase(PrescriptionTools.getShortDescriptionAsCompactText(pres)));
 
-                Prescription prescription = listRegularMeds.get(pr);
+                String secondline;
+                if (pres.isOnDemand()) {
+                    secondline = SYSTools.xx("misc.msg.ondemand") + ": " + pres.getSituation().getText() + "\n";
+                    secondline += PrescriptionTools.getDoseAsCompactText(pres);
+                } else {
+                    secondline = PrescriptionTools.getDoseAsCompactText(pres);
+                }
 
-                table.addCell(new Phrase(PrescriptionTools.getShortDescriptionAsCompactText(prescription)));
-                table.addCell(new Phrase(PrescriptionTools.getDoseAsCompactText(prescription)));
+                table.addCell(new Phrase(secondline));
 
             }
             document.add(table);

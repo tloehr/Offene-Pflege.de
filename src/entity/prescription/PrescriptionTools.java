@@ -711,7 +711,6 @@ public class PrescriptionTools {
     public static String getDoseAsCompactText(Prescription prescription) {
         String result = "";
 
-
         ArrayList<PrescriptionSchedule> listSchedules = new ArrayList<>(prescription.getPrescriptionSchedule());
         Collections.sort(listSchedules);
 
@@ -1003,6 +1002,19 @@ public class PrescriptionTools {
 
         ArrayList<Prescription> result = null;
         Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NULL AND p.tradeform IS NOT NULL AND p.to >= :now ORDER BY p.tradeform.medProduct.text");
+        query.setParameter("resident", resident);
+        query.setParameter("now", new Date());
+        result = new ArrayList<Prescription>(query.getResultList());
+
+        em.close();
+        return result;
+    }
+
+    public static ArrayList<Prescription> getAllActiveOnDemandMedsOnly(Resident resident) {
+        EntityManager em = OPDE.createEM();
+
+        ArrayList<Prescription> result = null;
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.tradeform IS NOT NULL AND p.to >= :now ORDER BY p.tradeform.medProduct.text");
         query.setParameter("resident", resident);
         query.setParameter("now", new Date());
         result = new ArrayList<Prescription>(query.getResultList());

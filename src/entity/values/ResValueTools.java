@@ -3,14 +3,12 @@ package entity.values;
 
 import entity.building.Station;
 import entity.building.StationTools;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import gui.GUITools;
 import op.OPDE;
-import op.tools.Pair;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -661,6 +659,61 @@ public class ResValueTools {
     }
 
 
+    public static ArrayList<Pair<Resident, BigDecimal>> findNotableWeightChanges(int monthsback, BigDecimal changeRateInPercent) {
+        java.time.LocalDate from = java.time.LocalDate.now().minusMonths(monthsback).withDayOfMonth(1);
+
+        EntityManager em = OPDE.createEM();
+        DateFormat df = DateFormat.getDateInstance();
+
+        String jpqlWithoutRetired = " " +
+                " SELECT rv " +
+                " FROM ResValue rv " +
+                " WHERE rv.vtype.valType = :valType " +
+                " AND rv.resident.adminonly <> 2 " +
+                " AND rv.pit >= :from " +
+                " AND rv.resident.station IS NOT NULL" +
+                " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
+
+        Query query = em.createQuery(jpqlWithoutRetired);
+        query.setParameter("valType", ResValueTypesTools.WEIGHT);
+        query.setParameter("from", DateUtils.asDate(from.atStartOfDay()));
+        ArrayList<ResValue> listVal = new ArrayList<ResValue>(query.getResultList());
+        em.close();
+
+        // Daten Sortieren in einer Hashmap aus Listen
+        HashMap<Resident, ArrayList<ResValue>> listData = new HashMap<Resident, ArrayList<ResValue>>();
+        for (ResValue val : listVal) {
+            if (!listData.containsKey(val.getResident())) {
+                listData.put(val.getResident(), new ArrayList<ResValue>());
+            }
+            listData.get(val.getResident()).add(val);
+        }
+
+        // Nach BW sortieren
+        ArrayList<Resident> listResidents = new ArrayList<>(listData.keySet());
+        Collections.sort(listResidents);
+
+        ResValueTypes heightType = ResValueTypesTools.getType(ResValueTypesTools.HEIGHT);
+        ResValueTypes weightType = ResValueTypesTools.getType(ResValueTypesTools.WEIGHT);
+
+        ArrayList<Pair<Resident, BigDecimal>> resultList = new ArrayList<>();
+
+        for (Resident resident : listResidents) {
+
+            if (listData.size() > 1) {
+                ResValue firstValue = listData.get(resident).get(0);
+                ResValue lastValue = listData.get(resident).get(listData.size() - 1);
+                BigDecimal divWeight = firstValue.getVal1().subtract(lastValue.getVal1());
+                Pair result = new Pair<>(resident, divWeight);
+                resultList.add(result);
+                OPDE.debug(result);
+            }
+        }
+
+        return resultList;
+    }
+
+
     public static HashMap<LocalDate, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, LocalDate from, LocalDate to) {
         // First BD is for the influx, second for the outflow
         EntityManager em = OPDE.createEM();
@@ -834,8 +887,10 @@ public class ResValueTools {
 
 
     /**
-     * returns a list of triples of {Resident, ResValue, int} for residents which havent had a stool in the last int days.
-     * The ResValue denotes the last stool, if there was any. NULL otherwise.
+     * Ermittelt eine Liste von Bewohner, die über eine bestimtme Zeit keinen Stuhlgang hatten. Aber nur
+     * falls eine Überwachung eingetragen war.
+     * <p>
+     * Abwesende BW werden ausgeschlossen.
      *
      * @return
      */
@@ -849,24 +904,28 @@ public class ResValueTools {
         LocalDate now = new LocalDate();
 
         for (Resident resident : listResident) {
-            Properties controlling = resident.getControlling();
-            // if the controlling was just set its not necessary to look too far into the past
-            // #24
-            String sDate = controlling.getProperty(ResidentTools.KEY_DATE1);
-            LocalDate startingOn = null;
-            if (sDate != null) {
-                startingOn = new LocalDate(sDate);
-            }
 
-            if (controlling.containsKey(ResidentTools.KEY_STOOLDAYS) && !controlling.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off")) {
-                int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_STOOLDAYS));
-                if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
-                    startingOn = now.minusDays(days);
+            if (!ResInfoTools.isAway(resident)) {  // https://github.com/tloehr/Offene-Pflege.de/issues/97
+
+                Properties controlling = resident.getControlling();
+                // if the controlling was just set its not necessary to look too far into the past
+                // #24
+                String sDate = controlling.getProperty(ResidentTools.KEY_DATE1);
+                LocalDate startingOn = null;
+                if (sDate != null) {
+                    startingOn = new LocalDate(sDate);
                 }
-                ResValue lastStool = getLast(resident, ResValueTypesTools.STOOL);
 
-                if (lastStool == null || new DateTime(lastStool.getPit()).toLocalDate().isBefore(startingOn)) {
-                    result.add(new Object[]{resident, lastStool, days});
+                if (controlling.containsKey(ResidentTools.KEY_STOOLDAYS) && !controlling.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off")) {
+                    int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_STOOLDAYS));
+                    if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
+                        startingOn = now.minusDays(days);
+                    }
+                    ResValue lastStool = getLast(resident, ResValueTypesTools.STOOL);
+
+                    if (lastStool == null || new DateTime(lastStool.getPit()).toLocalDate().isBefore(startingOn)) {
+                        result.add(new Object[]{resident, lastStool, days});
+                    }
                 }
             }
         }
@@ -874,6 +933,40 @@ public class ResValueTools {
         listResident.clear();
         return result;
     }
+
+//    public static ArrayList<Object[]> getStrangeWeightChanges() {
+//
+//        int months = 3;
+//        double percent = 0.5d;
+//
+//        ArrayList<Object[]> result = new ArrayList<Object[]>();
+//        Station currentStation = StationTools.getStationForThisHost();
+//        ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
+//
+//        LocalDate now = new LocalDate();
+//
+//        for (Resident resident : listResident) {
+//
+//            if (!ResInfoTools.isAway(resident)) {
+//
+//
+//                if (controlling.containsKey(ResidentTools.KEY_STOOLDAYS) && !controlling.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off")) {
+//                    int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_STOOLDAYS));
+//                    if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
+//                        startingOn = now.minusDays(days);
+//                    }
+//                    ResValue lastStool = getLast(resident, ResValueTypesTools.STOOL);
+//
+//                    if (lastStool == null || new DateTime(lastStool.getPit()).toLocalDate().isBefore(startingOn)) {
+//                        result.add(new Object[]{resident, lastStool, days});
+//                    }
+//                }
+//            }
+//        }
+//
+//        listResident.clear();
+//        return result;
+//    }
 
     public static ArrayList<Object[]> getHighLowIn() {
 
@@ -885,64 +978,67 @@ public class ResValueTools {
         try {
             for (Resident resident : listResident) {
 
-                ArrayList<Pair<LocalDate, BigDecimal>> violatingValues = new ArrayList<Pair<LocalDate, BigDecimal>>();
-                Properties controlling = resident.getControlling();
+                if (!ResInfoTools.isAway(resident)) { // https://github.com/tloehr/Offene-Pflege.de/issues/97
 
-                if (controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) {
+                    ArrayList<Pair<LocalDate, BigDecimal>> violatingValues = new ArrayList<Pair<LocalDate, BigDecimal>>();
+                    Properties controlling = resident.getControlling();
 
-                    // if the controlling was just set its not necessary to look too far into the past
-                    // #24
-                    String sDate = controlling.getProperty(ResidentTools.KEY_DATE2);
-                    LocalDate startingOn = null;
-                    if (sDate != null) {
-                        startingOn = new LocalDate(sDate);
-                    }
+                    if (controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) {
+
+                        // if the controlling was just set its not necessary to look too far into the past
+                        // #24
+                        String sDate = controlling.getProperty(ResidentTools.KEY_DATE2);
+                        LocalDate startingOn = null;
+                        if (sDate != null) {
+                            startingOn = new LocalDate(sDate);
+                        }
 
 
-                    int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
-                    if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
-                        startingOn = now.minusDays(days);
-                    }
-                    HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, startingOn);
+                        int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
+                        if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
+                            startingOn = now.minusDays(days);
+                        }
+                        HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, startingOn);
 
-                    if (!in.isEmpty()) {
-                        for (LocalDate day = startingOn; day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
+                        if (!in.isEmpty()) {
+                            for (LocalDate day = startingOn; day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
 
-                            if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
-                                violatingValues.add(new Pair<LocalDate, BigDecimal>(day, in.get(day)));
+                                if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
+                                    violatingValues.add(new Pair<LocalDate, BigDecimal>(day, in.get(day)));
+                                }
                             }
                         }
                     }
-                }
 
-                if (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off")) {
+                    if (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off")) {
 
-                    // if the controlling was just set its not necessary to look too far into the past
-                    // #24
-                    String sDate = controlling.getProperty(ResidentTools.KEY_DATE3);
-                    LocalDate startingOn = null;
-                    if (sDate != null) {
-                        startingOn = new LocalDate(sDate);
-                    }
+                        // if the controlling was just set its not necessary to look too far into the past
+                        // #24
+                        String sDate = controlling.getProperty(ResidentTools.KEY_DATE3);
+                        LocalDate startingOn = null;
+                        if (sDate != null) {
+                            startingOn = new LocalDate(sDate);
+                        }
 
-                    int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
-                    if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
-                        startingOn = now.minusDays(days);
-                    }
+                        int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
+                        if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
+                            startingOn = now.minusDays(days);
+                        }
 
-                    HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, startingOn);
-                    if (!in.isEmpty()) {
-                        for (LocalDate day = startingOn; day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
+                        HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, startingOn);
+                        if (!in.isEmpty()) {
+                            for (LocalDate day = startingOn; day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
 
-                            if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
-                                violatingValues.add(new Pair<LocalDate, BigDecimal>(day, in.get(day)));
+                                if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
+                                    violatingValues.add(new Pair<LocalDate, BigDecimal>(day, in.get(day)));
+                                }
                             }
                         }
                     }
-                }
 
-                if (!violatingValues.isEmpty()) {
-                    result.add(new Object[]{resident, violatingValues});
+                    if (!violatingValues.isEmpty()) {
+                        result.add(new Object[]{resident, violatingValues});
+                    }
                 }
             }
         } catch (Exception e) {

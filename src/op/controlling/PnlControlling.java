@@ -30,9 +30,8 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.swing.*;
 import com.jidesoft.swing.JideBoxLayout;
-import com.jidesoft.swing.JideButton;
-import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
 import entity.building.Homes;
 import entity.building.HomesTools;
@@ -57,7 +56,10 @@ import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
-import op.tools.*;
+import op.tools.Pair;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -65,14 +67,12 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
-import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
@@ -96,16 +96,11 @@ import java.util.concurrent.ExecutionException;
  */
 public class PnlControlling extends CleanablePanel {
 
-    public static final int TAB_CONTROLLING = 0;
-    public static final int TAB_QMSPLAN = 1;
-
-
     private JScrollPane jspSearch;
     private Qmsplan showMeFirst;
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     private Closure progressClosure;
     private CollapsiblePanes searchPanes;
-    private PnlQMSPlan pnlQMSPlan;
     private boolean init = false;
     private Commontags filterTag = null;
 
@@ -137,23 +132,22 @@ public class PnlControlling extends CleanablePanel {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress.getFirst(), progress.getSecond()));
         };
         initComponents();
-        tabMain.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
+
         initPanel();
     }
 
     private void initPanel() {
-//        prepareSearchArea();
-        pnlQMSPlan = null;
-        tabMain.setTitleAt(TAB_CONTROLLING, SYSTools.xx("opde.controlling.tab.controlling"));
-//        tabMain.setTitleAt(TAB_QMS, SYSTools.xx("opde.controlling.tab.qms"));
-        tabMain.setTitleAt(TAB_QMSPLAN, SYSTools.xx("opde.controlling.tab.qmsplan"));
-        tabMain.setEnabledAt(TAB_QMSPLAN, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, getInternalClassID()));
-
-        if (showMeFirst != null) {
-            tabMain.setSelectedIndex(TAB_QMSPLAN);
-        } else {
-            reload();
-        }
+//        pnlQMSPlan = null;
+//        tabMain.setTitleAt(TAB_CONTROLLING, SYSTools.xx("opde.controlling.tab.controlling"));
+////        tabMain.setTitleAt(TAB_QMS, SYSTools.xx("opde.controlling.tab.qms"));
+//        tabMain.setTitleAt(TAB_QMSPLAN, SYSTools.xx("opde.controlling.tab.qmsplan"));
+//        tabMain.setEnabledAt(TAB_QMSPLAN, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, getInternalClassID()));
+//
+//        if (showMeFirst != null) {
+//            tabMain.setSelectedIndex(TAB_QMSPLAN);
+//        } else {
+//            reload();
+//        }
 
 
     }
@@ -1268,9 +1262,9 @@ public class PnlControlling extends CleanablePanel {
     public void cleanup() {
         super.cleanup();
         cpsControlling.removeAll();
-        if (pnlQMSPlan != null) {
-            pnlQMSPlan.cleanup();
-        }
+//        if (pnlQMSPlan != null) {
+//            pnlQMSPlan.cleanup();
+//        }
     }
 
     private void tabMainStateChanged(ChangeEvent e) {
@@ -1283,51 +1277,31 @@ public class PnlControlling extends CleanablePanel {
         // defers from my usual method, because every tab can have its own searcharea.
         prepareSearchArea();
 
-        switch (tabMain.getSelectedIndex()) {
-            case TAB_CONTROLLING: {
+        helpkey = OPDE.getAppInfo().getInternalClasses().containsKey(internalClassID) ? OPDE.getAppInfo().getInternalClasses().get(internalClassID).getHelpurl() : null;
+        OPDE.getDisplayManager().setMainMessage(internalClassID);
 
+        cpsControlling.removeAll();
+        cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
 
-                helpkey = OPDE.getAppInfo().getInternalClasses().containsKey(internalClassID) ? OPDE.getAppInfo().getInternalClasses().get(internalClassID).getHelpurl() : null;
-                OPDE.getDisplayManager().setMainMessage(internalClassID);
-
-                cpsControlling.removeAll();
-                cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
-
-                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
-                    cpsControlling.add(createCP4Orga());
-                }
-
-                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
-                    cpsControlling.add(createCP4Staff());
-                }
-
-                cpsControlling.add(createCP4Nursing());
-                cpsControlling.add(createCP4Nutrition());
-                cpsControlling.add(createCP4Pain());
-                cpsControlling.add(createCP4Fall());
-
-                cpsControlling.add(createCP4Hygiene());
-
-                if (OPDE.isCalcMediUPR1()) {
-                    cpsControlling.add(createCP4Drugs());
-                }
-                cpsControlling.addExpansion();
-                break;
-            }
-            case TAB_QMSPLAN: {
-                if (pnlQMSPlan == null) {
-                    pnlQMSPlan = new PnlQMSPlan(showMeFirst);
-                    tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
-                    showMeFirst = null;
-                } else {
-                    pnlQMSPlan.reload();
-                }
-                break;
-            }
-            default: {
-            }
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
+            cpsControlling.add(createCP4Orga());
         }
 
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
+            cpsControlling.add(createCP4Staff());
+        }
+
+        cpsControlling.add(createCP4Nursing());
+        cpsControlling.add(createCP4Nutrition());
+        cpsControlling.add(createCP4Pain());
+        cpsControlling.add(createCP4Fall());
+
+        cpsControlling.add(createCP4Hygiene());
+
+        if (OPDE.isCalcMediUPR1()) {
+            cpsControlling.add(createCP4Drugs());
+        }
+        cpsControlling.addExpansion();
 
     }
 
@@ -1466,9 +1440,9 @@ public class PnlControlling extends CleanablePanel {
             OPDE.error(e);
         }
 
-
-        GUITools.addAllComponents(mypanel, addCommands());
-        GUITools.addAllComponents(mypanel, addFilters());
+//
+//        GUITools.addAllComponents(mypanel, addCommands());
+//        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
 
@@ -1479,121 +1453,6 @@ public class PnlControlling extends CleanablePanel {
     }
 
 
-    private java.util.List<Component> addCommands() {
-        java.util.List<Component> list = new ArrayList<Component>();
-
-        if (tabMain.getSelectedIndex() == TAB_QMSPLAN) {
-
-            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-                JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), actionEvent -> {
-                    currentEditor = new DlgQMSPlan(new Qmsplan(""), qmsplan -> {
-                        if (qmsplan != null) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
-                                em.getTransaction().commit();
-//                                        pnlQMSPlan.getListQMSPlans().add(myQMSPlan);
-                                pnlQMSPlan.reload();
-                                prepareSearchArea();
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                } else {
-                                    reload();
-                                }
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-                        }
-                        currentEditor = null;
-                    });
-                    currentEditor.setVisible(true);
-                });
-                list.add(addButton);
-            }
-        }
-        return list;
-    }
-
-    private java.util.List<Component> addFilters() {
-        java.util.List<Component> list = new ArrayList<Component>();
-
-        if (tabMain.getSelectedIndex() == TAB_QMSPLAN) {
-
-
-            final JToggleButton tbClosedOnes2 = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showclosed"));
-
-            ArrayList<Commontags> listTags = CommontagsTools.getAllUsedInQMSPlans(true);
-            if (!listTags.isEmpty()) {
-
-                JPanel pnlTags = new JPanel();
-                pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.PAGE_AXIS));
-                pnlTags.setOpaque(false);
-
-                final JButton btnReset = GUITools.createHyperlinkButton("misc.commands.resetFilter", SYSConst.icon16tagPurpleDelete4, e -> {
-
-//                        init = true;
-//                        tbClosedOnes2.setSelected(false);
-//                        init = false;
-
-//                        pnlQMSPlan.reload();
-//
-//                        pnlQMSPlan.cleanup();
-//                        pnlQMSPlan = new PnlQMSPlan(null);
-//                        tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
-
-                    filterTag = null;
-                    tbClosedOnes2.setSelected(false);
-
-                });
-                pnlTags.add(btnReset, RiverLayout.LEFT);
-
-                for (final Commontags commontag : listTags) {
-
-                    final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> {
-//                            init = true;
-//                            tbClosedOnes2.setSelected(true);
-//                            init = false;
-//
-//                            pnlQMSPlan.cleanup();
-//                            pnlQMSPlan = new PnlQMSPlan(null);
-//                            tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
-//                            //TODO: mark the filter when it is used. maybe a yellow background
-
-                        filterTag = commontag;
-                        tbClosedOnes2.setSelected(true);
-                    });
-                    pnlTags.add(btnTag);
-
-
-                }
-                list.add(pnlTags);
-            }
-
-
-            tbClosedOnes2.addItemListener(itemEvent -> {
-//                    if (init) return;
-                pnlQMSPlan.reload(filterTag, itemEvent.getStateChange() == ItemEvent.SELECTED);
-            });
-            list.add(tbClosedOnes2);
-            tbClosedOnes2.setHorizontalAlignment(SwingConstants.LEFT);
-
-
-        }
-
-        return list;
-    }
 
 
 }

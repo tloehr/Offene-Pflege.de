@@ -671,8 +671,7 @@ public class PnlReport extends NursingRecordsPanel {
         boolean sameMonth = now.dayOfMonth().withMaximumValue().equals(month.dayOfMonth().withMaximumValue());
 
         final LocalDate start = sameMonth ? now : SYSCalendar.eom(month);
-
-
+        
         // the end is usually the bom(of the current month). But there are some odd
         // circumstances (when the resident moved in during the first week within that month)
         // and the first day of that week belongs to the prior month, when this
