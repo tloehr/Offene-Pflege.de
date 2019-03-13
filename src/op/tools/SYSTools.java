@@ -1444,4 +1444,8 @@ public class SYSTools {
         return remoteBuilddate > localBuilddate;
     }
 
+    public static BigDecimal prozentualeVeraenderung(BigDecimal ausgangswert, BigDecimal endwert){
+        return endwert.subtract(ausgangswert).divide(ausgangswert, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
+    }
+
 }

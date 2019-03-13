@@ -10,6 +10,7 @@ import gui.GUITools;
 import op.OPDE;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -659,7 +660,12 @@ public class ResValueTools {
     }
 
 
-    public static ArrayList<Pair<Resident, BigDecimal>> findNotableWeightChanges(int monthsback, BigDecimal changeRateInPercent) {
+    /**
+     * @param monthsback
+     * @param changeRateInPercent
+     * @return eine Liste aus Tripeln (Bewohner, Veränderung absolut, Veränderung in Prozent)
+     */
+    public static ArrayList<ImmutableTriple<Resident, BigDecimal, BigDecimal>> findNotableWeightChanges(int monthsback, BigDecimal changeRateInPercent) {
         java.time.LocalDate from = java.time.LocalDate.now().minusMonths(monthsback).withDayOfMonth(1);
 
         EntityManager em = OPDE.createEM();
@@ -693,16 +699,21 @@ public class ResValueTools {
         ArrayList<Resident> listResidents = new ArrayList<>(listData.keySet());
         Collections.sort(listResidents);
 
-        ArrayList<Pair<Resident, BigDecimal>> resultList = new ArrayList<>();
+//        ArrayList<Pair<Resident, BigDecimal>> resultList = new ArrayList<>();
+
+        ArrayList<ImmutableTriple<Resident, BigDecimal, BigDecimal>> resultList = new ArrayList<>();
 
         for (Resident resident : listResidents) {
             if (listData.containsKey(resident) && listData.get(resident).size() > 1) {
                 ResValue firstValue = listData.get(resident).get(0);
-                ResValue lastValue = listData.get(resident).get(listData.size() - 1);
+                ResValue lastValue = listData.get(resident).get(listData.get(resident).size() - 1);
                 BigDecimal divWeight = firstValue.getVal1().subtract(lastValue.getVal1());
-                Pair result = new Pair<>(resident, divWeight);
-                resultList.add(result);
-                OPDE.debug(result);
+                ImmutableTriple<Resident, BigDecimal, BigDecimal> result = new ImmutableTriple<>(resident, divWeight, SYSTools.prozentualeVeraenderung(firstValue.getVal1(), lastValue.getVal1()));
+                if (result.getRight().abs().compareTo(changeRateInPercent) >= 0) {
+                    resultList.add(result);
+                    OPDE.debug(result);
+                }
+
             }
         }
 

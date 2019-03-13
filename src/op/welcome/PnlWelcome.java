@@ -41,6 +41,7 @@ import op.tools.MyJDialog;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
@@ -74,9 +75,14 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<Object[]> birthdayList;
     private java.util.List<Prescription> emptyStocksList;  //https://github.com/tloehr/Offene-Pflege.de/issues/102
     // https://www.apotheken-umschau.de/gewichtsverlust
-    //https://github.com/tloehr/Offene-Pflege.de/issues/98
+    // Wer ungewollt mehr als zehn Prozent seines Gewichtes innerhalb weniger Monate verliert, sollte einen Arzt aufsuchen,
+    // empfiehlt die Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS).
+    // Prozentuale Veränderung
+    // (endwert-ausgangswert)/ausgangswert * 100
+    // Denn hinter dem ungewollten Abnehmen stecken oft Magen-Darm-Erkankungen.
+    // https://github.com/tloehr/Offene-Pflege.de/issues/98
     // mehr als 5% in 3 Monaten oder mehr als 10% in 6 Monaten
-    private ArrayList<Pair<Resident, BigDecimal>> strangeWeightList;
+    private ArrayList<ImmutableTriple<Resident, BigDecimal, BigDecimal>> strangeWeightList;
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
     private ArrayList<Qms> dueQMSes;
@@ -194,7 +200,7 @@ public class PnlWelcome extends CleanablePanel {
                 expiryList = MedStockTools.getExpiryList(7);
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
-                strangeWeightList = ResValueTools.findNotableWeightChanges(3, new BigDecimal(30));
+                strangeWeightList = ResValueTools.findNotableWeightChanges(3, new BigDecimal(5));
                 dueQMSes = QmsTools.getDueList(OPDE.getLogin().getUser());
                 Collections.sort(processList);
                 int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size() + emptyStocksList.size();
