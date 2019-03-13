@@ -76,7 +76,7 @@ public class PnlWelcome extends CleanablePanel {
     // https://www.apotheken-umschau.de/gewichtsverlust
     //https://github.com/tloehr/Offene-Pflege.de/issues/98
     // mehr als 5% in 3 Monaten oder mehr als 10% in 6 Monaten
-    private java.util.List<Prescription> strangeWeightList;
+    private ArrayList<Pair<Resident, BigDecimal>> strangeWeightList;
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
     private ArrayList<Qms> dueQMSes;
@@ -100,6 +100,7 @@ public class PnlWelcome extends CleanablePanel {
         SYSTools.clear(processList);
         SYSTools.clear(birthdayList);
         SYSTools.clear(noStoolList);
+        SYSTools.clear(strangeWeightList);
         SYSTools.clear(violatingLiquidValues);
         SYSTools.clear(dueQMSes);
 
@@ -193,7 +194,7 @@ public class PnlWelcome extends CleanablePanel {
                 expiryList = MedStockTools.getExpiryList(7);
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
-                strangeWeightList = null;
+                strangeWeightList = ResValueTools.findNotableWeightChanges(3, new BigDecimal(30));
                 dueQMSes = QmsTools.getDueList(OPDE.getLogin().getUser());
                 Collections.sort(processList);
                 int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size() + emptyStocksList.size();

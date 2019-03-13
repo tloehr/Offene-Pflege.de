@@ -27,7 +27,6 @@ package entity.system;
 
 import entity.files.*;
 import entity.reports.NReport;
-import entity.staff.Training2Users;
 import interfaces.Attachable;
 import op.OPDE;
 import op.tools.SYSTools;
@@ -38,7 +37,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 /**
  * @author tloehr
@@ -101,9 +99,6 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<User2File> attachedFilesConnections;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "attendee")
-    private Collection<Training2Users> attendedTrainings;
 
     public Users() {
         uid = null;

@@ -14,8 +14,6 @@ import entity.prescription.Prescription;
 import entity.qms.Qms;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
-import entity.staff.Training;
-import entity.staff.Training2Users;
 import entity.system.Users;
 import entity.values.ResValue;
 import interfaces.Attachable;
@@ -44,7 +42,7 @@ import java.util.Collections;
  */
 public class DlgFiles extends MyJDialog {
     private Attachable attachable;
-//    private boolean filesAttached = false;
+    //    private boolean filesAttached = false;
     private Closure afterAttachAction;
     private JList list;
 
@@ -52,9 +50,9 @@ public class DlgFiles extends MyJDialog {
      * Creates a generic file attachment dialog to show existing files and add new ones.
      *
      * @param attachable        object to add the files to
-         * @param afterAttachAction what to do, after files have been attached. if this is <code>null</code>, file drops are not possible.
-         */
-        public DlgFiles(Attachable attachable, Closure afterAttachAction) {
+     * @param afterAttachAction what to do, after files have been attached. if this is <code>null</code>, file drops are not possible.
+     */
+    public DlgFiles(Attachable attachable, Closure afterAttachAction) {
         super(false);
         this.attachable = attachable;
         this.afterAttachAction = afterAttachAction;
@@ -190,10 +188,6 @@ public class DlgFiles extends MyJDialog {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.npAssignCollection sf WHERE sf.nursingProcess = :np ");
             query.setParameter("np", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
-        } else if (attachable instanceof Training) {
-            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.trAssignCollection sf WHERE sf.training = :training ");
-            query.setParameter("training", attachable);
-            files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof Users) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.usersAssignCollection uf WHERE uf.user = :user ");
             query.setParameter("user", attachable);
@@ -206,11 +200,8 @@ public class DlgFiles extends MyJDialog {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.qmsAssignCollection ac WHERE ac.qms = :qms ");
             query.setParameter("qms", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
-        } else if (attachable instanceof Training2Users) {
-            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.trainAttendeeAssignCollection tac WHERE tac.training2Users = :training2users ");
-            query.setParameter("training2users", attachable);
-            files = new ArrayList<SYSFiles>(query.getResultList());
         }
+        
         Collections.sort(files);
 
         em.close();
@@ -241,8 +232,8 @@ public class DlgFiles extends MyJDialog {
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                    "default:grow, $lcgap, default:grow",
-                    "fill:default:grow, $lgap, default"));
+                        "default:grow, $lcgap, default:grow",
+                        "fill:default:grow, $lgap, default"));
 
                 //---- btnCancel ----
                 btnCancel.setText(null);

@@ -5,7 +5,6 @@ import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
-import entity.staff.Training;
 import gui.interfaces.EditorComponent;
 
 import javax.persistence.*;
@@ -75,14 +74,6 @@ public class Commontags implements Comparable<Commontags> {
     @Column(name = "version")
     private Long version;
 
-    //TODO: add a sorter row
-
-    @ManyToMany(mappedBy = "commontags")
-    private Collection<Training> trainings;
-
-    public Collection<Training> getTrainings() {
-        return trainings;
-    }
 
     public Collection<Qmsplan> getQmsplans() {
         return qmsplans;

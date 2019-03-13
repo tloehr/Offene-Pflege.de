@@ -672,7 +672,7 @@ public class ResValueTools {
                 " AND rv.resident.adminonly <> 2 " +
                 " AND rv.pit >= :from " +
                 " AND rv.resident.station IS NOT NULL" +
-                " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
+                " ORDER BY rv.resident.rid, rv.pit ";
 
         Query query = em.createQuery(jpqlWithoutRetired);
         query.setParameter("valType", ResValueTypesTools.WEIGHT);
@@ -693,14 +693,10 @@ public class ResValueTools {
         ArrayList<Resident> listResidents = new ArrayList<>(listData.keySet());
         Collections.sort(listResidents);
 
-        ResValueTypes heightType = ResValueTypesTools.getType(ResValueTypesTools.HEIGHT);
-        ResValueTypes weightType = ResValueTypesTools.getType(ResValueTypesTools.WEIGHT);
-
         ArrayList<Pair<Resident, BigDecimal>> resultList = new ArrayList<>();
 
         for (Resident resident : listResidents) {
-
-            if (listData.size() > 1) {
+            if (listData.containsKey(resident) && listData.get(resident).size() > 1) {
                 ResValue firstValue = listData.get(resident).get(0);
                 ResValue lastValue = listData.get(resident).get(listData.size() - 1);
                 BigDecimal divWeight = firstValue.getVal1().subtract(lastValue.getVal1());

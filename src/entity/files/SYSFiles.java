@@ -83,8 +83,6 @@ public class SYSFiles implements Serializable, Comparable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<SYSNP2FILE> npAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<Training2File> trAssignCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<User2File> usersAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<Resident2File> residentAssignCollection;
@@ -92,10 +90,6 @@ public class SYSFiles implements Serializable, Comparable {
     private Collection<Qmsplan2File> qmsplanAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<Qms2File> qmsAssignCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<Training2File> trainingAssignCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<TrainingAttendee2File> trainAttendeeAssignCollection;
 
     public SYSFiles() {
     }
@@ -125,10 +119,6 @@ public class SYSFiles implements Serializable, Comparable {
         return bwiAssignCollection;
     }
 
-    public Collection<Training2File> getTrAssignCollection() {
-        return trAssignCollection;
-    }
-
     public Users getUser() {
         return user;
     }
@@ -155,14 +145,6 @@ public class SYSFiles implements Serializable, Comparable {
 
     public Collection<Qms2File> getQmsAssignCollection() {
         return qmsAssignCollection;
-    }
-
-    public Collection<Training2File> getTrainingAssignCollection() {
-        return trainingAssignCollection;
-    }
-
-    public Collection<TrainingAttendee2File> getTrainAttendeeAssignCollection() {
-        return trainAttendeeAssignCollection;
     }
 
     public Long getOcfid() {

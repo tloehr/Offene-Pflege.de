@@ -30,8 +30,8 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
-import com.jidesoft.swing.*;
 import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
 import entity.building.Homes;
 import entity.building.HomesTools;
@@ -45,7 +45,6 @@ import entity.process.QProcessTools;
 import entity.qms.ControllingTools;
 import entity.qms.Qmsplan;
 import entity.reports.NReportTools;
-import entity.staff.TrainingTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import entity.system.SYSPropsTools;
@@ -257,39 +256,7 @@ public class PnlControlling extends CleanablePanel {
         return cpOrga;
     }
 
-    private CollapsiblePane createCP4Staff() {
-        final CollapsiblePane cpStaff = new CollapsiblePane();
 
-        String title = "<html><font size=+1>" +
-                SYSTools.xx("opde.controlling.staff") +
-                "</font></html>";
-
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
-            try {
-                cpStaff.setCollapsed(!cpStaff.isCollapsed());
-            } catch (PropertyVetoException pve) {
-                // BAH!
-            }
-        });
-        cpStaff.setTitleLabelComponent(cptitle.getMain());
-        cpStaff.setSlidingDirection(SwingConstants.SOUTH);
-        cpStaff.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
-            @Override
-            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpStaff.setContentPane(createContentPanel4Orga());
-            }
-        });
-
-        if (!cpStaff.isCollapsed()) {
-            cpStaff.setContentPane(createContentPanel4Staff());
-        }
-
-        cpStaff.setHorizontalAlignment(SwingConstants.LEADING);
-        //        cpOrga.setOpaque(false);
-        //        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
-
-        return cpStaff;
-    }
 
     private CollapsiblePane createCP4Hygiene() {
         final CollapsiblePane cpHygiene = new CollapsiblePane();
@@ -876,62 +843,7 @@ public class PnlControlling extends CleanablePanel {
         return props;
     }
 
-    private JPanel createContentPanel4Staff() {
-        JPanel pnlContent = new JPanel(new VerticalLayout());
-
-        /***
-         *      ____  _         __  __
-         *     / ___|| |_ __ _ / _|/ _|
-         *     \___ \| __/ _` | |_| |_
-         *      ___) | || (_| |  _|  _|
-         *     |____/ \__\__,_|_| |_|
-         *
-         */
-        JPanel pnlTraining = new JPanel(new BorderLayout());
-        final JButton btnTrainings = GUITools.createHyperlinkButton("opde.controlling.staff.training", null, null);
-        Pair<LocalDate, LocalDate> minmax = TrainingTools.getMinMax();
-        btnTrainings.setEnabled(minmax != null);
-
-        final JComboBox cmbYears = new JComboBox();
-
-        if (minmax == null) {
-            cmbYears.setModel(new DefaultComboBoxModel());
-        } else {
-            ArrayList<Integer> years = new ArrayList<>();
-
-            for (int year = minmax.getSecond().getYear(); year >= minmax.getFirst().getYear(); year--) {
-                years.add(year);
-            }
-
-            cmbYears.setModel(SYSTools.list2cmb(years));
-            cmbYears.setSelectedIndex(0);
-        }
-
-        btnTrainings.addActionListener(e -> {
-
-            OPDE.getMainframe().setBlocked(true);
-            SwingWorker worker = new SwingWorker() {
-                @Override
-                protected Object doInBackground() throws Exception {
-                    SYSFilesTools.print(TrainingTools.getTraining2Attendees((Integer) cmbYears.getSelectedItem()), false);
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
-                }
-            };
-            worker.execute();
-        });
-        pnlTraining.add(btnTrainings, BorderLayout.WEST);
-        pnlTraining.add(cmbYears, BorderLayout.EAST);
-        pnlContent.add(pnlTraining);
-
-
-        return pnlContent;
-    }
+//
 
     private JPanel createContentPanel4Nursing() {
         JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -1287,9 +1199,6 @@ public class PnlControlling extends CleanablePanel {
             cpsControlling.add(createCP4Orga());
         }
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
-            cpsControlling.add(createCP4Staff());
-        }
 
         cpsControlling.add(createCP4Nursing());
         cpsControlling.add(createCP4Nutrition());

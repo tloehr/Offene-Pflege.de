@@ -36,8 +36,6 @@ import entity.prescription.Prescription;
 import entity.qms.Qms;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
-import entity.staff.Training;
-import entity.staff.Training2Users;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.values.ResValue;
@@ -45,7 +43,6 @@ import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.io.FileUtils;
 
@@ -59,7 +56,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -206,10 +202,6 @@ public class SYSFilesTools {
                                 Resident2File link2 = em.merge(new Resident2File(sysfile, ((NursingProcess) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getResidentAssignCollection().add(link2);
 
-                            } else if (attachable instanceof Training) {
-                                Training2File link = em.merge(new Training2File(sysfile, (Training) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getTrAssignCollection().add(link);
-                                ((Training) attachable).getAttachedFilesConnections().add(link);
                             } else if (attachable instanceof Users) {
                                 User2File link = em.merge(new User2File(sysfile, (Users) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getUsersAssignCollection().add(link);
@@ -226,8 +218,6 @@ public class SYSFilesTools {
                                 Qms2File link = em.merge(new Qms2File(sysfile, (Qms) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getQmsAssignCollection().add(link);
                                 ((Qms) attachable).getAttachedFilesConnections().add(link);
-                            } else if (attachable instanceof Training2Users) {
-                                em.merge(((SYSFilesContainer) attachable).attachFile(sysfile));
                             }
                         }
                         successful.add(sysfile);
