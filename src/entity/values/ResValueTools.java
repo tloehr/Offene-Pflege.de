@@ -10,7 +10,7 @@ import gui.GUITools;
 import op.OPDE;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.javatuples.Quartet;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.time.Period;
 import java.util.*;
 
 /**
@@ -550,6 +551,7 @@ public class ResValueTools {
                 " FROM ResValue rv " +
                 " WHERE rv.vtype.valType = :valType " +
                 " AND rv.resident.adminonly <> 2 " +
+                " AND rv.editedBy IS NULL " + // gelöschte ignorieren
                 " AND rv.pit >= :from " +
                 " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
 
@@ -558,6 +560,7 @@ public class ResValueTools {
                 " FROM ResValue rv " +
                 " WHERE rv.vtype.valType = :valType " +
                 " AND rv.resident.adminonly <> 2 " +
+                " AND rv.editedBy IS NULL " + // gelöschte ignorieren
                 " AND rv.pit >= :from " +
                 " AND rv.resident.station IS NOT NULL" +
                 " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
@@ -661,12 +664,15 @@ public class ResValueTools {
 
 
     /**
-     * @param monthsback
-     * @param changeRateInPercent
-     * @return eine Liste aus Tripeln (Bewohner, Veränderung absolut, Veränderung in Prozent)
+     * Erstellt eine Liste von auffälligen Gewichtsveränderungen.
+     *
+     * @param monthsback          - der zu prüfende Zeitraum in Monaten von jetzt an gerechnet. Wenn innerhalb des zu prüfenden Zeitraums nicht mindestens zwei Werte vorhanden sind, kommt der BW nicht in die Liste.
+     * @param changeRateInPercent - Die Gewichtsveränderung in Prozent, aber eine Meldung in die Liste mit aufgenommen werden soll.
+     * @return eine Liste aus 4-Tupeln (Bewohner, Betrachteter Zeitraum in Tagen, Veränderung absolut, Veränderung in Prozent). In die Liste kommt man nur rein, wenn man die "changeRate" erfüllt. Oder wenn die Rate nicht ermittelbar war. Z.B. weil es keine Werte gibt.
      */
-    public static ArrayList<ImmutableTriple<Resident, BigDecimal, BigDecimal>> findNotableWeightChanges(int monthsback, BigDecimal changeRateInPercent) {
+    public static ArrayList<Quartet<Resident, Period, BigDecimal, BigDecimal>> findNotableWeightChanges(int monthsback, BigDecimal changeRateInPercent) {
         java.time.LocalDate from = java.time.LocalDate.now().minusMonths(monthsback).withDayOfMonth(1);
+
 
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
@@ -676,6 +682,7 @@ public class ResValueTools {
                 " FROM ResValue rv " +
                 " WHERE rv.vtype.valType = :valType " +
                 " AND rv.resident.adminonly <> 2 " +
+                " AND rv.editedBy IS NULL " + // gelöschte ignorieren
                 " AND rv.pit >= :from " +
                 " AND rv.resident.station IS NOT NULL" +
                 " ORDER BY rv.resident.rid, rv.pit ";
@@ -701,19 +708,23 @@ public class ResValueTools {
 
 //        ArrayList<Pair<Resident, BigDecimal>> resultList = new ArrayList<>();
 
-        ArrayList<ImmutableTriple<Resident, BigDecimal, BigDecimal>> resultList = new ArrayList<>();
+        ArrayList<Quartet<Resident, Period, BigDecimal, BigDecimal>> resultList = new ArrayList<>();
 
         for (Resident resident : listResidents) {
             if (listData.containsKey(resident) && listData.get(resident).size() > 1) {
                 ResValue firstValue = listData.get(resident).get(0);
                 ResValue lastValue = listData.get(resident).get(listData.get(resident).size() - 1);
+                java.time.LocalDate startDate = DateUtils.asLocalDate(firstValue.getPit());
+                java.time.LocalDate endDate = DateUtils.asLocalDate(lastValue.getPit());
+
+                Period betrachteterZeitraum = Period.between(startDate, endDate);
+
                 BigDecimal divWeight = firstValue.getVal1().subtract(lastValue.getVal1());
-                ImmutableTriple<Resident, BigDecimal, BigDecimal> result = new ImmutableTriple<>(resident, divWeight, SYSTools.prozentualeVeraenderung(firstValue.getVal1(), lastValue.getVal1()));
-                if (result.getRight().abs().compareTo(changeRateInPercent) >= 0) {
+                Quartet<Resident, Period, BigDecimal, BigDecimal> result = new Quartet<>(resident, betrachteterZeitraum, divWeight, SYSTools.prozentualeVeraenderung(firstValue.getVal1(), lastValue.getVal1()));
+                if (result.getValue3().abs().compareTo(changeRateInPercent) >= 0) {
                     resultList.add(result);
                     OPDE.debug(result);
                 }
-
             }
         }
 

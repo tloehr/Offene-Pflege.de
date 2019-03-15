@@ -41,8 +41,8 @@ import op.tools.MyJDialog;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.log4j.Logger;
+import org.javatuples.Quartet;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
@@ -59,6 +59,7 @@ import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -82,7 +83,7 @@ public class PnlWelcome extends CleanablePanel {
     // Denn hinter dem ungewollten Abnehmen stecken oft Magen-Darm-Erkankungen.
     // https://github.com/tloehr/Offene-Pflege.de/issues/98
     // mehr als 5% in 3 Monaten oder mehr als 10% in 6 Monaten
-    private ArrayList<ImmutableTriple<Resident, BigDecimal, BigDecimal>> strangeWeightList;
+    private ArrayList<Quartet<Resident, Period, BigDecimal, BigDecimal>> strangeWeightList;
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
     private ArrayList<Qms> dueQMSes;
@@ -215,6 +216,21 @@ public class PnlWelcome extends CleanablePanel {
                         progress++;
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4(process).getMain());
+                    }
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
+                }
+
+                if (!strangeWeightList.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            SYSTools.xx("misc.msg.notableWeightChanges") +
+                            "</font></html>";
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    for (Quartet<Resident, Period, BigDecimal, BigDecimal> entry : strangeWeightList) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4(entry).getMain());
                     }
                     cp.setContentPane(pnlContent);
                     cpsWelcome.add(cp);
@@ -460,6 +476,35 @@ public class PnlWelcome extends CleanablePanel {
 
         return cptitle;
     }
+
+
+    private DefaultCPTitle createCP4(Quartet<Resident, Period, BigDecimal, BigDecimal> entry) {
+        Resident resident = entry.getValue0();
+        Period betrachteterZeitraum = entry.getValue1();
+        BigDecimal absolut = entry.getValue2();
+        BigDecimal prozent = entry.getValue2();
+
+        String title = "<html><table border=\"0\">" +
+                "<tr valign=\"top\">" +
+                "<td width=\"200\" align=\"left\">" +
+                "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
+                "<td width=\"200\" align=\"left\">" + SYSTools.xx("controlling.misc.controlPeriod") + ": " +
+                betrachteterZeitraum + "</td>" +
+                "<td width=\"200\" align=\"left\">" + SYSTools.xx("misc.msg.change") + ": " +
+                absolut + " (" + prozent + "%)" + "</td>" +
+                "</tr>" +
+                "</table>" +
+                "</html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
+            OPDE.getMainframe().clearPreviousProgbutton();
+            OPDE.getMainframe().setCurrentResident(resident);
+            OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
+        });
+
+        return cptitle;
+    }
+
 
     private DefaultCPTitle createCP4Birthdays(final Resident resident, int newAge, int days2Birthday) {
 
