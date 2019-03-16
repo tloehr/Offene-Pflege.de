@@ -482,16 +482,16 @@ public class PnlWelcome extends CleanablePanel {
         Resident resident = entry.getValue0();
         Period betrachteterZeitraum = entry.getValue1();
         BigDecimal absolut = entry.getValue2();
-        BigDecimal prozent = entry.getValue2();
+        BigDecimal prozent = entry.getValue3();
 
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"200\" align=\"left\">" +
                 "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
-                "<td width=\"200\" align=\"left\">" + SYSTools.xx("controlling.misc.controlPeriod") + ": " +
-                betrachteterZeitraum + "</td>" +
+                "<td width=\"200\" align=\"left\">" + SYSTools.xx("misc.msg.period") + ": " +
+                format(betrachteterZeitraum) + "</td>" +
                 "<td width=\"200\" align=\"left\">" + SYSTools.xx("misc.msg.change") + ": " +
-                absolut + " (" + prozent + "%)" + "</td>" +
+                absolut + " kg (" + prozent.setScale(2, RoundingMode.HALF_UP) + "%)" + "</td>" +
                 "</tr>" +
                 "</table>" +
                 "</html>";
@@ -505,6 +505,13 @@ public class PnlWelcome extends CleanablePanel {
         return cptitle;
     }
 
+
+    public static String format(Period d) {
+
+        return
+                (d.getMonths() == 0 ? "" : d.getMonths() + " Monate, ") +
+                        (d.getDays() == 0 ? "" : d.getDays() + " Tage");
+    }
 
     private DefaultCPTitle createCP4Birthdays(final Resident resident, int newAge, int days2Birthday) {
 
