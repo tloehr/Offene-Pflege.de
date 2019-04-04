@@ -1,0 +1,25 @@
+<!--
+
+BWINFTYP: apoplex01
+Schlaganfall
+
+since-db-version:
+deprecated-since:
+replaces:
+replaced-by:
+equivalence-id:
+
+ ▜▘   ▐              ▜ ▙▗▌     ▌
+ ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
+ ▐ ▌ ▌▐ ▖▛▀ ▌  ▐▐ ▞▀▌▐ ▌ ▌▌ ▌▌ ▌▛▀
+ ▀▘▘ ▘ ▀ ▝▀▘▘   ▘ ▝▀▘ ▘▘ ▘▝▀ ▝▀▘▝▀▘
+( ) MODE_INTERVAL_BYSECOND = 0;
+( ) MODE_INTERVAL_BYDAY = 1;
+( ) MODE_INTERVAL_NOCONSTRAINTS = 2;
+(X) MODE_INTERVAL_SINGLE_INCIDENTS = 3;
+
+-->
+<resinfotype>
+    <imagelabel image="/artwork/48x48/qpr48.png" tooltip="Diese Information ist ein Indikator für die Qualitätsprüfung."/>
+    <textfield label="Datum" length="12" name="strokedate" type="date" preset="currentdate"/>
+</resinfotype>
