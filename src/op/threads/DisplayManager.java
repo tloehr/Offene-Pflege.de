@@ -102,7 +102,7 @@ public class DisplayManager extends Thread {
         lblDiabetes = new JLabel(SYSConst.icon22diabetes);
         lblDiabetes.setVisible(false);
         lblDiabetes.setOpaque(false);
-        lblFallRisk = new JLabel(SYSConst.icon22falling);
+        lblFallRisk = new JLabel(SYSConst.findIcon(SYSConst.icon22falling));
         lblFallRisk.setVisible(false);
         lblFallRisk.setOpaque(false);
 

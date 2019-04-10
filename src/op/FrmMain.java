@@ -838,7 +838,7 @@ public class FrmMain extends JFrame {
                 pnl.add(new JLabel(SYSConst.icon16warning));
             }
             if (specialities.get(ResInfoTypeTools.TYPE_FALLRISK).contains(resident)) {
-                pnl.add(new JLabel(SYSConst.icon16falling));
+                pnl.add(new JLabel(SYSConst.findIcon(SYSConst.icon16falling)));
             }
         }
     }

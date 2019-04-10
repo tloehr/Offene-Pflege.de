@@ -16,8 +16,6 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import java.io.File;
 import java.io.FileWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 

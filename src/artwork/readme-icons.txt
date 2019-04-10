@@ -48,3 +48,4 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- if_anonymous_45050.png (https://www.iconfinder.com/icons/45050/anonymous_icon)
 -- falling-99177_640.png (https://pixabay.com/de/fallen-ausl%C3%B6sung-nach-unten-treppe-99177/)
 -- hillslope-99173_640 (https://pixabay.com/de/hillslope-fallen-mann-hange-99173/)
+-- evalutie-score.[png|svg] https://openclipart.org/detail/237767/evaluation-score

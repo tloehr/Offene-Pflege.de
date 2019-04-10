@@ -25,6 +25,7 @@ import entity.qms.QmsTools;
 import entity.system.CommontagsTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
+import entity.values.ResValueTypesTools;
 import gui.GUITools;
 import gui.interfaces.CleanablePanel;
 import gui.interfaces.DefaultCPTitle;
@@ -42,7 +43,7 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.log4j.Logger;
-import org.javatuples.Quartet;
+import org.javatuples.Quintet;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
@@ -62,7 +63,6 @@ import java.text.DateFormat;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Properties;
 
 /**
@@ -74,7 +74,7 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<QProcess> processList;
     private java.util.List<MedStock> expiryList;
     private java.util.List<Object[]> birthdayList;
-    private java.util.List<Prescription> emptyStocksList;  //https://github.com/tloehr/Offene-Pflege.de/issues/102
+    //    private java.util.List<Prescription> emptyStocksList;  //https://github.com/tloehr/Offene-Pflege.de/issues/102
     // https://www.apotheken-umschau.de/gewichtsverlust
     // Wer ungewollt mehr als zehn Prozent seines Gewichtes innerhalb weniger Monate verliert, sollte einen Arzt aufsuchen,
     // empfiehlt die Deutsche Gesellschaft für Gastroenterologie, Verdauungs- und Stoffwechselkrankheiten (DGVS).
@@ -83,12 +83,14 @@ public class PnlWelcome extends CleanablePanel {
     // Denn hinter dem ungewollten Abnehmen stecken oft Magen-Darm-Erkankungen.
     // https://github.com/tloehr/Offene-Pflege.de/issues/98
     // mehr als 5% in 3 Monaten oder mehr als 10% in 6 Monaten
-    private ArrayList<Quartet<Resident, Period, BigDecimal, BigDecimal>> strangeWeightList;
+    private ArrayList<Quintet<Resident, java.time.LocalDate, java.time.LocalDate, BigDecimal, BigDecimal>> strangeWeightList;
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
     private ArrayList<Qms> dueQMSes;
     private final int BIRTHDAY = 4;
     private Logger logger = Logger.getLogger(getClass());
+    private BigDecimal WEIGHT_PERCENT = new BigDecimal(5);
+    private int WEIGHT_MONTHSBACK = 3;
 
     public PnlWelcome(JScrollPane jspSearch) {
         super("opde.welcome");
@@ -195,16 +197,16 @@ public class PnlWelcome extends CleanablePanel {
             protected Object doInBackground() throws Exception {
                 int progress = -1;
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
-                emptyStocksList = PrescriptionTools.getAllActiveWithEmptyInventories();
+//                emptyStocksList = PrescriptionTools.getAllActiveWithEmptyInventories();
                 processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
                 birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
                 expiryList = MedStockTools.getExpiryList(7);
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
-                strangeWeightList = ResValueTools.findNotableWeightChanges(3, new BigDecimal(5));
+                strangeWeightList = ResValueTools.findNotableWeightChanges(WEIGHT_MONTHSBACK, WEIGHT_PERCENT);    // 3 monate, 5%
                 dueQMSes = QmsTools.getDueList(OPDE.getLogin().getUser());
                 Collections.sort(processList);
-                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size() + emptyStocksList.size();
+                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size() + dueQMSes.size();
 
                 if (!processList.isEmpty()) {
                     String title = "<html><font size=+1>" +
@@ -221,13 +223,15 @@ public class PnlWelcome extends CleanablePanel {
                     cpsWelcome.add(cp);
                 }
 
+
                 if (!strangeWeightList.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            SYSTools.xx("misc.msg.notableWeightChanges") +
+                            SYSTools.xx("misc.msg.notableWeightChanges") + " " + WEIGHT_MONTHSBACK + " " + SYSTools.xx("misc.msg.months") + ", " +
+                            WEIGHT_PERCENT + "%" +
                             "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
-                    for (Quartet<Resident, Period, BigDecimal, BigDecimal> entry : strangeWeightList) {
+                    for (Quintet<Resident, java.time.LocalDate, java.time.LocalDate, BigDecimal, BigDecimal> entry : strangeWeightList) {
                         progress++;
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4(entry).getMain());
@@ -251,22 +255,22 @@ public class PnlWelcome extends CleanablePanel {
                     cpsWelcome.add(cp);
                 }
 
-                if (!emptyStocksList.isEmpty()) {
-                    Collections.sort(emptyStocksList, Comparator.comparing(Prescription::getResident));
-                    String title = "<html><font size=+1>" +
-                            SYSTools.xx("nursingrecords.handover.emptyInventories") +
-                            "</font></html>";
-
-                    CollapsiblePane cp = new CollapsiblePane(title);
-                    JPanel pnlContent = new JPanel(new VerticalLayout());
-                    for (Prescription prescription : emptyStocksList) {
-                        progress++;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
-                        pnlContent.add(createCP4(prescription).getMain());
-                    }
-                    cp.setContentPane(pnlContent);
-                    cpsWelcome.add(cp);
-                }
+//                if (!emptyStocksList.isEmpty()) {
+//                    Collections.sort(emptyStocksList, Comparator.comparing(Prescription::getResident));
+//                    String title = "<html><font size=+1>" +
+//                            SYSTools.xx("nursingrecords.handover.emptyInventories") +
+//                            "</font></html>";
+//
+//                    CollapsiblePane cp = new CollapsiblePane(title);
+//                    JPanel pnlContent = new JPanel(new VerticalLayout());
+//                    for (Prescription prescription : emptyStocksList) {
+//                        progress++;
+//                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
+//                        pnlContent.add(createCP4(prescription).getMain());
+//                    }
+//                    cp.setContentPane(pnlContent);
+//                    cpsWelcome.add(cp);
+//                }
 
                 if (!birthdayList.isEmpty()) {
                     String title = "<html><font size=+1>" +
@@ -477,21 +481,30 @@ public class PnlWelcome extends CleanablePanel {
         return cptitle;
     }
 
-
-    private DefaultCPTitle createCP4(Quartet<Resident, Period, BigDecimal, BigDecimal> entry) {
+    /**
+     * erstellt den Abschnitt für die Gewichts Warnungen
+     *
+     * @param entry
+     * @return
+     */
+    private DefaultCPTitle createCP4(Quintet<Resident, java.time.LocalDate, java.time.LocalDate, BigDecimal, BigDecimal> entry) {
         Resident resident = entry.getValue0();
-        Period betrachteterZeitraum = entry.getValue1();
-        BigDecimal absolut = entry.getValue2();
-        BigDecimal prozent = entry.getValue3();
+        java.time.LocalDate startDate = entry.getValue1();
+        java.time.LocalDate endDate = entry.getValue2();
+        BigDecimal absolut = entry.getValue3();
+        BigDecimal prozent = entry.getValue4();
+
+        ResValue height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
+        ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
 
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"200\" align=\"left\">" +
                 "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
-                "<td width=\"200\" align=\"left\">" + SYSTools.xx("misc.msg.period") + ": " +
-                format(betrachteterZeitraum) + "</td>" +
-                "<td width=\"200\" align=\"left\">" + SYSTools.xx("misc.msg.change") + ": " +
-                absolut + " kg (" + prozent.setScale(2, RoundingMode.HALF_UP) + "%)" + "</td>" +
+                "<td width=\"200\" align=\"left\">" +//+ SYSTools.xx("misc.msg.period") + ": " +
+                startDate + " &rarr; " + endDate + "</td>" +
+                "<td width=\"200\" align=\"left\">" +// + SYSTools.xx("misc.msg.change") + ": " +
+                absolut + " kg (" + prozent.setScale(2, RoundingMode.HALF_UP) + "%" + (height != null ? ", BMI: " + ResValueTools.getBMI(weight.getVal1(), height.getVal1()) : "") + ")" + "</td>" +
                 "</tr>" +
                 "</table>" +
                 "</html>";

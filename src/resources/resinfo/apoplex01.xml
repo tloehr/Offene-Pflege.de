@@ -1,0 +1,31 @@
+<!--
+
+ ▜▘   ▐              ▜ ▙▗▌     ▌
+ ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
+ ▐ ▌ ▌▐ ▖▛▀ ▌  ▐▐ ▞▀▌▐ ▌ ▌▌ ▌▌ ▌▛▀
+ ▀▘▘ ▘ ▀ ▝▀▘▘   ▘ ▝▀▘ ▘▘ ▘▝▀ ▝▀▘▝▀▘
+( ) MODE_INTERVAL_BYSECOND = 0;
+( ) MODE_INTERVAL_BYDAY = 1;
+( ) MODE_INTERVAL_NOCONSTRAINTS = 2;
+(X) MODE_INTERVAL_SINGLE_INCIDENTS = 3;
+
+Gehört zur Überleitung: nein
+Gehört zur QPR: ja
+
+-->
+<resinfotype bwinftyp="apoplex01" sinceversion="12" deprecated="0" abstract_type="157" equivalent="0" intervalmode="3"
+             infokurz="Schlaganfall" infolang="" category="15" tx="false" qpr="true">
+    <imagelabel image="/artwork/48x48/evalutie-score-48.png"
+                tooltip="Diese Information ist ein Indikator für die Qualitätsprüfung."/>
+    <textfield label="Datum" length="12" name="strokedate" type="date" preset="currentdate"/>
+</resinfotype>
+
+
+        <!--
+
+
+        INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`) VALUES ('apoplex01', 'Schlaganfall', '', '15', '157', '3', '0',
+                    '<imagelabel image="/artwork/48x48/qpr48.png" tooltip="Diese Information ist ein Indikator für die Qualitätsprüfung."/>
+                     <textfield label="Datum" length="12" name="strokedate" type="date" preset="currentdate"/>');
+
+        -->

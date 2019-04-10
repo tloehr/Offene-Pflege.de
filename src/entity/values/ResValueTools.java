@@ -10,7 +10,7 @@ import gui.GUITools;
 import op.OPDE;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
-import org.javatuples.Quartet;
+import org.javatuples.Quintet;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -22,7 +22,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.time.Period;
 import java.util.*;
 
 /**
@@ -670,7 +669,7 @@ public class ResValueTools {
      * @param changeRateInPercent - Die Gewichtsveränderung in Prozent, aber eine Meldung in die Liste mit aufgenommen werden soll.
      * @return eine Liste aus 4-Tupeln (Bewohner, Betrachteter Zeitraum in Tagen, Veränderung absolut, Veränderung in Prozent). In die Liste kommt man nur rein, wenn man die "changeRate" erfüllt. Oder wenn die Rate nicht ermittelbar war. Z.B. weil es keine Werte gibt.
      */
-    public static ArrayList<Quartet<Resident, Period, BigDecimal, BigDecimal>> findNotableWeightChanges(int monthsback, BigDecimal changeRateInPercent) {
+    public static ArrayList<Quintet<Resident, java.time.LocalDate, java.time.LocalDate, BigDecimal, BigDecimal>> findNotableWeightChanges(int monthsback, BigDecimal changeRateInPercent) throws Exception {
         java.time.LocalDate from = java.time.LocalDate.now().minusMonths(monthsback).withDayOfMonth(1);
 
 
@@ -684,7 +683,7 @@ public class ResValueTools {
                 " AND rv.resident.adminonly <> 2 " +
                 " AND rv.editedBy IS NULL " + // gelöschte ignorieren
                 " AND rv.pit >= :from " +
-                " AND rv.resident.station IS NOT NULL" +
+                " AND rv.resident.station IS NOT NULL" + // nur aktive BW
                 " ORDER BY rv.resident.rid, rv.pit ";
 
         Query query = em.createQuery(jpqlWithoutRetired);
@@ -697,7 +696,7 @@ public class ResValueTools {
         HashMap<Resident, ArrayList<ResValue>> listData = new HashMap<Resident, ArrayList<ResValue>>();
         for (ResValue val : listVal) {
             if (!listData.containsKey(val.getResident())) {
-                listData.put(val.getResident(), new ArrayList<ResValue>());
+                listData.put(val.getResident(), new ArrayList<>());
             }
             listData.get(val.getResident()).add(val);
         }
@@ -708,7 +707,7 @@ public class ResValueTools {
 
 //        ArrayList<Pair<Resident, BigDecimal>> resultList = new ArrayList<>();
 
-        ArrayList<Quartet<Resident, Period, BigDecimal, BigDecimal>> resultList = new ArrayList<>();
+        ArrayList<Quintet<Resident, java.time.LocalDate, java.time.LocalDate, BigDecimal, BigDecimal>> resultList = new ArrayList<>();
 
         for (Resident resident : listResidents) {
             if (listData.containsKey(resident) && listData.get(resident).size() > 1) {
@@ -717,11 +716,11 @@ public class ResValueTools {
                 java.time.LocalDate startDate = DateUtils.asLocalDate(firstValue.getPit());
                 java.time.LocalDate endDate = DateUtils.asLocalDate(lastValue.getPit());
 
-                Period betrachteterZeitraum = Period.between(startDate, endDate);
+//                Period betrachteterZeitraum = Period.between(startDate, endDate);
 
-                BigDecimal divWeight = firstValue.getVal1().subtract(lastValue.getVal1());
-                Quartet<Resident, Period, BigDecimal, BigDecimal> result = new Quartet<>(resident, betrachteterZeitraum, divWeight, SYSTools.prozentualeVeraenderung(firstValue.getVal1(), lastValue.getVal1()));
-                if (result.getValue3().abs().compareTo(changeRateInPercent) >= 0) {
+                BigDecimal divWeight = lastValue.getVal1().subtract(firstValue.getVal1());
+                Quintet<Resident, java.time.LocalDate, java.time.LocalDate, BigDecimal, BigDecimal> result = new Quintet<>(resident, startDate, endDate, divWeight, SYSTools.prozentualeVeraenderung(firstValue.getVal1(), lastValue.getVal1()));
+                if (result.getValue4().abs().compareTo(changeRateInPercent) >= 0) {
                     resultList.add(result);
                     OPDE.debug(result);
                 }

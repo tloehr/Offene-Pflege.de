@@ -30,7 +30,7 @@ public class FTPConfigBean {
 
     public FTPConfigBean(Properties preset) {
         host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_HOST));
-        port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PORT), "20");
+        port = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PORT), "21");
         user = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_USER));
         password = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
         workingdir = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_FTP_WD, "/"));

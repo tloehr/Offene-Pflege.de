@@ -1,7 +1,8 @@
 -- Ab Version 1.14.4.x
 UPDATE `sysprops` SET `V` = '12' WHERE `K` = 'dbstructure';
 --
--- Neue Felder bei den Infektionen
+--
+-- #109
 UPDATE `resinfotype` SET `type` = '157' WHERE `BWINFTYP` = 'FALLRISK1';
 UPDATE `resinfotype` SET `XML` = '<optiongroup name="sturzrisiko" label="Wie hoch wird das Sturzrisiko eingeschätzt ?">
     	<option label="stark" name="ja"/>
@@ -65,3 +66,9 @@ UPDATE `resinfotype` SET `XML` = '<optiongroup name="sturzrisiko" label="Wie hoc
     <checkbox name="morethan4" label="mehrere Medikamente" tooltip="generell Einnahme von mehreren Medikamenten (bei mehr als 4 verschiedenen besteht ein erhöhtes Risiko)" layout="br"/>
 
     <label size="12" fontstyle="italic" label="Gefahren in der Umgebung werden hier nicht aufgeführt. Davon ist in einer Pflegeeinrichtung nicht auszugehen."/>' WHERE `BWINFTYP` = 'FALLRISK1';
+
+-- Neue ResInfoTypes für die QPR #108
+
+INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`) VALUES ('apoplex01', 'Schlaganfall', '', '15', '157', '3', '0',
+            '<imagelabel image="/artwork/48x48/qpr48.png" tooltip="Diese Information ist ein Indikator für die Qualitätsprüfung."/>
+             <textfield label="Datum" length="12" name="strokedate" type="date" preset="currentdate"/>');
