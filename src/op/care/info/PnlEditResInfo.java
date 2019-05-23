@@ -881,7 +881,7 @@ public class PnlEditResInfo {
         TextFieldFocusListener(int type, boolean optional) {
             this.type = type;
             this.optional = optional;
-            minmax = new Pair<DateTime, DateTime>(new DateTime(SYSConst.DATE_THE_VERY_BEGINNING), new DateTime(SYSConst.DATE_UNTIL_FURTHER_NOTICE));
+            minmax = new Pair<>(new DateTime(SYSConst.DATE_THE_VERY_BEGINNING), new DateTime(SYSConst.DATE_UNTIL_FURTHER_NOTICE));
         }
 
         TextFieldFocusListener(int type, Pair<DateTime, DateTime> minmax, boolean optional) {
@@ -891,12 +891,12 @@ public class PnlEditResInfo {
         }
 
         public void focusGained(FocusEvent e) {
-            SYSTools.markAllTxt((JTextField) e.getSource());
+            SYSTools.markAllTxt((JTextComponent) e.getSource());
         }
 
         public void focusLost(FocusEvent e) {
-            JTextField j = (JTextField) e.getSource();
-            String text = ((JTextField) e.getSource()).getText();
+            JTextComponent j = (JTextComponent) e.getSource();
+            String text = ((JTextComponent) e.getSource()).getText();
 
             if (type != TYPE_DONT_CARE) {
 
@@ -1250,7 +1250,15 @@ public class PnlEditResInfo {
                     hfill = "";
                 }
                 JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")) + ":");
-                JTextField j = new JTextField(length);
+
+                // https://github.com/tloehr/Offene-Pflege.de/issues/110
+//                JTextComponent j = new JTextField(length);
+
+
+                JTextComponent j = new JTextArea("");
+                JScrollPane scrlpane = new JScrollPane(j);
+
+//                JTextField j = new JTextField(length);
                 j.setOpaque(false);
                 j.setDisabledTextColor(Color.DARK_GRAY);
                 focusTraversal.add(j);
@@ -1276,12 +1284,12 @@ public class PnlEditResInfo {
                 }
 
 
-                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left"); // br left
                 outerpanel.add(layout, jl);
 
 
                 String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "left" + hfill);
-                outerpanel.add(innerlayout, j);
+                outerpanel.add(innerlayout, scrlpane);
 
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
 
@@ -1294,7 +1302,13 @@ public class PnlEditResInfo {
                 }
                 content.put(groupname, j.getText());
             }
-            // ---------------------- Separators --------------------------------
+            /***
+             *                                  __
+             *      ___ ___ ___  ___ ________ _/ /____  ____
+             *     (_-</ -_) _ \/ _ `/ __/ _ `/ __/ _ \/ __/
+             *    /___/\__/ .__/\_,_/_/  \_,_/\__/\___/_/
+             *           /_/
+             */
             if (tagName.equalsIgnoreCase("separator")) {
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "p hfill");
                 outerpanel.add(layout, new JSeparator());

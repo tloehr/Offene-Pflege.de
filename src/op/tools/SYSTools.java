@@ -425,7 +425,7 @@ public class SYSTools {
     }
 
 
-    public static void markAllTxt(JTextField jtf) {
+    public static void markAllTxt(JTextComponent jtf) {
         jtf.setSelectionStart(0);
         jtf.setSelectionEnd(jtf.getText().length());
     }

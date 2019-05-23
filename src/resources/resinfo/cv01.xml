@@ -1,0 +1,24 @@
+<!--
+
+ ▜▘   ▐              ▜ ▙▗▌     ▌
+ ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
+ ▐ ▌ ▌▐ ▖▛▀ ▌  ▐▐ ▞▀▌▐ ▌ ▌▌ ▌▌ ▌▛▀
+ ▀▘▘ ▘ ▀ ▝▀▘▘   ▘ ▝▀▘ ▘▘ ▘▝▀ ▝▀▘▝▀▘
+(X) MODE_INTERVAL_BYSECOND = 0;
+( ) MODE_INTERVAL_BYDAY = 1;
+( ) MODE_INTERVAL_NOCONSTRAINTS = 2;
+( ) MODE_INTERVAL_SINGLE_INCIDENTS = 3;
+
+Gehört zur Überleitung: tx
+Gehört zur QPR: qpr
+category: pk zu resinfocategory
+
+auswertung über PnlEditResInfo
+abstract_type siehe ResInfoTypeTools. 0 heisst, dass dieser InfoTyp nicht automatisch ausgewertet wird.
+
+-->
+<resinfotype bwinftyp="cv01" sinceversion="12" deprecated="0" abstract_type="0" equivalent="0" intervalmode="0"
+             infokurz="Biographie" infolang="Informationen, die den Lebenslauf des/der BW enthalten." category="12"
+             tx="false" qpr="false">
+    <textfield label="Datum" length="12" name="strokedate" type="date" preset="currentdate"/>
+</resinfotype>

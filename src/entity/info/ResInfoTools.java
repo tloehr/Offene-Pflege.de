@@ -477,6 +477,12 @@ public class ResInfoTools {
 
     }
 
+    /**
+     * diese Methode erstellt eine einfache Textdarstellung für eine Wunde (WOUND..). Das findet Verwendung bei der Erstellung des Überleitbogens.
+     * @param resInfo
+     * @param ignorebodyscheme
+     * @return
+     */
     public static String getContentAsPlainText(ResInfo resInfo, boolean ignorebodyscheme) {
         ArrayList result = parseResInfo(resInfo);
 
@@ -586,6 +592,14 @@ public class ResInfoTools {
         return html;
     }
 
+    /**
+     * Ausgelagerter Algorithmus aus  getContentAsPlainText().
+     * @param struktur
+     * @param content
+     * @param scaleriskmodel
+     * @param ignorebodyscheme
+     * @return
+     */
     private static String toPlainText(DefaultMutableTreeNode struktur, Properties content, ArrayList<RiskBean> scaleriskmodel, boolean ignorebodyscheme) {
         BigDecimal scalesum = null;
         String plaintext = "";
@@ -673,7 +687,11 @@ public class ResInfoTools {
             }
             plaintext += SYSTools.xx("misc.msg.scalerisk.rating") + ": " + scalesum + " (" + risiko + "); ";
         }
-        return plaintext.substring(0, plaintext.length() - 2);
+        
+        // Wenn bei der Auswertung der Plaintext leer bleibt kommt es hier zu einem Absturz.
+        // Tritt nur bei Wunden auf.
+        // https://github.com/tloehr/Offene-Pflege.de/issues/111
+        return plaintext.isEmpty() ? plaintext : plaintext.substring(0, plaintext.length() - 2);
     }
 
     private static boolean treeHasTrueCheckboxes(DefaultMutableTreeNode tree, Properties content) {

@@ -1,0 +1,4 @@
+<checkbox name="diarrhoe" label="Neigt zu Durchfällen" tx="Seite 1, Abschnitt 5"/>
+<checkbox name="obstipation" label="Neigt zu Verstopfung" tx="Seite 1, Abschnitt 5"/>
+<checkbox name="digital" label="Digitales Ausräumen" tooltip="Das digitale Ausräumen beschreibt eine Maßnahme zur manuellen Entfernung von hartem Stuhl aus dem Enddarm.[br/]Diese Behandlung wird vorallem bei Koprostase, Stuhlimpaktion oder einer Darmlähmung durchgeführt." tx="Seite 1, Abschnitt 5"/>
+<checkbox name="ap.aid" label="Anus Praeter" tx="Seite 1, Abschnitt 5"/>

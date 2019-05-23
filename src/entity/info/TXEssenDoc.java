@@ -1232,8 +1232,7 @@ public class TXEssenDoc {
 
 
                 // hier wird der inhalt der farbigen Kästen gesetzt, der für jede Wunde eine Beschreibung enthält.
-                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + ", " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true) + (currentWound.getText().isEmpty() ? "" : ", \"" + currentWound.getText() + "\""))
-                ;
+                content.put(pdfwounddescription[lineno], SYSTools.xx(descriptionKey) + ", " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true) + (currentWound.getText().isEmpty() ? "" : ", \"" + currentWound.getText() + "\""));
 
                 if (type == ResInfoTypeTools.TYPE_MYCOSIS) {
                     content.put(TXEAF.WOUND_MYCOSIS_HEADLINE, "misc.msg.mycosis");

@@ -708,13 +708,17 @@ public class SYSConst {
     public static final Icon icon22medical = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/medical.png"));
     public static final Icon icon22warning = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/warning.png"));
 
-    public static Icon findIcon(String name){
-        return new ImageIcon(SYSConst.class.getResource(name));
+    public static Icon findIcon(String name, int size) {
+        return new ImageIcon(SYSConst.class.getResource("/artwork/"+size+"x"+size+"/"+name));
     }
+    public static Icon findIcon(String name){
+            return new ImageIcon(SYSConst.class.getResource(name));
+        }
     public static String icon22falling = "/artwork/22x22/hillslope.png";
-    public static String icon16falling = "/artwork/22x22/hillslope.png";
-    public static String icon48falling = "/artwork/22x22/hillslope.png";
-
+    public static String strIconFalling = "hillslope.png";
+    public static String strIconQPR = "evaluation-score.png";
+    public static String icon16falling = "/artwork/16x16/hillslope.png";
+    public static String icon48falling = "/artwork/48x48/hillslope.png";
 
     public static final Icon icon48sideeffects = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/prescription_bottle.png"));
     public static final Icon icon22sideeffects = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/prescription_bottle.png"));
