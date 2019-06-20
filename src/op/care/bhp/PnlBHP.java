@@ -48,7 +48,6 @@ import op.system.Validator;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
-import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
@@ -61,10 +60,7 @@ import javax.persistence.RollbackException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -785,6 +781,10 @@ public class PnlBHP extends NursingRecordsPanel {
 
                     "</font></html>";
         } else {
+
+//            if (bhp.getPrescription().getID() == 11014l){
+//                OPDE.debug(bhp.getPrescription());
+//            }
             title = "<html><font size=+1>" +
                     SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                     (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
