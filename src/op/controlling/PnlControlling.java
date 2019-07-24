@@ -171,7 +171,7 @@ public class PnlControlling extends CleanablePanel {
         cpPain.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpPain.setContentPane(createContentPanel4Pain());
+                cpPain.setContentPane(createContentPanel4Fall());
             }
         });
 

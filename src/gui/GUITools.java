@@ -413,7 +413,6 @@ public class GUITools {
         OPDE.getDisplayManager().setIconAllergy(allergy != null && allergy.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(allergy.getHtml())) : null);
         OPDE.getDisplayManager().setIconFalling(ResInfoTools.hasSevereFallRisk(fall_risk) ? SYSTools.toHTML(SYSConst.html_div(fall_risk.getHtml())) : null);
 
-
         if (ResInfoTools.isAway(resident)) {
             OPDE.getDisplayManager().setIconAway();
         } else if (ResInfoTools.isDead(resident)) {

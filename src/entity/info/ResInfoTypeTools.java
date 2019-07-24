@@ -101,7 +101,7 @@ public class ResInfoTypeTools {
     public static final int TYPE_SURGERY = 145;
     public static final int TYPE_VESSEL_CATHETER = 146;
 
-    public static final int TYPE_STROKE = 157; // Apoplex
+    public static final int TYPE_STROKE = 158; // Apoplex
 
     // find new max type via sql: SELECT MAX(equiv), MAX(TYPE) FROM resinfotype
 

@@ -1712,6 +1712,7 @@ public class ResInfoTools {
         progress.execute(new Pair<Integer, Integer>(p, 100));
         html.append(SYSConst.html_h1("opde.controlling.nursing.fallsindicators.byMonth"));
         html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+        html.append(SYSConst.html_paragraph("opde.controlling.expstandard.fall.bemerkung1"));
         String tableContent = SYSConst.html_table_tr(SYSConst.html_table_th("Monat") + SYSConst.html_table_th("Sturzindikator"));
 
         p = 0;
