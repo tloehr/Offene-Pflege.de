@@ -137,6 +137,7 @@ public class DisplayManager extends Thread {
         setIconDiabetes(null);
         setIconWarning(null);
         setIconAllergy(null);
+        setIconFalling(null);
         messageQ.clear();
         processSubMessage();
     }

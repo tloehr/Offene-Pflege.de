@@ -1255,10 +1255,10 @@ public class PnlEditResInfo {
 //                JTextComponent j = new JTextField(length);
 
 
-                JTextComponent j = new JTextArea("");
-                JScrollPane scrlpane = new JScrollPane(j);
+//                JTextComponent j = new JTextArea("");
+//                JScrollPane scrlpane = new JScrollPane(j);
 
-//                JTextField j = new JTextField(length);
+                JTextField j = new JTextField(length);
                 j.setOpaque(false);
                 j.setDisabledTextColor(Color.DARK_GRAY);
                 focusTraversal.add(j);
@@ -1289,7 +1289,7 @@ public class PnlEditResInfo {
 
 
                 String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "left" + hfill);
-                outerpanel.add(innerlayout, scrlpane);
+                outerpanel.add(innerlayout, j);
 
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
 
