@@ -70,7 +70,7 @@ UPDATE `resinfotype` SET `XML` = '<optiongroup name="sturzrisiko" label="Wie hoc
 -- Neue ResInfoTypes für die QPR #108
 
 INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`) VALUES ('apoplex01', 'Schlaganfall', '', '15', '158', '3', '0',
-            '<imagelabel image="/artwork/48x48/evaluation-score.png     " tooltip="Diese Information ist ein Indikator für die Qualitätsprüfung."/>
+            '<imagelabel image="/artwork/48x48/evaluation-score.png" tooltip="Diese Information ist ein Indikator für die Qualitätsprüfung."/>
              <textfield label="Datum" length="12" name="strokedate" type="date" preset="currentdate"/>');
 #
 # -- Fehler korrigieren, bei dem ich vor einiger Zeit den type bei den ResInfoTypes für fallrisk und apoplex doppelt vergeben hatte.

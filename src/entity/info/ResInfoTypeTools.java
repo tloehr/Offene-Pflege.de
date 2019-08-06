@@ -10,11 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 24.10.11
- * Time: 16:33
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 24.10.11 Time: 16:33 To change this template use File | Settings | File
+ * Templates.
  */
 public class ResInfoTypeTools {
 
@@ -68,7 +65,7 @@ public class ResInfoTypeTools {
     public static final int TYPE_WOUND8 = 149;
     public static final int TYPE_WOUND9 = 150;
     public static final int TYPE_WOUND10 = 151;
-//    public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5};
+    //    public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5};
     public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5, TYPE_WOUND6, TYPE_WOUND7, TYPE_WOUND8, TYPE_WOUND9, TYPE_WOUND10};
     public static final int TYPE_WOUNDHISTORY1 = 122;
     public static final int TYPE_WOUNDHISTORY2 = 123;
@@ -91,8 +88,8 @@ public class ResInfoTypeTools {
     public static final int TYPE_MYCOSIS = 135;
     public static final int TYPE_PSYCH = 136;
     public static final int TYPE_PAIN = 137;
-    public static final int TYPE_FIXATION= 138;
-    public static final int TYPE_LIVINGWILL= 139;
+    public static final int TYPE_FIXATION = 138;
+    public static final int TYPE_LIVINGWILL = 139;
     public static final int TYPE_AMPUTATION = 140;
     public static final int TYPE_SPECIALIST = 141;
     public static final int TYPE_HOSPITAL_STAY = 142;
@@ -102,8 +99,15 @@ public class ResInfoTypeTools {
     public static final int TYPE_VESSEL_CATHETER = 146;
 
     public static final int TYPE_STROKE = 158; // Apoplex
+    // Die sechs Lebensbereiche des Begutachtungsinstruments (BI)
+    public static final int TYPE_BI1 = 159; // BI1 Mobilität
+    public static final int TYPE_BI2 = 160; // BI2 kognitiven und kommunikativen Fähigkeiten
+    public static final int TYPE_BI3 = 161; // BI3 die Verhaltensweisen und psychischen Problemlagen
+    public static final int TYPE_BI4 = 162; // BI4 die Selbstversorgung
+    public static final int TYPE_BI5 = 163; // BI5 krankheits- und therapiebedingten Anforderungen und Belastungen
+    public static final int TYPE_BI6 = 164; // BI6 Gestaltung des Alltagslebens und sozialer Kontakte
 
-    // find new max type via sql: SELECT MAX(equiv), MAX(TYPE) FROM resinfotype
+    // find new max type via sql: SELECT 'next to use',MAX(equiv)+1, MAX(TYPE)+1 FROM resinfotype;
 
     public static final String TYPE_ABSENCE_HOSPITAL = "HOSPITAL";
     public static final String TYPE_ABSENCE_HOLLIDAY = "HOLLIDAY";
@@ -161,22 +165,20 @@ public class ResInfoTypeTools {
         return containsOnlyClosedInfos;
     }
 
-    public static ResInfoType getResInfoType4Annotation(Commontags tag){
-        if (tag.getType() == CommontagsTools.TYPE_SYS_ANTIBIOTICS){
+    public static ResInfoType getResInfoType4Annotation(Commontags tag) {
+        if (tag.getType() == CommontagsTools.TYPE_SYS_ANTIBIOTICS) {
             return getByType(TYPE_ANTIBIOTICS);
         }
         return null;
     }
 
 
-    public static boolean is4Annotations(ResInfoType resInfoType){
-            if (resInfoType.getType() == TYPE_ANTIBIOTICS){
-                return true;
-            }
-            return false;
+    public static boolean is4Annotations(ResInfoType resInfoType) {
+        if (resInfoType.getType() == TYPE_ANTIBIOTICS) {
+            return true;
         }
-
-
+        return false;
+    }
 
 
     public static boolean containsOneActiveObsoleteInfo(ArrayList<ResInfo> listInfos) {

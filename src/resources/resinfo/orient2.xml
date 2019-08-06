@@ -1,0 +1,81 @@
+<!--
+
+ ▜▘   ▐              ▜ ▙▗▌     ▌
+ ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
+ ▐ ▌ ▌▐ ▖▛▀ ▌  ▐▐ ▞▀▌▐ ▌ ▌▌ ▌▌ ▌▛▀
+ ▀▘▘ ▘ ▀ ▝▀▘▘   ▘ ▝▀▘ ▘▘ ▘▝▀ ▝▀▘▝▀▘
+* MODE_INTERVAL_BYSECOND = 0;
+* MODE_INTERVAL_BYDAY = 1;
+* MODE_INTERVAL_NOCONSTRAINTS = 2;
+* MODE_INTERVAL_SINGLE_INCIDENTS = 3;
+
+
+UPDATE `resinfotype` SET `type` = '-1' WHERE `BWINFTYP` = 'ORIENT1';
+INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`,            `BWIKID`, `type`, `IntervalMode`,
+`equiv`, `XML`)
+                           VALUES ('orient02', 'Demenz und Orientierung', '',   '5',     '132',       '0',
+                           '20',
+                    '');
+
+
+
+-->
+<resinfotype bwinftyp="orient2" sinceversion="13" abstract_type="132" equivalent="20" intervalmode="0"
+             infokurz="Demenz und Orientierung" infolang="" category="5" tx="true" qpr="true">
+
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
+    <imagelabel image="/artwork/48x48/evaluation-score.png"
+                tooltip="Wenn Sie eine Form der Demenz wählen wird das als Diagnose bei der Indikatoren-Auswertung für den MDK herangezogen."/>
+    <label fontstyle="bold"
+           label="Denken Sie daran, dass die Diagnose Demenz immer durch einen Arzt durchgeführt werden muss."/>
+    <optiongroup name="type_of_dementia" label="Form der Demenz">
+        <option label="Nicht dement" name="none" default="true"/>
+        <option label="Primäre Demenz" name="primary"
+                tooltip="Bei einer primären Demenz liegen neurodegenerative oder vaskuläre Veränderungen vor. Es wird unterschieden, ob die Nervenzellen des Gehirns degenerieren, also ohne äußerlich erkennbare Ursache untergehen (wie bei der Alzheimer-Krankheit), oder ob sie z.B. wegen Durchblutungsstörungen schwere Schäden erlitten haben (diese Form wird als vaskulärer Demenztyp bezeichnet)."/>
+        <option label="Sekundäre Demenz"
+                tooltip="Hier ist der geistige Verfall die Folge einer anderen organischen Erkrankung wie einer Hirnverletzung, einer Hirngeschwulst oder einer Herz-Kreislauf-Krankheit; auch Arzneistoffe und Gifte wie Alkohol (Korsakow- Syndrom) oder andere Drogen können dazu führen. Wenn die Grunderkrankung wirksam behandelt wird, Giftstoffe das Gehirn nicht mehr belasten oder Verletzungen geheilt sind, normalisiert sich meist die geistige Leistungsfähigkeit. Oder es ist ein Stillstand des Leidens zu erreichen."
+                name="secondary"/>
+    </optiongroup>
+    <label fontstyle="bold" label="Welche Tests wurden durchgeführt ?"/>
+    <checkbox name="cct" label="Uhrentest (Clock Completion Test)"/>
+    <checkbox name="demtect" label="DemTect" layout="left"/>
+    <checkbox name="tfdd" label="TFDD" tooltip="TFDD - Test zu Früherkennung von Demenzen mit Depressionsabgrenzung"
+              layout="left"/>
+    <label fontstyle="bold" label="Bitte ausgefüllte Tests an diese Info anhängen."/>
+    <separator/>
+    <optiongroup name="demenzgrad" label="Grad der Demenz (nach Feil)">
+        <option label="keine klare Zuordnung möglich" name="tnz" default="true"/>
+        <option label="Mangelhaft unglückliche Orientierung" name="stufe1"/>
+        <option label="Zeitverwirrtheit" name="stufe2"/>
+        <option label="Sich wiederholende Bewegungen" name="stufe3" layout="br"/>
+        <option label="Vegetieren, vor sich hin dämmern" name="stufe4"/>
+    </optiongroup>
+    <separator/>
+    <label size="16" fontstyle="bold" label="Orientierungsfähigkeiten"/>
+    <optiongroup name="time" label="zeitlich">
+        <option label="ja" name="yes1" default="true"/>
+        <option label="nein" name="no1"/>
+        <option label="zeitweise" name="intermittent1"/>
+    </optiongroup>
+    <optiongroup layout="left" name="personal" label="persönlich">
+        <option label="ja" name="yes2" default="true"/>
+        <option label="nein" name="no2"/>
+        <option label="zeitweise" name="intermittent2"/>
+    </optiongroup>
+    <optiongroup name="location" label="örtlich">
+        <option label="ja" name="yes3" default="true"/>
+        <option label="nein" name="no3"/>
+        <option label="zeitweise" name="intermittent3"/>
+    </optiongroup>
+    <optiongroup name="situation" label="situativ">
+        <option label="ja" name="yes4" default="true"/>
+        <option label="nein" name="no4"/>
+        <option label="zeitweise" name="intermittent4"/>
+    </optiongroup>
+    <optiongroup name="runaway" label="weglauftendenz">
+        <option label="ja" name="yes5" default="true"/>
+        <option label="nein" name="no5"/>
+        <option label="zeitweise" name="intermittent5"/>
+    </optiongroup>
+
+</resinfotype>

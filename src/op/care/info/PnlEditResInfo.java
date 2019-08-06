@@ -59,11 +59,8 @@ import java.text.ParseException;
 import java.util.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: tloehr
- * Date: 11.05.13
- * Time: 13:57
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: tloehr Date: 11.05.13 Time: 13:57 To change this template use File | Settings |
+ * File Templates.
  */
 public class PnlEditResInfo {
 
@@ -145,6 +142,7 @@ public class PnlEditResInfo {
 
 
         if (tooltip != null) {
+            tooltip = SYSTools.xx(tooltip);
             tooltip = tooltip.replace('[', '<').replace(']', '>');
 
             if (tooltip.indexOf("<p>") < 0 && tooltip.indexOf("<li>") < 0) {
@@ -156,7 +154,7 @@ public class PnlEditResInfo {
 
 
             final JButton ttip = GUITools.getTinyButton(SYSTools.toHTMLForScreen(tooltip), SYSConst.icon16info);
-            txt.setText(SYSTools.toHTMLForScreen(tooltip));
+            txt.setText(tooltip);
 
             ttip.addActionListener(e -> {
                 popupInfo.setOwner(ttip);
@@ -177,7 +175,7 @@ public class PnlEditResInfo {
             tx = tx.replace("<li>", "<li style=\"width:300px;\">");
 
             final JButton btntx = GUITools.getTinyButton(SYSTools.toHTMLForScreen(tx), SYSConst.icon16ambulance);
-            txt.setText(SYSTools.toHTMLForScreen(tx));
+            txt.setText(tx); // alt: txt.setText(SYSTools.toHTMLForScreen(tx));
 
             btntx.addActionListener(e -> {
                 popupInfo.setOwner(btntx);
@@ -600,8 +598,8 @@ public class PnlEditResInfo {
 
 
     /**
-     * this method creates a panel based on the XML structure taken from ResInfoType and the content stored in the properties data
-     * in ResInfo.
+     * this method creates a panel based on the XML structure taken from ResInfoType and the content stored in the
+     * properties data in ResInfo.
      */
     public JPanel getPanel() {
 
@@ -630,8 +628,7 @@ public class PnlEditResInfo {
 
 
     /**
-     * läuft rekursiv durch alle Kinder eines Containers und setzt deren Enabled Status auf
-     * enabled.
+     * läuft rekursiv durch alle Kinder eines Containers und setzt deren Enabled Status auf enabled.
      */
     private void setXEnabled(JComponent container, boolean enabled) {
         // Bei einer Combobox muss die Rekursion ebenfalls enden.
@@ -955,27 +952,31 @@ public class PnlEditResInfo {
 
 
     /**
-     * Dieser Handler ist ein SaxParser Handler. Er durchläuft das Struktur XML Dokument und erstellt einen JPanel, der alle
-     * notwendigen Swing Komponenten enthält.
+     * Dieser Handler ist ein SaxParser Handler. Er durchläuft das Struktur XML Dokument und erstellt einen JPanel, der
+     * alle notwendigen Swing Komponenten enthält.
      * <p>
      * Folgende XML Konstrukte können verwendet werden:
      * <ol>
-     * <li><code>&lt;checkbox name=&quot;aengstlich&quot; label=&quot;ängstlich&quot;/&gt;</code> führt zu <img src="doc-files/checkbox.png">
+     * <li><code>&lt;checkbox name=&quot;aengstlich&quot; label=&quot;ängstlich&quot;/&gt;</code> führt zu <img
+     * src="doc-files/checkbox.png">
      * </li>
      * </ol>
      * <p>
-     * Die beschriebenen Konstrukte können nacheinander verwendet werden, so dass nach einer Optiongroup mehrere Checkboxes folgen.
-     * Ein Konstrukt wird immer in eine eigene JPanel mit einem FlowLayout eingeschlossen (innerpanel).
-     * Die innerpanels werden dann alle der Reihe nach wieder in eine JPanel (untereinander, GridLayout) eingefügt (outerpanel).
-     * Diese outerpanel ist letztlich das Ergebnis.
+     * Die beschriebenen Konstrukte können nacheinander verwendet werden, so dass nach einer Optiongroup mehrere
+     * Checkboxes folgen. Ein Konstrukt wird immer in eine eigene JPanel mit einem FlowLayout eingeschlossen
+     * (innerpanel). Die innerpanels werden dann alle der Reihe nach wieder in eine JPanel (untereinander, GridLayout)
+     * eingefügt (outerpanel). Diese outerpanel ist letztlich das Ergebnis.
      * <p>
-     * Ausserdem schreibt der Handler in die beiden HashMaps <code>components</code> und <code>antwort</code>. <code>components</code> enthält die
-     * erstellten Components, der Zugriff erfolgt über das <code>name</code> Attribut aus der XML Struktur. So dass man, gemäß des obigen Beispiels unter 1.), über
+     * Ausserdem schreibt der Handler in die beiden HashMaps <code>components</code> und <code>antwort</code>.
+     * <code>components</code> enthält die erstellten Components, der Zugriff erfolgt über das <code>name</code>
+     * Attribut aus der XML Struktur. So dass man, gemäß des obigen Beispiels unter 1.), über
      * <code>component.get("aengstlich")</code> den Zugriff auf die entsprechend JCheckbox erhält.
      * <p>
-     * <code>antwort</code> enthält den aktuellen Zustand des jeweiligen Widgets. Bei Checkboxes (wie im Beispiel beschrieben): ("aengstlich", "false"). Bei Optiongroups
-     * setzt sich der Name des einzelnen Radiobuttons aus gruppenname und optionname zusammen: ("hilfebedarf.uA", "true"). Textfelder enthalten den Eingabetext direkt:
-     * ("vorname", "Torsten"). Listen enthalten den Primary Key der entsprechenden Tabellenzeile (meist ist das ein <code>long</code> Wert: ("zimm", 38).
+     * <code>antwort</code> enthält den aktuellen Zustand des jeweiligen Widgets. Bei Checkboxes (wie im Beispiel
+     * beschrieben): ("aengstlich", "false"). Bei Optiongroups setzt sich der Name des einzelnen Radiobuttons aus
+     * gruppenname und optionname zusammen: ("hilfebedarf.uA", "true"). Textfelder enthalten den Eingabetext direkt:
+     * ("vorname", "Torsten"). Listen enthalten den Primary Key der entsprechenden Tabellenzeile (meist ist das ein
+     * <code>long</code> Wert: ("zimm", 38).
      */
     private class HandlerDatenStruktur extends DefaultHandler {
 
@@ -1100,7 +1101,7 @@ public class PnlEditResInfo {
                 map.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
                 jl.setFont(original.deriveFont(map));
 
-//                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+//                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
@@ -1563,7 +1564,7 @@ public class PnlEditResInfo {
              */
             if (tagName.equalsIgnoreCase("tx")) {
                 JLabel jl = new JLabel(SYSConst.icon22ambulance);
-                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
             /***
@@ -1600,7 +1601,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("imagelabel")) {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));
-                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
                 jl.setText(attributes.getValue("text"));
                 outerpanel.add(layout, jl);
@@ -1615,7 +1616,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("label")) {
                 //groupname = attributes.getValue("name");
                 groupname = null;
-                JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")));
+                JLabel jl = new JLabel();
 
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
                     jl.setForeground(GUITools.getColor(attributes.getValue("color")));
@@ -1641,9 +1642,15 @@ public class PnlEditResInfo {
                     jl.setFont(new Font("Arial", fontstyle, 12));
                 }
 
+                String content_for_label = SYSTools.xx(attributes.getValue("label"));
+                if (!SYSTools.catchNull(attributes.getValue("parwidth")).isEmpty()) {
+                    content_for_label = "<html><p style=\"width:" + attributes.getValue("parwidth") + ";\">" + content_for_label + "</p></html>";
+                }
+                jl.setText(content_for_label);
 
-//                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
-//                jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
+
+//                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+//                jl.setToolTipText(SYSTools.toHTML(SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
@@ -1662,7 +1669,7 @@ public class PnlEditResInfo {
                 jcb.setOpaque(false);
                 focusTraversal.add(jcb);
                 jcb.setName(groupname);
-//                jcb.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+//                jcb.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 components.put(groupname, jcb);
                 jcb.addItemListener(new ComboBoxItemStateListener());
                 JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")) + ":");
@@ -1776,7 +1783,7 @@ public class PnlEditResInfo {
 
 
         public String getTooltip() {
-            return tooltip;
+            return SYSTools.xx(tooltip);
         }
 
 

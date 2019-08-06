@@ -11,7 +11,8 @@ equivalence-id: 14
 MODE_INTERVAL_BYSECOND = 0
 TYPE_MOBILITY = 110
 -->
-<tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Du hier als Bemerkung einträgst, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
+<tx
+        tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
 <checkbox name="bedridden" label="bettlägerig"/>
 <!-- ==================Aufstehen================== -->
 <optiongroup name="stand" label="Aufstehen">

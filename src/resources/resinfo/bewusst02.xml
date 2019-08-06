@@ -1,0 +1,44 @@
+<!--
+
+ ▜▘   ▐              ▜ ▙▗▌     ▌
+ ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
+ ▐ ▌ ▌▐ ▖▛▀ ▌  ▐▐ ▞▀▌▐ ▌ ▌▌ ▌▌ ▌▛▀
+ ▀▘▘ ▘ ▀ ▝▀▘▘   ▘ ▝▀▘ ▘▘ ▘▝▀ ▝▀▘▝▀▘
+* MODE_INTERVAL_BYSECOND = 0;
+* MODE_INTERVAL_BYDAY = 1;
+* MODE_INTERVAL_NOCONSTRAINTS = 2;
+* MODE_INTERVAL_SINGLE_INCIDENTS = 3;
+
+-->
+<resinfotype bwinftyp="bewusst01" sinceversion="13" abstract_type="131" equivalent="21" intervalmode="0"
+             infokurz="Bewusstseinszustand" infolang="" category="5" tx="true" qpr="true">
+
+
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
+    <imagelabel image="/artwork/48x48/evaluation-score.png"
+                tooltip="QDVS-Indikator &quot;Bewusstseinszustand&quot;"/>
+    <!-- Maßstäbe und Grundsätze für die Qualität, die Q-Sicherung und Q-Darstellung sowie für die Entwicklung eines einrichtungsinternen Q-Managements nach §113 SGB XI in der vollstationären Pflege.
+         Anlage3 - Seite 10ff - Zeile 24-->
+    <checkbox label="wach/ansprechbar" name="awake" tooltip="Der Bewohner bzw. die Bewohnerin ist ansprechbar und kann an Aktivitäten teilnehmen."/>
+    <checkbox label="schläfrig" name="sleepy"
+              tooltip="Der Bewohner bzw. die Bewohnerin ist ansprechbar und gut erweckbar, wirkt jedoch müde und ist verlangsamt in seinen Handlungen."/>
+    <checkbox label="soporös" name="sopor"
+              tooltip="Als Sopor (lat. tiefer Schlaf) bezeichnet man eine Form der quantitativen Bewusstseinsstörung, bei der der Patient sich in einem schlafähnlichen Zustand befindet, in dem nur durch starke Stimuli (z. B. Schmerzreize) Reaktionen (z. B. Abwehrbewegungen) ausgelöst werden können. Ein volles Erwecken des Patienten ist dabei meist nicht mehr möglich. Die Reflexe sind erhalten, der Muskeltonus ist herabgesetzt."/>
+    <checkbox label="somnolent" name="somnolent"
+              tooltip="Der Bewohner bzw. die Bewohnerin ist sehr schläfrig und kann nur durch starke äußere Reize geweckt werden (z. B. kräftiges Rütteln an der Schulter oder mehrfaches, sehr lautes Ansprechen)."/>
+    <checkbox label="komatös" name="coma"
+              tooltip="Der Bewohner bzw. die Bewohnerin kann durch äußere Reize nicht mehr geweckt werden."/>
+    <checkbox label="wachkoma" name="vegetative"
+                  tooltip="Dies trifft nur dann zu, wenn eine ärztliche Diagnose vorliegt."/>
+    <label label="Erläuterungstexte übernommen aus &quot;Maßstäbe und Grundsätze für die Qualität, die Q-Sicherung"/>
+    <label label="Q-Darstellung sowie für die Entwicklung eines einrichtungsinternen Q-Managements nach §113 SGB XI"/>
+    <label label="in der vollstationären Pflege. Anlage3&quot;"/>
+</resinfotype>
+        <!--
+
+        UPDATE `resinfotype` SET `type` = '-1' WHERE `BWINFTYP` = 'conciuos';
+        INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`)
+                           VALUES ('bewusst01', 'Bewusstseinszustand', '',     '5',     '131',       '0',         '21',
+                    '');
+
+        -->
