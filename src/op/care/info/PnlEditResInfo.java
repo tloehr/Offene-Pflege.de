@@ -62,7 +62,7 @@ import java.util.*;
  * Created with IntelliJ IDEA. User: tloehr Date: 11.05.13 Time: 13:57 To change this template use File | Settings |
  * File Templates.
  */
-public class PnlEditResInfo {
+public class PnlEditResInfo implements HasLogger {
 
     public static final int EDIT = 0;
     public static final int CHANGE = 1;
@@ -126,9 +126,8 @@ public class PnlEditResInfo {
     public void addInfoButtons(JPanel pnl, String tooltip, String tx) {
         if (tooltip == null && tx == null) return;
 
-        final JTextPane txt = new JTextPane();
-        txt.setContentType("text/html");
-        txt.setEditable(false);
+
+        final JLabel txt = new JLabel();
 
         final JidePopup popupInfo = new JidePopup();
         popupInfo.setMovable(false);
@@ -146,15 +145,15 @@ public class PnlEditResInfo {
             tooltip = tooltip.replace('[', '<').replace(']', '>');
 
             if (tooltip.indexOf("<p>") < 0 && tooltip.indexOf("<li>") < 0) {
-                tooltip = "<p>" + tooltip + "</p>";
+                tooltip = HTMLTools.p(tooltip);
             }
 
             tooltip = tooltip.replace("<p>", "<p style=\"width:300px;\">");
             tooltip = tooltip.replace("<li>", "<li style=\"width:300px;\">");
 
 
-            final JButton ttip = GUITools.getTinyButton(SYSTools.toHTMLForScreen(tooltip), SYSConst.icon16info);
-            txt.setText(tooltip);
+            final JButton ttip = GUITools.getTinyButton(HTMLTools.toHTML(tooltip), SYSConst.findIcon(SYSConst.fontawesome_info_circle_o));
+            txt.setText(HTMLTools.toHTML(tooltip));
 
             ttip.addActionListener(e -> {
                 popupInfo.setOwner(ttip);
@@ -174,8 +173,8 @@ public class PnlEditResInfo {
             tx = tx.replace("<p>", "<p style=\"width:300px;\">");
             tx = tx.replace("<li>", "<li style=\"width:300px;\">");
 
-            final JButton btntx = GUITools.getTinyButton(SYSTools.toHTMLForScreen(tx), SYSConst.icon16ambulance);
-            txt.setText(tx); // alt: txt.setText(SYSTools.toHTMLForScreen(tx));
+            final JButton btntx = GUITools.getTinyButton(HTMLTools.toHTML(tx), SYSConst.icon16ambulance);
+            txt.setText(HTMLTools.toHTML(tx));
 
             btntx.addActionListener(e -> {
                 popupInfo.setOwner(btntx);
@@ -580,7 +579,7 @@ public class PnlEditResInfo {
 
                 if (components.containsKey(key) && components.get(key) instanceof Component && !((Component) components.get(key)).isEnabled()) {
                     content.remove(key);
-                    OPDE.debug("removing content for: " + key);
+                    getLogger().debug("removing content for: " + key);
                 }
             }
 

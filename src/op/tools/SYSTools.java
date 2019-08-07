@@ -813,6 +813,9 @@ public class SYSTools {
         result = SYSTools.replace(result, "ß", "&szlig;", false);
         result = SYSTools.replace(result, "°", "&deg;", false); //&deg;
         result = SYSTools.replace(result, "µ", "&micro;", false); //micro
+        // utf8
+        result = SYSTools.replace(result, "\u00c4", "&Auml;", false);
+                result = SYSTools.replace(result, "\u00e4", "&auml;", false);
         return result;
     }
 

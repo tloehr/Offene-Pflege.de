@@ -61,7 +61,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /*! \mainpage My Personal Index Page
  *
@@ -286,8 +289,8 @@ public class OPDE {
     }
 
     /**
-     * returns the minutes until the system timeouts the current login automatically when no user action is detected.
-     * if the timeout value is 0, no timeout is performed.
+     * returns the minutes until the system timeouts the current login automatically when no user action is detected. if
+     * the timeout value is 0, no timeout is performed.
      *
      * @return
      */
@@ -352,7 +355,8 @@ public class OPDE {
      * Hier ist die main Methode von OPDE. In dieser Methode wird auch festgestellt, wie OPDE gestartet wurde.
      * <ul>
      * <li>Im Standard Modus, das heisst mit graphischer Oberfläche. Das dürfte der häufigste Fall sein.</li>
-     * <li>Im DFNImport Modus. Der wird meist auf dem Datenbankserver gebraucht um Nachts die Durchführungsnachweise anhand der
+     * <li>Im DFNImport Modus. Der wird meist auf dem Datenbankserver gebraucht um Nachts die Durchführungsnachweise
+     * anhand der
      * DFNImport Tabelle zu generieren. Das alles gehört zu der Pflegeplanung.</li>
      * <li>Im BHPImport Modus. Auch dieser Modus wird auf dem DB-Server gebraucht um die Behandlungspflege Massnahmen
      * anhand der ärztlichen Verordnungen zu generieren.</li>
@@ -398,7 +402,7 @@ public class OPDE {
         logger = Logger.getRootLogger();
         uptime = SYSCalendar.now();
 
-        lang = ResourceBundle.getBundle("languageBundle", Locale.getDefault());
+        lang = ResourceBundle.getBundle("languageBundle", new CustomResourceBundleControl("UTF-8"));
 
         validatorFactory = Validation.buildDefaultValidatorFactory();
 

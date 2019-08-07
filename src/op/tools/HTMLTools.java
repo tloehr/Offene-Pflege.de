@@ -40,13 +40,13 @@ public class HTMLTools {
     /**
      * Erzeugt Bruchdarstellung (für 0.5, 0.25, 0.75, 0.33) in HTML zu dem übergebenen Wert.
      */
-     public static String printDouble(BigDecimal bd) {
-         return printDouble(bd.doubleValue());
-     }
+    public static String printDouble(BigDecimal bd) {
+        return printDouble(bd.doubleValue());
+    }
 
     /**
-     * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die
-     * der Methode übergeben wurden. Nur die Zeile inkl. der "tr" Tags.
+     * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die der Methode übergeben wurden. Nur die
+     * Zeile inkl. der "tr" Tags.
      *
      * @param objects
      * @return
@@ -56,8 +56,8 @@ public class HTMLTools {
     }
 
     /**
-     * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die
-     * der Methode übergeben wurden. Nur die Zeile inkl. der "th" Tags.
+     * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die der Methode übergeben wurden. Nur die
+     * Zeile inkl. der "th" Tags.
      *
      * @param objects
      * @return
@@ -67,8 +67,7 @@ public class HTMLTools {
     }
 
     /**
-     * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die
-     * der Methode übergeben wurden.
+     * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die der Methode übergeben wurden.
      *
      * @param objects
      * @return
@@ -90,7 +89,17 @@ public class HTMLTools {
     public static String toHTML(String in) {
         String out = null;
         if (!SYSTools.catchNull(in).equals("")) {
-            out = "<html><body>" + in + "</body></html>";
+            out = "<html>\n<head>\n" +
+                    "  <meta charset=\"UTF-8\">\n" +
+                    "</head>\n<body>" + in + "</body></html>";
+        }
+        return out;
+    }
+
+    public static String p(String in) {
+        String out = null;
+        if (!SYSTools.catchNull(in).equals("")) {
+            out = "<p>" + in + "</p>";
         }
         return out;
     }
