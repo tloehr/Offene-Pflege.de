@@ -17,7 +17,14 @@ INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`,            `B
                            '20',
                     '');
 
-
+            █                 ▄▄▄▄   ▄▄▄▄  ▄▄▄     ▄▄▄▄
+  ▄▄▄▄   ▄▄▄█  ▄   ▄   ▄▄▄   ▀   ▀█ ▄▀  ▀▄   █    █▀  ▀▄
+ █▀ ▀█  █▀ ▀█  ▀▄ ▄▀  █   ▀      ▄▀ █  ▄ █   █    █▄  ▄█
+ █   █  █   █   █▄█    ▀▀▀▄    ▄▀   █    █   █     ▀▀▀ █
+ ▀█▄██  ▀█▄██    █    ▀▄▄▄▀  ▄█▄▄▄▄  █▄▄█  ▄▄█▄▄  ▀▄▄▄▀
+     █
+     ▀
+* Wenn der Wert von "type_of_dementia" nicht gleich "none", dann wird diese Information für die QI25 herangezogen. Führt dann mindestens zu "1.F"
 
 -->
 <resinfotype bwinftyp="orient2" sinceversion="13" abstract_type="132" equivalent="20" intervalmode="0"

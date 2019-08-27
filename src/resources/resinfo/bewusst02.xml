@@ -9,6 +9,14 @@
 * MODE_INTERVAL_NOCONSTRAINTS = 2;
 * MODE_INTERVAL_SINGLE_INCIDENTS = 3;
 
+            █                 ▄▄▄▄   ▄▄▄▄  ▄▄▄     ▄▄▄▄
+  ▄▄▄▄   ▄▄▄█  ▄   ▄   ▄▄▄   ▀   ▀█ ▄▀  ▀▄   █    █▀  ▀▄
+ █▀ ▀█  █▀ ▀█  ▀▄ ▄▀  █   ▀      ▄▀ █  ▄ █   █    █▄  ▄█
+ █   █  █   █   █▄█    ▀▀▀▄    ▄▀   █    █   █     ▀▀▀ █
+ ▀█▄██  ▀█▄██    █    ▀▄▄▄▀  ▄█▄▄▄▄  █▄▄█  ▄▄█▄▄  ▀▄▄▄▀
+     █
+     ▀
+* Wird herangezogen für QI24 "1-5"
 -->
 <resinfotype bwinftyp="bewusst01" sinceversion="13" abstract_type="131" equivalent="21" intervalmode="0"
              infokurz="Bewusstseinszustand" infolang="" category="5" tx="true" qpr="true">

@@ -57,9 +57,11 @@ public class ResInfoType implements Serializable {
     @Version
     @Column(name = "version")
     private Long version;
-    // diese Spalte wird verwendet, wenn sich die Formulare ändern. Alle Vorgängerversionen eines Formulars haben dann die gleiche EQUIV Zahl.
-    // wenn ein neues Formular (das bisher noch nicht aktualisiert wurde) hinzu kommt, nimmt man einfach die höchste EQUIV + 1.
-    // So weiss OPDE aber hinterher was zusammengehört.
+    // Eine ResinfoType wird durch die abstrakte Nummierung in type gekennzeichnet für spätere Auswertungen. Überleitbogen, BI usw. Wenn aber ein Formular "stillgelegt"
+    // wird, dann geht dieser type verloren, weil ich den dann auf -1 setzen. Damit ich aber hinterher immer noch feststellen kann, was mal zusammen gehört
+    // hat, gibt es eine zweite klassifizierung über equiv, also alles was gleichwertig ist. das ist alles.
+    // es gibt types bei denen mich das nicht interessiert, dann steht deren equiv auf 0. hätte man auch so machen können, dass ale types doppelt eingetragen
+    // werden, hab ich aber damals nicht dran gedacht.
     // Diese Änderungen werden aber nur bei der Entwicklung vorgenommen und nicht während der Laufzeit.
     @Column(name = "equiv")
     private Integer equiv;

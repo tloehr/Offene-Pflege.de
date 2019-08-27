@@ -31,10 +31,7 @@ import java.text.DateFormat;
 import java.util.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: tloehr
- * Date: 03.06.13
- * Time: 17:18
+ * Created with IntelliJ IDEA. User: tloehr Date: 03.06.13 Time: 17:18
  * <p>
  * <p>
  * Nur die PDF Formulare, die als STATIC aus dem ES4 exportiert wurden liefern die Felder beim Stamper.
@@ -47,6 +44,10 @@ public class TXEssenDoc {
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
     public static final String SOURCEWOUND = "anlage_wunden_161016_static.pdf";
+
+    // das sind die die 4 Stufen aus der BI Bewertung
+    private final String[] BI_BEWERTUNG = new String[]{"selbst0", "selbst1", "selbst2", "selbst3"};
+    private final String[] SELBSTSTAENDIGKEITS_BEWERTUNG = new String[]{"none", "lvl1", "lvl2", "lvl3"};
 
     private final int MAX_VERORDNUNGEN_AUF_BOGEN = 8;
 
@@ -95,7 +96,7 @@ public class TXEssenDoc {
 
         SwingWorker worker = new SwingWorker() {
             @Override
-            protected Object doInBackground() throws Exception {
+            protected Object doInBackground() {
 
                 // Alle aktiven Infos laden
                 for (ResInfo info : ResInfoTools.getAllActive(resident)) {
@@ -498,8 +499,8 @@ public class TXEssenDoc {
 
 
     /**
-     * fills the usual stuff like resident name, insurances, dob and the rest on all three pages.
-     * filling means, putting pairs into the content HashMap.
+     * fills the usual stuff like resident name, insurances, dob and the rest on all three pages. filling means, putting
+     * pairs into the content HashMap.
      * <p/>
      * Contains also "1 Soziale Aspekte"
      */
@@ -652,7 +653,7 @@ public class TXEssenDoc {
      * mobilty
      */
     private void createContent4Section4() {
-        content.put(TXEAF.MOBILITY_GET_UP, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(TXEAF.MOBILITY_GET_UP, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand"), SELBSTSTAENDIGKEITS_BEWERTUNG));
         content.put(TXEAF.MOBILITY_AID_GETUP, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand.aid")));
         content.put(TXEAF.MOBILITY_WALKING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walk"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
         content.put(TXEAF.MOBILITY_AID_WALKING, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walk.aid")));
@@ -1380,8 +1381,8 @@ public class TXEssenDoc {
     }
 
     /**
-     * Falls mehr Verordnungen exisiteren, als auf die Hauptseite passen, erstelle ich hier ein weiteres Document.
-     * Dabei wird dann kein vorhandenes Template ausgefüllt, sondern ein komplett neues PDF Document erstellt.
+     * Falls mehr Verordnungen exisiteren, als auf die Hauptseite passen, erstelle ich hier ein weiteres Document. Dabei
+     * wird dann kein vorhandenes Template ausgefüllt, sondern ein komplett neues PDF Document erstellt.
      *
      * @param listMeds
      * @param startAt

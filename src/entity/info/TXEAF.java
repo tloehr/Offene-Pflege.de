@@ -1,7 +1,7 @@
 package entity.info;
 
 /**
- * This class contains the translation between the string constants and the keys of the specific places in the PDF template documents.
+ * In dieser Klasse werden die einzelnen IDs aus dem PDF Formular gespeichert. Also was nachher wohin geschrieben wird.
  */
 public class TXEAF {
     public static final String PAGE3_TX3_DATE = "Formular1[0].Patientenüberleitung-Seite3[0].Textfeld27[0]";

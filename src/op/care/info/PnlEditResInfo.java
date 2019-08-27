@@ -123,13 +123,78 @@ public class PnlEditResInfo implements HasLogger {
         initPanel(resInfo.getResInfoType().getXml());
     }
 
-    public void addInfoButtons(JPanel pnl, String tooltip, String tx) {
-        if (tooltip == null && tx == null) return;
+    /**
+     * Falls nötig, werden Info Icons an die ResInfos angehangen. Das kann sein für
+     * <li>Einfache Info-Symbole</li>
+     * <li>Überleitbogen</li>
+     * <li>Begutachrungsrelevante Eintröge</li>
+     * <li>QDVS Indikatoren</li>
+     *
+     * @param pnl
+     * @param tooltip
+     * @param tx
+     */
+    public void addInfoButtons(JPanel pnl, String tooltip, String tx, String bi, String qi) {
+        if (tooltip == null && tx == null && bi == null && qi == null) return;
+
+        tooltip = prepareTooltip(tooltip);
+        tx = prepareTooltip(tx);
+        bi = prepareTooltip(bi);
+        qi = prepareTooltip(qi);
+
+        if (tooltip != null) {
+            final JButton ttip = GUITools.getTinyButton(HTMLTools.toHTML(tooltip), SYSConst.findIcon(SYSConst.fontawesome_info_circle_o));
+            final JidePopup popupInfo = createPopupInfo(HTMLTools.toHTML(tooltip), ttip);
+
+            ttip.addActionListener(e -> {
+                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+            });
+            pnl.add("left", ttip);
+        }
+
+        if (tx != null) {
+            final JButton btntx = GUITools.getTinyButton(HTMLTools.toHTML(tx), SYSConst.findIcon(SYSConst.strIcon16ambulance));
+            final JidePopup popupInfo = createPopupInfo(HTMLTools.toHTML(tx), btntx);
+
+            btntx.addActionListener(e -> {
+                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+            });
+
+            pnl.add("left", btntx);
+        }
+
+        if (bi != null) { // Begutachtungsinstrument
+            final JButton btnbi = GUITools.getTinyButton(HTMLTools.toHTML(bi), SYSConst.findIcon(SYSConst.icon22bi));
+            final JidePopup popupInfo = createPopupInfo(HTMLTools.toHTML(bi), btnbi);
+
+            btnbi.addActionListener(e -> {
+                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+            });
 
 
-        final JLabel txt = new JLabel();
+            pnl.add("left", btnbi);
+        }
 
-        final JidePopup popupInfo = new JidePopup();
+        if (qi != null) { // indikator
+            final JButton btnqi = GUITools.getTinyButton(HTMLTools.toHTML(qi), SYSConst.findIcon(SYSConst.icon16qi));
+            final JidePopup popupInfo = createPopupInfo(HTMLTools.toHTML(qi), btnqi);
+
+            btnqi.addActionListener(e -> {
+                popupInfo.setOwner(btnqi);
+                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+            });
+
+
+            pnl.add("left", btnqi);
+        }
+
+        pnl.add("left", new JLabel(" "));
+    }
+
+    private JidePopup createPopupInfo(String strtxt, Component owner) {
+        JLabel txt = new JLabel(strtxt);
+        JidePopup popupInfo = new JidePopup();
+        popupInfo.setOwner(owner);
         popupInfo.setMovable(false);
 
         JScrollPane scrl = new JScrollPane(txt);
@@ -138,54 +203,22 @@ public class PnlEditResInfo implements HasLogger {
         popupInfo.setContentPane(scrl);
         popupInfo.removeExcludedComponent(txt);
         popupInfo.setDefaultFocusComponent(txt);
+        return popupInfo;
+    }
 
+    private String prepareTooltip(String in) {
+        if (in != null) {
+            in = SYSTools.xx(in);
+            in = in.replace('[', '<').replace(']', '>');
 
-        if (tooltip != null) {
-            tooltip = SYSTools.xx(tooltip);
-            tooltip = tooltip.replace('[', '<').replace(']', '>');
-
-            if (tooltip.indexOf("<p>") < 0 && tooltip.indexOf("<li>") < 0) {
-                tooltip = HTMLTools.p(tooltip);
+            if (in.indexOf("<p>") < 0 && in.indexOf("<li>") < 0) {
+                in = "<p>" + in + "</p>";
             }
 
-            tooltip = tooltip.replace("<p>", "<p style=\"width:300px;\">");
-            tooltip = tooltip.replace("<li>", "<li style=\"width:300px;\">");
-
-
-            final JButton ttip = GUITools.getTinyButton(HTMLTools.toHTML(tooltip), SYSConst.findIcon(SYSConst.fontawesome_info_circle_o));
-            txt.setText(HTMLTools.toHTML(tooltip));
-
-            ttip.addActionListener(e -> {
-                popupInfo.setOwner(ttip);
-                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
-            });
-            pnl.add("left", ttip);
+            in = in.replace("<p>", "<p style=\"width:300px;\">");
+            in = in.replace("<li>", "<li style=\"width:300px;\">");
         }
-
-        if (tx != null) {
-
-            tx = tx.replace('[', '<').replace(']', '>');
-
-            if (tx.indexOf("<p>") < 0 && tx.indexOf("<li>") < 0) {
-                tx = "<p>" + tx + "</p>";
-            }
-
-            tx = tx.replace("<p>", "<p style=\"width:300px;\">");
-            tx = tx.replace("<li>", "<li style=\"width:300px;\">");
-
-            final JButton btntx = GUITools.getTinyButton(HTMLTools.toHTML(tx), SYSConst.icon16ambulance);
-            txt.setText(HTMLTools.toHTML(tx));
-
-            btntx.addActionListener(e -> {
-                popupInfo.setOwner(btntx);
-                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
-            });
-
-
-            pnl.add("left", btntx);
-        }
-
-        pnl.add("left", new JLabel(" "));
+        return in;
     }
 
     /**
@@ -212,13 +245,13 @@ public class PnlEditResInfo implements HasLogger {
 
     private void initPanel(String xml) {
         content = new Properties();
-        focusTraversal = new ArrayList<JComponent>();
-        lockedforchanges = new ArrayList<String>();
-        enables = new HashMap<String, ArrayList<String>>();
-        disables = new HashMap<String, ArrayList<String>>();
-        defaultdisabled = new ArrayList<String>();
-        enabledBy = new HashMap<String, String>();
-        disabledBy = new HashMap<String, String>();
+        focusTraversal = new ArrayList<>();
+        lockedforchanges = new ArrayList<>();
+        enables = new HashMap<>();
+        disables = new HashMap<>();
+        defaultdisabled = new ArrayList<>();
+        enabledBy = new HashMap<>();
+        disabledBy = new HashMap<>();
 
         pnlContent = new JPanel(new BorderLayout());
         initPanel = true;
@@ -1046,7 +1079,7 @@ public class PnlEditResInfo implements HasLogger {
                     jl.setFont(original.deriveFont(map));
 
                     outerpanel.add("p left", jl);
-                    addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                    addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
                 }
             }
             if (tagName.equalsIgnoreCase("scale")) {
@@ -1103,7 +1136,7 @@ public class PnlEditResInfo implements HasLogger {
 //                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
-                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
                 tabgroup = true;
             }
             /***
@@ -1129,7 +1162,7 @@ public class PnlEditResInfo implements HasLogger {
                 }
                 j.setName(compName);
                 innerpanel.add(layout, j);
-                addInfoButtons(innerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(innerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
 
                 j.addActionListener(new RadioButtonActionListener());
                 if (scalemode) {
@@ -1166,7 +1199,7 @@ public class PnlEditResInfo implements HasLogger {
 
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), tabgroup ? "tab" : "br left");
                 outerpanel.add(layout, j);
-                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
 
                 int fontstyle = Font.PLAIN;
                 if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
@@ -1291,7 +1324,7 @@ public class PnlEditResInfo implements HasLogger {
                 String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "left" + hfill);
                 outerpanel.add(innerlayout, j);
 
-                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
 
                 components.put(groupname, j); // für den späteren Direktzugriff
                 j.addFocusListener(tffl);
@@ -1372,7 +1405,7 @@ public class PnlEditResInfo implements HasLogger {
 
                 components.put(groupname, pnlGP);
                 outerpanel.add(layout, pnlGP);
-                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
             }
             /***
              *                                ____       _           _
@@ -1443,7 +1476,7 @@ public class PnlEditResInfo implements HasLogger {
 
                 components.put(groupname, pnlRoom);
                 outerpanel.add(layout, pnlRoom);
-                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
             }
             /***
              *      _                     _ _        _          _           _
@@ -1499,7 +1532,7 @@ public class PnlEditResInfo implements HasLogger {
 
                 components.put(groupname, pnlHospital);
                 outerpanel.add(layout, pnlHospital);
-                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
             }
             /***
              *                        __              _                  _      _
@@ -1554,18 +1587,26 @@ public class PnlEditResInfo implements HasLogger {
                 components.put(groupname, pnlBodyScheme);
                 outerpanel.add(layout, pnlBodyScheme);
             }
-            /***
-             *      _   _                       _         _
-             *     | |_(_)_ _ _  _   __ _ _ __ | |__ _  _| |__ _ _ _  __ ___   __ __ _ _ _
-             *     |  _| | ' \ || | / _` | '  \| '_ \ || | / _` | ' \/ _/ -_) / _/ _` | '_|
-             *      \__|_|_||_\_, | \__,_|_|_|_|_.__/\_,_|_\__,_|_||_\__\___| \__\__,_|_|
-             *                |__/
-             */
+
+            hier gehts weiter
+                    brauchen tooltip für den title
+
             if (tagName.equalsIgnoreCase("tx")) {
-                JLabel jl = new JLabel(SYSConst.icon22ambulance);
+                JLabel jl = new JLabel(SYSConst.findIcon(SYSConst.strIcon22ambulance));
                 jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
+            if (tagName.equalsIgnoreCase("qi")) {
+                JLabel jl = new JLabel(SYSConst.findIcon(SYSConst.icon22qi));
+                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                outerpanel.add(jl);
+            }
+            if (tagName.equalsIgnoreCase("bi")) {
+                JLabel jl = new JLabel(SYSConst.findIcon(SYSConst.icon22bi));
+                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                outerpanel.add(jl);
+            }
+
             /***
              *                 _
              *      _   _ _ __| |
@@ -1652,7 +1693,7 @@ public class PnlEditResInfo implements HasLogger {
 //                jl.setToolTipText(SYSTools.toHTML(SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
-                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
             }
             /***
              *                   _         _
@@ -1675,7 +1716,7 @@ public class PnlEditResInfo implements HasLogger {
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
                 outerpanel.add("left", jcb);
-                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"), attributes.getValue("bi"), attributes.getValue("qi"));
 //                if (SYSTools.catchNull(attributes.getValue("defaultdisabled"), "false").equalsIgnoreCase("true")) {
 //                    defaultdisabled.add(groupname);
 //                }

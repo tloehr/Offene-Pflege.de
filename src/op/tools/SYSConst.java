@@ -720,8 +720,14 @@ public class SYSConst {
     public static String fontawesome_info_circle_o = "/artwork/16x16/bw/info-circle-o.png";
 
     public static String icon22falling = "/artwork/22x22/hillslope.png";
+    public static String strIcon16ambulance = "/artwork/16x16/ambulance2.png";
+    public static String strIcon22ambulance = "/artwork/22x22/ambulance2.png";
+    public static String icon16bi = "/artwork/16x16/bi16.png";
+    public static String icon16qi = "/artwork/16x16/mdk16.png";
+    public static String icon22bi = "/artwork/22x22/bi22.png";
+    public static String icon22qi = "/artwork/22x22/mdk22.png";
     public static String strIconFalling = "hillslope.png";
-    public static String strIconQPR = "evaluation-score.png";
+
     public static String icon16falling = "/artwork/16x16/hillslope.png";
     public static String icon48falling = "/artwork/48x48/hillslope.png";
 

@@ -102,8 +102,8 @@ public class ResInfoTypeTools {
     // Die sechs Lebensbereiche des Begutachtungsinstruments (BI)
     public static final int TYPE_BI1 = 159; // BI1 Mobilität
     public static final int TYPE_BI2 = 160; // BI2 kognitiven und kommunikativen Fähigkeiten
-    public static final int TYPE_BI3 = 161; // BI3 die Verhaltensweisen und psychischen Problemlagen
-    public static final int TYPE_BI4 = 162; // BI4 die Selbstversorgung
+    public static final int TYPE_BI3 = 161; // BI3 die Verhaltensweisen und psychischen Problemlagen (equiv 38)
+    public static final int TYPE_BI4 = 162; // BI4 die Selbstversorgung  (equiv 39)
     public static final int TYPE_BI5 = 163; // BI5 krankheits- und therapiebedingten Anforderungen und Belastungen
     public static final int TYPE_BI6 = 164; // BI6 Gestaltung des Alltagslebens und sozialer Kontakte
 
@@ -191,34 +191,5 @@ public class ResInfoTypeTools {
         }
         return containsOneActiveObsoleteInfo;
     }
-
-//    /**
-//     * if you hand over an obsolete infotype to this method it returns an
-//     * active version for it, using the equiv attribute. If the type is not
-//     * obsolete, you will get it back.
-//     * If there is no active version you will get NULL instead.
-//     * Infotypes without replacements have either none active one withing their
-//     * equiv domain or equiv is 0.
-//     *
-//     * @param resInfoType
-//     * @return
-//     */
-//    public static ResInfoType getActiveVersion4(ResInfoType resInfoType) {
-//        if (!resInfoType.isObsolete()) {
-//            return resInfoType;
-//        }
-//        if (resInfoType.getEquiv().intValue() == 0) {
-//            return null;
-//        }
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.equiv = :equiv AND b.type >= 0 ");
-//        query.setParameter("equiv", resInfoType.getEquiv());
-//        List<ResInfoType> resInfoTypes = query.getResultList();
-//        em.close();
-//        if (resInfoTypes.isEmpty()) {
-//            return null;
-//        }
-//        return resInfoTypes.get(0); // there should never be more than one active resinfotype.
-//    }
 
 }

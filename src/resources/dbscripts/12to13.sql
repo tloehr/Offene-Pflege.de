@@ -46,7 +46,7 @@ VALUES ('respirat2', 'Atmung/Beatmung', '', '15', '133', '0', '22',
 -- Bewusstseinszustand
 UPDATE `resinfotype`
 SET `type` = '-1'
-WHERE `BWINFTYP` = 'conciuos';
+WHERE `BWINFTYP` = 'concious';
 INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`)
 VALUES ('bewusst01', 'Bewusstseinszustand', '', '5', '131', '0', '21',
         '
@@ -74,3 +74,4 @@ VALUES ('bewusst01', 'Bewusstseinszustand', '', '5', '131', '0', '21',
 -- Neue Kategorie für die BI Instrumente
 UPDATE `resinfocategory` t SET t.`Bezeichnung` = 'BI Begutachtungsinstrumente', t.`Sortierung` = 101 WHERE t.`BWIKID` = 20
 --
+UPDATE `resinfotype` t SET t.`equiv` = 129 WHERE t.`BWINFTYP` = 'ARTNUTRIT';
