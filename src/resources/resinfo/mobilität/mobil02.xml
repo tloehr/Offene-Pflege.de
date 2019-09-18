@@ -1,0 +1,79 @@
+<!--
+
+ ▜▘   ▐              ▜ ▙▗▌     ▌
+ ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
+ ▐ ▌ ▌▐ ▖▛▀ ▌  ▐▐ ▞▀▌▐ ▌ ▌▌ ▌▌ ▌▛▀
+ ▀▘▘ ▘ ▀ ▝▀▘▘   ▘ ▝▀▘ ▘▘ ▘▝▀ ▝▀▘▝▀▘
+* MODE_INTERVAL_BYSECOND = 0;
+* MODE_INTERVAL_BYDAY = 1;
+* MODE_INTERVAL_NOCONSTRAINTS = 2;
+* MODE_INTERVAL_SINGLE_INCIDENTS = 3;
+
+INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`,            `BWIKID`, `type`, `IntervalMode`,
+`equiv`, `XML`)
+                           VALUES ('orient02', 'Demenz und Orientierung', '',   '5',     '132',       '0',
+                           '20',
+                    '');
+
+-->
+<resinfotype bwinftyp="mobil02" sinceversion="13" category="3" abstract_type="110" equivalent="14" intervalmode="0"
+             infokurz="Mobilität" infolang="" tx="false" qpr="true">
+
+    <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
+    <checkbox name="bedridden" label="bettlägerig"/>
+    <!-- name war vorher "bedmovement" -->
+    <optiongroup size="18" name="bett" label="Positionswechsel im Bett" qi="26" bi="4.1.1"
+                 tooltip="bi1.bett.erklaerung">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.bett.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.bett.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.bett.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.bett.selbst3"/>
+    </optiongroup>
+    <!-- name war vorher "sitting" wurde ab mobil02 umbenannt. Ebenso, wie bei allen Auswahlfelder gibts
+        kein "triff nicht" zu mehr und es gibt die Formulierung "übernahme" nicht mehr.
+        Das Hilfmittel Textfeld für jeden Abschnitt ist nicht mehr da. -->
+    <optiongroup size="18" name="sitz" label="Halten einer stabilen Sitzposition" qi="26" bi="4.1.2"
+                 tooltip="bi1.sitz.erklaerung">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.sitz.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.sitz.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.sitz.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.sitz.selbst3"/>
+    </optiongroup>
+    <!-- name war vorher "stand" und "transfer"-->
+    <optiongroup size="18" name="umsetzen" label="Umsetzen" qi="26" bi="4.1.3" tooltip="bi1.umsetzen.erklaerung">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.umsetzen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.umsetzen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.umsetzen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.umsetzen.selbst3"/>
+    </optiongroup>
+    <!-- name war vorher "walk" -->
+    <optiongroup size="18" name="wohnbereich" label="Fortbewegen innerhalb des Wohnbereichs" qi="26" bi="4.1.4"
+                 tooltip="bi1.wohnbereich.erklaerung">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.wohnbereich.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.wohnbereich.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.wohnbereich.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.wohnbereich.selbst3"/>
+    </optiongroup>
+
+    <!--  gabs vorher nicht -->
+    <optiongroup size="18" name="treppe" label="Treppensteigen" tooltip="bi1.treppen.erklaerung" qi="Zeile 30"
+                 bi="4.1.5">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.treppen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.treppen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.treppen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.treppen.selbst3"/>
+    </optiongroup>
+
+    <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
+              tooltip="bi1.unfaehig.arme.beine"
+              bi="4.1.6"/>
+
+    <tabgroup label="Hilfsmittel zur Bewegung" name="hilfsmittel">
+        <checkbox name="rollstuhl" label="Rollstuhl"/>
+        <checkbox name="kruecke" label="Unterarmgehstütze"/>
+        <checkbox name="rollator" label="Rollator"/>
+        <checkbox name="gehstock" label="Gehstock"/>
+    </tabgroup>
+    <textfield label="Sonstige" name="anderehm" innerlayout="left"/>
+
+</resinfotype>

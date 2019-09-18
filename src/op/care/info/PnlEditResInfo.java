@@ -1187,11 +1187,11 @@ public class PnlEditResInfo implements HasLogger {
              */
             if (tagName.equalsIgnoreCase("checkbox")) {
                 groupname = attributes.getValue("name");
+
                 JCheckBox j = new JCheckBox(SYSTools.xx(attributes.getValue("label")));
                 j.setOpaque(false);
                 focusTraversal.add(j);
                 j.setName(groupname);
-
 
                 components.put(groupname, j); // für den späteren Direktzugriff
 //                j.addActionListener(new CheckBoxActionListener());
@@ -1587,9 +1587,6 @@ public class PnlEditResInfo implements HasLogger {
                 components.put(groupname, pnlBodyScheme);
                 outerpanel.add(layout, pnlBodyScheme);
             }
-
-            hier gehts weiter
-                    brauchen tooltip für den title
 
             if (tagName.equalsIgnoreCase("tx")) {
                 JLabel jl = new JLabel(SYSConst.findIcon(SYSConst.strIcon22ambulance));

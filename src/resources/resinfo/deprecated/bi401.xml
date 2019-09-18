@@ -1,17 +1,4 @@
 <!--
-Cat: 3 (Bewegen/Mobilität)
-BWINFTYP: MOBILITY
-Mobilität
-02.09.2013
-since-db-version: 
-deprecated-since: 
-replaces: 
-replaced-by: 
-equivalence-id: 14
-MODE_INTERVAL_BYSECOND = 0
-TYPE_MOBILITY = 110
--->
-<!--
 
  ▜▘   ▐              ▜ ▙▗▌     ▌
  ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
@@ -32,17 +19,39 @@ Ich ordne hier die einzelnen Elemente den Qualitätsindiaktoren durch (jeweils d
 Gliederung des Formulargutachtens des BI.
 
 -->
-<resinfotype bwinftyp="bimodul1-01" sinceversion="13" category="20" abstract_type="159" equivalent="36" intervalmode="0"
-             infokurz="Modul 1 - Mobilität" infolang="bi1.intro" tx="false" qpr="true">
+<resinfotype bwinftyp="bi401" sinceversion="13" category="3" abstract_type="159" equivalent="14" intervalmode="0"
+             infokurz="Selbstversorgung" infolang="bi4.intro" tx="false" qpr="true">
 
-    <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
+    <!--    <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>-->
 
-    <label parwidth="600px" label="bi1.intro"/>
+    <label parwidth="600px" label="bi4.intro"/>
     <separator/>
-    <!--  QI26 F4.1.1 -->
-    <optiongroup size="18" label="Positionswechsel im Bett" name="poswechselbett" qi="Zeile 26"
+    <!-- F4.4 -->
+
+    <tabgroup size="16" fontstyle="bold" label="Ernährung parenteral oder über Sonde">
+        <checkbox label="parenteral (z. B. Port)" name="parenteral" layout="br left"/>
+        <checkbox label="perkutane endoskopische Gastrostomie (PEG)" name="peg" layout="left"/>
+        <checkbox label="perkutane endoskopische Jejunostomie (PEJ)" name="pej" layout="br left"/>
+        <checkbox label="(nasale) Magensonde" name="nasal" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Art der Gabe" name="tg1">
+        <checkbox label="Pumpe" name="pumpe" layout="br left"/>
+        <checkbox label="Schwerkraft" name="schwer" layout="left"/>
+        <checkbox label="bolus" name="bolus" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Blasenkontrolle/Harnkontinenz">
+        <checkbox label="ständig kontinent (keine unwillkürlichen Harnabgänge)" name="pumpe" layout="br left"/>
+        <checkbox label="Schwerkraft" name="schwer" layout="left"/>
+        <checkbox label="bolus" name="bolus" layout="left"/>
+    </tabgroup>
+
+    <label fontstyle="bold" size="16" label="Blasenkontrolle/Harnkontinenz"/>
+    <optiongroup size="16" fontstyle="nbold" name="kontinenz" qi="Zeile 26"
                  bi="Formulargutachten 4.1.1" tooltip="bi1.bett.erklaerung">
-        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.bett.selbst0"  />
+
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.bett.selbst0"/>
         <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.bett.selbst1"/>
         <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.bett.selbst2"/>
         <option label="unselbständig" name="selbst3" tooltip="bi1.bett.selbst3"/>
@@ -65,7 +74,7 @@ Gliederung des Formulargutachtens des BI.
         <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.umsetzen.selbst2"/>
         <option label="unselbständig" name="selbst3" tooltip="bi1.umsetzen.selbst3"/>
     </optiongroup>
-    
+
     <!--    QI29 F4.1.4 -->
     <optiongroup size="18" name="wohnbereich" label="Fortbewegen innerhalb des Wohnbereichs"
                  tooltip="bi1.wohnbereich.erklaerung" qi="Zeile 29" bi="Formulargutachten 4.1.4">
@@ -89,7 +98,6 @@ Gliederung des Formulargutachtens des BI.
 
     <separator/>
     <label parwidth="600px" label="bi.quellen"/>
-
 
 
 </resinfotype>

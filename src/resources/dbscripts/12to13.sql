@@ -71,7 +71,65 @@ VALUES ('bewusst01', 'Bewusstseinszustand', '', '5', '131', '0', '21',
     <label label="in der vollstationären Pflege. Anlage3&quot;"/>
 ');
 --
--- Neue Kategorie für die BI Instrumente
-UPDATE `resinfocategory` t SET t.`Bezeichnung` = 'BI Begutachtungsinstrumente', t.`Sortierung` = 101 WHERE t.`BWIKID` = 20
---
 UPDATE `resinfotype` t SET t.`equiv` = 129 WHERE t.`BWINFTYP` = 'ARTNUTRIT';
+--
+-- Mobilität
+UPDATE `resinfotype` SET `type` = '-1' WHERE `BWINFTYP` = 'MOBILITY';
+INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`)
+VALUES ('bi101', 'Mobilität', 'bi1.intro', '3', '110', '0', '14',
+        '
+<tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
+
+    <label parwidth="600px" label="bi1.intro"/>
+    <separator/>
+    <!--  QI26 F4.1.1 -->
+    <optiongroup size="18" label="Positionswechsel im Bett" name="poswechselbett" qi="Zeile 26"
+                 bi="Formulargutachten 4.1.1" tooltip="bi1.bett.erklaerung">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.bett.selbst0"  />
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.bett.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.bett.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.bett.selbst3"/>
+    </optiongroup>
+
+    <!--    QI27 F4.1.2 -->
+    <optiongroup size="18" name="stabilersitz" label="Halten einer stabilen Sitzposition" tooltip="bi1.sitz.erklaerung"
+                 qi="Zeile 27" bi="Formulargutachten 4.1.2">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.sitz.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.sitz.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.sitz.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.sitz.selbst3"/>
+    </optiongroup>
+
+    <!--    QI28 F4.1.3 -->
+    <optiongroup size="18" name="umsetzen" label="Umsetzen" tooltip="bi1.umsetzen.erklaerung" qi="Zeile 28"
+                 bi="Formulargutachten 4.1.3">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.umsetzen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.umsetzen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.umsetzen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.umsetzen.selbst3"/>
+    </optiongroup>
+
+    <!--    QI29 F4.1.4 -->
+    <optiongroup size="18" name="wohnbereich" label="Fortbewegen innerhalb des Wohnbereichs"
+                 tooltip="bi1.wohnbereich.erklaerung" qi="Zeile 29" bi="Formulargutachten 4.1.4">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.wohnbereich.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.wohnbereich.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.wohnbereich.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi.selbst3"/>
+    </optiongroup>
+
+    <!--    QI30 F4.1.5 -->
+    <optiongroup size="18" name="treppe" label="Treppensteigen" tooltip="bi1.treppen.erklaerung" qi="Zeile 30"
+                 bi="Formulargutachten 4.1.5">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi1.treppen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi1.treppen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi1.treppen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi1.treppen.selbst3"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Hilfsmittel"/>
+    <textfield name="hilfsmittel" innerlayout="left"/>
+
+    <separator/>
+    <label parwidth="600px" label="bi.quellen"/>
+');

@@ -1,16 +1,4 @@
-<!--
-Cat: 3 (Bewegen/Mobilität)
-BWINFTYP: MOBILITY
-Mobilität
-02.09.2013
-since-db-version: 
-deprecated-since: 
-replaces: 
-replaced-by: 
-equivalence-id: 14
-MODE_INTERVAL_BYSECOND = 0
-TYPE_MOBILITY = 110
--->
+
 <!--
 
  ▜▘   ▐              ▜ ▙▗▌     ▌
@@ -22,18 +10,11 @@ TYPE_MOBILITY = 110
 * MODE_INTERVAL_NOCONSTRAINTS = 2;
 * MODE_INTERVAL_SINGLE_INCIDENTS = 3;
 
-INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`,            `BWIKID`, `type`, `IntervalMode`,
-`equiv`, `XML`)
-                           VALUES ('orient02', 'Demenz und Orientierung', '',   '5',     '132',       '0',
-                           '20',
-                    '');
-
-
-bimodul2-01 (heisst modul2 aber erste version. man weiss nie was sich verändert)
+bi201 (heisst modul2 aber erste version. man weiss nie was sich verändert)
 
 -->
-<resinfotype bwinftyp="bimodul2-01" sinceversion="13" category="20" abstract_type="160" equivalent="37" intervalmode="0"
-             infokurz="Modul 2 - Kognitive und kommunikative Fähigkeiten" infolang="bi2.intro" tx="false"
+<resinfotype bwinftyp="bi201" sinceversion="13" category="20" abstract_type="160" equivalent="37" intervalmode="0"
+             infokurz="Kognitive und kommunikative Fähigkeiten" infolang="bi2.intro" tx="false"
              qpr="true">
 
     <label parwidth="600px" label="bi2.intro"/>

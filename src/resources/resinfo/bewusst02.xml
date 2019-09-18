@@ -17,10 +17,36 @@
      █
      ▀
 * Wird herangezogen für QI24 "1-5"
+* ersetzt concious.xml
+
+
+
+1,Körperpflege
+2,Ausscheidungen
+3,Bewegen/Mobilität
+4,Essen/Trinken
+5,Orientierung/Psyche
+6,Kommunikation/Wahrnehmung
+7,Schlaf
+8,Vitale Funktionen
+9,Hautzustand/Wunden
+10,Hauswirtschaft
+12,Soziales
+13,Verwaltung
+15,Medizinisch/Ärztlich
+16,Technik/Geräte
+17,Vorbeugung
+18,Kleidung
+19,Hygiene
+
+
+
 -->
 <resinfotype bwinftyp="bewusst01" sinceversion="13" abstract_type="131" equivalent="21" intervalmode="0"
              infokurz="Bewusstseinszustand" infolang="" category="5" tx="true" qpr="true">
 
+
+    prüfen bi bi2 und altem demenz usw.
 
     <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
     <imagelabel image="/artwork/48x48/evaluation-score.png"
