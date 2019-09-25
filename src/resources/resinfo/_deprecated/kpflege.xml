@@ -1,0 +1,81 @@
+
+<!-- ==================Waschen am Waschbecken================== -->
+<optiongroup name="waschen.becken" label="Waschen am Waschbecken">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Waschen im Bett================== -->
+<optiongroup name="waschen.bett" label="Waschen im Bett">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Kämmen================== -->
+<optiongroup name="kaemmen" label="Kämmen">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Haare waschen================= -->
+<optiongroup name="haare.waschen" label="Haare waschen">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Duschen================== -->
+<optiongroup name="duschen" label="Duschen">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Baden================== -->
+<optiongroup name="baden" label="Baden">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Intimpflege================== -->
+<optiongroup name="intimpflege" label="Intimpflege">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Nasenpflege================== -->
+<optiongroup name="nasenpflege" label="Nasenpflege">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Ohrenpflege================== -->
+<optiongroup name="ohrenpflege" label="Ohrenpflege">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>
+<!-- ==================Rasieren================== -->
+<optiongroup name="rasieren" label="Rasieren">
+<option label="trifft nicht zu" name="tnz" default="true"/>
+<option label="braucht keine Hilfe" name="keine"/>
+<option label="leichte Einschränkungen" name="lE"/>
+<option label="mittlere Einschränkungen" name="mE"/>
+<option label="schwere Einschränkungen" name="sE"/>
+</optiongroup>

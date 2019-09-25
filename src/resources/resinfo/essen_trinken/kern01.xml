@@ -4,15 +4,18 @@ BWINFTYP: ARTNUTRIT
 Künstliche Ernährung
 21.06.2013
 since-db-version: 
-deprecated-since: 
+_deprecated-since:
 replaced-by: 
 MODE_INTERVAL_BYSECOND = 0
 -->
-<resinfotype bwinftyp="k_ern01" sinceversion="13" category="4" abstract_type="129" equivalent="129" intervalmode="0"
+<resinfotype bwinftyp="kern01" sinceversion="13" category="4" abstract_type="129" equivalent="129" intervalmode="0"
              infokurz="Künstliche Ernährung" infolang="" tx="true" qpr="true" bi="true">
-    <tx tooltip="tx.k_ern"/>
+
+    <qpr
+            tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Zeile: 42"/>
+    <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
     <tx tooltip="Seite 2, Abschnitt 9."/>
-    <tx tooltip="Seite 2, Abschnitt 9."/>
+
     <combobox label="Sondentyp" name="tubetype">
         <item label="PEG (Perkutane endoskopische Gastrostomie)" name="peg"/>
         <item label="PEG/J (PEG mit duodenalem Schenkel)" name="pej"/>
@@ -33,15 +36,16 @@ MODE_INTERVAL_BYSECOND = 0
     <textfield name="calories" label="Kalorien (in 24h)" hfill="false" length="12"/>
 
     <separator/>
-    <optiongroup name="umfang" label="In welchem Umfang erfolgt eine künstliche Ernährung?">
-        <option label="nicht täglich oder nicht dauerhaft" name="umfang1" default="true"/>
-        <option label="täglich, aber zusätzlich zur oralen Ernährung" name="umfang2"/>
-        <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="umfang3"/>
+    <optiongroup name="umfang" label="In welchem Umfang erfolgt eine künstliche Ernährung?"
+                 qi="43" bi="4.4.13">
+        <option label="nicht täglich oder nicht dauerhaft" name="1" default="true"/>
+        <option label="täglich, aber zusätzlich zur oralen Ernährung" name="2"/>
+        <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="3"/>
     </optiongroup>
 
-    <optiongroup name="selbst" label="Erfolgt die Bedienung selbständig oder mit Fremdhilfe?">
-        <option label="selbständig" name="selbst0" default="true"/>
-        <option label="mit Fremdhilfe" name="selbst1"/>
+    <optiongroup name="selbst" label="Erfolgt die Bedienung selbständig oder mit Fremdhilfe?" qi="44" bi="4.4.13">
+        <option label="selbständig" name="1" default="true"/>
+        <option label="mit Fremdhilfe" name="2"/>
     </optiongroup>
 
 </resinfotype>

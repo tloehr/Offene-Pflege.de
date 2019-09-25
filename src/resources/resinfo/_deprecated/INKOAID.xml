@@ -4,7 +4,7 @@ BWINFTYP: INKOAID
 Inko-Hilfsmittel
 20.06.2013
 since-db-version: 
-deprecated-since: 8
+_deprecated-since: 8
 replaced-by: INKOAID2
 MODE_INTERVAL_BYSECOND = 0
 TYPE_INCOAID = 112

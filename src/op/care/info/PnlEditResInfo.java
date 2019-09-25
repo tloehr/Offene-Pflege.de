@@ -1056,15 +1056,7 @@ public class PnlEditResInfo implements HasLogger {
                 if (attributes.getValue("label") != null) {
                     JLabel jl = new JLabel(SYSTools.xx(attributes.getValue("label")));
 
-                    int fontstyle = Font.PLAIN;
-                    if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
-                        if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
-                            fontstyle = Font.BOLD;
-                        }
-                        if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
-                            fontstyle = Font.ITALIC;
-                        }
-                    }
+                    int fontstyle = getFontStyle(attributes);
                     if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
                         int size = Integer.parseInt(attributes.getValue("size"));
                         jl.setFont(new Font("Arial", fontstyle, size));
@@ -1738,6 +1730,19 @@ public class PnlEditResInfo implements HasLogger {
             if (SYSTools.catchNull(attributes.getValue("defaultdisabled"), "false").equalsIgnoreCase("true")) {
                 defaultdisabled.add(groupname);
             }
+        }
+
+        private int getFontStyle(Attributes attributes) {
+            int fontstyle = Font.PLAIN;
+            if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                    fontstyle = Font.BOLD;
+                }
+                if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                    fontstyle = Font.ITALIC;
+                }
+            }
+            return fontstyle;
         }
 
         public void endElement(String uri, String localName, String qName) throws SAXException {

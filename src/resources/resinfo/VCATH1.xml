@@ -4,7 +4,7 @@ BWINFTYP: VCATH1
 Gefäßkatheter
 11.03.2015
 since-db-version: 8
-deprecated-since: 
+_deprecated-since:
 replaced-by: 
 MODE_INTERVAL_BYSECOND = 0
 TYPE_VESSEL_CATHETER = 146

@@ -4,7 +4,7 @@ BWINFTYP: NINSUR02
 Pflegekasse
 12.04.2017
 since-db-version: 9
-deprecated-since: 
+_deprecated-since:
 replaces: NINSURANCE
 replaced-by: 
 equivalence-id: 15

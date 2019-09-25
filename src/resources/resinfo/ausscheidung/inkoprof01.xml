@@ -16,7 +16,7 @@ INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`,            `B
                     '');
 
 -->
-<resinfotype bwinftyp="inkoprof01" sinceversion="13" category="2" abstract_type="???" equivalent="???"
+<resinfotype bwinftyp="inkoprof01" sinceversion="13" category="2" abstract_type="159" equivalent="0"
              intervalmode="0" infokurz="Inkontinenz" infolang="" tx="false" qpr="true">
     <tx tooltip="Sobald das Inkontinenzprofil nicht mehr auf 'Kontinenz' steht, wird im Überleitbogen die Markierung für 'Harninkontinenz' gesetzt."/>
 

@@ -1,0 +1,102 @@
+<!--
+
+ ▜▘   ▐              ▜ ▙▗▌     ▌
+ ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
+ ▐ ▌ ▌▐ ▖▛▀ ▌  ▐▐ ▞▀▌▐ ▌ ▌▌ ▌▌ ▌▛▀
+ ▀▘▘ ▘ ▀ ▝▀▘▘   ▘ ▝▀▘ ▘▘ ▘▝▀ ▝▀▘▝▀▘
+* MODE_INTERVAL_BYSECOND = 0;
+* MODE_INTERVAL_BYDAY = 1;
+* MODE_INTERVAL_NOCONSTRAINTS = 2;
+* MODE_INTERVAL_SINGLE_INCIDENTS = 3;
+
+INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`,            `BWIKID`, `type`, `IntervalMode`,
+`equiv`, `XML`)
+                           VALUES ('orient02', 'Demenz und Orientierung', '',   '5',     '132',       '0',
+                           '20',
+                    '');
+
+1 - körperpflege
+
+-->
+<resinfotype bwinftyp="kpflege02" sinceversion="13" category="1" abstract_type="108" equivalent="1"
+             intervalmode="0" infokurz="Körperpflege" infolang="" tx="true" qpr="true">
+
+    <optiongroup size="18" name="oberkoerper" label="Waschen des vorderen Oberkörpers" qi="47" bi="4.4.1"
+                 tooltip="bi4.oberkoerper.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.oberkoerper.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.oberkoerper.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.oberkoerper.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.oberkoerper.selbst3"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="kopf" label="Körperpflege im Bereich des Kopfes" qi="48" bi="4.4.2"
+                 tooltip="bi4.kopf.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.kopf.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.kopf.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.kopf.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.kopf.selbst3"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="intim" label="Waschen des Intimbereichs" qi="49" bi="4.4.3"
+                 tooltip="bi4.intim.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.intim.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.intim.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.intim.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.intim.selbst3"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="baden" label="Duschen und Baden einschließlich Waschen der Haare" qi="50" bi="4.4.4"
+                 tooltip="bi4.baden.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.baden.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.baden.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.baden.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.baden.selbst3"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="okankleiden" label="An- und Auskleiden des Oberkörpers" qi="51"
+                 bi="4.4.5" tooltip="bi4.okankleiden.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.okankleiden.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.okankleiden.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.okankleiden.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.okankleiden.selbst3"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="ukankleiden" label="An- und Auskleiden des Unterkörpers" qi="52"
+                 bi="4.4.6" tooltip="bi4.ukankleiden.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.ukankleiden.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.ukankleiden.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.ukankleiden.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.ukankleiden.selbst3"/>
+    </optiongroup>
+
+    <textfield label="Bevorzugte Pflegemittel" name="preferred.careproducts" innerlayout="left"
+                  tx="Seite 1, Abschnitt 3"/>
+
+    <separator/>
+    <!-- ==================Spezielle Mundpflege================== -->
+    <label size="18" fontstyle="bold" label="Gründe für eine spezielle Mundpflege"/>
+    <checkbox name="zahnlosigkeit" label="Zahnlosigkeit" layout="br"/>
+    <checkbox name="mundtrockenheit" label="extreme Mundtrockenheit (durch Mundatmung, durch Medikamente)" layout="left"/>
+    <checkbox name="trockene.lippen" label="Trockene Lippen (Rhagade)" layout="left"/>
+    <checkbox name="zungenbelag" label="Schleimhautbelägen der Zunge" layout="br"/>
+    <checkbox name="speichel.dickf" label="dickflüssiger Speichel" layout="left"/>
+    <checkbox name="lockere.zaehne" label="lockere Zähne"  layout="left"/>
+    <checkbox name="laesion.mund" label="Schädigungen des Mundes" layout="left"/>
+    <checkbox name="soor" label="Soor (Pilzbefall)"  layout="left"/>
+    <checkbox name="stomatitis" label="Stomatitis (Mundentzündung)" layout="br"/>
+    <checkbox name="gingivitis" label="Gingivitis (Zahnfleischentzündung)"  layout="left"/>
+    <checkbox name="aphten" label="Erosionen mit entzündlichem Randsaum (Aphten)" layout="left"/>
+    <checkbox name="herpes" label="Lippenherpes"  layout="br"/>
+    <checkbox name="blutung" label="erhöhter Blutungsneigung" layout="left"/>
+    <checkbox name="mundflora" label="Zerstörung der physiologischen Mundflora" tooltip="durch Medikamente, Kortison, Zytostatika, Antibiotika"  layout="left"/>
+    <checkbox name="sauerstoff" label="längerfristiger Sauerstofftherapie (Mund trocknet aus)" layout="br"/>
+    <checkbox name="absaugen" label="wiederholte Nasale oder Orale Absaugvorgänge" layout="left"/>
+    <checkbox name="bewusstlos" label="Bewußtlosigkeit" layout="left"/>
+    <checkbox name="verletzung" label="Bei Verletzungen am Kiefer und in der Mundhöhle"  layout="br"/>
+    <checkbox name="nahrungskarenz" label="Bei Nahrungskarenz (PEG, Parenterale Ernährung (s.c.))" layout="left"/>
+    <checkbox name="schluckstoerung" label="Schluckstörungen" layout="br"/>
+    <checkbox name="az" label="reduzierter Allgemeinzustand" layout="left"/>
+    <checkbox name="praefinal" label="während des Sterbeprozesses" layout="left"/>
+    <checkbox name="immunschwaeche" label="Immunschwäche" layout="left"/>
+
+</resinfotype>

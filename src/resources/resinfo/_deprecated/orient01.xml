@@ -4,7 +4,7 @@ BWINFTYP: ORIENT1
 Demenz und Orientierung
 15.08.2013
 since-db-version: 
-deprecated-since: 
+_deprecated-since:
 replaced-by: 
 MODE_INTERVAL_BYSECOND = 0
 TYPE_ORIENTATION = 132

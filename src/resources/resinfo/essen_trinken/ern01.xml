@@ -1,0 +1,54 @@
+<!--
+Cat: 2 (Ausscheidungen)
+BWINFTYP: ARTNUTRIT
+Künstliche Ernährung
+21.06.2013
+since-db-version: 
+_deprecated-since:
+replaced-by: 
+MODE_INTERVAL_BYSECOND = 0
+-->
+<resinfotype bwinftyp="ern01" sinceversion="13" category="4" abstract_type="128" equivalent="18" intervalmode="0"
+             infokurz="Essen und Trinken" infolang="" tx="true" qpr="true" bi="true">
+
+
+    <optiongroup name="essen" size="18" label="Essen" tooltip="bi4.essen.erklaerung" qi="54" bi="4.4.8">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.essen.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.essen.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.essen.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.essen.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="trinken" size="18" label="Trinken" tooltip="bi4.trinken.erklaerung" qi="55" bi="4.4.9">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.trinken.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.trinken.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.trinken.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.trinken.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="mundgerecht" size="18" label="Mundgerechtes Zubereiten der Nahrung, Eingießen von Getränken"
+                 tooltip="bi4.mundgerecht.erklaerung" qi="53" bi="4.4.7">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.mundgerecht.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.mundgerecht.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.mundgerecht.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.mundgerecht.selbst3"/>
+    </optiongroup>
+
+    <checkbox label="Nahrungskarenz" name="abrosia" layout="left"/>
+    <checkbox label="Diätkost" name="diet" layout="left"/>
+    <checkbox label="Schluckstörungen" name="dysphagia"/>
+
+    <separator/>
+    <textfield name="likes" label="Vorlieben, Essen und Trinken" hfill="false" length="40"/>
+    <textfield name="hates" label="Abneigungen, Essen und Trinken" hfill="false" length="40"/>
+    <separator/>
+
+    <textfield name="zieltrinkmenge" label="Zieltrinkmenge (ml in 24h)"
+               tooltip="Hinterlegen Sie die zugehörige ärztliche Verordnung." layout="br" hfill="false" type="double"
+               length="20"/>
+
+    <textfield name="ubw" label="Übliches Körpergewicht"
+               tooltip="Was [der|die] Bewohner[in] als [ihr|sein] übliches Gewicht angibt. Einheit: kg" type="double"
+               layout="br" hfill="false" length="20"/>
+
+</resinfotype>

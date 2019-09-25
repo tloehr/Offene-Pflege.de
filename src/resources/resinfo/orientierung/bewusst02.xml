@@ -21,7 +21,7 @@
 
 
 
-1,Körperpflege
+1,körperpflege
 2,Ausscheidungen
 3,Bewegen/Mobilität
 4,Essen/Trinken
@@ -49,8 +49,8 @@
     prüfen bi bi2 und altem demenz usw.
 
     <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
-    <imagelabel image="/artwork/48x48/evaluation-score.png"
-                tooltip="QDVS-Indikator &quot;Bewusstseinszustand&quot;"/>
+    <qi tooltip="QDVS-Indikator &quot;Bewusstseinszustand&quot;"/>
+
     <!-- Maßstäbe und Grundsätze für die Qualität, die Q-Sicherung und Q-Darstellung sowie für die Entwicklung eines einrichtungsinternen Q-Managements nach §113 SGB XI in der vollstationären Pflege.
          Anlage3 - Seite 10ff - Zeile 24-->
     <checkbox label="wach/ansprechbar" name="awake" tooltip="Der Bewohner bzw. die Bewohnerin ist ansprechbar und kann an Aktivitäten teilnehmen."/>

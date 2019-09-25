@@ -336,7 +336,7 @@ public class TXEAF {
     public static final String PERSONAL_CARE_BASIN = "Formular1[0].#subform[0].PersonalCareBasin[0]";
     public static final String PERSONAL_CARE_BED = "Formular1[0].#subform[0].PersonalCareBed[0]";
     public static final String PERSONAL_CARE_COMMENT = "Formular1[0].#subform[0].SonstigesGrundpflege[0]";
-    public static final String PERSONAL_CARE_LEVEL = "Formular1[0].#subform[0].Körperpflege[0]";
+    public static final String PERSONAL_CARE_LEVEL = "Formular1[0].#subform[0].körperpflege[0]";
     public static final String PERSONAL_CARE_SHOWER = "Formular1[0].#subform[0].PersonalCareShower[0]";
     public static final String PREFERRED_CAREPRODUCTS = "Formular1[0].#subform[0].Pflegemittel[0]";
     public static final String PROPH_BEDSORE = "Formular1[0].#subform[0].#area[6].Dekubitus[0]";

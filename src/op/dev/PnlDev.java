@@ -260,7 +260,7 @@ public class PnlDev extends CleanablePanel {
 
 //                System.out.println("Hauswirtschaft: " + nf.format(stat.get(res).get(2)) + " Minuten am Tag");
 //                System.out.println("Soziales: " + nf.format(stat.get(res).get(3)) + " Minuten am Tag");
-//                System.out.println("Grundpflege (Körperpflege, Ernährung, Mobilität, Ausscheidung): " + nf.format(stat.get(res).get(0)) + " Minuten am Tag");
+//                System.out.println("Grundpflege (körperpflege, Ernährung, Mobilität, Ausscheidung): " + nf.format(stat.get(res).get(0)) + " Minuten am Tag");
 //                System.out.println("Behandlungspflege: " + nf.format(stat.get(res).get(1)) + " Minuten am Tag");
 //                System.out.println("Sonstiges: " + nf.format(stat.get(res).get(4)) + " Minuten am Tag");
 //

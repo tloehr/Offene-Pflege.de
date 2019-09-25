@@ -4,7 +4,7 @@ BWINFTYP: INFECT2
 Ansteckende Infektionen
 28.06.2018
 since-db-version: 11
-deprecated-since: 
+_deprecated-since:
 replaced-by: 
 MODE_INTERVAL_BYSECOND = 0
 TYPE_INFECTION = 99

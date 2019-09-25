@@ -4,7 +4,7 @@ BWINFTYP: ARTNUTRIT
 Künstliche Ernährung
 21.06.2013
 since-db-version: 
-deprecated-since: 
+_deprecated-since:
 replaced-by: 
 MODE_INTERVAL_BYSECOND = 0
 -->

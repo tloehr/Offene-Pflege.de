@@ -4,7 +4,7 @@ BWINFTYP: allergy
 Allergien
 
 since-db-version:
-deprecated-since:
+_deprecated-since:
 replaced-by:
 MODE_INTERVAL_BYSECOND = 0
 TYPE_ANTIBIOTICS = 143

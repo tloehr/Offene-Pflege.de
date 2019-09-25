@@ -1,0 +1,47 @@
+<optiongroup name="mouth.care" label="Mundpflege" tx="Seite 1, Abschnitt 3">
+<option label="selbstständig" name="none" default="true"/>
+<option label="mit Anleitung" name="lvl1"/>
+<option label="teilweise Übernahme" name="lvl2"/>
+<option label="vollständige Übernahme" name="lvl3"/>
+</optiongroup>
+<checkbox name="mouth.care.bed" label="Bett" layout="br"/>
+<checkbox name="mouth.care.shower" label="Bad, Dusche" layout="left"/>
+<checkbox name="mouth.care.basin" label="Waschbecken" layout="left"/>
+<separator/>
+<!-- Zahnprothese -->
+<optiongroup name="denture.care" label="Zahnprothese" tx="Seite 1, Abschnitt 3">
+<option label="trifft nicht zu" name="na" default="true"/>
+<option label="selbstständig" name="none"/>
+<option label="mit Anleitung" name="lvl1"/>
+<option label="teilweise Übernahme" name="lvl2"/>
+<option label="vollständige Übernahme" name="lvl3"/>
+</optiongroup>
+<checkbox name="denture.care.bed" label="Bett" layout="br"/>
+<checkbox name="denture.care.shower" label="Bad, Dusche" layout="left"/>
+<checkbox name="denture.care.basin" label="Waschbecken" layout="left"/>
+<separator/>
+<!-- ==================Spezielle Mundpflege================== -->
+<label size="12" fontstyle="bold" label="Gründe für eine spezielle Mundpflege. Beschreiben Sie die Maßnahmen in der Pflegeplanung."/>
+<checkbox name="zahnlosigkeit" label="Zahnlosigkeit" layout="br"/>
+<checkbox name="mundtrockenheit" label="extreme Mundtrockenheit (durch Mundatmung, durch Medikamente)" layout="left"/>
+<checkbox name="trockene.lippen" label="Trockene Lippen (Rhagade)" layout="left"/>
+<checkbox name="zungenbelag" label="Schleimhautbelägen der Zunge" layout="br"/>
+<checkbox name="speichel.dickf" label="dickflüssiger Speichel" layout="left"/>
+<checkbox name="lockere.zaehne" label="lockere Zähne"  layout="left"/>
+<checkbox name="laesion.mund" label="Schädigungen des Mundes" layout="left"/>
+<checkbox name="soor" label="Soor (Pilzbefall)"  layout="left"/>
+<checkbox name="stomatitis" label="Stomatitis (Mundentzündung)" layout="br"/>
+<checkbox name="gingivitis" label="Gingivitis (Zahnfleischentzündung)"  layout="left"/>
+<checkbox name="aphten" label="Erosionen mit entzündlichem Randsaum (Aphten)" layout="left"/>
+<checkbox name="herpes" label="Lippenherpes"  layout="br"/>
+<checkbox name="blutung" label="erhöhter Blutungsneigung" layout="left"/>
+<checkbox name="mundflora" label="Zerstörung der physiologischen Mundflora" tooltip="durch Medikamente, Kortison, Zytostatika, Antibiotika"  layout="left"/>
+<checkbox name="sauerstoff" label="längerfristiger Sauerstofftherapie (Mund trocknet aus)" layout="br"/>
+<checkbox name="absaugen" label="wiederholte Nasale oder Orale Absaugvorgänge" layout="left"/>
+<checkbox name="bewusstlos" label="Bewußtlosigkeit" layout="left"/>
+<checkbox name="verletzung" label="Bei Verletzungen am Kiefer und in der Mundhöhle"  layout="br"/>
+<checkbox name="nahrungskarenz" label="Bei Nahrungskarenz (PEG, Parenterale Ernährung (s.c.))" layout="left"/>
+<checkbox name="schluckstoerung" label="Schluckstörungen" layout="br"/>
+<checkbox name="az" label="reduzierter Allgemeinzustand" layout="left"/>
+<checkbox name="praefinal" label="während des Sterbeprozesses" layout="left"/>
+<checkbox name="immunschwaeche" label="Immunschwäche" layout="left"/>

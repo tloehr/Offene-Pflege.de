@@ -50,10 +50,7 @@ public class ResInfoTypeTools {
     public static final int TYPE_SKIN = 109;
     public static final int TYPE_MOBILITY = 110;
     public static final int TYPE_EXCRETIONS = 111;
-    public static final int TYPE_INCOAID = 112;
-    public static final int TYPE_INCO_PROFILE_DAY = 113;
-    public static final int TYPE_INCO_PROFILE_NIGHT = 114;
-    public static final int TYPE_INCO_FAECAL = 115;
+
     public static final int TYPE_SCALE_BRADEN = 116;
     public static final int TYPE_WOUND1 = 117;
     public static final int TYPE_WOUND2 = 118;
@@ -99,13 +96,18 @@ public class ResInfoTypeTools {
     public static final int TYPE_VESSEL_CATHETER = 146;
 
     public static final int TYPE_STROKE = 158; // Apoplex
+
+
     // Die sechs Lebensbereiche des Begutachtungsinstruments (BI)
-    public static final int TYPE_BI1 = 159; // BI1 Mobilität
-    public static final int TYPE_BI2 = 160; // BI2 kognitiven und kommunikativen Fähigkeiten
-    public static final int TYPE_BI3 = 161; // BI3 die Verhaltensweisen und psychischen Problemlagen (equiv 38)
-    public static final int TYPE_BI4 = 162; // BI4 die Selbstversorgung  (equiv 39)
-    public static final int TYPE_BI5 = 163; // BI5 krankheits- und therapiebedingten Anforderungen und Belastungen
-    public static final int TYPE_BI6 = 164; // BI6 Gestaltung des Alltagslebens und sozialer Kontakte
+    public static final int TYPE_INCO = 159; // BI1 Mobilität
+
+
+    // DEPRECATED
+    public static final int TYPE_INCOAID = 112;
+    public static final int TYPE_INCO_PROFILE_DAY = 113;
+    public static final int TYPE_INCO_PROFILE_NIGHT = 114;
+    public static final int TYPE_INCO_FAECAL = 115;
+
 
     // find new max type via sql: SELECT 'next to use',MAX(equiv)+1, MAX(TYPE)+1 FROM resinfotype;
 

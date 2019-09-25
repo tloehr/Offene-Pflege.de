@@ -15,7 +15,7 @@ BWINFTYP: WOUND[1-5]
 Wunde Nr.[1-5]
 21.06.2013
 since-db-version: 
-deprecated-since: 
+_deprecated-since:
 replaced-by:
 MODE_INTERVAL_BYSECOND = 0
 TYPE_WOUND1 = 117
