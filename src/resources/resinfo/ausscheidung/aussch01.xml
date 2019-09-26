@@ -1,0 +1,125 @@
+<resinfotype bwinftyp="aussch01" sinceversion="13" category="2" abstract_type="159" equivalent="0"
+             intervalmode="0" infokurz="Auscheidungen" infolang="" tx="false" qpr="true">
+    <tx tooltip="Sobald das Inkontinenzprofil nicht mehr auf 'Kontinenz' steht, wird im Überleitbogen die Markierung für 'Harninkontinenz' gesetzt."/>
+
+    <optiongroup size="18" name="toilette"
+                 label="Benutzen einer Toilette oder eines Toilettenstuhls"
+                 qi="56" bi="4.4.10" tooltip="bi4.toilette.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.toilette.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.toilette.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.toilette.selbst2" layout="br left"/>
+        <option label="unselbständig" name="3" tooltip="bi4.toilette.selbst3"/>
+    </optiongroup>
+
+    <separator/>
+
+    <optiongroup size="18" name="stuhlangabe" label="Darmkontrolle, Stuhlkontinenz" qi="46"
+                 bi="4.4 Angaben zur Versorgung"
+                 tooltip="bi4.stuhlangabe.erklaerung">
+        <option label="Person hat ein Colo- oder Ileostoma" name="1" tooltip="bi4.stuhlangabe.stufe1"/>
+        <option label="ständig kontinent" name="2" default="true" tooltip="bi4.stuhlangabe.stufe2" layout="br left"/>
+        <option label="überwiegend kontinent" name="3" tooltip="bi4.stuhlangabe.stufe3"/>
+        <option label="überwiegend IN_kontinent" name="4" tooltip="bi4.stuhlangabe.stufe4" layout="br left"/>
+        <option label="komplett IN_kontinent" name="5" tooltip="bi4.stuhlangabe.stufe5"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="stuhlbewaeltigung"
+                 label="Bewältigen der Folgen einer Stuhlinkontinenz und Umgang mit Stoma"
+                 qi="58" bi="4.4.12" tooltip="bi4.stuhlbewaeltigung.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.stuhlbewaeltigung.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.stuhlbewaeltigung.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.stuhlbewaeltigung.selbst2" layout="br left"/>
+        <option label="unselbständig" name="3" tooltip="bi4.stuhlbewaeltigung.selbst3"/>
+    </optiongroup>
+
+    <checkbox name="diarrhoe" label="Neigt zu Durchfällen" tx="Seite 1, Abschnitt 5" layout="br left"/>
+    <checkbox name="obstipation" label="Neigt zu Verstopfung" tx="Seite 1, Abschnitt 5" layout="left"/>
+    <checkbox name="digital" label="Digitales Ausräumen"
+              tooltip="Das digitale Ausräumen beschreibt eine Maßnahme zur manuellen Entfernung von hartem Stuhl aus dem Enddarm.[br/]Diese Behandlung wird vorallem bei Koprostase, Stuhlimpaktion oder einer Darmlähmung durchgeführt."
+              tx="Seite 1, Abschnitt 5" layout="left"/>
+
+    <separator/>
+
+    <optiongroup size="18" name="harnangabe" label="Blasenkontrolle/Harnkontinenz" qi="45"
+                 bi="4.4 Angaben zur Versorgung"
+                 tooltip="bi4.harnangabe.erklaerung">
+        <option label="Person hat einen Dauerkatheter oder ein Urostoma" name="1" tooltip="bi4.harnangabe.stufe1"/>
+        <option label="ständig kontinent" name="2" default="true" tooltip="bi4.harnangabe.stufe2" layout="br left"/>
+        <option label="überwiegend kontinent" name="3" tooltip="bi4.harnangabe.stufe3"/>
+        <option label="überwiegend IN_kontinent" name="4" tooltip="bi4.harnangabe.stufe4" layout="br left"/>
+        <option label="komplett IN_kontinent" name="5" tooltip="bi4.harnangabe.stufe5"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="hinkotag" label="Harn-Inkontinenzprofil (Tag)"
+                 tooltip="exp.kontinenzprof.erklaerung">
+        <option label="Kontinenz" name="kontinenz" default="true" tooltip="exp.harn.kontinenz"/>
+        <option label="Unabhängig erreichte Kontinenz" name="uek" tooltip="exp.harn.uek"/>
+        <option label="Abhängig erreichte Kontinenz" name="aek" tooltip="exp.harn.aek"/>
+        <option label="Unabhängig kompensierte Inkontinenz" name="uki" tooltip="exp.harn.uki" layout="br left"/>
+        <option label="Abhängig kompensierte Inkontinenz" name="aki" tooltip="exp.harn.aki"/>
+        <option label="Nicht kompensierte Inkontinenz" name="nki" tooltip="exp.harn.nki" layout="br left"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="hinkonacht" label="Harn-Inkontinenzprofil (Nacht)"
+                 tooltip="exp.kontinenzprof.erklaerung">
+        <option label="Kontinenz" name="kontinenz" default="true" tooltip="exp.harn.kontinenz"/>
+        <option label="Unabhängig erreichte Kontinenz" name="uek" tooltip="exp.harn.uek"/>
+        <option label="Abhängig erreichte Kontinenz" name="aek" tooltip="exp.harn.aek"/>
+        <option label="Unabhängig kompensierte Inkontinenz" name="uki" tooltip="exp.harn.uki" layout="br left"/>
+        <option label="Abhängig kompensierte Inkontinenz" name="aki" tooltip="exp.harn.aki"/>
+        <option label="Nicht kompensierte Inkontinenz" name="nki" tooltip="exp.harn.nki" layout="br left"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="harnbewaeltigung"
+                 label="Bewältigen der Folgen einer Harninkontinenz und Umgang mit Dauerkatheter und Urostoma" qi="57"
+                 bi="4.4.11" tooltip="bi4.harnbewaeltigung.erklaerung" tx="Seite 1, Abschnitt 3">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.harnbewaeltigung.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.harnbewaeltigung.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.harnbewaeltigung.selbst2" layout="br left"/>
+        <option label="unselbständig" name="3" tooltip="bi4.harnbewaeltigung.selbst3"/>
+    </optiongroup>
+
+    <label size="18" label="Ursachenanalyse für eine Harninkontinenz"/>
+    <label size="12" fontstyle="bold" label="Kognitive Einschränkung"/>
+    <checkbox name="kogn1" label="Abnahme geistiger Leistungsfähigkeit"/>
+    <checkbox name="kogn2" label="BewohnerIn bemerkt den Harndrang nicht" layout="left"/>
+    <checkbox name="kogn3" label="BewohnerIn findet die Toilette nicht" layout="br"/>
+    <checkbox name="kogn4" label="BewohnerIn hat Angst oder schämt sich bzgl. der Inkontinenz" layout="left"/>
+
+    <label size="12" fontstyle="bold" label="Körperliche Einschränkung"/>
+    <checkbox name="koerp1" label="BW schafft es nicht alleine auf die Toilette"/>
+    <checkbox name="koerp2" label="BW ist gangunsicher" layout="left"/>
+    <checkbox name="koerp3" label="hat Schwierigkeiten das Gleichgewicht zu halten" layout="left"/>
+    <checkbox name="koerp4" label="Muskelkraft fehlt" layout="br"/>
+    <checkbox name="koerp5" label="Flexibilität des Körpers fehlt" layout="left"/>
+    <checkbox name="koerp6" label="Fingerfertigkeit fehlt"
+              tooltip="z.B. fehlt dem BW die Fähigkeit die Hose oder den Rock aufzuknöpfen." layout="left"/>
+    <checkbox name="koerp7" label="BW sieht schlecht" layout="left"/>
+    <checkbox name="koerp8" label="BW ist immobil" layout="br"/>
+
+    <label size="12" fontstyle="bold" label="Erkrankungen"/>
+    <checkbox name="erk1" label="Schlaganfall"/>
+    <checkbox name="erk2" label="MS" layout="left"/>
+    <checkbox name="erk3" label="Parkinson" layout="left"/>
+    <checkbox name="erk4" label="Demenz" layout="left"/>
+    <checkbox name="erk5" label="Diabetes Mellitus" layout="left"/>
+    <checkbox name="erk6" label="Herzinsuffizienz" layout="left"/>
+
+    <label size="12" fontstyle="bold" label="Medikamente"
+           tooltip="Erhält der BW Medikamente, welche die Harn-Inkontinenz fördern ?"/>
+    <checkbox name="med1" label="Diuretika"/>
+    <checkbox name="med2" label="Anticholinergika" layout="left"/>
+    <checkbox name="med3" label="Antihistaminika" layout="left"/>
+    <checkbox name="med4" label="Antidepressiva" layout="left"/>
+    <checkbox name="med5" label="Neuroleptika" layout="left"/>
+    <checkbox name="med6" label="Kalziumantagonisten" layout="br"/>
+    <checkbox name="med7" label="Opiate" layout="left"/>
+
+    <label size="12" fontstyle="bold" label="Besonderheiten"/>
+    <checkbox name="bes1" label="Harnwegsinfekt" tooltip="Bitte Ausschluss mittels Urinanalyse wenn nötig"/>
+    <checkbox name="bes2" label="Obstipation (bei Frauen)" layout="left"/>
+    <checkbox name="bes3" label="Beckbodenschwäche (bei Frauen) z.B. bei Adipositas" layout="left"/>
+    <checkbox name="bes4" label="Östrogenmangel (bei Frauen)" layout="br"/>
+    <checkbox name="bes5" label="Veränderungen der Prostata (bei Männern)" layout="left"/>
+
+</resinfotype>

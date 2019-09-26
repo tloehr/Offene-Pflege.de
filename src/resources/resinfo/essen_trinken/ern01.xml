@@ -34,9 +34,10 @@ MODE_INTERVAL_BYSECOND = 0
         <option label="unselbständig" name="3" tooltip="bi4.mundgerecht.selbst3"/>
     </optiongroup>
 
-    <checkbox label="Nahrungskarenz" name="abrosia" layout="left"/>
+    <label size="18" label="Sonstige Angaben"/>
+    <checkbox label="Nahrungskarenz" name="abrosia" layout="br left"/>
     <checkbox label="Diätkost" name="diet" layout="left"/>
-    <checkbox label="Schluckstörungen" name="dysphagia"/>
+    <checkbox label="Schluckstörungen" name="dysphagia" layout="left"/>
 
     <separator/>
     <textfield name="likes" label="Vorlieben, Essen und Trinken" hfill="false" length="40"/>
