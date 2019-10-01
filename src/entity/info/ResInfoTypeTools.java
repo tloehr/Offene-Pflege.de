@@ -97,9 +97,8 @@ public class ResInfoTypeTools {
 
     public static final int TYPE_STROKE = 158; // Apoplex
 
-
-    // Die sechs Lebensbereiche des Begutachtungsinstruments (BI)
     public static final int TYPE_INCO = 159; // BI1 Mobilität
+    public static final int TYPE_ALLTAG = 160; // Alltagsleben. EQUIV 135
 
 
     // DEPRECATED

@@ -1,0 +1,36 @@
+<resinfotype bwinftyp="respirat2" sinceversion="13" abstract_type="133" equivalent="22" intervalmode="0"
+             infokurz="Atmung/Beatmung" infolang="" category="8" tx="true" qpr="true">
+
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 12."/>
+    <label size="18" fontstyle="bold" label="Atmung"/>
+    <checkbox label="unauffällig" name="normal"/>
+    <checkbox label="kardialer Stau" name="cardcongest" layout="left"/>
+    <checkbox label="Schmerzen" name="pain" layout="left"/>
+    <checkbox label="Husten" name="cough" layout="left"/>
+    <checkbox label="Verschleimung" name="mucous" layout="br"/>
+    <checkbox label="Auswurf" name="sputum" layout="left"/>
+    <checkbox label="Rauchen" name="smoking" layout="left"/>
+    <checkbox label="Asthma" name="asthma" layout="left"/>
+    <textfield name="other" label="Sonstiges" length="20"/>
+
+    <label size="18" fontstyle="bold" label="Besonderheiten"/>
+    <checkbox label="Tracheostoma" name="stoma"/>
+    <checkbox label="Silberkanüle" name="silver" layout="left"/>
+    <checkbox label="Silikonkanüle" name="silicon" layout="left"/>
+    <checkbox label="Absaugen" name="aspirate" layout="left"/>
+
+    <textfield name="tubetype" label="Kanülenart" length="10"/>
+    <textfield name="tubesize" label="Kanülengröße" length="10" layout="left"/>
+
+    <!-- Maßstäbe und Grundsätze für die Qualität, die Q-Sicherung und Q-Darstellung sowie für die Entwicklung eines einrichtungsinternen Q-Managements nach §113 SGB XI in der vollstationären Pflege.
+         Anlage3 - Seite 10ff - Zeile 23-->
+    <optiongroup size="18" name="beatmung"
+                 label="Beatmung"
+                 qi="23"
+                 tooltip="Die Antwortmöglichkeit „invasive Beatmung“ trifft zu, wenn die Beatmung durch eine Trachealkanüle erfolgt. Ansonsten ist „nicht invasiv“ anzukreuzen.">
+        <option label="ja, invasive Beatmung" name="1"/>
+        <option label="ja, aber nicht invasiv" name="2"/>
+        <option label="nein" default="true" name="3"/>
+    </optiongroup>
+
+</resinfotype>
