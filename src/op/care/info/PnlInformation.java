@@ -78,7 +78,6 @@ public class PnlInformation extends NursingRecordsPanel {
     private Map<String, CollapsiblePaneAdapter> cpListener;
     private List<Commontags> listUsedCommontags;
 
-
     public PnlInformation(Resident resident, JScrollPane jspSearch, PnlCare pnlCare) {
         super("nursingrecords.info");
         this.resident = resident;
@@ -128,6 +127,11 @@ public class PnlInformation extends NursingRecordsPanel {
             synchronized (mapCat2Type) {
                 mapCat2Type.get(type.getResInfoCat()).add(type);
             }
+
+            /*
+            TODO: Diese Konstruktion führt dazu, dass nur die Ketten von alten und akteullen Resinfotypes angezeigt werden, wenn der letzte noch aktuell ist. Sollte
+            ein ganzer "Strang" aus Equivs irgendwann enden, dann erscheinen die nicht mehr in der Überisicht. Ob es dazu aktuelle Infos gibt oder nicht.
+             */
             if (type.getEquiv() > 0) {
                 synchronized (mapEquiv2Type) {
                     mapEquiv2Type.put(type.getEquiv(), type);
@@ -552,7 +556,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                         // by this one, they must all be closed now.
                                                         if (!newinfo.isSingleIncident()) {
                                                             for (ResInfo myResInfo : mapType2ResInfos.get(resInfoType)) {
-                                                                if (!myResInfo.isClosed() && myResInfo.getResInfoType().isObsolete()) {
+                                                                if (!myResInfo.isClosed() && myResInfo.getResInfoType().isDeprecated()) {
                                                                     ResInfo closedResInfo = em.merge(myResInfo);
                                                                     em.lock(closedResInfo, LockModeType.OPTIMISTIC);
                                                                     closedResInfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
@@ -671,7 +675,7 @@ public class PnlInformation extends NursingRecordsPanel {
             title += resInfo.isClosed() ? DateFormat.getDateInstance().format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ")" : "";
         }
 
-        if (resInfo.getResInfoType().isObsolete() && mapEquiv2Type.containsKey(resInfo.getResInfoType().getEquiv())) {
+        if (resInfo.getResInfoType().isDeprecated() && mapEquiv2Type.containsKey(resInfo.getResInfoType().getEquiv())) {
             title += " -" + resInfo.getResInfoType().getShortDescription() + "-";
         }
 
@@ -689,7 +693,7 @@ public class PnlInformation extends NursingRecordsPanel {
             }
         });
 
-        if (resInfo.getResInfoType().isObsolete()) {
+        if (resInfo.getResInfoType().isDeprecated()) {
             cptitle.getButton().setIcon(SYSConst.icon22infogray);
             cptitle.getButton().setHorizontalTextPosition(SwingConstants.LEADING);
             cptitle.getButton().setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.info.outdated.form.explanation")));
@@ -1037,7 +1041,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
                         && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
                         && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE
-                        && !resInfo.getResInfoType().isObsolete()
+                        && !resInfo.getResInfoType().isDeprecated()
                         && !resInfo.isClosed()
                         && !resInfo.isSingleIncident()
                         && !resInfo.isNoConstraints()

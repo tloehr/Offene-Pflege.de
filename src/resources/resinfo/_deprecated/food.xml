@@ -1,0 +1,20 @@
+<tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 9.[br/]Der Wert für den BMI wird automatisch anhand der letzten Bewohner-Werte für Köpergröße und Gewicht berechnet."/>
+<optiongroup name="assistancelevelfood" label="Hilfebedarf">
+<option label="selbständig" name="none" default="true"/>
+<option label="braucht Anregung" name="needsmotivation"/>
+<option label="braucht Hilfe" name="needshelp"/>
+<option label="vollständige Hilfe" name="completehelp"/>
+</optiongroup>
+<checkbox label="Muss zum Trinken angehalten werden" name="motivationdrinking"/>
+<checkbox label="Trinkverhalten selbstständig" name="drinksalone" layout="left"/>
+<checkbox label="Nahrungskarenz" name="abrosia" layout="left"/>
+<checkbox label="Diätkost" name="diet" layout="left"/>
+<checkbox label="Schluckstörungen" name="dysphagia"/>
+<checkbox label="mundgerechte Zubereitung" name="bitesize" layout="left"/>
+<separator/>
+<textfield name="likes" label="Vorlieben, Essen und Trinken" hfill="false" length="40"/>
+<textfield name="hates" label="Abneigungen, Essen und Trinken" hfill="false" length="40"/>
+<separator/>
+<textfield name="breadunit" label="Broteinheiten (in 24h)" tooltip="Hinterlegen Sie die zugehörige ärztliche Verordnung." hfill="false"  type="double"  length="20"/>
+<textfield name="zieltrinkmenge" label="Zieltrinkmenge (ml in 24h)" tooltip="Hinterlegen Sie die zugehörige ärztliche Verordnung."  layout="br" hfill="false"  type="double"  length="20"/>
+<textfield name="ubw" label="Übliches Körpergewicht" tooltip="Was [der|die] Bewohner[in] als [ihr|sein] übliches Gewicht angibt. Einheit: kg" type="double" layout="br" hfill="false" length="20"/>

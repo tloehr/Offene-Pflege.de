@@ -55,13 +55,9 @@ import gui.interfaces.DefaultCPTitle;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
-import op.tools.Pair;
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
@@ -79,21 +75,23 @@ import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
- * ACL
- * ============
- * EXECUTE      Start this sub program and use the controlling queries
- * UPDATE       Enter and edit new / existing Qmsplans and Qmsschedules. Access the QMS tab in general.
- * DELETE       Delete Qmsplan with everything connected to it. But only when unused.
- * MANAGER      show staff controlling tab and allow to delete even USED Qmsplans.
- * USER1        Can access the organisational request tab.
+ * ACL ============ EXECUTE      Start this sub program and use the controlling queries UPDATE       Enter and edit new
+ * / existing Qmsplans and Qmsschedules. Access the QMS tab in general. DELETE       Delete Qmsplan with everything
+ * connected to it. But only when unused. MANAGER      show staff controlling tab and allow to delete even USED
+ * Qmsplans. USER1        Can access the organisational request tab.
  *
  * @author tloehr
  */
-public class PnlControlling extends CleanablePanel {
+public class PnlControlling extends CleanablePanel implements HasLogger {
 
     private JScrollPane jspSearch;
     private Qmsplan showMeFirst;
@@ -132,7 +130,7 @@ public class PnlControlling extends CleanablePanel {
         };
         initComponents();
 
-        initPanel();
+//        initPanel();
     }
 
     private void initPanel() {
@@ -255,7 +253,6 @@ public class PnlControlling extends CleanablePanel {
 
         return cpOrga;
     }
-
 
 
     private CollapsiblePane createCP4Hygiene() {
@@ -431,9 +428,9 @@ public class PnlControlling extends CleanablePanel {
                             }
                         } catch (IOException ioe) {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ioe.getMessage(), DisplayMessage.WARNING));
-                            Logger.getLogger(getClass()).error(ioe);
+                            getLogger().warn(ioe);
                         } catch (Exception e) {
-                            OPDE.fatal(Logger.getLogger(getClass()), e);
+                            getLogger().fatal(e);
                         }
 
                         OPDE.getDisplayManager().setProgressBarMessage(null);
@@ -460,7 +457,7 @@ public class PnlControlling extends CleanablePanel {
     }
 
     private CollapsiblePane createCP4Nursing() {
-        final CollapsiblePane cpOrga = new CollapsiblePane();
+        final CollapsiblePane cpNursing = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
                 SYSTools.xx("opde.controlling.nursing") +
@@ -468,28 +465,28 @@ public class PnlControlling extends CleanablePanel {
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
             try {
-                cpOrga.setCollapsed(!cpOrga.isCollapsed());
+                cpNursing.setCollapsed(!cpNursing.isCollapsed());
             } catch (PropertyVetoException pve) {
                 // BAH!
             }
         });
-        cpOrga.setTitleLabelComponent(cptitle.getMain());
-        cpOrga.setSlidingDirection(SwingConstants.SOUTH);
-        cpOrga.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+        cpNursing.setTitleLabelComponent(cptitle.getMain());
+        cpNursing.setSlidingDirection(SwingConstants.SOUTH);
+        cpNursing.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpOrga.setContentPane(createContentPanel4Nursing());
+                cpNursing.setContentPane(createContentPanel4Nursing());
             }
         });
 
-        if (!cpOrga.isCollapsed()) {
-            cpOrga.setContentPane(createContentPanel4Nursing());
+        if (!cpNursing.isCollapsed()) {
+            cpNursing.setContentPane(createContentPanel4Nursing());
         }
 
-        cpOrga.setHorizontalAlignment(SwingConstants.LEADING);
+        cpNursing.setHorizontalAlignment(SwingConstants.LEADING);
 
 
-        return cpOrga;
+        return cpNursing;
     }
 
     private JPanel createContentPanel4Pain() {
@@ -847,6 +844,50 @@ public class PnlControlling extends CleanablePanel {
 
     private JPanel createContentPanel4Nursing() {
         JPanel pnlContent = new JPanel(new VerticalLayout());
+        /***
+         *       ___  ______     ______    ____  __ ____  _  __
+         *      / _ \|  _ \ \   / / ___|  / /  \/  |  _ \| |/ /
+         *     | | | | | | \ \ / /\___ \ / /| |\/| | | | | ' /
+         *     | |_| | |_| |\ V /  ___) / / | |  | | |_| | . \
+         *      \__\_\____/  \_/  |____/_/  |_|  |_|____/|_|\_\
+         *
+         */
+        JPanel pnlQDVS = new JPanel(new BorderLayout());
+        final JButton btnQDVS = GUITools.createHyperlinkButton("opde.controlling.qdvs", null, null);
+        LocalDateTime lastQDVSDate = null;
+        try {
+            lastQDVSDate = Instant.ofEpochMilli(Long.parseLong(OPDE.getProps().getProperty("opde.controlling::qdvslastdate"))).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } catch (NumberFormatException nfe) {
+            lastQDVSDate = LocalDateTime.of(2019, Month.JULY, 01, 0, 0);
+        }
+        final JTextField txtLastDate = new JTextField(lastQDVSDate.format(DateTimeFormatter.ISO_DATE_TIME));
+        txtLastDate.setToolTipText(SYSTools.xx("letzte Kontrolle"));
+
+
+        final LocalDateTime tmp = lastQDVSDate;
+
+        btnQDVS.addActionListener(e -> {
+            OPDE.getMainframe().setBlocked(true);
+            SwingWorker worker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+//                    SYSPropsTools.storeProp("opde.controlling::qdvslastdate", txtWoundsMonthsBack.getText(), OPDE.getLogin().getUser());
+//                    SYSFilesTools.print("", false);
+                     getLogger().debug(getQDVS(tmp, null));
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                }
+            };
+            worker.execute();
+        });
+        pnlQDVS.add(btnQDVS, BorderLayout.WEST);
+        pnlQDVS.add(txtLastDate, BorderLayout.EAST);
+        pnlContent.add(pnlQDVS);
 
 
         /***
@@ -1255,6 +1296,11 @@ public class PnlControlling extends CleanablePanel {
     }// </editor-fold>//GEN-END:initComponents
 
 
+    public static String getQDVS(LocalDateTime lastTime, Resident resident) {
+        return "";
+    }
+
+
     public static String getWounds(int monthsback, Closure progress) {
         StringBuilder html = new StringBuilder(1000);
 
@@ -1360,8 +1406,6 @@ public class PnlControlling extends CleanablePanel {
 
 
     }
-
-
 
 
 }

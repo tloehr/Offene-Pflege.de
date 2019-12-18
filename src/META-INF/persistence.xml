@@ -62,7 +62,6 @@
         <class>entity.process.PCat</class>
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueTypes</class>
-        <class>entity.staff.Training</class>
         <class>entity.files.User2File</class>
         <class>entity.files.Resident2File</class>
         <class>entity.files.Qmsplan2File</class>
@@ -71,10 +70,6 @@
         <class>entity.qms.Qmsplan</class>
         <class>entity.qms.Qmssched</class>
         <class>entity.system.Commontags</class>
-        <class>entity.staff.Training2Users</class>
-        <class>entity.building.Resident2Rooms</class>
         <class>entity.building.Floors</class>
-        <class>entity.mx.MXmsg</class>
-        <class>entity.mx.MXrecipient</class>
     </persistence-unit>
 </persistence>

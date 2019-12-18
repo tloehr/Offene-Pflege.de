@@ -6,8 +6,6 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import op.OPDE;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -15,7 +13,6 @@ import org.joda.time.LocalTime;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.text.DateFormat;
@@ -135,8 +132,8 @@ public class PnlPIT extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow",
-            "16dlu, $nlgap, 16dlu"));
+                "default, $lcgap, default:grow",
+                "16dlu, $nlgap, 16dlu"));
 
         //---- labelDatum ----
         labelDatum.setText("Datum");
@@ -150,6 +147,7 @@ public class PnlPIT extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtDateFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtDateFocusLost(e);
@@ -165,6 +163,7 @@ public class PnlPIT extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtUhrzeitFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtUhrzeitFocusLost(e);

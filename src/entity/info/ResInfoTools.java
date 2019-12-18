@@ -44,11 +44,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 24.10.11
- * Time: 16:10
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 24.10.11 Time: 16:10 To change this template use File | Settings | File
+ * Templates.
  */
 public class ResInfoTools {
 
@@ -268,27 +265,27 @@ public class ResInfoTools {
         return resInfos;
     }
 
-    public static ArrayList<ResInfo> getClosedWithActiveForms(Resident resident) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type <> :type AND b.to < :tfn ORDER BY b.from DESC");
-        query.setParameter("bewohner", resident);
-        query.setParameter("type", ResInfoTypeTools.TYPE_OLD);
-        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
-        em.close();
-        return resInfos;
-    }
+//    public static ArrayList<ResInfo> getClosedWithActiveForms(Resident resident) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type <> :type AND b.to < :tfn ORDER BY b.from DESC");
+//        query.setParameter("bewohner", resident);
+//        query.setParameter("type", ResInfoTypeTools.TYPE_OLD);
+//        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+//        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+//        em.close();
+//        return resInfos;
+//    }
 
-    public static ArrayList<ResInfo> getClosedWithOldForms(Resident resident) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type = :type AND b.to < :tfn ORDER BY b.from DESC");
-        query.setParameter("bewohner", resident);
-        query.setParameter("type", ResInfoTypeTools.TYPE_OLD);
-        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
-        em.close();
-        return resInfos;
-    }
+//    public static ArrayList<ResInfo> getClosedWithOldForms(Resident resident) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type = :type AND b.to < :tfn ORDER BY b.from DESC");
+//        query.setParameter("bewohner", resident);
+//        query.setParameter("type", ResInfoTypeTools.TYPE_OLD);
+//        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+//        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+//        em.close();
+//        return resInfos;
+//    }
 
     public static ArrayList<ResInfo> getActive(Resident bewohner, ResInfoCategory cat) {
         EntityManager em = OPDE.createEM();
@@ -359,8 +356,8 @@ public class ResInfoTools {
     }
 
     /**
-     * calculates how much a given info can be period extended within a given sorted list of (other) infos including
-     * the given one.
+     * calculates how much a given info can be period extended within a given sorted list of (other) infos including the
+     * given one.
      *
      * @param info
      * @param sortedInfoList
@@ -453,15 +450,16 @@ public class ResInfoTools {
         return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
                 && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE
                 && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
-                && !resInfo.getResInfoType().isObsolete()
+                && !resInfo.getResInfoType().isDeprecated()
                 && resInfo.getResident().isActive()
                 && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident())
                 && resInfo.getPrescription() == null;
     }
 
     /**
-     * Ermittelt für eine ResInfo eine passende HTML Darstellung. Diese Methode wird nur bei einer Neueingabe oder Änderung
-     * verwendet. ResInfo Beans speichert die HTML Darstellung aus Performance Gründen kurz nach Ihrer Entstehung ab.
+     * Ermittelt für eine ResInfo eine passende HTML Darstellung. Diese Methode wird nur bei einer Neueingabe oder
+     * Änderung verwendet. ResInfo Beans speichert die HTML Darstellung aus Performance Gründen kurz nach Ihrer
+     * Entstehung ab.
      *
      * @param resInfo
      * @return
@@ -478,7 +476,9 @@ public class ResInfoTools {
     }
 
     /**
-     * diese Methode erstellt eine einfache Textdarstellung für eine Wunde (WOUND..). Das findet Verwendung bei der Erstellung des Überleitbogens.
+     * diese Methode erstellt eine einfache Textdarstellung für eine Wunde (WOUND..). Das findet Verwendung bei der
+     * Erstellung des Überleitbogens.
+     *
      * @param resInfo
      * @param ignorebodyscheme
      * @return
@@ -594,6 +594,7 @@ public class ResInfoTools {
 
     /**
      * Ausgelagerter Algorithmus aus  getContentAsPlainText().
+     *
      * @param struktur
      * @param content
      * @param scaleriskmodel
@@ -687,7 +688,7 @@ public class ResInfoTools {
             }
             plaintext += SYSTools.xx("misc.msg.scalerisk.rating") + ": " + scalesum + " (" + risiko + "); ";
         }
-        
+
         // Wenn bei der Auswertung der Plaintext leer bleibt kommt es hier zu einem Absturz.
         // Tritt nur bei Wunden auf.
         // https://github.com/tloehr/Offene-Pflege.de/issues/111
@@ -1537,12 +1538,13 @@ public class ResInfoTools {
         String jpql = " " +
                 " SELECT ri " +
                 " FROM ResInfo ri " +
-                " WHERE ri.bwinfotyp.equiv = :equiv " +
+                " WHERE ri.bwinfotyp = :infotyp " +
+                " AND ri.bwinfotyp.deprecated = false" +
                 " AND ri.resident.adminonly <> 2 " +
                 " AND ri.from >= :from ";
 
         Query query = em.createQuery(jpql);
-        query.setParameter("equiv", fallType.getEquiv());
+        query.setParameter("infotyp", fallType);
         query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<ResInfo> listData = new ArrayList<ResInfo>(query.getResultList());
 
@@ -1627,12 +1629,13 @@ public class ResInfoTools {
         String jpql1 = " " +
                 " SELECT ri " +
                 " FROM ResInfo ri " +
-                " WHERE ri.bwinfotyp.equiv = :equiv " +
+                " WHERE ri.bwinfotyp = :infotyp " +
+                " AND ri.bwinfotyp.deprecated = false" +
                 " AND ri.resident.adminonly <> 2 " +
                 " AND ri.from >= :from ";
 
         Query query1 = em.createQuery(jpql1);
-        query1.setParameter("equiv", fallType.getEquiv());
+        query1.setParameter("infotyp", fallType);
         query1.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<QProcessElement> listData = new ArrayList<QProcessElement>(query1.getResultList());
 
@@ -1945,7 +1948,8 @@ public class ResInfoTools {
         String jpql = " " +
                 " SELECT ri " +
                 " FROM ResInfo ri " +
-                " WHERE ri.bwinfotyp.equiv = :equiv " +
+                " WHERE ri.bwinfotyp = :infotyp " +
+                " AND ri.bwinfotyp.deprecated = false" +
                 " AND ri.resident.adminonly <> 2 " +
                 " AND ((ri.from <= :from AND ri.to >= :from) OR " +
                 " (ri.from <= :to AND ri.to >= :to) OR " +
@@ -1953,7 +1957,7 @@ public class ResInfoTools {
                 " AND ri.from >= :from ";
 
         Query query = em.createQuery(jpql);
-        query.setParameter("equiv", fallType.getEquiv());
+        query.setParameter("infotyp", fallType);
         query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
         ArrayList<ResInfo> listData = new ArrayList<ResInfo>(query.getResultList());

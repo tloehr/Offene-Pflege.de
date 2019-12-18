@@ -57,14 +57,19 @@ public class ResInfoType implements Serializable {
     @Version
     @Column(name = "version")
     private Long version;
+
     // Eine ResinfoType wird durch die abstrakte Nummierung in type gekennzeichnet für spätere Auswertungen. Überleitbogen, BI usw. Wenn aber ein Formular "stillgelegt"
     // wird, dann geht dieser type verloren, weil ich den dann auf -1 setzen. Damit ich aber hinterher immer noch feststellen kann, was mal zusammen gehört
     // hat, gibt es eine zweite klassifizierung über equiv, also alles was gleichwertig ist. das ist alles.
-    // es gibt types bei denen mich das nicht interessiert, dann steht deren equiv auf 0. hätte man auch so machen können, dass ale types doppelt eingetragen
+    // es gibt types bei denen mich das nicht interessiert, dann steht deren equiv auf 0. hätte man auch so machen können, dass alle types doppelt eingetragen
     // werden, hab ich aber damals nicht dran gedacht.
     // Diese Änderungen werden aber nur bei der Entwicklung vorgenommen und nicht während der Laufzeit.
     @Column(name = "equiv")
     private Integer equiv;
+
+    // steht für eine veraltete Version eines Formulars
+    @Column(name = "deprecated")
+    private Boolean deprecated;
 
     // ==
     // N:1 Relationen
@@ -89,13 +94,35 @@ public class ResInfoType implements Serializable {
         return bwinftyp;
     }
 
+    public Boolean isDeprecated() {
+        return deprecated;
+    }
+
     public void setBwinftyp(String bwinftyp) {
         this.bwinftyp = bwinftyp;
     }
 
+//    public Integer getEquiv() {
+//        return equiv;
+//    }
+
+
     public Integer getEquiv() {
         return equiv;
     }
+
+    public void setEquiv(Integer equiv) {
+        this.equiv = equiv;
+    }
+
+    public Boolean getDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(Boolean deprecated) {
+        this.deprecated = deprecated;
+    }
+
 
     public String getXml() {
         return xml;
@@ -145,14 +172,14 @@ public class ResInfoType implements Serializable {
         return type == ResInfoTypeTools.TYPE_ALLERGY || type == ResInfoTypeTools.TYPE_INFECTION || type == ResInfoTypeTools.TYPE_DIABETES || type == ResInfoTypeTools.TYPE_WARNING || type == ResInfoTypeTools.TYPE_FALLRISK;
     }
 
-    /**
-     * means, that the underlying form for this infotype is not used anymore. current resinfos are still
-     * available but cannot be changed anymore. Use the replacement instead. If there is any.
-     * @return
-     */
-    public boolean isObsolete() {
-        return type < 0;
-    }
+//    /**
+//     * means, that the underlying form for this infotype is not used anymore. current resinfos are still
+//     * available but cannot be changed anymore. Use the replacement instead. If there is any.
+//     * @return
+//     */
+//    public boolean isObsolete() {
+//        return type < 0;
+//    }
 
     @Override
     public int hashCode() {

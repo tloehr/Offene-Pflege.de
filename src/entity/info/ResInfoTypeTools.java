@@ -20,10 +20,12 @@ public class ResInfoTypeTools {
     public static final int MODE_INTERVAL_NOCONSTRAINTS = 2;
     public static final int MODE_INTERVAL_SINGLE_INCIDENTS = 3; // Das sind Ereignisse, bei denen von == bis gilt. Weitere Einschränkungen werden nicht gemacht.
 
-    public static final int STATUS_INACTIVE_NORMAL = -1;
-    public static final int STATUS_NORMAL = 0;
-    public static final int STATUS_SYSTEM = 10;
-    public static final int STATUS_INACTIVE_SYSTEM = -10;
+//    public static final int STATUS_INACTIVE_NORMAL = -1;
+//    public static final int STATUS_NORMAL = 0;
+//    public static final int STATUS_SYSTEM = 10;
+//    public static final int STATUS_INACTIVE_SYSTEM = -10;
+
+    // types 31-48 werden hier nicht verwendet.
 
     public static final int TYPE_ABSENCE = 10;
     public static final int TYPE_ROOM = 12;
@@ -148,7 +150,7 @@ public class ResInfoTypeTools {
 
     public static List<ResInfoType> getAllActive() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.type >= 0 ORDER BY b.bWInfoKurz ");
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.deprecated = FALSE ORDER BY b.bWInfoKurz ");
 //        query.setParameter("type", TYPE_DIAGNOSIS);
         List<ResInfoType> resInfoTypen = query.getResultList();
         em.close();
@@ -185,7 +187,7 @@ public class ResInfoTypeTools {
     public static boolean containsOneActiveObsoleteInfo(ArrayList<ResInfo> listInfos) {
         boolean containsOneActiveObsoleteInfo = false;
         for (ResInfo info : listInfos) {
-            containsOneActiveObsoleteInfo = info.getResInfoType().isObsolete() && !info.isClosed();
+            containsOneActiveObsoleteInfo = info.getResInfoType().isDeprecated() && !info.isClosed();
             if (containsOneActiveObsoleteInfo) {
                 break;
             }

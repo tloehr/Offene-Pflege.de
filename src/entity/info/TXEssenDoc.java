@@ -38,15 +38,13 @@ import java.util.*;
  */
 public class TXEssenDoc {
 
-    //    public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
-//    public static final String SOURCEDOC2 = "ueberleitungsbogen_160208.pdf";
     public static final String SOURCEDOC3 = "ueberleitungsbogen_20170810.pdf";
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
     public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
     public static final String SOURCEWOUND = "anlage_wunden_161016_static.pdf";
 
     // das sind die die 4 Stufen aus der BI Bewertung
-    private final String[] BI_BEWERTUNG = new String[]{"selbst0", "selbst1", "selbst2", "selbst3"};
+    private final String[] BI_BEWERTUNG = new String[]{"0", "1", "2", "3"};
     private final String[] SELBSTSTAENDIGKEITS_BEWERTUNG = new String[]{"none", "lvl1", "lvl2", "lvl3"};
 
     private final int MAX_VERORDNUNGEN_AUF_BOGEN = 8;
@@ -60,11 +58,8 @@ public class TXEssenDoc {
     private Logger logger = Logger.getLogger(getClass());
 
     private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 8);
-    //    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
     private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD, BaseColor.BLACK);
-    //    private PdfContentByte over = null;
-//    private PdfWriter writer = null;
-//
+
     ByteArrayOutputStream medListStream = null, icdListStream = null, woundsListStream = null;
     boolean mre, psych = false, wounds = false, infection = false;
     int progress, max;
@@ -88,10 +83,10 @@ public class TXEssenDoc {
 
 
         this.resident = res;
-        content = new HashMap<String, String>();
-        listICD = new ArrayList<ResInfo>();
-        mapID2Info = new HashMap<Integer, ResInfo>();
-        mapInfo2Properties = new HashMap<ResInfo, Properties>();
+        content = new HashMap<>();
+        listICD = new ArrayList<>();
+        mapID2Info = new HashMap<>();
+        mapInfo2Properties = new HashMap<>();
 
 
         SwingWorker worker = new SwingWorker() {
@@ -119,10 +114,10 @@ public class TXEssenDoc {
                     wounds = hasWounds() || hasMycosis();
                     psych = mapID2Info.containsKey(ResInfoTypeTools.TYPE_PSYCH);
 
+                    // Das hier ist das Hauptdokukent
                     File file1 = createDoc1();
                     content.clear();
                     listICD.clear();
-
 
                     progress++;
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
