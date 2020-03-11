@@ -1,0 +1,123 @@
+<resinfotype>
+    <scale name="pneumonie" label="Pneumonie Risiko-Wert">
+        <scalegroup name="pneu1" label="Zuverlässigkeit und Mitarbeit" tooltip="Wie gut arbeitet der BW mit ?">
+            <option label="kontinuierliche Mitarbeit" name="kont" score="0" default="true" layout="tab"/>
+            <option label="Mitarbeit nach Aufforderung" name="na" score="1"/>
+            <option label="Nur nach Aufforderung" name="nna" score="2" layout="tab"/>
+            <option label="keine" name="keine" score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu2" label="Vorliegende Atemwegserkrankungen">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="Leichter Infekt im Nasen/Rachenraum" name="s1" score="1" layout="tab"/>
+            <option label="Bronchialinfekt" name="s2" score="2" layout="tab"/>
+            <option label="Lungenerkrankung" name="s3" score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu3" label="Frühere Lungenerkrankungen">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="Leichte Infekte" name="s1" score="1" layout="tab"/>
+            <option label="Schwere Verläufe" name="s2" score="2" layout="tab"/>
+            <option label="Schwere Lungenerkrankungen" name="s3" score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu4" label="Immunschwäche">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="Leicht" name="s1" score="1" layout="tab"/>
+            <option label="Erhöht" name="s2" score="2" layout="tab"/>
+            <option label="Völlig" name="s3" score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu5" label="Raucher/Passivraucher">
+            <option label="Nichtraucher, geringfügiges Passivrauchen" name="s0" score="0" default="true" layout="tab"/>
+            <option label="Pro Tag 6 Zigaretten"
+                    tooltip="mit niedrigem Teer-/Kondensatgehalt &lt; 10 mg oder regelmäßiges Passivrauchen." name="s1"
+                    score="1" layout="tab"/>
+            <option label="Pro Tag 6 Zigaretten" name="s2" score="2"
+                    tooltip="mit Teer-/Kondensatgehalt zwischen 10 mg-13 mg oder häufiges Passivrauchen." layout="tab"/>
+            <option label="intensives Rauchen" name="s3" score="3"
+                    tooltip="Intensives Rauchen, mehr als 6 Zigaretten pro Tag mit Teer-/Kondensatgehalt über 14 mg oder ständiges Passivrauchen."
+                    layout="br"/>
+        </scalegroup>
+        <scalegroup name="pneu6" label="Schmerzen">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="Leichte Schmerzen, Dauerschmerzen" name="s1" score="1" layout="tab"/>
+            <option label="Mäßige atmungsbeeinflussende Schmerzen" name="s2" score="2" layout="tab"/>
+            <option label="Starke atmungsbeeinflussende Schmerzen" name="s3" score="3" layout="br"/>
+        </scalegroup>
+        <scalegroup name="pneu7" label="Schluckstörungen">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="Bei flüssiger Nahrung" name="s1" score="1" layout="tab"/>
+            <option label="Bei breiiger Nahrung" name="s2" score="2" layout="tab"/>
+            <option label="Komplette Schluckstörung, auch beim Schlucken von Speichel" name="s3" score="3" layout="br"/>
+        </scalegroup>
+        <scalegroup name="pneu8" label="Manipulative tracheale Maßnahmen">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="leichte" tooltip="Pflegemaßnahmen, z.B. Nasen- und Mundpflege" name="s1" score="1"
+                    layout="tab"/>
+            <option label="Absaugen" tooltip="Zusätzliche orale oder nasale Absaugung" name="s2" score="2"
+                    layout="tab"/>
+            <option label="kompliziertes Absaugen"
+                    tooltip="Zusätzlich endotracheale Absaugung ohne oder mit liegendem Tubus" name="s3" score="3"
+                    layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu9" label="Mobilitätseinschränkung">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="eingeschränkt" tooltip="Eingeschränkte Mobilität, durch Gehhilfen kompensierbar" name="s1"
+                    score="1" layout="tab"/>
+            <option label="bettruhe" tooltip="Hauptsächlich Bettruhe" name="s2" score="2" layout="tab"/>
+            <option label="Völlige Einschränkung" name="s3" score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu10" label="Arbeit in lungengefährdendem Beruf">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="Für 1-2 Jahre" name="s1" score="1" layout="tab"/>
+            <option label="Für 2-10 Jahre" name="s2" score="2" layout="tab"/>
+            <option label="Über 10 Jahre" name="s3" score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu11" label="Intubationsnarkose, Beatmung">
+            <option label="keine, kaum" tooltip="In den letzten 3 Wochen keine" name="s0" score="0" default="true"
+                    layout="tab"/>
+            <option label="kurz" tooltip="Kurze Intubationsnarkose (bis 2 Stunden)" name="s1" score="1" layout="tab"/>
+            <option label="lang" tooltip="Lang andauernde Intubationsnarkose (über 2 Stunden)" name="s2" score="2"
+                    layout="tab"/>
+            <option label="sehr lang" tooltip="Mehrere Intubationsnarkosen oder über 12 Stunden Beatmung" name="s3"
+                    score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu12" label="Bewusstseinslage">
+            <option label="Keine Einschränkung" name="s0" score="0" default="true" layout="tab"/>
+            <option label="Leichte Einschränkung" tooltip="reagiert auf Ansprache folgerichtig" name="s1" score="1"
+                    layout="tab"/>
+            <option label="Starke Einschränkung" tooltip="Reagiert auf Ansprache nicht folgerichtig" name="s2" score="2"
+                    layout="tab"/>
+            <option label="keine Reaktion" name="s3" score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu13" label="Atemanstrengung">
+            <option label="normal" tooltip="Zwerchfell- und Thoraxatmung ohne Anstrengung" name="s0" score="0"
+                    default="true" layout="tab"/>
+            <option label="angestrengt" tooltip="Zwerchfell- und Thoraxatmung mit Anstrengung" name="s1" score="1"
+                    layout="tab"/>
+            <option label="sehr angestrengt" tooltip="Zwerchfell- und Thoraxatmung mit großer Hilfestellung" name="s2"
+                    score="2" layout="tab"/>
+            <option label="nicht möglich" tooltip="Keine Zwerchfell- oder Thoraxatmung möglich" name="s3" score="3"
+                    layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu14" label="Atemfrequenz">
+            <option label="14-20 Atemzüge/min." name="s0" score="0" default="true" layout="tab"/>
+            <option label="Unregelmäßige Atmung" name="s1" score="1" layout="tab"/>
+            <option label="verlangsamt/beschleunigt" tooltip="Regelmäßige verlangsamte oder beschleunigte Atmung"
+                    name="s2" score="2" layout="tab"/>
+            <option label="abnormal"
+                    tooltip="Regelmäßige, sehr tiefe oder auch oberflächliche Atemzüge oder zwischen verlangsamt und beschleunigt wechselnde Atmung"
+                    name="s3" score="3" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="pneu15" label="Atemdepressive Arzneimittel">
+            <option label="keine" name="s0" score="0" default="true" layout="tab"/>
+            <option label="gering" tooltip="Unregelmäßige Einnahme, geringe Atemdepression" name="s1" score="1"
+                    layout="tab"/>
+            <option label="mäßig" tooltip="Regelmäßige Einnahme, mäßige Atemdepression" name="s2" score="2"
+                    layout="tab"/>
+            <option label="stark"
+                    tooltip="Regelmäßige Einnahme spezifischer atemdepressiver Arzneimittel (z.B. Opiate, Barbiturate)"
+                    name="s3" score="3" layout="tab"/>
+        </scalegroup>
+        <risk from="16" to="45" label="hochrangig gefährdet, Atemstörungen liegen vor" color="dark_red" rating="2"/>
+        <risk from="7" to="15" label="gefährdet" color="dark_orange" rating="1"/>
+        <risk from="0" to="6" label="nicht gefährdet" color="dark_green" rating="0"/>
+    </scale>
+</resinfotype>

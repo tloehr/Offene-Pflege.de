@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1">
+	<xs:include schemaLocation="../das_report_datatypes.xsd"/>
+	<xs:complexType name="result_resident_type">
+		<xs:sequence>
+			<xs:element name="type" type="global_result_type">
+				<xs:annotation>
+					<xs:documentation>Übergeordneter Typ der Ergebnisse</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" type="status_type">
+				<xs:annotation>
+					<xs:documentation>Status der Berechnung</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="residents" type="residents_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für Bewohner/Bewohnerinnen</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="residents_type">
+		<xs:sequence>
+			<xs:element name="resident" type="resident_type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für einzelne Bewohner/Bewohnerinnen</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="resident_type">
+		<xs:sequence>
+			<xs:element name="IDBEWOHNER">
+				<xs:annotation>
+					<xs:documentation>Bewohnerbezogene Nummer</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:int">
+								<xs:pattern value="[0-9]{6}"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="indicators" type="indicators_short_type">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für Kennzahlen</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="indicators_short_type">
+		<xs:sequence>
+			<xs:element name="indicator" type="indicator_short_type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für eine einzelne Kennzahl</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="indicator_short_type">
+		<xs:sequence>
+			<xs:element name="internal_id" type="non_neg_number_type">
+				<xs:annotation>
+					<xs:documentation>Interne ID der Kennzahl</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="external_id" type="text_type">
+				<xs:annotation>
+					<xs:documentation>Externe ID der Kennzahl</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

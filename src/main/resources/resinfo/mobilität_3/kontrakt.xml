@@ -1,0 +1,24 @@
+<resinfotype>
+    <tabgroup size="12" label="Kontrakturen an den oberen Extremitäten" name="tab1">
+        <checkbox name="finger.links" label="Finger der linken Hand"/>
+        <checkbox name="finger.rechts" label="Finger der rechten Hand" layout="left"/>
+        <checkbox name="hand.links" label="linkes Handgelenk" layout="left"/>
+        <checkbox name="hand.rechts" label="rechtes Handgelenk" layout="left"/>
+        <checkbox name="ebogen.links" label="linkes Ellenbogengelenk" layout="br"/>
+        <checkbox name="ebogen.rechts" label="rechtes Ellenbogengelenk" layout="left"/>
+        <checkbox name="schulter.links" label="linkes Schultergelenk" layout="left"/>
+        <checkbox name="schulter.rechts" label="rechtes Schultergelenk" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Kontrakturen an den unteren Extremitäten" name="tab2">
+        <checkbox name="zehen.links" label="Zehen des linken Fußes"/>
+        <checkbox name="zehen.rechts" label="Zehen des rechten Fußes" layout="left"/>
+        <checkbox name="fuss.links" label="linkes Fussgelenk" layout="left"/>
+        <checkbox name="fuss.rechts" label="rechtes Fussgelenk" layout="br"/>
+        <checkbox name="knie.links" label="linkes Knie" layout="left"/>
+        <checkbox name="knie.rechts" label="rechtes Knie" layout="left"/>
+        <checkbox name="huefte.links" label="linkes Hüftgelenk" layout="br"/>
+        <checkbox name="huefte.rechts" label="rechtes Hüftgelenk" layout="left"/>
+        <checkbox name="spitzfuss" label="Spitzfuß" layout="left"/>
+    </tabgroup>
+</resinfotype>

@@ -1,0 +1,30 @@
+<resinfotype>
+    <textfield label="Hosen, Stück" name="hosen" innerlayout="tab"/>
+    <textfield label="Röcke, Stück" name="rock" innerlayout="tab"/>
+    <textfield label="Kleider, Stück" name="kleider" innerlayout="tab"/>
+    <textfield label="BHs, Stück" name="bh" innerlayout="tab"/>
+    <textfield label="Pullover, Stück" name="pullover" innerlayout="tab"/>
+    <textfield label="Hemden, Blusen, Stück" name="hemden" innerlayout="tab"/>
+    <textfield label="T-Shirts, Stück" name="tshirt" innerlayout="tab"/>
+    <textfield label="Socken, Stück" name="socken" innerlayout="tab"/>
+    <textfield label="Strumpfhosen, Stück" name="strumpfhose" innerlayout="tab"/>
+    <textfield label="Schuhe, Stück" name="schuhe" innerlayout="tab"/>
+    <textfield label="Unterhemden, Stück" name="uhemden" innerlayout="tab"/>
+    <textfield label="Unterhosen (kurz), Stück" name="uhosenk" innerlayout="tab"/>
+    <textfield label="Unterhosen (lang), Stück" name="uhosenl" innerlayout="tab"/>
+    <textfield label="Krawatten, Stück" name="krawatten" innerlayout="tab"/>
+
+    <textfield label="Brillen, Stück, Art" name="brillen" innerlayout="tab"/>
+    <textfield label="Hörgeräte, Stück, Art" name="hgeraet" innerlayout="tab"/>
+    <textfield label="Schmuck, Stück, Beschreibung" name="schmuck" innerlayout="tab"/>
+    <textfield label="Aktenordner, Stück" name="akten" innerlayout="tab"/>
+    <textfield label="Koffer, Stück" name="koffer" innerlayout="tab"/>
+    <textfield label="Taschen, Stück" name="taschen" innerlayout="tab"/>
+
+    <textfield label="Möbel, Stück, Beschreibung" name="moebel" innerlayout="tab"/>
+    <textfield label="Fernseher, Stück, Marke, Größe" name="tv" innerlayout="tab"/>
+    <textfield label="Radio/CD, Stück, Marke" name="radio" innerlayout="tab"/>
+    <textfield label="DVD, Stück, Marke" name="dvd" innerlayout="tab"/>
+
+    <label label="Alle sonstigen Gegenstände schreiben Sie bitte in den Bemerkungstext." name="hinweis"/>
+</resinfotype>

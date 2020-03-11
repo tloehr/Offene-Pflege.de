@@ -1,0 +1,15 @@
+<resinfotype>
+    <textfield name="gericht" label="Amtsgericht"/>
+    <textfield label="Beschluss läuft ab" length="12" name="datum" type="date"/>
+
+    <tabgroup size="12" fontstyle="bold" label="Art der Fixierung" name="tab1">
+        <checkbox name="isolation" label="Zimmerisolation"/>
+        <checkbox name="gurte" label="Fixierung durch Gurte" layout="left"/>
+        <checkbox name="geristuhl" label="Fixierung durch Tisch des Geristuhl" layout="left"/>
+        <checkbox name="bettgitter" label="Bettgitter"/>
+        <checkbox name="sedierung" label="Sedierung" layout="left"/>
+    </tabgroup>
+
+    <label size="16" fontstyle="bold"
+           label="Denken Sie daran, dass Sie den Gerichtsbeschluss scannen und hier anhängen."/>
+</resinfotype>

@@ -1,0 +1,20 @@
+<tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 12."/>
+<label size="16" fontstyle="bold" label="Atmung"/>
+<checkbox label="unauffällig" name="normal"/>
+<checkbox label="kardialer Stau" name="cardcongest" layout="left"/>
+<checkbox label="Schmerzen" name="pain" layout="left"/>
+<checkbox label="Husten" name="cough" layout="left"/>
+<checkbox label="Verschleimung" name="mucous" layout="br"/>
+<checkbox label="Auswurf" name="sputum" layout="left"/>
+<checkbox label="Rauchen" name="smoking" layout="left"/>
+<checkbox label="Asthma" name="asthma" layout="left"/>
+<textfield name="other" label="Sonstiges" length="20" />
+
+<label size="16" fontstyle="bold" label="Besonderheiten"/>
+<checkbox label="Tracheostoma" name="stoma"/>
+<checkbox label="Silberkanüle" name="silver" layout="left"/>
+<checkbox label="Silikonkanüle" name="silicon"  layout="left"/>
+<checkbox label="Absaugen" name="aspirate" layout="left"/>
+
+<textfield name="tubetype" label="Kanülenart" length="10" />
+<textfield name="tubesize" label="Kanülengröße" length="10" layout="left"/>

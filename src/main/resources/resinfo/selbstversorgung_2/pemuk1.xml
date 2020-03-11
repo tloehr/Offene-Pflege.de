@@ -1,0 +1,48 @@
+<resinfotype>
+    <tabgroup size="16" label="Zeichen von Nahrungsmangel" name="tab1">
+
+        <checkbox name="außen" label="Äußerer Eindruck" tooltip="unterernährt / untergewichtig"/>
+        <checkbox name="bmi" label="BMI unter 20" tooltip="nur wenn ermittelbar" layout="left"/>
+        <checkbox name="unbgew" label="Unbeabsichtigter Gewichtsverlust"
+                  tooltip="über 5% in einem Monat, über 10% in 6 Monaten oder weit gewordene Kleidung" layout="left"/>
+        <checkbox layout="br" name="geringe" label="Auffällig geringe Essmenge"
+                  tooltip="mehr als ein Viertel Essensreste bei zwei Drittel der Mahlzeiten"/>
+        <checkbox layout="left" name="bedarfe" label="Erhöhter Energie-/Nährstoffbedarf und Verluste"
+                  tooltip="Hyperaktivität, Stresssituation, akute Krankheit, Fieber, offene Wunden wie Dekubitus, Ulcus Cruris, Diarrhö, Erbrechen, Blutverlust"/>
+    </tabgroup>
+
+    <tabgroup size="16" label="Risiko für Flüssigkeitsmangel" name="tab2">
+        <checkbox layout="br" name="mangelf" label="Zeichen von Flüssigkeitsmangel"
+                  tooltip="Plötzlich unerwartete Verwirrtheit, trockene Schleimhäute, konzentrierte Urin"/>
+        <checkbox layout="left" name="geringf" label="Auffällig geringe Trinkmenge"
+                  tooltip="weniger als 1000 ml/Tag über mehrere Tage"/>
+        <checkbox layout="left" name="bedarff" label="Erhöhter Flüssigkeitsbedarf"
+                  tooltip="Fieber, stark geheizte Räume, Sommerhitze"/>
+    </tabgroup>
+
+    <tabgroup size="16" label="Einschätzungshilfe" name="tab3">
+        <textfield name="groesse" type="double" preset="heightlast" label="Körpergröße in m" length="10" layout="br"/>
+        <textfield name="gewichta" type="double" preset="weightlast" label="Körpergewicht (aktuell) in kg" length="10"
+                   layout="left"/>
+        <textfield name="gewicht1" type="double" preset="weight-1m" label="Körpergewicht (vor 1 Monat) in kg"
+                   length="10"
+                   layout="br"/>
+        <textfield name="gewicht6" type="double" preset="weight-6m" label="Körpergewicht (vor 6 Monaten) in kg"
+                   length="10"
+                   layout="left"/>
+        <textfield name="gewicht12" type="double" preset="weight-1y" label="Körpergewicht (vor 1 Jahr) in kg"
+                   length="10"
+                   layout="br"/>
+        <checkbox layout="br" name="oedem" label="Ödeme sichtbar"/>
+        <checkbox layout="br" name="zuweit" label="Kleidung (Rock, Hose) zu weit geworden"/>
+    </tabgroup>
+
+    <optiongroup fontstyle="bold" name="grobein" label="Grobe äußere Einschätzung">
+        <option label="unterernährt" name="unter"/>
+        <option layout="left" label="normal ernährt" name="normal" default="true"/>
+        <option layout="left" label="überernährt" name="ueber"/>
+    </optiongroup>
+
+    <label size="10" color="blue"
+           label="Instrument des Projektverbundes Institut für Pflegewissenschaft, Universität Witten/Herdecke &amp; Institut für Ernährungs- und Lebensmittelwissenschaften, Universität Bonn, 2008"/>
+</resinfotype>

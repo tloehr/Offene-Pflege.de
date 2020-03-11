@@ -1,0 +1,41 @@
+<resinfotype bwinftyp="fixprot2" sinceversion="13" category="17" abstract_type="166" equivalent="0" intervalmode="3"
+             infokurz="Fixierungsprotokoll" infolang="" tx="false" qpr="true">
+
+    <!-- 21.12.2019: Das hier ersetzt fixprot1. Dabei wird aber das Interval auf Single Incident geändert. Entspricht
+     eher dem Protokoll Gedanken.
+     QDVS 78, 79, 80, 81
+     -->
+    <tabgroup size="18" label="Grund der Fixierung" name="tab1">
+        <checkbox name="eigen" label="Eigengefährung" />
+        <checkbox name="unfall" label="Sturz-/Unfallgefahr" layout="left"/>
+        <checkbox name="eigen" label="Auf eigenen Wunsch" layout="left"/>
+        <checkbox name="fremd" label="Fremdgefährdung"/>
+        <checkbox name="agg" label="Aggression" layout="left"/>
+        <checkbox name="path" label="pathologische Unruhe" layout="left"/>
+        <checkbox name="ngf" label="Nicht steh- und gehfähig"/>
+    </tabgroup>
+    <tabgroup size="18" label="Art der Fixierung" name="tab2">
+        <checkbox name="leibgurt" label="Leibgurt" qdvs="Verwendung im Abschschnitt &quot;Anwendung von Gurten&quot;"
+                  tooltip="Bitte beachten Sie, dass alle Gurtanwendungen zu erfassen sind, gleichgültig, ob eine richterliche Genehmigung oder das Einverständnis des Bewohners bzw. der Bewohnerin vorliegt. Auch Gurte, die der Bewohner bzw. die Bewohnerin theoresch selbst öffnen könnte, sind einzutragen. Auch wenn nur aufgrund der Befürchtung eines Sturzes fixiert wird, ist dies einzutragen."/>
+        <checkbox name="bettgitter" label="Bettseitenteile"
+                  qdvs="Verwendung im Abschschnitt &quot;Anwendung von Bettseitenteile&quot;"
+                  tooltip="Außer Betracht bleiben unterbrochene Bettseitenteile, die das Verlassen des Bettes nicht behindern."
+                  layout="left"/>
+        <checkbox name="sitzgurt" label="Sitzgurt"
+                  qdvs="Verwendung im Abschschnitt &quot;Anwendung von Gurten&quot;" layout="br tab"/>
+        <checkbox name="geristuhl" label="Geriatriestuhl mit Vorsatztisch" layout="left"/>
+        <checkbox name="sonst" label="Sonstiges" tooltip="Bitte in der Bemerkung beschreiben."/>
+    </tabgroup>
+
+    <optiongroup size="18" name="dauer">
+        <option label="tagsüber" default="true" name="tag"/>
+        <option label="nachts" name="nacht"/>
+        <option label="halbe Stunde" name="05"/>
+        <option label="1 Stunde" name="1"  layout="br tab"/>
+        <option label="2 Stunden" name="2"/>
+        <option label="sonst (bitte aufschreiben)" name="sonst"/>
+    </optiongroup>
+
+    <textfield name="dauersonst" label="Sonstige Dauer" depends-on="dauer" visible-when-dependency-eq="sonst"/>
+
+</resinfotype>

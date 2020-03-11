@@ -1,0 +1,43 @@
+<resinfotype bwinftyp="kern01" sinceversion="13" category="4" abstract_type="129" equivalent="129" intervalmode="0"
+             infokurz="Künstliche Ernährung" infolang="" tx="true" qpr="true" bi="true">
+
+    <qpr tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Zeile: 42"/>
+    <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
+    <tx tooltip="Seite 2, Abschnitt 9."/>
+
+    <combobox label="Sondentyp" name="tubetype">
+        <item label="PEG (Perkutane endoskopische Gastrostomie)" name="peg"/>
+        <item label="PEG/J (PEG mit duodenalem Schenkel)" name="pej"/>
+        <item label="Transnasale Ernährungssonde" name="nose"/>
+    </combobox>
+    <textfield name="tubesince" label="Sonde gelegt am" length="12" type="date"/>
+    <textfield name="tubereason" label="Warum wurde die PEG gelegt ?" hfill="false" length="40" innerlayout="br"/>
+
+    <tabgroup size="12" label="Verabreichung" name="tab1">
+        <checkbox label="Ernährungspumpe" name="pump"/>
+        <checkbox label="Schwerkraft" name="gravity" layout="left"/>
+        <checkbox label="Spritze" name="syringe" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Sonstiges" name="tab2">
+        <checkbox label="Orale Ernährung zusätzlich" name="oralnutrition"/>
+        <checkbox label="Parenterale Ernährung" name="parenteral" layout="left"/>
+    </tabgroup>
+
+    <textfield name="calories" label="Kalorien (in 24h)" hfill="false" length="12"/>
+
+    <separator/>
+    <optiongroup name="SVERNAEHRUNGUMFANG" label="In welchem Umfang erfolgt eine künstliche Ernährung?"
+                 qdvs="43" bi="4.4.13">
+        <option label="nicht täglich oder nicht dauerhaft" name="0" default="true"/>
+        <option label="täglich, aber zusätzlich zur oralen Ernährung" name="6"/>
+        <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="3"/>
+    </optiongroup>
+
+    <optiongroup name="SVFREMDHILFE" label="Erfolgt die Bedienung selbständig oder mit Fremdhilfe?" qdvs="44"
+                 bi="4.4.13">
+        <option label="selbständig" name="0" default="true"/>
+        <option label="mit Fremdhilfe" name="1"/>
+    </optiongroup>
+
+</resinfotype>

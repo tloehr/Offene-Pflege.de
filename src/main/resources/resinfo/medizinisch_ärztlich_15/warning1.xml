@@ -1,0 +1,6 @@
+<resinfotype>
+    <imagelabel image="/artwork/48x48/warning.png"/>
+    <textfield name="beschreibung" innerlayout="br" label="Welche wichtigen Besonderheiten sollen vermerkt werden ?"
+               layout="br"/>
+
+</resinfotype>

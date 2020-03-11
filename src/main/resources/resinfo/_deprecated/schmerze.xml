@@ -1,0 +1,43 @@
+
+<combobox label="Schmerzintensität" name="schmerzint">
+<item label="0 - kein Schmerz" name="0"/>
+<item label="1 - kaum Schmerzen" name="1"/>
+<item label="2 - kaum Schmerzen" name="2"/>
+<item label="3 - erträgliche Schmerzen" name="3"/>
+<item label="4 - erträgliche Schmerzen" name="4"/>
+<item label="5 - stärkere Schmerzen" name="5"/>
+<item label="6 - starke Schmerzen" name="6"/>
+<item label="7 - starke Schmerzen" name="7"/>
+<item label="8 - sehr starke Schmerzen" name="8"/>
+<item label="9 - fast unerträgliche Schmerzen" name="9"/>
+<item label="10 - unerträgliche Schmerzen" name="10"/>
+</combobox>
+<textfield name="schmerzort" label="Wo tritt der Schmerz auf ?"/>
+<label label="Beispiele für Schmerzarten: dumpf, pulsierend, nagelnd, schießend, brennen, steched, bohrend, ausstrahlend" name="l1"/>
+<textfield name="schmerzart" label="Beschreibung der Schmerzart"/>
+<label size="16" label="Sonstiges Befinden" name="l0" color="blue"/>
+<combobox label="Stuhlgang" name="stuhl">
+<item label="wie vor" name="0"/>
+<item label="gut" name="1"/>
+<item label="normal" name="2"/>
+<item label="schlecht" name="3"/>
+</combobox>
+<combobox label="Schlaf" name="schlaf">
+<item label="wie vor" name="0"/>
+<item label="gut" name="1"/>
+<item label="normal" name="2"/>
+<item label="schlecht" name="3"/>
+</combobox>
+<combobox label="Wohlbefinden" name="wohlb">
+<item label="wie vor" name="0"/>
+<item label="gut" name="1"/>
+<item label="normal" name="2"/>
+<item label="schlecht" name="3"/>
+</combobox>
+<combobox label="Beeinträchtigung der Tagesaktivität durch Schmerzen" name="taktiv">
+<item label="wie vor" name="0"/>
+<item label="keine" name="1"/>
+<item label="mittel" name="2"/>
+<item label="stark" name="3"/>
+</combobox>
+<label label="sollte es verstärkende oder lindernde Faktoren geben, so schreiben Sie diese bitte in die Bemerkung" name="l2" color="blue"/>

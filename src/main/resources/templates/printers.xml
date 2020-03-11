@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<printers>
+		<printer name="epl2" label="Zebra EPL2 Drucker" encoding="windows-1252">
+		<!-- Quelle: EPL2 Programmer’s Manual Programming for Page Mode Printing
+		Manual No. 980352-001 Rev.D (C) 2003 ZIH Corp.-->
+		<reset>
+			<!--Einstellung für Windows Latin 1 und deutsche Codetabelle-->
+			<line>I8,A,049</line>
+		</reset>
+		<forms>
+			<form name="etikett-medbestand-57x19" label="Kleine Etiketten für Medikamente (57x19)">
+				<line/>
+				<!--Beginn des Etiketts. Die vorstehende Leerzeile sollte beibehalten werden.-->
+				<line>N</line>
+				<!--Breite des Etiketts in Dots. Der LP2844 ist ein 203dpi Drucker. Somit gilt 57 mm = 456 dots.-->
+				<line>q456</line>
+				<!--Hoehe des Etiketts und Abstand zwischen den Etiketten in Dots.
+				Der LP2844 ist ein 203dpi Drucker. Somit gilt 19 mm = 152 dots.
+				Die 24 Dots Lücke habe ich aus dem Handbuch genommen. Das passt.-->
+				<line>Q152,24</line>
+				<line>A30,5,0,4,1,2,R,"<elem name="medstock.tradeform" multiline="true" maxlength="25" />"</line>
+				<line>A30,60,0,2,1,1,N,"#<elem name="medstock.package.pzn"/> <elem name="medstock.in" dateformat="'+'dd/MM/yy"/> <elem name="medstock.expires" dateformat="'!'dd/MM/yy"/> <elem name="medstock.tradeform.expires.after.opened"/>"</line>
+				<line>A30,80,0,3,1,1,N,"<elem name="medstock.inventory.resident.name" multiline="true" maxlength="15"/>"</line>
+				<line>A30,100,0,3,1,1,N,"<elem name="medstock.inventory.resident.name" multiline="true" maxlength="15"/>"</line>
+				<line>A30,120,0,3,1,1,N,"*<elem name="medstock.inventory.resident.dob" dateformat="ddMMyyyy"/> <elem name="medstock.inventory.resident.id" toupper="true"/>"</line>
+				<line>A240,80,0,5,1,1,R,"<elem name="medstock.id"/>"</line>
+				<line>A240,130,0,3,1,1,N,"<elem name="medstock.usershort"/>"</line>
+				<line>P1</line>
+				<line/>
+			</form>
+		</forms>
+	</printer>
+</printers>

@@ -1,0 +1,72 @@
+<resinfotype>
+    <label size="16" label="Gründe für eine geringe Nahrungsaufnahme" tooltip="warum isst der BW so wenig ?"
+           fontstyle="bold"/>
+
+    <tabgroup size="12" label="Körperlich oder geistig bedingte Beeinträchtigungen" name="tab1">
+        <checkbox layout="br" name="c1a" label="Kognitive Überforderung"
+                  tooltip="z.B. durch Demenzerkrankung; weiß nichts mit Essen anzufangen, vergisst zu schlucken"/>
+        <checkbox layout="left" name="c1b" label="Funktionseinschränkungen der Arme und Hände"
+                  tooltip="z.B. Erreichbarkeit von Speisen, kann Besteck nicht greifen, kann nicht schneiden"/>
+        <checkbox layout="br" name="c1c" label="Schlechter Zustand des Mundes"
+                  tooltip="z.B. Mundtrockenheit, Schleimhautdefekte"/>
+        <checkbox layout="left" name="c1d" label="Beeinträchtigung der Kaufunktion/Zahnprobleme"/>
+        <checkbox layout="br" name="c1e" label="Schluckstörungen"
+                  tooltip="z.B. verschluckt sich leicht, hustet oft beim Essen, vermeidet bestimmte Konsistenz"/>
+        <checkbox layout="left" name="c1f" label="Müdigkeit beim Essen"
+                  tooltip="z.B. Verdacht auf Medikamentennebenwirkung, veränderter Schlaf-Wachrhythmus"/>
+        <checkbox layout="br" name="c1g" label="Beeinträchtigung der Seh- oder Hörfähigkeit"/>
+        <checkbox layout="left" name="c1h" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Fehlende Lust zum Essen, kein Appetit, Ablehnen des Essens" name="tab2">
+        <checkbox layout="br" name="c2a" label="Besondere psychische Belastung"
+                  tooltip="z.B. Einsamkeit, Depressivität"/>
+        <checkbox layout="left" name="c2b" label="Akute Krankheit"/>
+        <checkbox layout="left" name="c2c" label="Schmerzen"/>
+        <checkbox layout="br" name="c2d" label="Bewegungsmangel"/>
+        <checkbox layout="left" name="c2e" label="Verdacht auf Medikamentennebenwirkungen"
+                  tooltip="z.B. Art, Anzahl der verschiedenen Präparate"/>
+        <checkbox layout="br" name="c2f" label="Auffallend reduzierter Geschmacks- und Geruchssinn"/>
+        <checkbox layout="left" name="c2h" label="Kulturelle, religiöse Gründe"/>
+        <checkbox layout="br" name="c2g"
+                  label="Keine ausreichenden Informationen über Speisen und ihre Zusammensetzung"/>
+        <checkbox layout="br" name="c2j" label="Angst vor Unverträglichkeiten oder Allergien"/>
+        <checkbox layout="left" name="c2i" label="Individuelle Abneigungen, Vorlieben, Gewohnheiten"/>
+        <checkbox layout="br" name="c2k" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Umgebungsfaktoren" name="tab3">
+        <checkbox layout="br" name="c3a" label="Esssituation wird als unangenehm empfunden"
+                  tooltip="z.B. Geräusche, Gerüche, Tischnachbarn"/>
+        <checkbox layout="left" name="c3b" label="inadäquate Essenszeiten"
+                  tooltip="z.B. Zeitpunkt, Dauer, Anpassungsmöglichkeit"/>
+        <checkbox layout="br" name="c3c" label="Hilfsmittelangebot"/>
+        <checkbox layout="left" name="c3d" label="Beziehung zu den Versorgungspersonen"/>
+        <checkbox layout="br" name="c3e" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Essensangebot" name="tab4">
+        <checkbox layout="br" name="c4a" label="Unzufriedenheit mit dem üblichen Angebot"
+                  tooltip="z.B. Gewohnheiten, soziale, kulturelle, religiöse Bedürfnisse hinsichtlich Lebensmittelauswahl, Menge, Geschmack, Temperatur, Aussehen"/>
+        <checkbox layout="left" name="c4b" label="Unangemessene Konsistenz" tooltip="z.B. hart, weich"/>
+        <checkbox layout="br" name="c4c" label="Nicht akzeptierte verordnete Diät (welche ?)"/>
+        <checkbox layout="left" name="c4d" label="Verdacht auf inadäquate Diät"/>
+        <checkbox layout="br" name="c4e" label="Einschätzung des Angebots"
+                  tooltip="Speisenplanung hinsichtlich Abwechslung, Menüzusammenstellung, Angemessenheit etc."/>
+        <checkbox layout="left" name="c4f" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+    <tabgroup size="12" label="Gründe für einen erhöhten Energie- und Nährstoffbedarf bzw. Verluste" name="tab5">
+
+        <checkbox layout="br" name="c5a" label="Krankheit"
+                  tooltip="z.B. Fieber, Infektion, Tumor, offene Wunden, Dekubitus, psychischer Stress, Blutverlust, starkes Erbrechen, anhaltende Durchfälle"/>
+        <checkbox layout="left" name="c5b" label="Hyperaktivität"
+                  tooltip="z.B. ständiges Umherlaufen, evtl. in Verbindung mit kognitiven Erkrankungen"/>
+        <checkbox layout="br" name="c5c" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <label size="10" color="blue"
+           label="Instrument des Projektverbundes Institut für Pflegewissenschaft, Universität Witten/Herdecke"/>
+    <label size="10" color="blue" label="und"/>
+    <label size="10" color="blue"
+           label="Institut für Ernährungs- und Lebensmittelwissenschaften, Universität Bonn, 2008"/>
+</resinfotype>

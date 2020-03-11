@@ -1,0 +1,50 @@
+<resinfotype category="17">
+    <scale name="kontrakt" label="Kontrakturen Risiko-Wert">
+        <scalegroup name="kon1" label="Zuverlässigkeit und Mitarbeit" tooltip="Wie gut arbeitet der BW mit ?">
+            <option label="keine" name="keine" score="10" layout="tab"/>
+            <option label="sehr eingeschränkt" name="se" score="20"/>
+            <option label="etwas eingeschränkt" name="ee" score="30" layout="tab"/>
+            <option label="nicht eingeschränkt" name="ne" score="40" default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="kon2" label="körperlicher Zustand">
+            <option label="sehr schlecht" name="ss" score="10" layout="tab"/>
+            <option label="schlecht" name="s" score="20" layout="tab"/>
+            <option label="mäßig" name="m" score="30" layout="tab"/>
+            <option label="gut" name="gut" score="40" default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="kon3" label="geistiger Zustand">
+            <option label="soporös, komatös" name="so" score="10"
+                    tooltip="[b]soporös:[/b] nur mit Schmerzreiz weckbar[br/][b]komatös:[/b] nicht weckbar"
+                    layout="tab"/>
+            <option label="somnolent, delirant" name="del" score="20"
+                    tooltip="[b]somnolent:[/b] Benommenheit mit abnormer Schläfrigkeit als leichtere Form der Bewusstseinstrübung (mit Erweckbarkeit)[br/][b]delirant:[/b] akute psychische Störung, die eine organische Ursache hat (also eine Form des akuten hirnorganischen Psychosyndroms)"
+                    layout="tab"/>
+            <option label="benommen, verwirrt" name="ben" score="30" layout="tab"/>
+            <option label="klar" name="klar" score="40" default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="kon4" label="Mobilität">
+            <option label="bettlägerig" name="bettl" score="10" layout="tab"/>
+            <option label="Rollstuhl bedürftig" name="rolls" score="20" layout="tab"/>
+            <option label="geht mit Hilfe" name="geht1" score="30" layout="tab"/>
+            <option label="geht ohne Hilfe" name="geht2" score="40" default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="kon5" label="Motorik"
+                    tooltip="Die [b]Motorik[/b] ist die Fähigkeit des Körpers eines Menschen, Tieres oder deren Organe, sich zu bewegen.">
+            <option label="total eingeschränkt" name="total" score="10" layout="tab"/>
+            <option label="sehr eingeschränkt" name="sehr" score="20" layout="tab"/>
+            <option label="etwas eingeschränkt" name="etwas" score="30" layout="tab"/>
+            <option label="nicht eingeschränkt" name="nicht" score="40" default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="kon6" label="Disposition und Erkrankung"
+                    tooltip="Je [i]kranker[/i] der BW ist, desto mehr steigt sein Kontrakturenrisiko.">
+            <option label="Viele verschiedene, schwere Erkrankungen" name="schwer" score="10" layout="tab"/>
+            <option label="Mehrere mittlere Erkrankungen" name="mittel" score="20" layout="tab"/>
+            <option label="Mehrere leichtere Erkrankungen" name="leicht" score="30" layout="tab"/>
+            <option label="Keine akuten Erkrankungen" name="keine" score="40" default="true" layout="tab"/>
+        </scalegroup>
+        <risk from="181" to="240" label="gering" color="dark_green" rating="0"/>
+        <risk from="60" to="180" label="hoch" color="dark_red" rating="1"/>
+    </scale>
+    <label name="hinweis" color="blue" size="10"
+           label="Erläuterungstexte wurden Wikipedia entnommen. http://de.wikipedia.org"/>
+</resinfotype>

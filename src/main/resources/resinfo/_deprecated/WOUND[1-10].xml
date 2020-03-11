@@ -1,0 +1,105 @@
+<resinfotype bwinftyp="WOUND1" sinceversion="4" abstract_type="117" equivalent="6" intervalmode="0"
+             infokurz="Wunde Nr.1" infolang="" category="9" tx="true" qpr="true">
+
+    <tx tooltip="Wunden werden auf dem Überleitbogen auf Seite 2 Abschnitt 19 eingetragen. Ebenso wirken sich die Eintragunegn auf den Abschnitt 10 aus (Wundschmerz, Wunden)"/>
+    <label label="Du kannst zwar mehr als eine Stelle markieren, aber beschreibe nur *eine* Wunde pro Formular."
+           size="16" fontstyle="bold"/>
+    <bodyscheme name="bs1"/>
+
+    <checkbox name="bedsore" label="Diese Wunde ist ein Druckgeschwür (Dekubitus)"
+              tx="Wenn Du das hier markierst, wird das auch auf dem Überleitbogen auf Seite 1 Abschnitt 7 eingetragen."
+              enables="epuap" disables="daniel" lockedforchanges="true" default="true"/>
+    <combobox label="Kategorien nach EPUAP" name="epuap"
+              tooltip="Denk dran, dass auch im weiteren Heilungs-Verlauf die anfängliche Wund-Kategorie [b]nicht mehr geändert[/b] wird. Sie bleibt bis zur Epithalisierung bestehen. Ein Dekubitus entwickelt sich also nicht rückwärts."
+              lockedforchanges="true">
+        <item label="Kategorie I: Nicht wegdrückbare Rötung" name="d1"
+              tooltip="Nicht wegdrückbare, umschriebene Rötung bei intakter Haut, gewöhnlich über einem knöchernen Vorsprung. Bei dunkel pigmentierter Haut ist ein Verblassen möglicherweise nicht sichtbar, die Farbe kann sich aber von der umgebenden Haut unterscheiden. Der Bereich kann schmerzempfindlich, verhärtet, weich, wärmer oder kälter sein als das umgebende Gewebe. Diese Symptome können auf eine (Dekubitus-) Gefährdung hinweisen."/>
+        <item label="Kategorie II: Teilverlust der Haut" name="d2"
+              tooltip="Teilzerstörung der Haut (bis zur Dermis), die als flaches, offenes Ulcus mit einem rot bis rosafarbenen Wundbett ohne Beläge in Erscheinung tritt. Kann sich auch als intakte oder offene/rupturierte, serumgefüllte Blase darstellen. Manifestiert sich als glänzendes oder trockenes, flaches Ulcus ohne nekrotisches Gewebe oder Bluterguss10. Diese Kategorie sollte nicht benutzt werden um Skin Tears (Gewebezerreißungen), Verbands- oder pflasterbedingte Hautschädigungen, feuchtigkeitsbedingte Läsionen, Mazerationen oder Abschürfungen zu beschreiben."/>
+        <item label="Kategorie III: Verlust der Haut" name="d3"
+              tooltip="Zerstörung aller Hautschichten. Subkutanes Fett kann sichtbar sein, jedoch keine Knochen, Muskeln oder Sehnen. Es kann ein Belag vorliegen, der jedoch nicht die Tiefe der Gewebsschädigung verschleiert. Es können Tunnel oder Unterminierungen vorliegen. Die Tiefe des Dekubitus der Kategorie III variiert je nach anatomischer Lokalisation. Der Nasenrücken, das Ohr, der Hinterkopf und das Gehörknöchelchen haben kein subkutanes Gewebe, daher können Kategorie III Wunden dort auch sehr oberflächlich sein. Im Gegensatz dazu können an besonders adipösen Körperstellen extrem tiefe Kategorie III Wunden auftreten. Knochen und Sehnen sind nicht sichtbar oder tastbar."/>
+        <item label="Kategorie IV: vollständiger Haut oder Gewebeverlust" name="d4"
+              tooltip="Totaler Gewebsverlust mit freiliegenden Knochen, Sehnen oder Muskeln. Belag und Schorf können vorliegen. Tunnel oder Unterminierungen liegen oft vor. Die Tiefe des Kategorie IV Dekubitus hängt von der anatomischen Lokalisation ab. Der Nasenrücken, das Ohr, der Hinterkopf und der Knochenvorsprung am Fußknöchel haben kein subkutanes Gewebe, daher können Wunden dort auch sehr oberflächlich sein. Kategorie IV Wunden können sich in Muskeln oder unterstützende Strukturen ausbreiten (Fascien, Sehnen oder Gelenkkapseln) und können dabei leicht Osteomyelitis oder Ostitis verursachen. Knochen und Sehnen sind sichtbar oder tastbar."/>
+    </combobox>
+    <combobox label="Wund-Stadium nach Daniel" name="daniel" defaultdisabled="true">
+        <item label="Wunde ist abgeheilt" name="d0"/>
+        <item label="1. Grad Hautrötung" name="d1"/>
+        <item label="2. Grad Blasenbildung" name="d2"/>
+        <item label="3. Grad offener Hautdefekt" name="d3"/>
+        <item label="4. Grad Muskulatur sichtbar" name="d4"/>
+        <item label="5. Grad Knochen befallen" name="d5"/>
+    </combobox>
+
+    <label size="16" label="Denk dran abgeheilte Wunden abzuschliessen." fontstyle="bold"/>
+    <checkbox name="pain" label="Die Wunde schmerzt"/>
+    <label label="Die Schmerzintensität musst Du gesondert unter 'Schmerzeinschätzung' eintragen." size="16"
+           fontstyle="bold" layout="p"/>
+
+    <textfield name="laenge" label="Länge (cm)" layout="br tab" length="6" hfill="false"/>
+    <textfield name="breite" label="Breite (cm)" layout="tab" length="6" hfill="false"/>
+    <textfield name="tiefe" label="Tiefe (cm)" layout="tab" length="6" hfill="false"/>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundfläche" name="tg1">
+        <checkbox name="epi" label="Epithelisierung" layout="left"/>
+        <checkbox name="ggran" label="gute Granulation" layout="left"/>
+        <checkbox name="sgran" label="schlechte Granulation" layout="left"/>
+        <checkbox name="fibrin" label="Fibrinbelag" layout="left"/>
+        <checkbox name="fnekr" label="Feuchte Nekrose" layout="left"/>
+        <checkbox name="tnekr" label="Trockene Nekrose" layout="br"/>
+        <checkbox name="inseln" label="Wundheilungsinseln" layout="left"/>
+        <checkbox name="hyper" label="Hypergranulation" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundumgebung" name="tg2">
+        <checkbox name="rosig1" label="rosig" layout="left"/>
+        <checkbox name="rot1" label="rot" layout="left"/>
+        <checkbox name="blau1" label="bläulich verfärbt" layout="left"/>
+        <checkbox name="marz1" label="marzeriert" layout="left"/>
+        <checkbox name="verh1" label="verhärtet" layout="left"/>
+        <checkbox name="oedem1" label="Ödembildung" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundrand" name="tg3">
+        <checkbox name="rosig2" label="rosig" layout="left"/>
+        <checkbox name="rot2" label="rot" layout="left"/>
+        <checkbox name="glatt2" label="glatt" layout="left"/>
+        <checkbox name="geschw2" label="geschwollen" layout="left"/>
+        <checkbox name="marz2" label="marzeriert" layout="left"/>
+        <checkbox name="nekr2" label="Nekrose" layout="left"/>
+        <checkbox name="taschen2" label="Taschenbildung" layout="br left" enables="ttasche" default="false"/>
+        <textfield name="ttasche" default="0" label="Tiefe der Tasche (cm)" length="6" hfill="false" size="16"
+                   fontstyle="bold" defaultdisabled="true" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundexsudat" name="tg4">
+        <checkbox name="kein3" label="kein" layout="left"/>
+        <checkbox name="wenig3" label="wenig" layout="left"/>
+        <checkbox name="viel3" label="viel" layout="left"/>
+        <checkbox name="klar3" label="klar" layout="left"/>
+        <checkbox name="blut3" label="blutig" layout="left"/>
+        <checkbox name="eitr3" label="eitrig" layout="left"/>
+        <checkbox name="gruen3" label="grün" layout="left"/>
+        <checkbox name="braun3" label="braun" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundgeruch (vor VW)" name="tg5">
+        <checkbox name="unauf4" label="unauffällig" layout="left"/>
+        <checkbox name="leicht4" label="leicht" layout="left"/>
+        <checkbox name="uebel4" label="übelriechend" layout="left"/>
+        <checkbox name="suebel4" label="stark übelriechend" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundgeruch (während VW)" name="tg6">
+        <checkbox name="unauf5" label="unauffällig" layout="left"/>
+        <checkbox name="leicht5" label="leicht" layout="left"/>
+        <checkbox name="uebel5" label="übelriechend" layout="left"/>
+        <checkbox name="suebel5" label="stark übelriechend" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundgeruch (nach VW)" name="tg7">
+        <checkbox name="unauf6" label="unauffällig" layout="left"/>
+        <checkbox name="leicht6" label="leicht" layout="left"/>
+        <checkbox name="uebel6" label="übelriechend" layout="left"/>
+        <checkbox name="suebel6" label="stark übelriechend" layout="left"/>
+    </tabgroup>
+</resinfotype>

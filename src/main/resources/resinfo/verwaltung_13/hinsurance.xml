@@ -1,0 +1,17 @@
+<resinfotype>
+    <copyfromtemplate/>
+    <textfield label="Name" name="hiname" innerlayout="tab" tx="Wird als Krankenkasse auf allen Seiten eingetragen."/>
+    <textfield label="Strasse" name="histreet" innerlayout="tab"/>
+    <textfield label="PLZ" name="hizip" innerlayout="tab"/>
+    <textfield label="Ort" name="hicity" innerlayout="tab"/>
+    <textfield label="Tel" name="hitel" innerlayout="tab"/>
+    <textfield label="Fax" name="hifax" innerlayout="tab"/>
+    <textfield label="Zuständig" name="hicontact" innerlayout="tab"/>
+    <separator/>
+    <textfield label="Versicherten Nr." name="personno" innerlayout="tab"
+               tx="Steht als Versicherten-Nr. auf dem medizinischen Kurzbericht."/>
+    <textfield label="Krankenkassen Nr." name="insuranceno" innerlayout="tab"
+               tx="Steht als Kassen-Nr. auf dem medizinischen Kurzbericht."/>/>
+    <separator/>
+    <checkbox name="nocopayment" label="Befreit von der gesetzlichen Zuzahlung"/>
+</resinfotype>

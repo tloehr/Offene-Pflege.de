@@ -1,0 +1,21 @@
+<resinfotype bwinftyp="gewdoku1" sinceversion="13" abstract_type="164" equivalent="149" intervalmode="0"
+             infokurz="Kommentierung Körpergewicht" infolang="" category="4" tx="false" qpr="true">
+
+    <qdvs
+            tooltip="Zeile(n) 72 - 75 im DAS Dokumentationsbogen (Abschnitt &quot;Körpergewicht und Größe&quot;)"/>
+    <tabgroup size="18" fontstyle="bold"
+              label="Welche der aufgeführten Punkte trafen laut Pflegedokumentation für den Bewohner bzw. die Bewohnerin seit der letzten Ergebniserfassung zu?">
+        <checkbox label="Gewichtsverlust durch medikamentöse Ausschwemmung" name="1"/>
+        <checkbox label="Gewichtsverlust aufgrund ärztlich angeordneter oder ärztlich genehmigter Diät" name="2"
+                  layout="br left"/>
+        <checkbox label="Mindestens 10% Gewichtsverlust während eines Krankenhausaufenthalts" name="3"
+                  layout="br left"/>
+        <checkbox
+                label="Aktuelles Gewicht liegt nicht vor. BW wird aufgrund einer Entscheidung des Arztes oder der Angehörigen oder eines Betreuers nicht mehr gewogen"
+                name="4" layout="br left"/>
+        <checkbox
+                label="Aktuelles Gewicht liegt nicht vor. BW möchte nicht gewogen werden" name="5" layout="br left"/>
+    </tabgroup>
+
+
+</resinfotype>

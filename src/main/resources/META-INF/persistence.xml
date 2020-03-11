@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+    <persistence-unit name="OPDEPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>de.offene_pflege.entity.system.Acl</class>
+        <class>de.offene_pflege.entity.prescription.GP</class>
+        <class>de.offene_pflege.entity.values.ResValue</class>
+        <class>de.offene_pflege.entity.Allowance</class>
+        <class>de.offene_pflege.entity.info.LCustodian</class>
+        <class>de.offene_pflege.entity.info.Resident</class>
+        <class>de.offene_pflege.entity.nursingprocess.DFN</class>
+        <class>de.offene_pflege.entity.building.Homes</class>
+        <class>de.offene_pflege.entity.system.Groups</class>
+        <class>de.offene_pflege.entity.info.ICD</class>
+        <class>de.offene_pflege.entity.info.HInsurance</class>
+        <class>de.offene_pflege.entity.prescription.Hospital</class>
+        <class>de.offene_pflege.entity.nursingprocess.InterventionSchedule</class>
+        <class>de.offene_pflege.entity.nursingprocess.Intervention</class>
+        <class>de.offene_pflege.entity.reports.NR2User</class>
+        <class>de.offene_pflege.entity.reports.NReport</class>
+        <class>de.offene_pflege.entity.nursingprocess.NPControl</class>
+        <class>de.offene_pflege.entity.nursingprocess.NursingProcess</class>
+        <class>de.offene_pflege.entity.building.Rooms</class>
+        <class>de.offene_pflege.entity.building.Station</class>
+        <class>de.offene_pflege.entity.reports.Handover2User</class>
+        <class>de.offene_pflege.entity.reports.Handovers</class>
+        <class>de.offene_pflege.entity.system.Users</class>
+        <class>de.offene_pflege.entity.files.SYSFiles</class>
+        <class>de.offene_pflege.entity.files.SYSINF2FILE</class>
+        <class>de.offene_pflege.entity.files.SYSNR2FILE</class>
+        <class>de.offene_pflege.entity.files.SYSVAL2FILE</class>
+        <class>de.offene_pflege.entity.files.SYSPRE2FILE</class>
+        <class>de.offene_pflege.entity.files.SYSNP2FILE</class>
+        <class>de.offene_pflege.entity.info.ResInfo</class>
+        <class>de.offene_pflege.entity.info.ResInfoCategory</class>
+        <class>de.offene_pflege.entity.info.ResInfoType</class>
+        <class>de.offene_pflege.entity.system.SYSGROUPS2ACL</class>
+        <class>de.offene_pflege.entity.system.SYSLogin</class>
+        <class>de.offene_pflege.entity.system.SYSProps</class>
+        <class>de.offene_pflege.entity.system.Syslog</class>
+        <class>de.offene_pflege.entity.system.Unique</class>
+        <class>de.offene_pflege.entity.prescription.BHP</class>
+        <class>de.offene_pflege.entity.prescription.TradeForm</class>
+        <class>de.offene_pflege.entity.prescription.MedStock</class>
+        <class>de.offene_pflege.entity.prescription.MedStockTransaction</class>
+        <class>de.offene_pflege.entity.prescription.DosageForm</class>
+        <class>de.offene_pflege.entity.prescription.ACME</class>
+        <class>de.offene_pflege.entity.prescription.MedPackage</class>
+        <class>de.offene_pflege.entity.prescription.MedProducts</class>
+        <class>de.offene_pflege.entity.prescription.MedInventory</class>
+        <class>de.offene_pflege.entity.prescription.Situations</class>
+        <class>de.offene_pflege.entity.prescription.Prescription</class>
+        <class>de.offene_pflege.entity.prescription.PrescriptionSchedule</class>
+        <class>de.offene_pflege.entity.process.SYSINF2PROCESS</class>
+        <class>de.offene_pflege.entity.process.SYSVAL2PROCESS</class>
+        <class>de.offene_pflege.entity.process.SYSNR2PROCESS</class>
+        <class>de.offene_pflege.entity.process.SYSNP2PROCESS</class>
+        <class>de.offene_pflege.entity.process.SYSPRE2PROCESS</class>
+        <class>de.offene_pflege.entity.process.PReport</class>
+        <class>de.offene_pflege.entity.process.PCat</class>
+        <class>de.offene_pflege.entity.process.QProcess</class>
+        <class>de.offene_pflege.entity.values.ResValueTypes</class>
+        <class>de.offene_pflege.entity.files.User2File</class>
+        <class>de.offene_pflege.entity.files.Resident2File</class>
+        <class>de.offene_pflege.entity.system.Commontags</class>
+        <class>de.offene_pflege.entity.building.Floors</class>
+        <class>de.offene_pflege.entity.QdvsLaufend</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0001:3320/opde"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+        </properties>
+    </persistence-unit>
+</persistence>

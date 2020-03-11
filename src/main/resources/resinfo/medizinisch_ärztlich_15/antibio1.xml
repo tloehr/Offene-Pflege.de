@@ -1,0 +1,45 @@
+<resinfotype>
+    <optiongroup name="application" label="Anwendung"
+                 tooltip="wird verwendet zur Prävalenzmessung im Rahmen des MRE-Siegels">
+        <option label="lokal" name="local"/>
+        <option label="systemisch" name="systemic" default="true"/>
+    </optiongroup>
+
+    <optiongroup name="treatment" label="Art der Behandlung">
+        <option label="prophylaktisch" name="prophylactic"/>
+        <option label="therapeutisch" name="therapeutic" default="true"/>
+    </optiongroup>
+
+    <tabgroup label="Antibiotikagabe wegen Infektion" name="reason">
+        <checkbox name="inf.urethra" label="Harnwege" layout="br"/>
+        <checkbox name="inf.skin.wound" label="Haut- oder Wunden"/>
+        <checkbox name="inf.respiratoric" label="Atemwege"/>
+        <checkbox name="inf.digestive" label="Magen-Darmtrakt" layout="br"/>
+        <checkbox name="inf.eyes" label="Augen"/>
+        <checkbox name="inf.ear.nose.mouth" label="Ohren/Nase/Mund"/>
+        <checkbox name="inf.systemic" label="systemische Infektion" layout="br"/>
+        <checkbox name="inf.fever" label="unerklärbares Fieber"/>
+    </tabgroup>
+    <textfield name="inf.other" label="andere Gründe" length="10" optional="true" hfill="false"/>
+
+    <combobox label="Wo wurde die Therapie begonnen" name="therapy.start">
+        <item label="Einrichtung" name="here"/>
+        <item label="Krankenhaus" name="hospital"/>
+        <item label="anderer Ort" name="other"/>
+    </combobox>
+
+    <combobox label="Wer hat das Mittel verschrieben" name="prescription.by">
+        <item label="Hausarzt" name="gp"/>
+        <item label="Facharzt" name="specialist"/>
+        <item label="Notarzt" name="emergency"/>
+    </combobox>
+
+    <tabgroup label="Sonstige Angaben" name="sonst">
+        <checkbox name="diag.urinetest" label="Urintest vor Therapie durchgeführt" layout="br"/>
+        <checkbox name="diag.microbiology" label="Mikrobiologische Diagnostik vor der Therapie"/>
+        <textfield name="diag.result" label="isolierter Erreger" length="30" optional="true" hfill="false"/>
+        <textfield name="diag.resistent" label="Antibiotikaresistenz" length="30" optional="true" hfill="false"/>
+    </tabgroup>
+    <url label="Nach: 'Bewohner B - Bewohner Fragebogen' (mre-netz regio rhein-ahr, siehe OPDE Quellen EXNER01)"
+         link="https://www.offene-pflege.de/de/sources-de"/>
+</resinfotype>

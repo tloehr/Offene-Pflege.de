@@ -1,0 +1,64 @@
+<!--
+Cat: 2 (Ausscheidungen)
+BWINFTYP: HINKO
+Harn-Inkontinenz (Tag)
+20.06.2013
+since-db-version: 
+_deprecated-since:
+replaces: 
+replaced-by: 
+equivalence-id: 0
+MODE_INTERVAL_BYSECOND = 0
+TYPE_INCO_PROFILE_DAY = 113
+-->
+<!-- ==================Harninkontinenz================== -->
+<label size="16" label="Einschätzung der Harninkontinenz" name="l0" color="blue"/>
+<tx tooltip="Sobald das Inkontinenzprofil nicht mehr auf 'Kontinenz' steht, wird im Überleitbogen die Markierung für 'Harninkontinenz' gesetzt."/>
+<combobox label="Inkontinenzprofil" name="inkoprofil" >
+<item label="Kontinenz" name="kontinenz"/>
+<item label="Unabhängig erreichte Kontinenz" name="uek"/>
+<item label="Abhängig erreichte Kontinenz" name="aek"/>
+<item label="Unabhängig kompensierte Inkontinenz" name="uki"/>
+<item label="Abhängig kompensierte Inkontinenz" name="aki"/>
+<item label="Nicht kompensierte Inkontinenz" name="nki"/>
+</combobox>
+<!-- ==================Risikofaktoren================== -->
+<label size="12" fontstyle="bold" label="Kognitive Einschränkung"/>
+<checkbox name="kogn1" label="Abnahme geistiger Leistungsfähigkeit"/>
+<checkbox name="kogn2" label="BewohnerIn bemerkt den Harndrang nicht" layout="left"/>
+<checkbox name="kogn3" label="BewohnerIn findet die Toilette nicht" layout="br"/>
+<checkbox name="kogn4" label="BewohnerIn hat Angst oder schämt sich bzgl. der Inkontinenz" layout="left"/>
+
+<label size="12" fontstyle="bold" label="Körperliche Einschränkung"/>
+<checkbox name="koerp1" label="BW schafft es nicht alleine auf die Toilette"/>
+<checkbox name="koerp2" label="BW ist gangunsicher" layout="left"/>
+<checkbox name="koerp3" label="hat Schwierigkeiten das Gleichgewicht zu halten" layout="left"/>
+<checkbox name="koerp4" label="Muskelkraft fehlt" layout="br"/>
+<checkbox name="koerp5" label="Flexibilität des Körpers fehlt" layout="left"/>
+<checkbox name="koerp6" label="Fingerfertigkeit fehlt" tooltip="z.B. fehlt dem BW die Fähigkeit die Hose oder den Rock aufzuknöpfen." layout="left"/>
+<checkbox name="koerp7" label="BW sieht schlecht" layout="left"/>
+<checkbox name="koerp8" label="BW ist immobil" layout="br"/>
+
+<label size="12" fontstyle="bold" label="Erkrankungen"/>
+<checkbox name="erk1" label="Schlaganfall"/>
+<checkbox name="erk2" label="MS" layout="left"/>
+<checkbox name="erk3" label="Parkinson" layout="left"/>
+<checkbox name="erk4" label="Demenz" layout="left"/>
+<checkbox name="erk5" label="Diabetes Mellitus" layout="left"/>
+<checkbox name="erk6" label="Herzinsuffizienz" layout="left"/>
+
+<label size="12" fontstyle="bold" label="Medikamente" tooltip="Erhält der BW Medikamente, welche die Inkontinenz fördern ?"/>
+<checkbox name="med1" label="Diuretika"/>
+<checkbox name="med2" label="Anticholinergika" layout="left"/>
+<checkbox name="med3" label="Antihistaminika"  layout="left"/>
+<checkbox name="med4" label="Antidepressiva" layout="left"/>
+<checkbox name="med5" label="Neuroleptika" layout="left"/>
+<checkbox name="med6" label="Kalziumantagonisten" layout="br"/>
+<checkbox name="med7" label="Opiate" layout="left"/>
+
+<label size="12" fontstyle="bold" label="Besonderheiten"/>
+<checkbox name="bes1" label="Harnwegsinfekt" tooltip="Bitte Ausschluss mittels Urinanalyse wenn nötig"/>
+<checkbox name="bes2" label="Obstipation (bei Frauen)" layout="left"/>
+<checkbox name="bes3" label="Beckbodenschwäche (bei Frauen) z.B. bei Adipositas"  layout="left"/>
+<checkbox name="bes4" label="Östrogenmangel (bei Frauen)" layout="br"/>
+<checkbox name="bes5" label="Veränderungen der Prostata (bei Männern)" layout="left"/>

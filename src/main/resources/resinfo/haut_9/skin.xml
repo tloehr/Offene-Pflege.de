@@ -1,0 +1,9 @@
+<resinfotype>
+    <tabgroup label="Hautbeschaffenheit" name="skin" tx="Seite 1, Abschnitt 3">
+        <checkbox name="skin.normal" label="intakt"/>
+        <checkbox name="skin.dry" label="trocken"/>
+        <checkbox name="skin.greasy" label="fettig"/>
+        <checkbox name="skin.itch" label="Juckreiz"/>
+    </tabgroup>
+    <textfield label="Sonstiges" name="skin.other"/>
+</resinfotype>

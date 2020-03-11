@@ -1,0 +1,5 @@
+<resinfotype>
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 19."/>
+    <textfield name="mycosistext" label="Beschreibe die Art der Infektion" innerlayout="br" layout="br tab"/>
+    <bodyscheme name="bs1"/>
+</resinfotype>

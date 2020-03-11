@@ -1,0 +1,15 @@
+
+<!-- Protokoll einer Fixierung-Massnahme -->
+<tabgroup label="Grund der Fixierung" name="tab1">
+<checkbox name="eigen" label="Eigengefährung"/>
+<checkbox name="fremd" label="Fremdgefährdung"/>
+<checkbox name="agg" label="Aggression" layout="br tab"/>
+<checkbox name="path" label="pathologische Unruhe"/>
+</tabgroup>
+<tabgroup label="Art der Fixierung" name="tab2">
+<checkbox name="leibg" label="Leibgurt"/>
+<checkbox name="bettg" label="Bettgitter"/>
+<checkbox name="sitzg" label="Sitzgurt" layout="br tab"/>
+<checkbox name="sonst" label="Sonstiges" tooltip="Bitte in der Bemerkung beschreiben."/>
+</tabgroup>
+<checkbox name="einwill" label="Einwillung des BW liegt vor" tooltip="Unterschreiben lassen und anhängen." layout="br"/>

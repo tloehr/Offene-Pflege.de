@@ -1,0 +1,5 @@
+<resinfotype>
+    <textfield label="Gültig bis" name="validthru" type="date" onlyinfuture="true"/>
+    <checkbox name="send" label="Mit ans Krankenhaus senden, bei Einweisung"/>
+    <label size="16" label="Denk dran, dass Du die Verfügung scannen und hier anhängen musst."/>
+</resinfotype>

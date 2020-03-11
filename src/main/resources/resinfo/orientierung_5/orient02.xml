@@ -1,0 +1,117 @@
+<resinfotype bwinftyp="orient2" sinceversion="13" abstract_type="132" equivalent="20" intervalmode="0"
+             infokurz="Demenz und Orientierung" infolang="" category="5" tx="true" qpr="true">
+
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
+    <optiongroup name="type_of_dementia" label="Form der Demenz" size="18">
+        <option label="Nicht dement" name="none" default="true"/>
+        <option label="Primäre Demenz" name="primary"
+                tooltip="Bei einer primären Demenz liegen neurodegenerative oder vaskuläre Veränderungen vor. Es wird unterschieden, ob die Nervenzellen des Gehirns degenerieren, also ohne äußerlich erkennbare Ursache untergehen (wie bei der Alzheimer-Krankheit), oder ob sie z.B. wegen Durchblutungsstörungen schwere Schäden erlitten haben (diese Form wird als vaskulärer Demenztyp bezeichnet)."/>
+        <option label="Sekundäre Demenz"
+                tooltip="Hier ist der geistige Verfall die Folge einer anderen organischen Erkrankung wie einer Hirnverletzung, einer Hirngeschwulst oder einer Herz-Kreislauf-Krankheit; auch Arzneistoffe und Gifte wie Alkohol (Korsakow- Syndrom) oder andere Drogen können dazu führen. Wenn die Grunderkrankung wirksam behandelt wird, Giftstoffe das Gehirn nicht mehr belasten oder Verletzungen geheilt sind, normalisiert sich meist die geistige Leistungsfähigkeit. Oder es ist ein Stillstand des Leidens zu erreichen."
+                name="secondary"/>
+    </optiongroup>
+
+    <tabgroup size="12" label="Welche Tests wurden durchgeführt ?" name="tab1">
+        <checkbox name="cct" label="Uhrentest (Clock Completion Test)"/>
+        <checkbox name="demtect" label="DemTect" layout="left"/>
+        <checkbox name="tfdd" label="TFDD" tooltip="TFDD - Test zu Früherkennung von Demenzen mit Depressionsabgrenzung"
+                  layout="left"/>
+        <label fontstyle="bold" label="Bitte ausgefüllte Tests an diese Info anhängen."/>
+    </tabgroup>
+
+    <optiongroup name="runaway" label="Weglauftendenz"><option label="ja" name="1" default="true"/> <option
+            label="nein" name="2"/><option label="zeitweise" name="3"/></optiongroup>
+
+    <separator/>
+
+    <optiongroup name="KKFERKENNEN" size="18" label="Erkennen von Personen aus dem näheren Umfeld"
+                 tooltip="bi2.personen.erklaerung" qdvs="Zeile(n) 30 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.personen.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.personen.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.personen.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.personen.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"
+                 qdvs="Zeile(n) 31 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.orte.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.orte.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.orte.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.orte.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFORIENTZEITLICH" size="18" label="Zeitliche Orientierung" tooltip="bi2.zeitlich.erklaerung"
+                 qdvs="Zeile(n) 32 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.zeitlich.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.zeitlich.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.zeitlich.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.zeitlich.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFERINNERN" size="18" label="Sich Erinnern" tooltip="bi2.erinnern.erklaerung"
+                 qdvs="Zeile(n) 33 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.erinnern.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.erinnern.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.erinnern.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.erinnern.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFHANDLUNGEN" size="18" label="Steuern von mehrschrittigen Alltagshandlungen"
+                 tooltip="bi2.handlungen.erklaerung" qdvs="Zeile(n) 34 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.handlungen.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.handlungen.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.handlungen.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.handlungen.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFENTSCHEIDUNGEN" size="18" label="Treffen von Entscheidungen im Alltagsleben"
+                 tooltip="bi2.entscheidungen.erklaerung" qdvs="Zeile(n) 35 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.entscheidungen.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.entscheidungen.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.entscheidungen.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.entscheidungen.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFVERSTEHENINFO" size="18" label="Verstehen von Sachverhalten und Informationen"
+                 tooltip="bi2.verstehen.erklaerung" qdvs="Zeile(n) 36 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.verstehen.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.verstehen.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.verstehen.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.verstehen.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFGEFAHRERKENNEN" size="18" label="Erkennen von Risiken und Gefahren"
+                 tooltip="bi2.risiken.erklaerung"
+                 qdvs="Zeile(n) 37 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.risiken.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.risiken.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.risiken.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.risiken.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFMITTEILEN" size="18" label="Mitteilen von elementaren Bedürfnissen"
+                 tooltip="bi2.beduerfnissen.erklaerung" qi="Zeile 39">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.beduerfnissen.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.beduerfnissen.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.beduerfnissen.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.beduerfnissen.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFVERSTEHENAUF" size="18" label="Verstehen von Aufforderungen"
+                 tooltip="bi2.aufforderungen.erklaerung" qdvs="Zeile(n) 39 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.aufforderungen.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.aufforderungen.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.aufforderungen.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.aufforderungen.selbst3"/>
+    </optiongroup>
+
+    <optiongroup name="KKFBETEILIGUNG" size="18" label="Beteiligung an einem Gespräch"
+                 tooltip="bi2.gespraech.erklaerung"
+                 qdvs="Zeile(n) 40 im DAS Dokumentationsbogen.">
+        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.gespraech.selbst0"/>
+        <option label="größtenteils vorhanden" name="1" tooltip="bi2.gespraech.selbst1"/>
+        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.gespraech.selbst2"/>
+        <option label="nicht vorhanden" name="3" tooltip="bi2.gespraech.selbst3"/>
+    </optiongroup>
+
+</resinfotype>

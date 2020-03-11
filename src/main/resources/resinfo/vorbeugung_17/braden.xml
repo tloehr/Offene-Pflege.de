@@ -1,0 +1,112 @@
+<resinfotype bwinftyp="braden" sinceversion="1" category="17" abstract_type="116" equivalent="0" intervalmode="0"
+             infokurz="Braden-Skala" infolang="" tx="true" qpr="false">
+
+    <tx tooltip="Die jeweils aktuelle Risikoermittlung wird, sofern ein Risiko besteht, auf dem Überleitbogen auf Seite 1 Abschnitt 7 vermerkt."/>
+    <scale name="braden" label="Dekubitus Risiko-Wert">
+        <scalegroup name="braden1" label="Sensorisches Empfindungsvermögen"
+                    tooltip="Das ist die Fähigkeit des Bewohners  auf druckbedingte Beschwerden lindernd  zu reagieren.">
+            <option label="fehlt" name="fehlt"
+                    tooltip="[ul][li]keine Reaktion auf schmerzhafte Reize. Mögliche Gründe: Bewusstlosigkeit, Sedierung[/li][li]Störung der Schmerzempfindung durch Lähmung, die den größten Teil des Körpers betreffen (z.B. hoher Querschnitt)[/li][/ul]"
+                    score="1" layout="tab"/>
+            <option label="stark eingeschränkt" name="se" tooltip="[ul]
+[li]eine Reaktion erfolgt nur auf starke Schmerzreize[/li]
+[li]Beschwerden können kaum geäußert werden (z.B. nur durch Stöhnen oder Unruhe)[/li]
+[li]Störung der Schmerzempfindung durch Lähmung, wovon die Hälfte des Körpers betroffen ist[/li][/ul]" score="2"/>
+            <option label="leicht eingeschränkt" name="le"
+                    tooltip="[ul][li]Reaktion auf Ansprache oder Kommandos[/li][li]Beschwerden können aber nicht immer ausgedrückt werden (z.B. dass die Position geändert werden soll)[/li][li]Störung der Schmerzempfindung durch Lähmung, wovon eine oder zwei Extremitäten betroffen sind[/li][/ul]"
+                    score="3" layout="tab"/>
+            <option label="vorhanden" name="vorhanden" score="4"
+                    tooltip="[ul][li]Reaktion auf Ansprache, Beschwerden können geäußert werden[/li][li]keine Störung der Schmerzempfindung[/li][/ul]"
+                    default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="braden2" label="Feuchtigkeit" tooltip="Ausmaß, in dem die Haut Feuchtigkeit ausgesetzt ist.">
+            <option label="ständig feucht" name="staendig"
+                    tooltip="[ul][li]die Haut ist ständig feucht durch Urin, Schweiß oder Kot[/li][li]immer, wenn der Patient gedreht wird, liegt er im Nassen[/li][/ul]"
+                    score="1" layout="tab"/>
+            <option label="oft feucht" name="oft"
+                    tooltip="[ul][li]die Haut ist oft feucht, aber nicht immer[/li][li]Bettzeug oder Wäsche muss mindestens einmal pro Schicht gewechselt werden[/li][/ul]"
+                    score="2" layout="tab"/>
+            <option label="manchmal feucht" name="manchmal"
+                    tooltip="[ul][li]die Haut ist manchmal feucht, und etwa einmal pro Tag wird neue Wäsche benötigt[/li][/ul]"
+                    score="3" layout="tab"/>
+            <option label="selten feucht" name="selten"
+                    tooltip="[ul][li]die Haut ist meist trocken[/li][li]neue Wäsche wird selten benötigt[/li][/ul]"
+                    score="4" default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="braden3" label="Aktivitäten" tooltip="Ausmaß der physischen Aktivität.">
+            <option label="bettlägerig" name="bettlaegerig" tooltip="ans Bett gebunden" score="1" layout="tab"/>
+            <option label="sitzt auf" name="sitzt"
+                    tooltip="[ul][li]kann mit Hilfe etwas laufen[/li][li]kann das eigene Gewicht nicht allein tragen[/li][li]braucht Hilfe, um aufzusitzen (Bett, Stuhl, Rollstuhl)[/li][/ul]"
+                    score="2" layout="tab"/>
+            <option label="geht wenig" name="wenig"
+                    tooltip="[ul][li]geht am Tag allein, aber selten und nur kurze Distanzen[/li][li]braucht für längere Strecken Hilfe[/li][li]verbringt die meiste Zeit im Bett oder im Stuhl[/li][/ul]"
+                    score="3" layout="tab"/>
+            <option label="geht regelmäßig" name="regelm"
+                    tooltip="[ul][li]geht regelmäßig 2- bis 3-mal pro Schicht[/li][li]bewegt sich regelmäßig[/li][/ul]"
+                    score="4" default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="braden4" label="Mobilität"
+                    tooltip="Fähigkeit des Bewohners, die Position alleine zu wechseln und zu halten.">
+            <option label="komplett immobil" name="komplett"
+                    tooltip="kann auch keinen geringfügigen Positionswechsel ohne Hilfe ausführen" score="1"
+                    layout="tab"/>
+            <option label="Mobilität stark eingeschränkt" name="se"
+                    tooltip="[ul][li]bewegt sich manchmal geringfügig (Körper oder Extremitäten)[/li][li]kann sich aber nicht regelmäßig allein ausreichend umlagern[/li][/ul]"
+                    score="2" layout="tab"/>
+            <option label="Mobilität gering eingeschränkt" name="ge"
+                    tooltip="macht regelmäßig kleine Positionswechsel des Körpers und der Extremitäten" score="3"
+                    layout="tab"/>
+            <option label="mobil" name="mobil" tooltip="kann allein seine Position umfassend verändern" score="4"
+                    default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="braden5" label="Ernährung" tooltip="Ernährungsgewohnheiten">
+            <option label="sehr schlechte Ernährung" name="schlecht"
+                    tooltip="[ul][li] isst kleine Portionen nie auf, sondern etwa nur 2/3[/li][li]isst nur 2 oder weniger Eiweißportionen (Milchprodukte, Fisch, Fleisch)[/li][li]trinkt zu wenig[/li][li]nimmt keine Ergänzungskost zu sich[/li][li]darf oral keine Kost zu sich nehmen[/li][li]nur klare Flüssigkeiten[/li][li]erhält Infusionen länger als 5 Tage[/li][/ul]"
+                    score="1" layout="tab"/>
+            <option label="mäßige Ernährung" name="maessig"
+                    tooltip="[ul][li]isst selten eine normale Essensportion auf, isst aber im Allgemeinen etwa die Hälfte der angebotenen Nahrung[/li][li]isst etwa 3 Eiweißportionen (Milchprodukte, Fisch, Fleisch)[/li][li]nimmt unregelmäßig Ergänzungskost zu sich[/li][li]erhält zu wenig Nährstoffe über Sondenkost oder Infusionen[/li][/ul]"
+                    score="2" layout="tab"/>
+            <option label="adäquate Ernährung" name="adaequat"
+                    tooltip="[ul][li]isst mehr als die Hälfte der normalen Essensportionen[/li][li]nimmt 4 Eiweißportionen (Milchprodukte, Fisch, Fleisch) zu sich[/li][li]verweigert gelegentlich eine Mahlzeit, nimmt aber Ergänzungskost zu sich[/li][li]kann über Sonde oder Infusion die meisten Nährstoffe zu sich nehmen[/li][/ul]"
+                    score="3" layout="tab"/>
+            <option label="gute Ernährung" name="gut"
+                    tooltip="[ul][li]isst immer die gebotenen Mahlzeiten auf[/li][li]nimmt 4 oder mehr Eiweißportionen (Milchprodukte, Fisch, Fleisch) zu sich[/li][li]isst auch manchmal zwischen den Mahlzeiten[/li][li]braucht keine Ergänzungskost[/li][/ul]"
+                    score="4" default="true" layout="tab"/>
+        </scalegroup>
+        <scalegroup name="braden6" label="Reibung und Scherkräfte">
+            <option label="Problem" name="problem"
+                    tooltip="[ul][li]braucht viel bis massive Unterstützung bei Lagewechsel[/li][li]Anheben ist ohne Schleifen über die Laken nicht möglich[/li][li]rutscht ständig im Bett oder im (Roll-)Stuhl herunter, muss immer wieder hochgezogen werden[/li][li]hat spastische Kontrakturen[/li][li]ist sehr unruhig (scheuert auf dem Laken)[/li][/ul]"
+                    score="1" layout="tab"/>
+            <option label="potenzielles Problem" name="potenziell"
+                    tooltip="[ul][li]bewegt sich etwas allein oder braucht wenig Hilfe[/li][li]beim Hochziehen schleift die Haut nur wenig über die Laken (kann sich etwas anheben)[/li][li]kann sich über längere Zeit in einer Lage halten (Stuhl, Rollstuhl)[/li][li]rutscht nur selten herunter[/li][/ul]"
+                    score="2" layout="tab"/>
+            <option label="kein Problem zurzeit" name="kein"
+                    tooltip="[ul][li]bewegt sich in Bett und Stuhl allein[/li][li]hat genügend Kraft, sich anzuheben[/li][li]kann eine Position über lange Zeit halten, ohne herunterzurutschen[/li][/ul]"
+                    score="3" layout="tab" default="true"/>
+        </scalegroup>
+        <risk from="20" to="23" label="niedrig" color="dark_green" rating="0"/>
+        <risk from="16" to="19" label="mittel" color="blue" rating="1"/>
+        <risk from="11" to="15" label="hoch" color="dark_orange" rating="2"/>
+        <risk from="6" to="10" label="sehr hoch" color="dark_red" rating="3"/>
+    </scale>
+
+    <separator/>
+    <tabgroup size="14" fontstyle="bold" label="extrinsische Faktoren" name="extrinsic">
+        <checkbox name="meds" label="Medikamente" layout="left"/>
+        <checkbox name="hygiene" label="Körperhygiene" layout="left"/>
+        <checkbox name="moisture" label="Feuchtigkeit" layout="br"/>
+        <checkbox name="friction" label="Reibung und Scherkräfte" layout="left"/>
+    </tabgroup>
+    <tabgroup size="14" fontstyle="bold" label="intrinsische Faktoren" name="intrinsic">
+        <checkbox name="age" label="Alter" layout="left"/>
+        <checkbox name="dehydration" label="Exsikose" layout="left"/>
+        <checkbox name="mobility" label="Reduzierte Mobilität" layout="left"/>
+        <checkbox name="weight" label="Gewicht" layout="br"/>
+        <checkbox name="metabolic" label="Stoffwechselerkrankung" layout="left"/>
+        <checkbox name="neuro" label="neurologische Erkrankung" layout="left"/>
+        <checkbox name="sensibility" label="Sensibilitätsstörungen" layout="left"/>
+        <checkbox name="malnutrition" label="Mangelernährung" layout="br"/>
+        <checkbox name="incontinence" label="Inkontinenz" layout="left"/>
+        <checkbox name="infection" label="Infektion" layout="left"/>
+    </tabgroup>
+</resinfotype>

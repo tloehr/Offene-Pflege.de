@@ -1,0 +1,6 @@
+<resinfotype bwinftyp="apoplex01" sinceversion="13" category="15" abstract_type="158" equivalent="0"
+             intervalmode="3" infokurz="Schlaganfall" infolang="" tx="true" qpr="true">
+
+    <datefield label="Datum" name="datum" qdvs="Zeilen 9 und 10"/>
+
+</resinfotype>

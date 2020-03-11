@@ -1,0 +1,58 @@
+<resinfotype>
+    <label size="16" label="Gründe für eine geringe Flüssigkeitsmenge" tooltip="warum trinkt der BW so wenig ?"
+           fontstyle="bold"/>
+    <tabgroup size="12" label="Körperlich oder geistig bedingte Beeinträchtigungen" name="tab1">
+        <checkbox layout="br" name="c1a" label="Kognitive Überforderung"
+                  tooltip="z.B. durch Demenzerkrankung; weiß nichts mit Getränk anzufangen, vergisst zu schlucken"/>
+        <checkbox layout="left" name="c1c" label="Schluckstörungen"
+                  tooltip="z.B. verschluckt sich leicht, hustet oft beim Trinken, vermeidet bestimmte Konsistenz"/>
+        <checkbox layout="br" name="c1b" label="Funktionseinschränkungen der Arme und Hände"
+                  tooltip="z.B. Erreichbarkeit von Getränken, kann Tasse/Becher nicht greifen"/>
+        <checkbox layout="left" name="c1d" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Fehlende Lust zum Trinken" name="tab2">
+        <checkbox layout="br" name="c2a" label="Schmerzen"/>
+        <checkbox layout="left" name="c2d"
+                  label="Keine ausreichenden Informationen über Getränke und Ihre Zusammensetzung"/>
+        <checkbox layout="br" name="c2b" label="Resuziertes Durstgefühl"/>
+        <checkbox layout="left" name="c2c" label="Wunsch nach geringer Urinausscheidung"
+                  tooltip="z.B. Angst vor Inkontinenz, häufige Toiiettengänge)"/>
+        <checkbox layout="br" name="c2e" label="Kulturelle, religiöse Gründe, Gewohnheiten"/>
+        <checkbox layout="left" name="c2f" label="Angst vor Unverträglichkeiten oder Allergien"/>
+        <checkbox layout="br" name="c2g" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Umgebungsfaktoren" name="tab3">
+        <checkbox layout="br" name="c3a" label="Hilfsmittelangebot"/>
+        <checkbox layout="left" name="c3b" label="Beziehung zu den Versorgungspersonen"/>
+        <checkbox layout="left" name="c3c" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Trinkangebot" name="tab4">
+        <checkbox layout="br" name="c4a" label="Allgemeine Unzufriedenheit"
+                  tooltip="z.B. nicht beachtete Gewohnheiten, kulturelle Bedürfnisse, Art der Getränke, Menge, Geschmack, Temperatur, Aussehen"/>
+        <checkbox layout="left" name="c4b" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Starkes Schwitzen" name="tab5">
+        <checkbox layout="br" name="c5a" label="Hitze" tooltip="z.B. stark geheizte Räume, Sommerhitze"/>
+        <checkbox layout="left" name="c5b" label="Unzweckmäßige Kleidung"/>
+        <checkbox layout="left" name="c5c" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <tabgroup size="12" label="Krankheitsbedingter Flüssigkeitsverlust" name="tab6">
+        <checkbox layout="br" name="c6a" label="Fieber" tooltip="z.B. stark geheizte Räume, Sommerhitze"/>
+        <checkbox layout="left" name="c6b" label="Starkes Erbrechen"/>
+        <checkbox layout="left" name="c6c" label="Blutverlust"/>
+        <checkbox layout="left" name="c6d" label="Anhaltende Durchfälle (Häufigkeit)"/>
+        <checkbox layout="br" name="c6e" label="Medikamente zur Entwässerung oder zum Abführen"/>
+        <checkbox layout="left" name="c6f" label="Andere Gründe/Ursachen"/>
+    </tabgroup>
+
+    <label size="10" color="blue"
+           label="Instrument des Projektverbundes Institut für Pflegewissenschaft, Universität Witten/Herdecke"/>
+    <label size="10" color="blue" label="und"/>
+    <label size="10" color="blue"
+           label="Institut für Ernährungs- und Lebensmittelwissenschaften, Universität Bonn, 2008"/>
+</resinfotype>

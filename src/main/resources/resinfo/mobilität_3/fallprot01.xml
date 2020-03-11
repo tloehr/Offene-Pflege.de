@@ -1,0 +1,93 @@
+<resinfotype bwinftyp="fallprot01" sinceversion="7" category="3" abstract_type="30" equivalent="0" intervalmode="3"
+             infokurz="Sturzprotokoll" infolang="" tx="false" qpr="true">
+    <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+           label="1. Grundlegende Angaben"/>
+
+    <tabgroup size="16" label="Datum und Uhrzeit des Sturzes" name="date1">
+        <textfield label="Datum" length="12" name="falldate" type="date" preset="currentdate"/>
+        <textfield label="Uhrzeit" length="12" name="falltime" type="time" layout="left" preset="currenttime"/>
+    </tabgroup>
+    <tabgroup size="16"
+              label="letzter Zeitpunkt, wann die Person vor dem Sturz gesehen wurde."
+              name="date2">
+        <textfield label="Datum" length="12" name="b4falldate" type="date" preset="currentdate"/>
+        <textfield label="Uhrzeit" length="12" name="b4falltime" type="time" layout="left" preset="currenttime"/>
+        <textfield name="textb4fall" label="Aktivitäten des Bewohners unmittelbar vor dem Sturz" innerlayout="br"
+                   hfill="false"/>
+    </tabgroup>
+
+    <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+           label="2. Beschreibung des Sturzereignisses"/>
+    <optiongroup label="Sturzort" name="sturzort">
+        <option label="BW-Zimmer" name="room" default="true"/>
+        <option label="BW Badezimmer" name="bathroom"/>
+        <option label="Gemeinschafts-Badezimmer" name="commbathroom"/>
+        <option label="Flur" name="hallway"/>
+        <option label="Gemeinschaftsraum" name="livingroom" layout="br"/>
+        <option label="Außerhalb des Hauses" name="outside"/>
+        <option label="Sonstiges (siehe unten)" name="other1"/>
+    </optiongroup>
+    <textfield name="othertext1" label="Sonstiges oder Erläuterung" hfill="false"/>
+
+    <optiongroup label="Körperstellung unmittelbar vor dem Sturz" name="b4fall">
+        <option label="Liegen" name="lying"/>
+        <option label="Sitzen" name="sitting"/>
+        <option label="Aufstehen/Hinsetzen vom/aufs Bett" name="getupsitdown1"/>
+        <option label="Aufstehen/Hinsetzen vom/auf Sessel/Stuhl" name="getupsitdown2" layout="br"/>
+        <option label="Aufstehen/Hinsetzen vom/auf Rollstuhl" name="getupsitdown3"/>
+        <option label="Aufstehen/Hinsetzen vom/auf Toilettenstuhl" name="getupsitdown4" layout="br"/>
+        <option label="Aufstehen/Hinsetzen (andere, bitte unten beschreiben)" name="getupsitdown5"/>
+        <option label="Stehen" name="standing" layout="br"/>
+        <option label="Gehen" name="walking" default="true"/>
+    </optiongroup>
+    <textfield name="othertext2" label="Andere" hfill="false"/>
+
+    <optiongroup label="Hilfsmittel" name="aux">
+        <option label="keine Hilfsmittel" name="none" default="true"/>
+        <option label="einseitige Gehhilfe" name="onesided"/>
+        <option label="beidseitige Gehhilfe" name="twosided"/>
+        <option label="Handstock" name="cane" layout="br"/>
+        <option label="Rollator" name="rollator"/>
+        <option label="Gehwagen (KG)" name="walker"/>
+        <option label="Andere, bitte unten beschreiben" name="other3"/>
+    </optiongroup>
+    <textfield name="othertext3" label="Andere" hfill="false"/>
+
+    <optiongroup label="Hindernisse/Umgebungsfaktoren" name="evironment"
+                 tooltip="Bedingungen, die durch die Umgebung vorgegeben sind, beeinflussen in ganz erheblichem Maße die Sturzgefährdung. Gerade im Begründungszusammenhang, warum es zu einem Sturzereignis gekommen ist, sollten Aspekte, die im Sturzumfeld liegen unbedingt beschrieben werden. Dies kann z.B. eine mangelhafte Beleuchtung, eine im Weg stehende Reisetasche, ein unebener oder besonders glatter Boden oder die Verwendung von nicht geeignetem Schuhwerk sein.">
+        <option label="keine" name="none" default="true"/>
+        <option label="Boden rutschig" name="slippery"/>
+        <option label="Hindernis im Weg" name="obstacle"/>
+        <option label="Beleuchtung unzureichend" name="badlight" layout="br"/>
+        <option label="Andere, bitte unten beschreiben" name="other4"/>
+    </optiongroup>
+    <textfield name="othertext4" label="Andere" hfill="false"/>
+
+    <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+           label="3. Beschreibung der Sturzfolgen"/>
+    <tabgroup label="Verletzungfolgen" name="consequences" hfill="false">
+        <checkbox label="Platzwunde" name="laceration" layout="br"/>
+        <checkbox label="Schürfwunde" name="graze" layout="left"/>
+        <checkbox label="Hämatome" name="bruise" layout="left"/>
+        <checkbox label="Fraktur" name="fracture" layout="left"
+                  qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
+        <checkbox label="Schmerzen" name="pain" layout="left"/>
+    </tabgroup>
+    <textfield name="othertext5" label="Andere" hfill="false"/>
+    <textfield name="fear" label="Sturzangst" hfill="false"
+               tooltip="zukünftige präventive Maßnahmen hängen von der Sturzangst des Patienten ab, da das Sturzereignis im Gedächtnis des Patienten haften bleibt und wissenschaftlich nachgewiesen ist, dass es einen negativen Einfluss auf ein mögliches weiteres Sturzgeschehen hat"/>
+
+    <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+           label="4. Massnahmen nach dem Sturz"/>
+    <tabgroup name="massnahmen" label="Eingeleitete Maßnahmen" hfill="false">
+        <checkbox label="Wundverband" name="wound"/>
+        <checkbox label="Lagerung / Kühlung" name="wound"/>
+        <checkbox label="Arztkontakt" name="gp" qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
+        <checkbox label="Krankenhauseinweisung" name="hospital"
+                  qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
+    </tabgroup>
+    <textfield name="othertext6" label="Anmerkungen zu den Massnahmen" hfill="false"/>
+
+    <url label="Das neue Formular 'Sturzprotokoll' (Uni Bonn, siehe OPDE Quellen UNIBONN2008-01)"
+         link="https://www.offene-pflege.de/de/sources-de"/>
+</resinfotype>

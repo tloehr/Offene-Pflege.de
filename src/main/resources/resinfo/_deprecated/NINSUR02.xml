@@ -1,0 +1,30 @@
+<resinfotype bwinftyp="NINSUR02" sinceversion="13" category="13" abstract_type="105" equivalent="15" intervalmode="0"
+             infokurz="Pflegekasse" infolang="" tx="false" qpr="true">
+
+    <textfield label="Name" name="niname" innerlayout="tab"/>
+    <textfield label="Strasse" name="nistreet" innerlayout="tab"/>
+    <textfield label="PLZ" name="nizip" innerlayout="tab"/>
+    <textfield label="Ort" name="nicity" innerlayout="tab"/>
+    <textfield label="Tel" name="nitel" innerlayout="tab"/>
+    <textfield label="Fax" name="nifax" innerlayout="tab"/>
+    <textfield label="Zuständig" name="nicontact" innerlayout="tab"/>
+    <separator/>
+    <textfield label="Versicherten Nr." name="personno" innerlayout="tab"/>
+    <textfield label="Krankenkassen Nr." name="insuranceno" innerlayout="tab"/>
+    <separator/>
+    <optiongroup name="grade" label="Einstufung" tx="Wird auf Seite 1 eingetragen."
+                 qi="Wird für die Indiaktoren an die DAS-Pflege verwendet.">
+        <option label="nicht eingestuft" name="none" default="true"/>
+        <option label="beantragt" name="requested"/>
+        <option label="abgelehnt" name="refused"/>
+        <option label="alte 0+" name="alte0p" layout="br"/>
+        <option label="Pflegegrad 1" name="pg1"/>
+        <option label="Pflegegrad 2" name="pg2"/>
+        <option label="Pflegegrad 3" name="pg3" layout="br"/>
+        <option label="Pflegegrad 4" name="pg4"/>
+        <option label="Pflegegrad 5" name="pg5"/>
+        <option label="andere (bitte in Beschreibung)" name="other" layout="br"/>
+    </optiongroup>
+    <textfield label="Beantragt am" name="requestdate" length="12" type="date" innerlayout="tab"
+               tx="Wird auf Seite 1 eingetragen."/>
+</resinfotype>

@@ -1,0 +1,415 @@
+package de.offene_pflege.op.threads;
+
+import de.offene_pflege.entity.files.SYSFilesTools;
+import de.offene_pflege.entity.system.SYSLoginTools;
+import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.Pair;
+import de.offene_pflege.op.tools.SYSConst;
+import de.offene_pflege.op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+
+import javax.persistence.OptimisticLockException;
+import javax.swing.*;
+import java.awt.*;
+import java.math.BigDecimal;
+
+/**
+ * Created by IntelliJ IDEA. User: tloehr Date: 28.03.12 Time: 16:00 To change this template use File | Settings | File
+ * Templates.
+ */
+public class DisplayManager extends Thread {
+    public static final String internalClassID = "opde.displaymanager";
+    private final Closure timeoutAction;
+    private final JProgressBar pbTimeout;
+    private boolean interrupted;
+    private JProgressBar jp;
+    private JLabel lblMain;
+    private JLabel lblSub;
+    private MessageQ messageQ;
+
+    // a pair for the text and the value for the progressbar.
+    private Pair<String, Integer> progressBarMessage;
+    private final Color defaultColor = new Color(105, 80, 69);
+    private Icon icondead, iconaway, icongone, iconbiohazard, iconfall;
+    private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning, lblFallRisk, lblKZP;
+    private long step = 0;
+    private int lastMinute;
+    private long lastoperation; // used for the timeout function to automatically log out idle users
+    private boolean pbIsInUse, pbTOIsInUse, sublabelIsInUse; // for optimization. the jp.setString() was called a trillion times without any need.
+    private Icon[] reloading;
+    private int currentAnimationFrameForReload = -1; // -1 means, no animation
+    private int timeoutmins;
+    private final Logger logger = Logger.getLogger(getClass());
+
+    public DisplayManager() {
+        this.timeoutAction = null;
+        this.pbTimeout = null;
+    }
+
+    public DisplayManager(JProgressBar p, JLabel lblM, JLabel lblS, JPanel pnlIcons, JProgressBar pbTimeout, Closure timeoutAction) {
+        super();
+
+        reloading = new Icon[]{SYSConst.icon32reload0, SYSConst.icon32reload1, SYSConst.icon32reload2, SYSConst.icon32reload3, SYSConst.icon32reload4,
+                SYSConst.icon32reload5, SYSConst.icon32reload6, SYSConst.icon32reload7,
+                SYSConst.icon32reload8, SYSConst.icon32reload9, SYSConst.icon32reload10,
+                SYSConst.icon32reload11, SYSConst.icon32reload12, SYSConst.icon32reload13,
+                SYSConst.icon32reload14, SYSConst.icon32reload15};
+
+        timeoutmins = OPDE.getTimeout();
+        this.pbTimeout = pbTimeout;
+        if (timeoutmins == 0) {
+            pbTimeout.setValue(0);
+            pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.turned.off"));
+        }
+
+        sublabelIsInUse = false;
+        pbIsInUse = false;
+        pbTOIsInUse = false;
+
+        progressBarMessage = new Pair<String, Integer>("", -1);
+        this.timeoutAction = timeoutAction;
+        setName("DisplayManager");
+        touch();
+        interrupted = false;
+        jp = p;
+        jp.setStringPainted(false);
+        jp.setValue(0);
+        jp.setMaximum(100);
+        lblMain = lblM;
+        lblSub = lblS;
+        icondead = SYSConst.icon22residentDied;
+        iconaway = SYSConst.icon22residentAbsent;
+        icongone = SYSConst.icon22residentGone;
+        iconbiohazard = SYSConst.icon22biohazard;
+
+        lblBiohazard = new JLabel(iconbiohazard);
+        lblBiohazard.setVisible(false);
+        lblBiohazard.setOpaque(false);
+        lblWarning = new JLabel(SYSConst.icon22warning);
+        lblWarning.setVisible(false);
+        lblWarning.setOpaque(false);
+        lblAllergy = new JLabel(SYSConst.icon22allergy);
+        lblAllergy.setVisible(false);
+        lblAllergy.setOpaque(false);
+        lblDiabetes = new JLabel(SYSConst.icon22diabetes);
+        lblDiabetes.setVisible(false);
+        lblDiabetes.setOpaque(false);
+        lblFallRisk = new JLabel(SYSConst.findIcon(SYSConst.icon22falling));
+        lblFallRisk.setVisible(false);
+        lblFallRisk.setOpaque(false);
+        lblKZP = new JLabel(SYSConst.findIcon(SYSConst.icon22kzp));
+        lblKZP.setVisible(false);
+        lblKZP.setOpaque(false);
+        pnlIcons.add(lblWarning);
+        pnlIcons.add(lblBiohazard);
+        pnlIcons.add(lblDiabetes);
+        pnlIcons.add(lblAllergy);
+        pnlIcons.add(lblFallRisk);
+        pnlIcons.add(lblKZP);
+
+        lblMain.setText(" ");
+        lblSub.setText(" ");
+        messageQ = new MessageQ();
+
+    }
+
+    public void setMainMessage(String message) {
+        setMainMessage(message, null);
+    }
+
+    public void setMainMessage(final String message, final String tooltip) {
+        SwingUtilities.invokeLater(() -> {
+//                OPDE.debug("DisplayManager.setMainMessage");
+            lblMain.setText(SYSTools.xx(message));
+            lblMain.setIcon(null);
+            lblMain.setToolTipText(tooltip);
+        });
+    }
+
+    public void clearAllMessages() {
+        setMainMessage(" ");
+        setIconBiohazard(null);
+        setIconDiabetes(null);
+        setIconWarning(null);
+        setIconAllergy(null);
+        setIconFalling(null);
+        setIconKZP(false); // null passt hier nicht. bei false wird Icon aber entfernt
+        messageQ.clear();
+        processSubMessage();
+    }
+
+    public void setIconDead() {
+        SwingUtilities.invokeLater(() -> lblMain.setIcon(icondead));
+    }
+
+    public void setIconGone() {
+        SwingUtilities.invokeLater(() -> lblMain.setIcon(icongone));
+    }
+
+    public void setIconBiohazard(final String tooltip) {
+        SwingUtilities.invokeLater(() -> {
+            lblBiohazard.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblBiohazard.setToolTipText(tooltip);
+        });
+    }
+
+    public void setIconWarning(final String tooltip) {
+        SwingUtilities.invokeLater(() -> {
+            lblWarning.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblWarning.setToolTipText(tooltip);
+        });
+    }
+
+    public void setIconAllergy(final String tooltip) {
+        SwingUtilities.invokeLater(() -> {
+            lblAllergy.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblAllergy.setToolTipText(tooltip);
+        });
+    }
+
+    public void setIconDiabetes(final String tooltip) {
+        SwingUtilities.invokeLater(() -> {
+            lblDiabetes.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblDiabetes.setToolTipText(tooltip);
+        });
+    }
+
+    public void setIconFalling(final String tooltip) {
+        SwingUtilities.invokeLater(() -> {
+            lblFallRisk.setVisible(tooltip != null && !tooltip.isEmpty());
+            lblFallRisk.setToolTipText(tooltip);
+        });
+    }
+
+    public void setIconKZP(final Boolean isKZP) {
+           SwingUtilities.invokeLater(() -> {
+               lblKZP.setVisible(isKZP);
+               lblKZP.setToolTipText(isKZP ? SYSTools.xx("misc.msg.kzp") : "");
+           });
+       }
+
+    public void setIconAway() {
+        SwingUtilities.invokeLater(() -> lblMain.setIcon(iconaway));
+    }
+
+    public void clearAllIcons() {
+        lblMain.setIcon(null);
+        lblBiohazard.setVisible(false);
+        lblWarning.setVisible(false);
+        lblDiabetes.setVisible(false);
+        lblAllergy.setVisible(false);
+        lblFallRisk.setVisible(false);
+        lblKZP.setVisible(false);
+    }
+
+    public void setProgressBarMessage(DisplayMessage pbMessage) {
+        synchronized (progressBarMessage) {
+            if (pbMessage == null) {
+                progressBarMessage.setFirst("");
+                progressBarMessage.setSecond(-1);
+                jp.setStringPainted(false);
+            } else {
+                progressBarMessage.setFirst(pbMessage.getMessage() == null ? "" : pbMessage.getMessage());
+                progressBarMessage.setSecond(pbMessage.getPercentage());
+//                logger.debug("pbMessage.getPercentage(): "+pbMessage.getPercentage());
+                jp.setStringPainted(true);
+            }
+        }
+    }
+
+    public void addSubMessage(String text) {
+        DisplayMessage msg = new DisplayMessage(text);
+        addSubMessage(msg);
+    }
+
+    public void addSubMessage(DisplayMessage msg) {
+        messageQ.add(msg);
+    }
+
+    public void clearSubMessages() {
+        messageQ.clear();
+        processSubMessage();
+    }
+
+    private void processSubMessage() {
+        synchronized (messageQ) {
+
+            if (!messageQ.isEmpty()) {
+                if (messageQ.getHead().isObsolete()) {
+                    messageQ.next();
+                } else if (!messageQ.getHead().isProcessed()) {
+                    messageQ.getHead().setProcessed();
+                    lblSub.setText(SYSTools.toHTMLForScreen(messageQ.getHead().getMessage()));
+                    sublabelIsInUse = true;
+                } else if (messageQ.hasNextMessage() && messageQ.getNextMessage().isUrgent()) {
+                    messageQ.next();
+                } else if (messageQ.getHead().isShowingTillReplacement() && messageQ.hasNextMessage()) {
+                    messageQ.next();
+                }
+            } else if (sublabelIsInUse) {
+                lblSub.setText(null);
+                sublabelIsInUse = false;
+            }
+
+
+            if (sublabelIsInUse) {
+                // Coloring
+                if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
+                    jp.setForeground(Color.RED);
+                    lblSub.setForeground(Color.RED);
+                } else if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.WARNING) {
+                    jp.setForeground(SYSConst.darkorange);
+                    lblSub.setForeground(SYSConst.darkorange);
+                } else {
+                    lblSub.setForeground(defaultColor);
+                    jp.setForeground(defaultColor);
+                }
+            }
+        }
+    }
+
+    private void check4EventsEveryMinute() {
+        if (OPDE.getLogin() == null) {
+            return;
+        }
+        int minute = new DateTime().getMinuteOfHour();
+        if (minute != lastMinute) {
+            lastMinute = minute;
+
+            // Maintenance Mode
+            if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
+                SYSFilesTools.print(SYSTools.xx("maintenance.mode.sorry"), false);
+                SYSLoginTools.logout();
+                System.exit(0);
+            }
+
+        }
+    }
+
+    private void processProgressBar() {
+        if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond().intValue() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
+            if (progressBarMessage.getSecond().intValue() < 0) {
+                if (currentAnimationFrameForReload == -1) {
+                    currentAnimationFrameForReload = 0;
+                }
+            }
+
+            if (progressBarMessage.getSecond().intValue() >= 0) {
+                jp.setValue(progressBarMessage.getSecond());
+            }
+            jp.setString(progressBarMessage.getFirst());
+            pbIsInUse = true;
+        } else {
+
+            if (progressBarMessage.getSecond().intValue() < 0 && pbIsInUse) {
+                OPDE.getMainframe().getBtnReload().setIcon(SYSConst.icon32reload0);
+                jp.setValue(0);
+                jp.setString(null);
+            }
+
+            if (jp.getValue() > 0) {
+                jp.setValue(0);
+                jp.setString(null);
+            }
+            currentAnimationFrameForReload = -1;
+            pbIsInUse = false;
+        }
+    }
+
+    public void touch() {
+        lastoperation = System.currentTimeMillis();
+    }
+
+    public static DisplayMessage getLockMessage(OptimisticLockException ole) {
+//        Logger.getLogger(ole.getClass()).debug("LOCKING FFS!!!!");
+        // ole.getEntity().getClass().getName()
+        return new DisplayMessage(SYSTools.xx("misc.msg.lockingexception") + ": " + ole.getMessage() + "", DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
+    }
+
+    public static DisplayMessage getLockMessage() {
+        return new DisplayMessage(SYSTools.xx("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
+    }
+
+    /**
+     * @param text
+     * @param operation can be one of deleted, closed, entered, changed, edited
+     * @return
+     */
+    public static DisplayMessage getSuccessMessage(String text, String operation) {
+        return new DisplayMessage("&raquo;" + text + " " + "&laquo; " + SYSTools.xx("misc.msg.successfully") + " " + SYSTools.xx("misc.msg." + operation), DisplayMessage.NORMAL);
+    }
+
+
+    @Override
+    public void run() {
+        while (!interrupted) {
+            try {
+                step++;
+
+                processProgressBar();
+                processSubMessage();
+                check4EventsEveryMinute();
+
+                /***
+                 *      _____ _                            _
+                 *     |_   _(_)_ __ ___   ___  ___  _   _| |_
+                 *       | | | | '_ ` _ \ / _ \/ _ \| | | | __|
+                 *       | | | | | | | | |  __/ (_) | |_| | |_
+                 *       |_| |_|_| |_| |_|\___|\___/ \__,_|\__|
+                 *
+                 */
+                // https://github.com/tloehr/Offene-Pflege.de/issues/62
+                if (timeoutmins > 0 && step % 120 == 0) {
+                    if (OPDE.getLogin() != null) {
+                        long timeoutPeriodInMillis = timeoutmins * 60 * 1000;
+                        long millisOfTimeout = lastoperation + timeoutPeriodInMillis;
+                        long millisToGo = millisOfTimeout - System.currentTimeMillis();
+                        pbTimeout.setMaximum(new BigDecimal(timeoutmins * 60).intValue());
+                        pbTimeout.setValue(new BigDecimal(millisToGo / 1000).intValue());
+                        pbTOIsInUse = true;
+                    } else {
+                        if (pbTOIsInUse) {
+                            pbTimeout.setValue(0);
+                            pbTOIsInUse = false;
+                        }
+                    }
+
+                    if (OPDE.getLogin() != null && System.currentTimeMillis() > lastoperation + (timeoutmins * 60 * 1000)) {
+                        timeoutAction.execute(null);
+                    }
+                }
+
+
+                if (currentAnimationFrameForReload >= 0 && step % 4 == 0) {
+
+                    if (currentAnimationFrameForReload > reloading.length - 1) {
+                        currentAnimationFrameForReload = 0;
+                    }
+
+                    OPDE.getMainframe().getBtnReload().setIcon(reloading[currentAnimationFrameForReload]);
+                    currentAnimationFrameForReload++;
+                }
+
+                Thread.sleep(50);
+            } catch (InterruptedException ie) {
+                interrupted = true;
+                logger.debug("DisplayManager interrupted!");
+            } catch (Exception e) {
+                OPDE.fatal(logger, e);
+            }
+        }
+    }
+
+
+    public void timeoutNow() {
+        timeoutAction.execute(null);
+    }
+
+
+    public void setTimeoutmins(int timeoutmins) {
+        this.timeoutmins = timeoutmins;
+    }
+}

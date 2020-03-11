@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1">
+	<xs:include schemaLocation="../das_report_datatypes.xsd"/>
+	<xs:complexType name="result_provider_type">
+		<xs:sequence>
+			<xs:element name="type" type="global_result_type">
+				<xs:annotation>
+					<xs:documentation>Übergeordneter Typ der Ergebnisse</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" type="status_type">
+				<xs:annotation>
+					<xs:documentation>Status der Berechnung</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="indicators" type="indicators_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für Kennzahlen</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="indicators_type">
+		<xs:sequence>
+			<xs:element name="indicator" type="indicator_base_type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für eine einzelne Kennzahl</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="indicator_base_type">
+		<xs:annotation>
+			<xs:documentation>Umschlagsselemente für einzelne Informationsgruppen zu Kennzahlen</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="definition" type="qi_information_type">
+				<xs:annotation>
+					<xs:documentation>Allgemeine Informationen der Kennzahl inkl. Typdefinition</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="result" type="qi_result_type">
+				<xs:annotation>
+					<xs:documentation>Ergebnisse und statistische Einstufung im Vergleich zum Durchschnitt</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="reference_value" type="qi_reference_value_type">
+				<xs:annotation>
+					<xs:documentation>Referenzwert</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="thresholds" type="thresholds_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Schwellenwerte</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="qi_information_type">
+		<xs:sequence>
+			<xs:element name="type" type="indicator_type">
+				<xs:annotation>
+					<xs:documentation>Kennzahltyp</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="internal_id" type="non_neg_number_type">
+				<xs:annotation>
+					<xs:documentation>Interne ID der Kennzahl</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="external_id" type="text_type">
+				<xs:annotation>
+					<xs:documentation>Externe ID der Kennzahl</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="text_type">
+				<xs:annotation>
+					<xs:documentation>Bezeichnung</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="text_z" type="long_text_type">
+				<xs:annotation>
+					<xs:documentation>Textliche Beschreibung des Zählers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="text_n" type="long_text_type">
+				<xs:annotation>
+					<xs:documentation>Textliche Beschreibung des Nenners</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="text_exclusion" type="long_text_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Optional: Textliche Beschreibung der Ausschlusskriterien</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="text_target" type="long_text_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Textliche Beschreibung des Qualitätsziels</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="minimum_number" type="non_neg_number_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Optional: Mindestanzahl im Nenner zur Berechnung des
+Indikators</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="standardization" type="yesno_type">
+				<xs:annotation>
+					<xs:documentation>Indikator/Kennzahl wird standardisiert</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="qi_result_type">
+		<xs:sequence>
+			<xs:element name="classification" type="classification_type">
+				<xs:annotation>
+					<xs:documentation>Einstufung unter Berücksichtigung der
+						Schwellenwerte</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="value_z" type="number_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Ergebnis im Zähler</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="value_n" type="number_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Ergebnis im Nenner</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="rate" type="decimal_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Ergebnis (Rate)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="result_out_of_range" type="yesno_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Ergebnis liegt innerhalb des Referenzbereichs</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="qi_reference_value_type">
+		<xs:sequence>
+			<xs:element name="type" type="reference_value_type">
+				<xs:annotation>
+					<xs:documentation>Kennzahltyp</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="operator" type="operator_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Operator (Richtung)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ref_value" type="decimal_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Referenzwert</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="operator_2" type="operator_lower_only_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Operator 2 (bei Korridoren)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ref_value_2" type="decimal_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Referenzwert 2 (bei Korridoren)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="thresholds_type">
+		<xs:sequence>
+			<xs:element name="threshold" type="threshold_type" maxOccurs="5">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für einen Schwellenwert</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="threshold_type">
+		<xs:sequence>
+			<xs:element name="classification" type="classification_type">
+				<xs:annotation>
+					<xs:documentation>Korrespondierende Einstufung als ganze Zahl</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="operator_1" type="operator_type">
+				<xs:annotation>
+					<xs:documentation>Operator/Richtung</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="value_1" type="decimal_type">
+				<xs:annotation>
+					<xs:documentation>1. Schwellenwert</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="operator_2" type="operator_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Optional: Operator/Richtung (bei
+						Korridoren)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="value_2" type="decimal_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>2. Schwellenwert (bei Korridoren)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

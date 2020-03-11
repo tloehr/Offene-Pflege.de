@@ -1,0 +1,54 @@
+<resinfotype bwinftyp="comms" sinceversion="13" category="12" abstract_type="101" equivalent="4"
+             intervalmode="0" infokurz="Kommunikation" infolang="" tx="true" qpr="true">
+
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
+    <textfield name="mothertongue" label="Muttersprache"
+               tx="Übernahme in 'Muttersprache' auf Seite 1 des Überleitbogen."/>
+    <tabgroup size="12" label="Hilfsmittel" name="hm1">
+        <checkbox name="hearaid" label="Hörgerät"/>
+        <checkbox name="glassesnear" label="Lesebrille" layout="left"/>
+        <checkbox name="glassesfar" label="Weitsichtbrille" layout="left"/>
+    </tabgroup>
+
+    <optiongroup name="ability1" label="Sprache">
+        <option label="ohne Einschränkung" name="oE1" default="true"/>
+        <option label="mit Einschränkungen" name="mE1"/>
+        <option label="zeitweise eingeschränkt" name="zE1"/>
+    </optiongroup>
+    <optiongroup name="ability2" label="Sprachverständnis">
+        <option label="ohne Einschränkung" name="oE2" default="true"/>
+        <option label="mit Einschränkungen" name="mE2"/>
+        <option label="zeitweise eingeschränkt" name="zE2"/>
+    </optiongroup>
+    <optiongroup name="ability3" label="Gehör">
+        <option label="ohne Einschränkung" name="oE3" default="true"/>
+        <option label="mit Einschränkungen" name="mE3"/>
+        <option label="zeitweise eingeschränkt" name="zE3"/>
+    </optiongroup>
+    <optiongroup name="ability4" label="Sehen">
+        <option label="ohne Einschränkung" name="oE4" default="true"/>
+        <option label="mit Einschränkungen" name="mE4"/>
+        <option label="zeitweise eingeschränkt" name="zE4"/>
+    </optiongroup>
+    <optiongroup name="ability5" label="Schrift">
+        <option label="ohne Einschränkung" name="oE5" default="true"/>
+        <option label="mit Einschränkungen" name="mE5"/>
+        <option label="zeitweise eingeschränkt" name="zE5"/>
+    </optiongroup>
+    <optiongroup name="ability6" label="Geruch">
+        <option label="ohne Einschränkung" name="oE6" default="true"/>
+        <option label="mit Einschränkungen" name="mE6"/>
+        <option label="zeitweise eingeschränkt" name="zE6"/>
+    </optiongroup>
+    <optiongroup name="ability7" label="Geschmack">
+        <option label="ohne Einschränkung" name="oE7" default="true"/>
+        <option label="mit Einschränkungen" name="mE7"/>
+        <option label="zeitweise eingeschränkt" name="zE7"/>
+    </optiongroup>
+    <optiongroup name="ability8" label="Tastempfinden">
+        <option label="ohne Einschränkung" name="oE8" default="true"/>
+        <option label="mit Einschränkungen" name="mE8"/>
+        <option label="zeitweise eingeschränkt" name="zE8"/>
+    </optiongroup>
+
+</resinfotype>

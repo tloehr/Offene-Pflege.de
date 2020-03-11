@@ -1,0 +1,21 @@
+<!--
+Cat: 15 (Medizinisch/Ärztlich)
+BWINFTYP: allergy
+Allergien
+
+since-db-version:
+_deprecated-since:
+replaced-by:
+MODE_INTERVAL_BYSECOND = 0
+TYPE_ANTIBIOTICS = 143
+see <a href="https://github.com/tloehr/Offene-Pflege.de/issues/11">GitHub #11</a>
+-->
+<resinfotype>
+    <imagelabel image="/artwork/48x48/allergy.png"/>
+
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 10."/>
+
+    <textfield name="beschreibung" innerlayout="br" label="Beschreiben Sie die Art der Allergie" layout="br tab"/>
+
+    <checkbox label="Allergiepaß vorhanden" name="allergiepass"/>
+</resinfotype>

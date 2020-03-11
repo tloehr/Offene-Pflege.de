@@ -1,0 +1,5 @@
+<resinfotype bwinftyp="apoplex01" sinceversion="13" category="15" abstract_type="162" equivalent="0"
+             intervalmode="3" infokurz="Knochenbruch (Fraktur)" infolang="" tx="true" qpr="true">
+
+   <datefield label="Datum" name="datum" qdvs="Zeilen 11 und 12"/>
+</resinfotype>

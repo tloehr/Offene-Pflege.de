@@ -1,0 +1,25 @@
+<resinfotype>
+    <label size="16" fontstyle="bold" label="Hauptbezugsperson"/>
+    <tx tooltip="Diese Angaben werden auf Seite 1, Abschnitt 1 eingetragen."/>
+    <textfield label="Anrede" name="c1title" length="25" hfill="false" innerlayout="tab"/>
+    <textfield label="Name" name="c1name" length="25" hfill="false" innerlayout="tab"/>
+    <textfield label="Vorname" name="c1firstname" length="25" hfill="false" innerlayout="tab"/>
+    <textfield label="Strasse" name="c1street" length="25" hfill="false" innerlayout="tab"/>
+    <textfield label="PLZ" name="c1zip" length="25" hfill="false" innerlayout="tab"/>
+    <textfield label="Ort" name="c1city" length="25" hfill="false" innerlayout="tab"/>
+    <textfield label="Tel" name="c1tel" length="25" hfill="false" innerlayout="tab"/>
+    <textfield label="Mobil" name="c1mobile" length="25" hfill="false" innerlayout="tab"/>
+    <textfield label="E-Mail" name="c1email" length="25" hfill="false" innerlayout="tab"/>
+    <checkbox name="c1ready2nurse" label="Pflegebereitschaft der Bezugsperson"
+              tx="Setzt 'Pflegebereitschaft der Bezugsperson' auf 'ja', falls angeklickt."/>
+
+    <label size="16" fontstyle="bold" label="Angehörige 1" innerlayout="tab"/>
+    <textfield name="name1" label="Name" length="25" hfill="false" innerlayout="tab"/>
+    <textfield name="ans1" label="Anschrift" length="25" hfill="false" innerlayout="tab"/>
+    <textfield name="tel1" label="Telefon" length="25" hfill="false" innerlayout="tab"/>
+
+    <label size="16" fontstyle="bold" label="Angehörige 2"/>
+    <textfield name="name2" label="Name" length="25" hfill="false" innerlayout="tab"/>
+    <textfield name="ans2" label="Anschrift" length="25" hfill="false" innerlayout="tab"/>
+    <textfield name="tel2" label="Telefon" length="25" hfill="false" innerlayout="tab"/>
+</resinfotype>

@@ -1,0 +1,16 @@
+<resinfotype>
+    <textfield label="Geburtsname" name="gebname" innerlayout="tab"/>
+    <textfield label="Geburtsort" name="gebort" innerlayout="tab"/>
+    <textfield label="Konfession" name="konfession" innerlayout="tab" tx="'Religion' auf Seite 1, oben"/>
+    <checkbox name="seelsorge" label="Seelsorge erwünscht"/>
+    <textfield label="Staatsang." name="staat" innerlayout="tab"/>
+
+    <optiongroup name="stand" label="Familienstand">
+        <option label="ledig" name="ledig" default="true"/>
+        <option label="verheiratet" name="verheiratet"/>
+        <option label="getrennt lebend" name="getrennt"/>
+        <option label="geschieden" name="geschieden"/>
+        <option label="verwitwet" name="verwitwet"/>
+    </optiongroup>
+    <checkbox name="single" label="alleinstehend" tx="'alleinstehend' auf Seite 1, Abschnitt 1"/>
+</resinfotype>

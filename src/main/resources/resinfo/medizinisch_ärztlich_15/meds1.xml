@@ -1,0 +1,17 @@
+<resinfotype>
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 16."/>
+
+    <tabgroup size="12" label="Medikamenteneinnahme" name="tab1">
+        <checkbox label="Einnahme selbstständig" name="self"/>
+        <checkbox label="Bereitstellen der Tagesration" name="dailyration" layout="left"/>
+        <checkbox label="Überwachung der Einnahme" name="control"/>
+        <checkbox label="Marcumar-Pass" name="marcumarpass" layout="left"/>
+    </tabgroup>
+
+    <optiongroup name="injection" label="Injektion">
+        <option label="trifft nicht zu" name="na" default="true"/>
+        <option label="selbstständig" name="none"/>
+        <option label="mit Anleitung" name="lvl1"/>
+        <option label="vollständige Übernahme" name="lvl3"/>
+    </optiongroup>
+</resinfotype>

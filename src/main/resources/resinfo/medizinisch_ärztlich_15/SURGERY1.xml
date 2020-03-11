@@ -1,0 +1,5 @@
+<resinfotype>
+    <textfield name="surgerytext" label="Art der OP" hfill="true"/>
+    <gpselect name="gp1" label="Ambulant durchgeführt"/>
+    <hospitalselect name="hospital1" label="im KH durchgeführt"/>
+</resinfotype>

@@ -1,0 +1,5 @@
+<resinfotype>
+    <checkbox name="vessel.catheter" label="Gefäßkatheter" layout="br" enables="bs1" default="true"/>
+    <label label="Lage des Katheters" size="16" fontstyle="bold"/>
+    <bodyscheme name="bs1"/>
+</resinfotype>

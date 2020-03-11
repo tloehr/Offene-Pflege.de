@@ -1,0 +1,32 @@
+<resinfotype bwinftyp="alltag01" sinceversion="13" category="12" abstract_type="160" equivalent="135"
+             intervalmode="0" infokurz="Alltagsleben" infolang="" tx="true" qpr="true">
+
+
+    <optiongroup size="18" name="GATAGESABLAUF"
+                 label="Tagesablauf gestalten und an Veränderungen anpassen"
+                 qi="59" bi="4.6.1" tooltip="bi6.alltag.erklaerung" tx="Seite 1, Abschnitt 8">
+        <option label="selbstständig" name="0" default="true" tooltip="bi6.alltag.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi6.alltag.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi6.alltag.selbst2" layout="br left"/>
+        <option label="unselbständig" name="3" tooltip="bi6.alltag.selbst3"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="GABESCHAEFTIGEN"
+                 label="Sich beschäftigen"
+                 qi="61" bi="4.6.3" tooltip="bi6.beschaeftigen.erklaerung" tx="Seite 1, Abschnitt 8">
+        <option label="selbstständig" name="0" default="true" tooltip="bi6.beschaeftigen.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi6.beschaeftigen.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi6.beschaeftigen.selbst2" layout="br left"/>
+        <option label="unselbständig" name="3" tooltip="bi6.beschaeftigen.selbst3"/>
+    </optiongroup>
+
+    <optiongroup size="18" name="GAPLANUNGEN"
+                 label="Vornehmen von in die Zukunft gerichteten Planungen"
+                 qi="62" bi="4.6.4" tooltip="bi6.zukunft.erklaerung" tx="Seite 1, Abschnitt 8">
+        <option label="selbstständig" name="0" default="true" tooltip="bi6.zukunft.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi6.zukunft.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi6.zukunft.selbst2" layout="br left"/>
+        <option label="unselbständig" name="3" tooltip="bi6.zukunft.selbst3"/>
+    </optiongroup>
+
+</resinfotype>

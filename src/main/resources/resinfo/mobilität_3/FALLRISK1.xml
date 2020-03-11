@@ -1,0 +1,81 @@
+<resinfotype>
+
+    <optiongroup name="sturzrisiko" label="Wie hoch wird das Sturzrisiko eingeschätzt ?">
+        <option label="stark" name="ja"/>
+        <option label="mittel" name="mittel"/>
+        <option label="leicht" name="leicht"/>
+        <option label="kein" name="nein" default="true"/>
+    </optiongroup>
+    <imagelabel image="/artwork/32x32/hillslope.png"
+                text="Dieses Symbol erscheint bei einem Risiko *stark* oder *mittel*"/>
+
+    <label name="hinweis" label="Nicht vergessen: schriftliche Auswertung in das Bemerkungsfeld schreiben" color="red"/>
+
+    <tabgroup size="12" fontstyle="bold" label="Sturzanamnese" name="sanam">
+        <checkbox name="past" label="fallrisk.past"/>
+        <checkbox name="fear" label="fallrisk.fear" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="12" fontstyle="bold" label="Funktionseinbußen und Funktionsbeeinträchtigungen" name="tab2">
+        <checkbox name="balance" label="Probleme mit der Körperbalance"/>
+        <checkbox name="gang" label="Gangveränderungen / eingeschränkte Bewegungsfreiheit" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="12" fontstyle="bold" label="Sehstörungen" name="tab3">
+        <checkbox name="kontrast" label="gestörte Kontrastwahrnehmung"/>
+        <checkbox name="schaerfe" label="gestörte Sehschärfe" layout="left"/>
+        <checkbox name="fov" label="Gesichtsfeldeinschränkung" layout="left"/>
+        <checkbox name="badglasses" label="Ungeeignete Brille" layout="br"/>
+        <checkbox name="newglasses" label="neue oder angepasste Brille"
+                  tooltip="Neue, angepasste Brillen mit der passenden Stärke können das Sturzrisiko zu Beginn erhöhen (!). Das liegt daran, dass die betroffene Person sich erst an die neue Brille gewöhnen muss. In dieser Zeit steigt das Sturzrisiko."
+                  layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="12" fontstyle="bold" label="Psychische Störungen" name="tab4">
+        <checkbox name="demenz" label="Demenz"/>
+        <checkbox name="depression" label="Depression" layout="left"/>
+        <checkbox name="delir" label="Delir" layout="left"/>
+    </tabgroup>
+
+    <label size="18" fontstyle="bold" label="Erkrankungen"
+           tooltip="erhöhte Belastung durch Erkrankungen oder Gesundheitsstörungen"/>
+    <tabgroup size="12" fontstyle="bold" label="Durch Ohnmachtsgefahr" name="tab5">
+        <checkbox name="hypoglykämie" label="Unterzuckerung (Hypoglykämie)" layout="br"/>
+        <checkbox name="blutdruckabfall" label="Blutdruckabfall beim Aufstehen" layout="left"/>
+        <checkbox name="herzrhythmusstörungen" label="Herzrhythmusstörungen" layout="left"/>
+        <checkbox name="tia" label="TIA (Transitorisch ischämische Attacke)" layout="br"/>
+        <checkbox name="epilepsie" label="Epilepsie" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="12" fontstyle="bold" label="Durch veränderte Mobilität, Motorik und Epfindung" name="tab6">
+        <checkbox name="ms" label="Multiple Sklerose" layout="br"/>
+        <checkbox name="parkinson" label="Parkinson" layout="left"/>
+        <checkbox name="apoplexie" label="Apoplexie" layout="left"/>
+        <checkbox name="polyneuropathie" label="Polyneuropathie" layout="left"/>
+        <checkbox name="krebserkrankungen" label="Krebserkrankungen" layout="left"/>
+        <checkbox name="osteoathritis" label="Osteoathritis" layout="br"/>
+        <checkbox name="az" fontstyle="italic" label="andere chronische Erkrankungen / schlechter Allgemeinzustand"
+                  layout="br"/>
+    </tabgroup>
+
+
+    <tabgroup size="12" fontstyle="bold" label="Sonstiges" name="tab7">
+        <checkbox name="nykturie" label="Dranginkontinenz, Nykturie"/>
+        <checkbox name="toilette" label="Probleme bei den Toilettengängen" layout="left"/>
+        <checkbox name="hilfsm" label="Unangemessener Umgang mit Hilfsmitteln" layout="br"/>
+        <checkbox name="kleidung" label="Unangemessene Kleidung und Schuhe" layout="br"/>
+    </tabgroup>
+
+    <tabgroup size="12" fontstyle="bold" label="Medikamente" name="tab8">
+        <checkbox name="psychopharmaka" label="Psychopharmaka"/>
+        <checkbox name="sedativa" label="Sedativa / Hypnotika" layout="left"/>
+        <checkbox name="antiarrhythmika" label="Antiarrhythmika" tooltip="z.B. Metoprolol, Bisoprolol und Nebivolol"
+                  layout="left"/>
+        <checkbox name="morethan4" label="mehrere Medikamente"
+                  tooltip="generell Einnahme von mehreren Medikamenten (bei mehr als 4 verschiedenen besteht ein erhöhtes Risiko)"
+                  layout="br"/>
+    </tabgroup>
+
+    <label size="12" fontstyle="italic"
+           label="Gefahren in der Umgebung werden hier nicht aufgeführt. Davon ist in einer Pflegeeinrichtung nicht auszugehen."/>
+</resinfotype>

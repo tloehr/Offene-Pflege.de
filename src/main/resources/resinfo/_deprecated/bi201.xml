@@ -1,0 +1,115 @@
+
+<!--
+
+ ▜▘   ▐              ▜ ▙▗▌     ▌
+ ▐ ▛▀▖▜▀ ▞▀▖▙▀▖▌ ▌▝▀▖▐ ▌▘▌▞▀▖▞▀▌▞▀▖
+ ▐ ▌ ▌▐ ▖▛▀ ▌  ▐▐ ▞▀▌▐ ▌ ▌▌ ▌▌ ▌▛▀
+ ▀▘▘ ▘ ▀ ▝▀▘▘   ▘ ▝▀▘ ▘▘ ▘▝▀ ▝▀▘▝▀▘
+* MODE_INTERVAL_BYSECOND = 0;
+* MODE_INTERVAL_BYDAY = 1;
+* MODE_INTERVAL_NOCONSTRAINTS = 2;
+* MODE_INTERVAL_SINGLE_INCIDENTS = 3;
+
+bi201 (heisst modul2 aber erste version. man weiss nie was sich verändert)
+
+-->
+<resinfotype bwinftyp="bi201" sinceversion="13" category="20" abstract_type="160" equivalent="37" intervalmode="0"
+             infokurz="Kognitive und kommunikative Fähigkeiten" infolang="bi2.intro" tx="false"
+             qpr="true">
+
+    <label parwidth="600px" label="bi2.intro"/>
+    <separator/>
+    <!--  QI26 F4.1.1 -->
+    <label fontstyle="bold" size="14" label="Erkennen von Personen aus dem näheren Umfeld" tooltip="bi2.personen.erklaerung"/>
+    <optiongroup name="personen">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.personen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.personen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.personen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.personen.selbst3"/>
+    </optiongroup>
+
+
+    <label fontstyle="bold" size="14" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"/>
+    <optiongroup name="orte">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.orte.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.orte.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.orte.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.orte.selbst3"/>
+    </optiongroup>
+
+
+    <label fontstyle="bold" size="14" label="Zeitliche Orientierung" tooltip="bi2.zeitlich.erklaerung"/>
+    <optiongroup name="zeitlich">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.zeitlich.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.zeitlich.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.zeitlich.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.zeitlich.selbst3"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Sich Erinnern" tooltip="bi2.erinnern.erklaerung"/>
+    <optiongroup name="erinnern">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.erinnern.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.erinnern.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.erinnern.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi.erinnern.selbst3"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Steuern von mehrschrittigen Alltagshandlungen" tooltip="bi2.handlungen.erklaerung"/>
+    <optiongroup name="handlungen">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.handlungen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.handlungen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.handlungen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.treppen.handlungen"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Treffen von Entscheidungen im Alltagsleben" tooltip="bi2.entscheidungen.erklaerung"/>
+    <optiongroup name="entscheidungen">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.entscheidungen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.entscheidungen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.entscheidungen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.entscheidungen.selbst3"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Verstehen von Sachverhalten und Informationen" tooltip="bi2.verstehen.erklaerung"/>
+    <optiongroup name="verstehen">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.verstehen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.verstehen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.verstehen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.verstehen.selbst3"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Erkennen von Risiken und Gefahren" tooltip="bi2.risiken.erklaerung"/>
+    <optiongroup name="risiken">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.risiken.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.risiken.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.risiken.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.risiken.selbst3"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Mitteilen von elementaren Bedürfnissen" tooltip="bi2.beduerfnissen.erklaerung"/>
+    <optiongroup name="beduerfnissen">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.beduerfnissen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.beduerfnissen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.beduerfnissen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.beduerfnissen.selbst3"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Verstehen von Aufforderungen" tooltip="bi2.aufforderungen.erklaerung"/>
+    <optiongroup name="aufforderungen">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.aufforderungen.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.aufforderungen.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.aufforderungen.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.aufforderungen.selbst3"/>
+    </optiongroup>
+
+    <label fontstyle="bold" size="14" label="Beteiligung an einem Gespräch" tooltip="bi2.gespraech.erklaerung"/>
+    <optiongroup name="gespraech">
+        <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.gespraech.selbst0"/>
+        <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.gespraech.selbst1"/>
+        <option label="überwiegend unselbständig" name="selbst2" tooltip="bi2.gespraech.selbst2"/>
+        <option label="unselbständig" name="selbst3" tooltip="bi2.gespraech.selbst3"/>
+    </optiongroup>
+    <separator/>
+    <label parwidth="600px" label="bi.quellen"/>
+
+</resinfotype>

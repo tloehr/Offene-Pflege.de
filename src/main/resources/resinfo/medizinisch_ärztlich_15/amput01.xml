@@ -1,0 +1,57 @@
+<resinfotype bwinftyp="amput01" sinceversion="13" category="15" abstract_type="140" equivalent="138"
+             intervalmode="3" infokurz="Knochenbruch (Fraktur)" infolang="" tx="true" qpr="true">
+
+    <label size="16" fontstyle="bold"
+           label="Amputationsangaben (werden zur Berechnung der angepassten Köpergewichte herangezogen)"/>
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 18."/>
+    <qdvs
+            tooltip="Wird für die Indiaktoren an die DAS-Pflege verwendet. Bitte besonders auf das Datum der Amputation achten."/>
+
+    <optiongroup name="upperleft" label="linkes, oberes Viertel">
+        <option label="keine Amputation" name="none" default="true"/>
+        <option label="linke Hand" name="hand"/>
+        <option label="unterhalb des linken Ellenbogens" name="belowellbow"/>
+        <option label="oberhalb des linken Ellenbogens" name="aboveellbow" layout="br tab"/>
+        <option label="vollständige linke, obere Extremität" name="complete"/>
+    </optiongroup>
+
+    <datefield label="Datum der Operation" name="dateupperleft" depends-on="upperleft"
+               visible-when-dependency-neq="none" default-value-when-shown="now"/>
+    <separator/>
+
+    <optiongroup name="upperright" label="rechtes, oberes Viertel">
+        <option label="keine Amputation" name="none" default="true"/>
+        <option label="rechte Hand" name="hand"/>
+        <option label="unterhalb des rechten Ellenbogens" name="belowellbow"/>
+        <option label="oberhalb des rechten Ellenbogens" name="aboveellbow" layout="br tab"/>
+        <option label="vollständige rechte, obere Extremität" name="complete"/>
+    </optiongroup>
+
+    <datefield label="Datum der Operation" name="dateupperright" depends-on="upperright"
+               visible-when-dependency-neq="none" default-value-when-shown="now"/>
+    <separator/>
+
+    <optiongroup name="lowerleft" label="linkes, unteres Viertel">
+        <option label="keine Amputation" name="none" default="true"/>
+        <option label="linker Fuß" name="foot"/>
+        <option label="unterhalb des linken Knies" name="belowknee"/>
+        <option label="oberhalb des linken Knies" name="aboveknee" layout="br tab"/>
+        <option label="vollständige linke, untere Extremität" name="complete"/>
+    </optiongroup>
+
+    <datefield label="Datum der Operation" name="datelowerleft" depends-on="lowerleft"
+               visible-when-dependency-neq="none" default-value-when-shown="now"/>
+    <separator/>
+
+    <optiongroup name="lowerright" label="rechtes, unteres Viertel">
+        <option label="keine Amputation" name="none" default="true"/>
+        <option label="rechter Fuß" name="foot"/>
+        <option label="unterhalb des rechten Knies" name="belowknee"/>
+        <option label="oberhalb des rechten Knies" name="aboveknee" layout="br tab"/>
+        <option label="vollständige rechte, untere Extremität" name="complete"/>
+    </optiongroup>
+
+    <datefield label="Datum der Operation" name="datelowerright" depends-on="lowerright"
+               visible-when-dependency-neq="none" default-value-when-shown="now"/>
+
+</resinfotype>

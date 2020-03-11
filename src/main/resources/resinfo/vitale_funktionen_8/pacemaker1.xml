@@ -1,0 +1,5 @@
+<resinfotype>
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 10."/>
+    <checkbox label="Herzschrittmacher" name="pacemaker"/>
+    <textfield name="lastcheck" label="Letzte Kontrolle" type="date" length="12" layout="br"/>
+</resinfotype>
