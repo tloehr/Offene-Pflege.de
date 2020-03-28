@@ -1,5 +1,5 @@
 <resinfotype bwinftyp="inkoaid2" sinceversion="5" category="2" abstract_type="112" equivalent="16"
-             intervalmode="0" infokurz="Inkontinenzhilfsmittel" infolang="" tx="false" qpr="true">
+             intervalmode="0" infokurz="Inkontinenz-Hilfsmittel und Katheter" infolang="" tx="false" qpr="true">
     <checkbox name="needshelp" label="Bewohner[in] benötigt Hilfe beim Wechsel der Inko-Materialien"
               tx="Seite 1, Abschnitt 5"/>
     <separator/>

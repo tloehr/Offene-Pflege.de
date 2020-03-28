@@ -45,6 +45,7 @@ public class TXEssenDoc implements HasLogger {
 
     // das sind die die 4 Stufen aus der BI Bewertung
     private final String[] QDVS_SCHEMA = new String[]{"0", "1", "2", "3"};
+    private final String[] QDVS_SCHEMA2 = new String[]{"0", "2", "4", "6"};
     private final String[] OPDE_SCHEMA = new String[]{"none", "lvl1", "lvl2", "lvl3"};
 
     private final int MAX_VERORDNUNGEN_AUF_BOGEN = 8;
@@ -324,6 +325,7 @@ public class TXEssenDoc implements HasLogger {
 
 
         AcroFields form = stamper.getAcroFields();
+//        form.getFields().keySet().forEach(s -> getLogger().debug(s));
         for (String key : content.keySet()) {
             if (!ArrayUtils.contains(PnlBodyScheme.PARTS, key)) { // this is a special case. The bodyparts and the pdfkeys have the same name.
                 getLogger().debug(key);
@@ -634,103 +636,104 @@ public class TXEssenDoc implements HasLogger {
     private void createContent4Section3() {
         // Unterscheidung wegen Versionsänderung der ResInfoTypes
 
-        if (!getResInfoType(ResInfoTypeTools.TYPE_CARE).isPresent()) return;
-        ResInfoType caretype = getResInfoType(ResInfoTypeTools.TYPE_CARE).get();
-        if (caretype.getID().equalsIgnoreCase("care")) { // Diese Version ist noch vor der QDVS01.1
-            // Das bedeutet auch, dass es noch MOUTHCARE gibt. Die fällt später weg und wird beides durch kpflege02 ersetzt.
-            content.put(TXEAF.PERSONAL_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care"), OPDE_SCHEMA));
-            content.put(TXEAF.PERSONAL_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
-            content.put(TXEAF.PERSONAL_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
-            content.put(TXEAF.PERSONAL_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
-
-            content.put(TXEAF.MOUTH_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care"), OPDE_SCHEMA));
-            content.put(TXEAF.MOUTH_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.bed")));
-            content.put(TXEAF.MOUTH_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.shower")));
-            content.put(TXEAF.MOUTH_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.basin")));
-
-            content.put(TXEAF.DENTURE_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care"), OPDE_SCHEMA));
-            content.put(TXEAF.DENTURE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.bed")));
-            content.put(TXEAF.DENTURE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.shower")));
-            content.put(TXEAF.DENTURE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.basin")));
-
-            content.put(TXEAF.COMBING_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care"), OPDE_SCHEMA));
-            content.put(TXEAF.COMBING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.bed")));
-            content.put(TXEAF.COMBING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.shower")));
-            content.put(TXEAF.COMBING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.basin")));
-
-            content.put(TXEAF.SHAVE_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care"), OPDE_SCHEMA));
-            content.put(TXEAF.SHAVE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.bed")));
-            content.put(TXEAF.SHAVE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.shower")));
-            content.put(TXEAF.SHAVE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.basin")));
-
-            content.put(TXEAF.DRESSING_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care"), OPDE_SCHEMA));
-            content.put(TXEAF.DRESSING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.bed")));
-            content.put(TXEAF.DRESSING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.shower")));
-            content.put(TXEAF.DRESSING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.basin")));
-        } else if (caretype.getID().equalsIgnoreCase("kpflege02")) { // Diese Version ist noch vor der QDVS01.1
-            // Die Struktur des Überleitbogens und der QDVS unterscheiden sich teilweise deutlich, so dass ich hier
-            // ein paar Entscheidungen treffen muss, wass ich wie abbilde.
-
-            // 1. Die Körperpflege Level ist MAX(oberkörper, intim, Duschenbaden). Wobei der Bereich von 0..3 (siehe QDVS Schema)
-            String carelevel = getMaxInt(ResInfoTypeTools.TYPE_CARE, "SVOBERKOERPER", "SVINTIMBEREICH", "SVDUSCHENBADEN");
-            content.put(TXEAF.PERSONAL_CARE_LEVEL, setRadiobutton(carelevel, QDVS_SCHEMA));
-
-            // 2. Die Einteilung für Bed, Bad, Waschbecken wird anhand einer Aufteilung in kpflege02 für alle abgebildet, die einen Level größer 0 haben.
-            if (!carelevel.equalsIgnoreCase("0")) {
+        if (getResInfoType(ResInfoTypeTools.TYPE_CARE).isPresent()) {
+            ResInfoType caretype = getResInfoType(ResInfoTypeTools.TYPE_CARE).get();
+            if (caretype.getID().equalsIgnoreCase("care")) { // Diese Version ist noch vor der QDVS01.1
+                // Das bedeutet auch, dass es noch MOUTHCARE gibt. Die fällt später weg und wird beides durch kpflege02 ersetzt.
+                content.put(TXEAF.PERSONAL_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care"), OPDE_SCHEMA));
                 content.put(TXEAF.PERSONAL_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
                 content.put(TXEAF.PERSONAL_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
                 content.put(TXEAF.PERSONAL_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
-            }
 
-            // 3. Körperpflege im Bereich des Kopfes ergibt einen Level von 0..3. Dieser wird hier hingeschrieben. Und zwar jeweils in die Zeile,
-            // die per SVKOPF.kaemmen, SVKOPF.zahnprothese, SVKOPF.rasur, SVKOPF.mundpflege markiert wurde.
-            String headlevel = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF");
-            boolean kaemmen = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF.kaemmen").equalsIgnoreCase("true");
-            boolean zahnprothese = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF.zahnprothese").equalsIgnoreCase("true");
-            boolean rasur = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF.rasur").equalsIgnoreCase("true");
-            boolean mundpflege = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF.mundpflege").equalsIgnoreCase("true");
-            // z.B. mundpflege ist angeklickt, dann schreiben wir den Wert hier hin, ansonsten "selbstständig" also "0"
-            content.put(TXEAF.COMBING_CARE_LEVEL, setRadiobutton(kaemmen ? headlevel : "0", QDVS_SCHEMA));
-            content.put(TXEAF.DENTURE_CARE_LEVEL, setRadiobutton(zahnprothese ? headlevel : "0", QDVS_SCHEMA));
-            content.put(TXEAF.SHAVE_CARE_LEVEL, setRadiobutton(rasur ? headlevel : "0", QDVS_SCHEMA));
-            content.put(TXEAF.MOUTH_CARE_LEVEL, setRadiobutton(mundpflege ? headlevel : "0", QDVS_SCHEMA));
+                content.put(TXEAF.MOUTH_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care"), OPDE_SCHEMA));
+                content.put(TXEAF.MOUTH_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.bed")));
+                content.put(TXEAF.MOUTH_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.shower")));
+                content.put(TXEAF.MOUTH_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.basin")));
 
-            // Jetzt noch die Bad, Waschbecken usw...
-            // Dann wenn level > 0 und z.B. rasur gemeint, dann auch das Waschbecken, wenn angeklickt.
-            if (!headlevel.equalsIgnoreCase("0")) {
-                if (kaemmen) {
-                    content.put(TXEAF.COMBING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
-                    content.put(TXEAF.COMBING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
-                    content.put(TXEAF.COMBING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
-                }
-                if (zahnprothese) {
-                    content.put(TXEAF.DENTURE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
-                    content.put(TXEAF.DENTURE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
-                    content.put(TXEAF.DENTURE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
-                }
-                if (rasur) {
-                    content.put(TXEAF.SHAVE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
-                    content.put(TXEAF.SHAVE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
-                    content.put(TXEAF.SHAVE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
-                }
-                if (mundpflege) {
-                    content.put(TXEAF.MOUTH_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
-                    content.put(TXEAF.MOUTH_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
-                    content.put(TXEAF.MOUTH_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
-                }
-            }
+                content.put(TXEAF.DENTURE_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care"), OPDE_SCHEMA));
+                content.put(TXEAF.DENTURE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.bed")));
+                content.put(TXEAF.DENTURE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.shower")));
+                content.put(TXEAF.DENTURE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.basin")));
 
-            // 4. An- und Auskleiden wie beim Waschen des Oberkörpers usw.
-            String dressinglevel = getMaxInt(ResInfoTypeTools.TYPE_CARE, "SVANAUSOBERKOERPER", "SVANAUSUNTERKOERPER");
-            content.put(TXEAF.DRESSING_CARE_LEVEL, setRadiobutton(dressinglevel, QDVS_SCHEMA));
+                content.put(TXEAF.COMBING_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care"), OPDE_SCHEMA));
+                content.put(TXEAF.COMBING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.bed")));
+                content.put(TXEAF.COMBING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.shower")));
+                content.put(TXEAF.COMBING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.basin")));
 
-            if (!dressinglevel.equalsIgnoreCase("0")) {
-                content.put(TXEAF.DRESSING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
-                content.put(TXEAF.DRESSING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
-                content.put(TXEAF.DRESSING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
+                content.put(TXEAF.SHAVE_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care"), OPDE_SCHEMA));
+                content.put(TXEAF.SHAVE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.bed")));
+                content.put(TXEAF.SHAVE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.shower")));
+                content.put(TXEAF.SHAVE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.basin")));
+
+                content.put(TXEAF.DRESSING_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care"), OPDE_SCHEMA));
+                content.put(TXEAF.DRESSING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.bed")));
+                content.put(TXEAF.DRESSING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.shower")));
+                content.put(TXEAF.DRESSING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.basin")));
+            } else if (caretype.getID().equalsIgnoreCase("kpflege02")) { // Diese Version ist noch vor der QDVS01.1
+                // Die Struktur des Überleitbogens und der QDVS unterscheiden sich teilweise deutlich, so dass ich hier
+                // ein paar Entscheidungen treffen muss, wass ich wie abbilde.
+
+                // 1. Die Körperpflege Level ist MAX(oberkörper, intim, Duschenbaden). Wobei der Bereich von 0..3 (siehe QDVS Schema)
+                String carelevel = getMaxInt(ResInfoTypeTools.TYPE_CARE, "SVOBERKOERPER", "SVINTIMBEREICH", "SVDUSCHENBADEN");
+                content.put(TXEAF.PERSONAL_CARE_LEVEL, setRadiobutton(carelevel, QDVS_SCHEMA));
+
+                // 2. Die Einteilung für Bed, Bad, Waschbecken wird anhand einer Aufteilung in kpflege02 für alle abgebildet, die einen Level größer 0 haben.
+                if (!carelevel.equalsIgnoreCase("0")) {
+                    content.put(TXEAF.PERSONAL_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
+                    content.put(TXEAF.PERSONAL_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
+                    content.put(TXEAF.PERSONAL_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
+                }
+
+                // 3. Körperpflege im Bereich des Kopfes ergibt einen Level von 0..3. Dieser wird hier hingeschrieben. Und zwar jeweils in die Zeile,
+                // die per SVKOPF.kaemmen, SVKOPF.zahnprothese, SVKOPF.rasur, SVKOPF.mundpflege markiert wurde.
+                String headlevel = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF");
+                boolean kaemmen = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF.kaemmen").equalsIgnoreCase("true");
+                boolean zahnprothese = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF.zahnprothese").equalsIgnoreCase("true");
+                boolean rasur = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF.rasur").equalsIgnoreCase("true");
+                boolean mundpflege = getValue(ResInfoTypeTools.TYPE_CARE, "SVKOPF.mundpflege").equalsIgnoreCase("true");
+                // z.B. mundpflege ist angeklickt, dann schreiben wir den Wert hier hin, ansonsten "selbstständig" also "0"
+                content.put(TXEAF.COMBING_CARE_LEVEL, setRadiobutton(kaemmen ? headlevel : "0", QDVS_SCHEMA));
+                content.put(TXEAF.DENTURE_CARE_LEVEL, setRadiobutton(zahnprothese ? headlevel : "0", QDVS_SCHEMA));
+                content.put(TXEAF.SHAVE_CARE_LEVEL, setRadiobutton(rasur ? headlevel : "0", QDVS_SCHEMA));
+                content.put(TXEAF.MOUTH_CARE_LEVEL, setRadiobutton(mundpflege ? headlevel : "0", QDVS_SCHEMA));
+
+                // Jetzt noch die Bad, Waschbecken usw...
+                // Dann wenn level > 0 und z.B. rasur gemeint, dann auch das Waschbecken, wenn angeklickt.
+                if (!headlevel.equalsIgnoreCase("0")) {
+                    if (kaemmen) {
+                        content.put(TXEAF.COMBING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
+                        content.put(TXEAF.COMBING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
+                        content.put(TXEAF.COMBING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
+                    }
+                    if (zahnprothese) {
+                        content.put(TXEAF.DENTURE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
+                        content.put(TXEAF.DENTURE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
+                        content.put(TXEAF.DENTURE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
+                    }
+                    if (rasur) {
+                        content.put(TXEAF.SHAVE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
+                        content.put(TXEAF.SHAVE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
+                        content.put(TXEAF.SHAVE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
+                    }
+                    if (mundpflege) {
+                        content.put(TXEAF.MOUTH_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
+                        content.put(TXEAF.MOUTH_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
+                        content.put(TXEAF.MOUTH_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
+                    }
+                }
+
+                // 4. An- und Auskleiden wie beim Waschen des Oberkörpers usw.
+                String dressinglevel = getMaxInt(ResInfoTypeTools.TYPE_CARE, "SVANAUSOBERKOERPER", "SVANAUSUNTERKOERPER");
+                content.put(TXEAF.DRESSING_CARE_LEVEL, setRadiobutton(dressinglevel, QDVS_SCHEMA));
+
+                if (!dressinglevel.equalsIgnoreCase("0")) {
+                    content.put(TXEAF.DRESSING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
+                    content.put(TXEAF.DRESSING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
+                    content.put(TXEAF.DRESSING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
+                }
             }
         }
-
+        
         // ab hier für alle Fälle gleich
         content.put(TXEAF.SKIN_DRY, setCheckbox(getValue(ResInfoTypeTools.TYPE_SKIN, "skin.dry")));
         content.put(TXEAF.SKIN_GREASY, setCheckbox(getValue(ResInfoTypeTools.TYPE_SKIN, "skin.greasy")));
@@ -747,60 +750,60 @@ public class TXEssenDoc implements HasLogger {
      */
     private void createContent4Section4() {
 
-        if (!getResInfoType(ResInfoTypeTools.TYPE_MOBILITY).isPresent()) return;
+        if (getResInfoType(ResInfoTypeTools.TYPE_MOBILITY).isPresent()) {
 
-        ResInfoType mobiletype = getResInfoType(ResInfoTypeTools.TYPE_MOBILITY).get();
+            ResInfoType mobiletype = getResInfoType(ResInfoTypeTools.TYPE_MOBILITY).get();
 
-        if (mobiletype.getID().equalsIgnoreCase("mobility")) { // Diese Version ist noch vor der QDVS01.1
-            content.put(TXEAF.MOBILITY_GET_UP, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand"), OPDE_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_GETUP, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand.aid").equals("--")));
-            content.put(TXEAF.MOBILITY_WALKING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walk"), OPDE_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_WALKING, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "walk.aid").equals("--")));
-            content.put(TXEAF.MOBILITY_TRANSFER, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "transfer"), OPDE_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_TRANSFER, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "transfer.aid").equals("--")));
-            content.put(TXEAF.MOBILITY_TOILET, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "toilet"), OPDE_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_TOILET, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "toilet.aid").equals("--")));
-            content.put(TXEAF.MOBILITY_SITTING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "sitting"), OPDE_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_SITTING, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "sitting.aid").equals("--")));
-            content.put(TXEAF.MOBILITY_BED, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedmovement"), OPDE_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_BED, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedmovement.aid").equals("--")));
+            if (mobiletype.getID().equalsIgnoreCase("mobility")) { // Diese Version ist noch vor der QDVS01.1
+                content.put(TXEAF.MOBILITY_GET_UP, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand"), OPDE_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_GETUP, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand.aid").equals("--")));
+                content.put(TXEAF.MOBILITY_WALKING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walk"), OPDE_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_WALKING, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "walk.aid").equals("--")));
+                content.put(TXEAF.MOBILITY_TRANSFER, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "transfer"), OPDE_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_TRANSFER, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "transfer.aid").equals("--")));
+                content.put(TXEAF.MOBILITY_TOILET, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "toilet"), OPDE_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_TOILET, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "toilet.aid").equals("--")));
+                content.put(TXEAF.MOBILITY_SITTING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "sitting"), OPDE_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_SITTING, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "sitting.aid").equals("--")));
+                content.put(TXEAF.MOBILITY_BED, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedmovement"), OPDE_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_BED, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedmovement.aid").equals("--")));
 
-            content.put(TXEAF.MOBILITY_AID_CRUTCH, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "crutch.aid")));
-            content.put(TXEAF.MOBILITY_AID_CANE, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "cane.aid")));
-            content.put(TXEAF.MOBILITY_AID_WHEELCHAIR, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "wheel.aid")));
-            content.put(TXEAF.MOBILITY_AID_WALKER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walker.aid")));
-            content.put(TXEAF.MOBILITY_AID_COMMENT, getValue(ResInfoTypeTools.TYPE_MOBILITY, "other.aid"));
-        } else if (mobiletype.getID().equalsIgnoreCase("mobil02")) { // neu
-            content.put(TXEAF.MOBILITY_GET_UP, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILUMSETZEN"), QDVS_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_GETUP, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILUMSETZEN.hilfsmittel").equals("--")));
+                content.put(TXEAF.MOBILITY_AID_CRUTCH, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "crutch.aid")));
+                content.put(TXEAF.MOBILITY_AID_CANE, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "cane.aid")));
+                content.put(TXEAF.MOBILITY_AID_WHEELCHAIR, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "wheel.aid")));
+                content.put(TXEAF.MOBILITY_AID_WALKER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walker.aid")));
+                content.put(TXEAF.MOBILITY_AID_COMMENT, getValue(ResInfoTypeTools.TYPE_MOBILITY, "other.aid"));
+            } else if (mobiletype.getID().equalsIgnoreCase("mobil02")) { // neu
+                content.put(TXEAF.MOBILITY_GET_UP, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILUMSETZEN"), QDVS_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_GETUP, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILUMSETZEN.hilfsmittel").equals("--")));
 
-            content.put(TXEAF.MOBILITY_TRANSFER, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILUMSETZEN"), QDVS_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_TRANSFER, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILUMSETZEN.hilfsmittel").equals("--")));
+                content.put(TXEAF.MOBILITY_TRANSFER, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILUMSETZEN"), QDVS_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_TRANSFER, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILUMSETZEN.hilfsmittel").equals("--")));
 
-            content.put(TXEAF.MOBILITY_TOILET, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "SVTOILETTE"), QDVS_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_TOILET, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "seat.aid"))); // <- from other section
-            content.put(TXEAF.MOBILITY_AID_COMMENT, getValue(ResInfoTypeTools.TYPE_INCOAID, "seat.aid").equalsIgnoreCase("true") ? "Toilettensitzerhöhung" : ""); // Schreibt noch einen Text in die Bemerkung wenn nötig
+                content.put(TXEAF.MOBILITY_TOILET, setRadiobutton(getValue(ResInfoTypeTools.TYPE_INCO, "SVTOILETTE"), QDVS_SCHEMA2));
+                content.put(TXEAF.MOBILITY_AID_TOILET, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "seat.aid"))); // <- from other section
+                content.put(TXEAF.MOBILITY_AID_COMMENT, getValue(ResInfoTypeTools.TYPE_INCOAID, "seat.aid").equalsIgnoreCase("true") ? "Toilettensitzerhöhung" : ""); // Schreibt noch einen Text in die Bemerkung wenn nötig
 
-            content.put(TXEAF.MOBILITY_SITTING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILSITZPOSITION"), QDVS_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_SITTING, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILSITZPOSITION.hilfsmittel").equals("--")));
+                content.put(TXEAF.MOBILITY_SITTING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILSITZPOSITION"), QDVS_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_SITTING, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILSITZPOSITION.hilfsmittel").equals("--")));
 
-            content.put(TXEAF.MOBILITY_BED, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILPOSWECHSEL"), QDVS_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_BED, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILPOSWECHSEL.hilfsmittel").equals("--")));
+                content.put(TXEAF.MOBILITY_BED, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILPOSWECHSEL"), QDVS_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_BED, setCheckbox(!getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILPOSWECHSEL.hilfsmittel").equals("--")));
 
-            content.put(TXEAF.MOBILITY_AID_CRUTCH, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "kruecke")));
-            content.put(TXEAF.MOBILITY_AID_CANE, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "gehstock")));
-            content.put(TXEAF.MOBILITY_AID_WHEELCHAIR, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "rollstuhl")));
-            content.put(TXEAF.MOBILITY_AID_WALKER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "rollator")));
+                content.put(TXEAF.MOBILITY_AID_CRUTCH, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "kruecke")));
+                content.put(TXEAF.MOBILITY_AID_CANE, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "gehstock")));
+                content.put(TXEAF.MOBILITY_AID_WHEELCHAIR, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "rollstuhl")));
+                content.put(TXEAF.MOBILITY_AID_WALKER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "rollator")));
 
-            // Setzt zusätzlich noch ein Häkchen bei Geh Hilfen wenn nur eines der nachfolgenden angeklickt wurde.
-            boolean hilfsmittel = getValue(ResInfoTypeTools.TYPE_MOBILITY, "kruecke").equalsIgnoreCase("true") ||
-                    getValue(ResInfoTypeTools.TYPE_MOBILITY, "gehstock").equalsIgnoreCase("true") ||
-                    getValue(ResInfoTypeTools.TYPE_MOBILITY, "rollstuhl").equalsIgnoreCase("true") ||
-                    getValue(ResInfoTypeTools.TYPE_MOBILITY, "rollator").equalsIgnoreCase("true");
-            content.put(TXEAF.MOBILITY_WALKING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILFORTBEWEGUNG"), QDVS_SCHEMA));
-            content.put(TXEAF.MOBILITY_AID_WALKING, setCheckbox(hilfsmittel));
+                // Setzt zusätzlich noch ein Häkchen bei Geh Hilfen wenn nur eines der nachfolgenden angeklickt wurde.
+                boolean hilfsmittel = getValue(ResInfoTypeTools.TYPE_MOBILITY, "kruecke").equalsIgnoreCase("true") ||
+                        getValue(ResInfoTypeTools.TYPE_MOBILITY, "gehstock").equalsIgnoreCase("true") ||
+                        getValue(ResInfoTypeTools.TYPE_MOBILITY, "rollstuhl").equalsIgnoreCase("true") ||
+                        getValue(ResInfoTypeTools.TYPE_MOBILITY, "rollator").equalsIgnoreCase("true");
+                content.put(TXEAF.MOBILITY_WALKING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "MOBILFORTBEWEGUNG"), QDVS_SCHEMA));
+                content.put(TXEAF.MOBILITY_AID_WALKING, setCheckbox(hilfsmittel));
+            }
         }
-
 
         content.put(TXEAF.MOBILITY_BEDRIDDEN, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedridden")));
         content.put(TXEAF.MOBILITY_AID_COMMODE, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "commode.aid"))); // <- from other section
@@ -810,6 +813,7 @@ public class TXEssenDoc implements HasLogger {
         String mobilityMeasures = "";
         long prev = -1;
 
+        // Bei Lagerungsarten werden alle dekubitus-prophylaktischen Maßnahmen aus den aktuellen Pflegeplanungen eingetragen.
         ArrayList<InterventionSchedule> listSchedule = InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_MOBILITY);
         listSchedule.addAll(InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE));
 
@@ -1209,38 +1213,39 @@ public class TXEssenDoc implements HasLogger {
      * consciousness
      */
     private void createContent4Section11() {
-        if (!getResInfoType(ResInfoTypeTools.TYPE_CONSCIOUS).isPresent()) return;
-        ResInfoType constype = getResInfoType(ResInfoTypeTools.TYPE_CONSCIOUS).get();
-        if (constype.getID().equalsIgnoreCase("conscious")) {
-            content.put(TXEAF.CONSCIOUSNESS_AWAKE, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "awake")));
-            content.put(TXEAF.CONSCIOUSNESS_SOPOR, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "sopor")));
-            content.put(TXEAF.CONSCIOUSNESS_COMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "coma")));
-            content.put(TXEAF.CONSCIOUSNESS_SOMNOLENT, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "somnolent")));
-        } else if (constype.getID().equalsIgnoreCase("bewusst01")) {
-            // TXEssen hat bisher kein Feld für Wachkoma, daher kreuze ich dann auch komatös an.
-            String bewusstseinsWert = getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "BEWUSSTSEINSZUSTAND");
-            content.put(TXEAF.CONSCIOUSNESS_AWAKE, setCheckbox(bewusstseinsWert.equalsIgnoreCase("1")));
-            content.put(TXEAF.CONSCIOUSNESS_SOPOR, setCheckbox(bewusstseinsWert.equalsIgnoreCase("2")));
-            content.put(TXEAF.CONSCIOUSNESS_SOMNOLENT, setCheckbox(bewusstseinsWert.equalsIgnoreCase("3")));
-            content.put(TXEAF.CONSCIOUSNESS_COMA, setCheckbox(bewusstseinsWert.equalsIgnoreCase("4") || bewusstseinsWert.equalsIgnoreCase("5")));
+        if (getResInfoType(ResInfoTypeTools.TYPE_CONSCIOUS).isPresent()) {
+            ResInfoType constype = getResInfoType(ResInfoTypeTools.TYPE_CONSCIOUS).get();
+            if (constype.getID().equalsIgnoreCase("conscious")) {
+                content.put(TXEAF.CONSCIOUSNESS_AWAKE, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "awake")));
+                content.put(TXEAF.CONSCIOUSNESS_SOPOR, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "sopor")));
+                content.put(TXEAF.CONSCIOUSNESS_COMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "coma")));
+                content.put(TXEAF.CONSCIOUSNESS_SOMNOLENT, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "somnolent")));
+            } else if (constype.getID().equalsIgnoreCase("bewusst01")) {
+                // TXEssen hat bisher kein Feld für Wachkoma, daher kreuze ich dann auch komatös an.
+                String bewusstseinsWert = getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "BEWUSSTSEINSZUSTAND");
+                content.put(TXEAF.CONSCIOUSNESS_AWAKE, setCheckbox(bewusstseinsWert.equalsIgnoreCase("1")));
+                content.put(TXEAF.CONSCIOUSNESS_SOPOR, setCheckbox(bewusstseinsWert.equalsIgnoreCase("2")));
+                content.put(TXEAF.CONSCIOUSNESS_SOMNOLENT, setCheckbox(bewusstseinsWert.equalsIgnoreCase("3")));
+                content.put(TXEAF.CONSCIOUSNESS_COMA, setCheckbox(bewusstseinsWert.equalsIgnoreCase("4") || bewusstseinsWert.equalsIgnoreCase("5")));
+            }
         }
 
-        if (!getResInfoType(ResInfoTypeTools.TYPE_ORIENTATION).isPresent()) return;
-        ResInfoType orienttype = getResInfoType(ResInfoTypeTools.TYPE_ORIENTATION).get();
-        if (orienttype.getID().equalsIgnoreCase("orient01")) {
-            content.put(TXEAF.ORIENTATION_TIME_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "time"), new String[]{"yes1", "no1", "intermittent1"}));
-            content.put(TXEAF.ORIENTATION_PERSONAL_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "personal"), new String[]{"yes2", "no2", "intermittent2"}));
-            content.put(TXEAF.ORIENTATION_LOCATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "location"), new String[]{"yes3", "no3", "intermittent3"}));
-            content.put(TXEAF.ORIENTATION_SITUATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "situation"), new String[]{"yes4", "no4", "intermittent4"}));
-            content.put(TXEAF.ORIENTATION_RUNNAWAY_TENDENCY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "runaway"), new String[]{"yes5", "no5", "intermittent5"}));
-        } else if (orienttype.getID().equalsIgnoreCase("orient02")) {
-            content.put(TXEAF.ORIENTATION_TIME_ABILITY, translateBIMODUL2(Integer.parseInt(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "KKFORIENTZEITLICH"))));
-            content.put(TXEAF.ORIENTATION_PERSONAL_ABILITY, translateBIMODUL2(Integer.parseInt(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "KKFERKENNEN"))));
-            content.put(TXEAF.ORIENTATION_LOCATION_ABILITY, translateBIMODUL2(Integer.parseInt(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "KKFORIENTOERTLICH"))));
-            content.put(TXEAF.ORIENTATION_SITUATION_ABILITY, translateBIMODUL2(Integer.parseInt(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "KKFVERSTEHENINFO"))));
-            content.put(TXEAF.ORIENTATION_RUNNAWAY_TENDENCY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "runaway"), new String[]{"1", "2", "3"}));
+        if (getResInfoType(ResInfoTypeTools.TYPE_ORIENTATION).isPresent()) {
+            ResInfoType orienttype = getResInfoType(ResInfoTypeTools.TYPE_ORIENTATION).get();
+            if (orienttype.getID().equalsIgnoreCase("orient01")) {
+                content.put(TXEAF.ORIENTATION_TIME_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "time"), new String[]{"yes1", "no1", "intermittent1"}));
+                content.put(TXEAF.ORIENTATION_PERSONAL_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "personal"), new String[]{"yes2", "no2", "intermittent2"}));
+                content.put(TXEAF.ORIENTATION_LOCATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "location"), new String[]{"yes3", "no3", "intermittent3"}));
+                content.put(TXEAF.ORIENTATION_SITUATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "situation"), new String[]{"yes4", "no4", "intermittent4"}));
+                content.put(TXEAF.ORIENTATION_RUNNAWAY_TENDENCY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "runaway"), new String[]{"yes5", "no5", "intermittent5"}));
+            } else if (orienttype.getID().equalsIgnoreCase("orient02")) {
+                content.put(TXEAF.ORIENTATION_TIME_ABILITY, translateBIMODUL2(Integer.parseInt(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "KKFORIENTZEITLICH"))));
+                content.put(TXEAF.ORIENTATION_PERSONAL_ABILITY, translateBIMODUL2(Integer.parseInt(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "KKFERKENNEN"))));
+                content.put(TXEAF.ORIENTATION_LOCATION_ABILITY, translateBIMODUL2(Integer.parseInt(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "KKFORIENTOERTLICH"))));
+                content.put(TXEAF.ORIENTATION_SITUATION_ABILITY, translateBIMODUL2(Integer.parseInt(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "KKFVERSTEHENINFO"))));
+                content.put(TXEAF.ORIENTATION_RUNNAWAY_TENDENCY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "runaway"), new String[]{"1", "2", "3"}));
+            }
         }
-
 
         // Ab hier wieder gleich
         content.put(TXEAF.COMMS_SPEECH_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "ability1"), new String[]{"oE1", "mE1", "zE1"}));

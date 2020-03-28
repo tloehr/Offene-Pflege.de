@@ -46,7 +46,6 @@
                long="opde.qdvs.appinfo.long" main="true"
                javaclass="de.offene_pflege.gui.qdvs" icon="mdk48.png">
             <execute langbundle="opde.qdvs.acl.execute"/>
-            <manager langbundle="opde.qdvs.acl.manager"/>
         </class>
         <class name="admin.residents.cash" short="admin.residents.cash.appinfo.short"
                long="admin.residents.cash.appinfo.long" main="true"

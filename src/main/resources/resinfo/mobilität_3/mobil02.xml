@@ -3,7 +3,7 @@
 
     <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
     <checkbox name="bedridden" label="bettlägerig"/>
-    <optiongroup size="18" name="MOBILPOSWECHSEL" label="Positionswechsel im Bett" qdvs="26" bi="4.1.1"
+    <optiongroup size="18" name="MOBILPOSWECHSEL" label="Positionswechsel im Bett" qdvs="26"
                  tooltip="bi1.bett.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi1.bett.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi1.bett.selbst1"/>
@@ -12,7 +12,7 @@
     </optiongroup>
     <textfield label="Hilfsmittel" name="MOBILPOSWECHSEL.hilfsmittel" innerlayout="left"/>
 
-    <optiongroup size="18" name="MOBILSITZPOSITION" label="Halten einer stabilen Sitzposition" qdvs="26" bi="4.1.2"
+    <optiongroup size="18" name="MOBILSITZPOSITION" label="Halten einer stabilen Sitzposition" qdvs="26"
                  tooltip="bi1.sitz.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi1.sitz.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi1.sitz.selbst1"/>
@@ -21,7 +21,7 @@
     </optiongroup>
     <textfield label="Hilfsmittel" name="MOBILSITZPOSITION.hilfsmittel" innerlayout="left"/>
 
-    <optiongroup size="18" name="MOBILUMSETZEN" label="Umsetzen" qdvs="26" bi="4.1.3" tooltip="bi1.umsetzen.erklaerung">
+    <optiongroup size="18" name="MOBILUMSETZEN" label="Umsetzen" qdvs="26" tooltip="bi1.umsetzen.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi1.umsetzen.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi1.umsetzen.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi1.umsetzen.selbst2"/>
@@ -29,7 +29,7 @@
     </optiongroup>
     <textfield label="Hilfsmittel" name="MOBILUMSETZEN.hilfsmittel" innerlayout="left"/>
 
-    <optiongroup size="18" name="MOBILFORTBEWEGUNG" label="Fortbewegen innerhalb des Wohnbereichs" qdvs="26" bi="4.1.4"
+    <optiongroup size="18" name="MOBILFORTBEWEGUNG" label="Fortbewegen innerhalb des Wohnbereichs" qdvs="26"
                  tooltip="bi1.wohnbereich.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi1.wohnbereich.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi1.wohnbereich.selbst1"/>
@@ -44,8 +44,7 @@
     </tabgroup>
 
     <optiongroup size="18" name="MOBILTREPPENSTEIGEN" label="Treppensteigen" tooltip="bi1.treppen.erklaerung"
-                 qdvs="Zeile 30"
-                 bi="4.1.5">
+                 qdvs="Zeile 30">
         <option label="selbstständig" name="0" default="true" tooltip="bi1.treppen.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi1.treppen.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi1.treppen.selbst2"/>
@@ -53,7 +52,6 @@
     </optiongroup>
 
     <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
-              tooltip="bi1.unfaehig.arme.beine"
-              bi="4.1.6"/>
+              tooltip="bi1.unfaehig.arme.beine"/>
 
 </resinfotype>

@@ -19,13 +19,17 @@
         <label fontstyle="bold" label="Bitte ausgefüllte Tests an diese Info anhängen."/>
     </tabgroup>
 
-    <optiongroup name="runaway" label="Weglauftendenz"><option label="ja" name="1" default="true"/> <option
-            label="nein" name="2"/><option label="zeitweise" name="3"/></optiongroup>
+    <optiongroup name="runaway" label="Weglauftendenz" tx="Verwendung bei Orientierung/Psyche: Weglauftendenz">
+        <option label="ja" name="1"/>
+        <option label="nein" name="2"  default="true"/>
+        <option label="zeitweise" name="3"/>
+    </optiongroup>
 
     <separator/>
 
     <optiongroup name="KKFERKENNEN" size="18" label="Erkennen von Personen aus dem näheren Umfeld"
-                 tooltip="bi2.personen.erklaerung" qdvs="Zeile(n) 30 im DAS Dokumentationsbogen.">
+                 tooltip="bi2.personen.erklaerung" qdvs="Zeile(n) 30 im DAS Dokumentationsbogen."
+                 tx="Verwendung bei Orientierung/Psyche: persönlich, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.personen.selbst0"/>
         <option label="größtenteils vorhanden" name="1" tooltip="bi2.personen.selbst1"/>
         <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.personen.selbst2"/>
@@ -33,7 +37,8 @@
     </optiongroup>
 
     <optiongroup name="KKFORIENTOERTLICH" size="18" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"
-                 qdvs="Zeile(n) 31 im DAS Dokumentationsbogen.">
+                 qdvs="Zeile(n) 31 im DAS Dokumentationsbogen."
+                 tx="Verwendung bei Orientierung/Psyche: örtlich, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.orte.selbst0"/>
         <option label="größtenteils vorhanden" name="1" tooltip="bi2.orte.selbst1"/>
         <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.orte.selbst2"/>
@@ -41,7 +46,8 @@
     </optiongroup>
 
     <optiongroup name="KKFORIENTZEITLICH" size="18" label="Zeitliche Orientierung" tooltip="bi2.zeitlich.erklaerung"
-                 qdvs="Zeile(n) 32 im DAS Dokumentationsbogen.">
+                 qdvs="Zeile(n) 32 im DAS Dokumentationsbogen."
+                 tx="Verwendung bei Orientierung/Psyche: zeitlich, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.zeitlich.selbst0"/>
         <option label="größtenteils vorhanden" name="1" tooltip="bi2.zeitlich.selbst1"/>
         <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.zeitlich.selbst2"/>
@@ -73,7 +79,8 @@
     </optiongroup>
 
     <optiongroup name="KKFVERSTEHENINFO" size="18" label="Verstehen von Sachverhalten und Informationen"
-                 tooltip="bi2.verstehen.erklaerung" qdvs="Zeile(n) 36 im DAS Dokumentationsbogen.">
+                 tooltip="bi2.verstehen.erklaerung" qdvs="Zeile(n) 36 im DAS Dokumentationsbogen."
+                 tx="Verwendung bei Orientierung/Psyche: situativ, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.verstehen.selbst0"/>
         <option label="größtenteils vorhanden" name="1" tooltip="bi2.verstehen.selbst1"/>
         <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.verstehen.selbst2"/>
@@ -90,28 +97,28 @@
     </optiongroup>
 
     <optiongroup name="KKFMITTEILEN" size="18" label="Mitteilen von elementaren Bedürfnissen"
-                 tooltip="bi2.beduerfnissen.erklaerung" qi="Zeile 39">
-        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.beduerfnissen.selbst0"/>
-        <option label="größtenteils vorhanden" name="1" tooltip="bi2.beduerfnissen.selbst1"/>
-        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.beduerfnissen.selbst2"/>
-        <option label="nicht vorhanden" name="3" tooltip="bi2.beduerfnissen.selbst3"/>
-    </optiongroup>
+                   tooltip="bi2.beduerfnissen.erklaerung" qdvs="Zeile 39">
+          <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.beduerfnissen.selbst0"/>
+          <option label="größtenteils vorhanden" name="1" tooltip="bi2.beduerfnissen.selbst1"/>
+          <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.beduerfnissen.selbst2"/>
+          <option label="nicht vorhanden" name="3" tooltip="bi2.beduerfnissen.selbst3"/>
+      </optiongroup>
 
-    <optiongroup name="KKFVERSTEHENAUF" size="18" label="Verstehen von Aufforderungen"
-                 tooltip="bi2.aufforderungen.erklaerung" qdvs="Zeile(n) 39 im DAS Dokumentationsbogen.">
-        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.aufforderungen.selbst0"/>
-        <option label="größtenteils vorhanden" name="1" tooltip="bi2.aufforderungen.selbst1"/>
-        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.aufforderungen.selbst2"/>
-        <option label="nicht vorhanden" name="3" tooltip="bi2.aufforderungen.selbst3"/>
-    </optiongroup>
+      <optiongroup name="KKFVERSTEHENAUF" size="18" label="Verstehen von Aufforderungen"
+                   tooltip="bi2.aufforderungen.erklaerung" qdvs="Zeile(n) 39 im DAS Dokumentationsbogen.">
+          <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.aufforderungen.selbst0"/>
+          <option label="größtenteils vorhanden" name="1" tooltip="bi2.aufforderungen.selbst1"/>
+          <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.aufforderungen.selbst2"/>
+          <option label="nicht vorhanden" name="3" tooltip="bi2.aufforderungen.selbst3"/>
+      </optiongroup>
 
-    <optiongroup name="KKFBETEILIGUNG" size="18" label="Beteiligung an einem Gespräch"
-                 tooltip="bi2.gespraech.erklaerung"
-                 qdvs="Zeile(n) 40 im DAS Dokumentationsbogen.">
-        <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.gespraech.selbst0"/>
-        <option label="größtenteils vorhanden" name="1" tooltip="bi2.gespraech.selbst1"/>
-        <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.gespraech.selbst2"/>
-        <option label="nicht vorhanden" name="3" tooltip="bi2.gespraech.selbst3"/>
-    </optiongroup>
+      <optiongroup name="KKFBETEILIGUNG" size="18" label="Beteiligung an einem Gespräch"
+                   tooltip="bi2.gespraech.erklaerung"
+                   qdvs="Zeile(n) 40 im DAS Dokumentationsbogen.">
+          <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.gespraech.selbst0"/>
+          <option label="größtenteils vorhanden" name="1" tooltip="bi2.gespraech.selbst1"/>
+          <option label="in geringem Maße vorhanden" name="2" tooltip="bi2.gespraech.selbst2"/>
+          <option label="nicht vorhanden" name="3" tooltip="bi2.gespraech.selbst3"/>
+      </optiongroup>
 
 </resinfotype>

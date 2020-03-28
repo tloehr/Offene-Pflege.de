@@ -928,103 +928,102 @@ SET t.XML = '<tabgroup size="12" label="Kontrakturen an den oberen Extremitäten
 WHERE t.BWINFTYP = 'KONTRAKT';
 --
 UPDATE resinfotype t
-SET t.XML = '  <tx
-                  tooltip="[b]Seite 1, Abschnitt 3. &quot;Grundpflege&quot;[/b]
-                  [br/]Die Markierungen im Abschnitt &quot;Grundpflege&quot; werden entsprechenden Ihren Einträgen in diesem Formular gesetzt.
-                  [br/]Der Bemerkungs-Text wird in die Bemerkungs-Zeile dieses Abschnitts im Überleitbogen übernommen."/>
+SET t.XML = '   <tx
+            tooltip="[b]Seite 1, Abschnitt 3. &quot;Grundpflege&quot;[/b]
+            [br/]Die Markierungen im Abschnitt &quot;Grundpflege&quot; werden entsprechenden Ihren Einträgen in diesem Formular gesetzt.
+            [br/]Der Bemerkungs-Text wird in die Bemerkungs-Zeile dieses Abschnitts im Überleitbogen übernommen."/>
 
-          <optiongroup size="18" name="SVOBERKOERPER" label="Waschen des vorderen Oberkörpers" qdvs="Zeile 47" bi="4.4.1"
-                       tooltip="bi4.oberkoerper.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi4.oberkoerper.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi4.oberkoerper.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi4.oberkoerper.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi4.oberkoerper.selbst3"/>
-          </optiongroup>
+    <optiongroup size="18" name="SVOBERKOERPER" label="Waschen des vorderen Oberkörpers" qdvs="Zeile 47"
+                 tooltip="bi4.oberkoerper.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.oberkoerper.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.oberkoerper.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.oberkoerper.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.oberkoerper.selbst3"/>
+    </optiongroup>
 
-          <optiongroup size="18" name="SVKOPF" label="Körperpflege im Bereich des Kopfes" qdvs="Zeile 48" bi="4.4.2"
-                       tooltip="bi4.kopf.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi4.kopf.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi4.kopf.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi4.kopf.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi4.kopf.selbst3"/>
-          </optiongroup>
+    <optiongroup size="18" name="SVKOPF" label="Körperpflege im Bereich des Kopfes" qdvs="Zeile 48"
+                 tooltip="bi4.kopf.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.kopf.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.kopf.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.kopf.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.kopf.selbst3"/>
+    </optiongroup>
 
-          <tabgroup size="14" label="Pflege des Kopfes umfasst auch" name="tab1">
-              <checkbox name="SVKOPF.kaemmen" label="Kämmen" layout="left"/>
-              <checkbox name="SVKOPF.mundpflege" label="Mundpflege" layout="left"/>
-              <checkbox name="SVKOPF.rasur" label="Rasieren" layout="left"/>
-              <checkbox name="SVKOPF.zahnprothese" label="Zahnprothese" layout="left"/>
-          </tabgroup>
+    <tabgroup size="14" label="Pflege des Kopfes umfasst auch" name="tab1">
+        <checkbox name="SVKOPF.kaemmen" label="Kämmen" layout="left"/>
+        <checkbox name="SVKOPF.mundpflege" label="Mundpflege" layout="left"/>
+        <checkbox name="SVKOPF.rasur" label="Rasieren" layout="left"/>
+        <checkbox name="SVKOPF.zahnprothese" label="Zahnprothese" layout="left"/>
+    </tabgroup>
 
-          <optiongroup size="18" name="SVINTIMBEREICH" label="Waschen des Intimbereichs" qdvs="Zeile 49" bi="4.4.3"
-                       tooltip="bi4.intim.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi4.intim.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi4.intim.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi4.intim.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi4.intim.selbst3"/>
-          </optiongroup>
+    <optiongroup size="18" name="SVINTIMBEREICH" label="Waschen des Intimbereichs" qdvs="Zeile 49"
+                 tooltip="bi4.intim.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.intim.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.intim.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.intim.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.intim.selbst3"/>
+    </optiongroup>
 
-          <optiongroup size="18" name="SVDUSCHENBADEN" label="Duschen und Baden einschließlich Waschen der Haare"
-                       qdvs="Zeile 50"
-                       bi="4.4.4"
-                       tooltip="bi4.baden.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi4.baden.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi4.baden.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi4.baden.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi4.baden.selbst3"/>
-          </optiongroup>
+    <optiongroup size="18" name="SVDUSCHENBADEN" label="Duschen und Baden einschließlich Waschen der Haare"
+                 qdvs="Zeile 50"
+                 tooltip="bi4.baden.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.baden.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.baden.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.baden.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.baden.selbst3"/>
+    </optiongroup>
 
-          <optiongroup size="18" name="SVANAUSOBERKOERPER" label="An- und Auskleiden des Oberkörpers" qdvs="Zeile 51"
-                       bi="4.4.5" tooltip="bi4.okankleiden.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi4.okankleiden.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi4.okankleiden.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi4.okankleiden.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi4.okankleiden.selbst3"/>
-          </optiongroup>
+    <optiongroup size="18" name="SVANAUSOBERKOERPER" label="An- und Auskleiden des Oberkörpers" qdvs="Zeile 51"
+                 tooltip="bi4.okankleiden.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.okankleiden.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.okankleiden.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.okankleiden.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.okankleiden.selbst3"/>
+    </optiongroup>
 
-          <optiongroup size="18" name="SVANAUSUNTERKOERPER" label="An- und Auskleiden des Unterkörpers" qdvs="Zeile 52"
-                       bi="4.4.6" tooltip="bi4.ukankleiden.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi4.ukankleiden.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi4.ukankleiden.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi4.ukankleiden.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi4.ukankleiden.selbst3"/>
-          </optiongroup>
+    <optiongroup size="18" name="SVANAUSUNTERKOERPER" label="An- und Auskleiden des Unterkörpers" qdvs="Zeile 52"
+                tooltip="bi4.ukankleiden.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi4.ukankleiden.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi4.ukankleiden.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi4.ukankleiden.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi4.ukankleiden.selbst3"/>
+    </optiongroup>
 
-          <label size="14" fontstyle="bold" label="Hilfen erfolgen im/am/in:"/>
-          <checkbox name="personal.care.bed" label="Bett" layout="left"/>
-          <checkbox name="personal.care.shower" label="Bad, Dusche" layout="left"/>
-          <checkbox name="personal.care.basin" label="Waschbecken" layout="left"/>
+    <label size="14" fontstyle="bold" label="Hilfen erfolgen im/am/in:"/>
+    <checkbox name="personal.care.bed" label="Bett" layout="left"/>
+    <checkbox name="personal.care.shower" label="Bad, Dusche" layout="left"/>
+    <checkbox name="personal.care.basin" label="Waschbecken" layout="left"/>
 
-          <textfield label="Bevorzugte Pflegemittel" name="preferred.careproducts" innerlayout="left"/>
+    <textfield label="Bevorzugte Pflegemittel" name="preferred.careproducts" innerlayout="left"/>
 
-          <!-- ==================Spezielle Mundpflege================== -->
-          <tabgroup size="18" label="Gründe für eine spezielle Mundpflege" name="tab2">
-              <checkbox name="zahnlosigkeit" label="Zahnlosigkeit" layout="br"/>
-              <checkbox name="mundtrockenheit" label="extreme Mundtrockenheit (durch Mundatmung, durch Medikamente)"
-                        layout="left"/>
-              <checkbox name="trockene.lippen" label="Trockene Lippen (Rhagade)" layout="left"/>
-              <checkbox name="zungenbelag" label="Schleimhautbelägen der Zunge" layout="br"/>
-              <checkbox name="speichel.dickf" label="dickflüssiger Speichel" layout="left"/>
-              <checkbox name="lockere.zaehne" label="lockere Zähne" layout="left"/>
-              <checkbox name="laesion.mund" label="Schädigungen des Mundes" layout="left"/>
-              <checkbox name="soor" label="Soor (Pilzbefall)" layout="left"/>
-              <checkbox name="stomatitis" label="Stomatitis (Mundentzündung)" layout="br"/>
-              <checkbox name="gingivitis" label="Gingivitis (Zahnfleischentzündung)" layout="left"/>
-              <checkbox name="aphten" label="Erosionen mit entzündlichem Randsaum (Aphten)" layout="left"/>
-              <checkbox name="herpes" label="Lippenherpes" layout="br"/>
-              <checkbox name="blutung" label="erhöhter Blutungsneigung" layout="left"/>
-              <checkbox name="mundflora" label="Zerstörung der physiologischen Mundflora"
-                        tooltip="durch Medikamente, Kortison, Zytostatika, Antibiotika" layout="left"/>
-              <checkbox name="sauerstoff" label="längerfristiger Sauerstofftherapie (Mund trocknet aus)" layout="br"/>
-              <checkbox name="absaugen" label="wiederholte Nasale oder Orale Absaugvorgänge" layout="left"/>
-              <checkbox name="bewusstlos" label="Bewußtlosigkeit" layout="left"/>
-              <checkbox name="verletzung" label="Bei Verletzungen am Kiefer und in der Mundhöhle" layout="br"/>
-              <checkbox name="nahrungskarenz" label="Bei Nahrungskarenz (PEG, Parenterale Ernährung (s.c.))" layout="left"/>
-              <checkbox name="schluckstoerung" label="Schluckstörungen" layout="br"/>
-              <checkbox name="az" label="reduzierter Allgemeinzustand" layout="left"/>
-              <checkbox name="praefinal" label="während des Sterbeprozesses" layout="left"/>
-              <checkbox name="immunschwaeche" label="Immunschwäche" layout="left"/>
-          </tabgroup>'
+    <!-- ==================Spezielle Mundpflege================== -->
+    <tabgroup size="18" label="Gründe für eine spezielle Mundpflege" name="tab2">
+        <checkbox name="zahnlosigkeit" label="Zahnlosigkeit" layout="br"/>
+        <checkbox name="mundtrockenheit" label="extreme Mundtrockenheit (durch Mundatmung, durch Medikamente)"
+                  layout="left"/>
+        <checkbox name="trockene.lippen" label="Trockene Lippen (Rhagade)" layout="left"/>
+        <checkbox name="zungenbelag" label="Schleimhautbelägen der Zunge" layout="br"/>
+        <checkbox name="speichel.dickf" label="dickflüssiger Speichel" layout="left"/>
+        <checkbox name="lockere.zaehne" label="lockere Zähne" layout="left"/>
+        <checkbox name="laesion.mund" label="Schädigungen des Mundes" layout="left"/>
+        <checkbox name="soor" label="Soor (Pilzbefall)" layout="left"/>
+        <checkbox name="stomatitis" label="Stomatitis (Mundentzündung)" layout="br"/>
+        <checkbox name="gingivitis" label="Gingivitis (Zahnfleischentzündung)" layout="left"/>
+        <checkbox name="aphten" label="Erosionen mit entzündlichem Randsaum (Aphten)" layout="left"/>
+        <checkbox name="herpes" label="Lippenherpes" layout="br"/>
+        <checkbox name="blutung" label="erhöhter Blutungsneigung" layout="left"/>
+        <checkbox name="mundflora" label="Zerstörung der physiologischen Mundflora"
+                  tooltip="durch Medikamente, Kortison, Zytostatika, Antibiotika" layout="left"/>
+        <checkbox name="sauerstoff" label="längerfristiger Sauerstofftherapie (Mund trocknet aus)" layout="br"/>
+        <checkbox name="absaugen" label="wiederholte Nasale oder Orale Absaugvorgänge" layout="left"/>
+        <checkbox name="bewusstlos" label="Bewußtlosigkeit" layout="left"/>
+        <checkbox name="verletzung" label="Bei Verletzungen am Kiefer und in der Mundhöhle" layout="br"/>
+        <checkbox name="nahrungskarenz" label="Bei Nahrungskarenz (PEG, Parenterale Ernährung (s.c.))" layout="left"/>
+        <checkbox name="schluckstoerung" label="Schluckstörungen" layout="br"/>
+        <checkbox name="az" label="reduzierter Allgemeinzustand" layout="left"/>
+        <checkbox name="praefinal" label="während des Sterbeprozesses" layout="left"/>
+        <checkbox name="immunschwaeche" label="Immunschwäche" layout="left"/>
+    </tabgroup>'
 WHERE t.BWINFTYP = 'kpflege02';
 --
 UPDATE resinfotype t
@@ -1530,60 +1529,58 @@ UPDATE resinfotype t SET t.XML = ' <tabgroup size="18" fontstyle="bold" label="H
               <option label="überwiegend unselbständig" name="2" tooltip="bi6.kontaktpflege.selbst2" layout="br left"/>
               <option label="unselbständig" name="3" tooltip="bi6.kontaktpflege.selbst3"/>
           </optiongroup>' WHERE t.BWINFTYP = 'sozial01';
-UPDATE resinfotype t SET t.XML = ' <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
-          <checkbox name="bedridden" label="bettlägerig"/>
-          <optiongroup size="18" name="MOBILPOSWECHSEL" label="Positionswechsel im Bett" qdvs="26" bi="4.1.1"
-                       tooltip="bi1.bett.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi1.bett.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi1.bett.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi1.bett.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi1.bett.selbst3"/>
-          </optiongroup>
-          <textfield label="Hilfsmittel" name="MOBILPOSWECHSEL.hilfsmittel" innerlayout="left"/>
+UPDATE resinfotype t SET t.XML = '  <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
+    <checkbox name="bedridden" label="bettlägerig"/>
+    <optiongroup size="18" name="MOBILPOSWECHSEL" label="Positionswechsel im Bett" qdvs="26"
+                 tooltip="bi1.bett.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi1.bett.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi1.bett.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi1.bett.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi1.bett.selbst3"/>
+    </optiongroup>
+    <textfield label="Hilfsmittel" name="MOBILPOSWECHSEL.hilfsmittel" innerlayout="left"/>
 
-          <optiongroup size="18" name="MOBILSITZPOSITION" label="Halten einer stabilen Sitzposition" qdvs="26" bi="4.1.2"
-                       tooltip="bi1.sitz.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi1.sitz.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi1.sitz.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi1.sitz.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi1.sitz.selbst3"/>
-          </optiongroup>
-          <textfield label="Hilfsmittel" name="MOBILSITZPOSITION.hilfsmittel" innerlayout="left"/>
+    <optiongroup size="18" name="MOBILSITZPOSITION" label="Halten einer stabilen Sitzposition" qdvs="26"
+                 tooltip="bi1.sitz.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi1.sitz.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi1.sitz.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi1.sitz.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi1.sitz.selbst3"/>
+    </optiongroup>
+    <textfield label="Hilfsmittel" name="MOBILSITZPOSITION.hilfsmittel" innerlayout="left"/>
 
-          <optiongroup size="18" name="MOBILUMSETZEN" label="Umsetzen" qdvs="26" bi="4.1.3" tooltip="bi1.umsetzen.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi1.umsetzen.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi1.umsetzen.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi1.umsetzen.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi1.umsetzen.selbst3"/>
-          </optiongroup>
-          <textfield label="Hilfsmittel" name="MOBILUMSETZEN.hilfsmittel" innerlayout="left"/>
+    <optiongroup size="18" name="MOBILUMSETZEN" label="Umsetzen" qdvs="26" tooltip="bi1.umsetzen.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi1.umsetzen.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi1.umsetzen.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi1.umsetzen.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi1.umsetzen.selbst3"/>
+    </optiongroup>
+    <textfield label="Hilfsmittel" name="MOBILUMSETZEN.hilfsmittel" innerlayout="left"/>
 
-          <optiongroup size="18" name="MOBILFORTBEWEGUNG" label="Fortbewegen innerhalb des Wohnbereichs" qdvs="26" bi="4.1.4"
-                       tooltip="bi1.wohnbereich.erklaerung">
-              <option label="selbstständig" name="0" default="true" tooltip="bi1.wohnbereich.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi1.wohnbereich.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi1.wohnbereich.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi1.wohnbereich.selbst3"/>
-          </optiongroup>
-          <tabgroup label="Hilfsmittel zur Bewegung" name="hilfsmittel">
-              <checkbox name="rollstuhl" label="Rollstuhl"/>
-              <checkbox name="kruecke" label="Unterarmgehstütze"/>
-              <checkbox name="rollator" label="Rollator"/>
-              <checkbox name="gehstock" label="Gehstock"/>
-          </tabgroup>
+    <optiongroup size="18" name="MOBILFORTBEWEGUNG" label="Fortbewegen innerhalb des Wohnbereichs" qdvs="26"
+                 tooltip="bi1.wohnbereich.erklaerung">
+        <option label="selbstständig" name="0" default="true" tooltip="bi1.wohnbereich.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi1.wohnbereich.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi1.wohnbereich.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi1.wohnbereich.selbst3"/>
+    </optiongroup>
+    <tabgroup label="Hilfsmittel zur Bewegung" name="hilfsmittel">
+        <checkbox name="rollstuhl" label="Rollstuhl"/>
+        <checkbox name="kruecke" label="Unterarmgehstütze"/>
+        <checkbox name="rollator" label="Rollator"/>
+        <checkbox name="gehstock" label="Gehstock"/>
+    </tabgroup>
 
-          <optiongroup size="18" name="MOBILTREPPENSTEIGEN" label="Treppensteigen" tooltip="bi1.treppen.erklaerung"
-                       qdvs="Zeile 30"
-                       bi="4.1.5">
-              <option label="selbstständig" name="0" default="true" tooltip="bi1.treppen.selbst0"/>
-              <option label="überwiegend selbständig" name="1" tooltip="bi1.treppen.selbst1"/>
-              <option label="überwiegend unselbständig" name="2" tooltip="bi1.treppen.selbst2"/>
-              <option label="unselbständig" name="3" tooltip="bi1.treppen.selbst3"/>
-          </optiongroup>
+    <optiongroup size="18" name="MOBILTREPPENSTEIGEN" label="Treppensteigen" tooltip="bi1.treppen.erklaerung"
+                 qdvs="Zeile 30">
+        <option label="selbstständig" name="0" default="true" tooltip="bi1.treppen.selbst0"/>
+        <option label="überwiegend selbständig" name="1" tooltip="bi1.treppen.selbst1"/>
+        <option label="überwiegend unselbständig" name="2" tooltip="bi1.treppen.selbst2"/>
+        <option label="unselbständig" name="3" tooltip="bi1.treppen.selbst3"/>
+    </optiongroup>
 
-          <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
-                    tooltip="bi1.unfaehig.arme.beine"
-                    bi="4.1.6"/>' WHERE t.BWINFTYP LIKE 'mobil02';
+    <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
+              tooltip="bi1.unfaehig.arme.beine"/>' WHERE t.BWINFTYP LIKE 'mobil02';
 UPDATE resinfotype t SET t.XML = ' <qpr tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Zeile: 42"/>
           <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
           <tx tooltip="Seite 2, Abschnitt 9."/>

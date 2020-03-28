@@ -1,7 +1,7 @@
 <resinfotype bwinftyp="comms" sinceversion="13" category="12" abstract_type="101" equivalent="4"
              intervalmode="0" infokurz="Kommunikation" infolang="" tx="true" qpr="true">
 
-    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen."/>
     <textfield name="mothertongue" label="Muttersprache"
                tx="Übernahme in 'Muttersprache' auf Seite 1 des Überleitbogen."/>
     <tabgroup size="12" label="Hilfsmittel" name="hm1">
@@ -10,27 +10,27 @@
         <checkbox name="glassesfar" label="Weitsichtbrille" layout="left"/>
     </tabgroup>
 
-    <optiongroup name="ability1" label="Sprache">
+    <optiongroup name="ability1" label="Sprache" tx="Verwendung bei Kommunikation: Sprache">
         <option label="ohne Einschränkung" name="oE1" default="true"/>
         <option label="mit Einschränkungen" name="mE1"/>
         <option label="zeitweise eingeschränkt" name="zE1"/>
     </optiongroup>
-    <optiongroup name="ability2" label="Sprachverständnis">
+    <optiongroup name="ability2" label="Sprachverständnis" tx="Verwendung bei Kommunikation: Sprachverständnis">
         <option label="ohne Einschränkung" name="oE2" default="true"/>
         <option label="mit Einschränkungen" name="mE2"/>
         <option label="zeitweise eingeschränkt" name="zE2"/>
     </optiongroup>
-    <optiongroup name="ability3" label="Gehör">
+    <optiongroup name="ability3" label="Gehör" tx="Verwendung bei Kommunikation: Gehör">
         <option label="ohne Einschränkung" name="oE3" default="true"/>
         <option label="mit Einschränkungen" name="mE3"/>
         <option label="zeitweise eingeschränkt" name="zE3"/>
     </optiongroup>
-    <optiongroup name="ability4" label="Sehen">
+    <optiongroup name="ability4" label="Sehen" tx="Verwendung bei Kommunikation: Sehen">
         <option label="ohne Einschränkung" name="oE4" default="true"/>
         <option label="mit Einschränkungen" name="mE4"/>
         <option label="zeitweise eingeschränkt" name="zE4"/>
     </optiongroup>
-    <optiongroup name="ability5" label="Schrift">
+    <optiongroup name="ability5" label="Schrift" tx="Verwendung bei Kommunikation: Schrift">
         <option label="ohne Einschränkung" name="oE5" default="true"/>
         <option label="mit Einschränkungen" name="mE5"/>
         <option label="zeitweise eingeschränkt" name="zE5"/>

@@ -1091,6 +1091,9 @@ public class InitWizard extends WizardDialog {
                         stmt.close();
                         summary.add(SYSTools.xx("opde.initwizard.summary.createdb.createschema", catalog));
 
+                        // todo: CREATE USER 'jeffrey'@'localhost' IDENTIFIED BY 'password';
+                        // Im Moment erzeugt GRANT den User implizit. Ist aber deprecated
+
                         String queryGrant1 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
                         stmt = jdbcConnection.prepareStatement(queryGrant1);
                         stmt.executeUpdate();

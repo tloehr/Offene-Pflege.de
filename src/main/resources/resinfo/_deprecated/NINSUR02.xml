@@ -13,7 +13,7 @@
     <textfield label="Krankenkassen Nr." name="insuranceno" innerlayout="tab"/>
     <separator/>
     <optiongroup name="grade" label="Einstufung" tx="Wird auf Seite 1 eingetragen."
-                 qi="Wird für die Indiaktoren an die DAS-Pflege verwendet.">
+                 qdvs="Wird für die Indiaktoren an die DAS-Pflege verwendet.">
         <option label="nicht eingestuft" name="none" default="true"/>
         <option label="beantragt" name="requested"/>
         <option label="abgelehnt" name="refused"/>

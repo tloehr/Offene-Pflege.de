@@ -3,7 +3,7 @@
 
     <optiongroup size="18" name="GARUHENSCHLAFEN"
                  label="Ruhen und Schlafen"
-                 qi="60" bi="4.6.2" tooltip="bi6.schlafen.erklaerung" tx="Seite 1, Abschnitt 8">
+                 qdvs="Zeile 60" bi="4.6.2" tooltip="bi6.schlafen.erklaerung" tx="Seite 1, Abschnitt 8">
         <option label="selbstständig" name="0" default="true" tooltip="bi6.schlafen.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi6.schlafen.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi6.schlafen.selbst2" layout="br left"/>

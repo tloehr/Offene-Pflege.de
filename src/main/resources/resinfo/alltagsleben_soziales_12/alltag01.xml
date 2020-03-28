@@ -4,7 +4,7 @@
 
     <optiongroup size="18" name="GATAGESABLAUF"
                  label="Tagesablauf gestalten und an Veränderungen anpassen"
-                 qi="59" bi="4.6.1" tooltip="bi6.alltag.erklaerung" tx="Seite 1, Abschnitt 8">
+                 qdvs="Zeile 59" bi="4.6.1" tooltip="bi6.alltag.erklaerung" >
         <option label="selbstständig" name="0" default="true" tooltip="bi6.alltag.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi6.alltag.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi6.alltag.selbst2" layout="br left"/>
@@ -13,7 +13,7 @@
 
     <optiongroup size="18" name="GABESCHAEFTIGEN"
                  label="Sich beschäftigen"
-                 qi="61" bi="4.6.3" tooltip="bi6.beschaeftigen.erklaerung" tx="Seite 1, Abschnitt 8">
+                 qdvs="Zeile 61" bi="4.6.3" tooltip="bi6.beschaeftigen.erklaerung" >
         <option label="selbstständig" name="0" default="true" tooltip="bi6.beschaeftigen.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi6.beschaeftigen.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi6.beschaeftigen.selbst2" layout="br left"/>
@@ -22,7 +22,7 @@
 
     <optiongroup size="18" name="GAPLANUNGEN"
                  label="Vornehmen von in die Zukunft gerichteten Planungen"
-                 qi="62" bi="4.6.4" tooltip="bi6.zukunft.erklaerung" tx="Seite 1, Abschnitt 8">
+                 qdvs="Zeile 62" bi="4.6.4" tooltip="bi6.zukunft.erklaerung" >
         <option label="selbstständig" name="0" default="true" tooltip="bi6.zukunft.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi6.zukunft.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi6.zukunft.selbst2" layout="br left"/>

@@ -7,14 +7,15 @@
                  qdvs="Zeile(n) 23 im DAS Dokumentationsbogen." tooltip="bi6.beschaeftigen.erklaerung"
                  tx="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11.">
         <option label="wach" name="1" default="true"
-                tooltip="Die Person ist ansprechbar und kann an Aktivitäten teilnehmen."/>
+                tooltip="Die Person ist ansprechbar und kann an Aktivitäten teilnehmen." tx="setzt 'wach'"/>
         <option label="schläfrig" name="2"
-                tooltip="Die Person ist ansprechbar und gut erweckbar, wirkt jedoch müde und ist verlangsamt in seinen Handlungen."/>
+                tooltip="Die Person ist ansprechbar und gut erweckbar, wirkt jedoch müde und ist verlangsamt in seinen Handlungen." tx="setzt 'soporös'"/>
         <option label="somnolent" name="3"
                 tooltip="Die Person ist sehr schläfrig und kann nur durch starke äußere Reize geweckt werden (z. B. kräftiges Rütteln an der Schulter oder mehrfaches, sehr lautes Ansprechen)."
-                layout="br left"/>
-        <option label="komatös" name="4" tooltip="Die Person kann durch äußere Reize nicht mehr geweckt werden."/>
-        <option label="wachkoma" name="5" tooltip="Dies trifft nur dann zu, wenn eine ärztliche Diagnose vorliegt."/>
+                layout="br left"  tx="setzt 'somnolent'"/>
+        <option label="komatös" name="4" tooltip="Die Person kann durch äußere Reize nicht mehr geweckt werden."
+                tx="setzt 'komatös'"/>
+        <option label="wachkoma" name="5" tooltip="Dies trifft nur dann zu, wenn eine ärztliche Diagnose vorliegt." tx="setzt 'komatös'"/>
     </optiongroup>
 
 </resinfotype>
