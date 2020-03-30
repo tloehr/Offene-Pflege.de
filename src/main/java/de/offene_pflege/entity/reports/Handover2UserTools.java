@@ -5,7 +5,7 @@
 
 package de.offene_pflege.entity.reports;
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -26,7 +26,7 @@ public class Handover2UserTools {
 //        return found;
 //    }
 
-    public static boolean containsUser(EntityManager em, Handovers handover, Users user) {
+    public static boolean containsUser(EntityManager em, Handovers handover, OPUsers user) {
 
         Query query = em.createQuery(" " +
                 " SELECT count(u) FROM Handovers h JOIN h.usersAcknowledged u " +

@@ -6,7 +6,7 @@ package de.offene_pflege.op.users;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.system.Groups;
+import de.offene_pflege.entity.system.OPGroups;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -25,10 +25,10 @@ import java.awt.event.ActionEvent;
 public class DlgGroup extends MyJDialog {
     public static final String internalClassID = "opde.users.dlggroup";
     private JToggleButton tbQualified;
-    private Groups group;
+    private OPGroups group;
     private Closure afterAction;
 
-    public DlgGroup(Groups group, Closure afterAction) {
+    public DlgGroup(OPGroups group, Closure afterAction) {
         super(false);
         this.group = group;
         this.afterAction = afterAction;
@@ -61,7 +61,7 @@ public class DlgGroup extends MyJDialog {
 
         if (group.getGID() == null) {
             EntityManager em = OPDE.createEM();
-            Groups myGroup = em.find(Groups.class, txtGID.getText().trim());
+            OPGroups myGroup = em.find(OPGroups.class, txtGID.getText().trim());
             em.close();
             if (myGroup != null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.alreadyExits", DisplayMessage.WARNING));

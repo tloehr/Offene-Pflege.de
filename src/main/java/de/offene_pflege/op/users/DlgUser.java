@@ -6,7 +6,7 @@ package de.offene_pflege.op.users;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.EMailSystem;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -26,10 +26,10 @@ import java.awt.event.FocusEvent;
  */
 public class DlgUser extends MyJDialog {
     public static final String internalClassID = "opde.users.dlgusers";
-    private Users user;
+    private OPUsers user;
     private Closure callback;
 
-    public DlgUser(Users user, Closure callback) {
+    public DlgUser(OPUsers user, Closure callback) {
         super(false);
         this.user = user;
         this.callback = callback;
@@ -95,7 +95,7 @@ public class DlgUser extends MyJDialog {
 
         if (txtUID.isEnabled()) {
             EntityManager em = OPDE.createEM();
-            Users check4user = em.find(Users.class, txtUID.getText().trim());
+            OPUsers check4user = em.find(OPUsers.class, txtUID.getText().trim());
             em.close();
             if (check4user != null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.users.dlgusers.uidtaken")));

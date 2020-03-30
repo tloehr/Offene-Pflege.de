@@ -71,14 +71,14 @@ public class PnlUser extends CleanablePanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
-    private ArrayList<Users> lstUsers;
-    private ArrayList<Groups> lstGroups;
+    private ArrayList<OPUsers> lstUsers;
+    private ArrayList<OPGroups> lstGroups;
 
     private HashMap<String, JPanel> contentMap;
     private HashMap<String, CollapsiblePane> cpMap;
 
 
-    private HashMap<String, Users> usermap;
+    private HashMap<String, OPUsers> usermap;
 
 
     private Color fg, bg;
@@ -101,7 +101,7 @@ public class PnlUser extends CleanablePanel {
         bg = GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_EARLY_BGITEM));
         contentMap = new HashMap<String, JPanel>();
         cpMap = new HashMap<String, CollapsiblePane>();
-        usermap = new HashMap<String, Users>();
+        usermap = new HashMap<String, OPUsers>();
         OPDE.getDisplayManager().setMainMessage(OPDE.getAppInfo().getInternalClasses().get(internalClassID).getShortDescription());
         prepareSearchArea();
         tabMain.setTitleAt(TAB_USER, SYSTools.xx("opde.users.tab.users"));
@@ -122,11 +122,11 @@ public class PnlUser extends CleanablePanel {
 
         lstUsers = UsersTools.getUsers(true);
         lstGroups = GroupsTools.getGroups();
-        for (Users user : lstUsers) {
+        for (OPUsers user : lstUsers) {
             usermap.put(user.getUID(), user);
             createCP4(user);
         }
-        for (Groups group : lstGroups) {
+        for (OPGroups group : lstGroups) {
             createCP4(group);
         }
         buildPanel();
@@ -291,14 +291,14 @@ public class PnlUser extends CleanablePanel {
             if (tabMain.getSelectedIndex() != TAB_USER) {
                 tabMain.setSelectedIndex(TAB_USER);
             }
-            currentEditor = new DlgUser(new Users(), o -> {
+            currentEditor = new DlgUser(new OPUsers(), o -> {
                 if (o != null) {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Users user = em.merge((Users) o);
+                        OPUsers user = em.merge((OPUsers) o);
                         // Put everyone into >>everyone<<
-                        Groups everyone = em.find(Groups.class, "everyone");
+                        OPGroups everyone = em.find(OPGroups.class, "everyone");
                         em.lock(everyone, LockModeType.OPTIMISTIC);
                         user.getGroups().add(everyone);
                         everyone.getMembers().add(user);
@@ -339,12 +339,12 @@ public class PnlUser extends CleanablePanel {
             if (tabMain.getSelectedIndex() != TAB_GROUPS) {
                 tabMain.setSelectedIndex(TAB_GROUPS);
             }
-            currentEditor = new DlgGroup(new Groups(), o -> {
+            currentEditor = new DlgGroup(new OPGroups(), o -> {
                 if (o != null) {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Groups myGroup = em.merge((Groups) o);
+                        OPGroups myGroup = em.merge((OPGroups) o);
                         em.getTransaction().commit();
                         createCP4(myGroup);
                         lstGroups.add(myGroup);
@@ -384,7 +384,7 @@ public class PnlUser extends CleanablePanel {
         return list;
     }
 
-    private CollapsiblePane createCP4(final Users user) {
+    private CollapsiblePane createCP4(final OPUsers user) {
         final String key = user.getUID() + ".xusers";
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
@@ -428,7 +428,7 @@ public class PnlUser extends CleanablePanel {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                Users myUser = em.merge(usermap.get(user.getUID()));
+                OPUsers myUser = em.merge(usermap.get(user.getUID()));
                 String newpw = SYSTools.generatePassword(myUser.getVorname(), myUser.getName());
                 em.lock(myUser, LockModeType.OPTIMISTIC);
                 myUser.setMd5pw(SYSTools.hashword(newpw));
@@ -482,10 +482,10 @@ public class PnlUser extends CleanablePanel {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                Users myUser = em.merge(usermap.get(user.getUID()));
+                OPUsers myUser = em.merge(usermap.get(user.getUID()));
                 em.lock(myUser, LockModeType.OPTIMISTIC);
 
-                myUser.setStatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
+                myUser.setUserstatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
 
                 em.getTransaction().commit();
                 lstUsers.remove(user);
@@ -539,7 +539,7 @@ public class PnlUser extends CleanablePanel {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Users myUser = em.merge((Users) o);
+                        OPUsers myUser = em.merge((OPUsers) o);
                         em.lock(myUser, LockModeType.OPTIMISTIC);
                         em.getTransaction().commit();
                         lstUsers.remove(user);
@@ -610,7 +610,7 @@ public class PnlUser extends CleanablePanel {
         return cp;
     }
 
-    private CollapsiblePane createCP4(final Groups group) {
+    private CollapsiblePane createCP4(final OPGroups group) {
         final String key = group.getGID() + ".xgroups";
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
@@ -672,7 +672,7 @@ public class PnlUser extends CleanablePanel {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Groups myGroup = em.merge(group);
+                        OPGroups myGroup = em.merge(group);
                         em.remove(myGroup);
                         em.getTransaction().commit();
                         lstGroups.remove(group);
@@ -701,7 +701,7 @@ public class PnlUser extends CleanablePanel {
             });
             currentEditor.setVisible(true);
         });
-        btnDeleteGroup.setEnabled(!group.isSystem());
+        btnDeleteGroup.setEnabled(!group.isSysflag());
         cpTitle.getRight().add(btnDeleteGroup);
 
         cp.setTitleLabelComponent(cpTitle.getMain());
@@ -716,7 +716,7 @@ public class PnlUser extends CleanablePanel {
         return cp;
     }
 
-    private JPanel createContentPanel4(final Groups group) {
+    private JPanel createContentPanel4(final OPGroups group) {
         JPanel contentPanel = new JPanel(new VerticalLayout());
         contentPanel.add(new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_bold(group.getDescription()))));
 
@@ -730,7 +730,7 @@ public class PnlUser extends CleanablePanel {
         return contentPanel;
     }
 
-    private JPanel createMemberPanel4(final Groups group) {
+    private JPanel createMemberPanel4(final OPGroups group) {
 
         CollapsiblePane cpMember = new CollapsiblePane(SYSTools.xx("opde.users.members"));
         cpMember.setBackground(bg.darker()); // a little darker
@@ -749,7 +749,7 @@ public class PnlUser extends CleanablePanel {
         return contentPanel;
     }
 
-    private JPanel createClassesPanel4(final Groups group) {
+    private JPanel createClassesPanel4(final OPGroups group) {
 
         HashMap<String, SYSGROUPS2ACL> lookup = SYSGROUPS2ACLTools.getIntClassesMap(group);
         CollapsiblePane cpClasses = new CollapsiblePane(SYSTools.xx("opde.users.modules"));
@@ -788,7 +788,7 @@ public class PnlUser extends CleanablePanel {
             cpsUsers.removeAll();
             cpsUsers.setLayout(new JideBoxLayout(cpsUsers, JideBoxLayout.Y_AXIS));
             Collections.sort(lstUsers);
-            for (Users user : lstUsers) {
+            for (OPUsers user : lstUsers) {
                 if (tbOldUsers.isSelected() || user.isActive()) {
                     cpsUsers.add(cpMap.get(user.getUID() + ".xusers"));
                 }
@@ -798,7 +798,7 @@ public class PnlUser extends CleanablePanel {
             cpsGroups.removeAll();
             cpsGroups.setLayout(new JideBoxLayout(cpsGroups, JideBoxLayout.Y_AXIS));
             Collections.sort(lstGroups);
-            for (Groups group : lstGroups) {
+            for (OPGroups group : lstGroups) {
                 cpsGroups.add(cpMap.get(group.getGID() + ".xgroups"));
             }
             cpsGroups.addExpansion();

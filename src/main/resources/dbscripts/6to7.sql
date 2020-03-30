@@ -87,7 +87,7 @@ insert into `commontags` (`id`, `text`, `color`, `type`) values('28','substituti
 INSERT INTO nreports2tags (pbid, ctagid) SELECT PBID, PBTAGID FROM nr2tags;
 DROP TABLE nr2tags;
 DROP TABLE nreporttags;
-ALTER TABLE `users` ADD COLUMN `mailconfirmed` SMALLINT DEFAULT 0 NOT NULL AFTER `EMail` ;
+ALTER TABLE opusers ADD COLUMN `mailconfirmed` SMALLINT DEFAULT 0 NOT NULL AFTER `EMail` ;
 INSERT INTO `sysgroups2acl` (`internalClassesID`, `VERSION`, `gid`) VALUES ('opde.training', 1, 'everyone');
 SET @last_id_in_table1 = LAST_INSERT_ID();
 INSERT INTO `acl` (`acl`, `icid`) VALUES ('6', @last_id_in_table1);

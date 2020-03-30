@@ -28,7 +28,7 @@ package de.offene_pflege.op.tools;
 
 import com.jidesoft.swing.JideSplitPane;
 import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -402,7 +402,7 @@ public class SYSTools {
     }
 
 
-    public static String anonymizeUser(Users user) {
+    public static String anonymizeUser(OPUsers user) {
         String result;
         if (OPDE.isAnonym() || OPDE.isUserCipher()) {
             result = "#" + user.getCipherid();
@@ -1295,7 +1295,7 @@ public class SYSTools {
         return lastname.substring(0, 1).toLowerCase() + firstname.substring(0, 1).toLowerCase() + SYSTools.padL(Integer.toString(generator.nextInt(9999)), 4, "0");
     }
 
-    public static void printpw(String password, Users user) {
+    public static void printpw(String password, OPUsers user) {
         String html;
 
         try {

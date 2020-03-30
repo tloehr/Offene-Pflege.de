@@ -122,7 +122,7 @@ public class SYSPropsTools {
     //should be useless in future
     public static final String LOCAL_KEY_CIPHER_NIC = "cipher.nic.id";
 
-    public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
+    public static void storeProp(EntityManager em, String key, String value, OPUsers user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
 
         if (user == null) {
@@ -150,7 +150,7 @@ public class SYSPropsTools {
         OPDE.setProp(key, value);
     }
 
-    public static void storeProp(String key, String value, Users user) {
+    public static void storeProp(String key, String value, OPUsers user) {
         // prevent redundant saves
         if (OPDE.getProps().containsKey(key) && OPDE.getProps().getProperty(key).equals(value)) {
             return;
@@ -180,7 +180,7 @@ public class SYSPropsTools {
         storeProp(key, value, null);
     }
 
-    public static void removeProp(EntityManager em, String key, Users user) throws Exception {
+    public static void removeProp(EntityManager em, String key, OPUsers user) throws Exception {
         if (!OPDE.getProps().containsKey(key) || user == null) {
             return;
         }
@@ -199,7 +199,7 @@ public class SYSPropsTools {
     }
 
 
-    public static void storeBoolean(String key, boolean value, Users user) {
+    public static void storeBoolean(String key, boolean value, OPUsers user) {
         storeProp(key, value ? "true" : "false", user);
     }
 
@@ -231,7 +231,7 @@ public class SYSPropsTools {
      * Lädt Properties aus der Tabelle OCProps ein.
      * Passend zu einer IP bzw. IP='*', wenn die Properties für alle gedacht sind.
      */
-    public static Properties loadProps(Users user) {
+    public static Properties loadProps(OPUsers user) {
         EntityManager em = OPDE.createEM();
         String jpql = "SELECT s FROM SYSProps s WHERE s.user = :user";
 
@@ -258,7 +258,7 @@ public class SYSPropsTools {
         return p;
     }
 
-    public static boolean isTrue(String key, Users user) {
+    public static boolean isTrue(String key, OPUsers user) {
         EntityManager em = OPDE.createEM();
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
 

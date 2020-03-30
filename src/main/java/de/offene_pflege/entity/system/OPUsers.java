@@ -42,9 +42,9 @@ import java.util.Collection;
  * @author tloehr
  */
 @Entity
-@Table(name = "users")
+@Table(name = "opusers")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class Users implements Serializable, Comparable<Users>, Attachable {
+public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "UKennung")
@@ -58,8 +58,8 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
     @Basic(optional = false)
     @Column(name = "Nachname")
     private String nachname;
-    @Column(name = "Status")
-    private Short status;
+    @Column(name = "userstatus")
+    private Short userstatus;
     @Basic(optional = false)
     @Column(name = "MD5PW")
     private String md5pw;
@@ -76,7 +76,7 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
     @JoinTable(name = "member", joinColumns =
     @JoinColumn(name = "UKennung"), inverseJoinColumns =
     @JoinColumn(name = "GKennung"))
-    private Collection<Groups> groups;
+    private Collection<OPGroups> groups;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSFiles> sysfilesCollection;
@@ -100,10 +100,10 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<User2File> attachedFilesConnections;
 
-    public Users() {
+    public OPUsers() {
         uid = null;
-        groups = new ArrayList<Groups>();
-        status = UsersTools.STATUS_ACTIVE;
+        groups = new ArrayList<OPGroups>();
+        userstatus = UsersTools.STATUS_ACTIVE;
         mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
         cipherid = 12;  //todo: berechnen
     }
@@ -153,12 +153,12 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
         this.nachname = nachname;
     }
 
-    public Short getStatus() {
-        return status;
+    public Short getUserstatus() {
+        return userstatus;
     }
 
-    public void setStatus(Short status) {
-        this.status = status;
+    public void setUserstatus(Short status) {
+        this.userstatus = status;
     }
 
     public String getMd5pw() {
@@ -184,11 +184,11 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
 //        return hash;
 //    }
 
-    public Collection<Groups> getGroups() {
+    public Collection<OPGroups> getGroups() {
         return groups;
     }
 
-    public void setGroups(Collection<Groups> groups) {
+    public void setGroups(Collection<OPGroups> groups) {
         this.groups = groups;
     }
 
@@ -199,11 +199,11 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
      */
     @Override
     public boolean isActive() {
-        return status == UsersTools.STATUS_ACTIVE;
+        return userstatus == UsersTools.STATUS_ACTIVE;
     }
 
     @Override
-    public int compareTo(Users o) {
+    public int compareTo(OPUsers o) {
         return toString().compareTo(o.toString());
     }
 
@@ -226,15 +226,15 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Users users = (Users) o;
+        OPUsers OPUsers = (OPUsers) o;
 
-        if (eMail != null ? !eMail.equals(users.eMail) : users.eMail != null) return false;
-        if (logins != null ? !logins.equals(users.logins) : users.logins != null) return false;
-        if (md5pw != null ? !md5pw.equals(users.md5pw) : users.md5pw != null) return false;
-        if (nachname != null ? !nachname.equals(users.nachname) : users.nachname != null) return false;
-        if (status != null ? !status.equals(users.status) : users.status != null) return false;
-        if (version != null ? !version.equals(users.version) : users.version != null) return false;
-        if (vorname != null ? !vorname.equals(users.vorname) : users.vorname != null) return false;
+        if (eMail != null ? !eMail.equals(OPUsers.eMail) : OPUsers.eMail != null) return false;
+        if (logins != null ? !logins.equals(OPUsers.logins) : OPUsers.logins != null) return false;
+        if (md5pw != null ? !md5pw.equals(OPUsers.md5pw) : OPUsers.md5pw != null) return false;
+        if (nachname != null ? !nachname.equals(OPUsers.nachname) : OPUsers.nachname != null) return false;
+        if (userstatus != null ? !userstatus.equals(OPUsers.userstatus) : OPUsers.userstatus != null) return false;
+        if (version != null ? !version.equals(OPUsers.version) : OPUsers.version != null) return false;
+        if (vorname != null ? !vorname.equals(OPUsers.vorname) : OPUsers.vorname != null) return false;
 
         return true;
     }
@@ -245,7 +245,7 @@ public class Users implements Serializable, Comparable<Users>, Attachable {
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (vorname != null ? vorname.hashCode() : 0);
         result = 31 * result + (nachname != null ? nachname.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (userstatus != null ? userstatus.hashCode() : 0);
         result = 31 * result + (md5pw != null ? md5pw.hashCode() : 0);
         result = 31 * result + (eMail != null ? eMail.hashCode() : 0);
         return result;

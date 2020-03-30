@@ -6,7 +6,7 @@
 package de.offene_pflege.entity.nursingprocess;
 
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -42,7 +42,7 @@ public class NPControl implements Serializable, Comparable<NPControl> {
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     public NPControl() {
     }
@@ -91,11 +91,11 @@ public class NPControl implements Serializable, Comparable<NPControl> {
         return nursingProcess;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

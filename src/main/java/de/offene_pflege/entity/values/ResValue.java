@@ -10,7 +10,7 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.process.SYSVAL2PROCESS;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
@@ -67,7 +67,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users editedBy;
+    private OPUsers editedBy;
     @JoinColumn(name = "ReplacedBy", referencedColumnName = "BWID")
     @OneToOne
     private ResValue replacedBy;
@@ -79,7 +79,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     // ==
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
     @JoinColumn(name = "BWKennung", referencedColumnName = "id")
     @ManyToOne
     private Resident resident;
@@ -106,7 +106,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         this(date, vtype.getDefault1(), vtype.getDefault2(), vtype.getDefault3(), "", new Date(), new Date(), vtype, null, null, null, OPDE.getLogin().getUser(), resident);
     }
 
-    public ResValue(Date pit, BigDecimal val1, BigDecimal val2, BigDecimal val3, String text, Date createDate, Date editDate, ResValueTypes vtype, Users editedBy, ResValue replacedBy, ResValue replacementFor, Users user, Resident resident) {
+    public ResValue(Date pit, BigDecimal val1, BigDecimal val2, BigDecimal val3, String text, Date createDate, Date editDate, ResValueTypes vtype, OPUsers editedBy, ResValue replacedBy, ResValue replacementFor, OPUsers user, Resident resident) {
         this.pit = pit;
         this.val2 = val2;
         this.val3 = val3;
@@ -177,11 +177,11 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         this.text = SYSTools.tidy(text);
     }
 
-    public Users getEditedBy() {
+    public OPUsers getEditedBy() {
         return editedBy;
     }
 
-    public void setEditedBy(Users editedBy) {
+    public void setEditedBy(OPUsers editedBy) {
         this.editedBy = editedBy;
     }
 
@@ -273,7 +273,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         return editedBy != null && replacedBy == null && replacementFor == null;
     }
 
-    public void setDeletedBy(Users deletedBy) {
+    public void setDeletedBy(OPUsers deletedBy) {
         editedBy = deletedBy;
         createDate = new Date();
         replacedBy = null;
@@ -284,11 +284,11 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         this.resident = resident;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

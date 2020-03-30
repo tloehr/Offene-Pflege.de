@@ -25,7 +25,7 @@
  */
 package de.offene_pflege.entity.files;
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -70,7 +70,7 @@ public class SYSFiles implements Serializable, Comparable {
     private String beschreibung;
     @JoinColumn(name = "UID", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<SYSNR2FILE> nrAssignCollection;
@@ -98,7 +98,7 @@ public class SYSFiles implements Serializable, Comparable {
         return residentAssignCollection;
     }
 
-    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user) {
+    public SYSFiles(String filename, String md5, Date filedate, long filesize, OPUsers user) {
         this.filename = filename;
         this.md5 = md5;
         this.filedate = filedate;
@@ -115,11 +115,11 @@ public class SYSFiles implements Serializable, Comparable {
         return bwiAssignCollection;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

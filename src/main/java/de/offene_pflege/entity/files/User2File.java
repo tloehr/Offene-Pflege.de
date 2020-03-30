@@ -1,6 +1,6 @@
 package de.offene_pflege.entity.files;
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -56,11 +56,11 @@ public class User2File {
 
     @JoinColumn(name = "editor", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users editor;
+    private OPUsers editor;
 
     @JoinColumn(name = "uid", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     @JoinColumn(name = "fid", referencedColumnName = "OCFID")
     @ManyToOne
@@ -69,7 +69,7 @@ public class User2File {
     public User2File() {
     }
 
-    public User2File(SYSFiles sysfile, Users user, Users editor, Date pit) {
+    public User2File(SYSFiles sysfile, OPUsers user, OPUsers editor, Date pit) {
         this.pit = pit;
         this.editor = editor;
         this.user = user;

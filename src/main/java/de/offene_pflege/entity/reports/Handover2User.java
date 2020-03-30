@@ -4,7 +4,7 @@
  */
 package de.offene_pflege.entity.reports;
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -36,12 +36,12 @@ public class Handover2User implements Serializable, Comparable<Handover2User> {
     private Handovers bericht;
     @JoinColumn(name = "UID", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     public Handover2User() {
     }
 
-    public Handover2User(Handovers bericht, Users user) {
+    public Handover2User(Handovers bericht, OPUsers user) {
         this.bericht = bericht;
         this.user = user;
         this.pit = new Date();
@@ -67,7 +67,7 @@ public class Handover2User implements Serializable, Comparable<Handover2User> {
         return bericht;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 

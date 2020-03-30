@@ -26,7 +26,7 @@
 package de.offene_pflege.entity.files;
 
 import de.offene_pflege.entity.prescription.Prescription;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -57,23 +57,23 @@ public class SYSPRE2FILE implements Serializable {
     private SYSFiles sysfile;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     public SYSPRE2FILE() {
     }
 
-    public SYSPRE2FILE(SYSFiles sysfile, Prescription prescription, Users user, Date pit) {
+    public SYSPRE2FILE(SYSFiles sysfile, Prescription prescription, OPUsers user, Date pit) {
         this.sysfile = sysfile;
         this.prescription = prescription;
         this.user = user;
         this.pit = pit;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

@@ -17,6 +17,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <mysql.connector.version>5.1.47</mysql.connector.version>
+<!--        <mysql.connector.version>8.0.19</mysql.connector.version>-->
         <eclipselink.version>2.7.6</eclipselink.version>
         <jide.version>3.7.7</jide.version>
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>
@@ -200,11 +201,6 @@
             <version>1.3</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.persistence</groupId>-->
-        <!--            <artifactId>org.eclipse.persistence.jpa</artifactId>-->
-        <!--            <version>2.5.2</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.jpa</artifactId>
@@ -222,11 +218,6 @@
             <artifactId>javax.el-api</artifactId>
             <version>3.0.0</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>javax.el</groupId>-->
-        <!--            <artifactId>javax.el-api</artifactId>-->
-        <!--            <version>2.2.4</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>javax.el</artifactId>

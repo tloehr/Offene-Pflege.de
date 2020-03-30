@@ -34,24 +34,24 @@ public class SYSLogin implements Serializable {
     private Date logout;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
         
 
     public SYSLogin() {
     }
 
-    public SYSLogin(Users user) {
+    public SYSLogin(OPUsers user) {
 //        this.host = OPDE.getHost();
         this.user = user;
         this.login = new Date();
         this.logout = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

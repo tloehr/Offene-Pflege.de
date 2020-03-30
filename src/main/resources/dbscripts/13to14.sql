@@ -1619,3 +1619,10 @@ UPDATE resinfotype t SET t.XML = ' <qpr tooltip="Sobald diese Information einget
               <option label="selbständig" name="0" default="true"/>
               <option label="mit Fremdhilfe" name="1"/>
           </optiongroup>' WHERE t.BWINFTYP LIKE 'kern01';
+--
+alter table `groups` change `System` sysflag tinyint(1) default 0 not null;
+rename table `groups` to opgroups;
+alter table users change Status userstatus tinyint null;
+rename table users to opusers;
+
+

@@ -15,10 +15,10 @@ import java.util.ArrayList;
  */
 public class GroupsTools {
 
-    public static ArrayList<Groups> getGroups() {
+    public static ArrayList<OPGroups> getGroups() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT g FROM Groups g ORDER BY g.gid ");
-        ArrayList<Groups> list = new ArrayList<Groups>(query.getResultList());
+        Query query = em.createQuery("SELECT g FROM OPGroups g ORDER BY g.gid ");
+        ArrayList<OPGroups> list = new ArrayList<OPGroups>(query.getResultList());
         em.close();
         return list;
     }

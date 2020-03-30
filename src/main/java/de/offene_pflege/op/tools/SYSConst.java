@@ -31,6 +31,7 @@ import de.offene_pflege.op.system.AppInfo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -255,6 +256,8 @@ public class SYSConst {
     public static final GregorianCalendar UNTIL_FURTHER_NOTICE = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 23, 59, 59);
     public static final Date DATE_THE_VERY_BEGINNING = new Date(VERY_BEGINNING.getTimeInMillis());
     public static final Date DATE_UNTIL_FURTHER_NOTICE = new Date(UNTIL_FURTHER_NOTICE.getTimeInMillis());
+    public static final LocalDateTime LD_VERY_BEGINNING = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
+    public static final LocalDateTime LD_UNTIL_FURTHER_NOTICE = LocalDateTime.of(9999, 12, 31, 23, 59, 59);
 
     public static final String UNITS[] = {"", SYSTools.xx("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"};
 
@@ -606,7 +609,7 @@ public class SYSConst {
     public static final Icon icon22residentDied = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-died.png"));
     public static final Icon icon22residentGone = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-gone.png"));
 
-//    public static final Icon icon22createDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_add.png"));
+    //    public static final Icon icon22createDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_add.png"));
 //    public static final Icon icon22commitDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_comit.png"));
 //    public static final Icon icon22updateDB = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/db_update.png"));
     public static final Icon icon48statusDB = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/db_status.png"));

@@ -35,7 +35,7 @@ import de.offene_pflege.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.entity.system.SYSPropsTools;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
@@ -200,10 +200,10 @@ public class SYSFilesTools {
                                 Resident2File link2 = em.merge(new Resident2File(sysfile, ((NursingProcess) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getResidentAssignCollection().add(link2);
 
-                            } else if (attachable instanceof Users) {
-                                User2File link = em.merge(new User2File(sysfile, (Users) attachable, OPDE.getLogin().getUser(), new Date()));
+                            } else if (attachable instanceof OPUsers) {
+                                User2File link = em.merge(new User2File(sysfile, (OPUsers) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getUsersAssignCollection().add(link);
-                                ((Users) attachable).getAttachedFilesConnections().add(link);
+                                ((OPUsers) attachable).getAttachedFilesConnections().add(link);
                             } else if (attachable instanceof Resident) {
                                 Resident2File link = em.merge(new Resident2File(sysfile, (Resident) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getResidentAssignCollection().add(link);

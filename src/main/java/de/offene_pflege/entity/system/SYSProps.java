@@ -27,13 +27,13 @@ public class SYSProps implements Serializable {
     private String value;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 
@@ -46,7 +46,7 @@ public class SYSProps implements Serializable {
         this.user = null;
     }
 
-    public SYSProps(String key, String value, Users user) {
+    public SYSProps(String key, String value, OPUsers user) {
         this.key = key;
         this.value = value;
         this.user = user;

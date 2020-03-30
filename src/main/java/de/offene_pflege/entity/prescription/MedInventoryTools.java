@@ -2,6 +2,7 @@ package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -11,7 +12,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -40,27 +40,27 @@ public class MedInventoryTools {
         };
     }
 
-    public static String getInventoryAsHTML(MedInventory inventory) {
-        String result = "";
-
-        String htmlcolor = inventory.isClosed() ? "gray" : "blue";
-
-        result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
-        result += "<font color=\"" + htmlcolor + "\"><b><u>" + inventory.getID() + "</u></b></font>&nbsp; ";
-        result += inventory.getText();
-
-
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
-
-        result += "<br/><font color=\"blue\">Eingang: " + df.format(inventory.getFrom()) + "</font>";
-        if (inventory.isClosed()) {
-            result += "<br/><font color=\"green\">Abschluss: " + df.format(inventory.getTo()) + "</font>";
-        }
-
-        result += "</font>";
-        return result;
-
-    }
+//    public static String getInventoryAsHTML(MedInventory inventory) {
+//        String result = "";
+//
+//        String htmlcolor = inventory.isClosed() ? "gray" : "blue";
+//
+//        result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
+//        result += "<font color=\"" + htmlcolor + "\"><b><u>" + inventory.getID() + "</u></b></font>&nbsp; ";
+//        result += inventory.getText();
+//
+//
+//        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+//
+//        result += "<br/><font color=\"blue\">Eingang: " + df.format(inventory.getFrom()) + "</font>";
+//        if (inventory.isClosed()) {
+//            result += "<br/><font color=\"green\">Abschluss: " + df.format(inventory.getTo()) + "</font>";
+//        }
+//
+//        result += "</font>";
+//        return result;
+//
+//    }
 
 //    public static BigDecimal getSum(MedInventory inventory) {
 ////        long timeStart = System.currentTimeMillis();
@@ -352,5 +352,9 @@ public class MedInventoryTools {
             // close inventory
             myInventory.setTo(enddate);
         }
+    }
+
+    public static boolean isClosed(MedInventory medInventory){
+        return JavaTimeConverter.toJavaLocalDateTime(medInventory.getTo()).isBefore(SYSConst.LD_UNTIL_FURTHER_NOTICE);
     }
 }

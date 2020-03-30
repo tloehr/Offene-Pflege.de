@@ -132,8 +132,8 @@ UPDATE `commontags` SET `type` = '11' WHERE `text` = 'schmerzbeauf' AND `type` =
 --
 -- https://github.com/tloehr/Offene-Pflege.de/issues/43
 --
-ALTER TABLE `users` ADD `active_since` DATETIME NULL;
-UPDATE `users` SET `active_since` = DATE_SUB(CURDATE(), INTERVAL 4 WEEK) WHERE `Status` = 1;
+ALTER TABLE opusers ADD `active_since` DATETIME NULL;
+UPDATE opusers SET `active_since` = DATE_SUB(CURDATE(), INTERVAL 4 WEEK) WHERE userstatus = 1;
 --
 -- für Timo
 --

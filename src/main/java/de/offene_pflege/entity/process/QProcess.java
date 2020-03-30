@@ -9,7 +9,7 @@ import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.reports.NReport;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSConst;
@@ -54,10 +54,10 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     private Long version;
     @JoinColumn(name = "Ersteller", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users creator;
+    private OPUsers creator;
     @JoinColumn(name = "Besitzer", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users owner;
+    private OPUsers owner;
     @JoinColumn(name = "BWKennung", referencedColumnName = "id")
     @ManyToOne
     private Resident resident;
@@ -233,19 +233,19 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.to = to;
     }
 
-    public Users getCreator() {
+    public OPUsers getCreator() {
         return creator;
     }
 
-    public void setCreator(Users creator) {
+    public void setCreator(OPUsers creator) {
         this.creator = creator;
     }
 
-    public Users getOwner() {
+    public OPUsers getOwner() {
         return owner;
     }
 
-    public void setOwner(Users owner) {
+    public void setOwner(OPUsers owner) {
         this.owner = owner;
     }
 

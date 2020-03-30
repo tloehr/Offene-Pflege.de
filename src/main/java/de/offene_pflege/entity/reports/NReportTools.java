@@ -11,7 +11,7 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.system.Commontags;
 import de.offene_pflege.entity.system.CommontagsTools;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSCalendar;
@@ -1069,7 +1069,7 @@ public class NReportTools {
      * @param deletedBy
      * @return
      */
-    public static NReport delete(NReport report, Users deletedBy) {
+    public static NReport delete(NReport report, OPUsers deletedBy) {
         report.setDeletedBy(deletedBy);
         report.setDelPIT(new Date());
         report.getAttachedFilesConnections().clear();
@@ -1084,7 +1084,7 @@ public class NReportTools {
      * @param deletedBy
      * @return
      */
-    public static NReport replace(NReport report, Users deletedBy) {
+    public static NReport replace(NReport report, OPUsers deletedBy) {
         report.setDeletedBy(deletedBy);
         report.setDelPIT(new Date());
         report.getAttachedFilesConnections().clear();

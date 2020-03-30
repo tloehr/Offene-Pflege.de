@@ -402,7 +402,7 @@ public class PnlInventory extends NursingRecordsPanel {
             });
             cpMap.get(key).setTitleLabelComponent(cptitle.getMain());
             cpMap.get(key).setSlidingDirection(SwingConstants.SOUTH);
-            cptitle.getButton().setIcon(inventory.isClosed() ? SYSConst.icon22stopSign : null);
+            cptitle.getButton().setIcon(MedInventoryTools.isClosed(inventory) ? SYSConst.icon22stopSign : null);
 
 
             // https://github.com/tloehr/Offene-Pflege.de/issues/42
@@ -470,7 +470,7 @@ public class PnlInventory extends NursingRecordsPanel {
                     });
                     currentEditor.setVisible(true);
                 });
-                btnEditInvName.setEnabled(!inventory.isClosed());
+                btnEditInvName.setEnabled(!MedInventoryTools.isClosed(inventory));
                 cptitle.getRight().add(btnEditInvName);
             }
 
@@ -541,7 +541,7 @@ public class PnlInventory extends NursingRecordsPanel {
                     });
                     currentEditor.setVisible(true);
                 });
-                btnCloseInventory.setEnabled(!inventory.isClosed());
+                btnCloseInventory.setEnabled(!MedInventoryTools.isClosed(inventory));
                 cptitle.getRight().add(btnCloseInventory);
             }
 
@@ -609,11 +609,11 @@ public class PnlInventory extends NursingRecordsPanel {
 
             final JToggleButton tbClosedStock = GUITools.getNiceToggleButton(null);
             tbClosedStock.setToolTipText(SYSTools.xx("nursingrecords.inventory.showclosedstocks"));
-            if (!inventory.isClosed()) {
+            if (!MedInventoryTools.isClosed(inventory)) {
                 tbClosedStock.addItemListener(e -> cpMap.get(key).setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected())));
             }
-            tbClosedStock.setSelected(inventory.isClosed());
-            tbClosedStock.setEnabled(!inventory.isClosed());
+            tbClosedStock.setSelected(MedInventoryTools.isClosed(inventory));
+            tbClosedStock.setEnabled(!MedInventoryTools.isClosed(inventory));
 
             mapKey2ClosedToggleButton.put(key, tbClosedStock);
 
@@ -717,7 +717,7 @@ public class PnlInventory extends NursingRecordsPanel {
             cptitle.getRight().add(new StockPanel(stock));
 
 
-            if (!stock.getInventory().isClosed()) {
+            if (!MedInventoryTools.isClosed(stock.getInventory())) {
                 /***
                  *      ____       _       _   _          _          _
                  *     |  _ \ _ __(_)_ __ | |_| |    __ _| |__   ___| |

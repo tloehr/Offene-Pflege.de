@@ -6,7 +6,7 @@
 package de.offene_pflege.entity;
 
 import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -48,7 +48,7 @@ public class Allowance implements Serializable, Comparable<Allowance> {
 
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users editedBy;
+    private OPUsers editedBy;
     @JoinColumn(name = "replacedby", referencedColumnName = "id")
     @OneToOne
     private Allowance replacedBy;
@@ -88,7 +88,7 @@ public class Allowance implements Serializable, Comparable<Allowance> {
     private Resident resident;
     @JoinColumn(name = "uid", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
 
     @Override
@@ -165,7 +165,7 @@ public class Allowance implements Serializable, Comparable<Allowance> {
         return editedBy != null;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
@@ -173,7 +173,7 @@ public class Allowance implements Serializable, Comparable<Allowance> {
         return replacedBy;
     }
 
-    public void setReplacedBy(Allowance replacedBy, Users editedBy) {
+    public void setReplacedBy(Allowance replacedBy, OPUsers editedBy) {
         this.replacedBy = replacedBy;
         this.editPit = new Date();
         this.editedBy = editedBy;
@@ -191,7 +191,7 @@ public class Allowance implements Serializable, Comparable<Allowance> {
         this.editPit = editPit;
     }
 
-    public void setEditedBy(Users editedBy) {
+    public void setEditedBy(OPUsers editedBy) {
         this.editedBy = editedBy;
     }
 
@@ -199,7 +199,7 @@ public class Allowance implements Serializable, Comparable<Allowance> {
         this.replacementFor = replacementFor;
     }
 
-    public Users getEditedBy() {
+    public OPUsers getEditedBy() {
         return editedBy;
     }
 

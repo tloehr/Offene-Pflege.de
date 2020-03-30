@@ -1,7 +1,7 @@
 package de.offene_pflege.op.system;
 
 import de.offene_pflege.entity.system.SYSPropsTools;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -98,7 +98,7 @@ public class EMailSystem {
 //
 //    }
 
-    public static boolean sendMail(String subject, String bodyText, Users user) {
+    public static boolean sendMail(String subject, String bodyText, OPUsers user) {
         return sendMail(subject, bodyText, new Recipient[]{new Recipient(user)}, null);
     }
 
@@ -110,7 +110,7 @@ public class EMailSystem {
      * @param attach   array of files to attach
      * @return true if sent successfully, false if not
      */
-    public static boolean sendMail(String subject, String bodyText, Users user, File[] attach) {
+    public static boolean sendMail(String subject, String bodyText, OPUsers user, File[] attach) {
         return sendMail(subject, bodyText, new Recipient[]{new Recipient(user)}, attach);
     }
 
@@ -118,7 +118,7 @@ public class EMailSystem {
         return sendMail(subject, bodyText, new Recipient[]{recipient}, attach);
     }
 
-    public static boolean sendMail(String subject, String bodyText, ArrayList<Users> users, File[] attach) {
+    public static boolean sendMail(String subject, String bodyText, ArrayList<OPUsers> users, File[] attach) {
         if (users.isEmpty()) return false;
 
         ArrayList<Recipient> recipients = new ArrayList<>();

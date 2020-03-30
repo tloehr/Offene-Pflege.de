@@ -1,7 +1,7 @@
 package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSConst;
 
@@ -44,11 +44,11 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         return resident;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 
@@ -77,22 +77,17 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         return from;
     }
 
-    public Date getTo() {
-        return to;
-    }
-
     public void setFrom(Date from) {
         this.from = from;
+    }
+
+    public Date getTo() {
+        return to;
     }
 
     public void setTo(Date to) {
         this.to = to;
     }
-
-    public boolean isClosed(){
-        return to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-    }
-
 
     // ==
     // 1:N Relations
@@ -112,7 +107,7 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
     // ==
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     @Override
     public boolean equals(Object o) {

@@ -12,9 +12,8 @@ import java.util.Collection;
  * @author tloehr
  */
 @Entity
-@Table(name = "groups")
-
-public class Groups implements Serializable, Comparable<Groups> {
+@Table(name = "opgroups")
+public class OPGroups implements Serializable, Comparable<OPGroups> {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -27,17 +26,17 @@ public class Groups implements Serializable, Comparable<Groups> {
     @Column(name = "version")
     private Long version;
     @Basic(optional = false)
-    @Column(name = "System")
-    private boolean system;
+    @Column(name = "sysflag")
+    private boolean sysflag;
     @Basic(optional = false)
     @Column(name = "Examen")
     private boolean qualified;
     @ManyToMany(mappedBy = "groups")
-    private Collection<Users> members;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "groups")
+    private Collection<OPUsers> members;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "opgroups")
     private Collection<SYSGROUPS2ACL> icCollection;
 
-    public Groups() {
+    public OPGroups() {
         this.gid = null;
     }
 
@@ -45,11 +44,11 @@ public class Groups implements Serializable, Comparable<Groups> {
         this.gid = gid;
     }
 
-    public void setMembers(Collection<Users> members) {
+    public void setMembers(Collection<OPUsers> members) {
         this.members = members;
     }
 
-    public Collection<Users> getMembers() {
+    public Collection<OPUsers> getMembers() {
         return members;
     }
 
@@ -61,12 +60,12 @@ public class Groups implements Serializable, Comparable<Groups> {
         return gid;
     }
 
-    public boolean isSystem() {
-        return system;
+    public boolean isSysflag() {
+        return sysflag;
     }
 
-    public void setSystem(boolean system) {
-        this.system = system;
+    public void setSysflag(boolean system) {
+        this.sysflag = system;
     }
 
     public boolean isQualified() {
@@ -94,7 +93,7 @@ public class Groups implements Serializable, Comparable<Groups> {
     }
 
     @Override
-    public int compareTo(Groups o) {
+    public int compareTo(OPGroups o) {
         return gid.toLowerCase().compareTo(o.getGID().toLowerCase());
     }
 
@@ -108,10 +107,10 @@ public class Groups implements Serializable, Comparable<Groups> {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Groups)) {
+        if (!(object instanceof OPGroups)) {
             return false;
         }
-        Groups other = (Groups) object;
+        OPGroups other = (OPGroups) object;
         if ((this.gid == null && other.gid != null) || (this.gid != null && !this.gid.equals(other.gid))) {
             return false;
         }

@@ -12,7 +12,7 @@
         <class>de.offene_pflege.entity.info.Resident</class>
         <class>de.offene_pflege.entity.nursingprocess.DFN</class>
         <class>de.offene_pflege.entity.building.Homes</class>
-        <class>de.offene_pflege.entity.system.Groups</class>
+        <class>de.offene_pflege.entity.system.OPGroups</class>
         <class>de.offene_pflege.entity.info.ICD</class>
         <class>de.offene_pflege.entity.info.HInsurance</class>
         <class>de.offene_pflege.entity.prescription.Hospital</class>
@@ -26,7 +26,7 @@
         <class>de.offene_pflege.entity.building.Station</class>
         <class>de.offene_pflege.entity.reports.Handover2User</class>
         <class>de.offene_pflege.entity.reports.Handovers</class>
-        <class>de.offene_pflege.entity.system.Users</class>
+        <class>de.offene_pflege.entity.system.OPUsers</class>
         <class>de.offene_pflege.entity.files.SYSFiles</class>
         <class>de.offene_pflege.entity.files.SYSINF2FILE</class>
         <class>de.offene_pflege.entity.files.SYSNR2FILE</class>
@@ -68,7 +68,8 @@
         <class>de.offene_pflege.entity.building.Floors</class>
         <class>de.offene_pflege.entity.QdvsLaufend</class>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0001:3320/opde"/>
+<!--            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv02:3309/opde"/>-->
+<!--            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>-->
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
         </properties>
     </persistence-unit>

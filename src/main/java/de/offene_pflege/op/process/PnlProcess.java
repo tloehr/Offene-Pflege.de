@@ -23,7 +23,7 @@ import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.process.*;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -653,7 +653,7 @@ public class PnlProcess extends NursingRecordsPanel {
                         cmbPCat.setSelectedIndex(0);
                     }
                     initPhase = false;
-                    processList = QProcessTools.getProcesses4((Users) itemEvent.getItem());
+                    processList = QProcessTools.getProcesses4((OPUsers) itemEvent.getItem());
                     reloadDisplay();
                 });
                 list.add(cmbUser);
@@ -1244,7 +1244,7 @@ public class PnlProcess extends NursingRecordsPanel {
                         try {
                             em.getTransaction().begin();
                             QProcess myProcess = em.merge(qProcess);
-                            Users handOverTo = em.merge((Users) editor.getSelectedValue());
+                            OPUsers handOverTo = em.merge((OPUsers) editor.getSelectedValue());
                             if (!myProcess.isCommon()) {
                                 em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
                             }

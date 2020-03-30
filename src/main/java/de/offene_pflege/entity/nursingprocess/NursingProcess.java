@@ -12,7 +12,7 @@ import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.process.SYSNP2PROCESS;
 import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSConst;
@@ -72,10 +72,10 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     // ==
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users userON;
+    private OPUsers userON;
     @JoinColumn(name = "AbUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users userOFF;
+    private OPUsers userOFF;
     @JoinColumn(name = "BWKennung", referencedColumnName = "id")
     @ManyToOne
     private Resident resident;
@@ -192,19 +192,19 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         this.nextEval = nKontrolle;
     }
 
-    public Users getUserOFF() {
+    public OPUsers getUserOFF() {
         return userOFF;
     }
 
-    public void setUserOFF(Users abgesetztDurch) {
+    public void setUserOFF(OPUsers abgesetztDurch) {
         this.userOFF = abgesetztDurch;
     }
 
-    public Users getUserON() {
+    public OPUsers getUserON() {
         return userON;
     }
 
-    public void setUserON(Users angesetztDurch) {
+    public void setUserON(OPUsers angesetztDurch) {
         this.userON = angesetztDurch;
     }
 
@@ -291,7 +291,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 //    }
 
     @Override
-    public Users getUser() {
+    public OPUsers getUser() {
         return userON;
     }
 
@@ -395,7 +395,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         return result;
     }
 
-    public NursingProcess(String topic, String situation, String goal, Date from, Date to, long npseries, Date nextEval, Long version, Users userON, Users userOFF, Resident bewohner, ResInfoCategory category, Collection<SYSNP2PROCESS> attachedQProcessConnections, List<NPControl> npControls, List<InterventionSchedule> interventionSchedules) {
+    public NursingProcess(String topic, String situation, String goal, Date from, Date to, long npseries, Date nextEval, Long version, OPUsers userON, OPUsers userOFF, Resident bewohner, ResInfoCategory category, Collection<SYSNP2PROCESS> attachedQProcessConnections, List<NPControl> npControls, List<InterventionSchedule> interventionSchedules) {
         this.topic = topic;
         this.situation = situation;
         this.goal = goal;

@@ -5,7 +5,7 @@
 package de.offene_pflege.entity.process;
 
 import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -42,7 +42,7 @@ public class PReport implements Serializable, QProcessElement {
     private QProcess qProcess;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     public PReport() {
     }
@@ -96,11 +96,11 @@ public class PReport implements Serializable, QProcessElement {
         this.art = art;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

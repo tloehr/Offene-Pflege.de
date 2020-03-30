@@ -334,7 +334,7 @@ public class OPDE {
         return login;
     }
 
-    public static Users getMe() {
+    public static OPUsers getMe() {
         if (login == null) return null;
         return login.getUser();
     }
@@ -608,7 +608,7 @@ public class OPDE {
 
                 try {
                     em.getTransaction().begin();
-                    Users rootUser = em.find(Users.class, "admin");
+                    OPUsers rootUser = em.find(OPUsers.class, "admin");
 
                     SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
                     OPDE.setLogin(rootLogin);
@@ -645,7 +645,7 @@ public class OPDE {
 
                 try {
                     em.getTransaction().begin();
-                    Users rootUser = em.find(Users.class, "admin");
+                    OPUsers rootUser = em.find(OPUsers.class, "admin");
 
                     SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
                     OPDE.setLogin(rootLogin);

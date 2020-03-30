@@ -1,7 +1,7 @@
 package de.offene_pflege.entity.files;
 
 import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -55,7 +55,7 @@ public class Resident2File {
 
     @JoinColumn(name = "editor", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users editor;
+    private OPUsers editor;
 
     @JoinColumn(name = "rid", referencedColumnName = "id")
     @ManyToOne
@@ -69,7 +69,7 @@ public class Resident2File {
     public Resident2File() {
     }
 
-    public Resident2File(SYSFiles sysfile, Resident resident, Users editor, Date pit) {
+    public Resident2File(SYSFiles sysfile, Resident resident, OPUsers editor, Date pit) {
         this.pit = pit;
         this.editor = editor;
         this.resident = resident;

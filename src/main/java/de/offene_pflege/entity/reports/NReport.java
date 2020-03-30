@@ -8,7 +8,7 @@ import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.process.SYSNR2PROCESS;
 import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
@@ -116,7 +116,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
      */
     @JoinColumn(name = "NewBy", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users newBy;
+    private OPUsers newBy;
 
 
     /**
@@ -124,7 +124,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
      */
     @JoinColumn(name = "DeletedBy", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users deletedBy;
+    private OPUsers deletedBy;
 
     /**
      * Das ist der BW, dem der Bericht zugeordnet wurde.
@@ -138,7 +138,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
      */
     @JoinColumn(name = "EditedBy", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users editedBy;
+    private OPUsers editedBy;
 
     /**
      * Falls der Bericht ersetzt wurde, dann steht der Bericht, der ihn ersetzt hat. `null` wenn nicht.
@@ -217,7 +217,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
      * @param replacedBy
      * @param replacementFor
      */
-    private NReport(Date pit, Date newPIT, Date editedPIT, String text, int minutes, Users newBy, Resident resident, Users editedBy, NReport replacedBy, NReport replacementFor) {
+    private NReport(Date pit, Date newPIT, Date editedPIT, String text, int minutes, OPUsers newBy, Resident resident, OPUsers editedBy, NReport replacedBy, NReport replacementFor) {
         this.pit = pit;
         this.newPIT = newPIT;
         this.editedPIT = editedPIT;
@@ -305,11 +305,11 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.delPIT = delPIT;
     }
 
-    public Users getDeletedBy() {
+    public OPUsers getDeletedBy() {
         return deletedBy;
     }
 
-    public void setDeletedBy(Users deletedBy) {
+    public void setDeletedBy(OPUsers deletedBy) {
         this.deletedBy = deletedBy;
     }
 
@@ -317,11 +317,11 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.resident = resident;
     }
 
-    public Users getEditedBy() {
+    public OPUsers getEditedBy() {
         return editedBy;
     }
 
-    public void setEditedBy(Users editedBy) {
+    public void setEditedBy(OPUsers editedBy) {
         this.editedBy = editedBy;
     }
 
@@ -385,21 +385,21 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
 
-    public Users getNewBy() {
+    public OPUsers getNewBy() {
         return newBy;
     }
 
     @Override
-    public Users getUser() {
+    public OPUsers getUser() {
         return newBy;
     }
 
-    public void setNewBy(Users user) {
+    public void setNewBy(OPUsers user) {
         this.newBy = user;
     }
 
     @Override
-    public Users getOwner() {
+    public OPUsers getOwner() {
         return newBy;
     }
 

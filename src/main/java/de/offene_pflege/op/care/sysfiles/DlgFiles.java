@@ -12,7 +12,7 @@ import de.offene_pflege.entity.info.ResInfo;
 import de.offene_pflege.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.reports.NReport;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.OPDE;
@@ -186,7 +186,7 @@ public class DlgFiles extends MyJDialog {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.npAssignCollection sf WHERE sf.nursingProcess = :np ");
             query.setParameter("np", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
-        } else if (attachable instanceof Users) {
+        } else if (attachable instanceof OPUsers) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.usersAssignCollection uf WHERE uf.user = :user ");
             query.setParameter("user", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());

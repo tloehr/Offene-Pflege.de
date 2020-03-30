@@ -6,7 +6,7 @@
 package de.offene_pflege.entity.reports;
 
 import de.offene_pflege.entity.building.Homes;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
@@ -20,7 +20,7 @@ import java.util.Collections;
  */
 public class NR2UserTools {
 
-    public static boolean containsUser(EntityManager em, NReport nReport, Users user) {
+    public static boolean containsUser(EntityManager em, NReport nReport, OPUsers user) {
 
         Query query = em.createQuery(" " +
                 " SELECT count(u) FROM NReport n JOIN n.usersAcknowledged u " +
@@ -35,7 +35,7 @@ public class NR2UserTools {
 
     }
 
-    public static boolean containsUser(NReport nReport, Users user) {
+    public static boolean containsUser(NReport nReport, OPUsers user) {
         boolean contains = false;
         for (NR2User nr2User : nReport.getUsersAcknowledged()) {
             contains = nr2User.getUser().equals(user);
@@ -80,7 +80,7 @@ public class NR2UserTools {
      * @param home
      * @return
      */
-    public static boolean hasOpenReports(LocalDate day, Users user, Homes home) {
+    public static boolean hasOpenReports(LocalDate day, OPUsers user, Homes home) {
         boolean openReports = false;
         for (NReport nReport : NReportTools.getNReports4Handover(day, home)) {
             openReports = !containsUser(nReport, user);

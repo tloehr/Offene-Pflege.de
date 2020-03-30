@@ -26,7 +26,7 @@
 package de.offene_pflege.entity.files;
 
 import de.offene_pflege.entity.reports.NReport;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -58,12 +58,12 @@ public class SYSNR2FILE implements Serializable {
     private NReport nReport;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     public SYSNR2FILE() {
     }
 
-    public SYSNR2FILE(SYSFiles sysfile, NReport nReport, Users user, Date pit) {
+    public SYSNR2FILE(SYSFiles sysfile, NReport nReport, OPUsers user, Date pit) {
         this.sysfile = sysfile;
         this.nReport = nReport;
         this.user = user;
@@ -78,11 +78,11 @@ public class SYSNR2FILE implements Serializable {
         this.nReport = nReport;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

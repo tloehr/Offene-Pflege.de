@@ -2,7 +2,7 @@ package de.offene_pflege.entity.nursingprocess;
 
 
 import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
@@ -64,7 +64,7 @@ public class DFN implements Serializable, Comparable<DFN> {
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
 //    public NReport getNReport() {
 //        return nReport;
@@ -269,7 +269,7 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.resident = bewohner;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
@@ -277,7 +277,7 @@ public class DFN implements Serializable, Comparable<DFN> {
         return nursingProcess == null;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

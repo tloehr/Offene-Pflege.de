@@ -5,7 +5,7 @@
 
 package de.offene_pflege.entity.reports;
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -35,7 +35,7 @@ public class NR2User implements Serializable, Comparable<NR2User> {
     private NReport bericht;
     @JoinColumn(name = "UID", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     public NR2User() {
     }
@@ -44,7 +44,7 @@ public class NR2User implements Serializable, Comparable<NR2User> {
         this.pkid = pkid;
     }
 
-    public NR2User(NReport bericht, Users user) {
+    public NR2User(NReport bericht, OPUsers user) {
         this.bericht = bericht;
         this.user = user;
         this.pit = new Date();
@@ -54,7 +54,7 @@ public class NR2User implements Serializable, Comparable<NR2User> {
         return bericht;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 

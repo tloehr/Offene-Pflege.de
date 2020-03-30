@@ -6,7 +6,7 @@ package de.offene_pflege.op.residents.bwassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
@@ -33,9 +33,9 @@ public class PnlBV extends JPanel {
 
     private void initPanel() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT o FROM Users o WHERE o.status = :status ORDER BY o.nachname, o.vorname");
+        Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.userstatus = :status ORDER BY o.nachname, o.vorname");
         query.setParameter("status", UsersTools.STATUS_ACTIVE);
-        java.util.List<Users> listUsers = query.getResultList();
+        java.util.List<OPUsers> listUsers = query.getResultList();
         em.close();
         listUsers.add(0, null);
         cmbBV.setModel(SYSTools.list2cmb(listUsers));

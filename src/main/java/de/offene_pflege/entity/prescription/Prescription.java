@@ -16,7 +16,7 @@ import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.process.SYSPRE2PROCESS;
 import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSCalendar;
@@ -145,10 +145,10 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     // ==
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users userON;
+    private OPUsers userON;
     @JoinColumn(name = "AbUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users userOFF;
+    private OPUsers userOFF;
     @JoinColumn(name = "BWKennung", referencedColumnName = "id")
     @ManyToOne
     private Resident resident;
@@ -198,7 +198,7 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
 //        this.weightControl = false;
     }
 
-    public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
+    public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, OPUsers userON, OPUsers userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
         this.from = from;
         this.to = to;
         this.toEndOfPackage = toEndOfPackage;
@@ -310,7 +310,7 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
         this.showOnDailyPlan = show;
     }
 
-    public Users getUserOFF() {
+    public OPUsers getUserOFF() {
         return userOFF;
     }
 
@@ -351,21 +351,21 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
         this.intervention = massnahme;
     }
 
-    public void setUserOFF(Users userOFF) {
+    public void setUserOFF(OPUsers userOFF) {
         this.userOFF = userOFF;
     }
 
-    public Users getUserON() {
+    public OPUsers getUserON() {
         return userON;
     }
 
-    public void setUserON(Users userON) {
+    public void setUserON(OPUsers userON) {
         this.userON = userON;
     }
 
 
     @Override
-    public Users getOwner() {
+    public OPUsers getOwner() {
         return userON;
     }
 
@@ -412,7 +412,7 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     }
 
     @Override
-    public Users getUser() {
+    public OPUsers getUser() {
         return userON;
     }
 

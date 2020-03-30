@@ -10,7 +10,7 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.reports.NReport;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
@@ -259,7 +259,7 @@ public class QProcessTools {
         return list;
     }
 
-    public static List<QProcess> getProcesses4(Users owner) {
+    public static List<QProcess> getProcesses4(OPUsers owner) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.owner = :owner");
         query.setParameter("owner", owner);
@@ -268,7 +268,7 @@ public class QProcessTools {
         return list;
     }
 
-    public static List<QProcess> getActiveProcesses4(Users owner) {
+    public static List<QProcess> getActiveProcesses4(OPUsers owner) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :baw AND qp.owner = :owner");
         query.setParameter("owner", owner);
@@ -333,7 +333,7 @@ public class QProcessTools {
 
         // By Month
         HashMap<DateMidnight, Integer> monthMap = new HashMap<DateMidnight, Integer>();
-        HashMap<Users, Integer> userMap = new HashMap<Users, Integer>();
+        HashMap<OPUsers, Integer> userMap = new HashMap<OPUsers, Integer>();
         HashMap<Resident, Integer> residentMap = new HashMap<Resident, Integer>();
         for (QProcess qp : listData) {
             DateMidnight currentMonth = new DateMidnight(qp.getFrom()).dayOfMonth().withMinimumValue();
@@ -352,7 +352,7 @@ public class QProcessTools {
         }
         ArrayList<DateMidnight> listMonth = new ArrayList<DateMidnight>(monthMap.keySet());
         Collections.sort(listMonth);
-        ArrayList<Users> listUsers = new ArrayList<Users>(userMap.keySet());
+        ArrayList<OPUsers> listUsers = new ArrayList<OPUsers>(userMap.keySet());
         Collections.sort(listUsers);
         ArrayList<Resident> listResidents = new ArrayList<Resident>(residentMap.keySet());
         Collections.sort(listResidents);
@@ -379,7 +379,7 @@ public class QProcessTools {
                 SYSConst.html_table_th("misc.msg.Number") +
                         SYSConst.html_table_th("misc.msg.Users")
         ));
-        for (Users user : listUsers) {
+        for (OPUsers user : listUsers) {
             table.append(SYSConst.html_table_tr(
                     SYSConst.html_table_td(new Integer(userMap.get(user)).toString(), "right") +
                             SYSConst.html_table_td(user.getFullname())

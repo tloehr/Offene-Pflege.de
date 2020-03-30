@@ -5,7 +5,7 @@
 package de.offene_pflege.entity.process;
 
 import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import java.util.ArrayList;
 
@@ -53,7 +53,7 @@ public interface QProcessElement {
      */
     public long getID();
 
-    public Users getUser();
+    public OPUsers getUser();
 
     public Resident getResident();
 }

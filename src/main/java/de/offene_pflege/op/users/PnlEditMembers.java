@@ -1,7 +1,7 @@
 package de.offene_pflege.op.users;
 
-import de.offene_pflege.entity.system.Groups;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPGroups;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.SYSConst;
@@ -24,11 +24,11 @@ import java.util.HashMap;
  */
 public class PnlEditMembers extends JPanel {
 
-    private Groups group;
-    private ArrayList<Users> listUsers; // is only needed once during setup of the panel
-    private HashMap<String, Users> userMap; // will be used during the use of the panel
+    private OPGroups group;
+    private ArrayList<OPUsers> listUsers; // is only needed once during setup of the panel
+    private HashMap<String, OPUsers> userMap; // will be used during the use of the panel
 
-    public PnlEditMembers(Groups group, ArrayList<Users> listUsers) {
+    public PnlEditMembers(OPGroups group, ArrayList<OPUsers> listUsers) {
         super();
         this.group = group;
         this.listUsers = listUsers;
@@ -38,10 +38,10 @@ public class PnlEditMembers extends JPanel {
 
     private void initPanel() {
 
-        userMap = new HashMap<String, Users>();
+        userMap = new HashMap<String, OPUsers>();
 //        int num = 0;
 
-        for (final Users user : listUsers) {
+        for (final OPUsers user : listUsers) {
 
 //            num++;
 
@@ -57,9 +57,9 @@ public class PnlEditMembers extends JPanel {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Users myUser = em.merge(userMap.get(uid));
+                        OPUsers myUser = em.merge(userMap.get(uid));
                         em.lock(myUser, LockModeType.OPTIMISTIC);
-                        Groups myGroup = em.merge(group);
+                        OPGroups myGroup = em.merge(group);
                         em.lock(myGroup, LockModeType.OPTIMISTIC);
                         if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
                             myUser.getGroups().add(myGroup);

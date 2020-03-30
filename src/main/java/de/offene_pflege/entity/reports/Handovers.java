@@ -8,7 +8,7 @@ import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessElement;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -45,7 +45,7 @@ public class Handovers implements Serializable, QProcessElement, Comparable<Hand
     private Homes home;
     @JoinColumn(name = "UID", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht", fetch = FetchType.EAGER)
     private List<Handover2User> usersAcknowledged;
 
@@ -92,11 +92,11 @@ public class Handovers implements Serializable, QProcessElement, Comparable<Hand
         this.home = home;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

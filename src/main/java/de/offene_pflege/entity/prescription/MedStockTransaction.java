@@ -1,6 +1,6 @@
 package de.offene_pflege.entity.prescription;
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 
 import javax.persistence.*;
@@ -130,7 +130,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         return stock;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
@@ -148,7 +148,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     //OWNER
-    private Users user;
+    private OPUsers user;
 
     //    @Override
 //    public boolean equals(Object o) {

@@ -26,7 +26,7 @@
 package de.offene_pflege.entity.files;
 
 import de.offene_pflege.entity.nursingprocess.NursingProcess;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -56,12 +56,12 @@ public class SYSNP2FILE implements Serializable {
     private NursingProcess nursingProcess;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     public SYSNP2FILE() {
     }
 
-    public SYSNP2FILE(SYSFiles sysfile, NursingProcess nursingProcess, Users user, Date pit) {
+    public SYSNP2FILE(SYSFiles sysfile, NursingProcess nursingProcess, OPUsers user, Date pit) {
         this.sysfile = sysfile;
         this.nursingProcess = nursingProcess;
         this.user = user;
@@ -76,11 +76,11 @@ public class SYSNP2FILE implements Serializable {
         this.nursingProcess = nursingProcess;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

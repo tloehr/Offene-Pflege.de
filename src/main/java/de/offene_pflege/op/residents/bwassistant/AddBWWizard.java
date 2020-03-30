@@ -12,7 +12,7 @@ import de.offene_pflege.entity.prescription.GP;
 import de.offene_pflege.entity.prescription.GPTools;
 import de.offene_pflege.entity.system.Unique;
 import de.offene_pflege.entity.system.UniqueTools;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
@@ -223,7 +223,7 @@ public class AddBWWizard {
         protected void initContentPane() {
             super.initContentPane();
             addComponent(new PnlBV(o -> {
-                resident.setPn1((Users) o);
+                resident.setPn1((OPUsers) o);
                 setupWizardButtons();
             }), true);
         }

@@ -1,7 +1,7 @@
 package de.offene_pflege.op.users;
 
-import de.offene_pflege.entity.system.Groups;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPGroups;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.SYSConst;
@@ -23,11 +23,11 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class PnlEditMemberships extends JPanel {
-    private Users user;
-    private ArrayList<Groups> listGroups; // is only needed once during setup of the panel
-    private HashMap<String, Groups> groupMap; // will be used during the use of the panel
+    private OPUsers user;
+    private ArrayList<OPGroups> listGroups; // is only needed once during setup of the panel
+    private HashMap<String, OPGroups> groupMap; // will be used during the use of the panel
 
-    public PnlEditMemberships(Users user, ArrayList<Groups> listGroups) {
+    public PnlEditMemberships(OPUsers user, ArrayList<OPGroups> listGroups) {
         super();
         this.user = user;
         this.listGroups = listGroups;
@@ -37,9 +37,9 @@ public class PnlEditMemberships extends JPanel {
 
     private void initPanel() {
 
-        groupMap = new HashMap<String, Groups>();
+        groupMap = new HashMap<String, OPGroups>();
 
-        for (final Groups group : listGroups) {
+        for (final OPGroups group : listGroups) {
             final String gid = group.getGID();
             groupMap.put(group.getGID(), group);
             JCheckBox cbGroup = new JCheckBox(group.getGID());
@@ -51,9 +51,9 @@ public class PnlEditMemberships extends JPanel {
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
-                    Users myUser = em.merge(user);
+                    OPUsers myUser = em.merge(user);
                     em.lock(myUser, LockModeType.OPTIMISTIC);
-                    Groups myGroup = em.merge(groupMap.get(gid));
+                    OPGroups myGroup = em.merge(groupMap.get(gid));
                     em.lock(myGroup, LockModeType.OPTIMISTIC);
 
                     if (itemEvent.getStateChange() == ItemEvent.SELECTED) {

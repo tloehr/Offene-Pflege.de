@@ -13,7 +13,7 @@ import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.GP;
 import de.offene_pflege.entity.prescription.GPTools;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
@@ -100,7 +100,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
 //            }
 //        });
 
-        ArrayList<Users> listUsers = UsersTools.getUsers(false);
+        ArrayList<OPUsers> listUsers = UsersTools.getUsers(false);
         listUsers.add(0, null);
         cmbPrimNurse1.setModel(new DefaultComboBoxModel(listUsers.toArray()));
         cmbPrimNurse1.setRenderer(UsersTools.getRenderer());
@@ -179,8 +179,8 @@ public class DlgEditResidentBaseData extends MyJDialog {
         resident.setEditor(OPDE.getLogin().getUser());
         resident.setGender(rbFemale.isSelected() ? ResidentTools.FEMALE : ResidentTools.MALE);
         resident.setGp((GP) cmbGP.getSelectedItem());
-        resident.setPn1((Users) cmbPrimNurse1.getSelectedItem());
-        resident.setPn2((Users) cmbPrimNurse2.getSelectedItem());
+        resident.setPn1((OPUsers) cmbPrimNurse1.getSelectedItem());
+        resident.setPn2((OPUsers) cmbPrimNurse2.getSelectedItem());
 //        resident.setRoom((Rooms) cmbRoom.getSelectedItem());
         resident.setStation((Station) cmbStation.getSelectedItem());
         resident.setCalcMediUPR1(tbCalcMediUPR1.isSelected());

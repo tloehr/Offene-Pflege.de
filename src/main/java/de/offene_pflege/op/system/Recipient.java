@@ -1,6 +1,6 @@
 package de.offene_pflege.op.system;
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.mail.internet.InternetAddress;
 import java.io.UnsupportedEncodingException;
@@ -12,7 +12,7 @@ public class Recipient {
 
     String mailaddress, fullname;
 
-    public Recipient(Users user) {
+    public Recipient(OPUsers user) {
         this.mailaddress = user.getEMail();
         this.fullname = user.getFullname();
     }

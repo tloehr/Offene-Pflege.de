@@ -177,7 +177,7 @@ public class SYSGROUPS2ACLTools {
      * @param group
      * @return
      */
-    public static HashMap<String, SYSGROUPS2ACL> getIntClassesMap(Groups group) {
+    public static HashMap<String, SYSGROUPS2ACL> getIntClassesMap(OPGroups group) {
         HashMap<String, SYSGROUPS2ACL> dblookup = new HashMap();
         if (group.getIntClasses() != null) {
             Iterator<SYSGROUPS2ACL> it = group.getIntClasses().iterator();

@@ -18,7 +18,7 @@ public class SYSLoginTools {
 
     public static SYSLogin login(String username, String password) {
         SYSLogin login = null;
-        Users user = UsersTools.checkPassword(username, password);
+        OPUsers user = UsersTools.checkPassword(username, password);
 
         if (user != null) {
             login = new SYSLogin(user);

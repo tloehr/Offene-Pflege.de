@@ -1,6 +1,6 @@
 package de.offene_pflege.op.settings.databeans;
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.gui.interfaces.EditorComponent;
 import de.offene_pflege.op.tools.SYSTools;
 import javax.validation.constraints.NotEmpty;
@@ -18,7 +18,7 @@ public class PersonalMailBean {
         this.mail = "";
     }
 
-    public PersonalMailBean(Users user) {
+    public PersonalMailBean(OPUsers user) {
         this.mail = SYSTools.catchNull(user.getEMail());
     }
 

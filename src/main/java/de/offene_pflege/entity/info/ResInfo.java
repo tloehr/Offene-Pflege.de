@@ -31,7 +31,7 @@ import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.process.SYSINF2PROCESS;
 import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.tools.SYSTools;
@@ -91,10 +91,10 @@ public class ResInfo implements Serializable, QProcessElement, Comparable<ResInf
     private ResInfoType bwinfotyp;
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users userON;
+    private OPUsers userON;
     @JoinColumn(name = "AbUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users userOFF;
+    private OPUsers userOFF;
     @JoinColumn(name = "BWKennung", referencedColumnName = "id")
     @ManyToOne
     private Resident resident;
@@ -221,19 +221,19 @@ public class ResInfo implements Serializable, QProcessElement, Comparable<ResInf
         this.properties = properties;
     }
 
-    public Users getUserOFF() {
+    public OPUsers getUserOFF() {
         return userOFF;
     }
 
-    public void setUserOFF(Users user) {
+    public void setUserOFF(OPUsers user) {
         this.userOFF = user;
     }
 
-    public Users getUserON() {
+    public OPUsers getUserON() {
         return userON;
     }
 
-    public void setUserON(Users user) {
+    public void setUserON(OPUsers user) {
         this.userON = user;
     }
 
@@ -293,7 +293,7 @@ public class ResInfo implements Serializable, QProcessElement, Comparable<ResInf
     }
 
     @Override
-    public Users getUser() {
+    public OPUsers getUser() {
         return userON;
     }
 

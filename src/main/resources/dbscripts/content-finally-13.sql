@@ -2,7 +2,7 @@ INSERT INTO `homes` (`eid`, `name`, `str`, `zip`, `city`, `tel`, `fax`,`color`,`
 INSERT INTO `floors` (`floorid`,`homeid`, `name`, `level`, `lift`, `version`) VALUES ('1','home1', 'Erdgeschoss', '0', '1', '1'); 
 INSERT INTO `rooms` (`RID`, `floorid`, `Text`, `Single`, `Bath`, `active`, `version`) values('1','1','1','1','1','1','0');
 INSERT INTO `station` (`statid`,`eid`, `name`, `version`) VALUES ('1','home1', 'Station 1','0');
-INSERT INTO `users` (Vorname, Nachname, UKennung, STATUS, MD5PW, version, cipherid) VALUES ('OPDE','Admin','admin',2,'notyet','0',ROUND((RAND() * (10000))+1));
+INSERT INTO opusers (Vorname, Nachname, UKennung, userstatus, MD5PW, version, cipherid) VALUES ('OPDE','Admin','admin',2,'notyet','0',ROUND((RAND() * (10000))+1));
 INSERT INTO `member` (`UKennung`, `GKennung`) VALUES ('admin', 'admin');
 INSERT INTO `member` (`UKennung`, `GKennung`) VALUES ('admin', 'everyone');
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('FM','00:00',NULL);

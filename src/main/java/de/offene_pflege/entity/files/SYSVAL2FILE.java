@@ -25,7 +25,7 @@ package de.offene_pflege.entity.files;
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
 
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.values.ResValue;
 
 import javax.persistence.*;
@@ -57,23 +57,23 @@ public class SYSVAL2FILE implements Serializable {
     private SYSFiles sysfile;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users user;
+    private OPUsers user;
 
     public SYSVAL2FILE() {
     }
 
-    public SYSVAL2FILE(SYSFiles sysfile, ResValue value, Users user, Date pit) {
+    public SYSVAL2FILE(SYSFiles sysfile, ResValue value, OPUsers user, Date pit) {
         this.sysfile = sysfile;
         this.value = value;
         this.user = user;
         this.pit = pit;
     }
 
-    public Users getUser() {
+    public OPUsers getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(OPUsers user) {
         this.user = user;
     }
 

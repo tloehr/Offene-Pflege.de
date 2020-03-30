@@ -27,19 +27,19 @@ public class UsersTools {
     public static final int MAIL_CONFIRMED = 1;
     public static final int MAIL_NOTIFICATIONS_ENABLED = 2;
 
-    public static ArrayList<Users> getUsers(boolean inactiveToo) {
+    public static ArrayList<OPUsers> getUsers(boolean inactiveToo) {
         EntityManager em = OPDE.createEM();
 
         Query query;
         if (inactiveToo) {
-            query = em.createQuery("SELECT u FROM Users u WHERE u.status <> :status ORDER BY u.nachname, u.vorname ");
+            query = em.createQuery("SELECT u FROM OPUsers u WHERE u.userstatus <> :status ORDER BY u.nachname, u.vorname ");
             query.setParameter("status", STATUS_ROOT);
         } else {
-            query = em.createQuery("SELECT u FROM Users u WHERE u.status = :status ORDER BY u.nachname, u.vorname ");
+            query = em.createQuery("SELECT u FROM OPUsers u WHERE u.userstatus = :status ORDER BY u.nachname, u.vorname ");
             query.setParameter("status", STATUS_ACTIVE);
         }
 
-        ArrayList<Users> list = new ArrayList<Users>(query.getResultList());
+        ArrayList<OPUsers> list = new ArrayList<OPUsers>(query.getResultList());
 
         em.close();
 
@@ -52,20 +52,20 @@ public class UsersTools {
 //    }
 
 
-    public static ArrayList<Users> getUsers(String searchPattern, boolean inactiveToo) {
+    public static ArrayList<OPUsers> getUsers(String searchPattern, boolean inactiveToo) {
         EntityManager em = OPDE.createEM();
 
         Query query;
         if (inactiveToo) {
-            query = em.createQuery("SELECT u FROM Users u WHERE u.status <> :status ORDER BY u.nachname, u.vorname ");
+            query = em.createQuery("SELECT u FROM OPUsers u WHERE u.userstatus <> :status ORDER BY u.nachname, u.vorname ");
             query.setParameter("status", STATUS_ROOT);
         } else {
-            query = em.createQuery("SELECT u FROM Users u WHERE (u.uid LIKE :pattern OR u.nachname LIKE :pattern OR u.vorname LIKE :pattern) AND u.status = :status ORDER BY u.nachname, u.vorname ");
+            query = em.createQuery("SELECT u FROM OPUsers u WHERE (u.uid LIKE :pattern OR u.nachname LIKE :pattern OR u.vorname LIKE :pattern) AND u.userstatus = :status ORDER BY u.nachname, u.vorname ");
             query.setParameter("status", STATUS_ACTIVE);
             query.setParameter("pattern", EntityTools.getMySQLsearchPattern(searchPattern));
         }
 
-        ArrayList<Users> list = new ArrayList<Users>(query.getResultList());
+        ArrayList<OPUsers> list = new ArrayList<OPUsers>(query.getResultList());
 
         em.close();
 
@@ -78,7 +78,7 @@ public class UsersTools {
             String text;
             if (o == null) {
                 text = SYSTools.xx("misc.commands.>>noselection<<");
-            } else if (o instanceof Users) {
+            } else if (o instanceof OPUsers) {
                 text = o.toString();
             } else {
                 text = o.toString();
@@ -87,17 +87,38 @@ public class UsersTools {
         };
     }
 
-    public static boolean isAdmin(Users user) {
+    public static boolean isAdmin(OPUsers user) {
+
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT g FROM Groups g WHERE g.gid = 'admin' AND :user MEMBER OF g.members");
+
+        Query query1 = em.createQuery("SELECT v FROM MedInventory v WHERE v.resident.id = 'au1' ");
+        query1.getResultList();
+//
+//        Query queryn = em.createNativeQuery("select * from medinventory where BWKennung='au1'");
+//        queryn.getResultList();
+//
+
+
+
+//        try {
+//            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl("srv0001", "3309", null),"root", "db-jor-uk-c");
+//            jdbcConnection.setCatalog("opde");
+//            PreparedStatement stmt = jdbcConnection.prepareStatement("select * from medinventory where BWKennung='au1'");
+//            ResultSet rs = stmt.executeQuery();
+//            rs.first();
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+
+        Query query = em.createQuery("SELECT g FROM OPGroups g WHERE g.gid = 'admin' AND :user MEMBER OF g.members");
         query.setParameter("user", user);
         boolean admin = query.getResultList().size() > 0;
-//        OPDE.debug("Benutzer ist " + (admin ? "" : "kein") + " Admin");
         em.close();
         return admin;
     }
 
-    public static Color getBG1(Users user) {
+    public static Color getBG1(OPUsers user) {
         Color active = GUITools.getColor("CEF0FF");
         Color closed = GUITools.getColor("C0C0C0");
         if (user.isActive()) {
@@ -107,9 +128,9 @@ public class UsersTools {
         return closed;
     }
 
-    public static boolean isQualified(Users user) {
+    public static boolean isQualified(OPUsers user) {
         boolean qualified = false;
-        for (Groups group : user.getGroups()) {
+        for (OPGroups group : user.getGroups()) {
             if (group.isQualified()) {
                 qualified = true;
                 break;
@@ -118,14 +139,14 @@ public class UsersTools {
         return qualified;
     }
 
-    public static Users checkPassword(String username, String password) {
+    public static OPUsers checkPassword(String username, String password) {
         EntityManager em = OPDE.createEM();
-        Users user = null;
+        OPUsers user = null;
         try {
-            Query query = em.createQuery("SELECT o FROM Users o WHERE o.uid = :uKennung AND o.md5pw = :md5pw");
+            Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.uid = :uKennung AND o.md5pw = :md5pw");
             query.setParameter("uKennung", username);
             query.setParameter("md5pw", SYSTools.hashword(password));
-            user = (Users) query.getSingleResult();
+            user = (OPUsers) query.getSingleResult();
         } catch (Exception e) {
             OPDE.info(e);
         } finally {

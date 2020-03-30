@@ -2,7 +2,7 @@ package de.offene_pflege.op.settings.subpanels;
 
 import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.gui.PnlBeanEditor;
 import de.offene_pflege.gui.events.RelaxedDocumentListener;
@@ -64,7 +64,7 @@ public class PnlUserMailSettings extends DefaultPanel {
 
         tbNotifications.addItemListener(ie -> {
             if (ie.getStateChange() != ItemEvent.SELECTED && ie.getStateChange() != ItemEvent.DESELECTED) return;
-            Users myUser = OPDE.getLogin().getUser();
+            OPUsers myUser = OPDE.getLogin().getUser();
             myUser.setMailConfirmed(ie.getStateChange() == ItemEvent.SELECTED ? UsersTools.MAIL_NOTIFICATIONS_ENABLED : UsersTools.MAIL_CONFIRMED);
             OPDE.getLogin().setUser(EntityTools.merge(myUser));
         });
@@ -90,7 +90,7 @@ public class PnlUserMailSettings extends DefaultPanel {
                         tbNotifications.setEnabled(keyConfirmed);
                         lblLED.setIcon(SYSConst.icon22ledRedOn);
 
-                        Users myUser = OPDE.getLogin().getUser();
+                        OPUsers myUser = OPDE.getLogin().getUser();
                         myUser.setMailConfirmed(UsersTools.MAIL_UNCONFIRMED);
                         OPDE.getLogin().setUser(EntityTools.merge(myUser));
 
@@ -108,7 +108,7 @@ public class PnlUserMailSettings extends DefaultPanel {
                             lastCheckOk = (Boolean) get();
 
                             if (lastCheckOk) {
-                                Users myUser = OPDE.getLogin().getUser();
+                                OPUsers myUser = OPDE.getLogin().getUser();
                                 myUser.setEMail(mailaddress);
                                 myUser.setMailConfirmed(UsersTools.MAIL_UNCONFIRMED);
                                 OPDE.getLogin().setUser(EntityTools.merge(myUser));
@@ -164,7 +164,7 @@ public class PnlUserMailSettings extends DefaultPanel {
                 lblLED.setIcon(keyConfirmed ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(keyConfirmed ? "opde.settings.personal.mail.confirmed" : "opde.settings.personal.mail.not.confirmed"));
                 if (keyConfirmed) {
-                    Users myUser = OPDE.getLogin().getUser();
+                    OPUsers myUser = OPDE.getLogin().getUser();
                     myUser.setMailConfirmed(UsersTools.MAIL_CONFIRMED);
                     OPDE.getLogin().setUser(EntityTools.merge(myUser));
                 }

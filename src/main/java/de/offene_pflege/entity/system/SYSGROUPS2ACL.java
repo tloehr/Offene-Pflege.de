@@ -31,16 +31,16 @@ public class SYSGROUPS2ACL implements Serializable {
     private Long version;
     @JoinColumn(name = "gid", referencedColumnName = "GKENNUNG")
     @ManyToOne
-    private Groups groups;
+    private OPGroups opgroups;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "intclass")
     private Collection<Acl> aclCollection;
 
     public SYSGROUPS2ACL() {
     }
 
-    public SYSGROUPS2ACL(String internalClassID, Groups groups) {
+    public SYSGROUPS2ACL(String internalClassID, OPGroups opgroups) {
         this.internalClassID = internalClassID;
-        this.groups = groups;
+        this.opgroups = opgroups;
         this.aclCollection = new ArrayList();
     }
 
@@ -52,12 +52,12 @@ public class SYSGROUPS2ACL implements Serializable {
         this.icid = icid;
     }
 
-    public Groups getGroups() {
-        return groups;
+    public OPGroups getOPGroups() {
+        return opgroups;
     }
 
-    public void setGroups(Groups groups) {
-        this.groups = groups;
+    public void setOPGroups(OPGroups opgroups) {
+        this.opgroups = opgroups;
     }
 
     public Collection<Acl> getAclCollection() {

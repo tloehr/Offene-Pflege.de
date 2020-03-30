@@ -30,7 +30,7 @@ import de.offene_pflege.entity.DefaultStringIDEntity;
 import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.entity.files.Resident2File;
 import de.offene_pflege.entity.prescription.GP;
-import de.offene_pflege.entity.system.Users;
+import de.offene_pflege.entity.system.OPUsers;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -53,9 +53,9 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
     private Boolean calcMediUPR1;
     private Station station;
     private GP gp;
-    private Users pn1;
-    private Users pn2;
-    private Users editor;
+    private OPUsers pn1;
+    private OPUsers pn2;
+    private OPUsers editor;
     private long idbewohner;
     private Collection<Allowance> allowance;
     private Collection<ResInfo> resInfoCollection;
@@ -153,21 +153,21 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
 
     @JoinColumn(name = "BV1UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    public Users getPn1() {
+    public OPUsers getPn1() {
         return pn1;
     }
 
-    public void setPn1(Users pn1) {
+    public void setPn1(OPUsers pn1) {
         this.pn1 = pn1;
     }
 
     @JoinColumn(name = "BV2UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    public Users getPn2() {
+    public OPUsers getPn2() {
         return pn2;
     }
 
-    public void setPn2(Users pn2) {
+    public void setPn2(OPUsers pn2) {
         this.pn2 = pn2;
     }
 
@@ -183,11 +183,11 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
 
     @JoinColumn(name = "Editor", referencedColumnName = "UKennung")
     @ManyToOne
-    public Users getEditor() {
+    public OPUsers getEditor() {
         return editor;
     }
 
-    public void setEditor(Users editor) {
+    public void setEditor(OPUsers editor) {
         this.editor = editor;
     }
 

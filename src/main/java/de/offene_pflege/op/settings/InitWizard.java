@@ -1090,16 +1090,23 @@ public class InitWizard extends WizardDialog {
                         stmt.executeUpdate();
                         stmt.close();
                         summary.add(SYSTools.xx("opde.initwizard.summary.createdb.createschema", catalog));
+                        
+                        String queryCreateUser1 = " CREATE USER '" + dbuser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        stmt = jdbcConnection.prepareStatement(queryCreateUser1);
+                        stmt.executeUpdate();
+                        stmt.close();
 
-                        // todo: CREATE USER 'jeffrey'@'localhost' IDENTIFIED BY 'password';
-                        // Im Moment erzeugt GRANT den User implizit. Ist aber deprecated
+                        String queryCreateUser2 = " CREATE USER '" + dbuser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        stmt = jdbcConnection.prepareStatement(queryCreateUser2);
+                        stmt.executeUpdate();
+                        stmt.close();
 
-                        String queryGrant1 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        String queryGrant1 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'localhost'";
                         stmt = jdbcConnection.prepareStatement(queryGrant1);
                         stmt.executeUpdate();
                         stmt.close();
 
-                        String queryGrant2 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        String queryGrant2 = " GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON " + catalog + ".* TO '" + dbuser + "'@'%'";
                         stmt = jdbcConnection.prepareStatement(queryGrant2);
                         stmt.executeUpdate();
                         stmt.close();
@@ -1131,7 +1138,7 @@ public class InitWizard extends WizardDialog {
                         }
 
                         // Set the password for the OPDE admin user
-                        String queryAdminPW = " UPDATE users SET md5pw = MD5(?) WHERE ukennung = 'admin'";
+                        String queryAdminPW = " UPDATE opusers SET md5pw = MD5(?) WHERE ukennung = 'admin'";
                         stmt = jdbcConnection.prepareStatement(queryAdminPW);
                         stmt.setString(1, generatedPassword4AdminUser);
                         stmt.executeUpdate();
