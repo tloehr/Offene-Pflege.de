@@ -9,12 +9,10 @@ import de.offene_pflege.op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
 @Table(name = "dfn")
-
 public class DFN implements Serializable, Comparable<DFN> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -42,9 +40,6 @@ public class DFN implements Serializable, Comparable<DFN> {
     @Basic(optional = false)
     @Column(name = "Erforderlich")
     private boolean floating;
-    @Basic(optional = false)
-    @Column(name = "Dauer")
-    private BigDecimal dauer;
     @Basic(optional = false)
     @Column(name = "MDate")
     @Temporal(TemporalType.TIMESTAMP)
@@ -110,7 +105,6 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.interventionSchedule = null;
         this.intervention = intervention;
         this.nursingProcess = null;
-        this.dauer = intervention.getDauer();
         this.resident = resident;
         this.floating = false;
         this.soll = now;
@@ -130,7 +124,6 @@ public class DFN implements Serializable, Comparable<DFN> {
         this.interventionSchedule = interventionSchedule;
         this.intervention = interventionSchedule.getIntervention();
         this.nursingProcess = interventionSchedule.getNursingProcess();
-        this.dauer = interventionSchedule.getDauer();
         this.resident = interventionSchedule.getNursingProcess().getResident();
         this.floating = interventionSchedule.isFloating();
         this.soll = soll;
@@ -224,14 +217,6 @@ public class DFN implements Serializable, Comparable<DFN> {
 
     public void setFloating(boolean floating) {
         this.floating = floating;
-    }
-
-    public BigDecimal getMinutes() {
-        return dauer;
-    }
-
-    public void setMinutes(BigDecimal minutes) {
-        this.dauer = minutes;
     }
 
     public Date getMdate() {

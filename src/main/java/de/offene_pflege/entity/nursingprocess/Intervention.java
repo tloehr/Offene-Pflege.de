@@ -28,9 +28,6 @@ public class Intervention implements Serializable {
     @Column(name = "Bezeichnung")
     private String bezeichnung;
     @Basic(optional = false)
-    @Column(name = "Dauer")
-    private BigDecimal dauer;
-    @Basic(optional = false)
     @Column(name = "MassArt")
     private int interventionType;
     @Column(name = "Aktiv")
@@ -55,7 +52,6 @@ public class Intervention implements Serializable {
 
     public Intervention(String bezeichnung, BigDecimal dauer, int interventionType, ResInfoCategory category) {
         this.bezeichnung = SYSTools.tidy(bezeichnung);
-        this.dauer = dauer;
         this.interventionType = interventionType;
         this.category = category;
         this.active = true;
@@ -76,15 +72,7 @@ public class Intervention implements Serializable {
     public void setBezeichnung(String bezeichnung) {
         this.bezeichnung = SYSTools.tidy(bezeichnung);
     }
-
-    public BigDecimal getDauer() {
-        return dauer;
-    }
-
-    public void setDauer(BigDecimal dauer) {
-        this.dauer = dauer;
-    }
-
+    
     public int getInterventionType() {
         return interventionType;
     }

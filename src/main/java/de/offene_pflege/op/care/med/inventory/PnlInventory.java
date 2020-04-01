@@ -65,6 +65,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 
@@ -512,7 +513,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                     }
                                 }
                                 // close inventory
-                                myInventory.setTo(new Date());
+                                myInventory.setTo(LocalDateTime.now());
 
                                 em.getTransaction().commit();
 

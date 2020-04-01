@@ -1624,5 +1624,17 @@ alter table `groups` change `System` sysflag tinyint(1) default 0 not null;
 rename table `groups` to opgroups;
 alter table users change Status userstatus tinyint null;
 rename table users to opusers;
+--
+alter table nreports drop column Dauer;
+alter table intervention drop column Dauer;
+alter table ischedule drop column Dauer;
+alter table bhp drop column Dauer;
+alter table dfn drop column Dauer;
+
+
+
+
+
+
 
 

@@ -91,22 +91,24 @@ public class UsersTools {
 
         EntityManager em = OPDE.createEM();
 
-        Query query1 = em.createQuery("SELECT v FROM MedInventory v WHERE v.resident.id = 'au1' ");
-        query1.getResultList();
+//        Query query1 = em.createQuery("SELECT v FROM MedInventory v WHERE v.resident.id = 'au1' ");
+//        query1.getResultList();
+
 //
 //        Query queryn = em.createNativeQuery("select * from medinventory where BWKennung='au1'");
 //        queryn.getResultList();
 //
-
-
 
 //        try {
 //            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl("srv0001", "3309", null),"root", "db-jor-uk-c");
 //            jdbcConnection.setCatalog("opde");
 //            PreparedStatement stmt = jdbcConnection.prepareStatement("select * from medinventory where BWKennung='au1'");
 //            ResultSet rs = stmt.executeQuery();
-//            rs.first();
-//
+//            rs.beforeFirst();
+//            while(rs.next()) {
+//                System.out.println(rs.getTimestamp("Bis"));
+//            }
+//            rs.close();
 //        } catch (SQLException e) {
 //            e.printStackTrace();
 //        }

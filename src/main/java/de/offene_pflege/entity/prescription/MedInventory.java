@@ -7,13 +7,12 @@ import de.offene_pflege.op.tools.SYSConst;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "medinventory")
-
 public class MedInventory implements Serializable, Comparable<MedInventory> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -28,12 +27,10 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
     private String text;
     @Basic(optional = false)
     @Column(name = "Von")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date from;
+    private LocalDateTime from;
     @Basic(optional = false)
     @Column(name = "Bis")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date to;
+    private LocalDateTime to;
 
     public MedInventory() {
 
@@ -56,8 +53,8 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         this.resident = resident;
         this.text = text;
         this.user = OPDE.getLogin().getUser();
-        this.from = new Date();
-        this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
+        this.from = LocalDateTime.now();
+        this.to = SYSConst.LD_UNTIL_FURTHER_NOTICE;
         this.medStocks = new ArrayList<MedStock>();
     }
 
@@ -73,19 +70,19 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         this.text = text;
     }
 
-    public Date getFrom() {
+    public LocalDateTime getFrom() {
         return from;
     }
 
-    public void setFrom(Date from) {
+    public void setFrom(LocalDateTime from) {
         this.from = from;
     }
 
-    public Date getTo() {
+    public LocalDateTime getTo() {
         return to;
     }
 
-    public void setTo(Date to) {
+    public void setTo(LocalDateTime to) {
         this.to = to;
     }
 

@@ -2,7 +2,6 @@ package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -12,6 +11,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -330,7 +330,7 @@ public class MedInventoryTools {
         return result;
     }
 
-    public static void closeAll(EntityManager em, Resident resident, Date enddate) throws Exception {
+    public static void closeAll(EntityManager em, Resident resident, LocalDateTime enddate) throws Exception {
         Query query = em.createQuery("SELECT i FROM MedInventory i WHERE i.resident = :resident AND i.to >= :now");
         query.setParameter("resident", resident);
         query.setParameter("now", enddate);
@@ -355,6 +355,6 @@ public class MedInventoryTools {
     }
 
     public static boolean isClosed(MedInventory medInventory){
-        return JavaTimeConverter.toJavaLocalDateTime(medInventory.getTo()).isBefore(SYSConst.LD_UNTIL_FURTHER_NOTICE);
+        return medInventory.getTo().isBefore(SYSConst.LD_UNTIL_FURTHER_NOTICE);
     }
 }

@@ -68,7 +68,6 @@
         <class>de.offene_pflege.entity.building.Floors</class>
         <class>de.offene_pflege.entity.QdvsLaufend</class>
         <properties>
-<!--            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv02:3309/opde"/>-->
 <!--            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>-->
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
         </properties>
