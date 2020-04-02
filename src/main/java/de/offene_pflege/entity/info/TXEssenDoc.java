@@ -10,7 +10,7 @@ import de.offene_pflege.entity.nursingprocess.*;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.ResValueTypesTools;
+import de.offene_pflege.entity.values.ResvaluetypesTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.info.PnlBodyScheme;
 import de.offene_pflege.op.system.AppInfo;
@@ -1128,8 +1128,8 @@ public class TXEssenDoc implements HasLogger {
 
 
         // BMI
-        Optional<ResValue> weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
-        Optional<ResValue> height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
+        Optional<ResValue> weight = ResValueTools.getLast(resident, ResvaluetypesTools.WEIGHT);
+        Optional<ResValue> height = ResValueTools.getLast(resident, ResvaluetypesTools.HEIGHT);
 
         //https://github.com/tloehr/Offene-Pflege.de/issues/72
         content.put(TXEAF.FOOD_WEIGHT, weight.isPresent() ? SYSTools.formatBigDecimal(weight.get().getVal1()) + weight.get().getType().getUnit1() + "/" + DateFormat.getDateInstance().format(weight.get().getPit()) : "--");

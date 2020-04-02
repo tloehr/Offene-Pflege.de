@@ -929,43 +929,6 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
         pnlWounds.add(txtWoundsMonthsBack, BorderLayout.EAST);
         pnlContent.add(pnlWounds);
 
-
-        /***
-         *      ____             _       _   _____ _
-         *     / ___|  ___   ___(_) __ _| | |_   _(_)_ __ ___   ___  ___
-         *     \___ \ / _ \ / __| |/ _` | |   | | | | '_ ` _ \ / _ \/ __|
-         *      ___) | (_) | (__| | (_| | |   | | | | | | | | |  __/\__ \
-         *     |____/ \___/ \___|_|\__,_|_|   |_| |_|_| |_| |_|\___||___/
-         *
-         */
-        JPanel pblSocialTimes = new JPanel(new BorderLayout());
-        final JButton btnSocialTimes = GUITools.createHyperlinkButton("opde.controlling.nursing.social", null, null);
-        final JComboBox cmbSocialTimes = new JComboBox(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
-        btnSocialTimes.addActionListener(e -> {
-            OPDE.getMainframe().setBlocked(true);
-            SwingWorker worker = new SwingWorker() {
-                @Override
-                protected Object doInBackground() throws Exception {
-                    LocalDate month = (LocalDate) cmbSocialTimes.getSelectedItem();
-                    SYSFilesTools.print(NReportTools.getTimes4SocialReports(month, progressClosure), false);
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
-                }
-            };
-            worker.execute();
-        });
-        cmbSocialTimes.setRenderer((list, value, index, isSelected, cellHasFocus) -> new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((LocalDate) value).toDate()), index, isSelected, cellHasFocus));
-        cmbSocialTimes.setSelectedIndex(cmbSocialTimes.getItemCount() - 2);
-        pblSocialTimes.add(btnSocialTimes, BorderLayout.WEST);
-        pblSocialTimes.add(cmbSocialTimes, BorderLayout.EAST);
-        pnlContent.add(pblSocialTimes);
-
-
         return pnlContent;
     }
 

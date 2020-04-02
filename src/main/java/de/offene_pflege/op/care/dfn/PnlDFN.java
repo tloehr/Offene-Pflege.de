@@ -69,7 +69,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.*;
@@ -816,7 +815,6 @@ public class PnlDFN extends NursingRecordsPanel {
                             em.lock(myDFN.getNursingProcess(), LockModeType.OPTIMISTIC);
                         }
 
-                        myDFN.setMinutes(new BigDecimal((Integer) o));
                         myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
                         myDFN.setMdate(new Date());
                         em.getTransaction().commit();

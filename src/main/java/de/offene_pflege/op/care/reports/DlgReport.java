@@ -6,9 +6,6 @@ package de.offene_pflege.op.care.reports;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.swing.DefaultOverlayable;
-import com.jidesoft.swing.OverlayableIconsFactory;
-import com.jidesoft.swing.OverlayableUtils;
 import de.offene_pflege.entity.info.ResInfo;
 import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.ResInfoTypeTools;
@@ -23,8 +20,9 @@ import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.text.NumberFormat;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Date;
 
 /**
@@ -34,10 +32,7 @@ public class DlgReport extends MyJDialog {
     private NReport nReport;
     private Closure actionBlock;
 
-    private DefaultOverlayable ovrDauer;
-    private JLabel attentionIcon;
     private PnlPIT pnlPIT;
-    private int defaultMinutes;
     private PnlCommonTags pnlCommonTags;
 
     public DlgReport(NReport nReport, Closure actionBlock) {
@@ -60,55 +55,10 @@ public class DlgReport extends MyJDialog {
         add(new JScrollPane(pnlCommonTags), CC.xyw(2, 6, 3));
 
         txtBericht.setText(nReport.getText());
-        defaultMinutes = nReport.getMinutes();
-        txtMinutes.setText(Integer.toString(defaultMinutes));
-
-        txtMinutes.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent focusEvent) {
-                txtDauerFocusGained(focusEvent);
-            }
-
-            @Override
-            public void focusLost(FocusEvent focusEvent) {
-                txtDauerFocusLost(focusEvent);
-            }
-        });
-
-        lblTime.setText(SYSTools.xx("misc.msg.Minutes"));
-
-        attentionIcon = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
-        ovrDauer = new DefaultOverlayable(lblTime, attentionIcon, DefaultOverlayable.SOUTH_EAST);
-        ovrDauer.setOverlayVisible(true);
-        add(ovrDauer, CC.xy(2, 4));
 
         SwingUtilities.invokeLater(() -> txtBericht.requestFocus());
     }
 
-    private void txtDauerFocusGained(FocusEvent e) {
-        SYSTools.markAllTxt(txtMinutes);
-    }
-
-    private void txtDauerFocusLost(FocusEvent e) {
-        if (nReport == null) return;
-
-        NumberFormat nf = NumberFormat.getIntegerInstance();
-        String test = txtMinutes.getText();
-        int dauer;
-        try {
-            Number num = nf.parse(test);
-            dauer = num.intValue();
-            if (dauer < 0) {
-                dauer = defaultMinutes;
-                txtMinutes.setText(Integer.toString(defaultMinutes));
-            }
-        } catch (Exception exc) {
-            dauer = defaultMinutes;
-            txtMinutes.setText(Integer.toString(defaultMinutes));
-        }
-        ovrDauer.setOverlayVisible(dauer == defaultMinutes);
-        nReport.setMinutes(dauer);
-    }
 
     @Override
     public void dispose() {
@@ -141,8 +91,6 @@ public class DlgReport extends MyJDialog {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        lblTime = new JLabel();
-        txtMinutes = new JTextField();
         scrollPane1 = new JScrollPane();
         txtBericht = new JTextArea();
         panel2 = new JPanel();
@@ -162,16 +110,7 @@ public class DlgReport extends MyJDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "13dlu, pref, $rgap, 336dlu, 13dlu",
-            "13dlu, default, $nlgap, default, fill:143dlu, fill:46dlu, default, 13dlu"));
-
-        //---- lblTime ----
-        lblTime.setText("Dauer");
-        lblTime.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblTime, CC.xy(2, 4));
-
-        //---- txtMinutes ----
-        txtMinutes.setColumns(5);
-        contentPane.add(txtMinutes, CC.xy(4, 4, CC.LEFT, CC.DEFAULT));
+            "13dlu, default, $nlgap, fill:143dlu, fill:46dlu, default, 13dlu"));
 
         //======== scrollPane1 ========
         {
@@ -182,7 +121,7 @@ public class DlgReport extends MyJDialog {
             txtBericht.setLineWrap(true);
             scrollPane1.setViewportView(txtBericht);
         }
-        contentPane.add(scrollPane1, CC.xywh(2, 5, 3, 1, CC.FILL, CC.FILL));
+        contentPane.add(scrollPane1, CC.xywh(2, 4, 3, 1, CC.FILL, CC.FILL));
 
         //======== panel2 ========
         {
@@ -198,15 +137,13 @@ public class DlgReport extends MyJDialog {
             btnApply.addActionListener(e -> btnApplyActionPerformed(e));
             panel2.add(btnApply);
         }
-        contentPane.add(panel2, CC.xy(4, 7, CC.RIGHT, CC.FILL));
+        contentPane.add(panel2, CC.xy(4, 6, CC.RIGHT, CC.FILL));
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JLabel lblTime;
-    private JTextField txtMinutes;
     private JScrollPane scrollPane1;
     private JTextArea txtBericht;
     private JPanel panel2;

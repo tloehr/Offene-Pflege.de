@@ -4,7 +4,7 @@
     <label size="24" label="Einschätzung durch Pflegekraft" color="blue"/>
     <qdvs tooltip="Wird bei der Auswertung zur QDVS herangezogen."/>
 
-    <scale name="besd" label="BESD - BEurteilung von Schmerzen bei Demenz" resvaltype="14">
+    <scale name="besd" label="BESD - BEurteilung von Schmerzen bei Demenz" >
         <scalegroup name="besd1" label="Atmung (unabhängig von Lautäußerungen)">
             <option label="normal" name="s0-1" score="0" layout="left" default="true"/>
             <option label="gelegentlich angestrengt atmen" name="s1-1" score="1" layout="left"/>

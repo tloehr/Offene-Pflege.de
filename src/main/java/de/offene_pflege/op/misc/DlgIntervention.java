@@ -26,11 +26,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
 
 /**
  * @author Torsten Löhr
@@ -38,7 +33,6 @@ import java.text.ParseException;
 public class DlgIntervention extends MyJDialog {
     Intervention intervention2Edit;
     private JToggleButton tbActive;
-    Number dauer = BigDecimal.TEN;
 
     public DlgIntervention() {
         super(false);
@@ -64,13 +58,11 @@ public class DlgIntervention extends MyJDialog {
             intervention2Edit = (Intervention) lstInterventions.getSelectedValue();
             if (intervention2Edit == null) {
                 txtText.setText(null);
-                txtLength.setText(null);
                 tbActive.setSelected(false);
                 cmbType.setSelectedIndex(-1);
                 cmbCat.setSelectedIndex(-1);
             } else {
                 txtText.setText(intervention2Edit.getBezeichnung());
-                txtLength.setText(intervention2Edit.getDauer().toBigInteger().toString());
                 tbActive.setSelected(intervention2Edit.isActive());
                 cmbType.setSelectedIndex(intervention2Edit.getInterventionType() - 1);
                 cmbCat.setSelectedItem(intervention2Edit.getCategory());
@@ -94,15 +86,6 @@ public class DlgIntervention extends MyJDialog {
         return true;
     }
 
-    private void txtDauerFocusLost(FocusEvent e) {
-        try {
-            dauer = NumberFormat.getNumberInstance().parse(txtLength.getText());
-        } catch (ParseException e1) {
-            dauer = BigDecimal.TEN;
-            txtLength.setText("10");
-        }
-    }
-
     private void btnEditActionPerformed(ActionEvent e) {
         if (lstInterventions.getSelectedValue() == null){
             return;
@@ -112,7 +95,6 @@ public class DlgIntervention extends MyJDialog {
 
     private void set2EditMode(boolean editMode) {
         txtText.setEnabled(editMode);
-        txtLength.setEnabled(editMode);
         tbActive.setEnabled(editMode);
         cmbType.setEnabled(editMode);
         cmbCat.setEnabled(editMode);
@@ -127,7 +109,7 @@ public class DlgIntervention extends MyJDialog {
     private void btnSaveActionPerformed(ActionEvent evt) {
         if (saveok()) {
             if (intervention2Edit == null) {
-                intervention2Edit = new Intervention(txtText.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbType.getSelectedIndex() + 1, (ResInfoCategory) cmbCat.getSelectedItem());
+                intervention2Edit = new Intervention(txtText.getText().trim(),  cmbType.getSelectedIndex() + 1, (ResInfoCategory) cmbCat.getSelectedItem());
             }
 
             EntityManager em = OPDE.createEM();
@@ -136,7 +118,6 @@ public class DlgIntervention extends MyJDialog {
                 Intervention myIntervention = em.merge(intervention2Edit);
                 em.lock(myIntervention, LockModeType.OPTIMISTIC);
                 myIntervention.setBezeichnung(txtText.getText().trim());
-                myIntervention.setDauer(new BigDecimal(dauer.doubleValue()));
                 myIntervention.setCategory(em.merge((ResInfoCategory) cmbCat.getSelectedItem()));
                 myIntervention.setInterventionType(cmbType.getSelectedIndex() + 1);
                 myIntervention.setActive(tbActive.isSelected());
@@ -172,7 +153,6 @@ public class DlgIntervention extends MyJDialog {
 
     private void btnAddActionPerformed(ActionEvent e) {
         txtText.setText(txtSearch.getText());
-        txtLength.setText(null);
         tbActive.setSelected(false);
         cmbType.setSelectedIndex(-1);
         cmbCat.setSelectedIndex(-1);
@@ -187,8 +167,6 @@ public class DlgIntervention extends MyJDialog {
         panel2 = new JPanel();
         lblText = new JLabel();
         txtText = new JTextField();
-        lblLength = new JLabel();
-        txtLength = new JTextField();
         lblCat = new JLabel();
         cmbCat = new JComboBox<>();
         lblType = new JLabel();
@@ -223,7 +201,7 @@ public class DlgIntervention extends MyJDialog {
             {
                 panel2.setLayout(new FormLayout(
                     "default, $lcgap, 63dlu:grow",
-                    "5*(default, $lgap), fill:default:grow"));
+                    "4*(default, $lgap), fill:default:grow"));
 
                 //---- lblText ----
                 lblText.setText("Bezeichnung");
@@ -235,28 +213,10 @@ public class DlgIntervention extends MyJDialog {
                 txtText.setEnabled(false);
                 panel2.add(txtText, CC.xy(3, 1));
 
-                //---- lblLength ----
-                lblLength.setText("Dauer");
-                lblLength.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(lblLength, CC.xy(1, 3));
-
-                //---- txtLength ----
-                txtLength.setText("10");
-                txtLength.setToolTipText(null);
-                txtLength.setFont(new Font("Arial", Font.PLAIN, 14));
-                txtLength.setEnabled(false);
-                txtLength.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtDauerFocusLost(e);
-                    }
-                });
-                panel2.add(txtLength, CC.xy(3, 3));
-
                 //---- lblCat ----
                 lblCat.setText("Kategorie");
                 lblCat.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(lblCat, CC.xy(1, 5));
+                panel2.add(lblCat, CC.xy(1, 3));
 
                 //---- cmbCat ----
                 cmbCat.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -267,12 +227,12 @@ public class DlgIntervention extends MyJDialog {
                 }));
                 cmbCat.setFont(new Font("Arial", Font.PLAIN, 14));
                 cmbCat.setEnabled(false);
-                panel2.add(cmbCat, CC.xy(3, 5));
+                panel2.add(cmbCat, CC.xy(3, 3));
 
                 //---- lblType ----
                 lblType.setText("Art");
                 lblType.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(lblType, CC.xy(1, 7));
+                panel2.add(lblType, CC.xy(1, 5));
 
                 //---- cmbType ----
                 cmbType.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -283,7 +243,7 @@ public class DlgIntervention extends MyJDialog {
                 }));
                 cmbType.setFont(new Font("Arial", Font.PLAIN, 14));
                 cmbType.setEnabled(false);
-                panel2.add(cmbType, CC.xy(3, 7));
+                panel2.add(cmbType, CC.xy(3, 5));
 
                 //======== panel3 ========
                 {
@@ -317,7 +277,7 @@ public class DlgIntervention extends MyJDialog {
                     btnEject.addActionListener(e -> btnEjectActionPerformed(e));
                     panel3.add(btnEject);
                 }
-                panel2.add(panel3, CC.xywh(1, 11, 3, 1, CC.RIGHT, CC.BOTTOM));
+                panel2.add(panel3, CC.xywh(1, 9, 3, 1, CC.RIGHT, CC.BOTTOM));
             }
             panel1.add(panel2, CC.xywh(5, 3, 1, 5));
 
@@ -369,8 +329,6 @@ public class DlgIntervention extends MyJDialog {
     private JPanel panel2;
     private JLabel lblText;
     private JTextField txtText;
-    private JLabel lblLength;
-    private JTextField txtLength;
     private JLabel lblCat;
     private JComboBox<String> cmbCat;
     private JLabel lblType;

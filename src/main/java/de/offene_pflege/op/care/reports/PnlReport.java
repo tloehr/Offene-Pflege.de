@@ -883,7 +883,6 @@ public class PnlReport extends NursingRecordsPanel {
                                                     (nreport.isAddedLater() ? SYSConst.html_16x16_Clock + "&nbsp;" : "") +
                                                     DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                                                     " " + SYSTools.xx("misc.msg.Time.short") +
-                                                    ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                                                     ", " + nreport.getNewBy().getFullname() +
                                                     (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple_internal)) + "</p></b></td>"
                                     ) +
@@ -1476,78 +1475,6 @@ public class PnlReport extends NursingRecordsPanel {
             });
             btnTAGs.setEnabled(NReportTools.isChangeable(nreport));
             pnlMenu.add(btnTAGs);
-
-
-            /***
-             *      _     _         __  __ _             _
-             *     | |__ | |_ _ __ |  \/  (_)_ __  _   _| |_ ___  ___
-             *     | '_ \| __| '_ \| |\/| | | '_ \| | | | __/ _ \/ __|
-             *     | |_) | |_| | | | |  | | | | | | |_| | ||  __/\__ \
-             *     |_.__/ \__|_| |_|_|  |_|_|_| |_|\__,_|\__\___||___/
-             *
-             */
-            final JButton btnMinutes = GUITools.createHyperlinkButton("nursingrecords.reports.btnminutes.tooltip", SYSConst.icon22clock, null);
-            btnMinutes.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnMinutes.addActionListener(actionEvent -> {
-
-                final JPopupMenu menu = SYSCalendar.getMinutesMenu(new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360}, o -> {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-
-                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                        NReport myReport = em.merge(nreport);
-                        em.lock(myReport, LockModeType.OPTIMISTIC);
-
-                        myReport.setMinutes((Integer) o);
-                        myReport.setEditedPIT(new Date());
-
-                        em.getTransaction().commit();
-
-                        final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-
-                        synchronized (contentmap) {
-                            contentmap.remove(keyNewDay);
-                        }
-                        synchronized (linemap) {
-                            linemap.remove(nreport);
-                        }
-
-                        synchronized (valuecache) {
-                            valuecache.get(keyNewDay).remove(nreport);
-                            valuecache.get(keyNewDay).add(myReport);
-                            Collections.sort(valuecache.get(keyNewDay));
-                        }
-
-                        createCP4Day(new LocalDate(myReport.getPit()));
-
-                        buildPanel();
-                        GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        } else {
-                            reloadDisplay(true);
-                        }
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
-                    }
-                });
-
-                menu.show(btnMinutes, 0, btnMinutes.getHeight());
-            });
-            btnMinutes.setEnabled(!nreport.isObsolete() && nreport.isMine());
-            pnlMenu.add(btnMinutes);
 
             pnlMenu.add(new JSeparator());
 

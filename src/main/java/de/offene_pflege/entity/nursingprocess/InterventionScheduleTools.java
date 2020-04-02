@@ -268,7 +268,6 @@ public class InterventionScheduleTools {
             nursingProcess.getInterventionSchedule().get(index).setSon(source.getSon());
             nursingProcess.getInterventionSchedule().get(index).setFloating(source.isFloating());
             nursingProcess.getInterventionSchedule().get(index).setLDatum(source.getLDatum());
-            nursingProcess.getInterventionSchedule().get(index).setDauer(source.getDauer());
             nursingProcess.getInterventionSchedule().get(index).setBemerkung(source.getBemerkung());
         }
     }

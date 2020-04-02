@@ -26,11 +26,12 @@ import org.joda.time.MutableInterval;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -308,7 +309,6 @@ public class NReportTools {
                                     (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
                                     DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                                     " " + SYSTools.xx("misc.msg.Time.short") +
-                                    ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                                     ", " + nreport.getNewBy().getFullname() +
                                     (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
 
@@ -460,9 +460,6 @@ public class NReportTools {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         result = sdf.format(nReport.getPit()) + "; " + nReport.getNewBy().getFullname();
-        if (showMinutes && !nReport.isDeleted() && !nReport.isReplaced()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.Effort") + ": " + nReport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)");
-        }
 //        result += SYSTools.catchNull(getTagsAsHTML(nReport), "<br/>[", "]") + " ";
         if (showIDs) {
             result += "<br/><i>[" + nReport.getPbid() + "]</i>";
@@ -678,102 +675,6 @@ public class NReportTools {
 
 
         return list;
-    }
-
-    public static String getTimes4SocialReports(LocalDate month, Closure progress) {
-        StringBuilder html = new StringBuilder(1000);
-        Format monthFormmatter = new SimpleDateFormat("MMMM yyyy");
-
-        DateTime from = SYSCalendar.bom(month).toDateTimeAtStartOfDay();
-        DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
-
-        int p = -1;
-        progress.execute(new Pair<Integer, Integer>(p, 100));
-
-        EntityManager em = OPDE.createEM();
-
-        String jpql1 = " " +
-                " SELECT DISTINCT n FROM NReport n " +
-                " JOIN n.commontags ct " +
-                " WHERE n.pit >= :from AND n.pit <= :to AND n.replacedBy IS NULL AND n.resident.adminonly <> 2 AND (ct.type = :type1 OR ct.type = :type2) ORDER BY n.resident.id ";
-        Query query1 = em.createQuery(jpql1);
-        query1.setParameter("type1", CommontagsTools.TYPE_SYS_SOCIAL);
-        query1.setParameter("type2", CommontagsTools.TYPE_SYS_SOCIAL2);
-        query1.setParameter("from", from.toDate());
-        query1.setParameter("to", to.toDate());
-        ArrayList<NReport> listNR = new ArrayList<NReport>(query1.getResultList());
-
-        em.close();
-
-        HashMap<Resident, Pair<Integer, Integer>> statmap = new HashMap<Resident, Pair<Integer, Integer>>();
-        p = 0;
-        for (NReport nr : listNR) {
-            p++;
-            progress.execute(new Pair<Integer, Integer>(p, listNR.size()));
-
-            if (!statmap.containsKey(nr.getResident())) {
-                statmap.put(nr.getResident(), new Pair<Integer, Integer>(0, 0));
-            }
-            Pair<Integer, Integer> pair = statmap.get(nr.getResident());
-            int socialtime = pair.getFirst();
-            int peatime = pair.getSecond();
-
-
-            for (Commontags ctag : nr.getCommontags()) {
-                if (ctag.getType() == CommontagsTools.TYPE_SYS_SOCIAL) {
-                    socialtime += nr.getMinutes();
-                }
-                if (ctag.getType() == CommontagsTools.TYPE_SYS_SOCIAL2) {
-                    peatime += nr.getMinutes();
-                }
-            }
-
-            statmap.put(nr.getResident(), new Pair<Integer, Integer>(socialtime, peatime));
-        }
-
-        html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nursing.social")));
-        html.append(SYSConst.html_h2(monthFormmatter.format(month.toDate())));
-
-
-        StringBuilder table = new StringBuilder(1000);
-        table.append(SYSConst.html_table_tr(
-                SYSConst.html_table_th("misc.msg.resident") +
-                        SYSConst.html_table_th(SYSTools.xx("misc.msg.Effort") + " (" + SYSTools.xx("misc.msg.Minutes") + ")") +
-                        SYSConst.html_table_th(SYSTools.xx("misc.msg.Effort") + " (" + SYSTools.xx("misc.msg.Hours") + ")") +
-                        SYSConst.html_table_th(SYSTools.xx("opde.controlling.nursing.social.averageHoursPerDay")) +
-                        SYSConst.html_table_th("PEA " + SYSTools.xx("misc.msg.Effort") + " (" + SYSTools.xx("misc.msg.Minutes") + ")") +
-                        SYSConst.html_table_th("PEA " + SYSTools.xx("misc.msg.Effort") + " (" + SYSTools.xx("misc.msg.Hours") + ")") +
-                        SYSConst.html_table_th("PEA " + SYSTools.xx("opde.controlling.nursing.social.averageHoursPerDay"))
-        ));
-
-        BigDecimal daysinmonth = new BigDecimal(month.dayOfMonth().withMaximumValue().getDayOfMonth());
-
-        ArrayList<Resident> listResident = new ArrayList<Resident>(statmap.keySet());
-        Collections.sort(listResident);
-
-        for (Resident resident : listResident) {
-
-            Pair<Integer, Integer> pair = statmap.get(resident);
-            BigDecimal socialtime = new BigDecimal(pair.getFirst());
-            BigDecimal peatime = new BigDecimal(pair.getSecond());
-
-            boolean highlight = socialtime.equals(BigDecimal.ZERO) || peatime.equals(BigDecimal.ZERO);
-
-            table.append(SYSConst.html_table_tr(
-                    SYSConst.html_table_td(ResidentTools.getTextCompact(resident)) +
-                            SYSConst.html_table_td(SYSTools.formatBigDecimal(socialtime), socialtime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(SYSTools.formatBigDecimal(socialtime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP)), socialtime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(SYSTools.formatBigDecimal(socialtime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP)), socialtime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(SYSTools.formatBigDecimal(peatime), peatime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(SYSTools.formatBigDecimal(peatime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP)), peatime.equals(BigDecimal.ZERO)) +
-                            SYSConst.html_table_td(SYSTools.formatBigDecimal(peatime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP)), peatime.equals(BigDecimal.ZERO))
-                    , highlight));
-        }
-
-        html.append(SYSConst.html_table(table.toString(), "1"));
-        html.append(SYSConst.html_paragraph("opde.controlling.nursing.social.peaexplain"));
-
-        return html.toString();
     }
 
     public static ArrayList<NReport> getNReports(Resident resident, LocalDate ldfrom, LocalDate ldto) {

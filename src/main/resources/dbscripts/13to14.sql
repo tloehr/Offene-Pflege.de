@@ -1485,7 +1485,8 @@ alter table homes
     drop column erhebungszeitraum,
     drop column auswertungszeitraum;
 --
-UPDATE resinfotype t SET t.XML = ' <tabgroup size="18" fontstyle="bold" label="Hauptbezugsperson" name="hbp">
+UPDATE resinfotype t
+SET t.XML = ' <tabgroup size="18" fontstyle="bold" label="Hauptbezugsperson" name="hbp">
               <tx tooltip="Diese Angaben werden auf Seite 1, Abschnitt 1 eingetragen."/>
               <textfield label="Anrede" name="c1title" length="25" hfill="false" innerlayout="tab"/>
               <textfield label="Name" name="c1name" length="25" hfill="false" innerlayout="tab"/>
@@ -1528,8 +1529,10 @@ UPDATE resinfotype t SET t.XML = ' <tabgroup size="18" fontstyle="bold" label="H
               <option label="überwiegend selbständig" name="1" tooltip="bi6.beschaeftigen.selbst1"/>
               <option label="überwiegend unselbständig" name="2" tooltip="bi6.kontaktpflege.selbst2" layout="br left"/>
               <option label="unselbständig" name="3" tooltip="bi6.kontaktpflege.selbst3"/>
-          </optiongroup>' WHERE t.BWINFTYP = 'sozial01';
-UPDATE resinfotype t SET t.XML = '  <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
+          </optiongroup>'
+WHERE t.BWINFTYP = 'sozial01';
+UPDATE resinfotype t
+SET t.XML = '  <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
     <checkbox name="bedridden" label="bettlägerig"/>
     <optiongroup size="18" name="MOBILPOSWECHSEL" label="Positionswechsel im Bett" qdvs="26"
                  tooltip="bi1.bett.erklaerung">
@@ -1580,8 +1583,10 @@ UPDATE resinfotype t SET t.XML = '  <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br
     </optiongroup>
 
     <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
-              tooltip="bi1.unfaehig.arme.beine"/>' WHERE t.BWINFTYP LIKE 'mobil02';
-UPDATE resinfotype t SET t.XML = ' <qpr tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Zeile: 42"/>
+              tooltip="bi1.unfaehig.arme.beine"/>'
+WHERE t.BWINFTYP LIKE 'mobil02';
+UPDATE resinfotype t
+SET t.XML = ' <qpr tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Zeile: 42"/>
           <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
           <tx tooltip="Seite 2, Abschnitt 9."/>
 
@@ -1618,23 +1623,30 @@ UPDATE resinfotype t SET t.XML = ' <qpr tooltip="Sobald diese Information einget
                        bi="4.4.13">
               <option label="selbständig" name="0" default="true"/>
               <option label="mit Fremdhilfe" name="1"/>
-          </optiongroup>' WHERE t.BWINFTYP LIKE 'kern01';
+          </optiongroup>'
+WHERE t.BWINFTYP LIKE 'kern01';
 --
-alter table `groups` change `System` sysflag tinyint(1) default 0 not null;
+alter table `groups`
+    change `System` sysflag tinyint(1) default 0 not null;
 rename table `groups` to opgroups;
-alter table users change Status userstatus tinyint null;
+alter table users
+    change Status userstatus tinyint null;
 rename table users to opusers;
 --
-alter table nreports drop column Dauer;
-alter table intervention drop column Dauer;
-alter table ischedule drop column Dauer;
-alter table bhp drop column Dauer;
-alter table dfn drop column Dauer;
-
-
-
-
-
-
-
-
+alter table nreports
+    drop column Dauer;
+alter table intervention
+    drop column Dauer;
+alter table ischedule
+    drop column Dauer;
+alter table bhp
+    drop column Dauer;
+alter table dfn
+    drop column Dauer;
+--
+alter table Resvaluetypes
+    add active bool default true not null,
+    add version  bigint(20) not null;
+UPDATE Resvaluetypes t
+SET t.active = 0
+WHERE t.ID = 14

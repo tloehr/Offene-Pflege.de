@@ -51,8 +51,6 @@ public class BHP implements Serializable, Comparable<BHP> {
     @Column(name = "MDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
-    @Column(name = "Dauer")
-    private Short dauer;
     @Column(name = "needsText")
     private Boolean needsText;
     @Basic(optional = false)
@@ -76,7 +74,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.nanotime = System.nanoTime();
         this.mdate = new Date();
         this.needsText = false;
-        this.dauer = 0;
     }
 
     /**
@@ -105,7 +102,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         stockTransaction = new ArrayList<MedStockTransaction>();
         this.outcome4 = bhp;
         this.needsText = true;
-        this.dauer = 0;
     }
 
     public BHP(PrescriptionSchedule prescriptionSchedule, Date soll, Byte sZeit, BigDecimal dosis) {
@@ -123,7 +119,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.mdate = new Date();
         stockTransaction = new ArrayList<MedStockTransaction>();
         this.needsText = false;
-        this.dauer = 0;
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bhp")
@@ -252,14 +247,6 @@ public class BHP implements Serializable, Comparable<BHP> {
 
     public void setMDate(Date mdate) {
         this.mdate = mdate;
-    }
-
-    public Short getDauer() {
-        return dauer;
-    }
-
-    public void setDauer(Short dauer) {
-        this.dauer = dauer;
     }
 
     public Prescription getPrescription() {
@@ -397,7 +384,6 @@ public class BHP implements Serializable, Comparable<BHP> {
 
         if (text != null ? !text.equals(bhp.text) : bhp.text != null) return false;
         if (bhpid != null ? !bhpid.equals(bhp.bhpid) : bhp.bhpid != null) return false;
-        if (dauer != null ? !dauer.equals(bhp.dauer) : bhp.dauer != null) return false;
         if (dosis != null ? !dosis.equals(bhp.dosis) : bhp.dosis != null) return false;
         if (iZeit != null ? !iZeit.equals(bhp.iZeit) : bhp.iZeit != null) return false;
         if (ist != null ? !ist.equals(bhp.ist) : bhp.ist != null) return false;
@@ -431,7 +417,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (mdate != null ? mdate.hashCode() : 0);
-        result = 31 * result + (dauer != null ? dauer.hashCode() : 0);
         result = 31 * result + (nanotime != null ? nanotime.hashCode() : 0);
 //        result = 31 * result + (stockTransaction != null ? stockTransaction.hashCode() : 0);
         result = 31 * result + (prescriptionSchedule != null ? prescriptionSchedule.hashCode() : 0);

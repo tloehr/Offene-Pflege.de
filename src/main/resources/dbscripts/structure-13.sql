@@ -809,7 +809,7 @@ CREATE TABLE `resvalue` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `resvaluetypes` (
+CREATE TABLE `Resvaluetypes` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Text` varchar(100) NOT NULL,
   `Label1` varchar(100) DEFAULT NULL,

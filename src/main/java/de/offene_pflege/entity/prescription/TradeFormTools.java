@@ -192,7 +192,7 @@ public class TradeFormTools {
                 " AND inv.to = :to");
         query.setParameter("resident", resident);
         query.setParameter("tradeform", tradeform);
-        query.setParameter("to", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        query.setParameter("to", SYSConst.LD_UNTIL_FURTHER_NOTICE);
         return (MedInventory) query.getSingleResult();
     }
 

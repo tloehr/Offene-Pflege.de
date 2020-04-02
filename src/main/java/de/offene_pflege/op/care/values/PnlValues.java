@@ -41,8 +41,8 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.process.*;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.ResValueTypes;
-import de.offene_pflege.entity.values.ResValueTypesTools;
+import de.offene_pflege.entity.values.Resvaluetypes;
+import de.offene_pflege.entity.values.ResvaluetypesTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -78,11 +78,11 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
-    private java.util.List<ResValueTypes> lstValueTypes;
+    private java.util.List<Resvaluetypes> lstValueTypes;
     private Map<String, CollapsiblePane> cpMap;
     private Map<ResValue, JPanel> linemap;
     private Map<String, ArrayList<ResValue>> mapType2Values;
-//    private final ResValueTypes LIQUIDBALANCE;
+//    private final Resvaluetypes LIQUIDBALANCE;
 
 //    private Color[] color1, color2;
 
@@ -90,7 +90,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         super("nursingrecords.vitalparameters");
         this.resident = resident;
         this.jspSearch = jspSearch;
-//        LIQUIDBALANCE = ResValueTypesTools.getType(ResValueTypesTools.LIQUIDBALANCE);
+//        LIQUIDBALANCE = ResvaluetypesTools.getType(ResvaluetypesTools.LIQUIDBALANCE);
         initComponents();
         initPanel();
         prepareSearchArea();
@@ -102,19 +102,12 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         linemap = Collections.synchronizedMap(new HashMap<ResValue, JPanel>());
         mapType2Values = Collections.synchronizedMap(new HashMap<String, ArrayList<ResValue>>());
 
-//        mapCollapsed = Collections.synchronizedMap(new HashMap<String, Boolean>());
-
-//        balances = Collections.synchronizedMap(new HashMap<LocalDate, Pair<BigDecimal, BigDecimal>>());
-
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT t FROM ResValueTypes t WHERE t.valType != :valtype ORDER BY t.text");
-        query.setParameter("valtype", ResValueTypesTools.LIQUIDBALANCE);
-        lstValueTypes = Collections.synchronizedList(new ArrayList<ResValueTypes>(query.getResultList()));
-//        lstValueTypes.remove(LIQUIDBALANCE);
-        em.close();
+        Query query = em.createQuery("SELECT t FROM Resvaluetypes t WHERE t.valType != :valtype ORDER BY t.text");
+        query.setParameter("valtype", ResvaluetypesTools.LIQUIDBALANCE);
+        lstValueTypes = Collections.synchronizedList(new ArrayList<Resvaluetypes>(query.getResultList()));
 
-//        color1 = SYSConst.blue1;
-//        color2 = SYSConst.greyscale;
+        em.close();
 
     }
 
@@ -254,7 +247,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         synchronized (cpMap) {
             cpMap.clear();
         }
-        for (ResValueTypes vtype : lstValueTypes) {
+        for (Resvaluetypes vtype : lstValueTypes) {
             createCP4Type(vtype);
         }
 
@@ -262,7 +255,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
     }
 
-    private CollapsiblePane createCP4Type(final ResValueTypes vtype) {
+    private CollapsiblePane createCP4Type(final Resvaluetypes vtype) {
         final String keyType = vtype.getID() + ".xtypes";
         final CollapsiblePane cpType = getCP(keyType);
 
@@ -327,7 +320,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         return cpType;
     }
 
-    private JPanel createContentPanel4Type(final ResValueTypes vtype) {
+    private JPanel createContentPanel4Type(final Resvaluetypes vtype) {
 
         ArrayList<Integer> years = ResValueTools.getYearsWithValues(resident, vtype);
 
@@ -358,7 +351,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         return pnlContent;
     }
 
-    private CollapsiblePane createCP4Year(final ResValueTypes vtype, final int year) {
+    private CollapsiblePane createCP4Year(final Resvaluetypes vtype, final int year) {
         final String keyYears = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
         final CollapsiblePane cpYear = getCP(keyYears);
 
@@ -397,7 +390,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         cpYear.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-//                if (vtype.getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+//                if (vtype.getValType() == ResvaluetypesTools.LIQUIDBALANCE) {
 //                    cpYear.setContentPane(createContentPanel4Year(year));
 //                } else {
                 cpYear.setContentPane(createContentPanel4Year(vtype, year));
@@ -409,7 +402,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 //        cpYear.setBackground(getColor(vtype, SYSConst.light4));
 
         if (!cpYear.isCollapsed()) {
-//            if (vtype.getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+//            if (vtype.getValType() == ResvaluetypesTools.LIQUIDBALANCE) {
 //                cpYear.setContentPane(createContentPanel4Year(year));
 //            } else {
             cpYear.setContentPane(createContentPanel4Year(vtype, year));
@@ -424,7 +417,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
     }
 
     // containts all resvalues but NOT the LIQUIDBALANCES
-    private JPanel createContentPanel4Year(final ResValueTypes vtype, final int year) {
+    private JPanel createContentPanel4Year(final Resvaluetypes vtype, final int year) {
         final String keyYears = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
 
         java.util.List<ResValue> myValues;
@@ -686,7 +679,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         cpsValues.setLayout(new JideBoxLayout(cpsValues, JideBoxLayout.Y_AXIS));
 
         synchronized (lstValueTypes) {
-            for (ResValueTypes vtype : lstValueTypes) {
+            for (Resvaluetypes vtype : lstValueTypes) {
                 synchronized (cpMap) {
                     cpsValues.add(cpMap.get(vtype.getID() + ".xtypes"));
                 }
@@ -699,7 +692,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
     private JPanel getMenu(final ResValue resValue) {
 
-        final ResValueTypes vtype = resValue.getType();
+        final Resvaluetypes vtype = resValue.getType();
 
         JPanel pnlMenu = new JPanel(new VerticalLayout());
 
@@ -1042,7 +1035,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
     }
 
 
-    private void addValue(final ResValueTypes vtype) {
+    private void addValue(final Resvaluetypes vtype) {
 
         final String keyType = vtype.getID() + ".xtypes";
 

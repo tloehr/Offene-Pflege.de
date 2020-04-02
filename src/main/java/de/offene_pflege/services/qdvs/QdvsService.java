@@ -7,7 +7,7 @@ import de.offene_pflege.entity.building.RoomsTools;
 import de.offene_pflege.entity.info.*;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.ResValueTypesTools;
+import de.offene_pflege.entity.values.ResvaluetypesTools;
 import de.offene_pflege.gui.events.AddTextListener;
 import de.offene_pflege.op.tools.*;
 import de.offene_pflege.services.qdvs.schema.*;
@@ -331,11 +331,11 @@ public class QdvsService implements HasLogger {
                 listeBWFehlerfrei.remove(resident);
             }
 
-            if (!ResValueTools.getMostRecentBefore(resident, ResValueTypesTools.WEIGHT, ERHEBUNGSDATUM).isPresent()) {
+            if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesTools.WEIGHT, ERHEBUNGSDATUM).isPresent()) {
                 residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
                 listeBWFehlerfrei.remove(resident);
             }
-            if (!ResValueTools.getMostRecentBefore(resident, ResValueTypesTools.HEIGHT, ERHEBUNGSDATUM).isPresent()) {
+            if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesTools.HEIGHT, ERHEBUNGSDATUM).isPresent()) {
                 residentInfoObjectMap.get(resident).addLog("qdvs.error.height.missing");
                 listeBWFehlerfrei.remove(resident);
             }
@@ -864,8 +864,8 @@ public class QdvsService implements HasLogger {
     }
 
     private void groesse_gewicht(DasQsDataType qsData, Resident resident) {
-        ResValue weight = ResValueTools.getMostRecentBefore(resident, ResValueTypesTools.WEIGHT, ERHEBUNGSDATUM).get();
-        ResValue height = ResValueTools.getMostRecentBefore(resident, ResValueTypesTools.HEIGHT, ERHEBUNGSDATUM).get();
+        ResValue weight = ResValueTools.getMostRecentBefore(resident, ResvaluetypesTools.WEIGHT, ERHEBUNGSDATUM).get();
+        ResValue height = ResValueTools.getMostRecentBefore(resident, ResvaluetypesTools.HEIGHT, ERHEBUNGSDATUM).get();
 
         getLogger().debug("Gewicht: " + weight.toString());
         getLogger().debug("Größe: " + height.toString());

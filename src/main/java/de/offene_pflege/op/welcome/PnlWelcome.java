@@ -22,7 +22,7 @@ import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.ResValueTypesTools;
+import de.offene_pflege.entity.values.ResvaluetypesTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -422,7 +422,7 @@ public class PnlWelcome extends CleanablePanel {
                     "<td width=\"100\" align=\"left\">" +
                     SYSTools.formatBigDecimal(val.getSecond().setScale(2, RoundingMode.HALF_UP)) + " ml</td>";
 
-            // TODO: replace ml with the values of the ResValueTypes
+            // TODO: replace ml with the values of the Resvaluetypes
             if (highin != null && highin.compareTo(val.getSecond()) < 0) {
                 title += "<td width=\"350\" align=\"left\"><b>" +
                         SYSTools.xx("misc.msg.tooHigh") + "</b>, " + SYSTools.xx("opde.welcome.highin") +
@@ -470,8 +470,8 @@ public class PnlWelcome extends CleanablePanel {
         BigDecimal absolut = entry.getValue3();
         BigDecimal prozent = entry.getValue4();
 
-        Optional<ResValue> height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
-        Optional<ResValue> weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
+        Optional<ResValue> height = ResValueTools.getLast(resident, ResvaluetypesTools.HEIGHT);
+        Optional<ResValue> weight = ResValueTools.getLast(resident, ResvaluetypesTools.WEIGHT);
 
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +

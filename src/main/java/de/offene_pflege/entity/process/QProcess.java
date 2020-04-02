@@ -101,35 +101,6 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
     private Collection<SYSVAL2PROCESS> attachedResValueConnections;
 
-    // ==
-    // M:N Relationen
-    // ==
-//    @ManyToMany
-//    @JoinTable(name = "SYSNR2PROCESS", joinColumns =
-//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-//    @JoinColumn(name = "PBID"))
-//    private Collection<NReport> pflegeberichte;
-//    @ManyToMany
-//    @JoinTable(name = "SYSINF2PROCESS", joinColumns =
-//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-//    @JoinColumn(name = "BWInfoID"))
-//    private Collection<ResInfo> bwinfos;
-//    @ManyToMany
-//    @JoinTable(name = "SYSNP2PROCESS", joinColumns =
-//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-//    @JoinColumn(name = "PlanID"))
-//    private Collection<Planung> planungen;
-//    @ManyToMany
-//    @JoinTable(name = "SYSPRE2PROCESS", joinColumns =
-//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-//    @JoinColumn(name = "VerID"))
-//    private Collection<Verordnung> prescription;
-//    @ManyToMany
-//    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
-//    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
-//    @JoinColumn(name = "BWID"))
-//    private Collection<ResValue> bwerte;
-
     public QProcess() {
     }
 

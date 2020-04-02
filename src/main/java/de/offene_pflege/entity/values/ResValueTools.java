@@ -75,7 +75,7 @@ public class ResValueTools {
     }
 
 
-//    public static ArrayList<Integer> getYearsWithValues(Resident resident, ResValueTypes type) {
+//    public static ArrayList<Integer> getYearsWithValues(Resident resident, Resvaluetypes type) {
 //        EntityManager em = OPDE.createEM();
 //        Query query = em.createNativeQuery("SELECT DISTINCT(YEAR(PIT)) j FROM resvalue WHERE BWKennung = ? AND TYPE = ? ORDER BY j DESC");
 //        query.setParameter(1, resident.getId());
@@ -85,7 +85,7 @@ public class ResValueTools {
 //        return result;
 //    }
 
-    public static ArrayList<Integer> getYearsWithValues(Resident resident, ResValueTypes type) {
+    public static ArrayList<Integer> getYearsWithValues(Resident resident, Resvaluetypes type) {
            EntityManager em = OPDE.createEM();
            ArrayList<Integer> result = new ArrayList<Integer>();
            Query query = em.createQuery(" SELECT rv.pit FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :type ORDER BY rv.pit DESC");
@@ -99,7 +99,7 @@ public class ResValueTools {
            return result;
        }
 
-//    public static ArrayList<Date> getDaysWithValues(Resident resident, ResValueTypes type, int year) {
+//    public static ArrayList<Date> getDaysWithValues(Resident resident, Resvaluetypes type, int year) {
 //        DateTime from = new LocalDate(year, 1, 1).dayOfYear().withMinimumValue().toDateTimeAtStartOfDay();
 //        DateTime to = new LocalDate(year, 1, 1).dayOfYear().withMaximumValue().toDateTimeAtStartOfDay().secondOfDay().withMaximumValue();
 //
@@ -107,7 +107,7 @@ public class ResValueTools {
 //        Query query = em.createNativeQuery(" " +
 //                " SELECT DISTINCT DATE(r.pit) d" +
 //                " FROM resvalue r " +
-//                " INNER JOIN resvaluetypes t ON r.type = t.id " +
+//                " INNER JOIN Resvaluetypes t ON r.type = t.id " +
 //                " WHERE DATE(r.pit) >= ? AND DATE(r.pit) <= ? AND r.bwkennung = ? AND t.valtype = ? " +
 //                " GROUP BY DATE(r.pit)" +
 //                " ORDER BY d DESC");
@@ -277,7 +277,7 @@ public class ResValueTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 > 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("type", ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter("type", ResvaluetypesTools.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
         BigDecimal sumwert = (BigDecimal) query.getSingleResult();
@@ -292,7 +292,7 @@ public class ResValueTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 < 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("type", ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter("type", ResvaluetypesTools.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
         BigDecimal sumwert = (BigDecimal) query.getSingleResult();
@@ -307,7 +307,7 @@ public class ResValueTools {
 //     * @param resident
 //     * @return
 //     */
-//    public static Pair<DateTime, DateTime> getMinMax(Resident resident, ResValueTypes vtype) {
+//    public static Pair<DateTime, DateTime> getMinMax(Resident resident, Resvaluetypes vtype) {
 //        Pair<DateTime, DateTime> result = null;
 //
 //        EntityManager em = OPDE.createEM();
@@ -336,7 +336,7 @@ public class ResValueTools {
 //        return result;
 //    }
 //
-//    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype) {
+//    public static ArrayList<ResValue> getResValues(Resident resident, Resvaluetypes vtype) {
 //        EntityManager em = OPDE.createEM();
 //        Query query = em.createQuery("" +
 //                " SELECT rv FROM ResValue rv " +
@@ -389,7 +389,7 @@ public class ResValueTools {
                 " AND rv.vtype.valType = :type" +
                 " AND rv.editedBy IS NULL " +
                 " ORDER BY rv.pit DESC ");
-        query.setParameter("type", ResValueTypesTools.PAIN);
+        query.setParameter("type", ResvaluetypesTools.PAIN);
         query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
@@ -423,7 +423,7 @@ public class ResValueTools {
         return list;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, LocalDate day) {
+    public static ArrayList<ResValue> getResValues(Resident resident, Resvaluetypes vtype, LocalDate day) {
 
 //        //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
 //        DateTime from = day.toDateTime().secondOfDay().withMinimumValue();
@@ -447,7 +447,7 @@ public class ResValueTools {
         return list;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, int year) {
+    public static ArrayList<ResValue> getResValues(Resident resident, Resvaluetypes vtype, int year) {
 
 //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
         DateTime from = SYSCalendar.boy(year);
@@ -475,12 +475,12 @@ public class ResValueTools {
         String result = (rv.isDeleted() || rv.isReplaced() ? "<s>" : "");
 //        NumberFormat dcf = DecimalFormat.getNumberInstance();
 
-        if (rv.getType().getValType() == ResValueTypesTools.RR) {
+        if (rv.getType().getValType() == ResvaluetypesTools.RR) {
             DecimalFormat dcf1 = new DecimalFormat(rv.getType().getFormat1());
             DecimalFormat dcf2 = new DecimalFormat(rv.getType().getFormat2());
             DecimalFormat dcf3 = new DecimalFormat(rv.getType().getFormat3());
             result += "<b>" + dcf1.format(rv.getVal1()) + "/" + dcf2.format(rv.getVal2()) + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + dcf3.format(rv.getVal3()) + " " + rv.getType().getUnit3() + "</b>";
-        } else if (rv.getType().getValType() == ResValueTypesTools.STOOL || rv.getType().getValType() == ResValueTypesTools.VOMIT || rv.getType().getValType() == ResValueTypesTools.ASPIRATION) {
+        } else if (rv.getType().getValType() == ResvaluetypesTools.STOOL || rv.getType().getValType() == ResvaluetypesTools.VOMIT || rv.getType().getValType() == ResvaluetypesTools.ASPIRATION) {
             result += "<i>" + SYSTools.catchNull(rv.getText(), "--") + "</i>";
         } else {
             DecimalFormat dcf = new DecimalFormat(rv.getType().getFormat1());
@@ -586,7 +586,7 @@ public class ResValueTools {
                 " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
 
         Query query = em.createQuery(retiredToo ? jpqlWithRetired : jpqlWithoutRetired);
-        query.setParameter("valType", ResValueTypesTools.WEIGHT);
+        query.setParameter("valType", ResvaluetypesTools.WEIGHT);
         query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<ResValue> listVal = new ArrayList<ResValue>(query.getResultList());
         em.close();
@@ -605,8 +605,8 @@ public class ResValueTools {
         html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nutrition.weightstats")));
         html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
-        ResValueTypes heightType = ResValueTypesTools.getType(ResValueTypesTools.HEIGHT);
-        ResValueTypes weightType = ResValueTypesTools.getType(ResValueTypesTools.WEIGHT);
+        Resvaluetypes heightType = ResvaluetypesTools.getType(ResvaluetypesTools.HEIGHT);
+        Resvaluetypes weightType = ResvaluetypesTools.getType(ResvaluetypesTools.WEIGHT);
         p = 0;
 
         for (Resident resident : listResidents) {
@@ -615,7 +615,7 @@ public class ResValueTools {
 
             html.append(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
 
-            Optional<ResValue> height = getLast(resident, ResValueTypesTools.HEIGHT);
+            Optional<ResValue> height = getLast(resident, ResvaluetypesTools.HEIGHT);
 
             html.append(
                     SYSConst.html_div(
@@ -713,7 +713,7 @@ public class ResValueTools {
                 " ORDER BY rv.resident.id, rv.pit ";
 
         Query query = em.createQuery(jpqlWithoutRetired);
-        query.setParameter("valType", ResValueTypesTools.WEIGHT);
+        query.setParameter("valType", ResvaluetypesTools.WEIGHT);
         query.setParameter("from", DateUtils.asDate(from.atStartOfDay()));
         ArrayList<ResValue> listVal = new ArrayList<ResValue>(query.getResultList());
         em.close();
@@ -770,7 +770,7 @@ public class ResValueTools {
                 " AND rv.pit <= :to" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
-        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
         query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         query.setParameter("to", SYSCalendar.eod(to).toDate());
         ArrayList<ResValue> list = null;
@@ -813,7 +813,7 @@ public class ResValueTools {
 //                " AND rv.pit <= :to ");
 //
 //        query.setParameter("resident", resident);
-//        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
 //        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
 //        query.setParameter("to", SYSCalendar.eod(day).toDate());
 //        BigDecimal sum = (BigDecimal) query.getSingleResult();
@@ -836,7 +836,7 @@ public class ResValueTools {
 //                " AND rv.pit <= :to ");
 //
 //        query.setParameter("resident", resident);
-//        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
 //        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
 //        query.setParameter("to", SYSCalendar.eod(day).toDate());
 //        BigDecimal sum = (BigDecimal) query.getSingleResult();
@@ -861,7 +861,7 @@ public class ResValueTools {
 //                " AND rv.pit <= :to" +
 //                " ORDER BY rv.pit DESC ");
 //        query.setParameter("resident", resident);
-//        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
 //        query.setParameter("from", from.toDate());
 //        query.setParameter("from", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
 //        BigDecimal avg = (BigDecimal) query.getSingleResult();
@@ -881,7 +881,7 @@ public class ResValueTools {
                 " AND rv.pit >= :from" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
-        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
         query.setParameter("from", from.toDate());
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
         em.close();
@@ -910,7 +910,7 @@ public class ResValueTools {
 //                " AND rv.pit >= :from" +
 //                " ORDER BY rv.pit DESC ");
 //        query.setParameter("resident", resident);
-//        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
 //        query.setParameter("from", from.toDate());
 //        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
 //        em.close();
@@ -964,7 +964,7 @@ public class ResValueTools {
                     if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
                         startingOn = now.minusDays(days);
                     }
-                    Optional<ResValue> lastStool = getLast(resident, ResValueTypesTools.STOOL);
+                    Optional<ResValue> lastStool = getLast(resident, ResvaluetypesTools.STOOL);
 
                     if (lastStool.isPresent() || new DateTime(lastStool.get().getPit()).toLocalDate().isBefore(startingOn)) {
                         result.add(new Object[]{resident, lastStool.get(), days});
@@ -998,7 +998,7 @@ public class ResValueTools {
 //                    if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
 //                        startingOn = now.minusDays(days);
 //                    }
-//                    ResValue lastStool = getLast(resident, ResValueTypesTools.STOOL);
+//                    ResValue lastStool = getLast(resident, ResvaluetypesTools.STOOL);
 //
 //                    if (lastStool == null || new DateTime(lastStool.getPit()).toLocalDate().isBefore(startingOn)) {
 //                        result.add(new Object[]{resident, lastStool, days});
@@ -1217,15 +1217,15 @@ public class ResValueTools {
 //                "       LIMIT 0,?" +
 //                ") c ON d1 = d3 ");
 //
-//        query.setParameter(1, ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter(1, ResvaluetypesTools.LIQUIDBALANCE);
 //        query.setParameter(2, resident.getId());
 //        query.setParameter(3, start.toDateTimeAtStartOfDay().toDate());
 //        query.setParameter(4, entriesBack);
-//        query.setParameter(5, ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter(5, ResvaluetypesTools.LIQUIDBALANCE);
 //        query.setParameter(6, resident.getId());
 //        query.setParameter(7, start.toDateTimeAtStartOfDay().toDate());
 //        query.setParameter(8, entriesBack);
-//        query.setParameter(9, ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter(9, ResvaluetypesTools.LIQUIDBALANCE);
 //        query.setParameter(10, resident.getId());
 //        query.setParameter(11, start.toDateTimeAtStartOfDay().toDate());
 //        query.setParameter(12, entriesBack);
@@ -1233,7 +1233,7 @@ public class ResValueTools {
 
 
         Query trinkQuery = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype AND rv.pit >= :after AND rv.pit <= :before AND rv.editedBy = NULL ORDER BY rv.pit");
-        trinkQuery.setParameter("vtype", ResValueTypesTools.getType(ResValueTypesTools.LIQUIDBALANCE));
+        trinkQuery.setParameter("vtype", ResvaluetypesTools.getType(ResvaluetypesTools.LIQUIDBALANCE));
         trinkQuery.setParameter("resident", resident);
         trinkQuery.setParameter("after", JavaTimeConverter.toDate(after.atStartOfDay()));
         trinkQuery.setParameter("before", JavaTimeConverter.toDate(before.atTime(23, 59, 59)));

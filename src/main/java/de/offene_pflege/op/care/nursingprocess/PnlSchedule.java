@@ -106,13 +106,6 @@ public class PnlSchedule extends JPanel {
         spinMonat.setValue(1);
     }
 
-    private void txtMinutesFocusLost(FocusEvent e) {
-        BigDecimal bd = SYSTools.parseDecimal(txtMinutes.getText());
-        if (bd == null || bd.compareTo(BigDecimal.ZERO) <= 0) {
-            txtMinutes.setText(SYSTools.formatBigDecimal(is.getDauer()));
-        }
-    }
-
     private void txtLDateFocusLost(FocusEvent evt) {
         SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusWeeks(4));
     }
@@ -220,9 +213,6 @@ public class PnlSchedule extends JPanel {
 
         txtBemerkung.setText(is.getBemerkung());
 
-        lblMinutes.setText(SYSTools.xx("misc.msg.Minute(s)"));
-        txtMinutes.setText(SYSTools.formatBigDecimal(is.getDauer())); // https://github.com/tloehr/Offene-Pflege.de/issues/31
-
         tbFloating = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.pnlschedule.floatinginterventions"));
         tbFloating.setSelected(is.isFloating());
         panelMain.add(tbFloating, CC.xy(3, 5));
@@ -296,8 +286,6 @@ public class PnlSchedule extends JPanel {
         panel2 = new JPanel();
         jLabel13 = new JLabel();
         txtLDate = new JTextField();
-        lblMinutes = new JLabel();
-        txtMinutes = new JTextField();
         pnlBemerkung = new JPanel();
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
@@ -316,8 +304,8 @@ public class PnlSchedule extends JPanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                    "$rgap, $lcgap, 223dlu:grow, $lcgap, $rgap",
-                    "$rgap, $lgap, pref, $lgap, default, $lgap, pref, $lgap, default, $lgap, 72dlu:grow, 2*($lgap, default)"));
+                "$rgap, $lcgap, 223dlu:grow, $lcgap, $rgap",
+                "$rgap, $lgap, pref, $lgap, default, $lgap, pref, $lgap, default, $lgap, 72dlu:grow, 2*($lgap, default)"));
 
             //======== splitRegular ========
             {
@@ -331,8 +319,8 @@ public class PnlSchedule extends JPanel {
                     pnlTageszeit.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlTageszeit.setBorder(new EtchedBorder());
                     pnlTageszeit.setLayout(new FormLayout(
-                            "6*(28dlu, $lcgap), default",
-                            "fill:default, $lgap, fill:default"));
+                        "6*(28dlu, $lcgap), default",
+                        "fill:default, $lgap, fill:default"));
 
                     //---- jLabel6 ----
                     jLabel6.setText("Nachts, fr\u00fch morgens");
@@ -396,7 +384,6 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -414,7 +401,6 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -432,7 +418,6 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -450,7 +435,6 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -468,7 +452,6 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -486,7 +469,6 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -505,8 +487,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlUhrzeit.setBorder(new EtchedBorder());
                     pnlUhrzeit.setLayout(new FormLayout(
-                            "default, $ugap, 75dlu, $ugap, pref",
-                            "default:grow, $rgap, default"));
+                        "default, $ugap, 75dlu, $ugap, pref",
+                        "default:grow, $rgap, default"));
 
                     //---- lblUhrzeit ----
                     lblUhrzeit.setText("Anzahl Massnahmen");
@@ -532,7 +514,6 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtIntegerFocusLost(e);
@@ -555,8 +536,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlDaily.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlDaily.setLayout(new FormLayout(
-                            "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
-                            "default, $lgap, pref, $lgap, default"));
+                        "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
+                        "default, $lgap, pref, $lgap, default"));
 
                     //---- label3 ----
                     label3.setText("alle");
@@ -584,14 +565,14 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlWeekly.setLayout(new FormLayout(
-                            "default, 7*(13dlu), $lcgap, default:grow",
-                            "$ugap, $lgap, default, $lgap, pref, default:grow, $lgap, $rgap"));
+                        "default, 7*(13dlu), $lcgap, default:grow",
+                        "$ugap, $lgap, default, $lgap, pref, default:grow, $lgap, $rgap"));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                                "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
-                                "default:grow, $lgap, default"));
+                            "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
+                            "default:grow, $lgap, default"));
 
                         //---- btnJedeWoche ----
                         btnJedeWoche.setText("Jede Woche");
@@ -716,8 +697,8 @@ public class PnlSchedule extends JPanel {
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.setLayout(new FormLayout(
-                            "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
-                            "3*(default, $lgap), default"));
+                        "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
+                        "3*(default, $lgap), default"));
 
                     //---- label4 ----
                     label4.setText("jeden");
@@ -752,15 +733,15 @@ public class PnlSchedule extends JPanel {
                     pnlMonthly.add(spinMonatTag, CC.xy(5, 7));
 
                     //---- cmbTag ----
-                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[]{
-                            "Tag des Monats",
-                            "Montag",
-                            "Dienstag",
-                            "Mittwoch",
-                            "Donnerstag",
-                            "Freitag",
-                            "Samstag",
-                            "Sonntag"
+                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[] {
+                        "Tag des Monats",
+                        "Montag",
+                        "Dienstag",
+                        "Mittwoch",
+                        "Donnerstag",
+                        "Freitag",
+                        "Samstag",
+                        "Sonntag"
                     }));
                     cmbTag.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.add(cmbTag, CC.xywh(7, 7, 3, 1));
@@ -772,8 +753,8 @@ public class PnlSchedule extends JPanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $ugap, default, $lcgap, default:grow",
-                        "default:grow"));
+                    "default, $lcgap, default:grow, $ugap, default, $lcgap, default:grow",
+                    "default:grow"));
 
                 //---- jLabel13 ----
                 jLabel13.setText("Erst einplanen ab dem");
@@ -789,28 +770,13 @@ public class PnlSchedule extends JPanel {
                     }
                 });
                 panel2.add(txtLDate, CC.xy(3, 1));
-
-                //---- lblMinutes ----
-                lblMinutes.setText("text");
-                lblMinutes.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(lblMinutes, CC.xy(5, 1));
-
-                //---- txtMinutes ----
-                txtMinutes.setFont(new Font("Arial", Font.PLAIN, 14));
-                txtMinutes.addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        txtMinutesFocusLost(e);
-                    }
-                });
-                panel2.add(txtMinutes, CC.xy(7, 1));
             }
             panelMain.add(panel2, CC.xy(3, 9));
 
             //======== pnlBemerkung ========
             {
                 pnlBemerkung.setBorder(new TitledBorder(null, "Kommentar zur Anwendung (Erscheint im DFN)", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
-                        new Font("Arial", Font.PLAIN, 14)));
+                    new Font("Arial", Font.PLAIN, 14)));
                 pnlBemerkung.setLayout(new BoxLayout(pnlBemerkung, BoxLayout.X_AXIS));
 
                 //======== jScrollPane1 ========
@@ -983,7 +949,6 @@ public class PnlSchedule extends JPanel {
 
         is.setFloating(tbFloating.isSelected());
         is.setBemerkung(txtBemerkung.getText());
-        is.setDauer(SYSTools.parseDecimal(txtMinutes.getText()));
 
         if (!is.isValid()) {
             throw new NumberFormatException("Anzahl muss min. 1 sein");
@@ -1114,8 +1079,6 @@ public class PnlSchedule extends JPanel {
     private JPanel panel2;
     private JLabel jLabel13;
     private JTextField txtLDate;
-    private JLabel lblMinutes;
-    private JTextField txtMinutes;
     private JPanel pnlBemerkung;
     private JScrollPane jScrollPane1;
     private JTextArea txtBemerkung;

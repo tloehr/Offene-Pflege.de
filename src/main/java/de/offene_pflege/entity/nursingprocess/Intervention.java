@@ -11,7 +11,6 @@ import de.offene_pflege.op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * @author tloehr
@@ -50,7 +49,7 @@ public class Intervention implements Serializable {
         this.massID = massID;
     }
 
-    public Intervention(String bezeichnung, BigDecimal dauer, int interventionType, ResInfoCategory category) {
+    public Intervention(String bezeichnung, int interventionType, ResInfoCategory category) {
         this.bezeichnung = SYSTools.tidy(bezeichnung);
         this.interventionType = interventionType;
         this.category = category;

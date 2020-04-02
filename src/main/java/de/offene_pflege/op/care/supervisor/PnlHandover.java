@@ -713,7 +713,6 @@ public class PnlHandover extends NursingRecordsPanel {
                             "<tr valign=\"top\">" +
                             "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                             " " + SYSTools.xx("misc.msg.Time.short") +
-                            "<br/>" + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                             "</td>" +
                             "<td width=\"100\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
                             "<td width=\"400\" align=\"left\">" +

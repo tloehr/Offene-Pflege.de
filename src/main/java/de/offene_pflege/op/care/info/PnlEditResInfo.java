@@ -19,8 +19,8 @@ import de.offene_pflege.entity.prescription.Hospital;
 import de.offene_pflege.entity.prescription.HospitalTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.ResValueTypes;
-import de.offene_pflege.entity.values.ResValueTypesTools;
+import de.offene_pflege.entity.values.Resvaluetypes;
+import de.offene_pflege.entity.values.ResvaluetypesTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.PDF;
@@ -437,16 +437,16 @@ public class PnlEditResInfo implements HasLogger {
         }
 
         if (preset.equalsIgnoreCase("heightlast")) {
-            Optional<ResValue> r = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
+            Optional<ResValue> r = ResValueTools.getLast(resident, ResvaluetypesTools.HEIGHT);
             return r.isPresent() ? SYSTools.formatBigDecimal(r.get().getVal1()) : d;
         }
         if (preset.equalsIgnoreCase("weightlast")) {
-            Optional<ResValue> r = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
+            Optional<ResValue> r = ResValueTools.getLast(resident, ResvaluetypesTools.WEIGHT);
             return r.isPresent() ? SYSTools.formatBigDecimal(r.get().getVal1()) : d;
         }
         if (preset.equalsIgnoreCase("weight-1m")) {
             long target = new DateTime().minusMonths(1).getMillis();
-            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new LocalDate().minusDays(45), new LocalDate().minusDays(15));
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResvaluetypesTools.WEIGHT, new LocalDate().minusDays(45), new LocalDate().minusDays(15));
 
             ResValue closest = null;
             long distance = Long.MAX_VALUE;
@@ -461,7 +461,7 @@ public class PnlEditResInfo implements HasLogger {
         }
         if (preset.equalsIgnoreCase("weight-6m")) {
             long target = new DateTime().minusMonths(6).getMillis();
-            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new LocalDate().minusMonths(6).minusDays(15), new LocalDate().minusMonths(5).minusDays(15));
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResvaluetypesTools.WEIGHT, new LocalDate().minusMonths(6).minusDays(15), new LocalDate().minusMonths(5).minusDays(15));
 
             ResValue closest = null;
             long distance = Long.MAX_VALUE;
@@ -476,7 +476,7 @@ public class PnlEditResInfo implements HasLogger {
         }
         if (preset.equalsIgnoreCase("weight-1y")) {
             long target = new DateTime().minusYears(1).getMillis();
-            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new LocalDate().minusYears(1).minusDays(15), new LocalDate().minusMonths(11).minusDays(15));
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResvaluetypesTools.WEIGHT, new LocalDate().minusYears(1).minusDays(15), new LocalDate().minusMonths(11).minusDays(15));
 
             ResValue closest = null;
             long distance = Long.MAX_VALUE;
@@ -1064,7 +1064,7 @@ public class PnlEditResInfo implements HasLogger {
                 scaleButtonGroups = new ArrayList();
                 scaleriskmodel = new ArrayList();
                 try {
-                    ResValueTypes scaleValueType = ResValueTypesTools.getType(Short.parseShort(SYSTools.catchNull(attributes.getValue("resvaltype"))));
+                    Resvaluetypes scaleValueType = ResvaluetypesTools.getType(Short.parseShort(SYSTools.catchNull(attributes.getValue("resvaltype"))));
                     resInfo.setResValue(new ResValue(resInfo.getResident(), scaleValueType, resInfo.getFrom()));
                     resInfo.getResValue().setVal1(BigDecimal.ZERO);
                 } catch (NumberFormatException nfe) {

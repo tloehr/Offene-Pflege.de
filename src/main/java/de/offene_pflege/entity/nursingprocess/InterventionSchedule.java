@@ -11,7 +11,6 @@ import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
@@ -74,8 +73,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
     @Temporal(TemporalType.TIMESTAMP)
     private Date lDatum;
     @Basic(optional = false)
-    @Column(name = "Dauer")
-    private BigDecimal dauer;
     @Lob
     @Column(name = "Bemerkung")
     private String bemerkung;
@@ -100,7 +97,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
         this.morgens = 1;
         this.taeglich = 1;
         this.lDatum = new LocalDate().toDate();
-        this.dauer = intervention.getDauer();
         this.nursingProcess = planung;
         this.intervention = intervention;
 
@@ -126,7 +122,7 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public InterventionSchedule(Short nachtMo, Short morgens, Short mittags, Short nachmittags, Short abends, Short nachtAb, Short uhrzeitAnzahl, Date uhrzeit, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Boolean erforderlich, Date lDatum, BigDecimal dauer, String bemerkung, NursingProcess nursingProcess, Intervention intervention) {
+    public InterventionSchedule(Short nachtMo, Short morgens, Short mittags, Short nachmittags, Short abends, Short nachtAb, Short uhrzeitAnzahl, Date uhrzeit, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Boolean erforderlich, Date lDatum, String bemerkung, NursingProcess nursingProcess, Intervention intervention) {
         this.nachtMo = nachtMo;
         this.morgens = morgens;
         this.mittags = mittags;
@@ -148,7 +144,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
         this.son = son;
         this.erforderlich = erforderlich;
         this.lDatum = lDatum;
-        this.dauer = dauer;
         this.bemerkung = bemerkung;
         this.nursingProcess = nursingProcess;
         this.intervention = intervention;
@@ -331,14 +326,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
         this.lDatum = lDatum;
     }
 
-    public BigDecimal getDauer() {
-        return dauer;
-    }
-
-    public void setDauer(BigDecimal dauer) {
-        this.dauer = dauer;
-    }
-
     public String getBemerkung() {
         return bemerkung;
     }
@@ -499,7 +486,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
         if (termID != null ? !termID.equals(that.termID) : that.termID != null) return false;
         if (abends != null ? !abends.equals(that.abends) : that.abends != null) return false;
         if (bemerkung != null ? !bemerkung.equals(that.bemerkung) : that.bemerkung != null) return false;
-        if (dauer != null ? !dauer.equals(that.dauer) : that.dauer != null) return false;
         if (die != null ? !die.equals(that.die) : that.die != null) return false;
         if (don != null ? !don.equals(that.don) : that.don != null) return false;
         if (erforderlich != null ? !erforderlich.equals(that.erforderlich) : that.erforderlich != null) return false;
@@ -554,7 +540,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
         result = 31 * result + (son != null ? son.hashCode() : 0);
         result = 31 * result + (erforderlich != null ? erforderlich.hashCode() : 0);
         result = 31 * result + (lDatum != null ? lDatum.hashCode() : 0);
-        result = 31 * result + (dauer != null ? dauer.hashCode() : 0);
         result = 31 * result + (bemerkung != null ? bemerkung.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (nursingProcess != null ? nursingProcess.hashCode() : 0);
@@ -565,35 +550,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
     @Override
     public int compareTo(InterventionSchedule interventionSchedule) {
         return intervention.getBezeichnung().compareTo(interventionSchedule.getIntervention().getBezeichnung());
-//        if (uhrzeit != null && interventionSchedule.getUhrzeit() == null){
-//            return -1;
-//        }
-//        if (uhrzeit == null && interventionSchedule.getUhrzeit() != null){
-//            return 1;
-//        }
-//        if (uhrzeit != null){
-//            return uhrzeit.compareTo(interventionSchedule.getUhrzeit());
-//        }
-//        if (isDaily() && !interventionSchedule.isDaily()){
-//            return 1;
-//        }
-//        if (!isDaily() && interventionSchedule.isDaily()){
-//            return -1;
-//        }
-//        if (isDaily()){
-//            return new Short(getTaeglich()).compareTo(interventionSchedule.getTaeglich());
-//        }
-//        if (isWeekly() && !interventionSchedule.isWeekly()){
-//            return 1;
-//        }
-//        if (!isWeekly() && interventionSchedule.isWeekly()){
-//            return -1;
-//        }
-//        if (isWeekly()){
-//            return new Short(getWoechentlich()).compareTo(interventionSchedule.getWoechentlich());
-//        }
-//
-
     }
 
     @Override
@@ -603,6 +559,6 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
 
     @Override
     public InterventionSchedule clone() {
-        return new InterventionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitAnzahl, uhrzeit, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, erforderlich, lDatum, dauer, bemerkung, nursingProcess, intervention);
+        return new InterventionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitAnzahl, uhrzeit, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, erforderlich, lDatum, bemerkung, nursingProcess, intervention);
     }
 }

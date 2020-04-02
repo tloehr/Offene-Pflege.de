@@ -104,14 +104,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private String text;
 
     /**
-     * Das hier ist ein Relikt aus der Zeit als alle in der Pflege so auf den Minuten herumgeritten sind. Man kann hier
-     * angeben, wie lange die Tätigkeit, die in dem Bericht beschrieben wurde, gedauert hat.
-     */
-    @Basic(optional = false)
-    @Column(name = "Dauer")
-    private int minutes;
-
-    /**
      * Die Kennung des Benutzers, der diesen Bericht eingetragen hat.
      */
     @JoinColumn(name = "NewBy", referencedColumnName = "UKennung")
@@ -193,7 +185,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.pit = new Date();
         this.newPIT = new Date();
         this.text = "";
-        this.minutes = 3;
         this.resident = resident;
         this.newBy = OPDE.getLogin().getUser();
         this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
@@ -210,19 +201,17 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
      * @param newPIT
      * @param editedPIT
      * @param text
-     * @param minutes
      * @param newBy
      * @param resident
      * @param editedBy
      * @param replacedBy
      * @param replacementFor
      */
-    private NReport(Date pit, Date newPIT, Date editedPIT, String text, int minutes, OPUsers newBy, Resident resident, OPUsers editedBy, NReport replacedBy, NReport replacementFor) {
+    private NReport(Date pit, Date newPIT, Date editedPIT, String text, OPUsers newBy, Resident resident, OPUsers editedBy, NReport replacedBy, NReport replacementFor) {
         this.pit = pit;
         this.newPIT = newPIT;
         this.editedPIT = editedPIT;
         this.text = SYSTools.tidy(text);
-        this.minutes = minutes;
         this.newBy = newBy;
         this.resident = resident;
         this.editedBy = editedBy;
@@ -266,14 +255,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
 
     public void setText(String text) {
         this.text = SYSTools.tidy(text);
-    }
-
-    public int getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(int dauer) {
-        this.minutes = dauer;
     }
 
     public Resident getResident() {
@@ -410,7 +391,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
 
         NReport nReport = (NReport) o;
 
-        if (minutes != nReport.minutes) return false;
 //        if (editedBy != null ? !editedBy.equals(nReport.editedBy) : nReport.editedBy != null) return false;
         if (editedPIT != null ? !editedPIT.equals(nReport.editedPIT) : nReport.editedPIT != null) return false;
         if (newPIT != null ? !newPIT.equals(nReport.newPIT) : nReport.newPIT != null) return false;
@@ -436,7 +416,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         result = 31 * result + (pit != null ? pit.hashCode() : 0);
         result = 31 * result + (editedPIT != null ? editedPIT.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + minutes;
         result = 31 * result + (newBy != null ? newBy.hashCode() : 0);
         result = 31 * result + (resident != null ? resident.hashCode() : 0);
 //        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
@@ -488,7 +467,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     @Override
     public NReport clone() {
 
-        final NReport clonedReport = new NReport(pit, newPIT, editedPIT, text, minutes, newBy, resident, editedBy, null, null);
+        final NReport clonedReport = new NReport(pit, newPIT, editedPIT, text, newBy, resident, editedBy, null, null);
 
         CollectionUtils.forAllDo(commontags, new Closure() {
             public void execute(Object o) {

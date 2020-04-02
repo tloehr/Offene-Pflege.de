@@ -27,10 +27,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.awt.event.*;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 /**
@@ -41,8 +41,6 @@ public class PnlSelectIntervention extends JPanel {
     public static final String internalClassID = "nursingrecords.nursingprocess.pnlselectinterventions";
     private Closure actionBlock;
     private JToggleButton tbAktiv;
-    Number dauer = BigDecimal.TEN;
-    Component focusOwner = null;
 
     public PnlSelectIntervention(Closure actionBlock) {
         this.actionBlock = actionBlock;
@@ -54,7 +52,6 @@ public class PnlSelectIntervention extends JPanel {
 
     private void initPanel() {
         lblText.setText(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.lbltext"));
-        lblLength.setText(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.lbllength"));
         lblCat.setText(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.lblcat"));
         lblType.setText(SYSTools.xx("nursingrecords.nursingprocess.pnlselectinterventions.lbltype"));
 
@@ -69,47 +66,7 @@ public class PnlSelectIntervention extends JPanel {
         cmbCategory.setSelectedItem(null);
 
 
-        setFocusCycleRoot(true);
-        setFocusTraversalPolicy(new FocusTraversalPolicy() {
-            @Override
-            public Component getComponentAfter(Container aContainer, Component aComponent) {
-                if (focusOwner == null) {
-                    focusOwner = txtText;
-                } else if (focusOwner.equals(txtText)) {
-                    focusOwner = txtLength;
-                } else {
-                    focusOwner = txtText;
-                }
-                return focusOwner;
-            }
 
-            @Override
-            public Component getComponentBefore(Container aContainer, Component aComponent) {
-                if (focusOwner == null) {
-                    focusOwner = txtLength;
-                } else if (focusOwner.equals(txtLength)) {
-                    focusOwner = txtText;
-                } else {
-                    focusOwner = txtLength;
-                }
-                return focusOwner;
-            }
-
-            @Override
-            public Component getFirstComponent(Container aContainer) {
-                return txtText;
-            }
-
-            @Override
-            public Component getLastComponent(Container aContainer) {
-                return txtLength;
-            }
-
-            @Override
-            public Component getDefaultComponent(Container aContainer) {
-                return txtText;
-            }
-        });
 
 
     }
@@ -138,15 +95,6 @@ public class PnlSelectIntervention extends JPanel {
         return true;
     }
 
-    private void txtDauerFocusLost(FocusEvent e) {
-        try {
-            dauer = NumberFormat.getNumberInstance().parse(txtLength.getText());
-        } catch (ParseException e1) {
-            dauer = BigDecimal.TEN;
-            txtLength.setText("10");
-        }
-    }
-
     private void lstInterventionsMouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
             btnOk.doClick();
@@ -167,7 +115,7 @@ public class PnlSelectIntervention extends JPanel {
     private void btnEditActionPerformed(ActionEvent e) {
         intervention2Edit = (Intervention) lstInterventions.getSelectedValue();
         txtText.setText(intervention2Edit.getBezeichnung());
-        txtLength.setText(intervention2Edit.getDauer().toBigInteger().toString());
+//        txtLength.setText(intervention2Edit.getDauer().toBigInteger().toString());
         tbAktiv.setSelected(intervention2Edit.isActive());
         cmbCategory.setSelectedItem(intervention2Edit.getCategory());
         tbAktiv.setEnabled(true);
@@ -184,7 +132,7 @@ public class PnlSelectIntervention extends JPanel {
     private void btnSaveActionPerformed(ActionEvent evt) {
         if (saveok()) {
             if (intervention2Edit == null) {
-                Intervention intervention = new Intervention(txtText.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbType.getSelectedIndex() + 1, (ResInfoCategory) cmbCat.getSelectedItem());
+                Intervention intervention = new Intervention(txtText.getText().trim(), cmbType.getSelectedIndex() + 1, (ResInfoCategory) cmbCat.getSelectedItem());
                 lstInterventions.setModel(SYSTools.list2dlm(Arrays.asList(intervention)));
                 btnEdit.setEnabled(false);
             } else {
@@ -194,7 +142,6 @@ public class PnlSelectIntervention extends JPanel {
                     Intervention myIntervention = em.merge(intervention2Edit);
                     em.lock(myIntervention, LockModeType.OPTIMISTIC);
                     myIntervention.setBezeichnung(txtText.getText().trim());
-                    myIntervention.setDauer(new BigDecimal(dauer.doubleValue()));
                     myIntervention.setCategory(em.merge((ResInfoCategory) cmbCat.getSelectedItem()));
                     myIntervention.setInterventionType(cmbType.getSelectedIndex() + 1);
                     myIntervention.setActive(tbAktiv.isSelected());
@@ -240,9 +187,7 @@ public class PnlSelectIntervention extends JPanel {
         btnEdit = new JButton();
         pnlRight = new JPanel();
         lblText = new JLabel();
-        lblLength = new JLabel();
         txtText = new JTextField();
-        txtLength = new JTextField();
         lblCat = new JLabel();
         cmbCat = new JComboBox<>();
         lblType = new JLabel();
@@ -351,39 +296,21 @@ public class PnlSelectIntervention extends JPanel {
                     pnlRight.setBorder(null);
                     pnlRight.setLayout(new FormLayout(
                         "default, $lcgap, default:grow",
-                        "3*(fill:default, $lgap), 2*(default, $lgap), default:grow"));
+                        "2*(fill:default, $lgap), 2*(default, $lgap), default:grow"));
 
                     //---- lblText ----
                     lblText.setText("Bezeichnung");
                     lblText.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlRight.add(lblText, CC.xy(1, 1));
 
-                    //---- lblLength ----
-                    lblLength.setText("Dauer");
-                    lblLength.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(lblLength, CC.xy(1, 3));
-
                     //---- txtText ----
                     txtText.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlRight.add(txtText, CC.xy(3, 1));
 
-                    //---- txtLength ----
-                    txtLength.setHorizontalAlignment(SwingConstants.RIGHT);
-                    txtLength.setText("10");
-                    txtLength.setToolTipText(null);
-                    txtLength.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtLength.addFocusListener(new FocusAdapter() {
-                        @Override
-                        public void focusLost(FocusEvent e) {
-                            txtDauerFocusLost(e);
-                        }
-                    });
-                    pnlRight.add(txtLength, CC.xy(3, 3));
-
                     //---- lblCat ----
                     lblCat.setText("Kategorie");
                     lblCat.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(lblCat, CC.xy(1, 5));
+                    pnlRight.add(lblCat, CC.xy(1, 3));
 
                     //---- cmbCat ----
                     cmbCat.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -393,12 +320,12 @@ public class PnlSelectIntervention extends JPanel {
                         "Item 4"
                     }));
                     cmbCat.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(cmbCat, CC.xy(3, 5));
+                    pnlRight.add(cmbCat, CC.xy(3, 3));
 
                     //---- lblType ----
                     lblType.setText("Art");
                     lblType.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(lblType, CC.xy(1, 7));
+                    pnlRight.add(lblType, CC.xy(1, 5));
 
                     //---- cmbType ----
                     cmbType.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -408,7 +335,7 @@ public class PnlSelectIntervention extends JPanel {
                         "Item 4"
                     }));
                     cmbType.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(cmbType, CC.xy(3, 7));
+                    pnlRight.add(cmbType, CC.xy(3, 5));
 
                     //======== panel4 ========
                     {
@@ -426,7 +353,7 @@ public class PnlSelectIntervention extends JPanel {
                         btnSave.addActionListener(e -> btnSaveActionPerformed(e));
                         panel4.add(btnSave);
                     }
-                    pnlRight.add(panel4, CC.xywh(1, 11, 3, 1, CC.RIGHT, CC.BOTTOM));
+                    pnlRight.add(panel4, CC.xywh(1, 9, 3, 1, CC.RIGHT, CC.BOTTOM));
                 }
                 split1.setRightComponent(pnlRight);
             }
@@ -451,9 +378,7 @@ public class PnlSelectIntervention extends JPanel {
     private JButton btnEdit;
     private JPanel pnlRight;
     private JLabel lblText;
-    private JLabel lblLength;
     private JTextField txtText;
-    private JTextField txtLength;
     private JLabel lblCat;
     private JComboBox<String> cmbCat;
     private JLabel lblType;

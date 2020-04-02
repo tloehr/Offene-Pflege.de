@@ -85,7 +85,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     private Resident resident;
     @JoinColumn(name = "Type", referencedColumnName = "ID")
     @ManyToOne
-    private ResValueTypes vtype;
+    private Resvaluetypes vtype;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "value")
     private Collection<SYSVAL2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "resValue")
@@ -98,15 +98,15 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     public ResValue() {
     }
 
-    public ResValue(Resident resident, ResValueTypes vtype) {
+    public ResValue(Resident resident, Resvaluetypes vtype) {
         this(new Date(), vtype.getDefault1(), vtype.getDefault2(), vtype.getDefault3(), "", new Date(), new Date(), vtype, null, null, null, OPDE.getLogin().getUser(), resident);
     }
 
-    public ResValue(Resident resident, ResValueTypes vtype, Date date) {
+    public ResValue(Resident resident, Resvaluetypes vtype, Date date) {
         this(date, vtype.getDefault1(), vtype.getDefault2(), vtype.getDefault3(), "", new Date(), new Date(), vtype, null, null, null, OPDE.getLogin().getUser(), resident);
     }
 
-    public ResValue(Date pit, BigDecimal val1, BigDecimal val2, BigDecimal val3, String text, Date createDate, Date editDate, ResValueTypes vtype, OPUsers editedBy, ResValue replacedBy, ResValue replacementFor, OPUsers user, Resident resident) {
+    public ResValue(Date pit, BigDecimal val1, BigDecimal val2, BigDecimal val3, String text, Date createDate, Date editDate, Resvaluetypes vtype, OPUsers editedBy, ResValue replacedBy, ResValue replacementFor, OPUsers user, Resident resident) {
         this.pit = pit;
         this.val2 = val2;
         this.val3 = val3;
@@ -161,11 +161,11 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         this.val1 = val1;
     }
 
-    public ResValueTypes getType() {
+    public Resvaluetypes getType() {
         return vtype;
     }
 
-    public void setType(ResValueTypes type) {
+    public void setType(Resvaluetypes type) {
         this.vtype = type;
     }
 
@@ -215,10 +215,6 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     public void setEditDate(Date mdate) {
         this.editDate = mdate;
-    }
-
-    public boolean isWithoutValue() {
-        return vtype.getID() == ResValueTypesTools.VOMIT || vtype.getID() == ResValueTypesTools.STOOL;
     }
 
     @Override
