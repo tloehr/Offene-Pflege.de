@@ -6,7 +6,7 @@ package de.offene_pflege.op.users;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.EMailSystem;
 import de.offene_pflege.op.threads.DisplayMessage;

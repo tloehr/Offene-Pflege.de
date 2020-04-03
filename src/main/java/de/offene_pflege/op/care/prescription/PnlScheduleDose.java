@@ -31,7 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideTabbedPane;
-import de.offene_pflege.entity.prescription.PrescriptionSchedule;
+import de.offene_pflege.backend.entity.prescription.PrescriptionSchedule;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSCalendar;

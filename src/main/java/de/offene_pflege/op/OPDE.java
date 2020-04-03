@@ -27,11 +27,11 @@ package de.offene_pflege.op;
 
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.nursingprocess.DFNTools;
-import de.offene_pflege.entity.prescription.BHPTools;
-import de.offene_pflege.entity.system.*;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.nursingprocess.DFNTools;
+import de.offene_pflege.backend.entity.prescription.BHPTools;
+import de.offene_pflege.backend.entity.system.*;
 import de.offene_pflege.op.settings.InitWizard;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.system.EMailSystem;
@@ -253,7 +253,7 @@ public class OPDE {
         }
 
         String html = SYSTools.getThrowableAsHTML(e);
-        File temp = SYSFilesTools.print(html, false);
+        File temp = SYSFilesService.print(html, false);
 
         if (!isDebug()) {
             EMailSystem.sendErrorMail(e.getMessage(), temp);
@@ -578,7 +578,7 @@ public class OPDE {
 
             // enable JPA cache
             jpaProps.put("eclipselink.cache.shared.default", cl.hasOption("c") ? "true" : "false");
-            jpaProps.put("eclipselink.session.customizer", "de.offene_pflege.entity.JPAEclipseLinkSessionCustomizer");
+            jpaProps.put("eclipselink.session.customizer", "de.offene_pflege.backend.entity.JPAEclipseLinkSessionCustomizer");
 
             Connection jdbcConnection = DriverManager.getConnection(url, jpaProps.getProperty(SYSPropsTools.KEY_JDBC_USER), jpaProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD));
             int neededVersion = OPDE.getAppInfo().getDbversion();

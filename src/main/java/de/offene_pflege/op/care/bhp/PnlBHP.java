@@ -35,11 +35,11 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.utils.ColorUtils;
 import com.toedter.calendar.JDateChooser;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -1470,7 +1470,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
                 }
 
-                SYSFilesTools.print(html, true);
+                SYSFilesService.print(html, true);
             });
             list.add(printPrescription);
         }

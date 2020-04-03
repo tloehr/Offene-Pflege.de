@@ -3,7 +3,11 @@ package de.offene_pflege.gui;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.info.*;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.info.*;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.services.ResInfoTypeTools;
+import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.system.FileDrop;
@@ -402,26 +406,26 @@ public class GUITools {
 
 
     public static void setResidentDisplay(Resident resident) {
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident), SYSTools.toHTML(ResInfoTools.getTXReportHeader(resident, false)));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident), SYSTools.toHTML(ResInfoService.getTXReportHeader(resident, false)));
         // result += getTXReportHeader(resident, withlongheader);
-        ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_INFECTION));
-        ResInfo diabetes = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIABETES));
-        ResInfo warning = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_WARNING));
-        ResInfo allergy = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ALLERGY));
-        ResInfo fall_risk = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALLRISK));
+        ResInfo biohazard = ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_INFECTION));
+        ResInfo diabetes = ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIABETES));
+        ResInfo warning = ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_WARNING));
+        ResInfo allergy = ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ALLERGY));
+        ResInfo fall_risk = ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALLRISK));
 
-        OPDE.getDisplayManager().setIconBiohazard(biohazard != null && biohazard.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(ResInfoTools.getContentAsHTML(biohazard))) : null);
-        OPDE.getDisplayManager().setIconDiabetes(diabetes != null && diabetes.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(ResInfoTools.getContentAsHTML(diabetes))) : null);
-        OPDE.getDisplayManager().setIconWarning(warning != null && warning.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(ResInfoTools.getContentAsHTML(warning))) : null);
-        OPDE.getDisplayManager().setIconAllergy(allergy != null && allergy.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(ResInfoTools.getContentAsHTML(allergy))) : null);
-        OPDE.getDisplayManager().setIconFalling(ResInfoTools.hasSevereFallRisk(fall_risk) ? SYSTools.toHTML(SYSConst.html_div(ResInfoTools.getContentAsHTML(fall_risk))) : null);
-        OPDE.getDisplayManager().setIconKZP(ResInfoTools.isKZP(resident));
+        OPDE.getDisplayManager().setIconBiohazard(biohazard != null && biohazard.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(ResInfoService.getContentAsHTML(biohazard))) : null);
+        OPDE.getDisplayManager().setIconDiabetes(diabetes != null && diabetes.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(ResInfoService.getContentAsHTML(diabetes))) : null);
+        OPDE.getDisplayManager().setIconWarning(warning != null && warning.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(ResInfoService.getContentAsHTML(warning))) : null);
+        OPDE.getDisplayManager().setIconAllergy(allergy != null && allergy.isCurrentlyValid() ? SYSTools.toHTML(SYSConst.html_div(ResInfoService.getContentAsHTML(allergy))) : null);
+        OPDE.getDisplayManager().setIconFalling(ResInfoService.hasSevereFallRisk(fall_risk) ? SYSTools.toHTML(SYSConst.html_div(ResInfoService.getContentAsHTML(fall_risk))) : null);
+        OPDE.getDisplayManager().setIconKZP(ResInfoService.isKZP(resident));
 
-        if (ResInfoTools.isAway(resident)) {
+        if (ResInfoService.isAway(resident)) {
             OPDE.getDisplayManager().setIconAway();
-        } else if (ResInfoTools.isDead(resident)) {
+        } else if (ResInfoService.isDead(resident)) {
             OPDE.getDisplayManager().setIconDead();
-        } else if (ResInfoTools.isGone(resident)) {
+        } else if (ResInfoService.isGone(resident)) {
             OPDE.getDisplayManager().setIconGone();
         }
         OPDE.getDisplayManager().clearSubMessages();

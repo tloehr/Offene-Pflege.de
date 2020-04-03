@@ -11,15 +11,15 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.files.SYSVAL2FILE;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.process.SYSVAL2PROCESS;
-import de.offene_pflege.entity.values.ResValue;
-import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.Resvaluetypes;
-import de.offene_pflege.entity.values.ResvaluetypesTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.SYSVAL2FILE;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.process.SYSVAL2PROCESS;
+import de.offene_pflege.backend.entity.values.ResValue;
+import de.offene_pflege.backend.entity.values.ResValueTools;
+import de.offene_pflege.backend.entity.values.Resvaluetypes;
+import de.offene_pflege.backend.entity.values.ResvaluetypesTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
@@ -127,7 +127,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
     private void btnPrintActionPerformed(ActionEvent e) {
         if (listValues == null || listValues.isEmpty()) return;
-        SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(listValues)), true);
+        SYSFilesService.print(SYSTools.toHTML(ResValueTools.getAsHTML(listValues)), true);
     }
 
     private void scrlLeftComponentResized(ComponentEvent e) {

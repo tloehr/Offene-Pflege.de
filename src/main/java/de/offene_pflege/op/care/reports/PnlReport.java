@@ -33,14 +33,14 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.process.*;
-import de.offene_pflege.entity.reports.NReport;
-import de.offene_pflege.entity.reports.NReportTools;
-import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.CommontagsTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.process.*;
+import de.offene_pflege.backend.entity.reports.NReport;
+import de.offene_pflege.backend.entity.reports.NReportTools;
+import de.offene_pflege.backend.entity.system.Commontags;
+import de.offene_pflege.backend.entity.system.CommontagsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -245,7 +245,7 @@ public class PnlReport extends NursingRecordsPanel {
         txtSearch.setFont(SYSConst.ARIAL14);
         txtSearch.addActionListener(e -> {
             if (SYSTools.catchNull(txtSearch.getText()).trim().length() >= 3) {
-                SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), true, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
+                SYSFilesService.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), true, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
             }
         });
 
@@ -269,7 +269,7 @@ public class PnlReport extends NursingRecordsPanel {
             pnlTags.setOpaque(false);
 
             for (final Commontags commontag : listUsedCommontags) {
-                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), true, null, null), false));
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesService.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), true, null, null), false));
                 btnTag.setForeground(GUITools.getColor(commontag.getColor()));
                 pnlTags.add(btnTag);
             }
@@ -522,7 +522,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintMonth.setContentAreaFilled(false);
             btnPrintMonth.setBorder(null);
             btnPrintMonth.setToolTipText(SYSTools.xx("misc.tooltips.btnprintmonth"));
-            btnPrintMonth.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, start, end), true, null, null), false));
+            btnPrintMonth.addActionListener(actionEvent -> SYSFilesService.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, start, end), true, null, null), false));
             cptitle.getRight().add(btnPrintMonth);
         }
 
@@ -625,7 +625,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintMonth.setContentAreaFilled(false);
             btnPrintMonth.setBorder(null);
             btnPrintMonth.setToolTipText(SYSTools.xx("misc.tooltips.btnprintmonth"));
-            btnPrintMonth.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month), true, null, null), false));
+            btnPrintMonth.addActionListener(actionEvent -> SYSFilesService.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month), true, null, null), false));
             cptitle.getRight().add(btnPrintMonth);
         }
         cpMonth.setTitleLabelComponent(cptitle.getMain());
@@ -731,7 +731,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintWeek.setContentAreaFilled(false);
             btnPrintWeek.setBorder(null);
             btnPrintWeek.setToolTipText(SYSTools.xx("misc.tooltips.btnprintweek"));
-            btnPrintWeek.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week), true, null, null), false));
+            btnPrintWeek.addActionListener(actionEvent -> SYSFilesService.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week), true, null, null), false));
             cptitle.getRight().add(btnPrintWeek);
         }
 
@@ -818,7 +818,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintDay.setContentAreaFilled(false);
             btnPrintDay.setBorder(null);
             btnPrintDay.setToolTipText(SYSTools.xx("misc.tooltips.btnprintday"));
-            btnPrintDay.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day), true, null, null), false));
+            btnPrintDay.addActionListener(actionEvent -> SYSFilesService.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day), true, null, null), false));
             titleCPDay.getRight().add(btnPrintDay);
         }
 

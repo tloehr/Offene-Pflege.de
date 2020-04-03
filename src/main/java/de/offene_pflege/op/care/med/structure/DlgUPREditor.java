@@ -6,10 +6,10 @@ package de.offene_pflege.op.care.med.structure;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.prescription.MedStock;
-import de.offene_pflege.entity.prescription.MedStockTools;
-import de.offene_pflege.entity.prescription.TradeForm;
-import de.offene_pflege.entity.prescription.TradeFormTools;
+import de.offene_pflege.backend.entity.prescription.MedStock;
+import de.offene_pflege.backend.entity.prescription.MedStockTools;
+import de.offene_pflege.backend.entity.prescription.TradeForm;
+import de.offene_pflege.backend.entity.prescription.TradeFormTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;

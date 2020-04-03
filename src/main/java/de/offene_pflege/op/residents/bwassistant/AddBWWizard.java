@@ -5,14 +5,18 @@ import com.jidesoft.dialog.ButtonNames;
 import com.jidesoft.dialog.PageEvent;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.*;
-import de.offene_pflege.entity.building.Rooms;
-import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.info.*;
-import de.offene_pflege.entity.prescription.GP;
-import de.offene_pflege.entity.prescription.GPTools;
-import de.offene_pflege.entity.system.Unique;
-import de.offene_pflege.entity.system.UniqueTools;
-import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.done.Rooms;
+import de.offene_pflege.backend.entity.done.Station;
+import de.offene_pflege.backend.entity.info.*;
+import de.offene_pflege.backend.entity.prescription.GP;
+import de.offene_pflege.backend.entity.prescription.GPTools;
+import de.offene_pflege.backend.entity.system.Unique;
+import de.offene_pflege.backend.entity.system.UniqueTools;
+import de.offene_pflege.backend.entity.system.OPUsers;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.services.ResInfoTypeTools;
+import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
@@ -297,18 +301,18 @@ public class AddBWWizard {
                 Boolean isKZP = q.getValue3();
 
                 if (hauf != null) {
-                    resinfo_hauf = ResInfoTools.createStayResInfo(resident, hauf, isKZP);
+                    resinfo_hauf = ResInfoService.createStayResInfo(resident, hauf, isKZP);
                 } else {
                     resinfo_hauf = null;
                 }
                 if (room != null) {
-                    resinfo_room = ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
+                    resinfo_room = ResInfoService.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
 
                     Properties props = new Properties();
                     props.put("room.id", Long.toString(room.getRoomID()));
                     props.put("room.text", room.toString());
-                    ResInfoTools.setContent(resinfo_room, props);
-                    ResInfoTools.setFrom(resinfo_room, hauf);
+                    ResInfoService.setContent(resinfo_room, props);
+                    ResInfoService.setFrom(resinfo_room, hauf);
                 } else {
                     resinfo_room = null;
                 }
@@ -364,9 +368,9 @@ public class AddBWWizard {
 //            result += "<li>" + SYSTools.xx("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
 
             result += "<li>" + SYSTools.xx("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(resinfo_hauf.getFrom()) + "</li>";
-            result += "<li>" + SYSTools.xx("misc.msg.room") + ": " + (resinfo_room == null ? SYSTools.xx("misc.msg.noentryyet") : ResInfoTools.getRoomFrom(resinfo_room).toString()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.room") + ": " + (resinfo_room == null ? SYSTools.xx("misc.msg.noentryyet") : ResInfoService.getRoomFrom(resinfo_room).toString()) + "</li>";
             result += "<li>" + SYSTools.xx("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";
-            if (ResInfoTools.isKZP(resinfo_hauf)) {
+            if (ResInfoService.isKZP(resinfo_hauf)) {
                 result += SYSConst.html_li(SYSConst.html_color(Color.RED, SYSTools.xx("misc.msg.kzp")));
             }
 

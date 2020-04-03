@@ -17,16 +17,17 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
-import de.offene_pflege.entity.building.Rooms;
-import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.*;
-import de.offene_pflege.entity.prescription.PrescriptionTools;
-import de.offene_pflege.entity.process.*;
-import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.CommontagsTools;
-import de.offene_pflege.entity.system.SYSPropsTools;
-import de.offene_pflege.entity.values.ResValue;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.done.Rooms;
+import de.offene_pflege.backend.entity.done.Station;
+import de.offene_pflege.backend.services.*;
+import de.offene_pflege.backend.entity.info.*;
+import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
+import de.offene_pflege.backend.entity.process.*;
+import de.offene_pflege.backend.entity.system.Commontags;
+import de.offene_pflege.backend.entity.system.CommontagsTools;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.values.ResValue;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -168,7 +169,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
             listAllTypes.addAll(ResInfoTypeTools.getAllActive());
         }
         synchronized (listAllInfos) {
-            listAllInfos.addAll(ResInfoTools.getAll(resident));
+            listAllInfos.addAll(ResInfoService.getAll(resident));
         }
         sortData();
     }
@@ -271,11 +272,11 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                             html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
                                             html += type.getType() == ResInfoTypeTools.TYPE_FALLRISK ? SYSConst.html_48x48_warning : "";
 
-                                            html += ResInfoTools.getResInfosAsHTML(mapType2ResInfos.get(type), true, null);
+                                            html += ResInfoService.getResInfosAsHTML(mapType2ResInfos.get(type), true, null);
                                         }
                                     }
 
-                                    SYSFilesTools.print(html, true);
+                                    SYSFilesService.print(html, true);
                                 });
                                 btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
@@ -405,11 +406,11 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                             html += resInfoType.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
                                             html += resInfoType.getType() == ResInfoTypeTools.TYPE_FALLRISK ? SYSConst.html_48x48_warning : "";
 
-                                            html += ResInfoTools.getResInfosAsHTML(mapType2ResInfos.get(resInfoType), true, null);
+                                            html += ResInfoService.getResInfosAsHTML(mapType2ResInfos.get(resInfoType), true, null);
                                         }
 
 
-                                        SYSFilesTools.print(html, true);
+                                        SYSFilesService.print(html, true);
                                     });
                                     btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
                                     dctpt.getRight().add(btnPrint);
@@ -449,7 +450,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                     if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
                                         final JideButton btnAdd = GUITools.createHyperlinkButton("nursingrecords.info.noconstraints", SYSConst.icon22add, null);
                                         btnAdd.addActionListener(e -> {
-                                            currentEditor = new DlgDiag(ResInfoTools.createResInfo(resInfoType, resident), o -> {
+                                            currentEditor = new DlgDiag(ResInfoService.createResInfo(resInfoType, resident), o -> {
                                                 if (o != null) {
                                                     EntityManager em = OPDE.createEM();
                                                     try {
@@ -527,7 +528,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                         btnAdd.addActionListener(e -> {
                                             // https://github.com/tloehr/Offene-Pflege.de/issues/35
                                             final MyJDialog dlgPopup = new MyJDialog(true);
-                                            PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(ResInfoTools.createResInfo(resInfoType, resident), o -> {
+                                            PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(ResInfoService.createResInfo(resInfoType, resident), o -> {
                                                 dlgPopup.dispose();
                                                 if (o != null) {
 
@@ -543,7 +544,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                                         // Macht nur Sinn bei BY_DAY oder BY_SECOND
                                                         if (newinfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY ||
                                                                 newinfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYSECOND) {
-                                                            ResInfoTools.setConnectionId(em, newinfo);
+                                                            ResInfoService.setConnectionId(em, newinfo);
                                                         }
 
 //                                                        newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
@@ -554,7 +555,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                                                 if (!myResInfo.isClosed() && myResInfo.getResInfoType().isDeprecated()) {
                                                                     ResInfo closedResInfo = em.merge(myResInfo);
                                                                     em.lock(closedResInfo, LockModeType.OPTIMISTIC);
-                                                                    ResInfoTools.setTo(closedResInfo, new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
+                                                                    ResInfoService.setTo(closedResInfo, new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
                                                                     closedResInfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                                                                 }
                                                             }
@@ -862,7 +863,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            btnProcess.setEnabled(ResInfoService.isEditable(resInfo) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             cptitle.getRight().add(btnProcess);
         }
 
@@ -895,7 +896,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     ArrayList<ResInfo> list = new ArrayList<ResInfo>();
                     list.add(resInfo);
 
-                    SYSFilesTools.print(ResInfoTools.getContentAsHTML(resInfo), false);
+                    SYSFilesService.print(ResInfoService.getContentAsHTML(resInfo), false);
                 } else {
                     mapInfo2Editor.get(resInfo).print();
                 }
@@ -982,9 +983,9 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
 
 //                            newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
                             newinfo.setUserON(em.merge(OPDE.getLogin().getUser()));
-                            ResInfoTools.setFrom(newinfo, new Date());
+                            ResInfoService.setFrom(newinfo, new Date());
 
-                            ResInfoTools.setTo(oldinfo, new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
+                            ResInfoService.setTo(oldinfo, new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
                             oldinfo.setUserOFF(newinfo.getUserON());
 
                             em.getTransaction().commit();
@@ -1005,7 +1006,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             if (newinfo.getResInfoType().isAlertType()) {
                                 GUITools.setResidentDisplay(resident);
                                 if (newinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_FALLRISK) {
-                                    if (ResInfoTools.hasSevereFallRisk(newinfo)) {
+                                    if (ResInfoService.hasSevereFallRisk(newinfo)) {
                                         OPDE.getMainframe().addBesonderheit(newinfo.getResInfoType(), resident);
                                     } else {
                                         OPDE.getMainframe().removeBesonderheit(newinfo.getResInfoType(), resident);
@@ -1039,7 +1040,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     currentEditor.setVisible(true);
                 } else { // Cancel gedrückt
                     // den bestehenden mit einem neuen überschreiben, der die evtl. Änderungen nicht beinhaltet.
-                    mapInfo2Editor.put(resInfo, new PnlEditResInfo(ResInfoTools.clone(resInfo), GUITools.getColor(resInfo.getResInfoType().getResInfoCat().getColor())));
+                    mapInfo2Editor.put(resInfo, new PnlEditResInfo(ResInfoService.clone(resInfo), GUITools.getColor(resInfo.getResInfoType().getResInfoCat().getColor())));
                 }
                 reloadDisplay();
             });
@@ -1047,7 +1048,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
 
 
         btnChange.setEnabled(
-               ResInfoTools.isChangeable(resInfo)
+               ResInfoService.isChangeable(resInfo)
         );
 
         /***
@@ -1135,7 +1136,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                     GUITools.setResidentDisplay(resident);
 
                                     if (editinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_FALLRISK) {
-                                        if (ResInfoTools.hasSevereFallRisk(editinfo)) {
+                                        if (ResInfoService.hasSevereFallRisk(editinfo)) {
                                             OPDE.getMainframe().addBesonderheit(editinfo.getResInfoType(), resident);
                                         } else {
                                             OPDE.getMainframe().removeBesonderheit(editinfo.getResInfoType(), resident);
@@ -1171,7 +1172,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                         currentEditor.setVisible(true);
                     } else { // cancel wurde gedrückt
                         // den bestehenden mit einem neuen überschreiben, der die evtl. Änderungen nicht beinhaltet.
-                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(ResInfoTools.clone(resInfo), GUITools.getColor(resInfo.getResInfoType().getResInfoCat().getColor())));
+                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(ResInfoService.clone(resInfo), GUITools.getColor(resInfo.getResInfoType().getResInfoCat().getColor())));
                     }
                     reloadDisplay();
                 }
@@ -1180,7 +1181,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         });
 
         // Only active ones can be edited, and only by the same user that started it or the admin.
-        btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
+        btnEdit.setEnabled(ResInfoService.isEditable(resInfo) && (OPDE.isAdmin() ||
                 (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new LocalDate(resInfo.getFrom()).equals(new LocalDate()))  // The same user only on the same day.
         ));
 
@@ -1230,13 +1231,13 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                         content = PrescriptionTools.getPrescriptionAsHTML(resInfo.getPrescription(), false, false, false, false) + "<hrule/><br/>";
                     }
 
-                    content += ResInfoTools.getContentAsHTML(resInfo);
+                    content += ResInfoService.getContentAsHTML(resInfo);
 
                     txt.setText(SYSTools.toHTMLForScreen(SYSConst.html_fontface + content + "</font>"));//   SYSConst.html_div(resInfo.getContentAsHTML()));
                     cpInfo.setContentPane(new JScrollPane(txt));
                 } else {
                     if (!mapInfo2Editor.containsKey(resInfo)) {
-                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(ResInfoTools.clone(resInfo), GUITools.getColor(resInfo.getResInfoType().getResInfoCat().getColor())));
+                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(ResInfoService.clone(resInfo), GUITools.getColor(resInfo.getResInfoType().getResInfoCat().getColor())));
                     }
                     cpInfo.setContentPane(new JScrollPane(mapInfo2Editor.get(resInfo).getPanel()));
                 }
@@ -1315,8 +1316,8 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
             btnResMovedOut.setEnabled(ResidentTools.isActive(resident));
         }
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            btnResIsAway.setEnabled(ResidentTools.isActive(resident) && !ResInfoTools.isAway(resident));
-            btnResIsBack.setEnabled(ResidentTools.isActive(resident) && ResInfoTools.isAway(resident));
+            btnResIsAway.setEnabled(ResidentTools.isActive(resident) && !ResInfoService.isAway(resident));
+            btnResIsBack.setEnabled(ResidentTools.isActive(resident) && ResInfoService.isAway(resident));
         }
         reloadDisplay();
     }
@@ -1384,11 +1385,11 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
                             html += type.getType() == ResInfoTypeTools.TYPE_FALLRISK ? SYSConst.html_48x48_warning : "";
 
-                            html += ResInfoTools.getResInfosAsHTML(mapType2ResInfos.get(type), true, null);
+                            html += ResInfoService.getResInfosAsHTML(mapType2ResInfos.get(type), true, null);
                         }
                     }
                 }
-                SYSFilesTools.print(html, true);
+                SYSFilesService.print(html, true);
             });
             btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
@@ -1462,7 +1463,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 ResInfo editinfo = em.merge(resInfo);
                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                 em.lock(editinfo, LockModeType.OPTIMISTIC);
-                                ResInfoTools.setTo(editinfo, new Date());
+                                ResInfoService.setTo(editinfo, new Date());
                                 editinfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                                 em.getTransaction().commit();
 
@@ -1618,8 +1619,8 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                 em.lock(editinfo, LockModeType.OPTIMISTIC);
                                 DateTime date = (DateTime) o;
-                                ResInfoTools.setFrom(editinfo, date.toDate());
-                                ResInfoTools.setTo(editinfo, date.toDate());
+                                ResInfoService.setFrom(editinfo, date.toDate());
+                                ResInfoService.setTo(editinfo, date.toDate());
                                 em.getTransaction().commit();
 
                                 synchronized (mapType2ResInfos) {
@@ -1674,7 +1675,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     GUITools.showPopup(popup, SwingConstants.WEST);
                 } else {
                     final JidePopup popup = new JidePopup();
-                    Pair<Date, Date> expansion = ResInfoTools.getMinMaxExpansion(resInfo, mapType2ResInfos.get(resInfo.getResInfoType()));
+                    Pair<Date, Date> expansion = ResInfoService.getMinMaxExpansion(resInfo, mapType2ResInfos.get(resInfo.getResInfoType()));
                     PnlPeriod pnlPeriod = new PnlPeriod(expansion.getFirst(), expansion.getSecond(), resInfo.getFrom(), resInfo.getTo(), o -> {
                         popup.hidePopup();
                         if (o != null) {
@@ -1685,8 +1686,8 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                 em.lock(editinfo, LockModeType.OPTIMISTIC);
                                 Pair<Date, Date> period = (Pair<Date, Date>) o;
-                                ResInfoTools.setFrom(editinfo, period.getFirst());
-                                ResInfoTools.setTo(editinfo, period.getSecond());
+                                ResInfoService.setFrom(editinfo, period.getFirst());
+                                ResInfoService.setTo(editinfo, period.getSecond());
                                 editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
                                 em.getTransaction().commit();
 
@@ -1736,7 +1737,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                 }
 
             });
-            btnChangePeriod.setEnabled((ResInfoTools.isEditable(resInfo) || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY)
+            btnChangePeriod.setEnabled((ResInfoService.isEditable(resInfo) || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY)
                     && (OPDE.isAdmin() ||
                     (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new LocalDate(resInfo.getFrom()).equals(new LocalDate()))  // The same user only on the same day.
             ));
@@ -1979,7 +1980,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            btnProcess.setEnabled(ResInfoService.isEditable(resInfo) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
 
             if (!resInfo.getAttachedQProcessConnections().isEmpty()) {
                 JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedQProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
@@ -2037,15 +2038,15 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
             kzp_endet.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             kzp_endet.setAlignmentX(Component.LEFT_ALIGNMENT);
             kzp_endet.addActionListener(actionEvent -> {
-                if (!ResInfoTools.isKZP(resident)) {
+                if (!ResInfoService.isKZP(resident)) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.notkzp"));
                     return;
                 }
-                if (ResInfoTools.isDead(resident)) {
+                if (ResInfoService.isDead(resident)) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.isdeadnow"));
                     return;
                 }
-                if (ResInfoTools.isGone(resident)) {
+                if (ResInfoService.isGone(resident)) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.resident.movedout"));
                     return;
                 }
@@ -2064,13 +2065,13 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             Bei der alten HAUF wird STAY=ResInfoTypeTools.STAY_VALUE_NOW_PERMANENT gesetzt.
                              */
 
-                            ResInfo bwinfo_kzp_hauf = em.merge(ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY)));
-                            ResInfo bwinfo_hauf_nach_kzp = em.merge(ResInfoTools.createStayResInfo(resident, new Date(), false));
+                            ResInfo bwinfo_kzp_hauf = em.merge(ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY)));
+                            ResInfo bwinfo_hauf_nach_kzp = em.merge(ResInfoService.createStayResInfo(resident, new Date(), false));
 
                             // Bei dem alten den STAY ändern und die Props zurückschreiben
-                            Properties kzp_props = ResInfoTools.getContent(bwinfo_kzp_hauf);
+                            Properties kzp_props = ResInfoService.getContent(bwinfo_kzp_hauf);
                             kzp_props.put(ResInfoTypeTools.STAY_KEY, ResInfoTypeTools.STAY_VALUE_NOW_PERMANENT);
-                            ResInfoTools.setContent(bwinfo_kzp_hauf, kzp_props);
+                            ResInfoService.setContent(bwinfo_kzp_hauf, kzp_props);
                             // und Enden lassen (1 Sekunde VOR dem neuen)
                             bwinfo_kzp_hauf.setTo(new DateTime(bwinfo_hauf_nach_kzp.getFrom()).minusSeconds(1).toDate());
                             bwinfo_kzp_hauf.setUserOFF(OPDE.getLogin().getUser());
@@ -2119,15 +2120,15 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
             resComesback.setAlignmentX(Component.LEFT_ALIGNMENT);
             resComesback.addActionListener(actionEvent -> {
 
-                if (ResInfoTools.isDead(resident)) {
+                if (ResInfoService.isDead(resident)) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.isdeadnow"));
                     return;
                 }
-                if (!ResInfoTools.isGone(resident)) {
+                if (!ResInfoService.isGone(resident)) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.msg.stillhere"));
                     return;
                 }
-                ResInfo last_stay = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+                ResInfo last_stay = ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
                 LocalDate departed = new LocalDate().minusDays(2);
                 if (last_stay != null) {
                     departed = new LocalDate(last_stay.getTo());
@@ -2154,16 +2155,16 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
 
                             Resident myResident = em.merge(resident);
                             myResident.setStation(station);
-                            ResInfo resinfo_stay = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), myResident));
-                            ResInfoTools.setFrom(resinfo_stay, stay);
+                            ResInfo resinfo_stay = em.merge(ResInfoService.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), myResident));
+                            ResInfoService.setFrom(resinfo_stay, stay);
 
                             if (room != null) {
-                                ResInfo resinfo_room = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident));
+                                ResInfo resinfo_room = em.merge(ResInfoService.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident));
                                 Properties props = new Properties();
                                 props.put("room.id", Long.toString(room.getRoomID()));
                                 props.put("room.text", room.toString());
-                                ResInfoTools.setContent(resinfo_room, props);
-                                ResInfoTools.setFrom(resinfo_room, stay);
+                                ResInfoService.setContent(resinfo_room, props);
+                                ResInfoService.setFrom(resinfo_room, stay);
                             }
 
                             em.getTransaction().commit();
@@ -2361,7 +2362,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
              */
             btnResIsAway.addActionListener(actionEvent -> {
                 final JidePopup popup = new JidePopup();
-                PnlAway pnlAway = new PnlAway(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE), resident), o -> {
+                PnlAway pnlAway = new PnlAway(ResInfoService.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE), resident), o -> {
                     popup.hidePopup();
                     if (o != null) {
                         EntityManager em = OPDE.createEM();
@@ -2414,7 +2415,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                 popup.setDefaultFocusComponent(pnlAway);
                 GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
             });
-            btnResIsAway.setEnabled(ResidentTools.isActive(resident) && !ResInfoTools.isAway(resident));
+            btnResIsAway.setEnabled(ResidentTools.isActive(resident) && !ResInfoService.isAway(resident));
             list.add(btnResIsAway);
 
             btnResIsBack = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.info.resident.isback"), SYSConst.icon22residentBack, null);
@@ -2433,9 +2434,9 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     Resident myResident = em.merge(resident);
                     em.lock(myResident, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                    ResInfo lastabsence = em.merge(ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE)));
+                    ResInfo lastabsence = em.merge(ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE)));
                     em.lock(lastabsence, LockModeType.OPTIMISTIC);
-                    ResInfoTools.setTo(lastabsence, new Date());
+                    ResInfoService.setTo(lastabsence, new Date());
                     lastabsence.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                     em.getTransaction().commit();
 
@@ -2467,7 +2468,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     em.close();
                 }
             });
-            btnResIsBack.setEnabled(ResidentTools.isActive(resident) && ResInfoTools.isAway(resident));
+            btnResIsBack.setEnabled(ResidentTools.isActive(resident) && ResInfoService.isAway(resident));
             list.add(btnResIsBack);
 
 

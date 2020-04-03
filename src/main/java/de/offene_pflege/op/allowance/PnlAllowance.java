@@ -33,11 +33,11 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.Allowance;
-import de.offene_pflege.entity.AllowanceTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
+import de.offene_pflege.backend.entity.Allowance;
+import de.offene_pflege.backend.entity.AllowanceTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -299,7 +299,7 @@ public class PnlAllowance extends CleanablePanel {
             btnPrintResident.setContentAreaFilled(false);
             btnPrintResident.setBorder(null);
             btnPrintResident.setToolTipText(SYSTools.xx("admin.residents.cash.btnprintresident.tooltip"));
-            btnPrintResident.addActionListener(actionEvent -> SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, resident), true));
+            btnPrintResident.addActionListener(actionEvent -> SYSFilesService.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, resident), true));
             cptitle.getRight().add(btnPrintResident);
         }
 
@@ -456,7 +456,7 @@ public class PnlAllowance extends CleanablePanel {
             if (!carrySums.containsKey(carry4printKey)) {
                 carrySums.put(carry4printKey, AllowanceTools.getSUM(resident, SYSCalendar.eoy(start.minusYears(1))));
             }
-            SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carrySums.get(carry4printKey), resident), true);
+            SYSFilesService.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carrySums.get(carry4printKey), resident), true);
         });
         cptitle.getRight().add(btnPrintYear);
 
@@ -567,7 +567,7 @@ public class PnlAllowance extends CleanablePanel {
             }
 
             final BigDecimal carry4print = AllowanceTools.getSUM(resident, SYSCalendar.eom(month.minusMonths(1)));
-            SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry4print, resident), true);
+            SYSFilesService.print(AllowanceTools.getAsHTML(cashmap.get(key), carry4print, resident), true);
         });
 
         cptitle.getRight().add(btnPrintMonth);
@@ -715,7 +715,7 @@ public class PnlAllowance extends CleanablePanel {
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
             final JideButton btnPrintStat = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.printstat"), SYSConst.icon22calc, null);
-            btnPrintStat.addActionListener(actionEvent -> SYSFilesTools.print(AllowanceTools.getOverallSumAsHTML(12), false));
+            btnPrintStat.addActionListener(actionEvent -> SYSFilesService.print(AllowanceTools.getOverallSumAsHTML(12), false));
             list.add(btnPrintStat);
         }
         return list;

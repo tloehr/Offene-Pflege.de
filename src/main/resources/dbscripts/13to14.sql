@@ -1584,7 +1584,7 @@ SET t.XML = '  <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier 
 
     <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
               tooltip="bi1.unfaehig.arme.beine"/>'
-WHERE t.BWINFTYP LIKE 'mobil02';
+WHERE t.BWINFTYP = 'mobil02';
 UPDATE resinfotype t
 SET t.XML = ' <qpr tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Zeile: 42"/>
           <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
@@ -1624,7 +1624,92 @@ SET t.XML = ' <qpr tooltip="Sobald diese Information eingetragen wurde, geht das
               <option label="selbständig" name="0" default="true"/>
               <option label="mit Fremdhilfe" name="1"/>
           </optiongroup>'
-WHERE t.BWINFTYP LIKE 'kern01';
+WHERE t.BWINFTYP = 'kern01';
+--
+UPDATE resinfotype t SET t.XML = ' <label size="24" label="Einschätzung durch Pflegekraft" color="blue"/>
+          <qdvs tooltip="Wird bei der Auswertung zur QDVS herangezogen."/>
+
+          <scale name="besd" label="BESD - BEurteilung von Schmerzen bei Demenz" >
+              <scalegroup name="besd1" label="Atmung (unabhängig von Lautäußerungen)">
+                  <option label="normal" name="s0-1" score="0" layout="left" default="true"/>
+                  <option label="gelegentlich angestrengt atmen" name="s1-1" score="1" layout="left"/>
+                  <option label="kurze Phasen von Hyperventilation" tooltip="schnelle und tiefe Atemzu?ge" name="s1-2"
+                          score="1" layout="br"/>
+                  <option label="lautstark angestrengt atmen" name="s2-1" score="2" layout="left"/>
+                  <option label="lange Phasen von Hyperventilation" tooltip="schnelle und tiefe Atemzu?ge" name="s2-2"
+                          score="2" layout="br"/>
+                  <option label="Cheyne Stoke Atmung"
+                          tooltip="tiefer werdende und wieder abflachende Atemzu?ge mit Atempausen" name="s2-3" score="2"
+                          layout="left"/>
+              </scalegroup>
+              <scalegroup name="besd2" label="Negative Lautäußerungen">
+                  <option label="keine" name="s0-1" score="0" layout="left" default="true"/>
+                  <option label="gelegentlich stöhnen oder ächzen" name="s1-1" score="1" layout="left"/>
+                  <option label="sich leise negativ oder missbilligend äußern" name="s1-2" score="1" layout="br"/>
+                  <option label="wiederholt beunruhigt rufen" name="s2-1" score="2" layout="left"/>
+                  <option label="laut stöhnen oder ächzen" name="s2-2" score="2" layout="br"/>
+                  <option label="weinen" name="s2-3" score="2" layout="left"/>
+              </scalegroup>
+              <scalegroup name="besd3" label="Gesichtsausdruck">
+                  <option label="lächelnd oder nichts sagend" name="s0-1" score="0" layout="left" default="true"/>
+                  <option label="trauriger Gesichtsausdruck" name="s1-1" score="1" layout="left"/>
+                  <option label="ängstlicher Gesichtsausdruck" name="s1-2" score="1" layout="br"/>
+                  <option label="sorgenvoller Blick" name="s1-3" score="1" layout="left"/>
+                  <option label="grimassieren" name="s2-1" score="2" layout="left"/>
+              </scalegroup>
+              <scalegroup name="besd4" label="Körpersprache">
+                  <option label="entspannt" name="s0-1" score="0" layout="left" default="true"/>
+                  <option label="angespannte Körperhaltung" name="s1-1" score="1" layout="left"/>
+                  <option label="nervös hin und her gehen" name="s1-2" score="1" layout="br"/>
+                  <option label="nesteln" name="s1-3" score="1" layout="left"/>
+                  <option label="Körpersprache starr" name="s2-1" score="2" layout="left"/>
+                  <option label="geballte Fäuste" name="s2-2" score="2" layout="left"/>
+                  <option label="angezogene Knie" name="s2-3" score="2" layout="br"/>
+                  <option label="sich entziehen oder wegstoßen" name="s2-4" score="2" layout="left"/>
+                  <option label="schlagen" name="s2-5" score="2" layout="left"/>
+              </scalegroup>
+              <scalegroup name="besd5" label="Trost">
+                  <option label="trösten nicht notwendig" name="s0-1" score="0" layout="left" default="true"/>
+                  <option label="Ablenken durch Stimme oder Berührung ist möglich" name="s1-1" score="1" layout="left"/>
+                  <option label="Ablenken durch Stimme oder Berührung ist nicht möglich" name="s2-1" score="2" layout="br"/>
+              </scalegroup>
+              <risk from="0" to="1" label="Wahrscheinlich keine Schmerzen" color="dark_green" rating="0"/>
+              <risk from="2" to="10" label="BW hat wahrscheinlich Schmerzen" color="dark_red" rating="1"/>
+          </scale>
+
+          <label size="24" label="Situationsbeurteilung" color="blue"/>
+
+          <checkbox name="schmerzfrei" label="Schmerzfrei durch Medikamente" layout="br left" depends-on="schmerzint"
+                    size="14"/>
+          <label
+                  label="Akutschmerz i.d.R. weniger als 3 Monate, Chronischer Schmerz zwischen 6 Wochen und 3 Monaten, oder länger"
+                  size="14" fontstyle="bold"/>
+
+          <combobox label="Schmerztyp" name="schmerztyp" tooltip="[h1]Akuter Schmerz, „sinnvoller Schmerz“[/h1]
+            [p]
+            Der akute Schmerz gilt als Alarmzeichen des Körpers. Schon die alten Griechen nannten den Schmerz den „bellenden Wächter der Gesundheit“ (Hypokrates).
+            Der akute Schmerz macht uns aufmerksam, dass etwas nicht stimmt und ist zeitlich begrenzt. Ist die Ursache behoben verschwindet der Schmerz meistens wieder. Wenn wir wissen warum wir Schmerzen haben (z.B. den Fuss verstaucht), können wir den Schmerz auch eher akzeptieren. Hier spielt die individuelle Wahrnehmung und das Erlernte „umgehen mit dem Schmerz“ eine wichtige Rolle.
+            [/p]
+            [p]
+            Akuter Schmerz ist ein plötzlich auftretender und nur kurze Zeit andauern der Schmerz. Er wird als existentielle Erfahrung wahrgenommen, die eine lebenserhaltende Alarm- und Schutzfunktion einnimmt. Akuter Schmerz steht in einem offensichtlichen und direkten Zusammenhang mit einer Gewebe oder Organschädigung, also einer körperlichen Ursache. Nonverbale und verbale Signale, die wir im akuten Schmerz aussenden, verursachen unwillku?rlich Empathie und das Bedu?ürfnis fu?r Abhilfe zu sorgen. Akuter Schmerz geht mit physiologischen Begleiterscheinungen einher, wie einem Anstieg des Blutdrucks, des Pulses, Schweißausbru?chen und Anstieg der Atemfrequenz. Insbesondere diese Begleiterscheinungen, die in der akuten Versorgungssituation unmittelbar erkennbar sind, zeigt der Mensch mit ausschließlich chronischen Schmerzen nicht.
+            [/p]
+
+            [h1]Chronischer Schmerz, „sinnloser Schmerz“[/h1]
+            [p]
+            Der chronische Schmerz hat an sich keine Warnfunktion mehr. Seine Ursache ist nicht (mehr) ausschaltbar, er nimmt dem Menschen sinnlos die Kraft weg und zehrt allmählich seinen Lebensmut auf. Wenn die Tage zur Qual werden, erschöpft sich die Tragfähigkeit, der Leidende wünscht nur mehr ein Ende herbei, unter Umständen sogar um den Preis seines Lebens, denn es genügt nicht nur am Leben zu sein, man muss auch sein Leben haben.
+            Der chronische Schmerz kann zur eigenständigen Schmerzkrankheit werden, der alle Ebenen des Menschseins beeinflusst und beeinträchtigt. Man spricht dann von „total pain“. Dieser Schmerz ist oft losgelöst von der ursprünglichen Krankheit. Gerade wenn die Ursache unbekannt ist, kann die Chronifizierung schnell eintreten.
+            [/p]
+            [p]
+            Der Übergang zwischen akutem und chronischem Schmerz verläuft kontinuierlich. Gleichwohl werden verschiedene Zeiträume angenommen, ab wann ein Schmerz als chronischer, oder anhaltender Schmerz zu betrachten ist. Je nach Lokalisation des Schmerzes wird hierbei von mehr als 6 Wochen bis hin zu 3 Monaten ausgegangen. In erster Linie wird die Entstehung des chronischen Schmerzes durch drei grundlegende Elemente beschrieben:
+            [/p]
+            [ul]
+            [li]Es handelt sich um einen Entstehungsprozess, der durch ein Zusammenwirken von krankheitsbedingten und psychosozialen Prozessen gekennzeichnet ist.[/li]
+            [li]Chronischer Schmerz ist Schmerz, der u?ber einen Punkt, an dem die Heilung abgeschlossen sein sollte hinaus, anhält oder weiter auftritt. Chronischer Schmerz kann häufig nicht (mehr) mit einem Gewebeschaden oder einer Verletzung in Verbindung gebracht werden.[/li]
+            [li]Der Chronifizierung akuter Schmerzen kann durch angemessene Therapie des akuten Schmerzes entgegengewirkt werden. Eine fru?hzeitige Linderung von akutem Schmerz kann eine Entwicklung von chronischen Schmerzen verhindern. Bestimmte operative Verfahren, z. B. Amputationen, Mastektomien oder Thorakotomien bewirken häufig chronische Schmerzen.[/li]
+            [/ul]" depends-on="schmerzint" visible-when-dependency-neq="0" default-value-when-shown="0">
+              <item label="akute Schmerzen" name="0"/>
+              <item label="chronische Schmerzen" name="1"/>
+          </combobox>' WHERE t.BWINFTYP = 'besd2';
 --
 alter table `groups`
     change `System` sysflag tinyint(1) default 0 not null;
@@ -1644,9 +1729,115 @@ alter table bhp
 alter table dfn
     drop column Dauer;
 --
-alter table Resvaluetypes
+alter table resvaluetypes
     add active bool default true not null,
     add version  bigint(20) not null;
-UPDATE Resvaluetypes t
+UPDATE resvaluetypes t
 SET t.active = 0
 WHERE t.ID = 14
+--
+alter table floors
+  change floorid id bigint unsigned auto_increment;
+alter table handover2user
+  change PKID id bigint unsigned auto_increment;
+alter table rooms
+  change RID id bigint unsigned auto_increment;
+alter table handovers
+  change HID id bigint unsigned auto_increment;
+alter table hinsurance
+  change KassID id bigint unsigned auto_increment;
+alter table icd
+  change icdid id bigint unsigned auto_increment;
+alter table lcustodian
+  change BetrID id bigint unsigned auto_increment;
+alter table resinfo
+  change BWINFOID id bigint unsigned auto_increment;
+alter table resinfocategory
+  change BWIKID id bigint unsigned auto_increment;
+alter table resinfotype
+  change BWINFTYP id CHAR(10) NOT NULL;
+alter table opusers
+  change UKennung id CHAR(10) NOT NULL;
+alter table opgroups
+  change GKennung id CHAR(20) NOT NULL;
+alter table member change OCMID id bigint unsigned auto_increment;
+ALTER TABLE handover2user
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER PIT;
+ALTER TABLE lcustodian
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER Status;
+ALTER TABLE icd
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER Text;
+alter table station modify EID char(10) not null;
+alter table floors modify homeid char(10) not null;
+alter table dfn
+  change DFNID id bigint unsigned auto_increment;
+alter table intervention
+  change MassID id bigint unsigned auto_increment;
+alter table ischedule
+  change TermID id bigint unsigned auto_increment;
+alter table npcontrol
+  change PKonID id bigint unsigned auto_increment;
+alter table nursingprocess
+  change PlanID id bigint unsigned auto_increment;
+ALTER TABLE npcontrol
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER PlanID;
+alter table nr2user
+  change PKID id bigint unsigned auto_increment;
+ALTER TABLE nr2user
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER PIT;
+alter table nreports
+  change PBID id bigint unsigned auto_increment;
+alter table acme
+  change MPHID id bigint unsigned auto_increment,
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER WWW;
+alter table bhp
+  change BHPID id bigint unsigned auto_increment;
+alter table dosageform
+  change FormID id bigint unsigned auto_increment;
+alter table gp
+  change ArztID id bigint unsigned auto_increment;
+alter table hospital
+  change KHID id bigint unsigned auto_increment;
+alter table medinventory
+  change VorID id bigint unsigned auto_increment;
+alter table medpackage
+  change MPID id bigint unsigned auto_increment;
+alter table medproducts
+  change medpid id bigint unsigned auto_increment;
+alter table medstock
+  change BestID id bigint unsigned auto_increment;
+alter table medstocktx
+  change BuchID id bigint unsigned auto_increment;
+alter table prescription
+  change VerID id bigint unsigned auto_increment;
+alter table pschedule
+  change BHPPID id bigint unsigned auto_increment;
+alter table situations
+  change SitID id bigint unsigned auto_increment,
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER UKategorie;
+alter table tradeform
+  change DafID id bigint unsigned auto_increment;
+alter table pcat
+  change VKatID id bigint unsigned auto_increment,
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER Art;
+alter table preport
+  change VBID id bigint unsigned auto_increment,
+  ADD COLUMN version BIGINT(20) UNSIGNED DEFAULT 0 NOT NULL AFTER UKennung;
+alter table qprocess
+  change VorgangID id bigint unsigned auto_increment,
+  drop column pdca;
+alter table resvalue
+  change BWID id bigint unsigned auto_increment;
+alter table uniqueid
+  change UNIQID id bigint unsigned auto_increment;
+alter table sysfiles change OCFID id bigint unsigned auto_increment;
+alter table opde.sysinf2file change ID id bigint unsigned auto_increment;
+alter table opde.sysnr2file change ID id bigint unsigned auto_increment;
+alter table opde.sysnp2file change ID id bigint unsigned auto_increment;
+alter table opde.syspre2file change ID id bigint unsigned auto_increment;
+alter table opde.sysval2file change ID id bigint unsigned auto_increment;
+drop table training;
+drop table training2file;
+drop table training2tags;
+drop table training2users;
+drop table trainatt2file;

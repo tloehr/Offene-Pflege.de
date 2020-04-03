@@ -6,8 +6,12 @@ package de.offene_pflege.op.allowance;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.Allowance;
-import de.offene_pflege.entity.info.*;
+import de.offene_pflege.backend.entity.Allowance;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.info.*;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.services.ResInfoTypeTools;
+import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSCalendar;
@@ -99,7 +103,7 @@ public class PnlTX extends JPanel {
 
     private void cmbResidentItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            ResInfo firstStay = ResInfoTools.getFirstResinfo((Resident) e.getItem(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+            ResInfo firstStay = ResInfoService.getFirstResinfo((Resident) e.getItem(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
             min = firstStay == null ? new LocalDate().dayOfMonth().withMinimumValue() : new LocalDate(firstStay.getFrom());
             txtDate.setText(new LocalDate().toString("dd.MM.yyyy"));
         }
@@ -214,12 +218,12 @@ public class PnlTX extends JPanel {
         ResInfo firstStay = null;
         if (tx.getResident() != null) {
             cmbResident.setModel(new DefaultComboBoxModel<Resident>(new Resident[]{tx.getResident()}));
-            firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+            firstStay = ResInfoService.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         } else {
             ArrayList<Resident> list = ResidentTools.getAllActive();
             cmbResident.setModel(SYSTools.list2cmb(list));
             if (!list.isEmpty()) {
-                firstStay = ResInfoTools.getFirstResinfo(list.get(0), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+                firstStay = ResInfoService.getFirstResinfo(list.get(0), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
             }
         }
 

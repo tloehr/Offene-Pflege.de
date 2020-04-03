@@ -9,13 +9,14 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.combobox.DateExComboBox;
 import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.*;
-import de.offene_pflege.entity.nursingprocess.NursingProcess;
-import de.offene_pflege.entity.nursingprocess.NursingProcessTools;
-import de.offene_pflege.entity.prescription.*;
-import de.offene_pflege.entity.reports.NReportTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.*;
+import de.offene_pflege.backend.entity.info.*;
+import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.nursingprocess.NursingProcessTools;
+import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.entity.reports.NReportTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.op.OPDE;
@@ -394,7 +395,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
 
                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                     em.lock(oldinfo, LockModeType.OPTIMISTIC);
-                    ResInfoTools.setTo(oldinfo, new Date());
+                    ResInfoService.setTo(oldinfo, new Date());
                     oldinfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
 
                     Properties content = new Properties();
@@ -412,9 +413,9 @@ public class PnlDev extends CleanablePanel implements HasLogger {
                     content.setProperty("requested", "false");
                     content.setProperty("grade", result);
 
-                    ResInfo newInfo = em.merge(ResInfoTools.createResInfo(ninsurance, resident));
+                    ResInfo newInfo = em.merge(ResInfoService.createResInfo(ninsurance, resident));
                     newInfo.setText(oldinfo.getText());
-                    ResInfoTools.setContent(newInfo, content);
+                    ResInfoService.setContent(newInfo, content);
 //                    newInfo.setHtml(ResInfoTools.getContentAsHTML(newInfo));
 
 //                    OPDE.debug(newInfo.getResident().toString());
@@ -452,8 +453,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         resident = EntityTools.find(Resident.class, txtResSearch.getText().trim());
         if (resident == null) return;
 
-        ResInfo stay1 = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
-        ResInfo stay2 = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        ResInfo stay1 = ResInfoService.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        ResInfo stay2 = ResInfoService.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
 
         lblResname.setText(ResidentTools.getLabelText(resident));
         dcFrom.setDate(stay1.getFrom());
@@ -476,7 +477,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         for (ResInfoCategory cat : ResInfoCategoryTools.getAll()) {
 
 
-            ArrayList<ResInfo> listInfos = ResInfoTools.getAll(resident, cat, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
+            ArrayList<ResInfo> listInfos = ResInfoService.getAll(resident, cat, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
             if (!listInfos.isEmpty()) {
                 html.append("<h2 id=\"fonth2\"><b>Pflegemodellkategorie:</b> " + cat.getText() + "</h2>\n");
 //            for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
@@ -491,7 +492,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
 //                html.append(type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "");
 //                html.append(type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "");
 
-                html.append(ResInfoTools.getResInfosAsHTML(listInfos, true, null));
+                html.append(ResInfoService.getResInfosAsHTML(listInfos, true, null));
             }
         }
 
@@ -519,7 +520,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         html.append(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate())), false, null, null));
 
 
-        File f = SYSFilesTools.print(html.toString(), true, false);
+        File f = SYSFilesService.print(html.toString(), true, false);
         try {
             FileUtils.copyFileToDirectory(f, new File(System.getProperty("user.home")));
         } catch (IOException e1) {
@@ -554,7 +555,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
 
                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                     em.lock(oldinfo, LockModeType.OPTIMISTIC);
-                    ResInfoTools.setTo(oldinfo, new Date());
+                    ResInfoService.setTo(oldinfo, new Date());
                     oldinfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
 
                     Properties content = new Properties();
@@ -570,9 +571,9 @@ public class PnlDev extends CleanablePanel implements HasLogger {
                     content.setProperty("GAINTERAKTION", "0");
                     content.setProperty("GAKONTAKTPFLEGE", "0");
 
-                    ResInfo newInfo = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_SOZIALES), resident));
+                    ResInfo newInfo = em.merge(ResInfoService.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_SOZIALES), resident));
                     newInfo.setText(oldinfo.getText());
-                    ResInfoTools.setContent(newInfo, content);
+                    ResInfoService.setContent(newInfo, content);
 //                    newInfo.setHtml(ResInfoTools.getContentAsHTML(newInfo));
 
                 }
@@ -605,9 +606,9 @@ public class PnlDev extends CleanablePanel implements HasLogger {
     }
 
     private void button5ActionPerformed(ActionEvent e) {
-        Optional<ResInfo> resInfo = ResInfoTools.findByID(Long.parseLong(txtResInfoID.getText().trim()));
+        Optional<ResInfo> resInfo = ResInfoService.findByID(Long.parseLong(txtResInfoID.getText().trim()));
         resInfo.ifPresent(resInfo1 -> {
-            textArea2.setText(ResInfoTools.getContentAsHTML(resInfo1));
+            textArea2.setText(ResInfoService.getContentAsHTML(resInfo1));
         });
 
     }
@@ -617,9 +618,9 @@ public class PnlDev extends CleanablePanel implements HasLogger {
     }
 
     private void button6ActionPerformed(ActionEvent e) {
-        Optional<ResInfo> resInfo = ResInfoTools.findByID(Long.parseLong(txtResInfoID.getText().trim()));
+        Optional<ResInfo> resInfo = ResInfoService.findByID(Long.parseLong(txtResInfoID.getText().trim()));
         resInfo.ifPresent(resInfo1 -> {
-            textArea2.setText(ResInfoTools.getContentAsPlainText(resInfo1));
+            textArea2.setText(ResInfoService.getContentAsPlainText(resInfo1));
         });
     }
 

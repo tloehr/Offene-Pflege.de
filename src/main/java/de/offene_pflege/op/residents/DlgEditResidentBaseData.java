@@ -7,14 +7,14 @@ package de.offene_pflege.op.residents;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.building.StationTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.prescription.GP;
-import de.offene_pflege.entity.prescription.GPTools;
-import de.offene_pflege.entity.system.OPUsers;
-import de.offene_pflege.entity.system.UsersTools;
+import de.offene_pflege.backend.entity.done.Station;
+import de.offene_pflege.backend.services.StationService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.prescription.GP;
+import de.offene_pflege.backend.entity.prescription.GPTools;
+import de.offene_pflege.backend.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.UsersTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -81,7 +81,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         cmbGP.setRenderer(GPTools.getRenderer());
         cmbGP.setSelectedItem(resident.getGp());
 
-        cmbStation.setModel(StationTools.getAll4Combobox(false));
+        cmbStation.setModel(StationService.getAll4Combobox(false));
         cmbStation.setRenderer(SYSTools.getDefaultRenderer());
         cmbStation.setSelectedItem(resident.getStation());
 //        cmbStation.addItemListener(new ItemListener() {

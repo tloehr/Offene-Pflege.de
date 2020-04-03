@@ -34,14 +34,14 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.nursingprocess.DFN;
-import de.offene_pflege.entity.nursingprocess.DFNTools;
-import de.offene_pflege.entity.nursingprocess.Intervention;
-import de.offene_pflege.entity.nursingprocess.NursingProcessTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.nursingprocess.DFN;
+import de.offene_pflege.backend.entity.nursingprocess.DFNTools;
+import de.offene_pflege.backend.entity.nursingprocess.Intervention;
+import de.offene_pflege.backend.entity.nursingprocess.NursingProcessTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -783,81 +783,6 @@ public class PnlDFN extends NursingRecordsPanel {
             btnEmpty.setEnabled(!dfn.isOpen());
             cptitle.getRight().add(btnEmpty);
 
-
-            /***
-             *      _     _         __  __ _             _
-             *     | |__ | |_ _ __ |  \/  (_)_ __  _   _| |_ ___  ___
-             *     | '_ \| __| '_ \| |\/| | | '_ \| | | | __/ _ \/ __|
-             *     | |_) | |_| | | | |  | | | | | | |_| | ||  __/\__ \
-             *     |_.__/ \__|_| |_|_|  |_|_|_| |_|\__,_|\__\___||___/
-             *
-             */
-            final JButton btnMinutes = new JButton(SYSConst.icon22clock);
-            btnMinutes.setPressedIcon(SYSConst.icon22clockPressed);
-            btnMinutes.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnMinutes.setContentAreaFilled(false);
-            btnMinutes.setBorder(null);
-//            btnCancel.setToolTipText(SYSTools.xx("nursingrecords.dfn.btneval.tooltip"));
-            btnMinutes.addActionListener(actionEvent -> {
-                if (!DFNTools.isChangeable(dfn)) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.dfn.notchangeable")));
-                    return;
-                }
-                final JPopupMenu menu = SYSCalendar.getMinutesMenu(new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360}, o -> {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-
-                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                        DFN myDFN = em.merge(dfn);
-                        em.lock(myDFN, LockModeType.OPTIMISTIC);
-                        if (!myDFN.isOnDemand()) {
-                            em.lock(myDFN.getNursingProcess(), LockModeType.OPTIMISTIC);
-                        }
-
-                        myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
-                        myDFN.setMdate(new Date());
-                        em.getTransaction().commit();
-
-                        CollapsiblePane cp1 = createCP4(myDFN);
-                        synchronized (mapDFN2Pane) {
-                            mapDFN2Pane.put(myDFN, cp1);
-                        }
-                        synchronized (mapShift2DFN) {
-                            int position = mapShift2DFN.get(myDFN.getShift()).indexOf(myDFN);
-                            mapShift2DFN.get(myDFN.getShift()).remove(position);
-                            mapShift2DFN.get(myDFN.getShift()).add(position, myDFN);
-                        }
-                        CollapsiblePane cp2 = createCP4(myDFN.getShift());
-                        synchronized (mapShift2Pane) {
-                            mapShift2Pane.put(myDFN.getShift(), cp2);
-                        }
-
-                        buildPanel(false);
-                    } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception e) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(e);
-                    } finally {
-                        em.close();
-                    }
-                });
-
-                menu.show(btnMinutes, 0, btnMinutes.getHeight());
-            });
-            btnMinutes.setEnabled(dfn.getState() != DFNTools.STATE_OPEN);
-            cptitle.getRight().add(btnMinutes);
         }
 
         /***
@@ -1143,7 +1068,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 }
             }
 
-            SYSFilesTools.print(html, true);
+            SYSFilesService.print(html, true);
         });
         list.add(printPrescription);
         return list;

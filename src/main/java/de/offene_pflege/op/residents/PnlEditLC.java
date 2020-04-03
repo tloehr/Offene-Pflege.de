@@ -6,7 +6,7 @@ package de.offene_pflege.op.residents;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.info.LCustodian;
+import de.offene_pflege.backend.entity.done.LCustodian;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.tools.PopupPanel;
 import de.offene_pflege.op.tools.SYSTools;

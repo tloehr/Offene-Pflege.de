@@ -1,6 +1,6 @@
 package de.offene_pflege.op.system;
 
-import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.OPUsers;
 
 import javax.mail.internet.InternetAddress;
 import java.io.UnsupportedEncodingException;

@@ -1,6 +1,6 @@
 package de.offene_pflege.op.settings;
 
-import de.offene_pflege.entity.info.ICD;
+import de.offene_pflege.backend.entity.done.ICD;
 import de.offene_pflege.op.OPDE;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

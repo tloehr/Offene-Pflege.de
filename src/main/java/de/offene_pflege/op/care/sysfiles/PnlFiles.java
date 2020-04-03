@@ -29,11 +29,11 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFiles;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.done.SYSFiles;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
@@ -313,7 +313,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
             // SELECT
             JMenuItem itemPopupShow = new JMenuItem(SYSTools.xx("misc.commands.show"), SYSConst.icon22magnify1);
-            itemPopupShow.addActionListener(evt12 -> SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN));
+            itemPopupShow.addActionListener(evt12 -> SYSFilesService.handleFile(sysfile, Desktop.Action.OPEN));
             menu.add(itemPopupShow);
 
 
@@ -382,7 +382,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
                         currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + sysfile.getFilename() + "</b><br/>" + SYSTools.xx("misc.questions.delete2"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), o -> {
                             if (o.equals(JOptionPane.YES_OPTION)) {
-                                SYSFilesTools.deleteFile(sysfile);
+                                SYSFilesService.deleteFile(sysfile);
                                 reloadTable();
                             }
                             currentEditor = null;
@@ -396,7 +396,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         } else if (evt.getClickCount() == 2) {
-            SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN);
+            SYSFilesService.handleFile(sysfile, Desktop.Action.OPEN);
         }
 
 
@@ -447,7 +447,7 @@ public class PnlFiles extends NursingRecordsPanel {
         // Das hier bleibt bewusst auch bei archivierten BWs offen.
         // Es kann ja sein, dass man hinterher noch was hinzufügen muss.
         mypanel.add(GUITools.getDropPanel(files -> {
-            java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, resident);
+            java.util.List<SYSFiles> successful = SYSFilesService.putFiles(files, resident);
             if (!successful.isEmpty()) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
             }

@@ -29,10 +29,10 @@ package de.offene_pflege.op.care.med.structure;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.prescription.DosageForm;
-import de.offene_pflege.entity.prescription.DosageFormTools;
-import de.offene_pflege.entity.prescription.TradeForm;
-import de.offene_pflege.entity.prescription.TradeFormTools;
+import de.offene_pflege.backend.entity.prescription.DosageForm;
+import de.offene_pflege.backend.entity.prescription.DosageFormTools;
+import de.offene_pflege.backend.entity.prescription.TradeForm;
+import de.offene_pflege.backend.entity.prescription.TradeFormTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;

@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * This is only for GUI control. No JPA affection.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 public @interface NotRemovableUnlessEmpty {
     String message() default "msg.cantberemoved.collection.not.empty";
     // only for Target ElementType.TYPE

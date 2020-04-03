@@ -1,7 +1,7 @@
 package de.offene_pflege.op.users;
 
-import de.offene_pflege.entity.system.OPGroups;
-import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.OPGroups;
+import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.SYSConst;

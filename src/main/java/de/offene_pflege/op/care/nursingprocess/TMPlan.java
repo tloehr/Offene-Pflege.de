@@ -31,9 +31,9 @@ package de.offene_pflege.op.care.nursingprocess;
  * @author tloehr
  */
 
-import de.offene_pflege.entity.nursingprocess.InterventionSchedule;
-import de.offene_pflege.entity.nursingprocess.InterventionScheduleTools;
-import de.offene_pflege.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.nursingprocess.InterventionSchedule;
+import de.offene_pflege.backend.entity.nursingprocess.InterventionScheduleTools;
+import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 

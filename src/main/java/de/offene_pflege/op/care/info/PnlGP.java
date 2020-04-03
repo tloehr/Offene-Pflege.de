@@ -5,8 +5,8 @@
 package de.offene_pflege.op.care.info;
 
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.entity.prescription.GP;
-import de.offene_pflege.entity.prescription.GPTools;
+import de.offene_pflege.backend.entity.prescription.GP;
+import de.offene_pflege.backend.entity.prescription.GPTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditGP;

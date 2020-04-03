@@ -1,0 +1,70 @@
+package de.offene_pflege.backend.services;
+
+import de.offene_pflege.backend.entity.done.LCustodian;
+import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.SYSTools;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.swing.*;
+import java.util.ArrayList;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: tloehr
+ * Date: 11.07.12
+ * Time: 13:53
+ * To change this template use File | Settings | File Templates.
+ */
+public class LCustodianService {
+
+    public static LCustodian create(){
+        LCustodian lCustodian = new LCustodian();
+        lCustodian.setAnrede("");
+        lCustodian.setName("");
+        lCustodian.setVorname("");
+        lCustodian.setStrasse("");
+        lCustodian.setPlz("");
+        lCustodian.setOrt("");
+        lCustodian.setTel("");
+        lCustodian.setPrivat("");
+        lCustodian.setFax("");
+        lCustodian.seteMail("");
+        lCustodian.setMobil("");
+        lCustodian.setStatus(0);
+        return lCustodian;
+    }
+
+    public static ListCellRenderer getRenderer() {
+        return (jList, o, i, isSelected, cellHasFocus) -> {
+            String text;
+            if (o == null) {
+                text = SYSTools.xx("misc.commands.>>noselection<<");
+            } else if (o instanceof LCustodian) {
+//                    text = ((LCustodian) o).getName() + ", " + ((LCustodian) o).getFirstname() + ", " + ((LCustodian) o).getCity();
+                text = getFullName((LCustodian) o);
+            } else {
+                text = o.toString();
+            }
+            return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+        };
+    }
+
+    public static String getFullName(LCustodian lcustodian) {
+        if (lcustodian != null) {
+            return SYSTools.anonymizeString(lcustodian.getAnrede() + " " + lcustodian.getVorname() + " " + lcustodian.getName());
+        } else {
+            return SYSTools.xx("misc.msg.noentryyet");
+        }
+    }
+
+    public static ArrayList<LCustodian> getAllActive() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname");
+        ArrayList<LCustodian> listLC = new ArrayList<LCustodian>(query.getResultList());
+        em.close();
+
+        return listLC;
+    }
+
+}

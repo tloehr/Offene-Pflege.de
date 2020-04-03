@@ -6,10 +6,10 @@ package de.offene_pflege.op.care.reports;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.info.ResInfo;
-import de.offene_pflege.entity.info.ResInfoTools;
-import de.offene_pflege.entity.info.ResInfoTypeTools;
-import de.offene_pflege.entity.reports.NReport;
+import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.services.ResInfoTypeTools;
+import de.offene_pflege.backend.entity.reports.NReport;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.MyJDialog;
@@ -47,7 +47,7 @@ public class DlgReport extends MyJDialog {
 
     private void initDialog() {
 
-        ResInfo firstStay = ResInfoTools.getFirstResinfo(nReport.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        ResInfo firstStay = ResInfoService.getFirstResinfo(nReport.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         pnlPIT = new PnlPIT(nReport.getPit(), new Date(), firstStay == null ? new Date() : firstStay.getFrom());
         add(pnlPIT, CC.xyw(2, 2, 3));
 

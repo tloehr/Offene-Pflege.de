@@ -6,8 +6,8 @@ package de.offene_pflege.op.settings.subpanels;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.prescription.MedStock;
-import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.prescription.MedStock;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.LogicalPrinter;

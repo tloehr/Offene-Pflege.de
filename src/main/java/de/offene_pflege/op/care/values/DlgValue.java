@@ -7,7 +7,7 @@ package de.offene_pflege.op.care.values;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
-import de.offene_pflege.entity.values.ResValue;
+import de.offene_pflege.backend.entity.values.ResValue;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.PnlPIT;
 import de.offene_pflege.op.tools.SYSTools;

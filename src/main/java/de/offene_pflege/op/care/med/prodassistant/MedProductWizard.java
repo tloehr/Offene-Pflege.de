@@ -5,7 +5,7 @@ import com.jidesoft.dialog.ButtonNames;
 import com.jidesoft.dialog.PageEvent;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.*;
-import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;

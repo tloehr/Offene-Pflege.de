@@ -8,12 +8,12 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideTabbedPane;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.info.ResInfo;
-import de.offene_pflege.entity.info.ResInfoTools;
-import de.offene_pflege.entity.info.ResInfoTypeTools;
-import de.offene_pflege.entity.prescription.Hospital;
-import de.offene_pflege.entity.prescription.HospitalTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.services.ResInfoTypeTools;
+import de.offene_pflege.backend.entity.prescription.Hospital;
+import de.offene_pflege.backend.entity.prescription.HospitalTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditHospital;
@@ -73,7 +73,7 @@ public class PnlAway extends JPanel {
         lblHolliday.setText(SYSTools.xx("misc.msg.pleaseenterdescription"));
         lblOther.setText(SYSTools.xx("misc.msg.pleaseenterdescription"));
 
-        props = ResInfoTools.getContent(abwesenheit);
+        props = ResInfoService.getContent(abwesenheit);
 
         if (props.containsKey("type")) {
             if (props.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL)) {
@@ -166,8 +166,8 @@ public class PnlAway extends JPanel {
             OPDE.fatal(ex);
         }
 
-        ResInfoTools.setFrom(abwesenheit, new Date());
-        ResInfoTools.setTo(abwesenheit, SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        ResInfoService.setFrom(abwesenheit, new Date());
+        ResInfoService.setTo(abwesenheit, SYSConst.DATE_UNTIL_FURTHER_NOTICE);
 
         actionBlock.execute(abwesenheit);
     }

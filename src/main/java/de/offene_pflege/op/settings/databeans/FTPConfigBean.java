@@ -1,6 +1,6 @@
 package de.offene_pflege.op.settings.databeans;
 
-import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.interfaces.EditorComponent;
 import de.offene_pflege.op.tools.SYSTools;
 

@@ -6,10 +6,10 @@ package de.offene_pflege.op.care.nursingprocess;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.info.ResInfoCategory;
-import de.offene_pflege.entity.info.ResInfoCategoryTools;
-import de.offene_pflege.entity.nursingprocess.Intervention;
-import de.offene_pflege.entity.nursingprocess.InterventionTools;
+import de.offene_pflege.backend.entity.info.ResInfoCategory;
+import de.offene_pflege.backend.services.ResInfoCategoryTools;
+import de.offene_pflege.backend.entity.nursingprocess.Intervention;
+import de.offene_pflege.backend.entity.nursingprocess.InterventionTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;

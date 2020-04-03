@@ -4,7 +4,7 @@
 
 package de.offene_pflege.op.settings.subpanels;
 
-import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.PnlBeanEditor;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.gui.interfaces.YesNoToggleButton;

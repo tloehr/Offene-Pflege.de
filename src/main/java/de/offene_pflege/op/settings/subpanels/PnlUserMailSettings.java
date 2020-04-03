@@ -1,9 +1,9 @@
 package de.offene_pflege.op.settings.subpanels;
 
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.system.SYSPropsTools;
-import de.offene_pflege.entity.system.OPUsers;
-import de.offene_pflege.entity.system.UsersTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.UsersTools;
 import de.offene_pflege.gui.PnlBeanEditor;
 import de.offene_pflege.gui.events.RelaxedDocumentListener;
 import de.offene_pflege.gui.interfaces.BoundedTextField;

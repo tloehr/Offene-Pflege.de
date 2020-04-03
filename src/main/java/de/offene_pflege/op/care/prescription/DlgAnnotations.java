@@ -6,12 +6,12 @@ package de.offene_pflege.op.care.prescription;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.info.ResInfo;
-import de.offene_pflege.entity.info.ResInfoTools;
-import de.offene_pflege.entity.info.ResInfoTypeTools;
-import de.offene_pflege.entity.prescription.Prescription;
-import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.CommontagsTools;
+import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.services.ResInfoTypeTools;
+import de.offene_pflege.backend.entity.prescription.Prescription;
+import de.offene_pflege.backend.entity.system.Commontags;
+import de.offene_pflege.backend.entity.system.CommontagsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.info.PnlEditResInfo;
 import de.offene_pflege.op.tools.MyJDialog;
@@ -77,9 +77,9 @@ public class DlgAnnotations extends MyJDialog {
         if (!CommontagsTools.isAnnotationNecessary(tag)) return;
 
         int mode = PnlEditResInfo.EDIT;
-        ResInfo annotation = ResInfoTools.getAnnotation4Prescription(prescription, tag);
+        ResInfo annotation = ResInfoService.getAnnotation4Prescription(prescription, tag);
         if (annotation == null) {
-            annotation = ResInfoTools.createResInfo(ResInfoTypeTools.getResInfoType4Annotation(tag), prescription.getResident());
+            annotation = ResInfoService.createResInfo(ResInfoTypeTools.getResInfoType4Annotation(tag), prescription.getResident());
             annotation.setPrescription(prescription);
             mode = PnlEditResInfo.NEW;
         }

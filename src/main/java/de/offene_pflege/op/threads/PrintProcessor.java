@@ -1,8 +1,8 @@
 package de.offene_pflege.op.threads;
 
-import de.offene_pflege.entity.prescription.MedStock;
-import de.offene_pflege.entity.prescription.MedStockTools;
-import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.prescription.MedStock;
+import de.offene_pflege.backend.entity.prescription.MedStockTools;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.LogicalPrinter;
 import de.offene_pflege.op.system.PrinterForm;

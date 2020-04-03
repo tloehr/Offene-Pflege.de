@@ -7,9 +7,9 @@ import com.jidesoft.wizard.AbstractWizardPage;
 import com.jidesoft.wizard.CompletionWizardPage;
 import com.jidesoft.wizard.DefaultWizardPage;
 import com.jidesoft.wizard.WizardDialog;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.events.RelaxedDocumentListener;
 import de.offene_pflege.gui.interfaces.YesNoToggleButton;
@@ -153,7 +153,7 @@ public class InitWizard extends WizardDialog {
                 OPDE.getLocalProps().putAll(jdbcProps);
                 OPDE.saveLocalProps();
                 if (!creationResultPage.isEmpty())
-                    SYSFilesTools.print(creationResultPage, true);
+                    SYSFilesService.print(creationResultPage, true);
                 dispose();
             }
         });

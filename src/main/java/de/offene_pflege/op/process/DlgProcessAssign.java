@@ -6,7 +6,7 @@ package de.offene_pflege.op.process;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.process.*;
+import de.offene_pflege.backend.entity.process.*;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSTools;

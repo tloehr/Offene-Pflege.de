@@ -33,16 +33,16 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.files.SYSVAL2FILE;
-import de.offene_pflege.entity.info.ResInfoTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.process.*;
-import de.offene_pflege.entity.values.ResValue;
-import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.Resvaluetypes;
-import de.offene_pflege.entity.values.ResvaluetypesTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.SYSVAL2FILE;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.process.*;
+import de.offene_pflege.backend.entity.values.ResValue;
+import de.offene_pflege.backend.entity.values.ResValueTools;
+import de.offene_pflege.backend.entity.values.Resvaluetypes;
+import de.offene_pflege.backend.entity.values.ResvaluetypesTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -256,7 +256,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
     }
 
     private CollapsiblePane createCP4Type(final Resvaluetypes vtype) {
-        final String keyType = vtype.getID() + ".xtypes";
+        final String keyType = vtype.getId() + ".xtypes";
         final CollapsiblePane cpType = getCP(keyType);
 
         final DefaultCPTitle cptitle = new DefaultCPTitle(vtype.getText(), e -> {
@@ -267,7 +267,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
             }
         });
         cptitle.getButton().setFont(SYSConst.ARIAL24);
-        cptitle.getButton().setForeground(vtype.getColor());
+        cptitle.getButton().setForeground(ResvaluetypesTools.getColor(vtype));
         cpType.setBackground(Color.white);
 
         cpType.setTitleLabelComponent(cptitle.getMain());
@@ -352,7 +352,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
     }
 
     private CollapsiblePane createCP4Year(final Resvaluetypes vtype, final int year) {
-        final String keyYears = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
+        final String keyYears = vtype.getId() + ".xtypes." + Integer.toString(year) + ".year";
         final CollapsiblePane cpYear = getCP(keyYears);
 
         DefaultCPTitle cptitle = new DefaultCPTitle(Integer.toString(year), e -> {
@@ -365,7 +365,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
 
         cptitle.getButton().setFont(SYSConst.ARIAL18);
-        cptitle.getButton().setForeground(GUITools.blend(vtype.getColor(), Color.BLACK, 0.75f));
+        cptitle.getButton().setForeground(GUITools.blend(ResvaluetypesTools.getColor(vtype), Color.BLACK, 0.75f));
         cpYear.setBackground(Color.white);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
@@ -379,7 +379,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                 if (!mapType2Values.containsKey(keyYears)) {
                     mapType2Values.put(keyYears, ResValueTools.getResValues(resident, vtype, year));
                 }
-                SYSFilesTools.print(SYSTools.toHTML(ResValueTools.getAsHTML(mapType2Values.get(keyYears))), true);
+                SYSFilesService.print(SYSTools.toHTML(ResValueTools.getAsHTML(mapType2Values.get(keyYears))), true);
             });
             cptitle.getRight().add(btnPrintYear);
         }
@@ -418,7 +418,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
     // containts all resvalues but NOT the LIQUIDBALANCES
     private JPanel createContentPanel4Year(final Resvaluetypes vtype, final int year) {
-        final String keyYears = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
+        final String keyYears = vtype.getId() + ".xtypes." + Integer.toString(year) + ".year";
 
         java.util.List<ResValue> myValues;
         synchronized (mapType2Values) {
@@ -450,7 +450,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
             final DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
 
-            pnlTitle.getMain().setBackground(GUITools.blend(vtype.getColor(), Color.WHITE, 0.1f));
+            pnlTitle.getMain().setBackground(GUITools.blend(ResvaluetypesTools.getColor(vtype), Color.WHITE, 0.1f));
             pnlTitle.getMain().setOpaque(true);
 
             if (resValue.isObsolete()) {
@@ -681,7 +681,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         synchronized (lstValueTypes) {
             for (Resvaluetypes vtype : lstValueTypes) {
                 synchronized (cpMap) {
-                    cpsValues.add(cpMap.get(vtype.getID() + ".xtypes"));
+                    cpsValues.add(cpMap.get(vtype.getId() + ".xtypes"));
                 }
             }
         }
@@ -696,7 +696,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
         JPanel pnlMenu = new JPanel(new VerticalLayout());
 
-        boolean doesNotBelongToResInfos = ResInfoTools.getInfosFor(resValue).isEmpty();
+        boolean doesNotBelongToResInfos = ResInfoService.getInfosFor(resValue).isEmpty();
 
         if (doesNotBelongToResInfos && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
@@ -740,8 +740,8 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                             em.getTransaction().commit();
 
                             DateTime dt = new DateTime(newValue.getPit());
-                            final String keyType = vtype.getID() + ".xtypes";
-                            final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                            final String keyType = vtype.getId() + ".xtypes";
+                            final String key = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                             synchronized (mapType2Values) {
                                 mapType2Values.get(key).remove(resValue);
@@ -827,9 +827,9 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                             em.getTransaction().commit();
 
                             DateTime dt = new DateTime(myValue.getPit());
-                            final String keyType = vtype.getID() + ".xtypes";
+                            final String keyType = vtype.getId() + ".xtypes";
 
-                            final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                            final String key = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                             synchronized (mapType2Values) {
                                 mapType2Values.get(key).remove(resValue);
@@ -896,7 +896,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                     em.close();
 
                     DateTime dt = new DateTime(myValue.getPit());
-                    final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                    final String key = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                     synchronized (mapType2Values) {
                         mapType2Values.get(key).remove(resValue);
@@ -966,7 +966,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                         em.getTransaction().commit();
 
                         DateTime dt = new DateTime(myValue.getPit());
-                        final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                        final String key = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                         synchronized (mapType2Values) {
                             mapType2Values.get(key).remove(resValue);
@@ -1037,7 +1037,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
     private void addValue(final Resvaluetypes vtype) {
 
-        final String keyType = vtype.getID() + ".xtypes";
+        final String keyType = vtype.getId() + ".xtypes";
 
         currentEditor = new DlgValue(new ResValue(resident, vtype), DlgValue.MODE_NEW, o -> {
             ResValue myValue = null;
@@ -1075,7 +1075,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                     DateTime dt = new DateTime(myValue.getPit());
 
 //                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day";
-                    final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                    final String keyYear = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 //                        final LocalDate week = SYSCalendar.max(SYSCalendar.bow(dt.toLocalDate()), new LocalDate(dt.getYear(), 1, 1));
 //                        final String keyWeek = vtype.getID() + ".xtypes." + week + ".week";
 

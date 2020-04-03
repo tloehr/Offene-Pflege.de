@@ -30,10 +30,10 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.ResInfoTools;
-import de.offene_pflege.entity.info.Resident;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -143,7 +143,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
                 @Override
                 protected Object doInBackground() throws Exception {
-                    return SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(),  tbBerichte.isSelected(), true, false, false, true, false));
+                    return SYSTools.toHTML(ResInfoService.getTXReport(resident, false, tbMedi.isSelected(),  tbBerichte.isSelected(), true, false, false, true, false));
                 }
 
                 @Override
@@ -171,7 +171,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
 //            txtUebersicht.repaint();
             SwingUtilities.invokeLater(() -> {
-                String html = SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
+                String html = SYSTools.toHTML(ResInfoService.getTXReport(resident, false, tbMedi.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                 txtUebersicht.setText(html);
 //                    jspHTML.getVerticalScrollBar().setValue(0);
 
@@ -194,7 +194,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
             @Override
             protected Object doInBackground() throws Exception {
-                html = SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
+                html = SYSTools.toHTML(ResInfoService.getTXReport(resident, false, tbMedi.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                 return null;
             }
 
@@ -291,7 +291,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
-        JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, actionEvent -> SYSFilesTools.print(ResInfoTools.getTXReport(resident, true, false, tbMedi.isSelected(), tbBerichte.isSelected(), true, false, true, true), true));
+        JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, actionEvent -> SYSFilesService.print(ResInfoService.getTXReport(resident, true, false, tbMedi.isSelected(), tbBerichte.isSelected(), true, false, true, true), true));
         mypanel.add(printButton);
 
 

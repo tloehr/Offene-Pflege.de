@@ -6,14 +6,14 @@ package de.offene_pflege.op.care.sysfiles;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.files.SYSFiles;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.ResInfo;
-import de.offene_pflege.entity.nursingprocess.NursingProcess;
-import de.offene_pflege.entity.prescription.Prescription;
-import de.offene_pflege.entity.reports.NReport;
-import de.offene_pflege.entity.system.OPUsers;
-import de.offene_pflege.entity.values.ResValue;
+import de.offene_pflege.backend.entity.done.SYSFiles;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.prescription.Prescription;
+import de.offene_pflege.backend.entity.reports.NReport;
+import de.offene_pflege.backend.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.values.ResValue;
 import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.FileDrop;
@@ -78,7 +78,7 @@ public class DlgFiles extends MyJDialog {
         dropPanel.setPreferredSize(new Dimension(180, 180));
         dropPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
         new FileDrop(dropPanel, files -> {
-            java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, attachable);
+            java.util.List<SYSFiles> successful = SYSFilesService.putFiles(files, attachable);
             if (!successful.isEmpty()) {
                 list.setModel(SYSTools.list2dlm(getAttachedFilesList(attachable)));
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
@@ -110,13 +110,13 @@ public class DlgFiles extends MyJDialog {
         }
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setCellRenderer(SYSFilesTools.getSYSFilesRenderer());
+        list.setCellRenderer(SYSFilesService.getSYSFilesRenderer());
 
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
                 if (SwingUtilities.isLeftMouseButton(mouseEvent) && mouseEvent.getClickCount() == 2) {
-                    SYSFilesTools.handleFile((SYSFiles) list.getSelectedValue(), Desktop.Action.OPEN);
+                    SYSFilesService.handleFile((SYSFiles) list.getSelectedValue(), Desktop.Action.OPEN);
                 }
 
                 //todo: this is much more complicated than it looks. maybe i need some sort of interface attachable

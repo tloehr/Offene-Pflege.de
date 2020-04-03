@@ -4,8 +4,8 @@
  */
 package de.offene_pflege.op.system;
 
-import de.offene_pflege.entity.system.Acl;
-import de.offene_pflege.entity.system.SYSGROUPS2ACL;
+import de.offene_pflege.backend.entity.system.Acl;
+import de.offene_pflege.backend.entity.system.SYSGROUPS2ACL;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.LocalMachine;
 import de.offene_pflege.op.tools.SYSTools;

@@ -18,13 +18,13 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.process.*;
-import de.offene_pflege.entity.system.OPUsers;
-import de.offene_pflege.entity.system.UsersTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.process.*;
+import de.offene_pflege.backend.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.UsersTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -204,7 +204,7 @@ public class PnlProcess extends NursingRecordsPanel {
             btnPrint.addActionListener(actionEvent -> {
                 String html = QProcessTools.getAsHTML(qProcess);
                 html += QProcessTools.getElementsAsHTML(qProcess, tbSystem.isSelected());
-                SYSFilesTools.print(html, true);
+                SYSFilesService.print(html, true);
             });
             cptitle.getRight().add(btnPrint);
         }

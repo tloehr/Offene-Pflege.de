@@ -29,14 +29,14 @@ package de.offene_pflege.op.care.info;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.info.ICD;
-import de.offene_pflege.entity.info.ResInfo;
-import de.offene_pflege.entity.info.ResInfoTools;
-import de.offene_pflege.entity.prescription.GP;
-import de.offene_pflege.entity.prescription.GPTools;
-import de.offene_pflege.entity.prescription.Hospital;
-import de.offene_pflege.entity.prescription.HospitalTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.done.ICD;
+import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.entity.prescription.GP;
+import de.offene_pflege.backend.entity.prescription.GPTools;
+import de.offene_pflege.backend.entity.prescription.Hospital;
+import de.offene_pflege.backend.entity.prescription.HospitalTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditGP;
@@ -486,7 +486,7 @@ public class DlgDiag extends MyJDialog {
         props.put("osteo", Boolean.toString(cbOsteo.isSelected()));
         props.put("ms", Boolean.toString(cbMS.isSelected()));
 
-        ResInfoTools.setContent(diag, props);
+        ResInfoService.setContent(diag, props);
         diag.setText(txtBemerkung.getText().trim());
     }
 

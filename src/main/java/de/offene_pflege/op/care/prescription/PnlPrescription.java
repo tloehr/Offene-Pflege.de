@@ -31,16 +31,16 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.ResInfo;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.prescription.*;
-import de.offene_pflege.entity.process.*;
-import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.CommontagsTools;
-import de.offene_pflege.entity.system.UniqueTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.entity.process.*;
+import de.offene_pflege.backend.entity.system.Commontags;
+import de.offene_pflege.backend.entity.system.CommontagsTools;
+import de.offene_pflege.backend.entity.system.UniqueTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -586,7 +586,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             pnlTags.setOpaque(false);
 
             for (final Commontags commontag : listUsedCommontags) {
-                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag), true, true, false, tbClosed.isSelected(), true), true));
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesService.print(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag), true, true, false, tbClosed.isSelected(), true), true));
                 btnTag.setForeground(GUITools.getColor(commontag.getColor()));
                 pnlTags.add(btnTag);
             }
@@ -726,7 +726,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
-            JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, actionEvent -> SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected(), true), true));
+            JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, actionEvent -> SYSFilesService.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected(), true), true));
             list.add(printPrescription);
 
 //            JideButton printDaily = GUITools.createHyperlinkButton("nursingrecords.prescription.printdailyplan", SYSConst.icon22print2, new ActionListener() {

@@ -7,8 +7,8 @@ package de.offene_pflege.op.residents.bwassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.entity.info.LCustodian;
-import de.offene_pflege.entity.info.LCustodianTools;
+import de.offene_pflege.backend.entity.done.LCustodian;
+import de.offene_pflege.backend.services.LCustodianService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditLC;
@@ -45,7 +45,7 @@ public class PnlLC extends JPanel {
         listLCustodian.add(0, null);
 
         cmbLC.setModel(new DefaultComboBoxModel(listLCustodian.toArray()));
-        cmbLC.setRenderer(LCustodianTools.getRenderer());
+        cmbLC.setRenderer(LCustodianService.getRenderer());
 
     }
 

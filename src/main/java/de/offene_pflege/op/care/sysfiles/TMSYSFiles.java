@@ -25,7 +25,7 @@
  */
 package de.offene_pflege.op.care.sysfiles;
 
-import de.offene_pflege.entity.files.SYSFiles;
+import de.offene_pflege.backend.entity.done.SYSFiles;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 

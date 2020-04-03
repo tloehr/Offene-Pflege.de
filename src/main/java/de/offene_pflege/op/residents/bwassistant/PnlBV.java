@@ -6,8 +6,8 @@ package de.offene_pflege.op.residents.bwassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.system.OPUsers;
-import de.offene_pflege.entity.system.UsersTools;
+import de.offene_pflege.backend.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.UsersTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.collections.Closure;

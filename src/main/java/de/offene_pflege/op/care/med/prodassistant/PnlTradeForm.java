@@ -6,7 +6,7 @@ package de.offene_pflege.op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.structure.PnlDosageForm;

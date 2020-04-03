@@ -1,6 +1,6 @@
 package de.offene_pflege.op.settings.subpanels;
 
-import de.offene_pflege.entity.EntityTools;
+import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.gui.PnlBeanEditor;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.op.OPDE;

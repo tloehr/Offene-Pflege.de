@@ -33,18 +33,18 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.ResInfoCategory;
-import de.offene_pflege.entity.info.ResInfoCategoryTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.nursingprocess.*;
-import de.offene_pflege.entity.process.*;
-import de.offene_pflege.entity.system.Commontags;
-import de.offene_pflege.entity.system.CommontagsTools;
-import de.offene_pflege.entity.system.Unique;
-import de.offene_pflege.entity.system.UniqueTools;
+import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.info.ResInfoCategory;
+import de.offene_pflege.backend.services.ResInfoCategoryTools;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.nursingprocess.*;
+import de.offene_pflege.backend.entity.process.*;
+import de.offene_pflege.backend.entity.system.Commontags;
+import de.offene_pflege.backend.entity.system.CommontagsTools;
+import de.offene_pflege.backend.entity.system.Unique;
+import de.offene_pflege.backend.entity.system.UniqueTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -519,7 +519,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 btnPrint.setPressedIcon(SYSConst.icon22print2Pressed);
                 btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnPrint.setAlignmentY(Component.TOP_ALIGNMENT);
-                btnPrint.addActionListener(actionEvent -> SYSFilesTools.print(NursingProcessTools.getAsHTML(np, true, true, true, true), true));
+                btnPrint.addActionListener(actionEvent -> SYSFilesService.print(NursingProcessTools.getAsHTML(np, true, true, true, true), true));
 
                 cptitle.getRight().add(btnPrint);
                 //                cptitle.getTitleButton().setVerticalTextPosition(SwingConstants.TOP);
@@ -645,7 +645,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         }
                     }
                 }
-                SYSFilesTools.print(html, true);
+                SYSFilesService.print(html, true);
             });
             btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
 

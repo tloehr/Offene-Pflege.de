@@ -27,8 +27,8 @@
 package de.offene_pflege.op.tools;
 
 import com.jidesoft.swing.JideSplitPane;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -1324,7 +1324,7 @@ public class SYSTools {
         html = SYSTools.htmlUmlautConversion(html);
 
 
-        SYSFilesTools.print(html, true);
+        SYSFilesService.print(html, true);
     }
 
     public static Collection subtract(Collection coll1, Collection coll2) {

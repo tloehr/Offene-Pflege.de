@@ -40,12 +40,16 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideSplitPane;
-import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.building.StationTools;
-import de.offene_pflege.entity.info.*;
-import de.offene_pflege.entity.prescription.PrescriptionTools;
-import de.offene_pflege.entity.system.SYSLoginTools;
-import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.done.Station;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.services.ResInfoTypeTools;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.services.StationService;
+import de.offene_pflege.backend.entity.info.*;
+import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
+import de.offene_pflege.backend.entity.system.SYSLoginTools;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.gui.qdvs.QDVS_Panel;
@@ -328,7 +332,7 @@ public class FrmMain extends JFrame {
             return;
         }
 
-        if (type.getType() == ResInfoTypeTools.TYPE_FALLRISK && !ResInfoTools.hasSevereFallRisk(resident)) {
+        if (type.getType() == ResInfoTypeTools.TYPE_FALLRISK && !ResInfoService.hasSevereFallRisk(resident)) {
             return;
         }
 
@@ -386,11 +390,11 @@ public class FrmMain extends JFrame {
             markierung_fuer_bewohner.put(ResInfoTypeTools.TYPE_FALLRISK, new HashSet<>());
             markierung_fuer_bewohner.put(TYPE_BESONDERHEIT_KURZZEITPFLEGE, new HashSet<>());
 
-            for (ResInfo info : ResInfoTools.getSpecialInfos()) {
+            for (ResInfo info : ResInfoService.getSpecialInfos()) {
                 // eine Sturzeinschätzung alleine reicht noch nicht aus, damit es als Symbol auftauchen soll. Nur ab bei
                 // sturzrisiko = mittel und sturzrisiko = ja (was stark heisst)
                 if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_FALLRISK) {
-                    if (ResInfoTools.hasSevereFallRisk(info)) {
+                    if (ResInfoService.hasSevereFallRisk(info)) {
                         markierung_fuer_bewohner.get(info.getResInfoType().getType()).add(info.getResident());
                     }
                 } else { // alle anderen Specialities können ruhig dabei
@@ -399,7 +403,7 @@ public class FrmMain extends JFrame {
             }
 
             ResidentTools.getAllActive().forEach(resident -> {
-                if (ResInfoTools.isKZP(resident))
+                if (ResInfoService.isKZP(resident))
                     markierung_fuer_bewohner.get(TYPE_BESONDERHEIT_KURZZEITPFLEGE).add(resident);
             });
         }
@@ -755,7 +759,7 @@ public class FrmMain extends JFrame {
 
         CollapsiblePane mypane = new CollapsiblePane(station == null ? SYSTools.xx("misc.msg.Archive") : station.getName());
         mypane.setFont(SYSConst.ARIAL14);
-        mypane.setEmphasized(station != null && station.equals(StationTools.getStationForThisHost()));
+        mypane.setEmphasized(station != null && station.equals(StationService.getStationForThisHost()));
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
 
         JPanel labelPanel = new JPanel();

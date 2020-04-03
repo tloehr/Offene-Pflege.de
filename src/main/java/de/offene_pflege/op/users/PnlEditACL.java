@@ -1,9 +1,9 @@
 package de.offene_pflege.op.users;
 
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.system.Acl;
-import de.offene_pflege.entity.system.SYSGROUPS2ACL;
-import de.offene_pflege.entity.system.SYSGROUPS2ACLTools;
+import de.offene_pflege.backend.entity.system.Acl;
+import de.offene_pflege.backend.entity.system.SYSGROUPS2ACL;
+import de.offene_pflege.backend.entity.system.SYSGROUPS2ACLTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClass;

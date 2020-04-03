@@ -6,9 +6,9 @@ package de.offene_pflege.op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.prescription.MedPackage;
-import de.offene_pflege.entity.prescription.MedPackageTools;
-import de.offene_pflege.entity.prescription.TradeForm;
+import de.offene_pflege.backend.entity.prescription.MedPackage;
+import de.offene_pflege.backend.entity.prescription.MedPackageTools;
+import de.offene_pflege.backend.entity.prescription.TradeForm;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSTools;

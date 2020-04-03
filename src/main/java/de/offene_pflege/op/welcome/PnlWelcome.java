@@ -11,18 +11,18 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
-import de.offene_pflege.entity.info.ResInfoTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.prescription.MedStock;
-import de.offene_pflege.entity.prescription.MedStockTools;
-import de.offene_pflege.entity.prescription.Prescription;
-import de.offene_pflege.entity.prescription.PrescriptionTools;
-import de.offene_pflege.entity.process.QProcess;
-import de.offene_pflege.entity.process.QProcessTools;
-import de.offene_pflege.entity.values.ResValue;
-import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.ResvaluetypesTools;
+import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.prescription.MedStock;
+import de.offene_pflege.backend.entity.prescription.MedStockTools;
+import de.offene_pflege.backend.entity.prescription.Prescription;
+import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
+import de.offene_pflege.backend.entity.process.QProcess;
+import de.offene_pflege.backend.entity.process.QProcessTools;
+import de.offene_pflege.backend.entity.values.ResValue;
+import de.offene_pflege.backend.entity.values.ResValueTools;
+import de.offene_pflege.backend.entity.values.ResvaluetypesTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -360,7 +360,7 @@ public class PnlWelcome extends CleanablePanel {
 
     private DefaultCPTitle createCP4NoStool(Object[] ns) {
         final Resident resident = (Resident) ns[0];
-        ResValue lastStool = (ResValue) ns[1];
+        Optional<ResValue> lastStool = (Optional<ResValue>) ns[1];
         int daysControl = (Integer) ns[2];
 
         String title = "<html><table border=\"0\">" +
@@ -368,7 +368,7 @@ public class PnlWelcome extends CleanablePanel {
                 "<td width=\"200\" align=\"left\">" +
                 "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
                 "<td width=\"200\" align=\"left\">" + SYSTools.xx("opde.welcome.lastStool") + ": " +
-                (lastStool == null ? SYSTools.xx("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.getPit())) + "</td>" +
+                (!lastStool.isPresent() ? SYSTools.xx("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.get().getPit())) + "</td>" +
                 "<td width=\"200\" align=\"left\">" + SYSTools.xx("controlling.misc.controlPeriod") + ": " +
                 daysControl + " " + SYSTools.xx("misc.msg.Days2") + "</td>" +
                 "</tr>" +
@@ -382,7 +382,7 @@ public class PnlWelcome extends CleanablePanel {
         });
 //        cptitle.getTitleButton().setCursor(null);
 
-        if (ResInfoTools.isAway(resident)) {
+        if (ResInfoService.isAway(resident)) {
             cptitle.getButton().setIcon(SYSConst.icon22residentAbsent);
             cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
         }
@@ -449,7 +449,7 @@ public class PnlWelcome extends CleanablePanel {
             OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
         });
 
-        if (ResInfoTools.isAway(resident)) {
+        if (ResInfoService.isAway(resident)) {
             cptitle.getButton().setIcon(SYSConst.icon22residentAbsent);
             cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
         }
@@ -529,7 +529,7 @@ public class PnlWelcome extends CleanablePanel {
         });
 //        cptitle.getTitleButton().setCursor(null);
 
-        if (ResInfoTools.isAway(resident)) {
+        if (ResInfoService.isAway(resident)) {
             cptitle.getButton().setIcon(SYSConst.icon22residentAbsent);
             cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
         }

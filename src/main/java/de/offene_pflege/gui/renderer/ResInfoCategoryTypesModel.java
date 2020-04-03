@@ -1,6 +1,6 @@
 package de.offene_pflege.gui.renderer;
 
-import de.offene_pflege.entity.info.ResInfoCategoryTools;
+import de.offene_pflege.backend.services.ResInfoCategoryTools;
 
 import javax.swing.*;
 

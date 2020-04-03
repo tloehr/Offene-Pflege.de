@@ -5,7 +5,7 @@
 
 package de.offene_pflege.op.system;
 
-import de.offene_pflege.entity.system.SYSGROUPS2ACL;
+import de.offene_pflege.backend.entity.system.SYSGROUPS2ACL;
 
 import java.util.ArrayList;
 import java.util.List;

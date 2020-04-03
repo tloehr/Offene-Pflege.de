@@ -28,7 +28,7 @@ package de.offene_pflege.op.care.supervisor;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.reports.Handovers;
+import de.offene_pflege.backend.entity.reports.Handovers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.PnlPIT;

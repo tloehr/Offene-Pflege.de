@@ -1,6 +1,6 @@
 package de.offene_pflege.services.qdvs;
 
-import de.offene_pflege.entity.info.Resident;
+import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.op.tools.SYSTools;
 
 import java.util.ArrayList;

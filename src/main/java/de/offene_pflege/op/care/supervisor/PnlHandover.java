@@ -32,13 +32,13 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.building.Homes;
-import de.offene_pflege.entity.building.HomesTools;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.Resident;
-import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.reports.*;
-import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.done.Homes;
+import de.offene_pflege.backend.services.HomesService;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.reports.*;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -666,7 +666,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
                             @Override
                             protected Object doInBackground() throws Exception {
-                                SYSFilesTools.print(Handover2UserTools.getAsHTML(handover), false);
+                                SYSFilesService.print(Handover2UserTools.getAsHTML(handover), false);
                                 return null;
                             }
 
@@ -769,7 +769,7 @@ public class PnlHandover extends NursingRecordsPanel {
                     btnInfo.setBorder(null);
                     btnInfo.addActionListener(e -> {
 
-                        SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
+                        SYSFilesService.print(NR2UserTools.getAsHTML(nreport), false);
 
 //                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 //                            OPDE.getMainframe().setBlocked(true);
@@ -1006,14 +1006,14 @@ public class PnlHandover extends NursingRecordsPanel {
             txtSearch.setFont(SYSConst.ARIAL14);
             txtSearch.addActionListener(e -> {
                 if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
-                    SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(NReportTools.getNReports4Handover((Homes) cmbHomes.getSelectedItem(), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), false);
+                    SYSFilesService.print(NReportTools.getReportsAndHandoversAsHTML(NReportTools.getNReports4Handover((Homes) cmbHomes.getSelectedItem(), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), false);
                 }
             });
             innerPanel.add(txtSearch);
             JButton btnSearchGeneralReports = GUITools.createHyperlinkButton("nursingrecords.handover.searchHandovers", null, null);
             btnSearchGeneralReports.addActionListener(e -> {
                 List listHandovers = HandoversTools.getBy(Integer.parseInt(yearModel.getSelectedItem().toString()), (Homes) cmbHomes.getSelectedItem());
-                SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(listHandovers, "", Integer.parseInt(yearModel.getSelectedItem().toString())), false);
+                SYSFilesService.print(NReportTools.getReportsAndHandoversAsHTML(listHandovers, "", Integer.parseInt(yearModel.getSelectedItem().toString())), false);
             });
             innerPanel.add(btnSearchGeneralReports);
             yearCombo = new JXComboBox(yearModel);
@@ -1029,7 +1029,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
         cmbHomes = new JComboBox();
         cmbHomes.setFont(SYSConst.ARIAL14);
-        HomesTools.setComboBox(cmbHomes);
+        HomesService.setComboBox(cmbHomes);
         cmbHomes.addItemListener(itemEvent -> {
             if (itemEvent.getStateChange() != ItemEvent.SELECTED) return;
             reloadDisplay();

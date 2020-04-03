@@ -1,6 +1,6 @@
 package de.offene_pflege.op.settings.databeans;
 
-import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.gui.interfaces.EditorComponent;
 import de.offene_pflege.op.tools.SYSTools;
 import javax.validation.constraints.NotEmpty;

@@ -6,8 +6,8 @@ package de.offene_pflege.op.settings.subpanels;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.info.ICD;
+import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.ICD;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.op.OPDE;
@@ -76,7 +76,7 @@ public class PnlICD extends DefaultPanel {
             if (dlmICDFiles.size() == 1) {
                 File opdeicd = dlmICDFiles.elementAt(0).exists() ? dlmICDFiles.elementAt(0) : null;
 
-                if (!SYSFilesTools.filenameExtension(opdeicd.getPath()).equalsIgnoreCase("xml")) {
+                if (!SYSFilesService.filenameExtension(opdeicd.getPath()).equalsIgnoreCase("xml")) {
 //                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.icd.wrongfile", DisplayMessage.WARNING));
                     btnImportICD.setIcon(SYSConst.icon22ledRedOn);
                 } else {
@@ -105,16 +105,16 @@ public class PnlICD extends DefaultPanel {
                 File file1 = dlmICDFiles.elementAt(0).exists() ? dlmICDFiles.elementAt(0) : null;
                 File file2 = dlmICDFiles.elementAt(1).exists() ? dlmICDFiles.elementAt(1) : null;
 
-                if (SYSFilesTools.filenameExtension(file1.getPath()).equalsIgnoreCase("xml")) {
+                if (SYSFilesService.filenameExtension(file1.getPath()).equalsIgnoreCase("xml")) {
                     dimdixml = file1;
                 }
-                if (SYSFilesTools.filenameExtension(file2.getPath()).equalsIgnoreCase("xml")) {
+                if (SYSFilesService.filenameExtension(file2.getPath()).equalsIgnoreCase("xml")) {
                     dimdixml = file2;
                 }
-                if (SYSFilesTools.filenameExtension(file1.getPath()).equalsIgnoreCase("dtd")) {
+                if (SYSFilesService.filenameExtension(file1.getPath()).equalsIgnoreCase("dtd")) {
                     dimdidtd = file1;
                 }
-                if (SYSFilesTools.filenameExtension(file2.getPath()).equalsIgnoreCase("dtd")) {
+                if (SYSFilesService.filenameExtension(file2.getPath()).equalsIgnoreCase("dtd")) {
                     dimdidtd = file2;
                 }
 

@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS qmsplan2file;
 CREATE TABLE `qmsplan2file` (  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,  `qmsplanid` bigint(20) unsigned NOT NULL,  `fid` bigint(20) unsigned NOT NULL,  `pit` datetime NOT NULL,  `editor` char(10) NOT NULL,  `version` bigint(20) unsigned NOT NULL DEFAULT '0',  PRIMARY KEY (`id`),  KEY `idx1` (`qmsplanid`)) ENGINE=InnoDB;
 DROP TABLE IF EXISTS qms2file;
 CREATE TABLE `qms2file` (  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,  `qmsid` bigint(20) unsigned NOT NULL,  `fid` bigint(20) unsigned NOT NULL,  `pit` datetime NOT NULL,  `editor` char(10) NOT NULL,  `version` bigint(20) unsigned NOT NULL DEFAULT '0',  PRIMARY KEY (`id`),  KEY `idx1` (`qmsid`)) ENGINE=InnoDB;
-INSERT INTO resident2file (rid, fid, pit, editor) SELECT BWKennung, OCFID, PIT, UKennung FROM sysfiles WHERE OCFID NOT IN (SELECT FID FROM sysinf2file) AND OCFID NOT IN (SELECT FID FROM sysnp2file) AND OCFID NOT IN (SELECT FID FROM sysnr2file) AND OCFID NOT IN (SELECT FID FROM syspre2file) AND OCFID NOT IN (SELECT FID FROM sysval2file) AND BWKennung IS NOT NULL ;
+INSERT INTO resident2file (rid, fid, pit, editor) SELECT BWKennung, id, PIT, UKennung FROM sysfiles WHERE id NOT IN (SELECT FID FROM sysinf2file) AND id NOT IN (SELECT FID FROM sysnp2file) AND id NOT IN (SELECT FID FROM sysnr2file) AND id NOT IN (SELECT FID FROM syspre2file) AND id NOT IN (SELECT FID FROM sysval2file) AND BWKennung IS NOT NULL ;
 ALTER TABLE `sysfiles` CHANGE `Filename` `Filename` VARCHAR(500) NOT NULL;
 ALTER TABLE `sysfiles` DROP COLUMN `BWKennung`, CHANGE `UKennung` `UID` VARCHAR(10) NOT NULL;
 DROP TABLE IF EXISTS qms;

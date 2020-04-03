@@ -7,9 +7,9 @@ package de.offene_pflege.op.care.med.prodassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.entity.prescription.ACME;
-import de.offene_pflege.entity.prescription.ACMETools;
-import de.offene_pflege.entity.prescription.MedProducts;
+import de.offene_pflege.backend.entity.prescription.ACME;
+import de.offene_pflege.backend.entity.prescription.ACMETools;
+import de.offene_pflege.backend.entity.prescription.MedProducts;
 import de.offene_pflege.op.OPDE;
 import org.apache.commons.collections.Closure;
 
