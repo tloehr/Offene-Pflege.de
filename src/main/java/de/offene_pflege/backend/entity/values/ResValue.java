@@ -8,7 +8,7 @@ import de.offene_pflege.backend.entity.done.SYSVAL2FILE;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.process.QProcess;
-import de.offene_pflege.backend.entity.process.QProcessElement;
+import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.SYSVAL2PROCESS;
 import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.interfaces.Attachable;
@@ -30,7 +30,7 @@ import java.util.Date;
 @Entity
 @Table(name = "resvalue")
 
-public class ResValue implements Serializable, QProcessElement, Cloneable, Comparable<ResValue>, Attachable {
+public class ResValue implements Serializable, QElement, Cloneable, Comparable<ResValue>, Attachable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -125,7 +125,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     }
 
-    public Long getId() {
+    public Long findPrimaryKey() {
         return id;
     }
 
@@ -218,7 +218,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     }
 
     @Override
-    public ArrayList<QProcess> getAttachedProcesses() {
+    public ArrayList<QProcess> findAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
         for (SYSVAL2PROCESS att : attachedProcessConnections) {
             list.add(att.getQProcess());
@@ -280,7 +280,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         this.resident = resident;
     }
 
-    public OPUsers getUser() {
+    public OPUsers findOwner() {
         return user;
     }
 
@@ -289,17 +289,17 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     }
 
     @Override
-    public long getPITInMillis() {
+    public long pitInMillis() {
         return pit.getTime();
     }
 
     @Override
-    public String getContentAsHTML() {
+    public String contentAsHTML() {
         return ResValueTools.getAsHTML(this);
     }
 
     @Override
-    public String getPITAsHTML() {
+    public String pitAsHTML() {
         return ResValueTools.getPITasHTML(this, false, false);
     }
 
@@ -366,7 +366,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 //    }
 
     @Override
-    public String getTitle() {
+    public String titleAsString() {
         return SYSTools.xx("nursingrecords.vitalparameters") + ": " + vtype.getText();
     }
 
@@ -383,7 +383,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         CollectionUtils.forAllDo(attachedFilesConnections, new Closure() {
             public void execute(Object o) {
                 SYSVAL2FILE oldAssignment = (SYSVAL2FILE) o;
-                clonedValue.attachedFilesConnections.add(new SYSVAL2FILE(oldAssignment.getSysfile(), clonedValue, clonedValue.getUser(), clonedValue.getPit()));
+                clonedValue.attachedFilesConnections.add(new SYSVAL2FILE(oldAssignment.getSysfile(), clonedValue, clonedValue.findOwner(), clonedValue.getPit()));
             }
         });
 

@@ -15,7 +15,6 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "sysinf2process")
-
 public class SYSINF2PROCESS {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +22,11 @@ public class SYSINF2PROCESS {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "VorgangID", referencedColumnName = "VorgangID")
+    @JoinColumn(name = "VorgangID", referencedColumnName = "id")
     private QProcess qProcess;
 
     @ManyToOne
-    @JoinColumn(name = "BWInfoID", referencedColumnName = "BWINFOID")
+    @JoinColumn(name = "BWInfoID", referencedColumnName = "id")
     private ResInfo bwinfo;
 
     protected SYSINF2PROCESS() {

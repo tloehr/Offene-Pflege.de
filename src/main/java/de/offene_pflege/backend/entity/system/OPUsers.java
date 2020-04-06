@@ -25,17 +25,12 @@
  */
 package de.offene_pflege.backend.entity.system;
 
-import de.offene_pflege.backend.entity.done.*;
-import de.offene_pflege.backend.entity.reports.NReport;
+import de.offene_pflege.backend.entity.DefaultStringIDEntity;
+import de.offene_pflege.backend.entity.done.User2File;
+import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.interfaces.Attachable;
-import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.tools.SYSTools;
-import org.eclipse.persistence.annotations.OptimisticLocking;
-import org.eclipse.persistence.annotations.OptimisticLockingType;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -43,124 +38,49 @@ import java.util.Collection;
  */
 @Entity
 @Table(name = "opusers")
-@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
-    private static final long serialVersionUID = 1L;
-    @Id
-    @Column(name = "UKennung")
-    private String uid;
-    @Version
-    @Column(name = "version")
-    private Long version;
-    @Basic(optional = false)
-    @Column(name = "Vorname")
+public class OPUsers extends DefaultStringIDEntity implements Comparable<OPUsers>, Attachable {
     private String vorname;
-    @Basic(optional = false)
-    @Column(name = "Nachname")
     private String nachname;
-    @Column(name = "userstatus")
     private Short userstatus;
-    @Basic(optional = false)
-    @Column(name = "MD5PW")
     private String md5pw;
-    @Column(name = "EMail")
-    private String eMail;
-    @Basic(optional = false)
-    @Column(name = "mailconfirmed")
-    private int mailConfirmed;
-    @Basic(optional = false)
-    @Column(name = "cipherid")
+    private String email;
+    private int mailconfirmed;
     private int cipherid; // zum chiffrierten ausdrucken der Pflegedoku. Datenschutz für die MitarbeiterInnen
-
-    @ManyToMany
-    @JoinTable(name = "member", joinColumns =
-    @JoinColumn(name = "UKennung"), inverseJoinColumns =
-    @JoinColumn(name = "GKennung"))
-    private Collection<OPGroups> groups;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Collection<SYSFiles> sysfilesCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Collection<SYSINF2FILE> SYSINF2FILECollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Collection<SYSNR2FILE> SYSNR2FILECollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Collection<SYSPRE2FILE> SYSPRE2FILECollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "newBy")
-    private Collection<NReport> NReport;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "editedBy")
-    private Collection<NReport> korrigierteNReport;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Collection<SYSLogin> logins;
-
-    public Collection<User2File> getAttachedFilesConnections() {
-        return attachedFilesConnections;
-    }
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private Collection<OPGroups> opGroups;
     private Collection<User2File> attachedFilesConnections;
 
-    public OPUsers() {
-        uid = null;
-        groups = new ArrayList<OPGroups>();
-        userstatus = UsersTools.STATUS_ACTIVE;
-        mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
-        cipherid = 12;  //todo: berechnen
-    }
-
-    public int getCipherid() {
-        return cipherid;
-    }
-
-    public void setCipherid(int cipherid) {
-        this.cipherid = cipherid;
-    }
-
-    public int getMailConfirmed() {
-        return mailConfirmed;
-    }
-
-    public void setMailConfirmed(int mailConfirmed) {
-        this.mailConfirmed = mailConfirmed;
-    }
-
-
-    public String getUID() {
-        return uid;
-    }
-
-    public String getUIDCiphered() {
-            return OPDE.isUserCipher() ? "#"+cipherid : uid;
-        }
-
-    public void setUID(String uid) {
-        this.uid = uid;
-    }
-
+    @Basic(optional = false)
+    @Column(name = "Vorname")
     public String getVorname() {
-        return SYSTools.anonymizeName(vorname, SYSTools.INDEX_FIRSTNAME_FEMALE);
+        return vorname;
     }
 
     public void setVorname(String vorname) {
         this.vorname = vorname;
     }
 
-    public String getName() {
-        return SYSTools.anonymizeName(nachname, SYSTools.INDEX_LASTNAME);
+
+    @Basic(optional = false)
+    @Column(name = "Nachname")
+    public String getNachname() {
+        return nachname;
     }
 
     public void setNachname(String nachname) {
         this.nachname = nachname;
     }
 
+    @Column(name = "userstatus")
     public Short getUserstatus() {
         return userstatus;
     }
 
-    public void setUserstatus(Short status) {
-        this.userstatus = status;
+    public void setUserstatus(Short userstatus) {
+        this.userstatus = userstatus;
     }
 
+    @Basic(optional = false)
+    @Column(name = "MD5PW")
     public String getMd5pw() {
         return md5pw;
     }
@@ -169,37 +89,58 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
         this.md5pw = md5pw;
     }
 
-    public String getEMail() {
-        return eMail;
+    @Column(name = "EMail")
+    public String getEmail() {
+        return email;
     }
 
-    public void setEMail(String eMail) {
-        this.eMail = eMail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-//    @Override
-//    public int hashCode() {
-//        int hash = 0;
-//        hash += (uid != null ? uid.hashCode() : 0);
-//        return hash;
-//    }
-
-    public Collection<OPGroups> getGroups() {
-        return groups;
+    @Basic(optional = false)
+    @Column(name = "mailconfirmed")
+    public int getMailconfirmed() {
+        return mailconfirmed;
     }
 
-    public void setGroups(Collection<OPGroups> groups) {
-        this.groups = groups;
+    public void setMailconfirmed(int mailconfirmed) {
+        this.mailconfirmed = mailconfirmed;
     }
 
-    /**
-     * gibt an, ob der betreffende User sich anmelden darf.
-     *
-     * @return true, wenn ja; false, sonst.
-     */
-    @Override
-    public boolean isActive() {
-        return userstatus == UsersTools.STATUS_ACTIVE;
+    @Basic(optional = false)
+    @Column(name = "cipherid")
+    public int getCipherid() {
+        return cipherid;
+    }
+
+    public void setCipherid(int cipherid) {
+        this.cipherid = cipherid;
+    }
+
+    @ManyToMany
+    @JoinTable(name = "member", joinColumns =
+    @JoinColumn(name = "UKennung"), inverseJoinColumns =
+    @JoinColumn(name = "GKennung"))
+    public Collection<OPGroups> getOpGroups() {
+        return opGroups;
+    }
+
+    public void setOpGroups(Collection<OPGroups> opGroups) {
+        this.opGroups = opGroups;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "opUsers")
+    public Collection<User2File> getAttachedFilesConnections() {
+        return attachedFilesConnections;
+    }
+
+    public void setAttachedFilesConnections(Collection<User2File> attachedFilesConnections) {
+        this.attachedFilesConnections = attachedFilesConnections;
+    }
+
+
+    public OPUsers() {
     }
 
     @Override
@@ -207,64 +148,8 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
         return toString().compareTo(o.toString());
     }
 
-//    @Override
-//    public boolean equals(Object object) {
-//
-//        if (!(object instanceof Users)) {
-//            return false;
-//        }
-//        Users other = (Users) object;
-//        if ((this.uid == null && other.uid != null) || (this.uid != null && !this.uid.equals(other.uid))) {
-//            return false;
-//        }
-//        return true;
-//    }
-
-
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        OPUsers OPUsers = (OPUsers) o;
-
-        if (eMail != null ? !eMail.equals(OPUsers.eMail) : OPUsers.eMail != null) return false;
-        if (logins != null ? !logins.equals(OPUsers.logins) : OPUsers.logins != null) return false;
-        if (md5pw != null ? !md5pw.equals(OPUsers.md5pw) : OPUsers.md5pw != null) return false;
-        if (nachname != null ? !nachname.equals(OPUsers.nachname) : OPUsers.nachname != null) return false;
-        if (userstatus != null ? !userstatus.equals(OPUsers.userstatus) : OPUsers.userstatus != null) return false;
-        if (version != null ? !version.equals(OPUsers.version) : OPUsers.version != null) return false;
-        if (vorname != null ? !vorname.equals(OPUsers.vorname) : OPUsers.vorname != null) return false;
-
-        return true;
+    public boolean active() {
+        return OPUsersService.isActive(this);
     }
-
-    @Override
-    public int hashCode() {
-        int result = uid != null ? uid.hashCode() : 0;
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (vorname != null ? vorname.hashCode() : 0);
-        result = 31 * result + (nachname != null ? nachname.hashCode() : 0);
-        result = 31 * result + (userstatus != null ? userstatus.hashCode() : 0);
-        result = 31 * result + (md5pw != null ? md5pw.hashCode() : 0);
-        result = 31 * result + (eMail != null ? eMail.hashCode() : 0);
-        return result;
-    }
-
-
-    @Override
-    public String toString() {
-        return getFullname() + " [" + uid + "]";
-    }
-
-    public String getFullname() {
-        String fullname = "";
-        if (OPDE.isUserCipher()){
-            fullname = "#"+cipherid;
-        } else {
-            fullname = getName() + ", " + getVorname();
-        }
-        return fullname;
-    }
-
 }

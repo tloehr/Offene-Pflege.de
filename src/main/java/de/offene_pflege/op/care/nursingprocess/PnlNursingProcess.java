@@ -34,6 +34,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.backend.services.SYSFilesService;
 import de.offene_pflege.backend.entity.info.ResInfoCategory;
 import de.offene_pflege.backend.services.ResInfoCategoryTools;
@@ -131,7 +132,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     @Override
     public void reload() {
         cleanup();
-        listNP = NursingProcessTools.getAll(resident);
+        listNP = NursingProcessService.getAll(resident);
         Collections.sort(listNP, (o1, o2) -> {
             int result = 0;
 
@@ -340,11 +341,11 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             }
 
             title += "<tr valign=\"top\">" +
-                    "<td width=\"280\" align=\"left\">" + np.getPITAsHTML() + "</td>" +
+                    "<td width=\"280\" align=\"left\">" + np.pitAsHTML() + "</td>" +
                     "<td width=\"500\" align=\"left\">" +
                     (np.isClosed() ? "<s>" : "") +
                     SYSConst.html_h2(np.getTopic()) +
-                    np.getContentAsHTML() +
+                    np.contentAsHTML() +
                     (np.isClosed() ? "</s>" : "") +
                     "</td></tr>";
             title += "</table>" +
@@ -439,18 +440,18 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 if (unassigned.contains(linkObject.getQProcess())) {
                                     linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                     linkObject.getNursingProcess().getAttachedQProcessConnections().remove(linkObject);
-                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myNP.getTitle() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myNP.titleAsString() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                     em.remove(linkObject);
                                 }
                             }
                             attached.clear();
 
                             for (QProcess qProcess : assigned) {
-                                List<QProcessElement> listElements = qProcess.getElements();
+                                List<QElement> listElements = qProcess.getElements();
                                 if (!listElements.contains(myNP)) {
                                     QProcess myQProcess = em.merge(qProcess);
                                     SYSNP2PROCESS myLinkObject = em.merge(new SYSNP2PROCESS(myQProcess, myNP));
-                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myNP.getTitle() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myNP.titleAsString() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                     qProcess.getAttachedNursingProcessesConnections().add(myLinkObject);
                                     myNP.getAttachedQProcessConnections().add(myLinkObject);
                                 }
@@ -519,7 +520,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 btnPrint.setPressedIcon(SYSConst.icon22print2Pressed);
                 btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnPrint.setAlignmentY(Component.TOP_ALIGNMENT);
-                btnPrint.addActionListener(actionEvent -> SYSFilesService.print(NursingProcessTools.getAsHTML(np, true, true, true, true), true));
+                btnPrint.addActionListener(actionEvent -> SYSFilesService.print(NursingProcessService.getAsHTML(np, true, true, true, true), true));
 
                 cptitle.getRight().add(btnPrint);
                 //                cptitle.getTitleButton().setVerticalTextPosition(SwingConstants.TOP);
@@ -639,7 +640,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         for (NursingProcess np : valuecache.get(cat)) {
                             if (tbShowClosed.isSelected() || !np.isClosed()) {
                                 html += SYSConst.html_h3(np.getTopic());
-                                html += NursingProcessTools.getAsHTML(np, false, true, true, true);
+                                html += NursingProcessService.getAsHTML(np, false, true, true, true);
                                 html += "<hr/>";
                             }
                         }
@@ -729,7 +730,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         try {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                            Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
+                            Unique unique = UniqueTools.getNewUID(em, NursingProcessService.UNIQUEID);
                             final NursingProcess newNP = em.merge((NursingProcess) np); // https://github.com/tloehr/Offene-Pflege.de/issues/89
                             newNP.setNPSeries(unique.getUid());
                             DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
@@ -821,7 +822,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
+                                    Unique unique = UniqueTools.getNewUID(em, NursingProcessService.UNIQUEID);
                                     final NursingProcess newNP = em.merge((NursingProcess) np);
                                     newNP.setNPSeries(unique.getUid());
                                     DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
@@ -1490,18 +1491,18 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             if (unassigned.contains(linkObject.getQProcess())) {
                                 linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                 linkObject.getNursingProcess().getAttachedQProcessConnections().remove(linkObject);
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myNP.getTitle() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myNP.titleAsString() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                 em.remove(linkObject);
                             }
                         }
                         attached.clear();
 
                         for (QProcess qProcess : assigned) {
-                            List<QProcessElement> listElements = qProcess.getElements();
+                            List<QElement> listElements = qProcess.getElements();
                             if (!listElements.contains(myNP)) {
                                 QProcess myQProcess = em.merge(qProcess);
                                 SYSNP2PROCESS myLinkObject = em.merge(new SYSNP2PROCESS(myQProcess, myNP));
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myNP.getTitle() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myNP.titleAsString() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                 qProcess.getAttachedNursingProcessesConnections().add(myLinkObject);
                                 myNP.getAttachedQProcessConnections().add(myLinkObject);
                             }

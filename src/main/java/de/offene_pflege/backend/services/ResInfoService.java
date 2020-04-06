@@ -6,7 +6,7 @@ import de.offene_pflege.backend.entity.done.Rooms;
 import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.entity.info.*;
 import de.offene_pflege.backend.entity.prescription.*;
-import de.offene_pflege.backend.entity.process.QProcessElement;
+import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.reports.NReportTools;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
@@ -216,7 +216,7 @@ public class ResInfoService implements HasLogger {
      */
     public static ResInfo getLastResinfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinfotyp", bwinfotyp);
         query.setFirstResult(0);
@@ -228,7 +228,7 @@ public class ResInfoService implements HasLogger {
 
     public static ResInfo getLastResinfo(Resident bewohner, String bwinftyp) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.bwinftyp = :bwinftyp ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner AND b.bwinfotyp.bwinftyp = :bwinftyp ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinftyp", bwinftyp);
         query.setFirstResult(0);
@@ -245,7 +245,7 @@ public class ResInfoService implements HasLogger {
      */
     public static List<ResInfo> getSpecialInfos() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident.station IS NOT NULL AND b.bwinfotyp.type IN (:absence, :infection, :warning, :diabetes, :allergy, :fallrisk) AND b.to > :now ");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident.station IS NOT NULL AND b.bwinfotyp.type IN (:absence, :infection, :warning, :diabetes, :allergy, :fallrisk) AND b.to > :now ");
         query.setParameter("absence", ResInfoTypeTools.TYPE_ABSENCE);
         query.setParameter("infection", ResInfoTypeTools.TYPE_INFECTION);
         query.setParameter("warning", ResInfoTypeTools.TYPE_WARNING);
@@ -260,7 +260,7 @@ public class ResInfoService implements HasLogger {
 
     public static ResInfo getLastResinfo(Resident bewohner, int type) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type = :type ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner AND b.bwinfotyp.type = :type ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("type", type);
         query.setFirstResult(0);
@@ -279,7 +279,7 @@ public class ResInfoService implements HasLogger {
      */
     public static ResInfo getFirstResinfo(Resident resident, ResInfoType resInfoType) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.bwinfotyp = :resInfoType ORDER BY b.from ASC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :resident AND b.bwinfotyp = :resInfoType ORDER BY b.from ASC");
         query.setParameter("resident", resident);
         query.setParameter("resInfoType", resInfoType);
         query.setFirstResult(0);
@@ -300,7 +300,7 @@ public class ResInfoService implements HasLogger {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(
                 " SELECT rinfo FROM ResInfo rinfo " +
-                        " WHERE rinfo.resident = :bewohner " +
+                        " WHERE rinfo.getResident = :bewohner " +
                         " AND rinfo.bwinfotyp.bwinftyp = :resinfoid " +
                         " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
                         " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
@@ -331,7 +331,7 @@ public class ResInfoService implements HasLogger {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(
                 " SELECT rinfo FROM ResInfo rinfo " +
-                        " WHERE rinfo.resident = :bewohner " +
+                        " WHERE rinfo.getResident = :bewohner " +
                         " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
                         " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
                         " (rinfo.from > :from AND rinfo.to < :to)) " +
@@ -357,7 +357,7 @@ public class ResInfoService implements HasLogger {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(
                 " SELECT rinfo FROM ResInfo rinfo " +
-                        " WHERE rinfo.resident = :bewohner " +
+                        " WHERE rinfo.getResident = :bewohner " +
                         " AND rinfo.bwinfotyp = :bwinfotyp " +
                         " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
                         " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
@@ -396,7 +396,7 @@ public class ResInfoService implements HasLogger {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(
                 " SELECT rinfo FROM ResInfo rinfo " +
-                        " WHERE rinfo.resident = :resident AND  rinfo.bwinfotyp.bwinftyp = :type " +
+                        " WHERE rinfo.getResident = :resident AND  rinfo.bwinfotyp.bwinftyp = :type " +
                         " AND rinfo.from <= :pit " +
                         " ORDER BY rinfo.from DESC "
         );
@@ -435,7 +435,7 @@ public class ResInfoService implements HasLogger {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(
                 " SELECT rinfo FROM ResInfo rinfo " +
-                        " WHERE rinfo.resident = :bewohner AND rinfo.bwinfotyp.resInfoCat = :cat " +
+                        " WHERE rinfo.getResident = :bewohner AND rinfo.bwinfotyp.resInfoCat = :cat " +
                         " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
                         " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
                         " (rinfo.from > :from AND rinfo.to < :to)) " +
@@ -465,7 +465,7 @@ public class ResInfoService implements HasLogger {
 
     public static ArrayList<ResInfo> getAll(Resident resident, ResInfoType type) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
         query.setParameter("bwinfotyp", type);
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
@@ -475,7 +475,7 @@ public class ResInfoService implements HasLogger {
 
     public static ArrayList<ResInfo> getActive(Resident resident, ResInfoType type) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.from <= :from AND b.to >= :to ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.from <= :from AND b.to >= :to ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
         query.setParameter("bwinfotyp", type);
         query.setParameter("from", new Date());
@@ -487,7 +487,7 @@ public class ResInfoService implements HasLogger {
 
     public static ArrayList<ResInfo> getAll(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner  ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner  ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
@@ -524,7 +524,7 @@ public class ResInfoService implements HasLogger {
 
     public static ArrayList<ResInfo> getAllActive(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.to = :tfn ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :resident AND b.to = :tfn ORDER BY b.from DESC");
         query.setParameter("resident", resident);
 
         query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
@@ -535,7 +535,7 @@ public class ResInfoService implements HasLogger {
 
     public static ArrayList<ResInfo> getAll4(Resident resident, int abstractinfotype, java.time.LocalDateTime targetdate) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.type = :abstractinfotype");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :resident AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.type = :abstractinfotype");
         query.setParameter("resident", resident);
         query.setParameter("abstractinfotype", abstractinfotype);
         query.setParameter("from", JavaTimeConverter.toDate(targetdate));
@@ -547,7 +547,7 @@ public class ResInfoService implements HasLogger {
 
     public static ArrayList<ResInfo> getActive(Resident bewohner, ResInfoCategory cat) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat = :cat ORDER BY b.from DESC, b.bwinfotyp.bwinftyp");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat = :cat ORDER BY b.from DESC, b.bwinfotyp.bwinftyp");
         query.setParameter("bewohner", bewohner);
         query.setParameter("cat", cat);
         query.setParameter("from", new Date());
@@ -559,7 +559,7 @@ public class ResInfoService implements HasLogger {
 
     public static ArrayList<ResInfo> getTemplatesByType(Resident resident2exclude, int resinfotype) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident <> :resident AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.type = :resinfotype ORDER BY b.resident.name ASC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident <> :resident AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.type = :resinfotype ORDER BY b.getResident.name ASC");
         query.setParameter("resident", resident2exclude);
         query.setParameter("resinfotype", resinfotype);
         query.setParameter("from", new Date());
@@ -571,7 +571,7 @@ public class ResInfoService implements HasLogger {
 
     public static ArrayList<ResInfo> getActive(Resident bewohner, int katart) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.catType = :katart ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.catType = :katart ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("katart", katart);
         query.setParameter("from", new Date());
@@ -594,7 +594,7 @@ public class ResInfoService implements HasLogger {
                     html += "</td>";
                     html += "<td valign=\"top\">" + resInfo.getResInfoType().getShortDescription();
                     html += "</td>";
-                    html += "<td valign=\"top\">" + resInfo.getPITAsHTML();
+                    html += "<td valign=\"top\">" + resInfo.pitAsHTML();
                     html += resInfo.isClosed() ? "<br/>" + SYSConst.html_22x22_StopSign : "";
                     html += "</td>";
                     html += "<td valign=\"top\">" + getContentAsHTML(resInfo);
@@ -1360,7 +1360,7 @@ public class ResInfoService implements HasLogger {
 
     private static String getDiags(Resident bewohner) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.to > :now ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.to > :now ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinfotyp", ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIAGNOSIS));
         query.setParameter("now", new Date());
@@ -1450,7 +1450,7 @@ public class ResInfoService implements HasLogger {
                 " FROM ResInfo ri " +
                 " WHERE ri.bwinfotyp = :infotyp " +
                 " AND ri.bwinfotyp.deprecated = false" +
-                " AND ri.resident.adminonly <> 2 " +
+                " AND ri.getResident.adminonly <> 2 " +
                 " AND ri.from >= :from ";
 
         Query query = em.createQuery(jpql);
@@ -1541,21 +1541,21 @@ public class ResInfoService implements HasLogger {
                 " FROM ResInfo ri " +
                 " WHERE ri.bwinfotyp = :infotyp " +
                 " AND ri.bwinfotyp.deprecated = false" +
-                " AND ri.resident.adminonly <> 2 " +
+                " AND ri.getResident.adminonly <> 2 " +
                 " AND ri.from >= :from ";
 
         Query query1 = em.createQuery(jpql1);
         query1.setParameter("infotyp", fallType);
         query1.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
-        ArrayList<QProcessElement> listData = new ArrayList<QProcessElement>(query1.getResultList());
+        ArrayList<QElement> listData = new ArrayList<QElement>(query1.getResultList());
 
         p = 0;
-        HashMap<Resident, ArrayList<QProcessElement>> dataMap = new HashMap<Resident, ArrayList<QProcessElement>>();
-        for (QProcessElement element : listData) {
+        HashMap<Resident, ArrayList<QElement>> dataMap = new HashMap<Resident, ArrayList<QElement>>();
+        for (QElement element : listData) {
             p++;
             progress.execute(new Pair<Integer, Integer>(p, listData.size()));
             if (!dataMap.containsKey(element.getResident())) {
-                dataMap.put(element.getResident(), new ArrayList<QProcessElement>());
+                dataMap.put(element.getResident(), new ArrayList<QElement>());
             }
             dataMap.get(element.getResident()).add(element);
         }
@@ -1584,16 +1584,16 @@ public class ResInfoService implements HasLogger {
                             SYSConst.html_table_th("misc.msg.details")
             ));
 
-            Collections.sort(dataMap.get(resident), (o1, o2) -> new Long(o1.getPITInMillis()).compareTo(new Long(o2.getPITInMillis())) * -1);
+            Collections.sort(dataMap.get(resident), (o1, o2) -> new Long(o1.pitInMillis()).compareTo(new Long(o2.pitInMillis())) * -1);
 
-            for (QProcessElement element : dataMap.get(resident)) {
+            for (QElement element : dataMap.get(resident)) {
                 if (element instanceof ResInfo) {
                     fallCount++;
                 }
 
                 table.append(SYSConst.html_table_tr(
-                        SYSConst.html_table_td(element.getPITAsHTML(), "left", "top") +
-                                SYSConst.html_table_td(element.getContentAsHTML())
+                        SYSConst.html_table_td(element.pitAsHTML(), "left", "top") +
+                                SYSConst.html_table_td(element.contentAsHTML())
                 ));
             }
 
@@ -1648,7 +1648,7 @@ public class ResInfoService implements HasLogger {
     }
 
     public static void closeAll(EntityManager em, Resident resident, Date enddate, String reason) throws Exception {
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.to >= :now");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.getResident = :resident AND b.to >= :now");
         query.setParameter("resident", resident);
         query.setParameter("now", enddate);
         List<ResInfo> bwinfos = query.getResultList();
@@ -1861,7 +1861,7 @@ public class ResInfoService implements HasLogger {
                 " FROM ResInfo ri " +
                 " WHERE ri.bwinfotyp = :infotyp " +
                 " AND ri.bwinfotyp.deprecated = false" +
-                " AND ri.resident.adminonly <> 2 " +
+                " AND ri.getResident.adminonly <> 2 " +
                 " AND ((ri.from <= :from AND ri.to >= :from) OR " +
                 " (ri.from <= :to AND ri.to >= :to) OR " +
                 " (ri.from > :from AND ri.to < :to)) " +

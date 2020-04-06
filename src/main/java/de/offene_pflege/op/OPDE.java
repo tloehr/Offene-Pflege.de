@@ -32,6 +32,7 @@ import de.offene_pflege.backend.services.SYSFilesService;
 import de.offene_pflege.backend.entity.nursingprocess.DFNTools;
 import de.offene_pflege.backend.entity.prescription.BHPTools;
 import de.offene_pflege.backend.entity.system.*;
+import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.op.settings.InitWizard;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.system.EMailSystem;
@@ -822,7 +823,7 @@ public class OPDE {
     }
 
     public static boolean isAdmin() {
-        return UsersTools.isAdmin(login.getUser());
+        return OPUsersService.isAdmin(login.getUser());
     }
 
     public static void setStandardFont() {

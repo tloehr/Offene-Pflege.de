@@ -29,18 +29,18 @@ import de.offene_pflege.backend.entity.DefaultEntity;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.done.SYSINF2FILE;
 import de.offene_pflege.backend.entity.prescription.Prescription;
-import de.offene_pflege.backend.entity.process.QProcessElement;
+import de.offene_pflege.backend.entity.process.QElement;
+import de.offene_pflege.backend.entity.process.QProcess;
 import de.offene_pflege.backend.entity.process.SYSINF2PROCESS;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.backend.entity.values.ResValue;
 import de.offene_pflege.backend.services.ResInfoService;
-import de.offene_pflege.backend.services.ResInfoTypeTools;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.interfaces.Attachable;
 
 import javax.persistence.*;
-import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -49,88 +49,29 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "resinfo")
-public class ResInfo extends DefaultEntity implements QProcessElement, Comparable<ResInfo>, Attachable {
-
-
-    @Basic(optional = false)
-    @Column(name = "Von")
-    @Temporal(TemporalType.TIMESTAMP)
+public class ResInfo extends DefaultEntity implements QElement, Comparable<ResInfo>, Attachable {
     private Date from;
-    @Basic(optional = false)
-    @Column(name = "Bis",length = 6)
-    @Temporal(TemporalType.TIMESTAMP)
     private Date to;
-
-    @Lob
-    @Column(name = "Properties")
     private String properties;
-    @Lob
-    @Column(name = "Bemerkung")
     private String bemerkung;
-    /**
-     * damit gruppen von ResInfos (immer vom selben ResInfoType), die gemeinsam einen Verlauf beschreiben als
-     * zusammengehörig erkannt werden können, erhalten diese gruppen immer eine eindeutige nummer, die sich aus der
-     * UNIQUE Tabelle errechnet. conncetionid == 0 heisst, dass ein Zusammenhang nicht benötigt wird. Wird bisher nur
-     * bei den Wunden benutzt, und da auch nur bei der QDVS Auswertung.
-     */
-    @Basic(optional = false)
-    @Column(name = "connectionid")
     private Long connectionid;
-    // ==
-    // N:1 Relationen
-    // ==
-    @JoinColumn(name = "BWINFTYP", referencedColumnName = "id")
-    @ManyToOne
     private ResInfoType resInfoType;
-    @JoinColumn(name = "AnUKennung", referencedColumnName = "id")
-    @ManyToOne
     private OPUsers userON;
-    @JoinColumn(name = "AbUKennung", referencedColumnName = "id")
-    @ManyToOne
     private OPUsers userOFF;
-    @JoinColumn(name = "BWKennung", referencedColumnName = "id")
-    @ManyToOne
     private Resident resident;
-    @JoinColumn(name = "resvalueid", referencedColumnName = "id")
-    @ManyToOne
     private ResValue resValue;
-    @JoinColumn(name = "prescriptionid", referencedColumnName = "id")
-    @ManyToOne
     private Prescription prescription;
-
-    public Prescription getPrescription() {
-        return prescription;
-    }
-
-    public void setPrescription(Prescription prescription) {
-        this.prescription = prescription;
-    }
-
-    // ==
-    // M:N Relationen
-    // ==
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "resinfo2tags", joinColumns =
-    @JoinColumn(name = "resinfoid"), inverseJoinColumns =
-    @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
-
-    public Collection<Commontags> getCommontags() {
-        return commontags;
-    }
-
-    // ==
-    // 1:N Relations
-    // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "id")
     private Collection<SYSINF2FILE> attachedFilesConnections;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
     private Collection<SYSINF2PROCESS> attachedProcessConnections;
 
 
     public ResInfo() {
     }
 
+    @Basic(optional = false)
+    @Column(name = "Von")
+    @Temporal(TemporalType.TIMESTAMP)
     public Date getFrom() {
         return from;
     }
@@ -138,6 +79,10 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
     public void setFrom(Date from) {
         this.from = from;
     }
+
+    @Basic(optional = false)
+    @Column(name = "Bis", length = 6)
+    @Temporal(TemporalType.TIMESTAMP)
 
     public Date getTo() {
         return to;
@@ -147,6 +92,9 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.to = to;
     }
 
+    @Lob
+    @Column(name = "Properties")
+
     public String getProperties() {
         return properties;
     }
@@ -155,6 +103,8 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.properties = properties;
     }
 
+    @Lob
+    @Column(name = "Bemerkung")
     public String getBemerkung() {
         return bemerkung;
     }
@@ -163,6 +113,14 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.bemerkung = bemerkung;
     }
 
+    /**
+     * damit gruppen von ResInfos (immer vom selben ResInfoType), die gemeinsam einen Verlauf beschreiben als
+     * zusammengehörig erkannt werden können, erhalten diese gruppen immer eine eindeutige nummer, die sich aus der
+     * UNIQUE Tabelle errechnet. conncetionid == 0 heisst, dass ein Zusammenhang nicht benötigt wird. Wird bisher nur
+     * bei den Wunden benutzt, und da auch nur bei der QDVS Auswertung.
+     */
+    @Basic(optional = false)
+    @Column(name = "connectionid")
     public Long getConnectionid() {
         return connectionid;
     }
@@ -171,6 +129,8 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.connectionid = connectionid;
     }
 
+    @JoinColumn(name = "BWINFTYP", referencedColumnName = "id")
+    @ManyToOne
     public ResInfoType getResInfoType() {
         return resInfoType;
     }
@@ -179,6 +139,8 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.resInfoType = resInfoType;
     }
 
+    @JoinColumn(name = "AnUKennung", referencedColumnName = "id")
+    @ManyToOne
     public OPUsers getUserON() {
         return userON;
     }
@@ -187,6 +149,8 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.userON = userON;
     }
 
+    @JoinColumn(name = "AbUKennung", referencedColumnName = "id")
+    @ManyToOne
     public OPUsers getUserOFF() {
         return userOFF;
     }
@@ -195,6 +159,8 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.userOFF = userOFF;
     }
 
+    @JoinColumn(name = "BWKennung", referencedColumnName = "id")
+    @ManyToOne
     @Override
     public Resident getResident() {
         return resident;
@@ -204,6 +170,8 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.resident = resident;
     }
 
+    @JoinColumn(name = "resvalueid", referencedColumnName = "id")
+    @ManyToOne
     public ResValue getResValue() {
         return resValue;
     }
@@ -212,10 +180,29 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.resValue = resValue;
     }
 
+    @JoinColumn(name = "prescriptionid", referencedColumnName = "id")
+    @ManyToOne
+    public Prescription getPrescription() {
+        return prescription;
+    }
+
+    public void setPrescription(Prescription prescription) {
+        this.prescription = prescription;
+    }
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "resinfo2tags", joinColumns =
+    @JoinColumn(name = "resinfoid"), inverseJoinColumns =
+    @JoinColumn(name = "ctagid"))
+    public Collection<Commontags> getCommontags() {
+        return commontags;
+    }
+
     public void setCommontags(Collection<Commontags> commontags) {
         this.commontags = commontags;
     }
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resInfo")
     public Collection<SYSINF2FILE> getAttachedFilesConnections() {
         return attachedFilesConnections;
     }
@@ -224,6 +211,7 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
         this.attachedFilesConnections = attachedFilesConnections;
     }
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
     public Collection<SYSINF2PROCESS> getAttachedProcessConnections() {
         return attachedProcessConnections;
     }
@@ -234,7 +222,7 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
 
     @Override
     public int compareTo(ResInfo resInfo) {
-        int compare =  this.getResInfoType().isDeprecated().compareTo(resInfo.getResInfoType().isDeprecated()) * -1;
+        int compare = this.getResInfoType().isDeprecated().compareTo(resInfo.getResInfoType().isDeprecated()) * -1;
         if (compare == 0) {
             compare = to.compareTo(resInfo.getTo());
         }
@@ -245,21 +233,48 @@ public class ResInfo extends DefaultEntity implements QProcessElement, Comparabl
     }
 
     @Override
-    public String getContentAsHTML() {
+    public long pitInMillis() {
+        return from.getTime();
+    }
+
+    @Override
+    public ArrayList<QProcess> findAttachedProcesses() {
+        ArrayList<QProcess> list = new ArrayList<>();
+        for (SYSINF2PROCESS att : attachedProcessConnections) {
+            list.add(att.getQProcess());
+        }
+        return list;
+    }
+
+    @Override
+    public String contentAsHTML() {
         return ResInfoService.getContentAsHTML(this);
     }
 
     @Override
-    public String getPITAsHTML() {
-        return ResInfoService.getPITAsHTML(this);
-    } ^
+    public String titleAsString() {
+        return null;
+    }
 
+    @Override
+    public String pitAsHTML() {
+        return ResInfoService.getPITAsHTML(this);
+    }
+
+    @Override
+    public OPUsers findOwner() {
+        return null;
+    }
 
 
     @Override
-    public boolean isActive() {
+    public boolean active() {
         return ResidentTools.isActive(resident) && !ResInfoService.isClosed(this);
     }
 
 
+    @Override
+    public long findPrimaryKey() {
+        return getId();
+    }
 }

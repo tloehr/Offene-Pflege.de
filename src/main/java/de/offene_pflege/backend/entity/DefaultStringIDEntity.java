@@ -3,11 +3,14 @@ package de.offene_pflege.backend.entity;
 
 import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.Tools;
+import org.eclipse.persistence.annotations.OptimisticLocking;
+import org.eclipse.persistence.annotations.OptimisticLockingType;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @MappedSuperclass
+@OptimisticLocking(type = OptimisticLockingType.VERSION_COLUMN)
 public abstract class DefaultStringIDEntity implements HasLogger, Serializable {
     private String id;
     private int version;

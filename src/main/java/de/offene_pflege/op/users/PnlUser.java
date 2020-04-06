@@ -33,6 +33,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.system.*;
+import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -120,7 +121,7 @@ public class PnlUser extends CleanablePanel {
          *                                              |_|            |___/
          */
 
-        lstUsers = UsersTools.getUsers(true);
+        lstUsers = OPUsersService.getUsers(true);
         lstGroups = GroupsTools.getGroups();
         for (OPUsers user : lstUsers) {
             usermap.put(user.getUID(), user);
@@ -398,7 +399,7 @@ public class PnlUser extends CleanablePanel {
         final CollapsiblePane cp = cpMap.get(key);
         DefaultCPTitle cptitle = new DefaultCPTitle("<html><font size=+1>" +
                 user.toString() +
-                (UsersTools.isQualified(user) ?
+                (OPUsersService.isQualified(user) ?
                         ", " + SYSTools.xx("opde.users.qualifiedNurse") : "") +
                 "</font></html>", e -> {
             try {
@@ -485,7 +486,7 @@ public class PnlUser extends CleanablePanel {
                 OPUsers myUser = em.merge(usermap.get(user.getUID()));
                 em.lock(myUser, LockModeType.OPTIMISTIC);
 
-                myUser.setUserstatus(myUser.isActive() ? UsersTools.STATUS_INACTIVE : UsersTools.STATUS_ACTIVE);
+                myUser.setUserstatus(myUser.isActive() ? OPUsersService.STATUS_INACTIVE : OPUsersService.STATUS_ACTIVE);
 
                 em.getTransaction().commit();
                 lstUsers.remove(user);
@@ -601,7 +602,7 @@ public class PnlUser extends CleanablePanel {
                                       }
 
         );
-        cp.setBackground(UsersTools.getBG1(user));
+        cp.setBackground(OPUsersService.getBG1(user));
         cp.setCollapsible(user.isActive());
 
         cp.setHorizontalAlignment(SwingConstants.LEADING);

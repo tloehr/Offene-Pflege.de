@@ -206,7 +206,7 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
     }
 
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resident")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "getResident")
     public Collection<ResInfo> getResInfoCollection() {
         return resInfoCollection;
     }

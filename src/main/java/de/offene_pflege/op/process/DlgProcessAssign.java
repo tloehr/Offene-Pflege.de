@@ -27,12 +27,12 @@ import java.util.Collections;
 public class DlgProcessAssign extends MyJDialog {
     public static final String internalClassID = "nursingrecords.qprocesses.pnlprocessassign";
 
-    private QProcessElement element;
+    private QElement element;
     private Closure afterAction;
     private ArrayList<QProcess> assigned, unassigned;
     private Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = null;
 
-    public DlgProcessAssign(QProcessElement element, Closure afterAction) {
+    public DlgProcessAssign(QElement element, Closure afterAction) {
         super(false);
         this.element = element;
         this.afterAction = afterAction;
@@ -48,7 +48,7 @@ public class DlgProcessAssign extends MyJDialog {
     }
 
     private void initPanel() {
-        assigned = element.getAttachedProcesses();
+        assigned = element.findAttachedProcesses();
         Collections.sort(assigned);
         unassigned = new ArrayList<QProcess>(QProcessTools.getActiveProcesses4(element.getResident()));
         unassigned.removeAll(assigned);

@@ -13,7 +13,7 @@ import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.nursingprocess.Intervention;
 import de.offene_pflege.backend.entity.process.QProcess;
-import de.offene_pflege.backend.entity.process.QProcessElement;
+import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.SYSPRE2PROCESS;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.OPUsers;
@@ -92,7 +92,7 @@ import java.util.List;
 @Entity
 @Table(name = "prescription")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class Prescription extends Ownable implements Serializable, QProcessElement, Cloneable, Comparable<Prescription>, Attachable {
+public class Prescription extends Ownable implements Serializable, QElement, Cloneable, Comparable<Prescription>, Attachable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -370,7 +370,7 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     }
 
     @Override
-    public String getTitle() {
+    public String titleAsString() {
         return SYSTools.xx("nursingrecords.prescription") + ": " + PrescriptionTools.getShortDescriptionAsCompactText(this);
     }
 
@@ -412,17 +412,17 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     }
 
     @Override
-    public OPUsers getUser() {
+    public OPUsers findOwner() {
         return userON;
     }
 
     @Override
-    public long getPITInMillis() {
+    public long pitInMillis() {
         return from.getTime();
     }
 
     @Override
-    public ArrayList<QProcess> getAttachedProcesses() {
+    public ArrayList<QProcess> findAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
         for (SYSPRE2PROCESS att : attachedProcessConnections) {
             list.add(att.getQProcess());
@@ -432,12 +432,12 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
 
 
     @Override
-    public String getContentAsHTML() {
+    public String contentAsHTML() {
         return PrescriptionTools.getPrescriptionAsHTML(this, false, false, true, false);
     }
 
     @Override
-    public String getPITAsHTML() {
+    public String pitAsHTML() {
         String result = "";
         DateFormat df = DateFormat.getDateInstance();
 

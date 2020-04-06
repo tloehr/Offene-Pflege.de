@@ -32,7 +32,7 @@ package de.offene_pflege.op.care.nursingprocess;
  */
 
 import de.offene_pflege.backend.entity.nursingprocess.InterventionSchedule;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionScheduleTools;
+import de.offene_pflege.backend.services.InterventionScheduleService;
 import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
@@ -77,7 +77,7 @@ public class TMPlan extends AbstractTableModel {
             case COL_TXT: {
                 String html = SYSConst.html_div_open;
                 html += "<b>" + planung.getInterventionSchedule().get(row).getIntervention().getBezeichnung() + "</b>";
-                html += InterventionScheduleTools.getTerminAsHTML(planung.getInterventionSchedule().get(row));
+                html += InterventionScheduleService.getTerminAsHTML(planung.getInterventionSchedule().get(row));
                 html += SYSConst.html_div_close;
                 result = SYSTools.toHTML(html);
                 break;

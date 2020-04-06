@@ -5,7 +5,7 @@ import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcessTools;
+import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
 import de.offene_pflege.backend.entity.reports.NReport;
@@ -81,11 +81,11 @@ public class ControllingTools {
             mapResidents.get(val.getResident()).getResValues().add(val);
         }
 
-        HashSet<NursingProcess> painNP = new HashSet(NursingProcessTools.getAll(CommontagsTools.TYPE_SYS_PAIN, from, to));
+        HashSet<NursingProcess> painNP = new HashSet(NursingProcessService.getAll(CommontagsTools.TYPE_SYS_PAIN, from, to));
         p += 5;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
-        painNP.addAll(NursingProcessTools.getAll(CommontagsTools.TYPE_SYS_PAINMGR, from, to));
+        painNP.addAll(NursingProcessService.getAll(CommontagsTools.TYPE_SYS_PAINMGR, from, to));
         p += 5;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
@@ -209,7 +209,7 @@ public class ControllingTools {
                 ArrayList<NursingProcess> listNP = new ArrayList<>(mapResidents.get(resident).getNursingProcesses());
                 Collections.sort(listNP);
                 for (NursingProcess np : listNP) {
-                    nursingprocess += NursingProcessTools.getAsHTML(np, false, true, false, false);
+                    nursingprocess += NursingProcessService.getAsHTML(np, false, true, false, false);
                 }
                 listNP.clear();
             }

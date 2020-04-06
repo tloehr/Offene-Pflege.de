@@ -39,7 +39,7 @@ import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.entity.info.*;
 import de.offene_pflege.backend.entity.prescription.MedStockTools;
-import de.offene_pflege.backend.entity.process.QProcessElement;
+import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.QProcessTools;
 import de.offene_pflege.backend.entity.qms.ControllingTools;
 import de.offene_pflege.backend.entity.reports.NReportTools;
@@ -1271,11 +1271,11 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
 
-        String jpql1 = " SELECT b FROM ResInfo b WHERE b.from > :from AND b.resident.adminonly <> 2 AND b.bwinfotyp.type = :type ORDER BY b.resident.id, b.from DESC ";
+        String jpql1 = " SELECT b FROM ResInfo b WHERE b.from > :from AND b.getResident.adminonly <> 2 AND b.bwinfotyp.type = :type ORDER BY b.getResident.id, b.from DESC ";
         Query query1 = em.createQuery(jpql1);
         query1.setParameter("type", ResInfoTypeTools.TYPE_WOUNDS);
         query1.setParameter("from", from.toDate());
-        ArrayList<QProcessElement> listVal = new ArrayList<QProcessElement>(query1.getResultList());
+        ArrayList<QElement> listVal = new ArrayList<QElement>(query1.getResultList());
 
         String jpql2 = " " +
                 " SELECT n FROM NReport n " +
@@ -1288,14 +1288,14 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
         Query query2 = em.createQuery(jpql2);
         query2.setParameter("type", CommontagsTools.TYPE_SYS_WOUNDS);
         query2.setParameter("from", from.toDate());
-        listVal.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
+        listVal.addAll(new ArrayList<QElement>(query2.getResultList()));
 
         em.close();
 
-        HashMap<Resident, ArrayList<QProcessElement>> listData = new HashMap<Resident, ArrayList<QProcessElement>>();
-        for (QProcessElement element : listVal) {
+        HashMap<Resident, ArrayList<QElement>> listData = new HashMap<Resident, ArrayList<QElement>>();
+        for (QElement element : listVal) {
             if (!listData.containsKey(element.getResident())) {
-                listData.put(element.getResident(), new ArrayList<QProcessElement>());
+                listData.put(element.getResident(), new ArrayList<QElement>());
             }
             listData.get(element.getResident()).add(element);
         }
@@ -1321,12 +1321,12 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
                             SYSConst.html_table_th("misc.msg.details")
             ));
 
-            Collections.sort(listData.get(resident), (o1, o2) -> new Long(o1.getPITInMillis()).compareTo(new Long(o2.getPITInMillis())) * -1);
+            Collections.sort(listData.get(resident), (o1, o2) -> new Long(o1.pitInMillis()).compareTo(new Long(o2.pitInMillis())) * -1);
 
-            for (QProcessElement element : listData.get(resident)) {
+            for (QElement element : listData.get(resident)) {
                 table.append(SYSConst.html_table_tr(
-                        SYSConst.html_table_td(element.getPITAsHTML(), "left", "top") +
-                                SYSConst.html_table_td(element.getContentAsHTML())
+                        SYSConst.html_table_td(element.pitAsHTML(), "left", "top") +
+                                SYSConst.html_table_td(element.contentAsHTML())
                 ));
             }
 

@@ -2,7 +2,7 @@ package de.offene_pflege.op.system;
 
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.backend.entity.system.OPUsers;
-import de.offene_pflege.backend.entity.system.UsersTools;
+import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSTools;
@@ -124,7 +124,7 @@ public class EMailSystem {
         ArrayList<Recipient> recipients = new ArrayList<>();
 
         users.forEach(user -> {
-            if (user.isActive() && user.getMailConfirmed() == UsersTools.MAIL_CONFIRMED) {
+            if (user.isActive() && user.getMailConfirmed() == OPUsersService.MAIL_CONFIRMED) {
                 recipients.add(new Recipient(user));
             }
         });

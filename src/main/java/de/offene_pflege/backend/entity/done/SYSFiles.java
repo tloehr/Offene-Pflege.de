@@ -44,7 +44,7 @@ public class SYSFiles extends DefaultEntity implements Comparable {
     private long filesize;
     private Date pit;
     private String beschreibung;
-    private OPUsers opuser;
+    private OPUsers opUsers;
     private Collection<SYSNR2FILE> nrAssignCollection;
     private Collection<SYSINF2FILE> bwiAssignCollection;
     private Collection<SYSPRE2FILE> preAssignCollection;
@@ -120,14 +120,13 @@ public class SYSFiles extends DefaultEntity implements Comparable {
 
     @JoinColumn(name = "UID", referencedColumnName = "id")
     @ManyToOne
-    public OPUsers getOpuser() {
-        return opuser;
+    public OPUsers getOpUsers() {
+        return opUsers;
     }
 
-    public void setOpuser(OPUsers opuser) {
-        this.opuser = opuser;
+    public void setOpUsers(OPUsers opUsers) {
+        this.opUsers = opUsers;
     }
-
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     public Collection<SYSNR2FILE> getNrAssignCollection() {

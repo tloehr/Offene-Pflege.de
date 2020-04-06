@@ -24,7 +24,7 @@ import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.process.*;
 import de.offene_pflege.backend.entity.system.OPUsers;
-import de.offene_pflege.backend.entity.system.UsersTools;
+import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -371,7 +371,7 @@ public class PnlProcess extends NursingRecordsPanel {
             elementPanel.add(btnAddPReport);
         }
 
-        for (final QProcessElement element : qProcess.getElements()) {
+        for (final QElement element : qProcess.getElements()) {
             if (tbSystem.isSelected() || !(element instanceof PReport) || !((PReport) element).isSystem()) {
                 final CollapsiblePane cpElement = createCP4(element, qProcess);
                 if (element instanceof PReport && ((PReport) element).isSystem()) {
@@ -390,9 +390,9 @@ public class PnlProcess extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4(final QProcessElement element, final QProcess qProcess) {
-        String elementTitle = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(element.getPITInMillis())) + "] " + SYSTools.left(element.getTitle(), MAX_TEXT_LENGTH);
-        elementTitle += " [" + element.getUser().getUID() + "]";
+    private CollapsiblePane createCP4(final QElement element, final QProcess qProcess) {
+        String elementTitle = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(element.pitInMillis())) + "] " + SYSTools.left(element.titleAsString(), MAX_TEXT_LENGTH);
+        elementTitle += " [" + element.findOwner().getUID() + "]";
 
         if (!mapCP.containsKey(element.hashCode())) {
             mapCP.put(element.hashCode(), new CollapsiblePane(elementTitle));
@@ -426,7 +426,7 @@ public class PnlProcess extends NursingRecordsPanel {
         btnUnlink.setBorder(null);
         btnUnlink.setToolTipText(SYSTools.xx("nursingrecords.qprocesses.btnunlink.tooltip"));
         btnUnlink.addActionListener(actionEvent -> {
-            currentEditor = new DlgYesNo(SYSTools.xx("nursingrecords.qprocesses.question.unlink") + "<p>" + element.getContentAsHTML() + "</p>", SYSConst.icon48delete, answer -> {
+            currentEditor = new DlgYesNo(SYSTools.xx("nursingrecords.qprocesses.question.unlink") + "<p>" + element.contentAsHTML() + "</p>", SYSConst.icon48delete, answer -> {
                 if (answer.equals(JOptionPane.YES_OPTION)) {
                     EntityManager em = OPDE.createEM();
                     try {
@@ -435,7 +435,7 @@ public class PnlProcess extends NursingRecordsPanel {
                             em.lock(em.merge(qProcess.getResident()), LockModeType.OPTIMISTIC);
                         }
 
-                        QProcessElement myElement = em.merge(element);
+                        QElement myElement = em.merge(element);
                         QProcess myProcess = em.merge(qProcess);
 
                         em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
@@ -501,7 +501,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 JTextPane elementText = new JTextPane();
                 elementText.setContentType("text/html");
                 elementText.setEditable(false);
-                elementText.setText(SYSTools.toHTML("<div id=\"fonttext\">" + element.getContentAsHTML()) + "</div>");
+                elementText.setText(SYSTools.toHTML("<div id=\"fonttext\">" + element.contentAsHTML()) + "</div>");
 
                 cpElement.setContentPane(elementText);
                 cpElement.setOpaque(false);
@@ -639,10 +639,10 @@ public class PnlProcess extends NursingRecordsPanel {
 
 
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
-                DefaultComboBoxModel dcbm1 = SYSTools.list2cmb(UsersTools.getUsers(false));
+                DefaultComboBoxModel dcbm1 = SYSTools.list2cmb(OPUsersService.getUsers(false));
                 cmbUser.setModel(dcbm1);
                 dcbm1.insertElementAt(null, 0);
-                cmbUser.setRenderer(UsersTools.getRenderer());
+                cmbUser.setRenderer(OPUsersService.getRenderer());
                 cmbUser.setFont(SYSConst.ARIAL14);
                 cmbUser.setSelectedIndex(0);
                 cmbUser.addItemListener(itemEvent -> {
@@ -1230,9 +1230,9 @@ public class PnlProcess extends NursingRecordsPanel {
                     popup.setMovable(false);
                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.PAGE_AXIS));
                     final JButton btnSave = new JButton(SYSConst.icon22apply);
-                    final JList editor = new JList(SYSTools.list2dlm(UsersTools.getUsers(false)));
+                    final JList editor = new JList(SYSTools.list2dlm(OPUsersService.getUsers(false)));
                     editor.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                    editor.setCellRenderer(UsersTools.getRenderer());
+                    editor.setCellRenderer(OPUsersService.getRenderer());
                     btnSave.addActionListener(evt -> {
 
                         if (editor.getSelectedValue() == null) {

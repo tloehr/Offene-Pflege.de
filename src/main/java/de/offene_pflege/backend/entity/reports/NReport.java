@@ -5,7 +5,7 @@ import de.offene_pflege.backend.entity.done.SYSNR2FILE;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.process.QProcess;
-import de.offene_pflege.backend.entity.process.QProcessElement;
+import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.SYSNR2PROCESS;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.OPUsers;
@@ -51,7 +51,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "nreports")
-public class NReport extends Ownable implements Serializable, QProcessElement, Comparable<NReport>, Cloneable, Attachable {
+public class NReport extends Ownable implements Serializable, QElement, Comparable<NReport>, Cloneable, Attachable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -371,7 +371,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     @Override
-    public OPUsers getUser() {
+    public OPUsers findOwner() {
         return newBy;
     }
 
@@ -426,12 +426,12 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     @Override
-    public String getContentAsHTML() {
+    public String contentAsHTML() {
         return NReportTools.getNReportAsHTML(this, false);
     }
 
     @Override
-    public String getPITAsHTML() {
+    public String pitAsHTML() {
         return NReportTools.getPITAsHTML(this);
     }
 
@@ -447,7 +447,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     @Override
-    public ArrayList<QProcess> getAttachedProcesses() {
+    public ArrayList<QProcess> findAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
         for (SYSNR2PROCESS att : attachedProcessConnections) {
             list.add(att.getQProcess());
@@ -460,7 +460,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     @Override
-    public String getTitle() {
+    public String titleAsString() {
         return SYSTools.xx("misc.msg.report") + ": " + text;
     }
 
@@ -492,7 +492,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     @Override
-    public long getPITInMillis() {
+    public long pitInMillis() {
         return pit.getTime();
     }
 

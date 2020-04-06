@@ -3,7 +3,7 @@ package de.offene_pflege.op.settings.subpanels;
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.backend.entity.system.OPUsers;
-import de.offene_pflege.backend.entity.system.UsersTools;
+import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.gui.PnlBeanEditor;
 import de.offene_pflege.gui.events.RelaxedDocumentListener;
 import de.offene_pflege.gui.interfaces.BoundedTextField;
@@ -47,10 +47,10 @@ public class PnlUserMailSettings extends DefaultPanel {
     public PnlUserMailSettings() {
         super("opde.settings.personal.mail");
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        keyConfirmed = OPDE.getLogin().getUser().getMailConfirmed() >= UsersTools.MAIL_CONFIRMED;
+        keyConfirmed = OPDE.getLogin().getUser().getMailConfirmed() >= OPUsersService.MAIL_CONFIRMED;
         lblLED.setIcon(keyConfirmed ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
 
-        tbNotifications = new YesNoToggleButton("opde.settings.personal.enable.notification", "opde.settings.personal.disable.notification", OPDE.getLogin().getUser().getMailConfirmed() == UsersTools.MAIL_NOTIFICATIONS_ENABLED);
+        tbNotifications = new YesNoToggleButton("opde.settings.personal.enable.notification", "opde.settings.personal.disable.notification", OPDE.getLogin().getUser().getMailConfirmed() == OPUsersService.MAIL_NOTIFICATIONS_ENABLED);
         tbNotifications.setEnabled(keyConfirmed);
 
         try {
@@ -65,7 +65,7 @@ public class PnlUserMailSettings extends DefaultPanel {
         tbNotifications.addItemListener(ie -> {
             if (ie.getStateChange() != ItemEvent.SELECTED && ie.getStateChange() != ItemEvent.DESELECTED) return;
             OPUsers myUser = OPDE.getLogin().getUser();
-            myUser.setMailConfirmed(ie.getStateChange() == ItemEvent.SELECTED ? UsersTools.MAIL_NOTIFICATIONS_ENABLED : UsersTools.MAIL_CONFIRMED);
+            myUser.setMailConfirmed(ie.getStateChange() == ItemEvent.SELECTED ? OPUsersService.MAIL_NOTIFICATIONS_ENABLED : OPUsersService.MAIL_CONFIRMED);
             OPDE.getLogin().setUser(EntityTools.merge(myUser));
         });
 
@@ -91,7 +91,7 @@ public class PnlUserMailSettings extends DefaultPanel {
                         lblLED.setIcon(SYSConst.icon22ledRedOn);
 
                         OPUsers myUser = OPDE.getLogin().getUser();
-                        myUser.setMailConfirmed(UsersTools.MAIL_UNCONFIRMED);
+                        myUser.setMailConfirmed(OPUsersService.MAIL_UNCONFIRMED);
                         OPDE.getLogin().setUser(EntityTools.merge(myUser));
 
                         Random generator = new Random(System.currentTimeMillis());
@@ -110,7 +110,7 @@ public class PnlUserMailSettings extends DefaultPanel {
                             if (lastCheckOk) {
                                 OPUsers myUser = OPDE.getLogin().getUser();
                                 myUser.setEMail(mailaddress);
-                                myUser.setMailConfirmed(UsersTools.MAIL_UNCONFIRMED);
+                                myUser.setMailConfirmed(OPUsersService.MAIL_UNCONFIRMED);
                                 OPDE.getLogin().setUser(EntityTools.merge(myUser));
                             } else {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.personal.mail.fail", DisplayMessage.WARNING));
@@ -150,7 +150,7 @@ public class PnlUserMailSettings extends DefaultPanel {
 
         lblLED.setText(SYSTools.xx("opde.settings.personal.mail.key"));
         BoundedTextField btf = new BoundedTextField(4, 4);
-        btf.setText(OPDE.getLogin().getUser().getMailConfirmed() == UsersTools.MAIL_UNCONFIRMED ? "" : OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TESTKEY));
+        btf.setText(OPDE.getLogin().getUser().getMailConfirmed() == OPUsersService.MAIL_UNCONFIRMED ? "" : OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TESTKEY));
 //        btf.getDocument().insertString(0, SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TESTKEY)), null);
         btf.getDocument().addDocumentListener(new RelaxedDocumentListener(var1 -> {
             try {
@@ -165,7 +165,7 @@ public class PnlUserMailSettings extends DefaultPanel {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(keyConfirmed ? "opde.settings.personal.mail.confirmed" : "opde.settings.personal.mail.not.confirmed"));
                 if (keyConfirmed) {
                     OPUsers myUser = OPDE.getLogin().getUser();
-                    myUser.setMailConfirmed(UsersTools.MAIL_CONFIRMED);
+                    myUser.setMailConfirmed(OPUsersService.MAIL_CONFIRMED);
                     OPDE.getLogin().setUser(EntityTools.merge(myUser));
                 }
             } catch (ParseException e) {

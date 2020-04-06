@@ -997,7 +997,7 @@ public class PnlReport extends NursingRecordsPanel {
                                         if (unassigned.contains(linkObject.getQProcess())) {
                                             linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                             linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
-                                            em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                            em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.titleAsString() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
 
                                             em.remove(linkObject);
                                         }
@@ -1005,11 +1005,11 @@ public class PnlReport extends NursingRecordsPanel {
                                     attached.clear();
 
                                     for (QProcess qProcess : assigned) {
-                                        List<QProcessElement> listElements = qProcess.getElements();
+                                        List<QElement> listElements = qProcess.getElements();
                                         if (!listElements.contains(myReport)) {
                                             QProcess myQProcess = em.merge(qProcess);
                                             SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-                                            em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                            em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.titleAsString() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                             qProcess.getAttachedNReportConnections().add(myLinkObject);
                                             myReport.getAttachedQProcessConnections().add(myLinkObject);
                                         }
@@ -1558,18 +1558,18 @@ public class PnlReport extends NursingRecordsPanel {
                             if (unassigned.contains(linkObject.getQProcess())) {
                                 linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                 linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.titleAsString() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                 em.remove(linkObject);
                             }
                         }
                         attached.clear();
 
                         for (QProcess qProcess : assigned) {
-                            List<QProcessElement> listElements = qProcess.getElements();
+                            List<QElement> listElements = qProcess.getElements();
                             if (!listElements.contains(myReport)) {
                                 QProcess myQProcess = em.merge(qProcess);
                                 SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.titleAsString() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                 qProcess.getAttachedNReportConnections().add(myLinkObject);
                                 myReport.getAttachedQProcessConnections().add(myLinkObject);
                             }

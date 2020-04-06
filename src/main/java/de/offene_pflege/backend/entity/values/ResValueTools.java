@@ -67,7 +67,7 @@ public class ResValueTools {
                 color = GUITools.getHTMLColor(SYSCalendar.getFGItem(SYSCalendar.whatShiftIs(bwert.getPit())));
             }
         }
-        String result = sdf.format(bwert.getPit()) + "; " + bwert.getUser().getFullname();
+        String result = sdf.format(bwert.getPit()) + "; " + bwert.findOwner().getFullname();
         if (showids) {
             result += "<br/><i>[" + bwert.getID() + "]</i>";
         }

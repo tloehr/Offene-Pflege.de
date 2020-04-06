@@ -14,7 +14,7 @@ import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.prescription.GP;
 import de.offene_pflege.backend.entity.prescription.GPTools;
 import de.offene_pflege.backend.entity.system.OPUsers;
-import de.offene_pflege.backend.entity.system.UsersTools;
+import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -100,13 +100,13 @@ public class DlgEditResidentBaseData extends MyJDialog {
 //            }
 //        });
 
-        ArrayList<OPUsers> listUsers = UsersTools.getUsers(false);
+        ArrayList<OPUsers> listUsers = OPUsersService.getUsers(false);
         listUsers.add(0, null);
         cmbPrimNurse1.setModel(new DefaultComboBoxModel(listUsers.toArray()));
-        cmbPrimNurse1.setRenderer(UsersTools.getRenderer());
+        cmbPrimNurse1.setRenderer(OPUsersService.getRenderer());
         cmbPrimNurse1.setSelectedItem(resident.getPn1());
         cmbPrimNurse2.setModel(new DefaultComboBoxModel(listUsers.toArray()));
-        cmbPrimNurse2.setRenderer(UsersTools.getRenderer());
+        cmbPrimNurse2.setRenderer(OPUsersService.getRenderer());
         cmbPrimNurse2.setSelectedItem(resident.getPn2());
 
 //        ArrayList<Rooms> listRooms = RoomsTools.getAllActive();

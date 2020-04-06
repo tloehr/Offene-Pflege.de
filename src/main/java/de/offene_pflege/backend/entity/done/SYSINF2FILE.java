@@ -41,7 +41,7 @@ public class SYSINF2FILE extends DefaultEntity {
     private Date pit;
     private ResInfo resInfo;
     private SYSFiles sysfiles;
-    private OPUsers opusers;
+    private OPUsers opUsers;
 
     public SYSINF2FILE() {
     }
@@ -79,11 +79,11 @@ public class SYSINF2FILE extends DefaultEntity {
 
     @JoinColumn(name = "UKennung", referencedColumnName = "id")
     @ManyToOne
-    public OPUsers getOpusers() {
-        return opusers;
+    public OPUsers getOpUsers() {
+        return opUsers;
     }
 
-    public void setOpusers(OPUsers opusers) {
-        this.opusers = opusers;
+    public void setOpUsers(OPUsers opUsers) {
+        this.opUsers = opUsers;
     }
 }

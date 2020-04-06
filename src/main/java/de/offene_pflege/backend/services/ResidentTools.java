@@ -9,7 +9,6 @@ import de.offene_pflege.backend.entity.done.Homes;
 import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.entity.info.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcessTools;
 import de.offene_pflege.backend.entity.prescription.MedInventoryTools;
 import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
 import de.offene_pflege.backend.entity.process.QProcessTools;
@@ -240,7 +239,7 @@ public class ResidentTools {
      * @param resident the resident in question
      */
     public static void endOfStay(EntityManager em, Resident resident, Date enddate, String reason) throws Exception {
-        NursingProcessTools.closeAll(em, resident, enddate);
+        NursingProcessService.closeAll(em, resident, enddate);
         ResInfoService.closeAll(em, resident, enddate, reason);
         MedInventoryTools.closeAll(em, resident, JavaTimeConverter.toJavaLocalDateTime(enddate));
         // The prescriptions must be closed after the MedInventories. Ohterwise there may be a locking exception.

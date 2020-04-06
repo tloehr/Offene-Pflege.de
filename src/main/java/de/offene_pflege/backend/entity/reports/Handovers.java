@@ -7,7 +7,7 @@ package de.offene_pflege.backend.entity.reports;
 import de.offene_pflege.backend.entity.done.Homes;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.process.QProcess;
-import de.offene_pflege.backend.entity.process.QProcessElement;
+import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
@@ -24,7 +24,7 @@ import java.util.List;
 @Entity
 @Table(name = "handovers")
 
-public class Handovers implements Serializable, QProcessElement, Comparable<Handovers> {
+public class Handovers implements Serializable, QElement, Comparable<Handovers> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -92,7 +92,7 @@ public class Handovers implements Serializable, QProcessElement, Comparable<Hand
         this.home = home;
     }
 
-    public OPUsers getUser() {
+    public OPUsers findOwner() {
         return user;
     }
 
@@ -130,27 +130,27 @@ public class Handovers implements Serializable, QProcessElement, Comparable<Hand
     }
 
     @Override
-    public long getPITInMillis() {
+    public long pitInMillis() {
         return pit.getTime();
     }
 
     @Override
-    public ArrayList<QProcess> getAttachedProcesses() {
+    public ArrayList<QProcess> findAttachedProcesses() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public String getContentAsHTML() {
+    public String contentAsHTML() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public String getTitle() {
+    public String titleAsString() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public String getPITAsHTML() {
+    public String pitAsHTML() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

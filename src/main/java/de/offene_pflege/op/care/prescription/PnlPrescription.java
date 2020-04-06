@@ -231,7 +231,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
-                "<td width=\"280\" align=\"left\">" + prescription.getPITAsHTML() + "</td>" +
+                "<td width=\"280\" align=\"left\">" + prescription.pitAsHTML() + "</td>" +
                 "<td width=\"380\" align=\"left\">" +
                 "<font size=+1>" + PrescriptionTools.getShortDescription(prescription) + "</font>" +
                 PrescriptionTools.getDoseAsHTML(prescription) +
@@ -353,7 +353,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             if (unassigned.contains(linkObject.getQProcess())) {
                                 linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                 linkObject.getPrescription().getAttachedProcessConnections().remove(linkObject);
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myPrescription.titleAsString() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                 em.remove(linkObject);
                             }
                         }
@@ -361,11 +361,11 @@ public class PnlPrescription extends NursingRecordsPanel {
 
 
                         for (QProcess qProcess : assigned) {
-                            List<QProcessElement> listElements = qProcess.getElements();
+                            List<QElement> listElements = qProcess.getElements();
                             if (!listElements.contains(myPrescription)) {
                                 QProcess myQProcess = em.merge(qProcess);
                                 SYSPRE2PROCESS myLinkObject = em.merge(new SYSPRE2PROCESS(myQProcess, myPrescription));
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myPrescription.titleAsString() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                 qProcess.getAttachedPrescriptionConnections().add(myLinkObject);
                                 myPrescription.getAttachedProcessConnections().add(myLinkObject);
                             }
@@ -1519,18 +1519,18 @@ public class PnlPrescription extends NursingRecordsPanel {
                             if (unassigned.contains(linkObject.getQProcess())) {
                                 linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                 linkObject.getPrescription().getAttachedProcessConnections().remove(linkObject);
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myPrescription.titleAsString() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                 em.remove(linkObject);
                             }
                         }
                         attached.clear();
 
                         for (QProcess qProcess : assigned) {
-                            List<QProcessElement> listElements = qProcess.getElements();
+                            List<QElement> listElements = qProcess.getElements();
                             if (!listElements.contains(myPrescription)) {
                                 QProcess myQProcess = em.merge(qProcess);
                                 SYSPRE2PROCESS myLinkObject = em.merge(new SYSPRE2PROCESS(myQProcess, myPrescription));
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myPrescription.titleAsString() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                 qProcess.getAttachedPrescriptionConnections().add(myLinkObject);
                                 myPrescription.getAttachedProcessConnections().add(myLinkObject);
                             }

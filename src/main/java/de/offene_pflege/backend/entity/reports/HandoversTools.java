@@ -38,7 +38,7 @@ public class HandoversTools {
     public static String getDateAndUser(Handovers bericht, boolean showIDs) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-        result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getFullname();
+        result = sdf.format(bericht.getPit()) + "; " + bericht.findOwner().getFullname();
         if (showIDs) {
             result += "<br/><i>(" + bericht.getUebid() + ")</i>";
         }
@@ -114,7 +114,7 @@ public class HandoversTools {
     public static String getDateAndUser(Handovers handover) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-        result = sdf.format(handover.getPit()) + "; " + handover.getUser().getFullname();
+        result = sdf.format(handover.getPit()) + "; " + handover.findOwner().getFullname();
         return result;
     }
 

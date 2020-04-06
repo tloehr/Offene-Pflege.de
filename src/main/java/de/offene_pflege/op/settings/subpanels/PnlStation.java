@@ -24,7 +24,7 @@ public class PnlStation extends DefaultPanel {
 
         cmbStation.addItemListener(e -> {
             if (cmbStation.getSelectedItem() == null) return;
-            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_STATION, ((Station) cmbStation.getSelectedItem()).getId().toString());
+            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_STATION, ((Station) cmbStation.getSelectedItem()).getPrimaryKey().toString());
             OPDE.saveLocalProps();
         });
 

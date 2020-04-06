@@ -14,7 +14,7 @@ import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.info.*;
 import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcessTools;
+import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.reports.NReportTools;
 import de.offene_pflege.gui.GUITools;
@@ -501,12 +501,12 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.nursingprocess") + "</h1>\n");
 
         for (ResInfoCategory cat : ResInfoCategoryTools.getAll4NP()) {
-            ArrayList<NursingProcess> allNPsForThisCat = NursingProcessTools.getAll(resident, cat, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
+            ArrayList<NursingProcess> allNPsForThisCat = NursingProcessService.getAll(resident, cat, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
             if (!allNPsForThisCat.isEmpty()) {
                 html.append("<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n");
                 for (NursingProcess np : allNPsForThisCat) {
                     html.append("<h3 id=\"fonth3\" >" + np.getTopic() + "</h3>\n");
-                    html.append(NursingProcessTools.getAsHTML(np, false, true, true, true));
+                    html.append(NursingProcessService.getAsHTML(np, false, true, true, true));
                 }
             }
         }

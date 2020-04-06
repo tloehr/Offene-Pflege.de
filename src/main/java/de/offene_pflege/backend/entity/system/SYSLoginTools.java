@@ -5,6 +5,7 @@
 package de.offene_pflege.backend.entity.system;
 
 import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.op.OPDE;
 
 import javax.persistence.EntityManager;
@@ -18,7 +19,7 @@ public class SYSLoginTools {
 
     public static SYSLogin login(String username, String password) {
         SYSLogin login = null;
-        OPUsers user = UsersTools.checkPassword(username, password);
+        OPUsers user = OPUsersService.checkPassword(username, password);
 
         if (user != null) {
             login = new SYSLogin(user);

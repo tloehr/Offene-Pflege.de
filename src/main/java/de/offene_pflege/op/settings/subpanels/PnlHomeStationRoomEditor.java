@@ -389,7 +389,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     private DefaultCollapsiblePane createCP(final Station station) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate = cre -> {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-            Station myStation = EntityTools.find(Station.class, station.getId());
+            Station myStation = EntityTools.find(Station.class, station.getPrimaryKey());
             dcp.getTitleButton().setForeground(GUITools.blend(station.getHome().getColor(), Color.BLACK, 0.85f));
             dcp.setBackground(GUITools.blend(myStation.getHome().getColor(), Color.WHITE, 0.2f));
             dcp.setTitleButtonText(myStation.getName());
@@ -397,7 +397,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
         ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-            Station myStation = EntityTools.find(Station.class, station.getId());
+            Station myStation = EntityTools.find(Station.class, station.getPrimaryKey());
             dcp.setContentPane(createContent(myStation, (DefaultCollapsiblePane<Station>) cre.getSource()));
         };
 
@@ -410,7 +410,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     private JPanel createContent(final Station station, DefaultCollapsiblePane<Station> dcl) {
         JPanel result = null;
         try {
-            PnlBeanEditor<Station> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Station.class, station.getId()), Station.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+            PnlBeanEditor<Station> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Station.class, station.getPrimaryKey()), Station.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
 
             pbe.addDataChangeListener(new JPADataChangeListener<>(evt -> {
                 pbe.reload(evt.getData());
@@ -654,18 +654,18 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             Container c = pnlMenu.getParent();
             ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
 
-            String message = EntityTools.mayBeDeleted(EntityTools.find(Station.class, station.getId()));
+            String message = EntityTools.mayBeDeleted(EntityTools.find(Station.class, station.getPrimaryKey()));
             if (message != null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
                 return;
             }
 
-            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + station.getName() + " (" + station.getId() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + station.getName() + " (" + station.getPrimaryKey() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     Station myStation = station;
                     String key = getKey(myStation);
                     // #27
-                    EntityTools.delete(EntityTools.find(Station.class, station.getId()));
+                    EntityTools.delete(EntityTools.find(Station.class, station.getPrimaryKey()));
 
                     parentCPS.get(getKey(myStation.getHome()) + ":station").remove(cpMap.get(key));
                     cpMap.remove(key);
@@ -687,7 +687,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         if (object instanceof Floors)
             return "floor:" + ((Floors) object).getFloorid();
         if (object instanceof Station)
-            return "station:" + ((Station) object).getId();
+            return "station:" + ((Station) object).getPrimaryKey();
 
         return null;
     }

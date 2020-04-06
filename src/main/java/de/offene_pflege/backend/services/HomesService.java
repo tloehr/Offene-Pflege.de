@@ -51,7 +51,7 @@ public class HomesService {
 
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
 
-        Query query2 = em.createQuery("SELECT s FROM Station s WHERE s.id = :statID");
+        Query query2 = em.createQuery("SELECT s FROM Station s WHERE s.getPrimaryKey = :statID");
         query2.setParameter("statID", statid);
         Station station = (Station) query2.getSingleResult();
         em.close();

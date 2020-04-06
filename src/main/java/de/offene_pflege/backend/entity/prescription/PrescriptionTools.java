@@ -97,7 +97,7 @@ public class PrescriptionTools {
                     " AND v.AnDatum < now() AND v.AbDatum > now() AND Date(bhp.LDatum) <= Date(now()) AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND bw.StatID = ? " +
                     " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.id, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Text, Ms.Bezeichnung)");
-            query.setParameter(1, station.getId());
+            query.setParameter(1, station.getPrimaryKey());
 
             printDailyPlanAsPDF(station, query.getResultList());
 
@@ -1083,7 +1083,7 @@ public class PrescriptionTools {
                     result += getRemark(myprescription);
 
                     result += "</td>";
-                    result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
+                    result += "<td valign=\"top\">" + myprescription.pitAsHTML();
 
                     result += "</td>";
                     result += "</tr>";

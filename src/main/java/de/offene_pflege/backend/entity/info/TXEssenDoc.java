@@ -814,8 +814,8 @@ public class TXEssenDoc implements HasLogger {
         long prev = -1;
 
         // Bei Lagerungsarten werden alle dekubitus-prophylaktischen Maßnahmen aus den aktuellen Pflegeplanungen eingetragen.
-        ArrayList<InterventionSchedule> listSchedule = InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_MOBILITY);
-        listSchedule.addAll(InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE));
+        ArrayList<InterventionSchedule> listSchedule = InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_MOBILITY);
+        listSchedule.addAll(InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE));
 
         for (InterventionSchedule is : listSchedule) {
             if (is.getIntervention().getMassID() != prev) {
@@ -825,7 +825,7 @@ public class TXEssenDoc implements HasLogger {
                 }
                 mobilityMeasures += is.getIntervention().getBezeichnung() + ": ";
             }
-            mobilityMeasures += InterventionScheduleTools.getTerminAsCompactText(is) + ", ";
+            mobilityMeasures += InterventionScheduleService.getTerminAsCompactText(is) + ", ";
         }
 
         listSchedule.clear();
@@ -883,7 +883,7 @@ public class TXEssenDoc implements HasLogger {
         }
 
         boolean weightControl = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty() ||
-                !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
+                !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
         content.put(TXEAF.EXCRETIONS_CONTROL_WEIGHT, setCheckbox(weightControl));
         content.put(TXEAF.MONITORING_WEIGHT, setCheckbox(weightControl));
 
@@ -929,14 +929,14 @@ public class TXEssenDoc implements HasLogger {
     }
 
     private void createContent4Section6() {
-        content.put(TXEAF.PROPH_CONTRACTURE, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_CONTRACTURE).isEmpty()));
-        content.put(TXEAF.PROPH_BEDSORE, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE).isEmpty()));
-        content.put(TXEAF.PROPH_SOOR, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_SOOR).isEmpty()));
-        content.put(TXEAF.PROPH_THROMBOSIS, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_THROMBOSIS).isEmpty()));
-        content.put(TXEAF.PROPH_PNEUMONIA, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_PNEUMONIA).isEmpty()));
-        content.put(TXEAF.PROPH_INTERTRIGO, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_INTERTRIGO).isEmpty()));
-        content.put(TXEAF.PROPH_FALL, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_FALL).isEmpty()));
-        content.put(TXEAF.PROPH_OBSTIPATION, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_OBSTIPATION).isEmpty()));
+        content.put(TXEAF.PROPH_CONTRACTURE, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_CONTRACTURE).isEmpty()));
+        content.put(TXEAF.PROPH_BEDSORE, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE).isEmpty()));
+        content.put(TXEAF.PROPH_SOOR, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_SOOR).isEmpty()));
+        content.put(TXEAF.PROPH_THROMBOSIS, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_THROMBOSIS).isEmpty()));
+        content.put(TXEAF.PROPH_PNEUMONIA, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_PNEUMONIA).isEmpty()));
+        content.put(TXEAF.PROPH_INTERTRIGO, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_INTERTRIGO).isEmpty()));
+        content.put(TXEAF.PROPH_FALL, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_FALL).isEmpty()));
+        content.put(TXEAF.PROPH_OBSTIPATION, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_OBSTIPATION).isEmpty()));
     }
 
     /**
@@ -1315,7 +1315,7 @@ public class TXEssenDoc implements HasLogger {
         boolean pulse = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PULSE_MONITORING).isEmpty();
         boolean temp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_TEMP_MONITORING).isEmpty();
         boolean weight = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
-        boolean pain = !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PAIN_MONITORING).isEmpty();
+        boolean pain = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PAIN_MONITORING).isEmpty();
 
         content.put(TXEAF.MONITORING_BP, setCheckbox(bp));
         content.put(TXEAF.MONITORING_PORT, setCheckbox(port));
@@ -1335,9 +1335,9 @@ public class TXEssenDoc implements HasLogger {
      * special monitoring
      */
     private void createContent4Section14() {
-        boolean logo = !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_LOGOPEDICS).isEmpty();
-        boolean physio = !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_PHYSIO).isEmpty();
-        boolean ergo = !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_ERGO).isEmpty();
+        boolean logo = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_LOGOPEDICS).isEmpty();
+        boolean physio = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_PHYSIO).isEmpty();
+        boolean ergo = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_ERGO).isEmpty();
 
         content.put(TXEAF.THERAPY_ERGO, setCheckbox(ergo));
         content.put(TXEAF.THERAPY_LOGO, setCheckbox(logo));

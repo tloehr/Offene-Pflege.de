@@ -384,7 +384,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             data[row][0] = df.format(val.getPit());
             data[row][1] = nf.format(val.getVal1());
             data[row][2] = val.getText();
-            data[row][3] = SYSTools.anonymizeUser(val.getUser());
+            data[row][3] = SYSTools.anonymizeUser(val.findOwner());
             data[row][4] = SYSConst.icon22delete;
             row++;
         }
@@ -423,7 +423,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             public void actionPerformed(ActionEvent ae) {
                 final int row = Integer.parseInt(ae.getActionCommand());
                 final ResValue val2Delete = listValues.get(row);
-                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + "<br/><i>" + df.format(val2Delete.getPit()) + "<br/>" + nf.format(val2Delete.getVal1()) + " ml<br/>" + val2Delete.getUser().toString() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
+                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + "<br/><i>" + df.format(val2Delete.getPit()) + "<br/>" + nf.format(val2Delete.getVal1()) + " ml<br/>" + val2Delete.findOwner().toString() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
                     if (answer.equals(JOptionPane.YES_OPTION)) {
 
 
@@ -441,7 +441,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                                 em.remove(connObj);
                             }
                             myValue.getAttachedProcessConnections().clear();
-                            myValue.getAttachedProcesses().clear();
+                            myValue.findAttachedProcesses().clear();
                             em.getTransaction().commit();
                             listValues.remove(row);
                             tmRight.removeRow(row);

@@ -8,7 +8,7 @@ import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.Homes;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
-import de.offene_pflege.backend.entity.process.QProcessElement;
+import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
 import de.offene_pflege.backend.entity.system.OPUsers;
@@ -406,7 +406,7 @@ public class NReportTools {
 //        return listElements;
 //    }
 
-    public static String getReportsAndHandoversAsHTML(List<QProcessElement> reports, String highlight, int year) {
+    public static String getReportsAndHandoversAsHTML(List<QElement> reports, String highlight, int year) {
         String html = "";
 //        boolean ihavesomethingtoshow = false;
 
@@ -422,7 +422,7 @@ public class NReportTools {
             );
 
 //            html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr><th>Info</th><th>Text</th>\n</tr>";
-            for (QProcessElement report : reports) {
+            for (QElement report : reports) {
                 String dateAndUser = (report instanceof NReport ? NReportTools.getDateAndUser((NReport) report, false, false) : HandoversTools.getDateAndUser((Handovers) report, false));
                 String resident = (report instanceof NReport ? ResidentTools.getFullName(report.getResident()) : "--");
 
@@ -879,7 +879,7 @@ public class NReportTools {
             list.addAll(query2.getResultList());
 
 
-            Collections.sort(list, (o1, o2) -> new Long(((QProcessElement) o1).getPITInMillis()).compareTo(new Long(((QProcessElement) o2).getPITInMillis())) * -1);
+            Collections.sort(list, (o1, o2) -> new Long(((QElement) o1).pitInMillis()).compareTo(new Long(((QElement) o2).pitInMillis())) * -1);
 
 
         } catch (Exception se) {

@@ -67,7 +67,7 @@ public class QProcessTools {
         return resident;
     }
 
-    public static void removeElementFromProcess(EntityManager em, QProcessElement element, QProcess qProcess) {
+    public static void removeElementFromProcess(EntityManager em, QElement element, QProcess qProcess) {
 
         Query query = null;
         if (element instanceof NReport) {
@@ -111,7 +111,7 @@ public class QProcessTools {
 
     }
 
-    public static String getNameOfElement(QProcessElement element) {
+    public static String getNameOfElement(QElement element) {
         String elementBezeichnung = "";
 
         if (element instanceof NReport) {
@@ -197,12 +197,12 @@ public class QProcessTools {
         html += "<table  id=\"fonttext\" border=\"1\"><tr>" +
                 "<th>" + SYSTools.xx("misc.msg.Date") + "</th><th>" + SYSTools.xx("misc.msg.content") + "</th></tr>";
 
-        for (QProcessElement element : qProcess.getElements()) {
+        for (QElement element : qProcess.getElements()) {
             if (includeSystemReports || !(element instanceof PReport) || !((PReport) element).isSystem()) {
                 html += "<tr >";
 
-                html += "<td valign=\"top\">" + df.format(new Date(element.getPITInMillis())) + "</td>";
-                html += "<td valign=\"top\">" + element.getContentAsHTML() + "</td>";
+                html += "<td valign=\"top\">" + df.format(new Date(element.pitInMillis())) + "</td>";
+                html += "<td valign=\"top\">" + element.contentAsHTML() + "</td>";
                 html += "</tr>";
             }
         }

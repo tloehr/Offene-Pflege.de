@@ -256,7 +256,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
     }
 
     private CollapsiblePane createCP4Type(final Resvaluetypes vtype) {
-        final String keyType = vtype.getId() + ".xtypes";
+        final String keyType = vtype.getPrimaryKey() + ".xtypes";
         final CollapsiblePane cpType = getCP(keyType);
 
         final DefaultCPTitle cptitle = new DefaultCPTitle(vtype.getText(), e -> {
@@ -352,7 +352,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
     }
 
     private CollapsiblePane createCP4Year(final Resvaluetypes vtype, final int year) {
-        final String keyYears = vtype.getId() + ".xtypes." + Integer.toString(year) + ".year";
+        final String keyYears = vtype.getPrimaryKey() + ".xtypes." + Integer.toString(year) + ".year";
         final CollapsiblePane cpYear = getCP(keyYears);
 
         DefaultCPTitle cptitle = new DefaultCPTitle(Integer.toString(year), e -> {
@@ -418,7 +418,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
     // containts all resvalues but NOT the LIQUIDBALANCES
     private JPanel createContentPanel4Year(final Resvaluetypes vtype, final int year) {
-        final String keyYears = vtype.getId() + ".xtypes." + Integer.toString(year) + ".year";
+        final String keyYears = vtype.getPrimaryKey() + ".xtypes." + Integer.toString(year) + ".year";
 
         java.util.List<ResValue> myValues;
         synchronized (mapType2Values) {
@@ -443,7 +443,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                     "<tr>" +
                     "<td width=\"200\" align=\"left\">" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resValue.getPit()) + " [" + resValue.getID() + "]</td>" +
                     "<td width=\"340\" align=\"left\">" + ResValueTools.getValueAsHTML(resValue) + "</td>" +
-                    "<td width=\"200\" align=\"left\">" + resValue.getUser().getFullname() + "</td>" +
+                    "<td width=\"200\" align=\"left\">" + resValue.findOwner().getFullname() + "</td>" +
                     "</tr>" +
                     "</table>" +
                     "</html>";
@@ -555,18 +555,18 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                                 if (unassigned.contains(linkObject.getQProcess())) {
                                     linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                     linkObject.getResValue().getAttachedProcessConnections().remove(linkObject);
-                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.titleAsString() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                     em.remove(linkObject);
                                 }
                             }
                             attached.clear();
 
                             for (QProcess qProcess : assigned) {
-                                java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                java.util.List<QElement> listElements = qProcess.getElements();
                                 if (!listElements.contains(myValue)) {
                                     QProcess myQProcess = em.merge(qProcess);
                                     SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
-                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.titleAsString() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                     qProcess.getAttachedResValueConnections().add(myLinkObject);
                                     myValue.getAttachedProcessConnections().add(myLinkObject);
                                 }
@@ -681,7 +681,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         synchronized (lstValueTypes) {
             for (Resvaluetypes vtype : lstValueTypes) {
                 synchronized (cpMap) {
-                    cpsValues.add(cpMap.get(vtype.getId() + ".xtypes"));
+                    cpsValues.add(cpMap.get(vtype.getPrimaryKey() + ".xtypes"));
                 }
             }
         }
@@ -740,8 +740,8 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                             em.getTransaction().commit();
 
                             DateTime dt = new DateTime(newValue.getPit());
-                            final String keyType = vtype.getId() + ".xtypes";
-                            final String key = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                            final String keyType = vtype.getPrimaryKey() + ".xtypes";
+                            final String key = vtype.getPrimaryKey() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                             synchronized (mapType2Values) {
                                 mapType2Values.get(key).remove(resValue);
@@ -823,13 +823,13 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                                 em.remove(connObj);
                             }
                             myValue.getAttachedProcessConnections().clear();
-                            myValue.getAttachedProcesses().clear();
+                            myValue.findAttachedProcesses().clear();
                             em.getTransaction().commit();
 
                             DateTime dt = new DateTime(myValue.getPit());
-                            final String keyType = vtype.getId() + ".xtypes";
+                            final String keyType = vtype.getPrimaryKey() + ".xtypes";
 
-                            final String key = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                            final String key = vtype.getPrimaryKey() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                             synchronized (mapType2Values) {
                                 mapType2Values.get(key).remove(resValue);
@@ -896,7 +896,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                     em.close();
 
                     DateTime dt = new DateTime(myValue.getPit());
-                    final String key = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                    final String key = vtype.getPrimaryKey() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                     synchronized (mapType2Values) {
                         mapType2Values.get(key).remove(resValue);
@@ -946,18 +946,18 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                             if (unassigned.contains(linkObject.getQProcess())) {
                                 linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                 linkObject.getResValue().getAttachedProcessConnections().remove(linkObject);
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.titleAsString() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                 em.remove(linkObject);
                             }
                         }
                         attached.clear();
 
                         for (QProcess qProcess : assigned) {
-                            java.util.List<QProcessElement> listElements = qProcess.getElements();
+                            java.util.List<QElement> listElements = qProcess.getElements();
                             if (!listElements.contains(myValue)) {
                                 QProcess myQProcess = em.merge(qProcess);
                                 SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.titleAsString() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                 qProcess.getAttachedResValueConnections().add(myLinkObject);
                                 myValue.getAttachedProcessConnections().add(myLinkObject);
                             }
@@ -966,7 +966,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                         em.getTransaction().commit();
 
                         DateTime dt = new DateTime(myValue.getPit());
-                        final String key = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                        final String key = vtype.getPrimaryKey() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                         synchronized (mapType2Values) {
                             mapType2Values.get(key).remove(resValue);
@@ -1037,7 +1037,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
     private void addValue(final Resvaluetypes vtype) {
 
-        final String keyType = vtype.getId() + ".xtypes";
+        final String keyType = vtype.getPrimaryKey() + ".xtypes";
 
         currentEditor = new DlgValue(new ResValue(resident, vtype), DlgValue.MODE_NEW, o -> {
             ResValue myValue = null;
@@ -1075,7 +1075,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                     DateTime dt = new DateTime(myValue.getPit());
 
 //                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day";
-                    final String keyYear = vtype.getId() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                    final String keyYear = vtype.getPrimaryKey() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 //                        final LocalDate week = SYSCalendar.max(SYSCalendar.bow(dt.toLocalDate()), new LocalDate(dt.getYear(), 1, 1));
 //                        final String keyWeek = vtype.getID() + ".xtypes." + week + ".week";
 

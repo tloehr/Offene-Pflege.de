@@ -1831,11 +1831,11 @@ alter table resvalue
 alter table uniqueid
   change UNIQID id bigint unsigned auto_increment;
 alter table sysfiles change OCFID id bigint unsigned auto_increment;
-alter table opde.sysinf2file change ID id bigint unsigned auto_increment;
-alter table opde.sysnr2file change ID id bigint unsigned auto_increment;
-alter table opde.sysnp2file change ID id bigint unsigned auto_increment;
-alter table opde.syspre2file change ID id bigint unsigned auto_increment;
-alter table opde.sysval2file change ID id bigint unsigned auto_increment;
+alter table sysinf2file change ID id bigint unsigned auto_increment;
+alter table sysnr2file change ID id bigint unsigned auto_increment;
+alter table sysnp2file change ID id bigint unsigned auto_increment;
+alter table syspre2file change ID id bigint unsigned auto_increment;
+alter table sysval2file change ID id bigint unsigned auto_increment;
 drop table training;
 drop table training2file;
 drop table training2tags;

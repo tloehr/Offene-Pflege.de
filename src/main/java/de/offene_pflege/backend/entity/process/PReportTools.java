@@ -58,7 +58,7 @@ public class PReportTools {
     public static String getPITAsHTML(PReport bericht) {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
-        html += df.format(bericht.getPit()) + "; " + bericht.getUser().getFullname();
+        html += df.format(bericht.getPit()) + "; " + bericht.findOwner().getFullname();
         return html;
     }
 

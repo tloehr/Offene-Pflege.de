@@ -2,9 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.offene_pflege.backend.entity.system;
+package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.system.OPGroups;
+import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 /**
  * @author tloehr
  */
-public class UsersTools {
+public class OPUsersService {
     public static final short STATUS_INACTIVE = 0;
     public static final short STATUS_ACTIVE = 1;
     public static final short STATUS_ROOT = 2;
@@ -26,6 +28,36 @@ public class UsersTools {
     public static final int MAIL_UNCONFIRMED = 0;
     public static final int MAIL_CONFIRMED = 1;
     public static final int MAIL_NOTIFICATIONS_ENABLED = 2;
+
+    public OPUsers create() {
+        OPUsers opUsers = new OPUsers();
+        opUsers.setUserstatus(STATUS_ACTIVE);
+        opUsers.setMailconfirmed(MAIL_UNCONFIRMED);
+        opUsers.setCipherid(12);
+        //cipherid = 12;  //todo: berechnen
+        return opUsers;
+    }
+
+    /**
+     * gibt an, ob der betreffende User sich anmelden darf.
+     *
+     * @return true, wenn ja; false, sonst.
+     */
+
+    public static boolean isActive(OPUsers opUsers) {
+        return opUsers.getUserstatus() == STATUS_ACTIVE;
+    }
+
+    public static String getFullname(OPUsers opUsers) {
+        String fullname = "";
+        if (OPDE.isUserCipher()) {
+            fullname = "#" + opUsers.getCipherid();
+        } else {
+            fullname = opUsers.getNachname() + ", " + opUsers.getVorname();
+        }
+        return fullname;
+    }
+
 
     public static ArrayList<OPUsers> getUsers(boolean inactiveToo) {
         EntityManager em = OPDE.createEM();
@@ -60,7 +92,7 @@ public class UsersTools {
             query = em.createQuery("SELECT u FROM OPUsers u WHERE u.userstatus <> :status ORDER BY u.nachname, u.vorname ");
             query.setParameter("status", STATUS_ROOT);
         } else {
-            query = em.createQuery("SELECT u FROM OPUsers u WHERE (u.uid LIKE :pattern OR u.nachname LIKE :pattern OR u.vorname LIKE :pattern) AND u.userstatus = :status ORDER BY u.nachname, u.vorname ");
+            query = em.createQuery("SELECT u FROM OPUsers u WHERE (u.id LIKE :pattern OR u.nachname LIKE :pattern OR u.vorname LIKE :pattern) AND u.userstatus = :status ORDER BY u.nachname, u.vorname ");
             query.setParameter("status", STATUS_ACTIVE);
             query.setParameter("pattern", EntityTools.getMySQLsearchPattern(searchPattern));
         }
@@ -132,7 +164,7 @@ public class UsersTools {
 
     public static boolean isQualified(OPUsers user) {
         boolean qualified = false;
-        for (OPGroups group : user.getGroups()) {
+        for (OPGroups group : user.getOpGroups()) {
             if (group.isQualified()) {
                 qualified = true;
                 break;
@@ -145,7 +177,7 @@ public class UsersTools {
         EntityManager em = OPDE.createEM();
         OPUsers user = null;
         try {
-            Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.uid = :uKennung AND o.md5pw = :md5pw");
+            Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.id = :uKennung AND o.md5pw = :md5pw");
             query.setParameter("uKennung", username);
             query.setParameter("md5pw", SYSTools.hashword(password));
             user = (OPUsers) query.getSingleResult();

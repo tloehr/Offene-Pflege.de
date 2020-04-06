@@ -128,7 +128,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.pcat = pcat;
     }
 
-    public void removeElement(QProcessElement element, Object connectionObject) {
+    public void removeElement(QElement element, Object connectionObject) {
         if (element instanceof NReport) {
             getAttachedNReportConnections().remove(connectionObject);
         } else if (element instanceof ResValue) {
@@ -236,8 +236,8 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.pcat = pcat;
     }
 
-    public List<QProcessElement> getElements() {
-        ArrayList<QProcessElement> elements = new ArrayList<QProcessElement>();
+    public List<QElement> getElements() {
+        ArrayList<QElement> elements = new ArrayList<QElement>();
         elements.addAll(PReports);
         for (SYSNR2PROCESS att : attachedNReportConnections) {
             elements.add(att.getNReport());
@@ -255,10 +255,10 @@ public class QProcess implements Serializable, Comparable<QProcess> {
             elements.add(att.getResValue());
         }
 
-        Collections.sort(elements, new Comparator<QProcessElement>() {
+        Collections.sort(elements, new Comparator<QElement>() {
             @Override
-            public int compare(QProcessElement o1, QProcessElement o2) {
-                return new Long(o1.getPITInMillis()).compareTo(o2.getPITInMillis()) * -1;
+            public int compare(QElement o1, QElement o2) {
+                return new Long(o1.pitInMillis()).compareTo(o2.pitInMillis()) * -1;
             }
         });
 

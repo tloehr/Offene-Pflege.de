@@ -1,10 +1,13 @@
-package de.offene_pflege.backend.entity.nursingprocess;
+package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.info.ResInfoCategory;
+import de.offene_pflege.backend.entity.nursingprocess.*;
+import de.offene_pflege.backend.entity.system.Commontags;
+import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
@@ -20,16 +23,96 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 19.07.12
- * Time: 15:50
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 19.07.12 Time: 15:50 To change this template use File | Settings | File
+ * Templates.
  */
-public class NursingProcessTools {
+public class NursingProcessService {
 
     public static final String UNIQUEID = "__plankenn";
     public static final int MAXNumOfEvals = 4;
+
+    public static NursingProcess create(Resident resident, OPUsers opUsers) {
+        NursingProcess nursingProcess = new NursingProcess();
+        nursingProcess.setResident(resident);
+        nursingProcess.setUserON(opUsers);
+        nursingProcess.setInterventionSchedules(new ArrayList<>());
+        nursingProcess.setAttachedFilesConnections(new ArrayList<>());
+        nursingProcess.setAttachedQProcessConnections(new ArrayList<>());
+        nursingProcess.setNpControls(new ArrayList<>());
+        nursingProcess.setFrom(new Date());
+        nursingProcess.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        nursingProcess.setNextEval(JavaTimeConverter.toDate(java.time.LocalDateTime.now().plusWeeks(4)));
+        nursingProcess.setCommontags(new ArrayList<>());
+        nursingProcess.setNpseries(-1l);
+        return nursingProcess;
+    }
+
+    public NursingProcess create(NursingProcess source) {
+        NursingProcess nursingProcess = new NursingProcess();
+        nursingProcess.setTopic(source.getTopic());
+        nursingProcess.setSituation(source.getSituation());
+        nursingProcess.setGoal(source.getGoal());
+        nursingProcess.setFrom(source.getFrom());
+        nursingProcess.setTo(source.getTo());
+        nursingProcess.setNpseries(source.getNpseries());
+        nursingProcess.setNextEval(source.getNextEval());
+        nursingProcess.setUserON(source.getUserON());
+        nursingProcess.setUserOFF(source.getUserOFF());
+        nursingProcess.setResident(source.getResident());
+        nursingProcess.setCategory(source.getCategory());
+        nursingProcess.setInterventionSchedules(new ArrayList<>());
+        nursingProcess.setAttachedFilesConnections(new ArrayList<>());
+        nursingProcess.setAttachedQProcessConnections(new ArrayList<>());
+        nursingProcess.setCommontags(new ArrayList<>());
+        return nursingProcess;
+
+        source.getInterventionSchedules().forEach(is -> {
+            InterventionSchedule myIS = is.clone();
+            myIS.setNursingProcess(nursingProcess);
+            nursingProcess.getInterventionSchedules().add(myIS);
+        });
+
+        for (Commontags ctag : commontags) {
+            myNewNP.getCommontags().add(ctag);
+        }
+        return myNewNP;
+    }
+
+
+
+    public static String getPitAsHTML(NursingProcess nursingProcess) {
+        String result = "";
+        DateFormat df = DateFormat.getDateInstance();
+
+        if (isClosed(this)) {
+
+            result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + df.format(nursingProcess.getFrom()) + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + df.format(nursingProcess.getTo()) + "</td>";
+            result += "</tr>\n";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + OPUsersService.getFullname(nursingProcess.getUserON()) + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + OPUsersService.getFullname(nursingProcess.getUserOFF()) + "</td>";
+            result += "</tr>\n";
+            result += "</table>\n";
+
+        } else {
+            result += df.format(nursingProcess.getFrom()) + "&nbsp;&raquo;&raquo;" +
+                    "<br/>" +
+                    OPUsersService.getFullname(nursingProcess.getUserON());
+        }
+        result += "<br/>[" + nursingProcess.getId() + "]";
+
+        return result;
+    }
+
+
+    public static boolean isClosed(NursingProcess nursingProcess) {
+        return nursingProcess.getFrom().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+    }
 
     public static ArrayList<NursingProcess> getAll(Resident resident, ResInfoCategory cat) {
         EntityManager em = OPDE.createEM();
@@ -157,7 +240,7 @@ public class NursingProcessTools {
             for (InterventionSchedule interventionSchedule : np.getInterventionSchedule()) {
                 html += "<li>";
                 html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b></div>";
-                html += InterventionScheduleTools.getTerminAsHTML(interventionSchedule);
+                html += InterventionScheduleService.getTerminAsHTML(interventionSchedule);
                 html += "</li>";
             }
             html += "</ul>";

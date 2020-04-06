@@ -221,7 +221,7 @@ public class CommontagsTools {
             String jpql = " SELECT DISTINCT c " +
                     " FROM Commontags c " +
                     " JOIN c.resinfos p " +
-                    " WHERE p.resident = :resident " +
+                    " WHERE p.getResident = :resident " +
                     " ORDER BY c.text ASC ";
 
 

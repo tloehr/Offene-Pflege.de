@@ -41,7 +41,7 @@ import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.nursingprocess.DFN;
 import de.offene_pflege.backend.entity.nursingprocess.DFNTools;
 import de.offene_pflege.backend.entity.nursingprocess.Intervention;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcessTools;
+import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -833,7 +833,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 JTextPane contentPane = new JTextPane();
                 contentPane.setContentType("text/html");
                 contentPane.setEditable(false);
-                contentPane.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML(dfn.getNursingProcess(), false, true, false, false)));
+                contentPane.setText(SYSTools.toHTML(NursingProcessService.getAsHTML(dfn.getNursingProcess(), false, true, false, false)));
                 dfnPane.setContentPane(contentPane);
             }
         });

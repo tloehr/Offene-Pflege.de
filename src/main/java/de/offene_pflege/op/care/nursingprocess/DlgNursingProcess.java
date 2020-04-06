@@ -34,7 +34,7 @@ import de.offene_pflege.backend.entity.info.ResInfoCategory;
 import de.offene_pflege.backend.services.ResInfoCategoryTools;
 import de.offene_pflege.backend.entity.nursingprocess.Intervention;
 import de.offene_pflege.backend.entity.nursingprocess.InterventionSchedule;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionScheduleTools;
+import de.offene_pflege.backend.services.InterventionScheduleService;
 import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
@@ -577,7 +577,7 @@ public class DlgNursingProcess extends MyJDialog {
                         selected.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row1));
                     }
 
-                    InterventionScheduleTools.copySchedule(template, selected, nursingProcess);
+                    InterventionScheduleService.copySchedule(template, selected, nursingProcess);
 
                     popup.hidePopup();
                     Collections.sort(nursingProcess.getInterventionSchedule());

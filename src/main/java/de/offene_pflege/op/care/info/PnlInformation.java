@@ -801,18 +801,18 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             if (unassigned.contains(linkObject.getQProcess())) {
                                 linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                 linkObject.getResInfo().getAttachedQProcessConnections().remove(linkObject);
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myInfo.titleAsString() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                 em.remove(linkObject);
                             }
                         }
                         attached.clear();
 
                         for (QProcess qProcess : assigned) {
-                            List<QProcessElement> listElements = qProcess.getElements();
+                            List<QElement> listElements = qProcess.getElements();
                             if (!listElements.contains(myInfo)) {
                                 QProcess myQProcess = em.merge(qProcess);
                                 SYSINF2PROCESS myLinkObject = em.merge(new SYSINF2PROCESS(myQProcess, myInfo));
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myInfo.titleAsString() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                 qProcess.getAttachedResInfoConnections().add(myLinkObject);
                                 myInfo.getAttachedQProcessConnections().add(myLinkObject);
                             }
@@ -1455,7 +1455,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                 final JButton btnStop = GUITools.createHyperlinkButton("nursingrecords.info.btnStop.tooltip", SYSConst.icon22playerStop, null);
                 btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnStop.addActionListener(actionEvent -> {
-                    currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.cancel") + "<br/>" + resInfo.getResInfoType().getShortDescription() + "<br/>" + resInfo.getPITAsHTML(), SYSConst.icon48playerStop, answer -> {
+                    currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.cancel") + "<br/>" + resInfo.getResInfoType().getShortDescription() + "<br/>" + resInfo.pitAsHTML(), SYSConst.icon48playerStop, answer -> {
                         if (answer.equals(JOptionPane.YES_OPTION)) {
                             EntityManager em = OPDE.createEM();
                             try {
@@ -1529,7 +1529,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     btnDelete.setEnabled(ResidentTools.isActive(resident));
                     btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnDelete.addActionListener(actionEvent -> {
-                        currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + resInfo.getPITAsHTML() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
+                        currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + resInfo.pitAsHTML() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
                                 EntityManager em = OPDE.createEM();
                                 try {
@@ -1919,18 +1919,18 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             if (unassigned.contains(linkObject.getQProcess())) {
                                 linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                 linkObject.getResInfo().getAttachedQProcessConnections().remove(linkObject);
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myInfo.titleAsString() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                 em.remove(linkObject);
                             }
                         }
                         attached.clear();
 
                         for (QProcess qProcess : assigned) {
-                            List<QProcessElement> listElements = qProcess.getElements();
+                            List<QElement> listElements = qProcess.getElements();
                             if (!listElements.contains(myInfo)) {
                                 QProcess myQProcess = em.merge(qProcess);
                                 SYSINF2PROCESS myLinkObject = em.merge(new SYSINF2PROCESS(myQProcess, myInfo));
-                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myInfo.titleAsString() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                 qProcess.getAttachedResInfoConnections().add(myLinkObject);
                                 myInfo.getAttachedQProcessConnections().add(myLinkObject);
                             }

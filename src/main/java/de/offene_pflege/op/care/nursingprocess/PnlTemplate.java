@@ -8,7 +8,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcessTools;
+import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.tools.MyJDialog;
@@ -49,7 +49,7 @@ public class PnlTemplate extends MyJDialog {
         lstTemplates.setCellRenderer(getListCellRenderer());
         lstTemplates.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && lstTemplates.getSelectedValue() != null) {
-                txtContent.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false, false)));
+                txtContent.setText(SYSTools.toHTML(NursingProcessService.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false, false)));
             }
         });
 
@@ -58,7 +58,7 @@ public class PnlTemplate extends MyJDialog {
     }
 
     private void refreshDisplay() {
-        java.util.List<NursingProcess> list = NursingProcessTools.getTemplates(txtSearch.getText(), tbInactive.isSelected());
+        java.util.List<NursingProcess> list = NursingProcessService.getTemplates(txtSearch.getText(), tbInactive.isSelected());
         lstTemplates.setModel(SYSTools.list2dlm(list));
     }
 

@@ -610,7 +610,7 @@ public class PnlHandover extends NursingRecordsPanel {
                             handover.getText() +
                             "</td>" +
 
-                            "<td width=\"100\" align=\"left\">" + handover.getUser().getFullname() + "</td>" +
+                            "<td width=\"100\" align=\"left\">" + handover.findOwner().getFullname() + "</td>" +
                             "</tr>" +
                             "</table>" +
                             "</html>";

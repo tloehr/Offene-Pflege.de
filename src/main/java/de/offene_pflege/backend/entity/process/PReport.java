@@ -20,7 +20,7 @@ import java.util.Date;
 @Entity
 @Table(name = "preport")
 
-public class PReport implements Serializable, QProcessElement {
+public class PReport implements Serializable, QElement {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -96,7 +96,7 @@ public class PReport implements Serializable, QProcessElement {
         this.art = art;
     }
 
-    public OPUsers getUser() {
+    public OPUsers findOwner() {
         return user;
     }
 
@@ -113,12 +113,12 @@ public class PReport implements Serializable, QProcessElement {
     }
 
     @Override
-    public String getContentAsHTML() {
+    public String contentAsHTML() {
         return PReportTools.getBerichtAsHTML(this);
     }
 
     @Override
-    public ArrayList<QProcess> getAttachedProcesses() {
+    public ArrayList<QProcess> findAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
         list.add(qProcess);
         return list;
@@ -126,17 +126,17 @@ public class PReport implements Serializable, QProcessElement {
 
 
     @Override
-    public long getPITInMillis() {
+    public long pitInMillis() {
         return pit.getTime();
     }
 
     @Override
-    public String getPITAsHTML() {
+    public String pitAsHTML() {
         return PReportTools.getPITAsHTML(this);
     }
 
     @Override
-    public String getTitle() {
+    public String titleAsString() {
         if (isPDCA()) return PReportTools.getPDCA(this);
         return text;
     }
