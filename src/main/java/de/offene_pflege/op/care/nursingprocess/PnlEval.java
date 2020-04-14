@@ -29,7 +29,7 @@ package de.offene_pflege.op.care.nursingprocess;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.Pair;

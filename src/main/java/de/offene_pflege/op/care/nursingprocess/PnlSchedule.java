@@ -30,7 +30,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideTabbedPane;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionSchedule;
+import de.offene_pflege.backend.entity.done.InterventionSchedule;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;

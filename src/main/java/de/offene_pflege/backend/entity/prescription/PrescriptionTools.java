@@ -11,7 +11,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.services.SYSFilesService;
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;

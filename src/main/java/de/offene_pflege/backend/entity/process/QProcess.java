@@ -4,9 +4,9 @@
  */
 package de.offene_pflege.backend.entity.process;
 
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.reports.NReport;
 import de.offene_pflege.backend.entity.system.OPUsers;

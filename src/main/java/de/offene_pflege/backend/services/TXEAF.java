@@ -1,4 +1,4 @@
-package de.offene_pflege.backend.entity.info;
+package de.offene_pflege.backend.services;
 
 /**
  * In dieser Klasse werden die einzelnen IDs aus dem PDF Formular gespeichert. Also was nachher wohin geschrieben wird.

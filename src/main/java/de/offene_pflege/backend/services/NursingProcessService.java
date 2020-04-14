@@ -2,25 +2,24 @@ package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
-import de.offene_pflege.backend.entity.nursingprocess.*;
-import de.offene_pflege.backend.entity.system.Commontags;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
+import de.offene_pflege.backend.entity.done.InterventionSchedule;
+import de.offene_pflege.backend.entity.done.NPControl;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import org.apache.commons.lang3.SerializationUtils;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA. User: tloehr Date: 19.07.12 Time: 15:50 To change this template use File | Settings | File
@@ -48,34 +47,35 @@ public class NursingProcessService {
     }
 
     public NursingProcess create(NursingProcess source) {
-        NursingProcess nursingProcess = new NursingProcess();
-        nursingProcess.setTopic(source.getTopic());
-        nursingProcess.setSituation(source.getSituation());
-        nursingProcess.setGoal(source.getGoal());
-        nursingProcess.setFrom(source.getFrom());
-        nursingProcess.setTo(source.getTo());
-        nursingProcess.setNpseries(source.getNpseries());
-        nursingProcess.setNextEval(source.getNextEval());
-        nursingProcess.setUserON(source.getUserON());
-        nursingProcess.setUserOFF(source.getUserOFF());
-        nursingProcess.setResident(source.getResident());
-        nursingProcess.setCategory(source.getCategory());
-        nursingProcess.setInterventionSchedules(new ArrayList<>());
-        nursingProcess.setAttachedFilesConnections(new ArrayList<>());
-        nursingProcess.setAttachedQProcessConnections(new ArrayList<>());
-        nursingProcess.setCommontags(new ArrayList<>());
-        return nursingProcess;
+        NursingProcess destination = new NursingProcess();
+        destination.setTopic(source.getTopic());
+        destination.setSituation(source.getSituation());
+        destination.setGoal(source.getGoal());
+        destination.setFrom(source.getFrom());
+        destination.setTo(source.getTo());
+        destination.setNpseries(source.getNpseries());
+        destination.setNextEval(source.getNextEval());
+        destination.setUserON(source.getUserON());
+        destination.setUserOFF(source.getUserOFF());
+        destination.setResident(source.getResident());
+        destination.setCategory(source.getCategory());
+        destination.setInterventionSchedules(new ArrayList<>());
+        destination.setAttachedFilesConnections(new ArrayList<>());
+        destination.setAttachedQProcessConnections(new ArrayList<>());
+        destination.setCommontags(new ArrayList<>());
 
         source.getInterventionSchedules().forEach(is -> {
-            InterventionSchedule myIS = is.clone();
-            myIS.setNursingProcess(nursingProcess);
-            nursingProcess.getInterventionSchedules().add(myIS);
+            InterventionSchedule myIS = SerializationUtils.clone(is);
+            myIS.setUuid(UUID.randomUUID().toString());
+            myIS.setNursingProcess(destination);
+            destination.getInterventionSchedules().add(myIS);
         });
 
-        for (Commontags ctag : commontags) {
-            myNewNP.getCommontags().add(ctag);
-        }
-        return myNewNP;
+        source.getCommontags().forEach(commontags -> {
+            destination.getCommontags().add(commontags);
+        });
+
+        return destination;
     }
 
 
@@ -84,7 +84,7 @@ public class NursingProcessService {
         String result = "";
         DateFormat df = DateFormat.getDateInstance();
 
-        if (isClosed(this)) {
+        if (isClosed(nursingProcess)) {
 
             result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
             result += "<tr>";
@@ -204,23 +204,23 @@ public class NursingProcessService {
             html += "<br/>&raquo;" + np.getTopic() + "&laquo";
         }
 
-        html += withIcon && np.isClosed() ? SYSConst.html_22x22_StopSign : "";
+        html += withIcon && isClosed(np) ? SYSConst.html_22x22_StopSign : "";
 
         html += "<div id=\"fonttext\">";
 
         html += withHeader ? "<b>" + SYSTools.xx("misc.msg.category") + ":</b> " + np.getCategory().getText() + "<br/>" : "";
 
         DateFormat df = DateFormat.getDateInstance();
-        if (!np.isClosed()) {
+        if (!isClosed(np)) {
             html += "<b>" + SYSTools.xx("nursingrecords.nursingprocess.pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
         }
 
         if (withDetails) {
-            html += SYSConst.html_bold("misc.msg.createdby") + ": " + np.getUserON().getFullname() + " ";
+            html += SYSConst.html_bold("misc.msg.createdby") + ": " + OPUsersService.getFullname(np.getUserON()) + " ";
             html += SYSConst.html_bold("misc.msg.atchrono") + ": " + df.format(np.getFrom());
-            if (np.isClosed()) {
+            if (isClosed(np)) {
                 html += "<br/>";
-                html += SYSConst.html_bold("misc.msg.closedBy") + ": " + np.getUserOFF().getFullname() + " ";
+                html += SYSConst.html_bold("misc.msg.closedBy") + ": " + OPUsersService.getFullname(np.getUserOFF()) + " ";
                 html += SYSConst.html_bold("misc.msg.atchrono") + ": " + df.format(np.getTo());
             }
         }
@@ -233,11 +233,11 @@ public class NursingProcessService {
 
         html += SYSConst.html_h3("nursingrecords.nursingprocess.interventions");
 
-        if (np.getInterventionSchedule().isEmpty()) {
+        if (np.getInterventionSchedules().isEmpty()) {
             html += "<ul><li><b>" + SYSTools.xx("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
         } else {
             html += "<ul>";
-            for (InterventionSchedule interventionSchedule : np.getInterventionSchedule()) {
+            for (InterventionSchedule interventionSchedule : np.getInterventionSchedules()) {
                 html += "<li>";
                 html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b></div>";
                 html += InterventionScheduleService.getTerminAsHTML(interventionSchedule);
@@ -246,16 +246,16 @@ public class NursingProcessService {
             html += "</ul>";
         }
 
-        if (!np.getEvaluations().isEmpty()) {
+        if (!np.getNpControls().isEmpty()) {
             html += SYSConst.html_h3(SYSTools.xx("misc.msg.DateOfEvals"));
             html += "<ul>";
             int numEvals = 0;
-            Collections.sort(np.getEvaluations());
-            for (NPControl npControl : np.getEvaluations()) {
+            Collections.sort(np.getNpControls());
+            for (NPControl npControl : np.getNpControls()) {
                 numEvals++;
-                html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(npControl) + "</div></li>";
-                if (!showAllEvals && np.getEvaluations().size() > MAXNumOfEvals && numEvals >= MAXNumOfEvals) {
-                    html += "<li>" + SYSConst.html_italic((np.getEvaluations().size() - numEvals) + " " + SYSTools.xx("misc.msg.moreToShow")) + " </li>";
+                html += "<li><div id=\"fonttext\">" + NPControlService.getAsHTML(npControl) + "</div></li>";
+                if (!showAllEvals && np.getNpControls().size() > MAXNumOfEvals && numEvals >= MAXNumOfEvals) {
+                    html += "<li>" + SYSConst.html_italic((np.getNpControls().size() - numEvals) + " " + SYSTools.xx("misc.msg.moreToShow")) + " </li>";
                     break;
                 }
             }

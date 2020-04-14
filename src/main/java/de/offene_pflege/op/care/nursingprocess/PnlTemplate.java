@@ -7,7 +7,7 @@ package de.offene_pflege.op.care.nursingprocess;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.backend.services.ResidentTools;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;

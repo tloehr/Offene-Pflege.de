@@ -6,8 +6,8 @@ package de.offene_pflege.op.care.med.structure;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionTools;
+import de.offene_pflege.backend.entity.done.Intervention;
+import de.offene_pflege.backend.services.InterventionService;
 import de.offene_pflege.backend.entity.prescription.DosageForm;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
@@ -137,7 +137,7 @@ public class PnlDosageForm extends PopupPanel {
 
         cmbUPR.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("state_upr1"), SYSTools.xx("state_uprn"), SYSTools.xx("state_dont_calc")}));
         cmbUPR.setSelectedIndex(form.getUPRState());
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionService.findBy(InterventionService.TYPE_PRESCRIPTION).toArray()));
         cmbUsageUnit.setModel(new DefaultComboBoxModel(Arrays.copyOfRange(SYSConst.UNITS, 1, SYSConst.UNITS.length - 1)));
         cmbPackUnit.setModel(new DefaultComboBoxModel(Arrays.copyOfRange(SYSConst.UNITS, 1, SYSConst.UNITS.length - 1)));
         txtDailyPlan = GUITools.createIntegerTextField(0, 20, 0);

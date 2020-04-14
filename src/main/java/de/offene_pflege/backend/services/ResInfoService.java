@@ -1,10 +1,7 @@
 package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.done.Rooms;
-import de.offene_pflege.backend.entity.done.Station;
-import de.offene_pflege.backend.entity.info.*;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.reports.NReportTools;
@@ -1263,7 +1260,7 @@ public class ResInfoService implements HasLogger {
          *                                  |_|               |___/
          */
         if (grundpflege) {
-            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryTools.BASICS);
+            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryService.BASICS);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
@@ -1285,7 +1282,7 @@ public class ResInfoService implements HasLogger {
          *
          */
         if (haut) {
-            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryTools.SKIN);
+            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryService.SKIN);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
@@ -1342,7 +1339,7 @@ public class ResInfoService implements HasLogger {
          *
          */
         if (vital) {
-            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryTools.VITAL);
+            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryService.VITAL);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {

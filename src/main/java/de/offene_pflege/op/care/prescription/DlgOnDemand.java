@@ -31,8 +31,8 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionTools;
+import de.offene_pflege.backend.entity.done.Intervention;
+import de.offene_pflege.backend.services.InterventionService;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
@@ -297,7 +297,7 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionService.findBy(InterventionService.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
     }
 
     /**
@@ -665,8 +665,8 @@ public class DlgOnDemand extends MyJDialog {
             cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{prescription.getTradeForm()}));
         }
 
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
-        cmbIntervention.setRenderer(InterventionTools.getRenderer());
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionService.findBy(InterventionService.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setRenderer(InterventionService.getRenderer());
         cmbIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
         txtIntervention.setEnabled(cmbIntervention.isEnabled());
         cmbIntervention.setSelectedItem(prescription.getIntervention());
@@ -722,7 +722,7 @@ public class DlgOnDemand extends MyJDialog {
 
 
     private void cmbMedItemStateChanged(ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionService.findBy(InterventionService.TYPE_PRESCRIPTION).toArray()));
         cmbIntervention.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getDosageForm().getIntervention());
         cmbIntervention.setEnabled(false);
         txtIntervention.setText(null);

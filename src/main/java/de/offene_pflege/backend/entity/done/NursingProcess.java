@@ -2,12 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.offene_pflege.backend.entity.nursingprocess;
+package de.offene_pflege.backend.entity.done;
 
 import de.offene_pflege.backend.entity.DefaultEntity;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.done.SYSNP2FILE;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
 import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.QProcess;
 import de.offene_pflege.backend.entity.process.SYSNP2PROCESS;

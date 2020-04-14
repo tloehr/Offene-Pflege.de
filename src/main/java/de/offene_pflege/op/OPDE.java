@@ -29,7 +29,7 @@ import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.services.SYSFilesService;
-import de.offene_pflege.backend.entity.nursingprocess.DFNTools;
+import de.offene_pflege.backend.services.DFNService;
 import de.offene_pflege.backend.entity.prescription.BHPTools;
 import de.offene_pflege.backend.entity.system.*;
 import de.offene_pflege.backend.services.OPUsersService;
@@ -616,9 +616,9 @@ public class OPDE {
                     initProps();
 
                     // create the new DFNs
-                    DFNTools.generate(em);
+                    DFNService.generate(em);
                     // move over the floating ones that have not yet been clicked to the current day
-                    DFNTools.moveFloating(em);
+                    DFNService.moveFloating(em);
 
                     em.getTransaction().commit();
                 } catch (Exception ex) {

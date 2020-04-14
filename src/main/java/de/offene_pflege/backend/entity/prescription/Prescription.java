@@ -7,11 +7,11 @@ package de.offene_pflege.backend.entity.prescription;
 
 import de.offene_pflege.backend.entity.Ownable;
 import de.offene_pflege.backend.entity.done.SYSPRE2FILE;
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
+import de.offene_pflege.backend.entity.done.Intervention;
 import de.offene_pflege.backend.entity.process.QProcess;
 import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.SYSPRE2PROCESS;

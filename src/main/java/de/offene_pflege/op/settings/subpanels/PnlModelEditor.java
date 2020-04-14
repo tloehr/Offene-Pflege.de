@@ -5,8 +5,8 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
-import de.offene_pflege.backend.services.ResInfoCategoryTools;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
+import de.offene_pflege.backend.services.ResInfoCategoryService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.PnlBeanEditor;
 import de.offene_pflege.gui.PnlYesNo;
@@ -116,7 +116,7 @@ public class PnlModelEditor extends DefaultPanel {
             protected Object doInBackground() throws Exception {
                 i = 0;
 
-                for (final ResInfoCategory cat : ResInfoCategoryTools.getAll()) {
+                for (final ResInfoCategory cat : ResInfoCategoryService.getAll()) {
                     try {
                         cpsMain.add(createCP(cat));
                     } catch (Exception e) {
@@ -178,7 +178,7 @@ public class PnlModelEditor extends DefaultPanel {
     private JideButton createAddButton() {
         final JideButton btnAdd = GUITools.createHyperlinkButton("opde.settings.model.btnAddCategory", SYSConst.icon22add, null);
         btnAdd.addActionListener(e -> {
-            ResInfoCategory newCat = EntityTools.merge(new ResInfoCategory(ResInfoCategoryTools.BASICS));
+            ResInfoCategory newCat = EntityTools.merge(new ResInfoCategory(ResInfoCategoryService.BASICS));
             if (newCat != null) {
                 try {
                     cpsMain.removeExpansion();

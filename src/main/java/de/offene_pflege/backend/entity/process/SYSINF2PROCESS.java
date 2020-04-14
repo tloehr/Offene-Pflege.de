@@ -1,6 +1,6 @@
 package de.offene_pflege.backend.entity.process;
 
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 
 import javax.persistence.*;
 

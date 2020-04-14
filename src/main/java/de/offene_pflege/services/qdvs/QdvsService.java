@@ -1,14 +1,11 @@
 package de.offene_pflege.services.qdvs;
 
 
-import de.offene_pflege.backend.entity.done.Homes;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.done.Rooms;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.services.ResInfoTypeTools;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.services.RoomsService;
-import de.offene_pflege.backend.entity.info.*;
 import de.offene_pflege.backend.entity.values.ResValue;
 import de.offene_pflege.backend.entity.values.ResValueTools;
 import de.offene_pflege.backend.entity.values.ResvaluetypesTools;

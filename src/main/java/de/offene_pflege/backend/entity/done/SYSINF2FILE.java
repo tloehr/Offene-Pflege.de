@@ -26,7 +26,6 @@
 package de.offene_pflege.backend.entity.done;
 
 import de.offene_pflege.backend.entity.DefaultEntity;
-import de.offene_pflege.backend.entity.info.ResInfo;
 import de.offene_pflege.backend.entity.system.OPUsers;
 
 import javax.persistence.*;

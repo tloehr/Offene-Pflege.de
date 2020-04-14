@@ -1,6 +1,6 @@
 package de.offene_pflege.backend.entity.prescription;
 
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
+import de.offene_pflege.backend.entity.done.Intervention;
 
 import javax.persistence.*;
 import java.io.Serializable;

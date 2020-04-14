@@ -1,6 +1,6 @@
 package de.offene_pflege.gui.renderer;
 
-import de.offene_pflege.backend.services.ResInfoCategoryTools;
+import de.offene_pflege.backend.services.ResInfoCategoryService;
 
 import javax.swing.*;
 
@@ -9,6 +9,6 @@ import javax.swing.*;
  */
 public class ResInfoCategoryTypesModel extends DefaultComboBoxModel<Integer> {
     public ResInfoCategoryTypesModel() {
-        super(ResInfoCategoryTools.TYPES);
+        super(ResInfoCategoryService.TYPES);
     }
 }

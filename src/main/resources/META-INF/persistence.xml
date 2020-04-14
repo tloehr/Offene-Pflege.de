@@ -10,18 +10,18 @@
         <class>de.offene_pflege.backend.entity.Allowance</class>
         <class>de.offene_pflege.backend.entity.done.LCustodian</class>
         <class>de.offene_pflege.backend.entity.done.Resident</class>
-        <class>de.offene_pflege.backend.entity.nursingprocess.DFN</class>
+        <class>de.offene_pflege.backend.entity.done.DFN</class>
         <class>de.offene_pflege.backend.entity.done.Homes</class>
         <class>de.offene_pflege.backend.entity.system.OPGroups</class>
         <class>de.offene_pflege.backend.entity.done.ICD</class>
         <class>de.offene_pflege.backend.entity.done.HInsurance</class>
         <class>de.offene_pflege.backend.entity.prescription.Hospital</class>
-        <class>de.offene_pflege.backend.entity.nursingprocess.InterventionSchedule</class>
-        <class>de.offene_pflege.backend.entity.nursingprocess.Intervention</class>
+        <class>de.offene_pflege.backend.entity.done.InterventionSchedule</class>
+        <class>de.offene_pflege.backend.entity.done.Intervention</class>
         <class>de.offene_pflege.backend.entity.reports.NR2User</class>
         <class>de.offene_pflege.backend.entity.reports.NReport</class>
-        <class>de.offene_pflege.backend.entity.nursingprocess.NPControl</class>
-        <class>de.offene_pflege.backend.entity.nursingprocess.NursingProcess</class>
+        <class>de.offene_pflege.backend.entity.done.NPControl</class>
+        <class>de.offene_pflege.backend.entity.done.NursingProcess</class>
         <class>de.offene_pflege.backend.entity.done.Rooms</class>
         <class>de.offene_pflege.backend.entity.done.Station</class>
         <class>de.offene_pflege.backend.entity.reports.Handover2User</class>
@@ -33,9 +33,9 @@
         <class>de.offene_pflege.backend.entity.done.SYSVAL2FILE</class>
         <class>de.offene_pflege.backend.entity.done.SYSPRE2FILE</class>
         <class>de.offene_pflege.backend.entity.done.SYSNP2FILE</class>
-        <class>de.offene_pflege.backend.entity.info.ResInfo</class>
-        <class>de.offene_pflege.backend.entity.info.ResInfoCategory</class>
-        <class>de.offene_pflege.backend.entity.info.ResInfoType</class>
+        <class>de.offene_pflege.backend.entity.done.ResInfo</class>
+        <class>de.offene_pflege.backend.entity.done.ResInfoCategory</class>
+        <class>de.offene_pflege.backend.entity.done.ResInfoType</class>
         <class>de.offene_pflege.backend.entity.system.SYSGROUPS2ACL</class>
         <class>de.offene_pflege.backend.entity.system.SYSLogin</class>
         <class>de.offene_pflege.backend.entity.system.SYSProps</class>

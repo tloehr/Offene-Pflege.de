@@ -38,9 +38,9 @@ import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.services.SYSFilesService;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
-import de.offene_pflege.backend.entity.nursingprocess.DFN;
-import de.offene_pflege.backend.entity.nursingprocess.DFNTools;
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
+import de.offene_pflege.backend.entity.done.DFN;
+import de.offene_pflege.backend.services.DFNService;
+import de.offene_pflege.backend.entity.done.Intervention;
 import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -145,7 +145,7 @@ public class PnlDFN extends NursingRecordsPanel {
         GUITools.setResidentDisplay(resident);
 
         initPhase = true;
-        jdcDate.setMinSelectableDate(DFNTools.getMinDatum(resident));
+        jdcDate.setMinSelectableDate(DFNService.getMinDatum(resident));
         jdcDate.setMaxSelectableDate(new Date());
         jdcDate.setDate(new Date());
         initPhase = false;
@@ -197,7 +197,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     int progress = 0;
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
 
-                    ArrayList<DFN> listDFNs = DFNTools.getDFNs(resident, jdcDate.getDate());
+                    ArrayList<DFN> listDFNs = DFNService.getDFNs(resident, jdcDate.getDate());
 
                     synchronized (mapShift2DFN) {
                         for (DFN dfn : listDFNs) {
@@ -501,14 +501,14 @@ public class PnlDFN extends NursingRecordsPanel {
         final CollapsiblePane dfnPane = new CollapsiblePane();
 
         ActionListener applyActionListener = actionEvent -> {
-            if (dfn.getState() == DFNTools.STATE_DONE) {
+            if (dfn.getState() == DFNService.STATE_DONE) {
                 return;
             }
             if (!dfn.isOnDemand() && dfn.getNursingProcess().isClosed()) {
                 return;
             }
 
-            if (DFNTools.isChangeable(dfn)) {
+            if (DFNService.isChangeable(dfn)) {
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
@@ -520,7 +520,7 @@ public class PnlDFN extends NursingRecordsPanel {
                         em.lock(myDFN.getNursingProcess(), LockModeType.OPTIMISTIC);
                     }
 
-                    myDFN.setState(DFNTools.STATE_DONE);
+                    myDFN.setState(DFNService.STATE_DONE);
                     myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
                     myDFN.setIst(new Date());
                     myDFN.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
@@ -573,7 +573,7 @@ public class PnlDFN extends NursingRecordsPanel {
         String title = "<html><font size=+1>" +
 //                (dfn.isFloating() ? (dfn.isActive() ? "(!) " : "(OK) ") : "") +
                 SYSTools.left(dfn.getIntervention().getBezeichnung(), MAX_TEXT_LENGTH) +
-                DFNTools.getScheduleText(dfn, " [", "]") +
+                DFNService.getScheduleText(dfn, " [", "]") +
                 (dfn.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(dfn.getUser()) + "</i>" : "") +
                 "</font></html>";
 
@@ -583,9 +583,9 @@ public class PnlDFN extends NursingRecordsPanel {
         DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? applyActionListener : null);
         dfnPane.setCollapseOnTitleClick(false);
 //        cptitle.getTitleButton().setIcon(DFNTools.getIcon(dfn));
-        JLabel icon1 = new JLabel(DFNTools.getIcon(dfn));
+        JLabel icon1 = new JLabel(DFNService.getIcon(dfn));
         icon1.setOpaque(false);
-        JLabel icon2 = new JLabel(DFNTools.getFloatingIcon(dfn));
+        JLabel icon2 = new JLabel(DFNService.getFloatingIcon(dfn));
         icon2.setOpaque(false);
         cptitle.getAdditionalIconPanel().add(icon1);
         cptitle.getAdditionalIconPanel().add(icon2);
@@ -629,11 +629,11 @@ public class PnlDFN extends NursingRecordsPanel {
             btnCancel.setBorder(null);
 //            btnCancel.setToolTipText(SYSTools.xx("nursingrecords.dfn.btneval.tooltip"));
             btnCancel.addActionListener(actionEvent -> {
-                if (dfn.getState() == DFNTools.STATE_REFUSED) {
+                if (dfn.getState() == DFNService.STATE_REFUSED) {
                     return;
                 }
 
-                if (DFNTools.isChangeable(dfn)) {
+                if (DFNService.isChangeable(dfn)) {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
@@ -645,7 +645,7 @@ public class PnlDFN extends NursingRecordsPanel {
                             em.lock(myDFN.getNursingProcess(), LockModeType.OPTIMISTIC);
                         }
 
-                        myDFN.setState(DFNTools.STATE_REFUSED);
+                        myDFN.setState(DFNService.STATE_REFUSED);
                         myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
                         myDFN.setIst(new Date());
                         myDFN.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
@@ -708,11 +708,11 @@ public class PnlDFN extends NursingRecordsPanel {
             btnEmpty.setBorder(null);
 //            btnCancel.setToolTipText(SYSTools.xx("nursingrecords.dfn.btneval.tooltip"));
             btnEmpty.addActionListener(actionEvent -> {
-                if (dfn.getState() == DFNTools.STATE_OPEN) {
+                if (dfn.getState() == DFNService.STATE_OPEN) {
                     return;
                 }
 
-                if (DFNTools.isChangeable(dfn)) {
+                if (DFNService.isChangeable(dfn)) {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
@@ -735,7 +735,7 @@ public class PnlDFN extends NursingRecordsPanel {
                             }
                         } else {
                             // the normal DFNs (those assigned to a NursingProcess) are reset to the OPEN state.
-                            myDFN.setState(DFNTools.STATE_OPEN);
+                            myDFN.setState(DFNService.STATE_OPEN);
                             myDFN.setUser(null);
                             myDFN.setIst(null);
                             myDFN.setiZeit(null);
@@ -1064,7 +1064,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 html += SYSConst.html_h2(SYSTools.xx("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDate.getDate())));
 
                 for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
-                    html += DFNTools.getDFNsAsHTMLtable(mapShift2DFN.get(shift));
+                    html += DFNService.getDFNsAsHTMLtable(mapShift2DFN.get(shift));
                 }
             }
 

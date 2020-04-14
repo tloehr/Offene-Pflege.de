@@ -1,6 +1,6 @@
 package de.offene_pflege.backend.services;
 
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -9,13 +9,10 @@ import javax.persistence.Query;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 22.06.12
- * Time: 14:21
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 22.06.12 Time: 14:21 To change this template use File | Settings | File
+ * Templates.
  */
-public class ResInfoCategoryTools {
+public class ResInfoCategoryService {
 
     public static final int BASICS = 0;
     public static final int NURSING = 100;
@@ -25,6 +22,16 @@ public class ResInfoCategoryTools {
 
     public static final String[] TYPESS = new String[]{SYSTools.xx("opde.settings.model.type.BASICS"), SYSTools.xx("opde.settings.model.type.NURSING"), SYSTools.xx("opde.settings.model.type.SKIN"), SYSTools.xx("opde.settings.model.type.VITAL"), SYSTools.xx("opde.settings.model.type.ADMINISTRATIVE")};
     public static final Integer[] TYPES = new Integer[]{BASICS, NURSING, SKIN, VITAL, ADMINISTRATIVE};
+
+
+    public static ResInfoCategory create(Integer catType) {
+        ResInfoCategory ri = new ResInfoCategory();
+        ri.setText(SYSTools.xx("opde.settings.model.btnAddCategory"));
+        ri.setCatType(catType);
+        ri.setSort(1);
+        ri.setColor("ffffff");
+        return ri;
+    }
 
 
     /**
@@ -38,7 +45,6 @@ public class ResInfoCategoryTools {
         em.close();
         return result;
     }
-
 
 
 //    /**

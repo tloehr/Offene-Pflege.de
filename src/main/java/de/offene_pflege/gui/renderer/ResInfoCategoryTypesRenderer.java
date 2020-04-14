@@ -1,6 +1,6 @@
 package de.offene_pflege.gui.renderer;
 
-import de.offene_pflege.backend.services.ResInfoCategoryTools;
+import de.offene_pflege.backend.services.ResInfoCategoryService;
 import de.offene_pflege.op.tools.SYSTools;
 
 import javax.swing.*;
@@ -15,8 +15,8 @@ public class ResInfoCategoryTypesRenderer implements ListCellRenderer {
 
     public ResInfoCategoryTypesRenderer() {
         int i = 0;
-        for (int type : ResInfoCategoryTools.TYPES) {
-            model.put(type, ResInfoCategoryTools.TYPESS[i]);
+        for (int type : ResInfoCategoryService.TYPES) {
+            model.put(type, ResInfoCategoryService.TYPESS[i]);
             i++;
         }
     }

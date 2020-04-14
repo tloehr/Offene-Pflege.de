@@ -17,11 +17,8 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.done.Rooms;
-import de.offene_pflege.backend.entity.done.Station;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.info.*;
 import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
 import de.offene_pflege.backend.entity.process.*;
 import de.offene_pflege.backend.entity.system.Commontags;
@@ -163,7 +160,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
     private void refreshData() {
         cleanup();
         synchronized (listCategories) {
-            listCategories.addAll(ResInfoCategoryTools.getAll());
+            listCategories.addAll(ResInfoCategoryService.getAll());
         }
         synchronized (listAllTypes) {
             listAllTypes.addAll(ResInfoTypeTools.getAllActive());

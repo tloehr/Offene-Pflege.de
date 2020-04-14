@@ -1,6 +1,6 @@
 package de.offene_pflege.backend.entity.system;
 
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoTypeTools;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.op.OPDE;

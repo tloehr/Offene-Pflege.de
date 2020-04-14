@@ -1,12 +1,10 @@
-package de.offene_pflege.backend.entity.info;
+package de.offene_pflege.backend.services;
 
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.nursingprocess.*;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.values.ResValue;
 import de.offene_pflege.backend.entity.values.ResValueTools;
@@ -814,8 +812,8 @@ public class TXEssenDoc implements HasLogger {
         long prev = -1;
 
         // Bei Lagerungsarten werden alle dekubitus-prophylaktischen Maßnahmen aus den aktuellen Pflegeplanungen eingetragen.
-        ArrayList<InterventionSchedule> listSchedule = InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_MOBILITY);
-        listSchedule.addAll(InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE));
+        ArrayList<InterventionSchedule> listSchedule = InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_MOBILITY);
+        listSchedule.addAll(InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_BEDSORE));
 
         for (InterventionSchedule is : listSchedule) {
             if (is.getIntervention().getMassID() != prev) {
@@ -882,8 +880,8 @@ public class TXEssenDoc implements HasLogger {
 
         }
 
-        boolean weightControl = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty() ||
-                !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
+        boolean weightControl = !PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_WEIGHT_MONITORING).isEmpty() ||
+                !InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_WEIGHT_MONITORING).isEmpty();
         content.put(TXEAF.EXCRETIONS_CONTROL_WEIGHT, setCheckbox(weightControl));
         content.put(TXEAF.MONITORING_WEIGHT, setCheckbox(weightControl));
 
@@ -910,7 +908,7 @@ public class TXEssenDoc implements HasLogger {
         content.put(TXEAF.EXCRETIONS_ONEWAY_AID, setCheckbox(diapers || pads1 || pads2 || undersheet));
         content.put(TXEAF.EXCRETIONS_CURRENT_USED_AID, incoaidtext.isEmpty() ? "--" : incoaidtext.substring(0, incoaidtext.length() - 2));
 
-        ArrayList<Prescription> presCatheterChange = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_CATHETER_CHANGE);
+        ArrayList<Prescription> presCatheterChange = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_CATHETER_CHANGE);
         if (!presCatheterChange.isEmpty()) {
             Date lastChange = SYSConst.DATE_THE_VERY_BEGINNING;
             for (Prescription prescription : presCatheterChange) { // usually there shouldn't be more than 1, but you never know
@@ -929,14 +927,14 @@ public class TXEssenDoc implements HasLogger {
     }
 
     private void createContent4Section6() {
-        content.put(TXEAF.PROPH_CONTRACTURE, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_CONTRACTURE).isEmpty()));
-        content.put(TXEAF.PROPH_BEDSORE, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE).isEmpty()));
-        content.put(TXEAF.PROPH_SOOR, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_SOOR).isEmpty()));
-        content.put(TXEAF.PROPH_THROMBOSIS, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_THROMBOSIS).isEmpty()));
-        content.put(TXEAF.PROPH_PNEUMONIA, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_PNEUMONIA).isEmpty()));
-        content.put(TXEAF.PROPH_INTERTRIGO, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_INTERTRIGO).isEmpty()));
-        content.put(TXEAF.PROPH_FALL, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_FALL).isEmpty()));
-        content.put(TXEAF.PROPH_OBSTIPATION, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_OBSTIPATION).isEmpty()));
+        content.put(TXEAF.PROPH_CONTRACTURE, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_CONTRACTURE).isEmpty()));
+        content.put(TXEAF.PROPH_BEDSORE, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_BEDSORE).isEmpty()));
+        content.put(TXEAF.PROPH_SOOR, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_SOOR).isEmpty()));
+        content.put(TXEAF.PROPH_THROMBOSIS, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_THROMBOSIS).isEmpty()));
+        content.put(TXEAF.PROPH_PNEUMONIA, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_PNEUMONIA).isEmpty()));
+        content.put(TXEAF.PROPH_INTERTRIGO, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_INTERTRIGO).isEmpty()));
+        content.put(TXEAF.PROPH_FALL, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_FALL).isEmpty()));
+        content.put(TXEAF.PROPH_OBSTIPATION, setCheckbox(!InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PROPH_OBSTIPATION).isEmpty()));
     }
 
     /**
@@ -1027,8 +1025,8 @@ public class TXEssenDoc implements HasLogger {
 
         long lastMeal = 0;
 
-        BHP bhp = BHPTools.getLastBHP(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
-        DFN dfn = DFNTools.getLastDFN(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
+        BHP bhp = BHPTools.getLastBHP(resident, InterventionService.FLAG_FOOD_CONSUMPTION);
+        DFN dfn = DFNService.getLastDFN(resident, InterventionService.FLAG_FOOD_CONSUMPTION);
 
         lastMeal = Math.max((bhp == null ? 0 : bhp.getIst().getTime()), (dfn == null ? 0 : dfn.getIst().getTime()));
 
@@ -1045,37 +1043,37 @@ public class TXEssenDoc implements HasLogger {
         BigDecimal bd750 = new BigDecimal(750);
         BigDecimal bd1000 = new BigDecimal(1000);
         BigDecimal foodml = BigDecimal.ZERO;
-        ArrayList<Prescription> listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_250ML);
+        ArrayList<Prescription> listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_FOOD_250ML);
         for (Prescription p : listPresGavageFood) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd250));
             }
         }
-        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_500ML);
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_FOOD_500ML);
         for (Prescription p : listPresGavageFood) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd500));
             }
         }
-        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_750ML);
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_FOOD_750ML);
         for (Prescription p : listPresGavageFood) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd750));
             }
         }
-        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_1000ML);
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_FOOD_1000ML);
         for (Prescription p : listPresGavageFood) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd1000));
             }
         }
-        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_100ML);
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_FOOD_100ML);
         for (Prescription p : listPresGavageFood) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd100));
             }
         }
-        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_200ML);
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_FOOD_200ML);
         for (Prescription p : listPresGavageFood) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd200));
@@ -1084,37 +1082,37 @@ public class TXEssenDoc implements HasLogger {
         listPresGavageFood.clear();
 
         BigDecimal liquidml = BigDecimal.ZERO;
-        ArrayList<Prescription> listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_250ML);
+        ArrayList<Prescription> listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_LIQUID_250ML);
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd250));
             }
         }
-        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_500ML);
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_LIQUID_500ML);
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd500));
             }
         }
-        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_750ML);
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_LIQUID_750ML);
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd750));
             }
         }
-        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_1000ML);
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_LIQUID_1000ML);
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd1000));
             }
         }
-        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_100ML);
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_LIQUID_100ML);
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd100));
             }
         }
-        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_200ML);
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GAVAGE_LIQUID_200ML);
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd200));
@@ -1309,13 +1307,13 @@ public class TXEssenDoc implements HasLogger {
      * special monitoring
      */
     private void createContent4Section13() {
-        boolean bp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_BP_MONITORING).isEmpty();
-        boolean port = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PORT_MONITORING).isEmpty();
-        boolean respiration = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_BREATH_MONITORING).isEmpty();
-        boolean pulse = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PULSE_MONITORING).isEmpty();
-        boolean temp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_TEMP_MONITORING).isEmpty();
-        boolean weight = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
-        boolean pain = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_PAIN_MONITORING).isEmpty();
+        boolean bp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_BP_MONITORING).isEmpty();
+        boolean port = !PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_PORT_MONITORING).isEmpty();
+        boolean respiration = !PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_BREATH_MONITORING).isEmpty();
+        boolean pulse = !PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_PULSE_MONITORING).isEmpty();
+        boolean temp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_TEMP_MONITORING).isEmpty();
+        boolean weight = !PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_WEIGHT_MONITORING).isEmpty();
+        boolean pain = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_PAIN_MONITORING).isEmpty();
 
         content.put(TXEAF.MONITORING_BP, setCheckbox(bp));
         content.put(TXEAF.MONITORING_PORT, setCheckbox(port));
@@ -1335,9 +1333,9 @@ public class TXEssenDoc implements HasLogger {
      * special monitoring
      */
     private void createContent4Section14() {
-        boolean logo = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_LOGOPEDICS).isEmpty();
-        boolean physio = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_PHYSIO).isEmpty();
-        boolean ergo = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_ERGO).isEmpty();
+        boolean logo = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_THERAPY_LOGOPEDICS).isEmpty();
+        boolean physio = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_THERAPY_PHYSIO).isEmpty();
+        boolean ergo = !InterventionScheduleService.getAllActiveByFlag(resident, InterventionService.FLAG_THERAPY_ERGO).isEmpty();
 
         content.put(TXEAF.THERAPY_ERGO, setCheckbox(ergo));
         content.put(TXEAF.THERAPY_LOGO, setCheckbox(logo));
@@ -1360,7 +1358,7 @@ public class TXEssenDoc implements HasLogger {
         content.put(TXEAF.MEDS_CONTROL, setCheckbox(getValue(ResInfoTypeTools.TYPE_MEDS, "control")));
         content.put(TXEAF.MEDS_MARCUMARPASS, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_MEDS, "marcumarpass")));
 
-        BHP lastMed = BHPTools.getLastBHP(resident, InterventionTools.FLAG_MEDS_APPLICATION);
+        BHP lastMed = BHPTools.getLastBHP(resident, InterventionService.FLAG_MEDS_APPLICATION);
         if (lastMed != null) {
             content.put(TXEAF.MEDS_LAST_APPLICATION, DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(lastMed.getIst()));
         } else {
@@ -1368,7 +1366,7 @@ public class TXEssenDoc implements HasLogger {
         }
 
 
-        ArrayList<Prescription> listGlucose = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GLUCOSE_MONITORING);
+        ArrayList<Prescription> listGlucose = PrescriptionTools.getAllActiveByFlag(resident, InterventionService.FLAG_GLUCOSE_MONITORING);
         if (!listGlucose.isEmpty()) {
             int daily = 0, weekly = 0;
             BigDecimal morning = BigDecimal.ZERO, noon = BigDecimal.ZERO, evening = BigDecimal.ZERO;

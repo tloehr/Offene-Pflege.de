@@ -1,8 +1,9 @@
-package de.offene_pflege.backend.entity.nursingprocess;
+package de.offene_pflege.backend.services;
 
 
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
+import de.offene_pflege.backend.entity.done.Intervention;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * Time: 14:26
  * To change this template use File | Settings | File Templates.
  */
-public class InterventionTools {
+public class InterventionService {
 
     public static final int TYPE_CARE = 1;
     public static final int TYPE_PRESCRIPTION = 2;
@@ -84,6 +85,15 @@ public class InterventionTools {
 //            "nursingrecords.nursingprocess.flag.physio",
 //            "nursingrecords.nursingprocess.flag.ergo",
 //            "nursingrecords.nursingprocess.flag.logo"};
+
+    public static Intervention create(String bezeichnung, int interventionType, ResInfoCategory category) {
+        Intervention i = new Intervention();
+        i.setBezeichnung(SYSTools.tidy(bezeichnung));
+        i.setInterventionType(interventionType);
+        i.setCategory(category);
+        i.setActive(true);
+        return i;
+      }
 
     public static ListCellRenderer getRenderer() {
         return (jList, o, i, b, b1) -> {

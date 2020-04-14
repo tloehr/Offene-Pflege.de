@@ -1,20 +1,20 @@
 package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionSchedule;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.Intervention;
+import de.offene_pflege.backend.entity.done.InterventionSchedule;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.DateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -129,34 +129,43 @@ public class InterventionScheduleService {
     }
 
 
-    public static InterventionSchedule create(NursingProcess planung, Intervention intervention) {
-         // todo: hier gehts weiter
-        this.morgens = 1;
-        this.taeglich = 1;
-        this.lDatum = new LocalDate().toDate();
-        this.nursingProcess = planung;
-        this.intervention = intervention;
+    public static InterventionSchedule create(NursingProcess nursingProcess, Intervention intervention) {
+        InterventionSchedule is = new InterventionSchedule();
+        // damit ich nicht so viel casten muss
+        short one = 1;
+        short zero = 0;
 
-        this.nachtMo = 0;
-        this.mittags = 0;
-        this.nachmittags = 0;
-        this.abends = 0;
-        this.nachtAb = 0;
-        this.uhrzeitAnzahl = 0;
-        this.uhrzeit = null;
-        this.woechentlich = 0;
-        this.monatlich = 0;
-        this.tagNum = 0;
-        this.mon = 0;
-        this.die = 0;
-        this.mit = 0;
-        this.don = 0;
-        this.fre = 0;
-        this.sam = 0;
-        this.son = 0;
-        this.erforderlich = false;
-        this.bemerkung = null;
-        this.uuid = UUID.randomUUID().toString();
+        is.setMorgens(one);
+        is.setTaeglich(one);
+        is.setlDatum(new Date());
+        is.setNursingProcess(nursingProcess);
+        is.setIntervention(intervention);
+
+        is.setNachtMo(zero);
+        is.setMittags(zero);
+        is.setNachmittags(zero);
+        is.setAbends(zero);
+        is.setNachtAb(zero);
+        is.setUhrzeitAnzahl(zero);
+        is.setUhrzeit(null);
+
+        is.setMon(zero);
+        is.setDie(zero);
+        is.setMit(zero);
+        is.setDon(zero);
+        is.setFre(zero);
+        is.setSam(zero);
+        is.setSon(zero);
+
+        is.setWoechentlich(zero);
+        is.setMonatlich(zero);
+        is.setTagNum(zero);
+
+        is.setErforderlich(false);
+        is.setBemerkung(null);
+        is.setUuid(UUID.randomUUID().toString());
+
+        return is;
     }
 
 
@@ -231,23 +240,24 @@ public class InterventionScheduleService {
 
         result += SYSTools.catchNull(termin.getBemerkung(), "<div id=\"fonttext\"><b>" + SYSTools.xx("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
 
-        if (termin.isFloating()) {
+        if (termin.getErforderlich()) {
             result += "<div id=\"fonttext\"><font color=\"blue\">" + SYSTools.xx("nursingrecords.nursingprocess.floatinginterventions") + "</font></div>";
         }
 
         return result;
     }
 
+
     public static String getRepeatPattern(InterventionSchedule schedule) {
         String result = "";
 
-        if (schedule.isTaeglich()) {
+        if (schedule.getTaeglich() > 0) {
             if (schedule.getTaeglich() > 1) {
                 result += "alle " + schedule.getTaeglich() + " Tage";
             } else {
                 result += "jeden Tag";
             }
-        } else if (schedule.isWoechentlich()) {
+        } else if (schedule.getWoechentlich() > 0) {
             if (schedule.getWoechentlich() == 1) {
                 result += "jede Woche ";
             } else {
@@ -268,7 +278,7 @@ public class InterventionScheduleService {
                 result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
             }
 
-        } else if (schedule.isMonatlich()) {
+        } else if (schedule.getMonatlich() >0) {
             if (schedule.getMonatlich() == 1) {
                 result += SYSTools.xx("misc.msg.everyMonth") + " ";
             } else {
@@ -305,11 +315,10 @@ public class InterventionScheduleService {
             result = "";
         }
 
-        DateMidnight ldatum = new DateTime(schedule.getLDatum()).toDateMidnight();
-        DateMidnight today = new DateMidnight();
+        LocalDate ldatum = JavaTimeConverter.toJavaLocalDateTime(schedule.getlDatum()).toLocalDate();
 
-        if (ldatum.compareTo(today) > 0) { // Die erste Ausführung liegt in der Zukunft
-            result += SYSTools.xx("nursingrecords.prescription.firstApplication") + ": " + DateFormat.getDateInstance().format(schedule.getLDatum());
+        if (ldatum.compareTo(LocalDate.now()) > 0) { // Die erste Ausführung liegt in der Zukunft
+            result += SYSTools.xx("nursingrecords.prescription.firstApplication") + ": " + DateFormat.getDateInstance().format(schedule.getlDatum());
         }
 
         return result;
@@ -337,7 +346,7 @@ public class InterventionScheduleService {
 
         int currentState;
         // Zeit verwendet ?
-        if (schedule.verwendetUhrzeit()) {
+        if (schedule.getUhrzeit() != null) {
             currentState = UHRZEIT;
         } else {
             currentState = ZEIT;
@@ -384,31 +393,34 @@ public class InterventionScheduleService {
      */
     public static void copySchedule(InterventionSchedule source, List<InterventionSchedule> selected, NursingProcess nursingProcess) {
         for (InterventionSchedule is : selected) {
-            int index = nursingProcess.getInterventionSchedule().indexOf(is);
-
-            nursingProcess.getInterventionSchedule().get(index).setNachtMo(source.getNachtMo());
-            nursingProcess.getInterventionSchedule().get(index).setMorgens(source.getMorgens());
-            nursingProcess.getInterventionSchedule().get(index).setMittags(source.getMittags());
-            nursingProcess.getInterventionSchedule().get(index).setNachmittags(source.getNachmittags());
-            nursingProcess.getInterventionSchedule().get(index).setAbends(source.getAbends());
-            nursingProcess.getInterventionSchedule().get(index).setNachtAb(source.getNachtAb());
-            nursingProcess.getInterventionSchedule().get(index).setUhrzeitAnzahl(source.getUhrzeitAnzahl());
-            nursingProcess.getInterventionSchedule().get(index).setUhrzeit(source.getUhrzeit());
-            nursingProcess.getInterventionSchedule().get(index).setTaeglich(source.getTaeglich());
-            nursingProcess.getInterventionSchedule().get(index).setWoechentlich(source.getWoechentlich());
-            nursingProcess.getInterventionSchedule().get(index).setMonatlich(source.getMonatlich());
-            nursingProcess.getInterventionSchedule().get(index).setTagNum(source.getTagNum());
-            nursingProcess.getInterventionSchedule().get(index).setMon(source.getMon());
-            nursingProcess.getInterventionSchedule().get(index).setDie(source.getDie());
-            nursingProcess.getInterventionSchedule().get(index).setMit(source.getMit());
-            nursingProcess.getInterventionSchedule().get(index).setDon(source.getDon());
-            nursingProcess.getInterventionSchedule().get(index).setFre(source.getFre());
-            nursingProcess.getInterventionSchedule().get(index).setSam(source.getSam());
-            nursingProcess.getInterventionSchedule().get(index).setSon(source.getSon());
-            nursingProcess.getInterventionSchedule().get(index).setFloating(source.isFloating());
-            nursingProcess.getInterventionSchedule().get(index).setLDatum(source.getLDatum());
-            nursingProcess.getInterventionSchedule().get(index).setBemerkung(source.getBemerkung());
+            int index = nursingProcess.getInterventionSchedules().indexOf(is);
+            nursingProcess.getInterventionSchedules().get(index).setNachtMo(source.getNachtMo());
+            nursingProcess.getInterventionSchedules().get(index).setMorgens(source.getMorgens());
+            nursingProcess.getInterventionSchedules().get(index).setMittags(source.getMittags());
+            nursingProcess.getInterventionSchedules().get(index).setNachmittags(source.getNachmittags());
+            nursingProcess.getInterventionSchedules().get(index).setAbends(source.getAbends());
+            nursingProcess.getInterventionSchedules().get(index).setNachtAb(source.getNachtAb());
+            nursingProcess.getInterventionSchedules().get(index).setUhrzeitAnzahl(source.getUhrzeitAnzahl());
+            nursingProcess.getInterventionSchedules().get(index).setUhrzeit(source.getUhrzeit());
+            nursingProcess.getInterventionSchedules().get(index).setTaeglich(source.getTaeglich());
+            nursingProcess.getInterventionSchedules().get(index).setWoechentlich(source.getWoechentlich());
+            nursingProcess.getInterventionSchedules().get(index).setMonatlich(source.getMonatlich());
+            nursingProcess.getInterventionSchedules().get(index).setTagNum(source.getTagNum());
+            nursingProcess.getInterventionSchedules().get(index).setMon(source.getMon());
+            nursingProcess.getInterventionSchedules().get(index).setDie(source.getDie());
+            nursingProcess.getInterventionSchedules().get(index).setMit(source.getMit());
+            nursingProcess.getInterventionSchedules().get(index).setDon(source.getDon());
+            nursingProcess.getInterventionSchedules().get(index).setFre(source.getFre());
+            nursingProcess.getInterventionSchedules().get(index).setSam(source.getSam());
+            nursingProcess.getInterventionSchedules().get(index).setSon(source.getSon());
+            nursingProcess.getInterventionSchedules().get(index).setErforderlich(source.getErforderlich());
+            nursingProcess.getInterventionSchedules().get(index).setlDatum(source.getlDatum());
+            nursingProcess.getInterventionSchedules().get(index).setBemerkung(source.getBemerkung());
         }
     }
+
+
+
+
 
 }

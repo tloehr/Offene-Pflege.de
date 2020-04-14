@@ -6,7 +6,7 @@ package de.offene_pflege.op.care.reports;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.services.ResInfoTypeTools;
 import de.offene_pflege.backend.entity.reports.NReport;

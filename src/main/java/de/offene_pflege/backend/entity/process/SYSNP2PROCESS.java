@@ -1,6 +1,6 @@
 package de.offene_pflege.backend.entity.process;
 
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 
 import javax.persistence.*;
 

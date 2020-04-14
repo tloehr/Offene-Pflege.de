@@ -34,13 +34,11 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.services.NursingProcessService;
-import de.offene_pflege.backend.services.SYSFilesService;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
-import de.offene_pflege.backend.services.ResInfoCategoryTools;
+import de.offene_pflege.backend.entity.done.NPControl;
+import de.offene_pflege.backend.entity.done.NursingProcess;
+import de.offene_pflege.backend.services.*;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
-import de.offene_pflege.backend.entity.nursingprocess.*;
 import de.offene_pflege.backend.entity.process.*;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
@@ -108,7 +106,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private void initPanel() {
         cpMap = new HashMap<String, CollapsiblePane>();
         valuecache = new HashMap<ResInfoCategory, ArrayList<NursingProcess>>();
-        categories = ResInfoCategoryTools.getAll4NP();
+        categories = ResInfoCategoryService.getAll4NP();
         contenPanelMap = new HashMap<NursingProcess, JPanel>();
         listUsedCommontags = new ArrayList<>();
         prepareSearchArea();
@@ -733,7 +731,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             Unique unique = UniqueTools.getNewUID(em, NursingProcessService.UNIQUEID);
                             final NursingProcess newNP = em.merge((NursingProcess) np); // https://github.com/tloehr/Offene-Pflege.de/issues/89
                             newNP.setNPSeries(unique.getUid());
-                            DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
+                            DFNService.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
 
                             // Refresh Display
@@ -825,7 +823,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     Unique unique = UniqueTools.getNewUID(em, NursingProcessService.UNIQUEID);
                                     final NursingProcess newNP = em.merge((NursingProcess) np);
                                     newNP.setNPSeries(unique.getUid());
-                                    DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
+                                    DFNService.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
                                     em.getTransaction().commit();
 
 
@@ -926,7 +924,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private JPanel getMenu(final NursingProcess np) {
 
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
-        long numDFNs = DFNTools.getNumDFNs(np);
+        long numDFNs = DFNService.getNumDFNs(np);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
@@ -968,7 +966,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             myNewNP.setFrom(new DateTime(myOldNP.getTo()).plusSeconds(1).toDate());
 
                             // Create new DFNs according to plan
-                            DFNTools.generate(em, myNewNP.getInterventionSchedule(), new LocalDate(), true);
+                            DFNService.generate(em, myNewNP.getInterventionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
 
                             // Refresh Display
@@ -1130,7 +1128,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             delQuery.executeUpdate();
 
                             // Create new DFNs according to plan
-                            DFNTools.generate(em, mynp.getInterventionSchedule(), new LocalDate(), true);
+                            DFNService.generate(em, mynp.getInterventionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
 
                             boolean reloadSearch = false;

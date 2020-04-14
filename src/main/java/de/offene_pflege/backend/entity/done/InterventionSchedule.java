@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package de.offene_pflege.backend.entity.nursingprocess;
+package de.offene_pflege.backend.entity.done;
 
 import de.offene_pflege.backend.entity.DefaultEntity;
 
@@ -41,6 +41,7 @@ public class InterventionSchedule extends DefaultEntity implements Comparable<In
     private String bemerkung;
     private NursingProcess nursingProcess;
     private Intervention intervention;
+    private String uuid; // nur zum Vergleich, damit ich nicht persistierte Elemente auseinander halten kann. Das kommt vor, bei Änderungen in den Pflegeplanungen.
 
     @Column(name = "NachtMo")
     public Short getNachtMo() {
@@ -253,8 +254,9 @@ public class InterventionSchedule extends DefaultEntity implements Comparable<In
     public void setNursingProcess(NursingProcess nursingProcess) {
         this.nursingProcess = nursingProcess;
     }
+
     @JoinColumn(name = "MassID", referencedColumnName = "id")
-     @ManyToOne
+    @ManyToOne
     public Intervention getIntervention() {
         return intervention;
     }
@@ -263,12 +265,30 @@ public class InterventionSchedule extends DefaultEntity implements Comparable<In
         this.intervention = intervention;
     }
 
+    @Transient
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public InterventionSchedule() {
     }
 
     @Override
     public int compareTo(InterventionSchedule interventionSchedule) {
         return intervention.getBezeichnung().compareTo(interventionSchedule.getIntervention().getBezeichnung());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        boolean equal = super.equals(other);
+        if (equal && getId() == null) { // nur für den fall der nicht presistierten Objekte
+            equal = uuid.equals(((InterventionSchedule) other).getUuid());
+        }
+        return equal;
     }
 
 

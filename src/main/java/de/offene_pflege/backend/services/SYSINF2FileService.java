@@ -2,7 +2,7 @@ package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.done.SYSFiles;
 import de.offene_pflege.backend.entity.done.SYSINF2FILE;
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.system.OPUsers;
 
 import java.util.Date;

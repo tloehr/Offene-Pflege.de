@@ -30,12 +30,12 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
-import de.offene_pflege.backend.services.ResInfoCategoryTools;
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionSchedule;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
+import de.offene_pflege.backend.services.ResInfoCategoryService;
+import de.offene_pflege.backend.entity.done.Intervention;
+import de.offene_pflege.backend.entity.done.InterventionSchedule;
 import de.offene_pflege.backend.services.InterventionScheduleService;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -81,7 +81,7 @@ public class DlgNursingProcess extends MyJDialog {
     }
 
     private void initDialog() {
-        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
+        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryService.getAll4NP().toArray()));
 
         lblTopic.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblTopic"));
         lblCat.setText(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblCat"));
@@ -580,7 +580,7 @@ public class DlgNursingProcess extends MyJDialog {
                     InterventionScheduleService.copySchedule(template, selected, nursingProcess);
 
                     popup.hidePopup();
-                    Collections.sort(nursingProcess.getInterventionSchedule());
+                    Collections.sort(nursingProcess.getInterventionSchedules());
                     ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
                 }
             });

@@ -1,8 +1,9 @@
-package de.offene_pflege.backend.entity.nursingprocess;
+package de.offene_pflege.backend.services;
 
-import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.entity.done.DFN;
+import de.offene_pflege.backend.entity.done.InterventionSchedule;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
@@ -24,21 +25,66 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 19.07.12
- * Time: 16:23
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 19.07.12 Time: 16:23 To change this template use File | Settings | File
+ * Templates.
  */
-public class DFNTools {
+public class DFNService {
     public static final byte STATE_OPEN = 0;
     public static final byte STATE_DONE = 1;
     public static final byte STATE_REFUSED = 2;
 
+//
+//    public static DFN create(Resident resident, Intervention intervention) {
+//        DFN dfn = new DFN();
+//        Date now = new Date();
+//        dfn.setResident(resident);
+//        dfn.setIntervention(intervention);
+//        dfn.setFloating(false);
+//        dfn.setSoll(now);
+//        dfn.setSoll(now);
+//        dfn.setsZeit(SYSCalendar.whatTimeIDIs(now));
+//        dfn.setIst(now);
+//        dfn.setiZeit(dfn.getsZeit());
+//        dfn.setState(STATE_DONE);
+//        
+//        this.user = OPDE.getLogin().getUser();
+//        this.resident = resident;
+//        this.mdate = now;
+//        this.stDatum = now;
+//    }
 
+    public static DFN create(InterventionSchedule interventionSchedule, Date soll, Byte sZeit) {
+        DFN dfn = new DFN();
+        dfn.setInterventionSchedule(interventionSchedule);
+        dfn.setIntervention(interventionSchedule.getIntervention());
+        dfn.setNursingProcess(interventionSchedule.getNursingProcess());
+        dfn.setResident(interventionSchedule.getNursingProcess().getResident());
+        dfn.setFloating(interventionSchedule.getErforderlich());
+        dfn.setSoll(soll);
+        dfn.setsZeit(sZeit);
+        dfn.setState(STATE_OPEN);
+        dfn.setMdate(new Date());
+        dfn.setStDatum(dfn.getMdate());
+        return dfn;
+    }
+
+    public static Byte getShift(DFN dfn) {
+        if (dfn.getNursingProcess() == null) {
+            return SYSCalendar.SHIFT_ON_DEMAND;
+        }
+        if (dfn.getsZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
+            return SYSCalendar.whatShiftIs(dfn.getSoll());
+        }
+        return SYSCalendar.whatShiftIs(dfn.getsZeit());
+    }
+
+
+    
     /**
-     * Diese Methode erzeugt den Tagesplan für die Behandlungspflegen. Dabei werden alle aktiven Verordnungen geprüft, ermittelt ob sie am betreffenden Stichtag auch "dran" sind und dann
-     * werden daraus Einträge in der BHP Tabelle erzeugt. Sie teilt sich die Arbeit mit der <code>erzeugen(EntityManager em, List<VerordnungPlanung> list, Date stichtag, Date zeit)</code> Methode
+     * Diese Methode erzeugt den Tagesplan für die Behandlungspflegen. Dabei werden alle aktiven Verordnungen geprüft,
+     * ermittelt ob sie am betreffenden Stichtag auch "dran" sind und dann werden daraus Einträge in der BHP Tabelle
+     * erzeugt. Sie teilt sich die Arbeit mit der <code>erzeugen(EntityManager em, List<VerordnungPlanung> list, Date
+     * stichtag, Date zeit)</code> Methode
      *
      * @param em, EntityManager Kontext
      * @return Anzahl der erzeugten BHPs
@@ -79,7 +125,7 @@ public class DFNTools {
                     " WHERE p.from <= :von AND p.to >= :bis " +
                     // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
                     " AND mt.lDatum <= :ldatum AND p.resident.adminonly <> 2 " +
-                    " ORDER BY mt.termID ");
+                    " ORDER BY mt.id ");
 
             // Diese Aufstellung ergibt mindestens die heute gültigen Einträge.
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
@@ -116,7 +162,7 @@ public class DFNTools {
 
 
         forceQuery.setParameter("now", now);
-        forceQuery.setParameter("state", DFNTools.STATE_OPEN);
+        forceQuery.setParameter("state", DFNService.STATE_OPEN);
 
         int affectedOldDFNs = 0;
         for (DFN dfn : new ArrayList<DFN>(forceQuery.getResultList())) {
@@ -128,8 +174,8 @@ public class DFNTools {
     }
 
     /**
-     * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben. Die Liste wird aber vorher
-     * noch darauf geprüft, ob sie auch wirklich an dem besagten Stichtag passt. Dabei gilt:
+     * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben. Die
+     * Liste wird aber vorher noch darauf geprüft, ob sie auch wirklich an dem besagten Stichtag passt. Dabei gilt:
      * <ol>
      * <li>Alles was taeglich angeordnet ist (jeden Tag oder jeden soundsovielten Tag)</li>
      * <li>Alles was woechentlich ist und die Spalte (Attribut) mit dem aktuellen Wochentagsnamen größer null ist.</li>
@@ -148,7 +194,8 @@ public class DFNTools {
      *
      * @param em         EntityManager Kontext
      * @param list       Liste der VerordnungPlanungen, die ggf. einzutragen sind.
-     * @param targetdate gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle Tag.
+     * @param targetdate gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle
+     *                   Tag.
      * @param wholeday   true, dann wird für den ganzen Tag erzeugt. false, dann ab der aktuellen Zeit.
      * @return die Anzahl der erzeugten BHPs.
      */
@@ -176,14 +223,14 @@ public class DFNTools {
             em.lock(em.merge(termin.getNursingProcess()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             em.lock(termin.getNursingProcess().getResident(), LockModeType.OPTIMISTIC);
 
-            if (!SYSCalendar.isInFuture(termin.getLDatum()) && (termin.isTaeglich() || termin.isPassenderWochentag(targetdate.toDate()) || termin.isPassenderTagImMonat(targetdate.toDate()))) {
+            if (!SYSCalendar.isInFuture(termin.getlDatum()) && (termin.getTaeglich() > 0 || InterventionScheduleService.isPassenderWochentag(termin, targetdate.toDate()) || InterventionScheduleService.isPassenderTagImMonat(termin,targetdate.toDate()))) {
 
                 boolean treffer = false;
-                LocalDate ldatum = new LocalDate(termin.getLDatum());
+                LocalDate ldatum = new LocalDate(termin.getlDatum());
 
                 // Genaue Ermittlung der Treffer
                 // =============================
-                if (termin.isTaeglich()) {
+                if (termin.getTaeglich()>0) {
 //                    OPDE.debug("Eine tägliche Planung");
                     // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
                     // der stichtag getroffen wurde oder überschritten ist.
@@ -193,7 +240,7 @@ public class DFNTools {
                     }
                     // Mich interssiert nur der Treffer, also die Punktlandung auf dem Stichtag
                     treffer = Days.daysBetween(ldatum, targetdate).getDays() == 0;
-                } else if (termin.isWoechentlich()) {
+                } else if (termin.getWoechentlich()>0) {
 //                    OPDE.debug("Eine wöchentliche Planung");
                     while (Weeks.weeksBetween(ldatum, targetdate).getWeeks() > 0) {
 //                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Wochen: " + termin.getWoechentlich());
@@ -202,7 +249,7 @@ public class DFNTools {
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest in der selben Kalenderwoche liegt.
                     // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
                     treffer = Weeks.weeksBetween(ldatum, targetdate).getWeeks() == 0;
-                } else if (termin.isMonatlich()) {
+                } else if (termin.getMonatlich()>0) {
 //                    OPDE.debug("Eine monatliche Planung");
                     while (Months.monthsBetween(ldatum, targetdate).getMonths() > 0) {
 //                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Monate: " + termin.getMonatlich());
@@ -229,68 +276,65 @@ public class DFNTools {
                     if (erstAbFM && termin.getNachtMo() > 0) {
 //                        OPDE.debug("SYSConst.FM, " + termin.getNachtMo());
                         for (int dfncount = 1; dfncount <= termin.getNachtMo(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_EARLY_IN_THE_MORNING));
+                            em.merge(create(termin, targetdate.toDate(), SYSCalendar.BYTE_EARLY_IN_THE_MORNING));
                             numdfn++;
                         }
                     }
                     if (erstAbMO && termin.getMorgens() > 0) {
 //                        OPDE.debug("SYSConst.MO, " + termin.getMorgens());
                         for (int dfncount = 1; dfncount <= termin.getMorgens(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_MORNING));
+                            em.merge(create(termin, targetdate.toDate(), SYSCalendar.BYTE_MORNING));
                             numdfn++;
                         }
                     }
                     if (erstAbMI && termin.getMittags() > 0) {
 //                        OPDE.debug("SYSConst.MI, " + termin.getMittags());
                         for (int dfncount = 1; dfncount <= termin.getMittags(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_NOON));
+                            em.merge(create(termin, targetdate.toDate(), SYSCalendar.BYTE_NOON));
                             numdfn++;
                         }
                     }
                     if (erstAbNM && termin.getNachmittags() > 0) {
 //                        OPDE.debug("SYSConst.NM, " + termin.getNachmittags());
                         for (int dfncount = 1; dfncount <= termin.getNachmittags(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_AFTERNOON));
+                            em.merge(create(termin, targetdate.toDate(), SYSCalendar.BYTE_AFTERNOON));
                             numdfn++;
                         }
                     }
                     if (erstAbAB && termin.getAbends() > 0) {
 //                        OPDE.debug("SYSConst.AB, " + termin.getAbends());
                         for (int dfncount = 1; dfncount <= termin.getAbends(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_EVENING));
+                            em.merge(create(termin, targetdate.toDate(), SYSCalendar.BYTE_EVENING));
                             numdfn++;
                         }
                     }
                     if (erstAbNA && termin.getNachtAb() > 0) {
 //                        OPDE.debug("SYSConst.NA, " + termin.getNachtAb());
                         for (int dfncount = 1; dfncount <= termin.getNachtAb(); dfncount++) {
-                            em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_LATE_AT_NIGHT));
+                            em.merge(create(termin, targetdate.toDate(), SYSCalendar.BYTE_LATE_AT_NIGHT));
                             numdfn++;
                         }
                     }
                     if (uhrzeitOK && termin.getUhrzeit() != null) {
 
                         // This adds a Time Value to a given Date
-
-                        // Correction for Daylight Savings
                         LocalTime timeofday = new LocalTime(termin.getUhrzeit());
                         LocalDateTime localTargetDateTime = targetdate.toLocalDateTime(timeofday);
 
                         if (dtz.isLocalDateTimeGap(localTargetDateTime)) {
                             //todo: find a better way to calculate this (getOffsetFromLocal)
                             localTargetDateTime = localTargetDateTime.plusHours(1);
-                            OPDE.info(SYSTools.xx("Correcting for DST. [TermID=" + termin.getTermID() + "] " + localTargetDateTime.toString()));
+                            OPDE.info(SYSTools.xx("Correcting for DST. [TermID=" + termin.getId() + "] " + localTargetDateTime.toString()));
                         }
 
-//                        Date newTargetdate = localTargetDateTime.toDate();
                         for (int dfncount = 1; dfncount <= termin.getUhrzeitAnzahl(); dfncount++) {
-                            em.merge(new DFN(termin, localTargetDateTime.toDate(), SYSConst.UZ));
+                            em.merge(create(termin, localTargetDateTime.toDate(), SYSConst.UZ));
                             numdfn++;
                         }
                     }
 
                     // Nun noch das LDatum in der Tabelle MassTermin neu setzen.
-                    termin.setLDatum(targetdate.toDate());
+                    termin.setlDatum(targetdate.toDate());
                 }
             } else {
 //                OPDE.debug("///////////////////////////////////////////////////////////");
@@ -317,7 +361,8 @@ public class DFNTools {
 
 
     /**
-     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
+     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not
+     * OnDemand)
      *
      * @param resident
      * @param date
@@ -402,19 +447,19 @@ public class DFNTools {
         Icon icon;
 
         if (Days.daysBetween(start, stop).getDays() > 14) {
-            if (dfn.isOpen()) {
+            if (dfn.getState() == STATE_OPEN) {
                 icon = SYSConst.icon22ledPurpleOn;
             } else {
                 icon = SYSConst.icon22ledPurpleOff;
             }
         } else if (Days.daysBetween(start, stop).getDays() > 7) {
-            if (dfn.isOpen()) {
+            if (dfn.getState() == STATE_OPEN) {
                 icon = SYSConst.icon22ledOrangeOn;
             } else {
                 icon = SYSConst.icon22ledOrangeOff;
             }
         } else {
-            if (dfn.isOpen()) {
+            if (dfn.getState() == STATE_OPEN) {
                 icon = SYSConst.icon22ledBlueOn;
             } else {
                 icon = SYSConst.icon22ledBlueOff;
@@ -426,8 +471,8 @@ public class DFNTools {
 
     public static String getScheduleText(DFN dfn, String prefix, String postfix) {
         String text = "";
-        if (!dfn.isOnDemand()) {
-            if (dfn.getSollZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
+        if (dfn.getNursingProcess() != null) {
+            if (dfn.getsZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
                 text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll());
             } else {
                 String[] msg = GUITools.getLocalizedMessages(SYSCalendar.TIMEIDTEXTLONG);
@@ -462,7 +507,7 @@ public class DFNTools {
         boolean residentAbsent = ResidentTools.isActive(dfn.getResident()) && ResInfoService.absentSince(dfn.getResident()) != null;
 
         return !residentAbsent && ResidentTools.isActive(dfn.getResident()) &&
-                (dfn.isOnDemand() || dfn.getNursingProcess().getTo().after(new Date())) && // prescription is active or it is unassigned
+                (dfn.getNursingProcess() == null || dfn.getNursingProcess().getTo().after(new Date())) && // prescription is active or it is unassigned
                 (dfn.getUser() == null ||
                         (dfn.getUser().equals(OPDE.getLogin().getUser()) &&
                                 Minutes.minutesBetween(new DateTime(dfn.getMdate()), new DateTime()).getMinutes() < DFN_MAX_MINUTES_TO_WITHDRAW));
@@ -472,7 +517,7 @@ public class DFNTools {
     public static Date getMinDatum(Resident bewohner) {
         Date date;
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT d FROM DFN d WHERE d.resident = :bewohner ORDER BY d.dfnid");
+        Query query = em.createQuery("SELECT d FROM DFN d WHERE d.resident = :bewohner ORDER BY d.id");
         query.setParameter("bewohner", bewohner);
         query.setMaxResults(1);
         try {
@@ -499,7 +544,6 @@ public class DFNTools {
         return dfn.isEmpty() ? null : dfn.get(0);
     }
 
-  
 
     public static String getDFNsAsHTMLtable(List<DFN> list) {
         String result = "";
@@ -507,7 +551,7 @@ public class DFNTools {
         if (!list.isEmpty()) {
 
             DFN d1 = list.get(0);
-            result += SYSConst.html_h2(d1.isOnDemand() ? "nursingrecords.dfn.ondemand" : SYSCalendar.SHIFT_TEXT[d1.getShift()]);
+            result += SYSConst.html_h2(d1.getNursingProcess() == null ? "nursingrecords.dfn.ondemand" : SYSCalendar.SHIFT_TEXT[getShift(d1)]);
 
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
@@ -518,10 +562,10 @@ public class DFNTools {
 
                 result += "<tr>";
                 result += "<td valign=\"top\">" + dfn.getIntervention().getBezeichnung() +
-                        (dfn.isOnDemand() || SYSTools.catchNull(dfn.getInterventionSchedule().getBemerkung()).isEmpty() ? "" : " <i>(" + dfn.getInterventionSchedule().getBemerkung() + ")</i>")
+                        (dfn.getNursingProcess() == null || SYSTools.catchNull(dfn.getInterventionSchedule().getBemerkung()).isEmpty() ? "" : " <i>(" + dfn.getInterventionSchedule().getBemerkung() + ")</i>")
                         + "</td>";
                 result += "<td valign=\"top\">" + getScheduleText(dfn, " [", "]") + getStateAsHTML(dfn) + "<br/>";
-                result += "<td valign=\"top\">" + (dfn.isOpen() ? "" : dfn.getUser().getUIDCiphered() + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(dfn.getIst())) + "</td>";
+                result += "<td valign=\"top\">" + (dfn.getState() == STATE_OPEN ? "" : OPUsersService.getUIDCiphered(dfn.getUser()) + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(dfn.getIst())) + "</td>";
 //                result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
 
                 result += "</td>";

@@ -23,11 +23,9 @@
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
-package de.offene_pflege.backend.entity.info;
+package de.offene_pflege.backend.entity.done;
 
 import de.offene_pflege.backend.entity.DefaultEntity;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.done.SYSINF2FILE;
 import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.QProcess;

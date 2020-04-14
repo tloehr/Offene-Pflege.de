@@ -2,7 +2,7 @@ package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.done.SYSFiles;
 import de.offene_pflege.backend.entity.done.SYSNP2FILE;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.backend.entity.system.OPUsers;
 
 import java.util.Date;

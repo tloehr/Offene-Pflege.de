@@ -33,7 +33,7 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.services.SYSFilesService;
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.prescription.*;

@@ -7,7 +7,7 @@ package de.offene_pflege.backend.services;
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.Homes;
 import de.offene_pflege.backend.entity.done.Station;
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.prescription.MedInventoryTools;
 import de.offene_pflege.backend.entity.prescription.PrescriptionTools;

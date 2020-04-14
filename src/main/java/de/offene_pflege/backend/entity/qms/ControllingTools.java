@@ -1,10 +1,10 @@
 package de.offene_pflege.backend.entity.qms;
 
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.prescription.PrescriptionTools;

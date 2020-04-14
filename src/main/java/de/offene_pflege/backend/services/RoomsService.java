@@ -4,7 +4,7 @@ import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.Floors;
 import de.offene_pflege.backend.entity.done.Homes;
 import de.offene_pflege.backend.entity.done.Rooms;
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSCalendar;

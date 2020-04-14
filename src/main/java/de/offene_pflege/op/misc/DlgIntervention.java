@@ -6,10 +6,10 @@ package de.offene_pflege.op.misc;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
-import de.offene_pflege.backend.services.ResInfoCategoryTools;
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionTools;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
+import de.offene_pflege.backend.services.ResInfoCategoryService;
+import de.offene_pflege.backend.entity.done.Intervention;
+import de.offene_pflege.backend.services.InterventionService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.nursingprocess.PnlSelectIntervention;
@@ -45,12 +45,12 @@ public class DlgIntervention extends MyJDialog {
         tbActive.setEnabled(false);
         panel2.add(tbActive, CC.xywh(1, 9, 3, 1, CC.LEFT, CC.DEFAULT));
         cmbType.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.interventions.CARE"), SYSTools.xx("misc.msg.interventions.PRESCRIPTION"), SYSTools.xx("misc.msg.interventions.SOCIAL")}));
-        cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
+        cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryService.getAll4NP().toArray()));
     }
 
     private void txtSearchActionPerformed(ActionEvent e) {
         if (txtSearch.getText().isEmpty()) return;
-        lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy(txtSearch.getText())));
+        lstInterventions.setModel(SYSTools.list2dlm(InterventionService.findBy(txtSearch.getText())));
     }
 
     private void lstInterventionsValueChanged(ListSelectionEvent e) {
@@ -143,7 +143,7 @@ public class DlgIntervention extends MyJDialog {
 
             set2EditMode(false);
             // https://github.com/tloehr/Offene-Pflege.de/issues/82
-            lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy(txtText.getText().trim())));
+            lstInterventions.setModel(SYSTools.list2dlm(InterventionService.findBy(txtText.getText().trim())));
         }
     }
 

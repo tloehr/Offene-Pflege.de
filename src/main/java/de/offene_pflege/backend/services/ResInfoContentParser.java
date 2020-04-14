@@ -1,4 +1,4 @@
-package de.offene_pflege.backend.entity.info;
+package de.offene_pflege.backend.services;
 
 import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.InfoTreeNodeBean;

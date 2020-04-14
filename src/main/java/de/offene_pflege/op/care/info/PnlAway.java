@@ -9,7 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideTabbedPane;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.info.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.services.ResInfoTypeTools;
 import de.offene_pflege.backend.entity.prescription.Hospital;

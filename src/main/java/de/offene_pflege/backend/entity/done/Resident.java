@@ -27,7 +27,6 @@ package de.offene_pflege.backend.entity.done;
 
 import de.offene_pflege.backend.entity.Allowance;
 import de.offene_pflege.backend.entity.DefaultStringIDEntity;
-import de.offene_pflege.backend.entity.info.ResInfo;
 import de.offene_pflege.backend.entity.prescription.GP;
 import de.offene_pflege.backend.entity.system.OPUsers;
 

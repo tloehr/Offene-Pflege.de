@@ -10,10 +10,12 @@ import com.jidesoft.combobox.DateExComboBox;
 import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
 import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.done.ResInfo;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
+import de.offene_pflege.backend.entity.done.ResInfoType;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.info.*;
-import de.offene_pflege.backend.entity.nursingprocess.NursingProcess;
+import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.reports.NReportTools;
@@ -474,7 +476,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
 
         html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.info"));
 
-        for (ResInfoCategory cat : ResInfoCategoryTools.getAll()) {
+        for (ResInfoCategory cat : ResInfoCategoryService.getAll()) {
 
 
             ArrayList<ResInfo> listInfos = ResInfoService.getAll(resident, cat, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
@@ -500,7 +502,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         // nursingProcess
         html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.nursingprocess") + "</h1>\n");
 
-        for (ResInfoCategory cat : ResInfoCategoryTools.getAll4NP()) {
+        for (ResInfoCategory cat : ResInfoCategoryService.getAll4NP()) {
             ArrayList<NursingProcess> allNPsForThisCat = NursingProcessService.getAll(resident, cat, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()));
             if (!allNPsForThisCat.isEmpty()) {
                 html.append("<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n");

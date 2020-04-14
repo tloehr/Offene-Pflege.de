@@ -83,6 +83,10 @@ public class OPUsersService {
 //        return user.getName() + ", " + user.getVorname() + " [" + user.getUIDCiphered() + "]";
 //    }
 
+    public static String getUIDCiphered(OPUsers opUsers) {
+        return OPDE.isUserCipher() ? "#" + opUsers.getCipherid() : opUsers.getId();
+    }
+
 
     public static ArrayList<OPUsers> getUsers(String searchPattern, boolean inactiveToo) {
         EntityManager em = OPDE.createEM();
@@ -155,7 +159,7 @@ public class OPUsersService {
     public static Color getBG1(OPUsers user) {
         Color active = GUITools.getColor("CEF0FF");
         Color closed = GUITools.getColor("C0C0C0");
-        if (user.isActive()) {
+        if (isActive(user)) {
             return active;
         }
 

@@ -6,10 +6,10 @@ package de.offene_pflege.op.care.nursingprocess;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.info.ResInfoCategory;
-import de.offene_pflege.backend.services.ResInfoCategoryTools;
-import de.offene_pflege.backend.entity.nursingprocess.Intervention;
-import de.offene_pflege.backend.entity.nursingprocess.InterventionTools;
+import de.offene_pflege.backend.entity.done.ResInfoCategory;
+import de.offene_pflege.backend.services.ResInfoCategoryService;
+import de.offene_pflege.backend.entity.done.Intervention;
+import de.offene_pflege.backend.services.InterventionService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
@@ -61,8 +61,8 @@ public class PnlSelectIntervention extends JPanel {
         SwingUtilities.invokeLater(() -> SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE));
 
         cmbType.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.interventions.CARE"), SYSTools.xx("misc.msg.interventions.PRESCRIPTION"), SYSTools.xx("misc.msg.interventions.SOCIAL")}));
-        cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
-        cmbCategory.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
+        cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryService.getAll4NP().toArray()));
+        cmbCategory.setModel(new DefaultComboBoxModel(ResInfoCategoryService.getAll4NP().toArray()));
         cmbCategory.setSelectedItem(null);
 
 
@@ -73,7 +73,7 @@ public class PnlSelectIntervention extends JPanel {
 
     private void txtSearchActionPerformed(ActionEvent e) {
         if (txtSearch.getText().isEmpty()) return;
-        lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy(InterventionTools.TYPE_CARE, txtSearch.getText())));
+        lstInterventions.setModel(SYSTools.list2dlm(InterventionService.findBy(InterventionService.TYPE_CARE, txtSearch.getText())));
         cmbCategory.setSelectedItem(null);
     }
 
@@ -104,7 +104,7 @@ public class PnlSelectIntervention extends JPanel {
     private void cmbCategoryItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED && e.getItem() != null) {
             txtSearch.setText(null);
-            lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy((ResInfoCategory) e.getItem())));
+            lstInterventions.setModel(SYSTools.list2dlm(InterventionService.findBy((ResInfoCategory) e.getItem())));
         }
     }
 
