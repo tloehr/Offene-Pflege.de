@@ -30,7 +30,9 @@ package de.offene_pflege.op.care.med.structure;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
+import de.offene_pflege.backend.entity.done.ACME;
 import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.services.ACMEService;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.prodassistant.DlgACME;
 import de.offene_pflege.op.tools.MyJDialog;
@@ -100,7 +102,7 @@ public class DlgProduct extends MyJDialog {
         EntityManager em = OPDE.createEM();
         Query query2 = em.createQuery("SELECT m FROM ACME m ORDER BY m.name, m.city");
         cmbAcme.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new ACME[]{})));
-        cmbAcme.setRenderer(ACMETools.getRenderer(0));
+        cmbAcme.setRenderer(ACMEService.getRenderer(0));
         em.close();
 
         if (product != null) {

@@ -45,7 +45,7 @@ import de.offene_pflege.backend.entity.done.ResInfoType;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
+import de.offene_pflege.backend.services.PrescriptionTools;
 import de.offene_pflege.backend.entity.system.SYSLoginTools;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;

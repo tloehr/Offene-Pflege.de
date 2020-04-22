@@ -1,5 +1,8 @@
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
+import de.offene_pflege.backend.entity.done.BHP;
+import de.offene_pflege.backend.entity.prescription.MedStock;
+import de.offene_pflege.backend.entity.prescription.MedStockTransaction;
 import de.offene_pflege.op.OPDE;
 
 import javax.persistence.EntityManager;

@@ -1,5 +1,6 @@
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
+import de.offene_pflege.backend.entity.prescription.MedPackage;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 

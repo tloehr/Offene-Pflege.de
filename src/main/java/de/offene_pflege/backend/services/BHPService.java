@@ -1,12 +1,13 @@
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
+import de.offene_pflege.backend.entity.done.BHP;
 import de.offene_pflege.backend.entity.done.Homes;
-import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
@@ -23,19 +24,16 @@ import java.text.DateFormat;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 01.12.11
- * Time: 15:49
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 01.12.11 Time: 15:49 To change this template use File | Settings | File
+ * Templates.
  */
-public class BHPTools {
+public class BHPService {
 
     public static final byte STATE_OPEN = 0;
     public static final byte STATE_DONE = 1;
     public static final byte STATE_REFUSED = 2;
     public static final byte STATE_REFUSED_DISCARDED = 3;
-    private static Logger logger = Logger.getLogger(BHPTools.class);
+    private static Logger logger = Logger.getLogger(BHPService.class);
 
 //    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
 //    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.bhp.shift.veryearly", "nursingrecords.bhp.shift.early", "nursingrecords.bhp.shift.late", "nursingrecords.bhp.shift.verylate"};
@@ -52,6 +50,110 @@ public class BHPTools {
 
 
     public static final String UIDPREFIX = "__bhp";
+
+    public static BHP create(PrescriptionSchedule prescriptionSchedule) {
+        BHP bhp = new BHP();
+        bhp.setPrescriptionSchedule(prescriptionSchedule);
+        bhp.setPrescription(prescriptionSchedule.getPrescription());
+        bhp.setResident(prescriptionSchedule.getPrescription().getResident());
+        bhp.setTradeform(prescriptionSchedule.getPrescription().getTradeForm());
+        bhp.setNanotime(System.nanoTime());
+        bhp.setMdate(new Date());
+        bhp.setNeedsText(false);
+        return bhp;
+    }
+
+    public static BHP create(BHP bhp1) {
+
+        PrescriptionSchedule prescriptionSchedule = bhp1.getPrescriptionSchedule();
+        BHP bhp = create(prescriptionSchedule);
+
+        // the target time depends on the moment when the original OnDemand BHP is clicked.
+        // the outcome needs to be checked "check after hours" + this moment
+        //todo: teste mich weg Zeitzone
+        java.time.LocalDateTime target_time = java.time.LocalDateTime.now().plusMinutes(prescriptionSchedule.getCheckAfterHours().multiply(new BigDecimal(60)).intValue());
+        bhp.setSoll(JavaTimeConverter.toDate(target_time));
+
+        bhp.setsZeit(SYSCalendar.BYTE_TIMEOFDAY);
+        bhp.setDosis(BigDecimal.ONE.negate());
+        bhp.setState(STATE_OPEN);
+        bhp.setOutcome4(bhp1);
+        bhp.setNeedsText(true);
+
+        return bhp;
+    }
+
+    public static BHP create(PrescriptionSchedule prescriptionSchedule, Date soll, Byte sZeit, BigDecimal dosis) {
+        BHP bhp = create(prescriptionSchedule);
+        // looks redundant but simplifies enormously
+        bhp.setSoll(soll);
+        bhp.setsZeit(sZeit);
+        bhp.setDosis(dosis);
+        bhp.setState(STATE_OPEN);
+        return bhp;
+    }
+
+    public static boolean hasMed(BHP bhp) {
+        return !isOutcomeText(bhp) && bhp.getTradeform() != null;
+    }
+
+    public static boolean shouldBeCalculated(BHP bhp) {
+        return !isOutcomeText(bhp) && hasMed(bhp) && bhp.getResident().getCalcMediUPR1();
+    }
+
+    public static boolean isOpen(BHP bhp) {
+        return bhp.getState() == STATE_OPEN;
+    }
+
+
+    /**
+     * true if the underlying prescription is of type "OnDemand".
+     *
+     * @return
+     */
+    public static boolean isOnDemand(BHP bhp) {
+        return bhp.getPrescription().isOnDemand() && !isOutcomeText(bhp);
+    }
+
+    public static boolean isOutcomeText(BHP bhp) {
+        return bhp.getOutcome4() != null;
+    }
+
+
+    public static Byte getShift(BHP bhp) {
+        if (isOnDemand(bhp)) {
+            return SYSCalendar.SHIFT_ON_DEMAND;
+        }
+        if (isOutcomeText(bhp)) {
+            return SYSCalendar.SHIFT_OUTCOMES;
+        }
+        if (bhp.getsZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
+            return SYSCalendar.whatShiftIs(bhp.getSoll());
+        }
+        return SYSCalendar.whatShiftIs(bhp.getsZeit());
+    }
+
+
+    /**
+     * This method tells, whether there was more than one stock involved in order to provide the necessary medication in
+     * the course of the application of this BHP. This can only happen when a stock is closed in advance. After clicking
+     * this BHP the first stock is emptied and then the next stock is opened.
+     *
+     * @return true or false
+     */
+    public static boolean isClosedStockInvolved(BHP bhp) {
+        boolean yes = false;
+        if (bhp.getStockTransaction() != null) {
+            for (MedStockTransaction buchung : bhp.getStockTransaction()) {
+                yes = buchung.getStock().isClosed();
+                if (yes) {
+                    break;
+                }
+            }
+        }
+        return yes;
+    }
+
 
     public static BHP getLastBHP(Prescription prescription) {
         EntityManager em = OPDE.createEM();
@@ -126,7 +228,7 @@ public class BHPTools {
         Date date;
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.resident = :resident ORDER BY b.bhpid");
+        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.resident = :resident ORDER BY b.id");
         query.setParameter("resident", bewohner);
         query.setMaxResults(1);
         try {
@@ -140,8 +242,10 @@ public class BHPTools {
     }
 
     /**
-     * Diese Methode erzeugt den Tagesplan für die Behandlungspflegen. Dabei werden alle aktiven Verordnungen geprüft, ermittelt ob sie am betreffenden targetdate auch "dran" sind und dann
-     * werden daraus Einträge in der BHP Tabelle erzeugt. Sie teilt sich die Arbeit mit der <code>erzeugen(EntityManager em, List<VerordnungpSchedule> list, Date targetdate, Date zeit)</code> Methode
+     * Diese Methode erzeugt den Tagesplan für die Behandlungspflegen. Dabei werden alle aktiven Verordnungen geprüft,
+     * ermittelt ob sie am betreffenden targetdate auch "dran" sind und dann werden daraus Einträge in der BHP Tabelle
+     * erzeugt. Sie teilt sich die Arbeit mit der <code>erzeugen(EntityManager em, List<VerordnungpSchedule> list, Date
+     * targetdate, Date zeit)</code> Methode
      *
      * @param em, EntityManager Kontext
      * @return Anzahl der erzeugten BHPs
@@ -212,8 +316,8 @@ public class BHPTools {
     }
 
     /**
-     * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben. Die Liste wird aber vorher
-     * noch darauf geprüft, ob sie auch wirklich an dem besagten targetdate passt. Dabei gilt:
+     * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben. Die
+     * Liste wird aber vorher noch darauf geprüft, ob sie auch wirklich an dem besagten targetdate passt. Dabei gilt:
      * <ol>
      * <li>Alles was taeglich angeordnet ist (jeden Tag oder jeden soundsovielten Tag)</li>
      * <li>Alles was woechentlich ist und die Spalte (Attribut) mit dem aktuellen Wochentagsnamen größer null ist.</li>
@@ -232,7 +336,8 @@ public class BHPTools {
      *
      * @param em         EntityManager Kontext
      * @param list       Liste der VerordnungpScheduleen, die ggf. einzutragen sind.
-     * @param targetdate gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle Tag.
+     * @param targetdate gibt an, für welches Datum die Einträge erzeugt werden. In der Regel ist das immer der aktuelle
+     *                   Tag.
      * @param wholeday   true, dann wird für den ganzen Tag erzeugt. false, dann ab der aktuellen Zeit.
      * @return die Anzahl der erzeugten BHPs.
      */
@@ -310,27 +415,27 @@ public class BHPTools {
 
                 if (treffer) {
                     if (erstAbFM && pSchedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_EARLY_IN_THE_MORNING, pSchedule.getNachtMo()));
+                        em.merge(create(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_EARLY_IN_THE_MORNING, pSchedule.getNachtMo()));
                         numbhp++;
                     }
                     if (erstAbMO && pSchedule.getMorgens().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_MORNING, pSchedule.getMorgens()));
+                        em.merge(create(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_MORNING, pSchedule.getMorgens()));
                         numbhp++;
                     }
                     if (erstAbMI && pSchedule.getMittags().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_NOON, pSchedule.getMittags()));
+                        em.merge(create(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_NOON, pSchedule.getMittags()));
                         numbhp++;
                     }
                     if (erstAbNM && pSchedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_AFTERNOON, pSchedule.getNachmittags()));
+                        em.merge(create(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_AFTERNOON, pSchedule.getNachmittags()));
                         numbhp++;
                     }
                     if (erstAbAB && pSchedule.getAbends().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_EVENING, pSchedule.getAbends()));
+                        em.merge(create(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_EVENING, pSchedule.getAbends()));
                         numbhp++;
                     }
                     if (erstAbNA && pSchedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0) {
-                        em.merge(new BHP(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_LATE_AT_NIGHT, pSchedule.getNachtAb()));
+                        em.merge(create(pSchedule, targetdate.toDate(), SYSCalendar.BYTE_LATE_AT_NIGHT, pSchedule.getNachtAb()));
                         numbhp++;
                     }
                     if (uhrzeitOK && pSchedule.getUhrzeit() != null) {
@@ -344,7 +449,7 @@ public class BHPTools {
                             OPDE.info(SYSTools.xx("Correcting for DST. [BHPPID=" + pSchedule.getBhppid() + "] " + localTargetDateTime.toString()));
                         }
 
-                        em.merge(new BHP(pSchedule, localTargetDateTime.toDate(), SYSConst.UZ, pSchedule.getUhrzeitDosis()));
+                        em.merge(create(pSchedule, localTargetDateTime.toDate(), SYSConst.UZ, pSchedule.getUhrzeitDosis()));
                         numbhp++;
                     }
 
@@ -368,8 +473,9 @@ public class BHPTools {
 
 
     /**
-     * retrieves a list of BHPs for a given resident for a given day. Only OnDemand prescriptions are used (not regular ones)
-     * This method creates a list of existing BHPs, as well as possible appliable BHPs which may be clicked by the user.
+     * retrieves a list of BHPs for a given resident for a given day. Only OnDemand prescriptions are used (not regular
+     * ones) This method creates a list of existing BHPs, as well as possible appliable BHPs which may be clicked by the
+     * user.
      *
      * @param resident
      * @param date
@@ -405,12 +511,12 @@ public class BHPTools {
                 if (listBHP4ThisPrescription.size() < schedule.getMaxAnzahl()) {
                     // Still some BHPs to go ?
                     for (int i = listBHP4ThisPrescription.size(); i < schedule.getMaxAnzahl(); i++) {
-                        BHP bhp = new BHP(schedule);
+                        BHP bhp = create(schedule);
                         bhp.setIst(now);
                         bhp.setSoll(date);
-                        bhp.setSollZeit(SYSCalendar.BYTE_TIMEOFDAY);
+                        bhp.setsZeit(SYSCalendar.BYTE_TIMEOFDAY);
                         bhp.setDosis(schedule.getMaxEDosis());
-                        bhp.setState(BHPTools.STATE_OPEN);
+                        bhp.setState(BHPService.STATE_OPEN);
                         listBHP4ThisPrescription.add(bhp);
                     }
                 }
@@ -470,8 +576,8 @@ public class BHPTools {
     }
 
     /**
-     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand).
-     * Outcome BHPs included, even if they originate from onDemand Prescriptions.
+     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not
+     * OnDemand). Outcome BHPs included, even if they originate from onDemand Prescriptions.
      *
      * @param resident
      * @param date
@@ -520,7 +626,7 @@ public class BHPTools {
             return null;
         }
 
-        if (bhp.isOutcomeText()) {
+        if (isOutcomeText(bhp)) {
             return null;
         }
 
@@ -548,8 +654,8 @@ public class BHPTools {
     }
 
     /**
-     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand).
-     * Outcome BHPs included, even if they originate from onDemand Prescriptions.
+     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not
+     * OnDemand). Outcome BHPs included, even if they originate from onDemand Prescriptions.
      *
      * @param resident
      * @param date
@@ -681,14 +787,14 @@ public class BHPTools {
         String text = "";
 
         // https://github.com/tloehr/Offene-Pflege.de/issues/63
-        if (bhp.isOutcomeText()) {
+        if (isOutcomeText(bhp)) {
             text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short");
-        } else if (!bhp.isOnDemand() && !bhp.isOutcomeText()) {
-            if (bhp.getSollZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
+        } else if (!isOnDemand(bhp) && !isOutcomeText(bhp)) {
+            if (bhp.getsZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
                 text += "<font color=\"blue\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short") + "</font>";
             } else {
                 String[] msg = GUITools.getLocalizedMessages(SYSCalendar.TIMEIDTEXTLONG);
-                text += msg[bhp.getSollZeit()];
+                text += msg[bhp.getsZeit()];
             }
         } else {
             if (bhp.getState() == STATE_DONE) {
@@ -720,7 +826,7 @@ public class BHPTools {
 
 
     public static Icon getWarningIcon(BHP bhp, MedStock stock) {
-        if (!bhp.shouldBeCalculated() || bhp.getPrescription().isClosed()) return null;
+        if (!shouldBeCalculated(bhp) || bhp.getPrescription().isClosed()) return null;
 
         Icon icon = null;
         BigDecimal sum = stock == null ? BigDecimal.ZERO : MedStockTools.getSum(stock);
@@ -745,20 +851,17 @@ public class BHPTools {
     public static boolean isChangeable(BHP bhp) {
         int BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW));
         boolean residentAbsent = ResidentTools.isActive(bhp.getResident()) && ResInfoService.absentSince(bhp.getResident()) != null;
-        MedInventory inventoryInUse = bhp.hasMed() ? TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeForm()) : null;
-        boolean medTrouble = bhp.shouldBeCalculated() && (inventoryInUse == null || MedStockTools.getStockInUse(inventoryInUse) == null);
+        MedInventory inventoryInUse = hasMed(bhp) ? TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeform()) : null;
+        boolean medTrouble = shouldBeCalculated(bhp) && (inventoryInUse == null || MedStockTools.getStockInUse(inventoryInUse) == null);
 
         return !residentAbsent && ResidentTools.isActive(bhp.getResident()) &&
                 !bhp.getPrescription().isClosed() &&
                 !medTrouble &&
                 (bhp.getUser() == null ||
                         (bhp.getUser().equals(OPDE.getMe()) &&
-                                Minutes.minutesBetween(new DateTime(bhp.getMDate()), new DateTime()).getMinutes() < BHP_MAX_MINUTES_TO_WITHDRAW)) &&
-                !bhp.isClosedStockInvolved();
+                                Minutes.minutesBetween(new DateTime(bhp.getMdate()), new DateTime()).getMinutes() < BHP_MAX_MINUTES_TO_WITHDRAW)) &&
+                !isClosedStockInvolved(bhp);
     }
-
-
-
 
 
     public static String getBHPsAsHTMLtable(List<BHP> list, boolean withHeader) {
@@ -769,12 +872,12 @@ public class BHPTools {
             BHP b1 = list.get(0);
 
             if (withHeader) {
-                if (b1.isOnDemand()) {
+                if (isOnDemand(b1)) {
                     result += SYSConst.html_h2("nursingrecords.bhp.ondemand");
-                } else if (b1.isOutcomeText()) {
+                } else if (isOutcomeText(b1)) {
                     result += SYSConst.html_h2("nursingrecords.bhp.outcome");
                 } else {
-                    result += SYSConst.html_h2(SYSCalendar.SHIFT_TEXT[b1.getShift()]);
+                    result += SYSConst.html_h2(SYSCalendar.SHIFT_TEXT[getShift(b1)]);
                 }
             }
 
@@ -782,7 +885,7 @@ public class BHPTools {
             String table = "";
 
 
-            if (b1.isOnDemand()) {
+            if (isOnDemand(b1)) {
                 table += SYSConst.html_table_tr(
                         SYSConst.html_table_th("nursingrecords.nursingprocess.interventions"),
                         SYSConst.html_table_th("misc.msg.state", "center"),
@@ -798,34 +901,34 @@ public class BHPTools {
             for (BHP bhp : list) {
                 String text =
                         PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()) +
-                                (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
-                                        " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
-                                (bhp.isOnDemand() || bhp.isOutcomeText() ? "" : getScheduleText(bhp, ", ", ""));
+                                (hasMed(bhp) ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDosis()) +
+                                        " " + DosageFormService.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
+                                (isOnDemand(bhp) || isOutcomeText(bhp) ? "" : getScheduleText(bhp, ", ", ""));
 
-                if (bhp.isOutcomeText() && bhp.getState() == BHPTools.STATE_DONE) {
+                if (isOutcomeText(bhp) && bhp.getState() == BHPService.STATE_DONE) {
                     text += "\n" + SYSConst.html_paragraph(bhp.getText());
                 }
 
 
-                if (b1.isOnDemand()) {
+                if (isOnDemand(b1)) {
                     String outcomeText = "/";
                     BHP outcome = getComment(bhp);
-                    if (outcome != null && !outcome.isOpen()) {
+                    if (outcome != null && !isOpen(outcome)) {
                         outcomeText = getStateAsHTML(outcome) + " ";
-                        outcomeText += (bhp.isOpen() ? "" : outcome.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(outcome.getIst()));
-                        outcomeText += (bhp.isOpen() ? "" : "<br/>" + SYSConst.html_paragraph(bhp.getText()));
+                        outcomeText += (isOpen(bhp) ? "" : outcome.getUser().getId() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(outcome.getIst()));
+                        outcomeText += (isOpen(bhp) ? "" : "<br/>" + SYSConst.html_paragraph(bhp.getText()));
                     }
 
                     table += SYSConst.html_table_tr(
                             SYSConst.html_table_td(text, "top"),
-                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUIDCiphered() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center"),
+                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (isOpen(bhp) ? "" : OPUsersService.getUIDCiphered(bhp.getUser()) + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center"),
                             SYSConst.html_table_td(outcomeText, "center")
                     );
 
                 } else {
                     table += SYSConst.html_table_tr(
                             SYSConst.html_table_td(text, "top"),
-                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUIDCiphered() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center")
+                            SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (isOpen(bhp) ? "" : OPUsersService.getUIDCiphered(bhp.getUser()) + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center")
                     );
                 }
 
@@ -854,8 +957,9 @@ public class BHPTools {
 
 
     /**
-     * a BHP should be confirmed on the same day. unless its during the night shift. Then you can click the BHPs from the nightshift before, until the night shift is over.
-     *
+     * a BHP should be confirmed on the same day. unless its during the night shift. Then you can click the BHPs from
+     * the nightshift before, until the night shift is over.
+     * <p>
      * https://github.com/tloehr/Offene-Pflege.de/issues/64
      *
      * @param bhp
@@ -874,7 +978,7 @@ public class BHPTools {
 
 //        logger.debug(bhp.getShift());
 
-        if (bhp.getShift() == SYSCalendar.SHIFT_VERY_LATE && SYSCalendar.whatShiftIs(now.toDate()) == SYSCalendar.SHIFT_VERY_EARLY)
+        if (getShift(bhp) == SYSCalendar.SHIFT_VERY_LATE && SYSCalendar.whatShiftIs(now.toDate()) == SYSCalendar.SHIFT_VERY_EARLY)
             return false;
 
         return true;

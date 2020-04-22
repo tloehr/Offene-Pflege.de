@@ -912,9 +912,9 @@ public class TXEssenDoc implements HasLogger {
         if (!presCatheterChange.isEmpty()) {
             Date lastChange = SYSConst.DATE_THE_VERY_BEGINNING;
             for (Prescription prescription : presCatheterChange) { // usually there shouldn't be more than 1, but you never know
-                BHP bhp = BHPTools.getLastBHP(prescription);
+                BHP bhp = BHPService.getLastBHP(prescription);
                 if (bhp != null) {
-                    lastChange = new Date(Math.max(lastChange.getTime(), BHPTools.getLastBHP(prescription).getIst().getTime()));
+                    lastChange = new Date(Math.max(lastChange.getTime(), BHPService.getLastBHP(prescription).getIst().getTime()));
                 }
             }
             if (!lastChange.equals(SYSConst.DATE_THE_VERY_BEGINNING)) {
@@ -1025,7 +1025,7 @@ public class TXEssenDoc implements HasLogger {
 
         long lastMeal = 0;
 
-        BHP bhp = BHPTools.getLastBHP(resident, InterventionService.FLAG_FOOD_CONSUMPTION);
+        BHP bhp = BHPService.getLastBHP(resident, InterventionService.FLAG_FOOD_CONSUMPTION);
         DFN dfn = DFNService.getLastDFN(resident, InterventionService.FLAG_FOOD_CONSUMPTION);
 
         lastMeal = Math.max((bhp == null ? 0 : bhp.getIst().getTime()), (dfn == null ? 0 : dfn.getIst().getTime()));
@@ -1358,7 +1358,7 @@ public class TXEssenDoc implements HasLogger {
         content.put(TXEAF.MEDS_CONTROL, setCheckbox(getValue(ResInfoTypeTools.TYPE_MEDS, "control")));
         content.put(TXEAF.MEDS_MARCUMARPASS, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_MEDS, "marcumarpass")));
 
-        BHP lastMed = BHPTools.getLastBHP(resident, InterventionService.FLAG_MEDS_APPLICATION);
+        BHP lastMed = BHPService.getLastBHP(resident, InterventionService.FLAG_MEDS_APPLICATION);
         if (lastMed != null) {
             content.put(TXEAF.MEDS_LAST_APPLICATION, DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(lastMed.getIst()));
         } else {

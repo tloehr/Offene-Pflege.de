@@ -32,7 +32,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.Intervention;
-import de.offene_pflege.backend.services.InterventionService;
+import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;

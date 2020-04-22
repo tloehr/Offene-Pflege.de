@@ -32,10 +32,9 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.process.*;
 import de.offene_pflege.backend.entity.system.Commontags;
@@ -615,7 +614,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                             Prescription myPrescription = em.merge(prescription);
                             myPrescription.setRelation(UniqueTools.getNewUID(em, "__verkenn").getUid());
-                            BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new LocalDate(), true);
+                            BHPService.generate(em, myPrescription.getPrescriptionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
 
                             lstPrescriptions.add(myPrescription);
@@ -760,7 +759,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     private JPanel getMenu(final Prescription prescription) {
 
         JPanel pnlMenu = new JPanel(new VerticalLayout());
-        long numBHPs = BHPTools.getConfirmedBHPs(prescription);
+        long numBHPs = BHPService.getConfirmedBHPs(prescription);
         final MedInventory inventory = prescription.shouldBeCalculated() ? TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm()) : null;
         final MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
@@ -802,7 +801,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             newPrescription.setFrom(now.plusSeconds(1).toDate());
 
                             // create new BHPs according to the prescription
-                            BHPTools.generate(em, newPrescription.getPrescriptionSchedule(), new LocalDate(), true);
+                            BHPService.generate(em, newPrescription.getPrescriptionSchedule(), new LocalDate(), true);
                             em.getTransaction().commit();
 
                             lstPrescriptions.remove(prescription);
@@ -988,7 +987,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 queryDELBHP.setParameter("prescription", myPrescription);
                                 queryDELBHP.executeUpdate();
 
-                                BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new LocalDate(), true);
+                                BHPService.generate(em, myPrescription.getPrescriptionSchedule(), new LocalDate(), true);
 
                                 em.getTransaction().commit();
 

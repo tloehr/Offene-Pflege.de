@@ -10,12 +10,8 @@ import com.jidesoft.combobox.DateExComboBox;
 import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.done.ResInfo;
-import de.offene_pflege.backend.entity.done.ResInfoCategory;
-import de.offene_pflege.backend.entity.done.ResInfoType;
-import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.done.NursingProcess;
 import de.offene_pflege.backend.services.NursingProcessService;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.reports.NReportTools;
@@ -166,7 +162,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
 
         try {
 
-            for (DosageForm dosageForm : DosageFormTools.getAll()) {
+            for (DosageForm dosageForm : DosageFormService.getAll()) {
                 mapDosageForm.put(dosageForm.getId(), dosageForm);
             }
 

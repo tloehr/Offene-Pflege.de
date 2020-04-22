@@ -6,7 +6,10 @@ package de.offene_pflege.op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import de.offene_pflege.backend.entity.done.DosageForm;
 import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.services.DosageFormService;
+import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.structure.PnlDosageForm;
@@ -71,10 +74,10 @@ public class PnlTradeForm extends JPanel {
         Query query = em.createQuery(" SELECT m FROM DosageForm m ");
 
         java.util.List listDosageForm = query.getResultList();
-        Collections.sort(listDosageForm, (us, them) -> DosageFormTools.toPrettyString((DosageForm) us).compareTo(DosageFormTools.toPrettyString((DosageForm) them)));
+        Collections.sort(listDosageForm, (us, them) -> DosageFormService.toPrettyString((DosageForm) us).compareTo(DosageFormService.toPrettyString((DosageForm) them)));
 
         cmbFormen.setModel(SYSTools.list2cmb(listDosageForm));
-        cmbFormen.setRenderer(DosageFormTools.getRenderer(0));
+        cmbFormen.setRenderer(DosageFormService.getRenderer(0));
         em.close();
 
         cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.Days"), SYSTools.xx("misc.msg.weeks")}));

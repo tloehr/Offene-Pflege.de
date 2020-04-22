@@ -1,8 +1,8 @@
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.Pair;
@@ -611,11 +611,11 @@ public class MedStockTools {
     public static BigDecimal getEstimatedUPR(TradeForm tradeForm) {
         OPDE.debug("<--- calcProspectiveUPR");
         BigDecimal upr = null;
-        if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_DONT_CALC) {
+        if (tradeForm.getDosageForm().getUPRState() == DosageFormService.STATE_DONT_CALC) {
             OPDE.debug("STATE_DONT_CALC");
             // no calculation for gel or ointments. they wont work out anyways.
             upr = BigDecimal.ONE;// getEstimatedUPR_BY_RESIDENT(tradeForm, resident);
-        } else if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
+        } else if (tradeForm.getDosageForm().getUPRState() == DosageFormService.STATE_UPRn) {
             OPDE.debug("STATE_UPRn");
 
             if (tradeForm.getConstantUPRn() != null) {

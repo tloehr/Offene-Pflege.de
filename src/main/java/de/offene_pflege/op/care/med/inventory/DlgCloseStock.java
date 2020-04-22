@@ -28,10 +28,10 @@ package de.offene_pflege.op.care.med.inventory;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.prescription.DosageFormTools;
+import de.offene_pflege.backend.services.DosageFormService;
 import de.offene_pflege.backend.entity.prescription.MedStock;
-import de.offene_pflege.backend.entity.prescription.MedStockTools;
-import de.offene_pflege.backend.entity.prescription.MedStockTransactionTools;
+import de.offene_pflege.backend.services.MedStockTools;
+import de.offene_pflege.backend.services.MedStockTransactionTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.MyJDialog;
@@ -265,7 +265,7 @@ public class DlgCloseStock extends MyJDialog {
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
-        rbStellen.setEnabled(medStock.getTradeForm().getDosageForm().getUPRState() == DosageFormTools.STATE_UPR1);
+        rbStellen.setEnabled(medStock.getTradeForm().getDosageForm().getUPRState() == DosageFormService.STATE_UPR1);
     }
 
     private void btnOkActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed

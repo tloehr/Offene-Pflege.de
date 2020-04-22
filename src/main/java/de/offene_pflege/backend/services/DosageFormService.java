@@ -1,6 +1,7 @@
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
 
+import de.offene_pflege.backend.entity.done.DosageForm;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
@@ -11,17 +12,41 @@ import javax.swing.*;
 import java.util.ArrayList;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 01.12.11
- * Time: 17:17
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 01.12.11 Time: 17:17 To change this template use File | Settings | File
+ * Templates.
  */
-public class DosageFormTools {
+public class DosageFormService {
     public static final short STATE_UPR1 = 0;
     public static final short STATE_UPRn = 1;
     public static final short STATE_DONT_CALC = 2;
     public static final String[] UPR_STATES = new String[]{SYSTools.xx("state_upr1"), SYSTools.xx("state_uprn"), SYSTools.xx("state_dont_calc")};
+
+
+    public static DosageForm create(int same_as) {
+        DosageForm df = new DosageForm();
+        df.setPreparation("");
+        df.setUsageText("");
+        df.setUsageUnit((short) 0);
+        df.setPackUnit((short) 0);
+        df.setDailyPlan((short) 0);
+        df.setUprstate(STATE_UPR1);
+        df.setSameas(same_as);
+        df.setIntervention(null);
+
+        return df;
+    }
+
+    public static boolean isUPR1(DosageForm df) {
+        return df.getUprstate() == STATE_UPR1;
+    }
+
+    public static boolean isDontCALC(DosageForm df) {
+        return df.getUprstate() == STATE_DONT_CALC;
+    }
+
+    public static boolean isUPRn(DosageForm df) {
+        return df.getUprstate() == STATE_UPRn;
+    }
 
 
     public static ArrayList<DosageForm> getAll() {
@@ -49,7 +74,7 @@ public class DosageFormTools {
                 DosageForm form = (DosageForm) o;
 
                 text = toPrettyString(form);
-                text += ", " + SYSTools.xx("misc.msg.upr") + " " + UPR_STATES[form.getUPRState()];
+                text += ", " + SYSTools.xx("misc.msg.upr") + " " + UPR_STATES[form.getUprstate()];
 
             } else {
                 text = o.toString();

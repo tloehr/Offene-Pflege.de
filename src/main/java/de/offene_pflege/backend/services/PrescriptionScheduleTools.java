@@ -1,9 +1,10 @@
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Phrase;
+import de.offene_pflege.backend.entity.prescription.PrescriptionSchedule;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.tools.HTMLTools;
 import de.offene_pflege.op.tools.SYSCalendar;

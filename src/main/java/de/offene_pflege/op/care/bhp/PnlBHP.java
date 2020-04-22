@@ -36,9 +36,9 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.utils.ColorUtils;
 import com.toedter.calendar.JDateChooser;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.entity.done.BHP;
+import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -117,7 +117,7 @@ public class PnlBHP extends NursingRecordsPanel {
         GUITools.setResidentDisplay(resident);
 
         initPhase = true;
-        jdcDatum.setMinSelectableDate(BHPTools.getMinDatum(resident));
+        jdcDatum.setMinSelectableDate(BHPService.getMinDatum(resident));
         jdcDatum.setDate(new Date());
         jdcDatum.setMaxSelectableDate(new Date());
         initPhase = false;
@@ -211,7 +211,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
                         synchronized (mapShift2BHP) {
-                            for (BHP bhp : BHPTools.getBHPs(resident, jdcDatum.getDate())) {
+                            for (BHP bhp : BHPService.getBHPs(resident, jdcDatum.getDate())) {
                                 if (!mapShift2BHP.containsKey(bhp.getShift())) {
                                     mapShift2BHP.put(bhp.getShift(), new ArrayList<BHP>());
                                 }
@@ -221,11 +221,11 @@ public class PnlBHP extends NursingRecordsPanel {
                             if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_ON_DEMAND)) {
                                 mapShift2BHP.put(SYSCalendar.SHIFT_ON_DEMAND, new ArrayList<BHP>());
                             }
-                            mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
+                            mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).addAll(BHPService.getBHPsOnDemand(resident, jdcDatum.getDate()));
                             if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_OUTCOMES)) {
                                 mapShift2BHP.put(SYSCalendar.SHIFT_OUTCOMES, new ArrayList<BHP>());
                             }
-                            mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
+                            mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).addAll(BHPService.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
                         }
 
                         synchronized (mapShift2Pane) {
@@ -273,7 +273,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 mapShift2Pane.clear();
             }
 
-            for (BHP bhp : BHPTools.getBHPs(resident, jdcDatum.getDate())) {
+            for (BHP bhp : BHPService.getBHPs(resident, jdcDatum.getDate())) {
                 if (!mapShift2BHP.containsKey(bhp.getShift())) {
                     mapShift2BHP.put(bhp.getShift(), new ArrayList<BHP>());
                 }
@@ -283,11 +283,11 @@ public class PnlBHP extends NursingRecordsPanel {
             if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_ON_DEMAND)) {
                 mapShift2BHP.put(SYSCalendar.SHIFT_ON_DEMAND, new ArrayList<BHP>());
             }
-            mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
+            mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).addAll(BHPService.getBHPsOnDemand(resident, jdcDatum.getDate()));
             if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_OUTCOMES)) {
                 mapShift2BHP.put(SYSCalendar.SHIFT_OUTCOMES, new ArrayList<BHP>());
             }
-            mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
+            mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).addAll(BHPService.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
 
             for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                 mapShift2Pane.put(shift, createCP4(shift));
@@ -316,9 +316,9 @@ public class PnlBHP extends NursingRecordsPanel {
 
                         LocalDate day = new LocalDate(jdcDatum.getDate());
                         if (shift == SYSCalendar.SHIFT_ON_DEMAND) {
-                            mapShift2Pane.get(SYSCalendar.SHIFT_ON_DEMAND).setCollapsed(!BHPTools.isOnDemandBHPs(resident, day));
+                            mapShift2Pane.get(SYSCalendar.SHIFT_ON_DEMAND).setCollapsed(!BHPService.isOnDemandBHPs(resident, day));
                         } else if (shift == SYSCalendar.SHIFT_OUTCOMES) {
-                            mapShift2Pane.get(SYSCalendar.SHIFT_OUTCOMES).setCollapsed(BHPTools.getOutcomeBHPs(resident, day).isEmpty());
+                            mapShift2Pane.get(SYSCalendar.SHIFT_OUTCOMES).setCollapsed(BHPService.getOutcomeBHPs(resident, day).isEmpty());
                         } else {
                             mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
                         }
@@ -583,18 +583,18 @@ public class PnlBHP extends NursingRecordsPanel {
 
         // only for BHPs with state OPEN
         ActionListener applyActionListener = actionEvent -> {
-            if (bhp.getState() != BHPTools.STATE_OPEN) {
+            if (bhp.getState() != BHPService.STATE_OPEN) {
                 return;
             }
             if (bhp.getPrescription().isClosed()) {
                 return;
             }
-            if (BHPTools.bhp2Old(bhp)){
+            if (BHPService.bhp2Old(bhp)){
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.notchangeable", DisplayMessage.WARNING));
                 return;
             }
 
-            if (BHPTools.isChangeable(bhp)) {
+            if (BHPService.isChangeable(bhp)) {
                 outcomeText = null;
                 if (bhp.getNeedsText()) {
                     currentEditor = new DlgYesNo(SYSConst.icon48comment, o -> {
@@ -662,7 +662,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
                     }
 
-                    myBHP.setState(BHPTools.STATE_DONE);
+                    myBHP.setState(BHPService.STATE_DONE);
                     myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
                     myBHP.setIst(new Date());
                     myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
@@ -714,7 +714,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 mapShift2BHP.get(myBHP.getShift()).add(position, bhp1);
                             }
 
-                            Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                            Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPService.getOnDemandComparator());
                         } else {
                             Collections.sort(mapShift2BHP.get(myBHP.getShift()));
                         }
@@ -772,7 +772,7 @@ public class PnlBHP extends NursingRecordsPanel {
             title = "<html><font size=+1>" +
                     SYSConst.html_italic(
                             SYSTools.left("&ldquo;" + PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
-                                    BHPTools.getScheduleText(bhp, "&rdquo;, ", "")
+                                    BHPService.getScheduleText(bhp, "&rdquo;, ", "")
                     )
                     // https://github.com/tloehr/Offene-Pflege.de/issues/63
                     + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + (bhp.isOpen() ? "--" : DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + SYSTools.xx("misc.msg.Time.short")) +
@@ -788,8 +788,8 @@ public class PnlBHP extends NursingRecordsPanel {
             title = "<html><font size=+1>" +
                     SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                     (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
-                            " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
-                    BHPTools.getScheduleText(bhp, ", ", "") +
+                            " " + DosageFormService.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
+                    BHPService.getScheduleText(bhp, ", ", "") +
                     (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "") +
                     "</font></html>";
@@ -797,13 +797,13 @@ public class PnlBHP extends NursingRecordsPanel {
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? applyActionListener : null);
 
-        JLabel icon1 = new JLabel(BHPTools.getIcon(bhp));
+        JLabel icon1 = new JLabel(BHPService.getIcon(bhp));
         icon1.setOpaque(false);
         if (!bhp.isOpen()) {
             icon1.setToolTipText("[" + bhp.getBHPid() + "] " + DateFormat.getDateTimeInstance().format(bhp.getIst()));
         }
 
-        JLabel icon2 = new JLabel(BHPTools.getWarningIcon(bhp, stock));
+        JLabel icon2 = new JLabel(BHPService.getWarningIcon(bhp, stock));
         icon2.setOpaque(false);
 
         cptitle.getAdditionalIconPanel().add(icon1);
@@ -923,14 +923,14 @@ public class PnlBHP extends NursingRecordsPanel {
                     btnRefuse.setBorder(null);
                     btnRefuse.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuse.tooltip")));
                     btnRefuse.addActionListener(actionEvent -> {
-                        if (bhp.getState() != BHPTools.STATE_OPEN) {
+                        if (bhp.getState() != BHPService.STATE_OPEN) {
                             return;
                         }
                         if (bhp.getPrescription().isClosed()) {
                             return;
                         }
 
-                        if (BHPTools.isChangeable(bhp)) {
+                        if (BHPService.isChangeable(bhp)) {
                             EntityManager em = OPDE.createEM();
                             try {
                                 em.getTransaction().begin();
@@ -941,7 +941,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
                                 em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
 
-                                myBHP.setState(BHPTools.STATE_REFUSED);
+                                myBHP.setState(BHPService.STATE_REFUSED);
                                 myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
                                 myBHP.setIst(new Date());
                                 myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
@@ -952,7 +952,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 mapShift2BHP.get(bhp.getShift()).remove(position);
                                 mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
                                 if (myBHP.isOnDemand()) {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPService.getOnDemandComparator());
                                 } else {
                                     Collections.sort(mapShift2BHP.get(myBHP.getShift()));
                                 }
@@ -1001,14 +1001,14 @@ public class PnlBHP extends NursingRecordsPanel {
                     btnRefuseDiscard.setBorder(null);
                     btnRefuseDiscard.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuseDiscard.tooltip")));
                     btnRefuseDiscard.addActionListener(actionEvent -> {
-                        if (bhp.getState() != BHPTools.STATE_OPEN) {
+                        if (bhp.getState() != BHPService.STATE_OPEN) {
                             return;
                         }
                         if (bhp.getPrescription().isClosed()) {
                             return;
                         }
 
-                        if (BHPTools.isChangeable(bhp)) {
+                        if (BHPService.isChangeable(bhp)) {
                             if (bhp.getPrescription().isWeightControlled()) {
                                 currentEditor = new DlgYesNo(SYSConst.icon48scales, o -> {
                                     if (SYSTools.catchNull(o).isEmpty()) {
@@ -1049,7 +1049,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
                                 em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
 
-                                myBHP.setState(BHPTools.STATE_REFUSED_DISCARDED);
+                                myBHP.setState(BHPService.STATE_REFUSED_DISCARDED);
                                 myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
                                 myBHP.setIst(new Date());
                                 myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
@@ -1069,7 +1069,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 mapShift2BHP.get(bhp.getShift()).remove(position);
                                 mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
                                 if (myBHP.isOnDemand()) {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPService.getOnDemandComparator());
                                 } else {
                                     Collections.sort(mapShift2BHP.get(myBHP.getShift()));
                                 }
@@ -1120,21 +1120,21 @@ public class PnlBHP extends NursingRecordsPanel {
                 btnUndo.setBorder(null);
                 btnUndo.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnEmpty.tooltip"));
                 btnUndo.addActionListener(actionEvent -> {
-                    if (bhp.getState() == BHPTools.STATE_OPEN) {
+                    if (bhp.getState() == BHPService.STATE_OPEN) {
                         return;
                     }
                     if (bhp.getPrescription().isClosed()) {
                         return;
                     }
 
-                    BHP outcomeBHP = BHPTools.getComment(bhp);
+                    BHP outcomeBHP = BHPService.getComment(bhp);
 
                     if (outcomeBHP != null && !outcomeBHP.isOpen()) {
                         // already commented
                         return;
                     }
 
-                    if (BHPTools.isChangeable(bhp)) {
+                    if (BHPService.isChangeable(bhp)) {
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
@@ -1148,7 +1148,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                             // the normal BHPs (those assigned to a NursingProcess) are reset to the OPEN state.
                             // TXs are deleted
-                            myBHP.setState(BHPTools.STATE_OPEN);
+                            myBHP.setState(BHPService.STATE_OPEN);
                             myBHP.setUser(null);
                             myBHP.setIst(null);
                             myBHP.setiZeit(null);
@@ -1181,7 +1181,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 mapShift2BHP.get(bhp.getShift()).remove(position);
                                 mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
                                 if (myBHP.isOnDemand()) {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPService.getOnDemandComparator());
                                 } else {
                                     Collections.sort(mapShift2BHP.get(myBHP.getShift()));
                                 }
@@ -1369,7 +1369,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
         jdcDatum = new JDateChooser(new Date());
         jdcDatum.setFont(new Font("Arial", Font.PLAIN, 18));
-        jdcDatum.setMinSelectableDate(BHPTools.getMinDatum(resident));
+        jdcDatum.setMinSelectableDate(BHPService.getMinDatum(resident));
 
         jdcDatum.setBackground(Color.WHITE);
         jdcDatum.addPropertyChangeListener(evt -> {
@@ -1465,7 +1465,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                     for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                         if (mapShift2BHP.containsKey(shift)) {
-                            html += BHPTools.getBHPsAsHTMLtable(mapShift2BHP.get(shift), true);
+                            html += BHPService.getBHPsAsHTMLtable(mapShift2BHP.get(shift), true);
                         }
                     }
                 }

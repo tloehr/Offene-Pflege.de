@@ -35,6 +35,7 @@ import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.services.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.prodassistant.MedProductWizard;
@@ -558,7 +559,7 @@ public class DlgNewStocks extends MyJDialog {
             inventory = em.merge(inventory);
 
             if (inventory.getID() == null) { // create a new MedInvetory.
-                inventory.setText(TradeFormTools.toPrettyString(tradeForm) + "; " + ACMETools.toPrettyStringShort(tradeForm.getMedProduct().getACME()));
+                inventory.setText(TradeFormTools.toPrettyString(tradeForm) + "; " + ACMEService.toPrettyStringShort(tradeForm.getMedProduct().getACME()));
             }
 
             // https://github.com/tloehr/Offene-Pflege.de/issues/16

@@ -35,7 +35,7 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
@@ -387,7 +387,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
                     "<td width=\"520\" align=\"left\"><font size=+1>" +
                     inventory.getText() + "</font></td>" +
-                    "<td width=\"200\" align=\"right\"><font size=+1>" + SYSTools.formatBigDecimal(sumInventory) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(inventory)) + "</font></td>" +
+                    "<td width=\"200\" align=\"right\"><font size=+1>" + SYSTools.formatBigDecimal(sumInventory) + " " + DosageFormService.getPackageText(MedInventoryTools.getForm(inventory)) + "</font></td>" +
 
                     "</tr>" +
                     "</table>" +
@@ -695,7 +695,7 @@ public class PnlInventory extends NursingRecordsPanel {
                     "<tr>" +
                     (stock.isClosed() ? "<s>" : "") +
                     "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + "</td>" +
-                    "<td width=\"200\" align=\"right\">" + SYSTools.formatBigDecimal(sumStock) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
+                    "<td width=\"200\" align=\"right\">" + SYSTools.formatBigDecimal(sumStock) + " " + DosageFormService.getPackageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
                     (stock.isClosed() ? "</s>" : "") +
                     "</tr>" +
                     "</table>" +

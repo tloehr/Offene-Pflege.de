@@ -41,12 +41,12 @@
         <class>de.offene_pflege.backend.entity.system.SYSProps</class>
         <class>de.offene_pflege.backend.entity.system.Syslog</class>
         <class>de.offene_pflege.backend.entity.system.Unique</class>
-        <class>de.offene_pflege.backend.entity.prescription.BHP</class>
+        <class>de.offene_pflege.backend.entity.done.BHP</class>
         <class>de.offene_pflege.backend.entity.prescription.TradeForm</class>
         <class>de.offene_pflege.backend.entity.prescription.MedStock</class>
         <class>de.offene_pflege.backend.entity.prescription.MedStockTransaction</class>
-        <class>de.offene_pflege.backend.entity.prescription.DosageForm</class>
-        <class>de.offene_pflege.backend.entity.prescription.ACME</class>
+        <class>de.offene_pflege.backend.entity.done.DosageForm</class>
+        <class>de.offene_pflege.backend.entity.done.ACME</class>
         <class>de.offene_pflege.backend.entity.prescription.MedPackage</class>
         <class>de.offene_pflege.backend.entity.prescription.MedProducts</class>
         <class>de.offene_pflege.backend.entity.prescription.MedInventory</class>

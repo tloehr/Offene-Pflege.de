@@ -5,7 +5,11 @@ import com.jidesoft.dialog.ButtonNames;
 import com.jidesoft.dialog.PageEvent;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.*;
+import de.offene_pflege.backend.entity.done.ACME;
 import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.services.DosageFormService;
+import de.offene_pflege.backend.services.MedPackageTools;
+import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
@@ -262,7 +266,7 @@ public class MedProductWizard {
                 } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
                     OPDE.debug("PackagePage OPENDED");
 //                        aPackage = null;
-                    pnlPackage.setLabelEinheit(DosageFormTools.getPackageText(tradeform.getDosageForm()));
+                    pnlPackage.setLabelEinheit(DosageFormService.getPackageText(tradeform.getDosageForm()));
                     pnlPackage.setDarreichung(tradeform);
                 }
             });
@@ -371,7 +375,7 @@ public class MedProductWizard {
             result += "<ul>";
             result += "<li>" + SYSTools.xx("misc.msg.drug") + ": <b>" + product.getText() + "</b>" + (product.getMedPID() == null ? " <i>" + SYSTools.xx("misc.msg.willBeCreated") + "</i>" : " <i>" + SYSTools.xx("misc.msg.alreadyExits") + "</i>") + "</li>";
             result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page3.title") + ": <b>" + TradeFormTools.toPrettyStringMediumWithExpiry(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + SYSTools.xx("misc.msg.willBeCreated") + "</i>" : " <i>" + SYSTools.xx("misc.msg.alreadyExits") + "</i>") + "</li>";
-            if (tradeform.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
+            if (tradeform.getDosageForm().getUPRState() == DosageFormService.STATE_UPRn) {
 
                 result += "<li>" + SYSTools.xx("misc.msg.upr") + ": <b>";
                 result += (tradeform.getConstantUPRn() == null ? SYSTools.xx("opde.medication.medproduct.wizard.page6.calcUPR") : SYSTools.xx("opde.medication.medproduct.wizard.page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + SYSTools.xx("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";

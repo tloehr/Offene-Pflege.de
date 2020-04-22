@@ -28,7 +28,7 @@
 package de.offene_pflege.op.care.prescription;
 
 import de.offene_pflege.backend.entity.prescription.Prescription;
-import de.offene_pflege.backend.entity.prescription.PrescriptionScheduleTools;
+import de.offene_pflege.backend.services.PrescriptionScheduleTools;
 import de.offene_pflege.op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;

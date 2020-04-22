@@ -4,11 +4,10 @@
  */
 package de.offene_pflege.backend.entity.reports;
 
+import de.offene_pflege.backend.entity.done.BHP;
 import de.offene_pflege.backend.entity.done.Homes;
-import de.offene_pflege.backend.services.SYSFilesService;
-import de.offene_pflege.backend.services.ResInfoService;
+import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
@@ -152,7 +151,7 @@ public class HandoversTools {
 
                 listAllActiveResidents = ResidentTools.getAllActive(home);
                 bhpStats = new HashMap<Resident, HashMap<Byte, Long>>();
-                listOpenBHPs = BHPTools.getOpenBHPs(day, home);
+                listOpenBHPs = BHPService.getOpenBHPs(day, home);
 
                 int max = listAllActiveResidents.size() * 2 + listOpenBHPs.size();
 

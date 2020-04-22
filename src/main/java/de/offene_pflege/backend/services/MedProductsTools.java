@@ -1,5 +1,6 @@
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
+import de.offene_pflege.backend.entity.prescription.MedProducts;
 import de.offene_pflege.op.tools.SYSTools;
 
 import javax.swing.*;

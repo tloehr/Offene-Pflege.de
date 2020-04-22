@@ -30,6 +30,8 @@ package de.offene_pflege.op.care.prescription;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.services.GPTools;
+import de.offene_pflege.backend.services.HospitalTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.MyJDialog;

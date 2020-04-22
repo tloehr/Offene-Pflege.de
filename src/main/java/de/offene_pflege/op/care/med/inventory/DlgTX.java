@@ -29,10 +29,10 @@ package de.offene_pflege.op.care.med.inventory;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.prescription.MedStockTools;
+import de.offene_pflege.backend.services.MedStockTools;
 import de.offene_pflege.backend.entity.prescription.MedStockTransaction;
-import de.offene_pflege.backend.entity.prescription.MedStockTransactionTools;
-import de.offene_pflege.backend.entity.prescription.TradeFormTools;
+import de.offene_pflege.backend.services.MedStockTransactionTools;
+import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.DocumentSizeFilter;
 import de.offene_pflege.op.tools.MyJDialog;

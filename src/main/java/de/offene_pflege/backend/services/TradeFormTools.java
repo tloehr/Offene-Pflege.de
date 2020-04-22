@@ -1,8 +1,12 @@
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
 
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.done.DosageForm;
+import de.offene_pflege.backend.entity.prescription.MedInventory;
+import de.offene_pflege.backend.entity.prescription.Prescription;
+import de.offene_pflege.backend.entity.prescription.TradeForm;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSConst;

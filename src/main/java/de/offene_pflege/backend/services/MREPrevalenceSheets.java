@@ -9,7 +9,6 @@ import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.ResInfoType;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.prescription.Prescription;
-import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
 import de.offene_pflege.gui.GUITools;

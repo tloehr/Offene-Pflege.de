@@ -13,7 +13,7 @@ import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.services.ResInfoTypeTools;
 import de.offene_pflege.backend.entity.prescription.Hospital;
-import de.offene_pflege.backend.entity.prescription.HospitalTools;
+import de.offene_pflege.backend.services.HospitalTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditHospital;

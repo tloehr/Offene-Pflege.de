@@ -1,13 +1,9 @@
-package de.offene_pflege.backend.entity.qms;
+package de.offene_pflege.backend.services;
 
-import de.offene_pflege.backend.entity.done.ResInfo;
-import de.offene_pflege.backend.services.ResInfoService;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.done.NursingProcess;
-import de.offene_pflege.backend.services.NursingProcessService;
+import de.offene_pflege.backend.entity.done.ResInfo;
+import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.prescription.Prescription;
-import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
 import de.offene_pflege.backend.entity.reports.NReport;
 import de.offene_pflege.backend.entity.reports.NReportTools;
 import de.offene_pflege.backend.entity.system.Commontags;
@@ -30,7 +26,7 @@ import java.util.HashSet;
 /**
  * Created by tloehr on 05.09.14.
  */
-public class ControllingTools {
+public class ControllingService {
 
     /**
      * gathers all the necessary data and puts them into one data structure organised as a HashMap<Resident, DB>.

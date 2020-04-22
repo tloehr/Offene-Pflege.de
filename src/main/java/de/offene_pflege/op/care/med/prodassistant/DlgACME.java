@@ -11,7 +11,7 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextField;
 import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
-import de.offene_pflege.backend.entity.prescription.ACME;
+import de.offene_pflege.backend.entity.done.ACME;
 import de.offene_pflege.op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 

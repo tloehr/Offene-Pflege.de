@@ -2,19 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.offene_pflege.backend.entity.prescription;
+package de.offene_pflege.backend.services;
 
 import com.itextpdf.text.Font;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
-import de.offene_pflege.backend.entity.done.Station;
-import de.offene_pflege.backend.services.SYSFilesService;
-import de.offene_pflege.backend.entity.done.ResInfo;
-import de.offene_pflege.backend.services.ResInfoService;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.services.ResidentTools;
+import de.offene_pflege.backend.entity.done.*;
+import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
 import de.offene_pflege.op.OPDE;
@@ -791,7 +787,7 @@ public class PrescriptionTools {
                             BigDecimal anwmenge = invSum.multiply(stockInUse.getUPR());
 
                             result += " " + SYSTools.xx("misc.msg.equalTo") + " " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
-                                    DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
+                                    DosageFormService.getUsageText(stockInUse.getTradeForm().getDosageForm());
                             result += " (" + SYSTools.xx("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " " + SYSTools.xx("misc.msg.to1");
                             if (stockInUse.getUPRDummyMode() == MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
                                 result += ", " + SYSTools.xx("misc.msg.preliminary");
@@ -808,7 +804,7 @@ public class PrescriptionTools {
                                 BigDecimal usage = stockSum.multiply(stockInUse.getUPR());
 
                                 result += " (" + SYSTools.xx("misc.msg.equalTo") + " " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +
-                                        DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm()) + ")";
+                                        DosageFormService.getUsageText(stockInUse.getTradeForm().getDosageForm()) + ")";
                             }
                         }
 
@@ -1138,11 +1134,11 @@ public class PrescriptionTools {
                 result += SYSConst.html_paragraph(paragraph);
 
                 if (myprescription.isOnDemand()) {
-                    ArrayList<BHP> listBHP = BHPTools.getBHPs(myprescription, from, to);
+                    ArrayList<BHP> listBHP = BHPService.getBHPs(myprescription, from, to);
 
                     if (!listBHP.isEmpty()) {
                         result += SYSConst.html_h3("BHPs");
-                        result += SYSConst.html_paragraph(BHPTools.getBHPsAsHTMLtable(listBHP, false));
+                        result += SYSConst.html_paragraph(BHPService.getBHPsAsHTMLtable(listBHP, false));
                     }
                 }
             }

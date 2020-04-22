@@ -30,6 +30,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.services.MedStockTools;
+import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.MyJDialog;

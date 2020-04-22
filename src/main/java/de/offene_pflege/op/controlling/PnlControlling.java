@@ -38,10 +38,10 @@ import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.done.Station;
-import de.offene_pflege.backend.entity.prescription.MedStockTools;
+import de.offene_pflege.backend.services.MedStockTools;
 import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.QProcessTools;
-import de.offene_pflege.backend.entity.qms.ControllingTools;
+import de.offene_pflege.backend.services.ControllingService;
 import de.offene_pflege.backend.entity.reports.NReportTools;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
@@ -507,7 +507,7 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
                 protected Object doInBackground() throws Exception {
                     SYSPropsTools.storeProp("opde.controlling::paindossiermonthsback", txtPainMonthsBack.getText(), OPDE.getLogin().getUser());
 
-                    return ControllingTools.getPainDossierAsHTML(new LocalDate().minusMonths(Integer.parseInt(txtPainMonthsBack.getText())), new LocalDate(), progressClosure);
+                    return ControllingService.getPainDossierAsHTML(new LocalDate().minusMonths(Integer.parseInt(txtPainMonthsBack.getText())), new LocalDate(), progressClosure);
                 }
 
                 @Override

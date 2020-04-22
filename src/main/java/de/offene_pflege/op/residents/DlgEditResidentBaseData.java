@@ -12,7 +12,7 @@ import de.offene_pflege.backend.services.StationService;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
 import de.offene_pflege.backend.entity.prescription.GP;
-import de.offene_pflege.backend.entity.prescription.GPTools;
+import de.offene_pflege.backend.services.GPTools;
 import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.gui.GUITools;

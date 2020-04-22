@@ -28,11 +28,14 @@ package de.offene_pflege.op;
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.services.SYSFilesService;
+import de.offene_pflege.backend.services.BHPService;
+import de.offene_pflege.backend.entity.system.OPUsers;
+import de.offene_pflege.backend.entity.system.SYSLogin;
+import de.offene_pflege.backend.entity.system.SYSPropsTools;
+import de.offene_pflege.backend.entity.system.SyslogTools;
 import de.offene_pflege.backend.services.DFNService;
-import de.offene_pflege.backend.entity.prescription.BHPTools;
-import de.offene_pflege.backend.entity.system.*;
 import de.offene_pflege.backend.services.OPUsersService;
+import de.offene_pflege.backend.services.SYSFilesService;
 import de.offene_pflege.op.settings.InitWizard;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.system.EMailSystem;
@@ -48,7 +51,6 @@ import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.swing.*;
 import javax.validation.Validation;
@@ -589,7 +591,7 @@ public class OPDE {
             if (neededVersion != currentVersion)
                 throw new PersistenceException(SYSTools.xx("error.sql.schema.version.mismatch"));
 
-            emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
+
 
             EntityManager em1 = emf.createEntityManager();
             em1.close();
@@ -652,7 +654,7 @@ public class OPDE {
                     OPDE.setLogin(rootLogin);
                     initProps();
 
-                    BHPTools.generate(em);
+                    BHPService.generate(em);
 
                     em.getTransaction().commit();
                 } catch (Exception ex) {

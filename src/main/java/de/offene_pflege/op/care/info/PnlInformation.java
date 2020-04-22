@@ -19,7 +19,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.prescription.PrescriptionTools;
+import de.offene_pflege.backend.services.PrescriptionTools;
 import de.offene_pflege.backend.entity.process.*;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;

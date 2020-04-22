@@ -29,10 +29,10 @@ package de.offene_pflege.op.care.med.structure;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.prescription.DosageForm;
-import de.offene_pflege.backend.entity.prescription.DosageFormTools;
+import de.offene_pflege.backend.entity.done.DosageForm;
+import de.offene_pflege.backend.services.DosageFormService;
 import de.offene_pflege.backend.entity.prescription.TradeForm;
-import de.offene_pflege.backend.entity.prescription.TradeFormTools;
+import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
@@ -157,7 +157,7 @@ public class DlgTradeForm extends MyJDialog {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
         cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
-        cmbForm.setRenderer(DosageFormTools.getRenderer(0));
+        cmbForm.setRenderer(DosageFormService.getRenderer(0));
         em.close();
 
         cmbForm.setSelectedItem(tradeForm.getDosageForm());

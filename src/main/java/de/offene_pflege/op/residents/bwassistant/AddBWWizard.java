@@ -10,7 +10,7 @@ import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.done.Rooms;
 import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.entity.prescription.GP;
-import de.offene_pflege.backend.entity.prescription.GPTools;
+import de.offene_pflege.backend.services.GPTools;
 import de.offene_pflege.backend.entity.system.Unique;
 import de.offene_pflege.backend.entity.system.UniqueTools;
 import de.offene_pflege.backend.entity.system.OPUsers;

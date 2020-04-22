@@ -7,8 +7,8 @@ package de.offene_pflege.op.care.med.prodassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.backend.entity.prescription.ACME;
-import de.offene_pflege.backend.entity.prescription.ACMETools;
+import de.offene_pflege.backend.entity.done.ACME;
+import de.offene_pflege.backend.services.ACMEService;
 import de.offene_pflege.backend.entity.prescription.MedProducts;
 import de.offene_pflege.op.OPDE;
 import org.apache.commons.collections.Closure;
@@ -44,7 +44,7 @@ public class PnlACME extends JPanel {
         EntityManager em = OPDE.createEM();
         Query query2 = em.createQuery("SELECT m FROM ACME m ORDER BY m.name, m.city");
         lstHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new ACME[]{})));
-        lstHersteller.setCellRenderer(ACMETools.getRenderer(0));
+        lstHersteller.setCellRenderer(ACMEService.getRenderer(0));
         em.close();
     }
 

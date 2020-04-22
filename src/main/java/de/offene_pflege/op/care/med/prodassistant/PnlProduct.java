@@ -7,7 +7,7 @@ package de.offene_pflege.op.care.med.prodassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.backend.entity.prescription.MedProducts;
-import de.offene_pflege.backend.entity.prescription.MedProductsTools;
+import de.offene_pflege.backend.services.MedProductsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.collections.Closure;

@@ -8,7 +8,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.backend.entity.done.Intervention;
 import de.offene_pflege.backend.services.InterventionService;
-import de.offene_pflege.backend.entity.prescription.DosageForm;
+import de.offene_pflege.backend.entity.done.DosageForm;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
