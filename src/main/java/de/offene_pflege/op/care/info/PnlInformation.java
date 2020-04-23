@@ -19,7 +19,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.services.PrescriptionTools;
+import de.offene_pflege.backend.services.PrescriptionService;
 import de.offene_pflege.backend.entity.process.*;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
@@ -1225,7 +1225,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
 
                     String content = "";
                     if (resInfo.getPrescription() != null) {
-                        content = PrescriptionTools.getPrescriptionAsHTML(resInfo.getPrescription(), false, false, false, false) + "<hrule/><br/>";
+                        content = PrescriptionService.getPrescriptionAsHTML(resInfo.getPrescription(), false, false, false, false) + "<hrule/><br/>";
                     }
 
                     content += ResInfoService.getContentAsHTML(resInfo);

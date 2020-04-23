@@ -3,7 +3,9 @@ package de.offene_pflege.backend.services;
 import de.offene_pflege.backend.entity.done.BHP;
 import de.offene_pflege.backend.entity.done.DosageForm;
 import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.entity.done.MedInventory;
+import de.offene_pflege.backend.entity.done.MedStock;
+import de.offene_pflege.backend.entity.done.MedStockTransaction;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
@@ -20,13 +22,20 @@ import java.util.Collections;
 import java.util.Date;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 18.11.11
- * Time: 16:25
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 18.11.11 Time: 16:25 To change this template use File | Settings | File
+ * Templates.
  */
-public class MedInventoryTools {
+public class MedInventoryService {
+
+    public static MedInventory create(Resident resident, String text) {
+        MedInventory mi = new MedInventory();
+        mi.setResident(resident);
+        mi.setText(text);
+        mi.setUser(OPDE.getLogin().getUser());
+        mi.setFrom(LocalDateTime.now());
+        mi.setTo(SYSConst.LD_UNTIL_FURTHER_NOTICE);
+        return mi;
+    }
 
     public static ListCellRenderer getInventoryRenderer() {
         return (jList, o, i, isSelected, cellHasFocus) -> {
@@ -81,7 +90,7 @@ public class MedInventoryTools {
         BigDecimal result = BigDecimal.ZERO;
         for (MedStock stock : inventory.getMedStocks()) {
             if (!stock.isClosed()) {
-                BigDecimal summe = MedStockTools.getSum(stock);
+                BigDecimal summe = MedStockService.getSum(stock);
                 result = result.add(summe);
             }
         }
@@ -107,13 +116,13 @@ public class MedInventoryTools {
         if (inventory == null) {
             throw new Exception("No MedStock is currently in use");
         }
-        MedStock stock = MedStockTools.getStockInUse(inventory);
-        if (stock.getTradeForm().getDosageForm().isDontCALC()) {
+        MedStock stock = MedStockService.getStockInUse(inventory);
+        if (DosageFormService.isDontCALC(stock.getTradeForm().getDosageForm())) {
             OPDE.debug("withdraw/5: no calculation necessary. is ointment or something like that");
             return;
         }
 
-        if (stock.getTradeForm().getDosageForm().isUPRn()) {
+        if (DosageFormService.isUPRn(stock.getTradeForm().getDosageForm())) {
             BigDecimal upr = stock.getTradeForm().getConstantUPRn() != null ? stock.getTradeForm().getConstantUPRn() : stock.getUPR();
             // #16
             quantity = quantity.divide(upr, 4, BigDecimal.ROUND_HALF_UP); // GitHub #16 Exception tritt hier auf. Weiter prüfen.
@@ -125,8 +134,8 @@ public class MedInventoryTools {
 
 
     /**
-     * Bricht von allen geschlossenen das nächste (im Sinne des Einbuchdatums) an. Funktioniert nur bei Vorräten, die z.Zt. keine
-     * angebrochenen Bestände haben.
+     * Bricht von allen geschlossenen das nächste (im Sinne des Einbuchdatums) an. Funktioniert nur bei Vorräten, die
+     * z.Zt. keine angebrochenen Bestände haben.
      *
      * @param inventory
      * @return der neu angebrochene Bestand. null, wenns nicht geklappt hat.
@@ -151,9 +160,9 @@ public class MedInventoryTools {
 
     public static BigDecimal getSum(EntityManager em, MedInventory inventory) throws Exception {
         BigDecimal result = BigDecimal.ZERO;
-        for (MedStock stock : MedStockTools.getAll(inventory)) {
+        for (MedStock stock : MedStockService.getAll(inventory)) {
             if (!stock.isClosed()) {
-                BigDecimal summe = MedStockTools.getSum(em, stock);
+                BigDecimal summe = MedStockService.getSum(em, stock);
                 result = result.add(summe);
             }
         }
@@ -194,7 +203,7 @@ public class MedInventoryTools {
 
         OPDE.debug("withdraw/4: MedStock: " + stock);
 
-        BigDecimal stockSum = MedStockTools.getSum(stock); // wieviel der angebrochene Bestand noch hergibt.
+        BigDecimal stockSum = MedStockService.getSum(stock); // wieviel der angebrochene Bestand noch hergibt.
 
 
         BigDecimal withdrawal = quantity;
@@ -210,13 +219,13 @@ public class MedInventoryTools {
 
         if (stockSum.compareTo(quantity) == 0) {
             if (stock.isToBeClosedSoon()) {
-                MedStockTools.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                MedStockService.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionService.STATE_EDIT_EMPTY_NOW);
             }
         } else if (stockSum.compareTo(quantity) < 0) {
             if (!stock.hasNext2Open() && stock.isToBeClosedSoon()) {
-                MedStockTools.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                MedStockService.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionService.STATE_EDIT_EMPTY_NOW);
             } else if (stock.hasNext2Open()) {
-                MedStock nextStock = MedStockTools.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                MedStock nextStock = MedStockService.close(em, stock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionService.STATE_EDIT_EMPTY_NOW);
                 withdraw(em, nextStock, quantity.subtract(stockSum), weight, bhp);
             }
         }
@@ -349,7 +358,7 @@ public class MedInventoryTools {
                     MedStock mystock = em.merge(stock);
                     em.lock(mystock, LockModeType.OPTIMISTIC);
                     mystock.setNextStock(null);
-                    MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.allinvetories.closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
+                    MedStockService.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.allinvetories.closed"), MedStockTransactionService.STATE_EDIT_INVENTORY_CLOSED);
                 }
             }
             // close inventory
@@ -357,7 +366,7 @@ public class MedInventoryTools {
         }
     }
 
-    public static boolean isClosed(MedInventory medInventory){
+    public static boolean isClosed(MedInventory medInventory) {
         return medInventory.getTo().isBefore(SYSConst.LD_UNTIL_FURTHER_NOTICE);
     }
 }

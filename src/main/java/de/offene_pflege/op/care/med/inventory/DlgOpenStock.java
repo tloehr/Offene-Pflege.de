@@ -28,9 +28,11 @@ package de.offene_pflege.op.care.med.inventory;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import de.offene_pflege.backend.entity.done.MedInventory;
+import de.offene_pflege.backend.entity.done.MedStock;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.prescription.*;
-import de.offene_pflege.backend.services.MedStockTools;
+import de.offene_pflege.backend.services.MedStockService;
 import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
@@ -184,7 +186,7 @@ public class DlgOpenStock extends MyJDialog {
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
         dcbm.insertElementAt(SYSTools.xx("misc.msg.none"), 0);
         cmbBestID.setModel(dcbm);
-        cmbBestID.setRenderer(MedStockTools.getBestandOnlyIDRenderer());
+        cmbBestID.setRenderer(MedStockService.getBestandOnlyIDRenderer());
 
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
@@ -194,7 +196,7 @@ public class DlgOpenStock extends MyJDialog {
         if (cmbBestID.getSelectedIndex() == 0) {
             cmbBestID.setToolTipText(null);
         } else {
-            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getTextASHTML((MedStock) cmbBestID.getSelectedItem())));
+            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockService.getTextASHTML((MedStock) cmbBestID.getSelectedItem())));
         }
     }//GEN-LAST:event_cmbBestIDItemStateChanged
 

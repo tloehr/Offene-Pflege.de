@@ -38,7 +38,7 @@ import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.done.Station;
-import de.offene_pflege.backend.services.MedStockTools;
+import de.offene_pflege.backend.services.MedStockService;
 import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.QProcessTools;
 import de.offene_pflege.backend.services.ControllingService;
@@ -951,7 +951,7 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
             SwingWorker worker = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
-                    return MedStockTools.getListForMedControl((Station) cmbStation.getSelectedItem(), progressClosure);
+                    return MedStockService.getListForMedControl((Station) cmbStation.getSelectedItem(), progressClosure);
                 }
 
                 @Override
@@ -992,7 +992,7 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
                 @Override
                 protected Object doInBackground() throws Exception {
 
-                    return MedStockTools.getNarcoticsWeightList(new LocalDate().minusMonths(1), new LocalDate());
+                    return MedStockService.getNarcoticsWeightList(new LocalDate().minusMonths(1), new LocalDate());
                 }
 
                 @Override

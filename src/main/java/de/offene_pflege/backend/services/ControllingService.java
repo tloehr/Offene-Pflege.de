@@ -107,11 +107,11 @@ public class ControllingService {
             mapResidents.get(info.getResident()).getResInfos().add(info);
         }
 
-        HashSet<Prescription> painPresc = new HashSet(PrescriptionTools.getAll(CommontagsTools.TYPE_SYS_PAIN, from, to));
+        HashSet<Prescription> painPresc = new HashSet(PrescriptionService.getAll(CommontagsTools.TYPE_SYS_PAIN, from, to));
         p += 5;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
-        painPresc.addAll(PrescriptionTools.getAll(CommontagsTools.TYPE_SYS_PAINMGR, from, to));
+        painPresc.addAll(PrescriptionService.getAll(CommontagsTools.TYPE_SYS_PAINMGR, from, to));
         p += 5;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
@@ -193,7 +193,7 @@ public class ControllingService {
             } else {
                 ArrayList<Prescription> listPrescriptions = new ArrayList<>(mapResidents.get(resident).getPrescriptions());
                 Collections.sort(listPrescriptions);
-                prescription += PrescriptionTools.getPrescriptionsAsHTML4PainList(listPrescriptions, from, to);
+                prescription += PrescriptionService.getPrescriptionsAsHTML4PainList(listPrescriptions, from, to);
                 listPrescriptions.clear();
             }
             resTXT += prescription;

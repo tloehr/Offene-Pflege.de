@@ -4,11 +4,8 @@
  */
 package de.offene_pflege.backend.entity.reports;
 
-import de.offene_pflege.backend.entity.done.BHP;
-import de.offene_pflege.backend.entity.done.Homes;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -261,12 +258,12 @@ public class HandoversTools {
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                     progress++;
                     String htmlul2 = "";
-                    ArrayList<MedInventory> listInventories = MedInventoryTools.getAllActive(resident);
+                    ArrayList<MedInventory> listInventories = MedInventoryService.getAllActive(resident);
                     for (MedInventory inventory : listInventories) {
-                        MedStock stock = MedInventoryTools.getCurrentOpened(inventory);
+                        MedStock stock = MedInventoryService.getCurrentOpened(inventory);
                         BigDecimal stockSum = null;
                         if (stock != null) {
-                            stockSum = MedStockTools.getSum(stock);
+                            stockSum = MedStockService.getSum(stock);
                         }
 
                         if (stock == null || stockSum.compareTo(BigDecimal.ZERO) <= 0) {

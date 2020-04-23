@@ -1,6 +1,6 @@
 package de.offene_pflege.backend.services;
 
-import de.offene_pflege.backend.entity.prescription.GP;
+import de.offene_pflege.backend.entity.done.GP;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -16,7 +16,29 @@ import java.util.ArrayList;
  * Time: 13:27
  * To change this template use File | Settings | File Templates.
  */
-public class GPTools {
+public class GPService {
+
+
+    public static GP create () {
+        return create("","","","","","","","","");
+      }
+
+    public static GP create (String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax) {
+        GP gp = new GP();
+        gp.setAnrede(anrede);
+        gp.setTitel(titel);
+        gp.setName(name);
+        gp.setVorname(vorname);
+        gp.setStrasse(strasse);
+        gp.setPlz(plz);
+        gp.setOrt(ort);
+        gp.setTel(tel);
+        gp.setFax(fax);
+        gp.setNeurologist(false);
+        gp.setDermatology(false);
+        gp.setStatus(0);
+        return gp;
+      }
 
     public static ListCellRenderer getRenderer() {
         return (jList, o, i, isSelected, cellHasFocus) -> {
@@ -38,7 +60,7 @@ public class GPTools {
             if (OPDE.isAnonym()) {
                 return "[" + SYSTools.xx("misc.msg.anon") + "]";
             }
-            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + " " + doc.getFirstname() + ", " + doc.getCity();
+            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getName() + " " + doc.getVorname() + ", " + doc.getOrt();
         } else {
             return SYSTools.xx("misc.msg.noentryyet");
         }
@@ -49,7 +71,7 @@ public class GPTools {
             if (OPDE.isAnonym()) {
                 return "[" + SYSTools.xx("misc.msg.anon") + "]";
             }
-            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getFirstname() + " " + doc.getName() + ", " + doc.getStreet() + ", " + doc.getZIP() + " " + doc.getCity() + ", Tel: " + doc.getTel();
+            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getVorname() + " " + doc.getName() + ", " + doc.getStrasse() + ", " + doc.getPlz() + " " + doc.getOrt() + ", Tel: " + doc.getTel();
         } else {
             return SYSTools.xx("misc.msg.noentryyet");
         }

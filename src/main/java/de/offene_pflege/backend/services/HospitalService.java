@@ -1,19 +1,28 @@
 package de.offene_pflege.backend.services;
 
-import de.offene_pflege.backend.entity.prescription.Hospital;
+import de.offene_pflege.backend.entity.done.Hospital;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
 import javax.swing.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 14.12.11
- * Time: 13:30
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 14.12.11 Time: 13:30 To change this template use File | Settings | File
+ * Templates.
  */
-public class HospitalTools {
+public class HospitalService {
+
+    public static Hospital create() {
+        Hospital h = new Hospital();
+        h.setName("");
+        h.setStreet("");
+        h.setZip("");
+        h.setCity("");
+        h.setTel("");
+        h.setFax("");
+        h.setState(0);
+        return h;
+    }
 
     public static ListCellRenderer getKHRenderer() {
         return (jList, o, i, isSelected, cellHasFocus) -> {

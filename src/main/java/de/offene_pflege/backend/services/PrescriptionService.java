@@ -10,15 +10,22 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import de.offene_pflege.backend.entity.done.*;
-import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.entity.prescription.Prescription;
+import de.offene_pflege.backend.entity.prescription.PrescriptionSchedule;
+import de.offene_pflege.backend.entity.prescription.Situations;
+import de.offene_pflege.backend.entity.prescription.TradeForm;
+import de.offene_pflege.backend.entity.process.SYSPRE2PROCESS;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
+import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -38,8 +45,68 @@ import java.util.concurrent.ExecutionException;
 /**
  * @author tloehr
  */
-public class PrescriptionTools {
+public class PrescriptionService {
 
+
+    public static Prescription create(Resident resident) {
+           create(new Date(), SYSConst.DATE_UNTIL_FURTHER_NOTICE)
+
+
+           this.resident = resident;
+
+           this.from = new Date();
+           this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
+           this.userON = OPDE.getLogin().getUser();
+
+
+       }
+
+       public static Prescription create(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, OPUsers userON, OPUsers userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
+           this.from = from;
+           this.to = to;
+           this.toEndOfPackage = toEndOfPackage;
+           this.relation = relation;
+           this.text = SYSTools.tidy(text);
+           this.showOnDailyPlan = showOnDailyPlan;
+           this.attachedFilesConnections = attachedFilesConnections;
+           this.attachedProcessConnections = attachedProcessConnections;
+           this.userON = userON;
+           this.userOFF = userOFF;
+           this.resident = resident;
+           this.intervention = intervention;
+           this.tradeform = tradeform;
+           this.situation = situation;
+           this.hospitalON = hospitalON;
+           this.hospitalOFF = hospitalOFF;
+           this.docON = docON;
+           this.docOFF = docOFF;
+
+       }
+
+
+      public Prescription create(Prescription source) {
+          final Prescription prescriptionClone = new Prescription(from, to, toEndOfPackage, relation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, OPDE.getLogin().getUser(), userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
+
+          CollectionUtils.forAllDo(pSchedule, new Closure() {
+              public void execute(Object o) {
+                  PrescriptionSchedule scheduleCopy = ((PrescriptionSchedule) o).createCopy(prescriptionClone);
+                  prescriptionClone.getPrescriptionSchedule().add(scheduleCopy);
+              }
+          });
+
+          for (Commontags ctag : commontags) {
+              prescriptionClone.getCommontags().add(ctag);
+          }
+
+          for (ResInfo annotation : annotations) {
+              ResInfo annotationClone = ResInfoService.clone(annotation);
+              annotationClone.setPrescription(prescriptionClone);
+
+              prescriptionClone.getAnnotations().add(annotationClone);
+          }
+
+          return prescriptionClone;
+      }
     /**
      * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
      * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
@@ -93,7 +160,7 @@ public class PrescriptionTools {
                     " AND v.AnDatum < now() AND v.AbDatum > now() AND Date(bhp.LDatum) <= Date(now()) AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND bw.StatID = ? " +
                     " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.id, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Text, Ms.Bezeichnung)");
-            query.setParameter(1, station.getPrimaryKey());
+            query.setParameter(1, station.getId());
 
             printDailyPlanAsPDF(station, query.getResultList());
 
@@ -478,7 +545,7 @@ public class PrescriptionTools {
             result += prescription.getIntervention().getBezeichnung();
         } else {
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
-            MedStock stockInUse = prescription.isClosed() ? null : MedStockTools.getStockInUse(inventory);
+            MedStock stockInUse = prescription.isClosed() ? null : MedStockService.getStockInUse(inventory);
 
             if (stockInUse != null) {
                 result += "<b>" + stockInUse.getTradeForm().getMedProduct().getText()
@@ -507,7 +574,7 @@ public class PrescriptionTools {
             result += prescription.getIntervention().getBezeichnung();
         } else {
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
-            MedStock stockInUse = prescription.isClosed() ? null : MedStockTools.getStockInUse(inventory);
+            MedStock stockInUse = prescription.isClosed() ? null : MedStockService.getStockInUse(inventory);
 
             if (stockInUse != null) {
                 result += stockInUse.getTradeForm().getMedProduct().getText()
@@ -534,7 +601,7 @@ public class PrescriptionTools {
             phrase.add(PDF.chunk(prescription.getIntervention().getBezeichnung()));
         } else {
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
-            MedStock stockInUse = prescription.isClosed() ? null : MedStockTools.getStockInUse(inventory);
+            MedStock stockInUse = prescription.isClosed() ? null : MedStockService.getStockInUse(inventory);
 
             if (stockInUse != null) {
                 phrase.add(PDF.chunk(stockInUse.getTradeForm().getMedProduct().getText() + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()), PDF.bold()));
@@ -560,7 +627,7 @@ public class PrescriptionTools {
         if (presription.shouldBeCalculated()) {
 
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(presription.getResident(), presription.getTradeForm());
-            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+            MedStock stockInUse = MedStockService.getStockInUse(inventory);
 
             if (stockInUse != null) {
                 // If the current prescription defers from the original one (different provider of the medication as in the beginning)
@@ -578,7 +645,7 @@ public class PrescriptionTools {
         if (presription.shouldBeCalculated()) {
 
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(presription.getResident(), presription.getTradeForm());
-            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+            MedStock stockInUse = MedStockService.getStockInUse(inventory);
 
             if (stockInUse != null) {
                 // If the current prescription defers from the original one (different provider of the medication as in the beginning)
@@ -602,7 +669,7 @@ public class PrescriptionTools {
         } else {
 
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(presription.getResident(), presription.getTradeForm());
-            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+            MedStock stockInUse = MedStockService.getStockInUse(inventory);
 
             if (stockInUse != null) {
                 // If the current prescription defers from the original one (different provider of the medication as in the beginning)
@@ -759,7 +826,7 @@ public class PrescriptionTools {
         String result = "";
         if (!prescription.isClosed() && prescription.shouldBeCalculated()) {
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
-            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+            MedStock stockInUse = MedStockService.getStockInUse(inventory);
 
             if (prescription.isUntilEndOfPackage()) {
                 result += "<b>" + SYSTools.xx("misc.msg.onlyUntilEndOfPackage") + "</b><br/>";
@@ -771,8 +838,8 @@ public class PrescriptionTools {
                     BigDecimal invSum = null;
                     BigDecimal stockSum = null;
                     try {
-                        invSum = MedInventoryTools.getSum(inventory);
-                        stockSum = MedStockTools.getSum(stockInUse);
+                        invSum = MedInventoryService.getSum(inventory);
+                        stockSum = MedStockService.getSum(stockInUse);
                     } catch (Exception e) {
                         OPDE.fatal(e);
                     } finally {
@@ -789,7 +856,7 @@ public class PrescriptionTools {
                             result += " " + SYSTools.xx("misc.msg.equalTo") + " " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     DosageFormService.getUsageText(stockInUse.getTradeForm().getDosageForm());
                             result += " (" + SYSTools.xx("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " " + SYSTools.xx("misc.msg.to1");
-                            if (stockInUse.getUPRDummyMode() == MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
+                            if (stockInUse.getUPRDummyMode() == MedStockService.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
                                 result += ", " + SYSTools.xx("misc.msg.preliminary");
                             }
                             result += ")";
@@ -811,7 +878,7 @@ public class PrescriptionTools {
                         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
                         // variable expiry ?
                         if (stockInUse.getTradeForm().getDaysToExpireAfterOpened() != null) {
-                            result += "<br/><font color=\"" + MedStockTools.getHTMLColor(stockInUse) + "\">" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stockInUse.getOpened()).plusDays(stockInUse.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
+                            result += "<br/><font color=\"" + MedStockService.getHTMLColor(stockInUse) + "\">" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stockInUse.getOpened()).plusDays(stockInUse.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
                         }
 
                         // fixed expiry ?
@@ -824,7 +891,7 @@ public class PrescriptionTools {
                                 expiryString = df.format(stockInUse.getExpires());
                             }
 
-                            result += "<br/><font color=\"" + MedStockTools.getHTMLColor(stockInUse) + "\">" + SYSTools.xx("misc.msg.expires") + ": " + expiryString + "</font>";
+                            result += "<br/><font color=\"" + MedStockService.getHTMLColor(stockInUse) + "\">" + SYSTools.xx("misc.msg.expires") + ": " + expiryString + "</font>";
                         }
 
 
@@ -835,7 +902,7 @@ public class PrescriptionTools {
                     if (inventory == null) {
                         result += "<b><font color=\"red\">" + SYSTools.xx("misc.msg.noInventoryYet") + "</font></b>";
                     } else {
-                        if (MedInventoryTools.getNextToOpen(inventory) != null) {
+                        if (MedInventoryService.getNextToOpen(inventory) != null) {
                             result += "<br/><b><font color=\"red\">" + SYSTools.xx("misc.msg.noOpenStock") + "</font></b>";
                         } else {
                             result += "<br/><b><font color=\"red\">" + SYSTools.xx("misc.msg.noOpenStock") + "</font></b>";
@@ -943,7 +1010,7 @@ public class PrescriptionTools {
                 try {
                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(em, p.getResident(), p.getTradeForm());
 
-                    MedStock stockInUse = MedStockTools.getStockInUse(em, inventory);
+                    MedStock stockInUse = MedStockService.getStockInUse(em, inventory);
                     if (stockInUse == null) { //leeren Vorrat gefunden
                         result.add(p);
                     }
@@ -1099,16 +1166,16 @@ public class PrescriptionTools {
 
         String td = SYSConst.html_bold(df.format(prescription.getFrom())) + "; " +
                 prescription.getUserON().getFullname() +
-                (prescription.getDocON() != null ? "; " + GPTools.getFullName(prescription.getDocON()) : "") +
-                (prescription.getHospitalON() != null ? "; " + HospitalTools.getFullName(prescription.getHospitalON()) : "");
+                (prescription.getDocON() != null ? "; " + GPService.getFullName(prescription.getDocON()) : "") +
+                (prescription.getHospitalON() != null ? "; " + HospitalService.getFullName(prescription.getHospitalON()) : "");
 
         td += "&nbsp;&rarr;&nbsp;";
 
         if (prescription.isClosed()) {
             td += SYSConst.html_bold(df.format(prescription.getTo())) + "; " +
                     prescription.getUserOFF().getFullname() +
-                    (prescription.getDocOFF() != null ? "; " + GPTools.getFullName(prescription.getDocOFF()) : "") +
-                    (prescription.getHospitalOFF() != null ? "; " + HospitalTools.getFullName(prescription.getHospitalOFF()) : "");
+                    (prescription.getDocOFF() != null ? "; " + GPService.getFullName(prescription.getDocOFF()) : "") +
+                    (prescription.getHospitalOFF() != null ? "; " + HospitalService.getFullName(prescription.getHospitalOFF()) : "");
 
         }
 

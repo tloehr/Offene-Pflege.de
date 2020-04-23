@@ -33,10 +33,10 @@ import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.ICD;
 import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoService;
-import de.offene_pflege.backend.entity.prescription.GP;
-import de.offene_pflege.backend.services.GPTools;
-import de.offene_pflege.backend.entity.prescription.Hospital;
-import de.offene_pflege.backend.services.HospitalTools;
+import de.offene_pflege.backend.entity.done.GP;
+import de.offene_pflege.backend.services.GPService;
+import de.offene_pflege.backend.entity.done.Hospital;
+import de.offene_pflege.backend.services.HospitalService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditGP;
@@ -148,11 +148,11 @@ public class DlgDiag extends MyJDialog {
         em.close();
 
         cmbArzt.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArzt.setRenderer(GPTools.getRenderer());
+        cmbArzt.setRenderer(GPService.getRenderer());
         cmbArzt.setSelectedIndex(0);
 
         cmbKH.setModel(new DefaultComboBoxModel(listKH.toArray()));
-        cmbKH.setRenderer(HospitalTools.getKHRenderer());
+        cmbKH.setRenderer(HospitalService.getKHRenderer());
         cmbKH.setSelectedIndex(0);
 
         cmbSicherheit.setModel(new DefaultComboBoxModel(new String[]{

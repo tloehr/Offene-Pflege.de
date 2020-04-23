@@ -1,23 +1,37 @@
 package de.offene_pflege.backend.services;
 
-import de.offene_pflege.backend.entity.prescription.MedPackage;
+import de.offene_pflege.backend.entity.done.MedPackage;
+import de.offene_pflege.backend.entity.prescription.TradeForm;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import java.math.BigDecimal;
 import java.util.Locale;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 15.12.11
- * Time: 15:24
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 15.12.11 Time: 15:24 To change this template use File | Settings | File
+ * Templates.
  */
-public class MedPackageTools {
+public class MedPackageService {
     public static final String GROESSE[] = {"N1", "N2", "N3", "AP", "OP"};
+
+    public static MedPackage create(TradeForm tf) {
+        MedPackage mp = new MedPackage();
+        mp.setTradeForm(tf);
+        return mp;
+    }
+
+    public static MedPackage create(TradeForm tradeForm, BigDecimal inhalt, Short groesse, String pzn) {
+        MedPackage mp = create(tradeForm);
+        mp.setInhalt(inhalt);
+        mp.setGroesse(groesse);
+        mp.setPzn(pzn);
+        return mp;
+    }
+
 
     public static ListCellRenderer getMedPackungRenderer() {
         return (jList, o, i, b, b1) -> {
@@ -36,15 +50,15 @@ public class MedPackageTools {
     }
 
     public static String toPrettyString(MedPackage aPackage) {
-        String text = SYSTools.formatBigDecimal(aPackage.getContent()) + " " + TradeFormTools.getPackUnit(aPackage.getTradeForm()) + ", " + GROESSE[aPackage.getSize()] + ", ";
+        String text = SYSTools.formatBigDecimal(aPackage.getInhalt()) + " " + TradeFormTools.getPackUnit(aPackage.getTradeForm()) + ", " + GROESSE[aPackage.getGroesse()] + ", ";
         text += "PZN: " + aPackage.getPzn();
         return text;
     }
 
     /**
-     * Checks if a PZN is valid and id not already in use.
-     * Testet ob eine neue PZN gültig ist. Also ob sie 7 oder 8 Zeichen lang ist. Führende 'ß' Zeichen (kommt bei den Barcodes vor)
-     * werden abgeschnitten. Und es wird anhand der Datenbank geprüft, ob die PZN noch frei ist oder nicht.
+     * Checks if a PZN is valid and id not already in use. Testet ob eine neue PZN gültig ist. Also ob sie 7 oder 8
+     * Zeichen lang ist. Führende 'ß' Zeichen (kommt bei den Barcodes vor) werden abgeschnitten. Und es wird anhand der
+     * Datenbank geprüft, ob die PZN noch frei ist oder nicht.
      *
      * @param pzn      die geprüfte und bereinigte PZN. <code>null</code> bei falscher oder belegter PZN.
      * @param ignoreMe lässt die betreffende Packung bei der Suche ausser acht. Null, wenn nicht gewünscht.
@@ -73,18 +87,19 @@ public class MedPackageTools {
     }
 
     /**
-       * This method checks if a given string represents a valid german PZN, which may (as of 2013) have a length
-       * of 7 or 8 chars. It must also be conform to the checksum algorithm defined by SecurPharm.
-       * <p>
-       * Extension for the <b>austrian</b> PZN system. In austria the PZN as a fixed size of 7 (well, 6 + the checkdigit).
-       * It is integrated into an EAN13 of a special structure.
-       * <p>
-       * All the barcode scanners that came across added a "ß" at the front of the scanned number. So this
-       * has to be removed if present.
-       *
-       * @param pzn the string to be checked
-       * @return the cleaned and checked string. PZN7's are always added up to PZN8's (by puttin a zero to the head). If the PZN was invalid you will only get NULL.
-       */
+     * This method checks if a given string represents a valid german PZN, which may (as of 2013) have a length of 7 or
+     * 8 chars. It must also be conform to the checksum algorithm defined by SecurPharm.
+     * <p>
+     * Extension for the <b>austrian</b> PZN system. In austria the PZN as a fixed size of 7 (well, 6 + the checkdigit).
+     * It is integrated into an EAN13 of a special structure.
+     * <p>
+     * All the barcode scanners that came across added a "ß" at the front of the scanned number. So this has to be
+     * removed if present.
+     *
+     * @param pzn the string to be checked
+     * @return the cleaned and checked string. PZN7's are always added up to PZN8's (by puttin a zero to the head). If
+     * the PZN was invalid you will only get NULL.
+     */
     public static String parsePZN(String pzn) throws NumberFormatException {
         return parsePZN(pzn, Locale.getDefault().getCountry().toLowerCase());
     }
@@ -160,12 +175,9 @@ public class MedPackageTools {
 
 
     /**
-     * checks the validity of a given PZN according to the algorithm defined by SecurPharm
-     * <br/>
-     * <br/>
+     * checks the validity of a given PZN according to the algorithm defined by SecurPharm <br/> <br/>
      * <img src="http://www.offene-pflege.de/images/javadoc/pzn-checksum-calculation.png">
-     * <br/>
-     * <br/>
+     * <br/> <br/>
      * <i>This picture has been taken from the german PZN8 document. It is copyrighted to
      * Informationsstelle für Arzneispezialitäten - IFA GmbH</i>
      *
@@ -181,9 +193,9 @@ public class MedPackageTools {
     }
 
     /**
-     * http://www.gs1.ch/docs/default-source/gs1-system-document/genspecs/genspec-kapitel9.pdf?sfvrsn=2
-     * Page 21
+     * http://www.gs1.ch/docs/default-source/gs1-system-document/genspecs/genspec-kapitel9.pdf?sfvrsn=2 Page 21
      * Stichwort: Modulo 10 Verfahren.
+     *
      * @param pzn
      * @return
      */

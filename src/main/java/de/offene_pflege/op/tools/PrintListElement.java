@@ -1,6 +1,6 @@
 package de.offene_pflege.op.tools;
 
-import de.offene_pflege.backend.entity.prescription.MedStock;
+import de.offene_pflege.backend.entity.done.MedStock;
 import de.offene_pflege.op.system.LogicalPrinter;
 import de.offene_pflege.op.system.PrinterForm;
 

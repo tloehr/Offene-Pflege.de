@@ -29,8 +29,8 @@ package de.offene_pflege.op.care.med.structure;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.prescription.MedPackage;
-import de.offene_pflege.backend.services.MedPackageTools;
+import de.offene_pflege.backend.entity.done.MedPackage;
+import de.offene_pflege.backend.services.MedPackageService;
 import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.MyJDialog;
@@ -59,7 +59,7 @@ public class DlgPack extends MyJDialog {
         initComponents();
         setTitle(title);
         this.aPackage = aPackage;
-        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackageTools.GROESSE));
+        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackageService.GROESSE));
 
         if (aPackage.getID() != null) {
             txtPZN.setText(SYSTools.catchNull(aPackage.getPzn()));
@@ -183,7 +183,7 @@ public class DlgPack extends MyJDialog {
 
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        String pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), aPackage.getID() != null ? aPackage : null);
+        String pzn = MedPackageService.checkNewPZN(txtPZN.getText().trim(), aPackage.getID() != null ? aPackage : null);
         BigDecimal inhalt = SYSTools.parseDecimal(txtInhalt.getText());
         if (inhalt != null && inhalt.compareTo(BigDecimal.ZERO) <= 0) {
             inhalt = null;

@@ -1,7 +1,6 @@
 package de.offene_pflege.backend.entity.prescription;
 
-import de.offene_pflege.backend.entity.done.BHP;
-import de.offene_pflege.backend.entity.done.DosageForm;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.op.tools.SYSTools;
 
 import javax.persistence.*;

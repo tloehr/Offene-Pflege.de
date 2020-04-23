@@ -1,8 +1,6 @@
 package de.offene_pflege.backend.services;
 
-import de.offene_pflege.backend.entity.done.BHP;
-import de.offene_pflege.backend.entity.done.Homes;
-import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
@@ -483,7 +481,7 @@ public class BHPService {
      */
     public static ArrayList<BHP> getBHPsOnDemand(Resident resident, Date date) {
 
-        List<Prescription> listPrescriptions = PrescriptionTools.getOnDemandPrescriptions(resident, date);
+        List<Prescription> listPrescriptions = PrescriptionService.getOnDemandPrescriptions(resident, date);
         LocalDate lDate = new LocalDate(date);
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
@@ -829,7 +827,7 @@ public class BHPService {
         if (!shouldBeCalculated(bhp) || bhp.getPrescription().isClosed()) return null;
 
         Icon icon = null;
-        BigDecimal sum = stock == null ? BigDecimal.ZERO : MedStockTools.getSum(stock);
+        BigDecimal sum = stock == null ? BigDecimal.ZERO : MedStockService.getSum(stock);
 
         if (stock == null) {
             icon = SYSConst.icon22ledRedOn;
@@ -852,7 +850,7 @@ public class BHPService {
         int BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW));
         boolean residentAbsent = ResidentTools.isActive(bhp.getResident()) && ResInfoService.absentSince(bhp.getResident()) != null;
         MedInventory inventoryInUse = hasMed(bhp) ? TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeform()) : null;
-        boolean medTrouble = shouldBeCalculated(bhp) && (inventoryInUse == null || MedStockTools.getStockInUse(inventoryInUse) == null);
+        boolean medTrouble = shouldBeCalculated(bhp) && (inventoryInUse == null || MedStockService.getStockInUse(inventoryInUse) == null);
 
         return !residentAbsent && ResidentTools.isActive(bhp.getResident()) &&
                 !bhp.getPrescription().isClosed() &&
@@ -900,7 +898,7 @@ public class BHPService {
 
             for (BHP bhp : list) {
                 String text =
-                        PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()) +
+                        PrescriptionService.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()) +
                                 (hasMed(bhp) ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDosis()) +
                                         " " + DosageFormService.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                                 (isOnDemand(bhp) || isOutcomeText(bhp) ? "" : getScheduleText(bhp, ", ", ""));

@@ -239,9 +239,9 @@ public class ResidentTools {
     public static void endOfStay(EntityManager em, Resident resident, Date enddate, String reason) throws Exception {
         NursingProcessService.closeAll(em, resident, enddate);
         ResInfoService.closeAll(em, resident, enddate, reason);
-        MedInventoryTools.closeAll(em, resident, JavaTimeConverter.toJavaLocalDateTime(enddate));
+        MedInventoryService.closeAll(em, resident, JavaTimeConverter.toJavaLocalDateTime(enddate));
         // The prescriptions must be closed after the MedInventories. Ohterwise there may be a locking exception.
-        PrescriptionTools.closeAll(em, resident, enddate);
+        PrescriptionService.closeAll(em, resident, enddate);
         QProcessTools.closeAll(em, resident, enddate);
     }
 

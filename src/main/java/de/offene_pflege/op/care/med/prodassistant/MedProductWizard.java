@@ -6,9 +6,11 @@ import com.jidesoft.dialog.PageEvent;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.*;
 import de.offene_pflege.backend.entity.done.ACME;
+import de.offene_pflege.backend.entity.done.MedPackage;
+import de.offene_pflege.backend.entity.done.MedProducts;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.services.DosageFormService;
-import de.offene_pflege.backend.services.MedPackageTools;
+import de.offene_pflege.backend.services.MedPackageService;
 import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -127,7 +129,7 @@ public class MedProductWizard {
             tradeform.getPackages().add(aPackage);
 
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(product.getText() + ", " + TradeFormTools.toPrettyString(tradeform) + ", " + MedPackageTools.toPrettyString(aPackage) + " " + SYSTools.xx("misc.msg.entrysuccessful")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(product.getText() + ", " + TradeFormTools.toPrettyString(tradeform) + ", " + MedPackageService.toPrettyString(aPackage) + " " + SYSTools.xx("misc.msg.entrysuccessful")));
             finishAction.execute(aPackage);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -380,7 +382,7 @@ public class MedProductWizard {
                 result += "<li>" + SYSTools.xx("misc.msg.upr") + ": <b>";
                 result += (tradeform.getConstantUPRn() == null ? SYSTools.xx("opde.medication.medproduct.wizard.page6.calcUPR") : SYSTools.xx("opde.medication.medproduct.wizard.page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + SYSTools.xx("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";
             }
-            result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
+            result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page6.newPackageWillBeCreated") + ": <b>" + MedPackageService.toPrettyString(aPackage) + "</b></li>";
 
             ACME displayFactory = acme == null ? product.getACME() : acme;
             result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page5.title") + ": <b>" + displayFactory.getName() + ", " + displayFactory.getCity() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + SYSTools.xx("misc.msg.willBeCreated") + "</i>" : " <i>" + SYSTools.xx("misc.msg.alreadyExits") + "</i>") + "</li>";

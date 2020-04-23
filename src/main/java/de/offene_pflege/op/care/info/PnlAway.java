@@ -12,8 +12,8 @@ import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.services.ResInfoTypeTools;
-import de.offene_pflege.backend.entity.prescription.Hospital;
-import de.offene_pflege.backend.services.HospitalTools;
+import de.offene_pflege.backend.entity.done.Hospital;
+import de.offene_pflege.backend.services.HospitalService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditHospital;
@@ -63,7 +63,7 @@ public class PnlAway extends JPanel {
 //        pnlRight.add(pnlEditKH, 0);
 
         cmbHospital.setModel(new DefaultComboBoxModel(list.toArray()));
-        cmbHospital.setRenderer(HospitalTools.getKHRenderer());
+        cmbHospital.setRenderer(HospitalService.getKHRenderer());
 
         tab1.setTitleAt(TAB_HOSPITAL, SYSTools.xx("misc.msg.hospital"));
         tab1.setTitleAt(TAB_HOLLIDAY, SYSTools.xx("misc.msg.holliday"));

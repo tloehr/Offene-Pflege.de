@@ -1,8 +1,8 @@
 package de.offene_pflege.op.care.info;
 
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.backend.entity.prescription.Hospital;
-import de.offene_pflege.backend.services.HospitalTools;
+import de.offene_pflege.backend.entity.done.Hospital;
+import de.offene_pflege.backend.services.HospitalService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditHospital;
@@ -84,7 +84,7 @@ public class PnlHospital extends JPanel {
         listHospitals.add(0, null);
 
         cmbHospital.setModel(new DefaultComboBoxModel(listHospitals.toArray()));
-        cmbHospital.setRenderer(HospitalTools.getKHRenderer());
+        cmbHospital.setRenderer(HospitalService.getKHRenderer());
 
     }
 

@@ -34,9 +34,11 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
+import de.offene_pflege.backend.entity.done.MedPackage;
+import de.offene_pflege.backend.entity.done.MedProducts;
 import de.offene_pflege.backend.entity.prescription.*;
-import de.offene_pflege.backend.services.MedPackageTools;
-import de.offene_pflege.backend.services.MedProductsTools;
+import de.offene_pflege.backend.services.MedPackageService;
+import de.offene_pflege.backend.services.MedProductsService;
 import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
@@ -330,7 +332,7 @@ public class PnlMed extends CleanablePanel {
                 component.setText((tbIDs.isSelected() ? "[" + ((TradeForm) node.getUserObject()).getID() + "] " : "") + TradeFormTools.toPrettyStringMediumWithExpiry((TradeForm) node.getUserObject()));
             } else if (node.getUserObject() instanceof MedPackage) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/package.png")));
-                component.setText((tbIDs.isSelected() ? "[" + ((MedPackage) node.getUserObject()).getID() + "] " : "") + MedPackageTools.toPrettyString((MedPackage) node.getUserObject()));
+                component.setText((tbIDs.isSelected() ? "[" + ((MedPackage) node.getUserObject()).getID() + "] " : "") + MedPackageService.toPrettyString((MedPackage) node.getUserObject()));
             } else {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/filenew.png")));
                 component.setText(null);
@@ -394,7 +396,7 @@ public class PnlMed extends CleanablePanel {
         list.add(txtSuche);
 
         lstPraep = new JList(new DefaultListModel());
-        lstPraep.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
+        lstPraep.setCellRenderer(MedProductsService.getMedProdukteRenderer());
         lstPraep.setFont(SYSConst.ARIAL14);
         lstPraep.addListSelectionListener(listSelectionEvent -> lstPraepValueChanged(listSelectionEvent));
         lstPraep.setFixedCellWidth(200);

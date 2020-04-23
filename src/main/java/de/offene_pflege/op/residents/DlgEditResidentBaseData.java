@@ -11,8 +11,8 @@ import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.services.StationService;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
-import de.offene_pflege.backend.entity.prescription.GP;
-import de.offene_pflege.backend.services.GPTools;
+import de.offene_pflege.backend.entity.done.GP;
+import de.offene_pflege.backend.services.GPService;
 import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.backend.services.OPUsersService;
 import de.offene_pflege.gui.GUITools;
@@ -75,10 +75,10 @@ public class DlgEditResidentBaseData extends MyJDialog {
 
         txtDOB.setText(DateFormat.getDateInstance().format(resident.getDob()));
 
-        ArrayList<GP> listGPs = GPTools.getAllActive();
+        ArrayList<GP> listGPs = GPService.getAllActive();
         listGPs.add(0, null);
         cmbGP.setModel(new DefaultComboBoxModel(listGPs.toArray()));
-        cmbGP.setRenderer(GPTools.getRenderer());
+        cmbGP.setRenderer(GPService.getRenderer());
         cmbGP.setSelectedItem(resident.getGp());
 
         cmbStation.setModel(StationService.getAll4Combobox(false));

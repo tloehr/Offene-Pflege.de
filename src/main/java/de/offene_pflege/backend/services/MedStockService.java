@@ -1,14 +1,13 @@
 package de.offene_pflege.backend.services;
 
-import de.offene_pflege.backend.entity.done.Station;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.entity.done.*;
+import de.offene_pflege.backend.entity.done.MedStock;
+import de.offene_pflege.backend.entity.done.MedStockTransaction;
+import de.offene_pflege.backend.entity.prescription.Prescription;
+import de.offene_pflege.backend.entity.prescription.TradeForm;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.tools.Pair;
-import de.offene_pflege.op.tools.SYSCalendar;
-import de.offene_pflege.op.tools.SYSConst;
-import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -22,16 +21,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 18.11.11
- * Time: 14:28
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 18.11.11 Time: 14:28 To change this template use File | Settings | File
+ * Templates.
  */
-public class MedStockTools {
+public class MedStockService {
 //    public static boolean apvNeuberechnung = true;
 
     public static final int STATE_NOTHING = 0;
@@ -46,13 +43,65 @@ public class MedStockTools {
     public static final int DONT_REPLACE_UPR = 3;
     public static final int DAYS_TO_EXPIRE_SOON = 5;
 
+
+    public static MedStock create(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text, BigDecimal upr, int uprDummyMode) {
+        MedStock ms = new MedStock();
+        ms.setUpr(upr == null ? BigDecimal.ONE : upr);
+        ms.setUprEffective(ms.getUpr());
+        ms.setUprDummyMode(uprDummyMode);
+        ms.setInventory(inventory);
+        ms.setTradeform(tradeform);
+        ms.setaPackage(aPackage);
+        ms.setText(text);
+        ms.setIn(new Date());
+        ms.setOpened(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        ms.setOut(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        ms.setUser(OPDE.getLogin().getUser());
+        ms.setState(STATE_NOTHING);
+        ms.setNextStock(null);
+        return ms;
+    }
+
+    public static boolean isToBeClosedSoon(MedStock ms) {
+        return ms.getState() == MedStockService.STATE_WILL_BE_CLOSED_SOON;
+    }
+
+
+
+    public static boolean isExpired(MedStock ms) {
+        return expiresIn(ms,0);
+    }
+
+    public static boolean expiresIn(MedStock ms, int days) {
+        if (isClosed(ms)) {
+            return false;
+        }
+        boolean expired1 = ms.getExpires() != null && JavaTimeConverter.toJavaLocalDateTime(ms.getExpires()).minusDays(days).isBefore(LocalDateTime.now());
+        boolean expired2 = isOpened(ms) && ms.getTradeform().getDaysToExpireAfterOpened() != null && JavaTimeConverter.toJavaLocalDateTime(ms.getOpened()).plusDays(ms.getTradeform().getDaysToExpireAfterOpened()).isBefore(LocalDateTime.now());
+        return expired1 || expired2;
+    }
+
+    public static boolean isNew(MedStock ms) {
+        return ms.getOpened().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && ms.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+    }
+
+    public static boolean isOpened(MedStock ms) {
+        return  ms.getOpened().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && ms.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+    }
+
+    public static boolean isClosed(MedStock ms) {
+        return ms.getOut().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+    }
+
+
+
     public static ListCellRenderer getBestandOnlyIDRenderer() {
         return (jList, o, i, isSelected, cellHasFocus) -> {
             String text;
             if (o == null) {
                 text = "<i>Keine Auswahl</i>"; //SYSTools.toHTML("<i>Keine Auswahl</i>");
             } else if (o instanceof MedStock) {
-                text = ((MedStock) o).getID().toString();
+                text = ((MedStock) o).getId().toString();
             } else {
                 text = o.toString();
             }
@@ -92,7 +141,7 @@ public class MedStockTools {
     }
 
 
-    public static MedStock getStockInUse(EntityManager em, MedInventory inventory) throws Exception{
+    public static MedStock getStockInUse(EntityManager em, MedInventory inventory) throws Exception {
         String jpql = " " +
                 " SELECT b FROM MedStock b " +
                 " WHERE b.inventory = :inventory " +
@@ -145,24 +194,24 @@ public class MedStockTools {
 //    }
 
     public static HashMap getStock4Printing(MedStock bestand) {
-        OPDE.debug("StockID: " + bestand.getID());
+        OPDE.debug("StockID: " + bestand.getId());
 
         HashMap hm = new HashMap();
-        hm.put("medstock.tradeform", TradeFormTools.toPrettyString(bestand.getTradeForm()));
+        hm.put("medstock.tradeform", TradeFormTools.toPrettyString(bestand.getTradeform()));
 
-        String pzn = bestand.getPackage() == null ? "??" : bestand.getPackage().getPzn();
+        String pzn = bestand.getaPackage() == null ? "??" : bestand.getaPackage().getPzn();
         hm.put("medstock.package.pzn", pzn);
-        hm.put("medstock.id", bestand.getID());
-        hm.put("medstock.in", bestand.getIN());
+        hm.put("medstock.id", bestand.getId());
+        hm.put("medstock.in", bestand.getIn());
 
         // stock expires
         hm.put("medstock.expires", bestand.getExpires());
 
         // expires after being opened
-        if (bestand.getTradeForm().getDaysToExpireAfterOpened() == null) {
+        if (bestand.getTradeform().getDaysToExpireAfterOpened() == null) {
             hm.put("medstock.tradeform.expires.after.opened", null);
         } else {
-            int days = bestand.getTradeForm().getDaysToExpireAfterOpened();
+            int days = bestand.getTradeform().getDaysToExpireAfterOpened();
             int weeks = 0;
             if (days >= 7) {
                 weeks = days / 7;
@@ -171,8 +220,8 @@ public class MedStockTools {
             hm.put("medstock.tradeform.expires.after.opened", "!!" + exp);
         }
 
-        hm.put("medstock.usershort", bestand.getUser().getUIDCiphered());
-        hm.put("medstock.userlong", bestand.getUser().getFullname());
+        hm.put("medstock.usershort", OPUsersService.getUIDCiphered(bestand.getUser()));
+        hm.put("medstock.userlong", OPUsersService.getFullname(bestand.getUser()));
         hm.put("medstock.inventory.resident.name", ResidentTools.getNameAndFirstname(bestand.getInventory().getResident()));
         hm.put("medstock.inventory.resident.dob", bestand.getInventory().getResident().getDob());
         hm.put("medstock.inventory.resident.id", SYSTools.anonymizeRID(bestand.getInventory().getResident().getId()));
@@ -197,8 +246,8 @@ public class MedStockTools {
     public static BigDecimal getSumOfDosesInBHP(MedStock medStock) {
         BigDecimal result = BigDecimal.ZERO;
         for (MedStockTransaction tx : medStock.getStockTransaction()) {
-            if (!tx.isPartOfCancelPair() && tx.isBHP()) {
-                result = result.add(tx.getBhp().getDose());
+            if (!MedStockTransactionService.isPartOfCancelPair(tx) && tx.getBhp() != null) {
+                result = result.add(tx.getBhp().getDosis());
             }
         }
         return result;
@@ -230,13 +279,13 @@ public class MedStockTools {
     }
 
     /**
-     * This method closes the given MedStock. It forces the current balance to zero by adding a system MedStockTransaction
-     * to the existing list of TXs.
+     * This method closes the given MedStock. It forces the current balance to zero by adding a system
+     * MedStockTransaction to the existing list of TXs.
      * <p>
      * If there is a next package to be used, it will be opened.
      * <p>
-     * If there are prescription (valid until the end of this package) there will be closed, too, unless
-     * there are still unused packages in this inventory.
+     * If there are prescription (valid until the end of this package) there will be closed, too, unless there are still
+     * unused packages in this inventory.
      *
      * @param em       persistence context to be used
      * @param medStock to be closed
@@ -248,62 +297,62 @@ public class MedStockTools {
     public static MedStock close(EntityManager em, MedStock medStock, String text, short state) throws Exception {
         MedStock nextStock = null;
         BigDecimal stocksum = getSum(medStock);
-        MedStockTransaction finalTX = new MedStockTransaction(medStock, stocksum.negate(), state);
+        MedStockTransaction finalTX = MedStockTransactionService.create(medStock, stocksum.negate(), state);
         finalTX.setText(text);
         medStock.getStockTransaction().add(finalTX);
-        medStock.setState(MedStockTools.STATE_NOTHING);
+        medStock.setState(MedStockService.STATE_NOTHING);
         DateTime now = new DateTime();
         medStock.setOut(now.toDate());
 
         BigDecimal effectiveUPR = getEffectiveUPR(medStock);
-        if (medStock.getTradeForm().getDosageForm().isUPRn()) {
-            if (medStock.getTradeForm().getConstantUPRn() == null) { // dynamic UPRn
-                if (medStock.getUPRDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
+        if (DosageFormService.isUPRn(medStock.getTradeform().getDosageForm())) {
+            if (medStock.getTradeform().getConstantUPRn() == null) { // dynamic UPRn
+                if (medStock.getUprDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
                     if (effectiveUPR.compareTo(BigDecimal.ZERO) > 0) { // if this stock was never used the effective UPR must be 0. we must handle this case separately
                         // if the deviation was too high (usually more than 20%), then the new UPR is discarded
                         BigDecimal maxDeviation = SYSTools.parseDecimal(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR_CORRIDOR));
-                        BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
+                        BigDecimal deviation = medStock.getUpr().divide(effectiveUPR, 4, RoundingMode.HALF_UP).subtract(new BigDecimal(100)).abs();
                         OPDE.debug("the deviation was: " + deviation + "%");
 
                         // if the deviation is below the limit, then the new UPR will be accepted.
                         // it must also be greater than 0
                         if (deviation.compareTo(maxDeviation) <= 0 && effectiveUPR.compareTo(BigDecimal.ZERO) > 0) {
                             OPDE.debug("acceptable");
-                            medStock.setUPR(effectiveUPR);
+                            medStock.setUpr(effectiveUPR);
                         } else {
                             OPDE.debug("discarded");
                         }
                     } else {
                         OPDE.debug("effective UPR is 0 or less. new UPR discarded");
                     }
-                } else if (medStock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
-                    medStock.setUPR(effectiveUPR);
-                    medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // will be part of the calculation in future
+                } else if (medStock.getUprDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
+                    medStock.setUpr(effectiveUPR);
+                    medStock.setUprDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // will be part of the calculation in future
 
                     // https://github.com/tloehr/Offene-Pflege.de/issues/16
                     // todo: nicht nur die eignen Stocks ändern (also innerhalb des Inventories), sondern auch für alle anderen BW, bei denen APV auch noch nicht feststeht.
                     for (MedStock dependantStocks : medStock.getInventory().getMedStocks()) {
-                        if (dependantStocks.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING) {
-                            dependantStocks.setUPR(effectiveUPR);
-                            dependantStocks.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
+                        if (dependantStocks.getUprDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING) {
+                            dependantStocks.setUpr(effectiveUPR);
+                            dependantStocks.setUprDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
                         }
                     }
                 }
             }
         }
-        medStock.setUPREffective(effectiveUPR);
+        medStock.setUprEffective(effectiveUPR);
 
-        if (medStock.hasNext2Open()) {
+        if (medStock.getNextStock() != null) {
             nextStock = medStock.getNextStock();
             nextStock.setOpened(now.plusSeconds(1).toDate());
-            OPDE.debug("NextStock: " + medStock.getNextStock().getID() + " will be opened now");
+            OPDE.debug("NextStock: " + medStock.getNextStock().getId() + " will be opened now");
         } else {
             // Nothing to open next ?
             // Are there still stocks in this inventory ?
-            if (MedInventoryTools.getNextToOpen(medStock.getInventory()) == null) {
+            if (MedInventoryService.getNextToOpen(medStock.getInventory()) == null) {
                 // No ??
                 // Are there any prescriptions that needs to be closed now, because of the empty package ?
-                for (Prescription prescription : PrescriptionTools.getPrescriptionsByInventory(medStock.getInventory())) {
+                for (Prescription prescription : PrescriptionService.getPrescriptionsByInventory(medStock.getInventory())) {
                     if (prescription.isUntilEndOfPackage()) {
                         prescription = em.merge(prescription);
                         em.lock(prescription, LockModeType.OPTIMISTIC);
@@ -320,8 +369,8 @@ public class MedStockTools {
 
     public static MedStockTransaction getStartTX(MedStock medStock) {
         MedStockTransaction result = null;
-        for (MedStockTransaction buchung : MedStockTransactionTools.getAll(medStock)) {
-            if (buchung.getState() == MedStockTransactionTools.STATE_CREDIT) {
+        for (MedStockTransaction buchung : MedStockTransactionService.getAll(medStock)) {
+            if (buchung.getState() == MedStockTransactionService.STATE_CREDIT) {
                 result = buchung;
                 break;
             }
@@ -331,8 +380,8 @@ public class MedStockTools {
 
 
     /**
-     * Diese Methode bucht auf einen Bestand immer genau soviel drauf oder runter, damit er auf
-     * dem gewünschten soll landet.
+     * Diese Methode bucht auf einen Bestand immer genau soviel drauf oder runter, damit er auf dem gewünschten soll
+     * landet.
      *
      * @param bestand um die es geht.
      * @param soll    gewünschter Endbestand
@@ -358,7 +407,7 @@ public class MedStockTools {
             }
 
             // passende Buchung anlegen.
-            result = em.merge(new MedStockTransaction(bestand, korrektur, status));
+            result = em.merge(MedStockTransactionService.create(bestand, korrektur, status));
             result.setText(text);
         }
         return result;
@@ -366,13 +415,13 @@ public class MedStockTools {
 
     public static String getTextASHTML(MedStock bestand) {
         String result = "";
-        result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getText() + " " + bestand.getTradeForm().getSubtext() + ", ";
+        result += "<font color=\"blue\"><b>" + bestand.getTradeform().getMedProduct().getText() + " " + bestand.getTradeform().getSubtext() + ", ";
 
-        if (bestand.getPackage() != null && !SYSTools.catchNull(bestand.getPackage().getPzn()).isEmpty()) {
-            result += SYSTools.xx("misc.msg.PZN") + ": " + bestand.getPackage().getPzn() + ", ";
-            result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + SYSConst.UNITS[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
-            String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getPreparation());
-            String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getUsageText());
+        if (bestand.getaPackage() != null && !SYSTools.catchNull(bestand.getaPackage().getPzn()).isEmpty()) {
+            result += SYSTools.xx("misc.msg.PZN") + ": " + bestand.getaPackage().getPzn() + ", ";
+            result += MedPackageService.GROESSE[bestand.getaPackage().getGroesse()] + ", " + bestand.getaPackage().getInhalt() + " " + SYSConst.UNITS[bestand.getTradeform().getDosageForm().getPackUnit()] + " ";
+            String zubereitung = SYSTools.catchNull(bestand.getTradeform().getDosageForm().getPreparation());
+            String anwtext = SYSTools.catchNull(bestand.getTradeform().getDosageForm().getUsageText());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
             result += "</b></font>";
         }
@@ -383,48 +432,48 @@ public class MedStockTools {
     public static String getAsHTML(MedStock stock) {
         String result = "";
 
-        String htmlcolor = stock.isClosed() ? "gray" : "red";
+        String htmlcolor = isClosed(stock) ? "gray" : "red";
 
         result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
-        result += "<font color=\"" + htmlcolor + "\"><b><u>" + stock.getID() + "</u></b></font>&nbsp; ";
-        result += TradeFormTools.toPrettyString(stock.getTradeForm());
+        result += "<font color=\"" + htmlcolor + "\"><b><u>" + stock.getId() + "</u></b></font>&nbsp; ";
+        result += TradeFormTools.toPrettyString(stock.getTradeform());
 
-        if (stock.hasPackage()) {
-            result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
+        if (stock.getaPackage() != null) {
+            result += ", " + MedPackageService.toPrettyString(stock.getaPackage());
         }
 
-        if (stock.getTradeForm().getDosageForm().isUPRn()) {
+        if (DosageFormService.isUPRn(stock.getTradeform().getDosageForm())) {
             result += ", APV: ";
-            if (stock.getTradeForm().getConstantUPRn() != null) {
-                result += SYSTools.formatBigDecimal(stock.getTradeForm().getConstantUPRn().setScale(2, RoundingMode.HALF_UP)) + " (" + SYSTools.xx("upreditor.constant.upr") + ")";
+            if (stock.getTradeform().getConstantUPRn() != null) {
+                result += SYSTools.formatBigDecimal(stock.getTradeform().getConstantUPRn().setScale(2, RoundingMode.HALF_UP)) + " (" + SYSTools.xx("upreditor.constant.upr") + ")";
             } else {
-                result += SYSTools.formatBigDecimal(stock.getUPR().setScale(2, RoundingMode.HALF_UP));
+                result += SYSTools.formatBigDecimal(stock.getUpr().setScale(2, RoundingMode.HALF_UP));
             }
-            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getConstantUPRn() != null ? SYSTools.xx("nursingrecords.inventory.UPRwillBeReplaced") : "");
+            result += " " + (stock.getUprDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeform().getConstantUPRn() != null ? SYSTools.xx("nursingrecords.inventory.UPRwillBeReplaced") : "");
         }
 
-        if (stock.hasNext2Open()) {
-            result += ", <b>" + SYSTools.xx("nursingrecords.inventory.nextstock") + ": " + stock.getNextStock().getID() + "</b>";
-        } else if (stock.isToBeClosedSoon()) {
+        if (stock.getNextStock() != null) {
+            result += ", <b>" + SYSTools.xx("nursingrecords.inventory.nextstock") + ": " + stock.getNextStock().getId() + "</b>";
+        } else if (isToBeClosedSoon(stock)) {
             result += ", <b>" + SYSTools.xx("nursingrecords.inventory.stockWillBeClosedSoon") + "</b>";
         }
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        result += "&nbsp;<font color=\"blue\">" + SYSTools.xx("misc.msg.incoming") + ": " + df.format(stock.getIN()) + "</font>";
-        if (stock.isOpened()) {
+        result += "&nbsp;<font color=\"blue\">" + SYSTools.xx("misc.msg.incoming") + ": " + df.format(stock.getIn()) + "</font>";
+        if (isOpened(stock)) {
             result += "&nbsp;<font color=\"green\">" + SYSTools.xx("misc.msg.opening") + ": " + df.format(stock.getOpened()) + "</font>";
 
             // variable expiry ?
-            if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
-                String color = stock.isExpired() ? "red" : "black";
-                result += "&nbsp;<font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
+            if (stock.getTradeform().getDaysToExpireAfterOpened() != null) {
+                String color =  isExpired(stock) ? "red" : "black";
+                result += "&nbsp;<font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeform().getDaysToExpireAfterOpened()).toDate()) + "</font>";
             }
 
         }
 
         // fixed expiry ?
-        if (stock.getExpires() != null && !stock.isClosed()) {
+        if (stock.getExpires() != null && !isClosed(stock)) {
             DateFormat sdf = df;
             // if expiry is at the end of a month then it has a different format
             if (new LocalDate(stock.getExpires()).equals(new LocalDate(stock.getExpires()).dayOfMonth().withMaximumValue())) {
@@ -433,7 +482,7 @@ public class MedStockTools {
             result += "&nbsp;<font color=\"" + getHTMLColor(stock) + "\">" + SYSTools.xx("misc.msg.expires") + ": " + sdf.format(stock.getExpires()) + "</font>";
         }
 
-        if (stock.isClosed()) {
+        if (isClosed(stock)) {
             result += SYSConst.html_bold("&nbsp;<font color=\"black\">" + SYSTools.xx("misc.msg.outgoing") + ": " + df.format(stock.getOut()) + "</font>");
         }
         result += "</font>";
@@ -535,8 +584,8 @@ public class MedStockTools {
 
             table.append(SYSConst.html_table_tr(
                     SYSConst.html_table_td(ResidentTools.getTextCompact(bestand.getInventory().getResident())) +
-                            SYSConst.html_table_td(bestand.getID().toString()) +
-                            SYSConst.html_table_td(TradeFormTools.toPrettyString(bestand.getTradeForm())) +
+                            SYSConst.html_table_td(bestand.getId().toString()) +
+                            SYSConst.html_table_td(TradeFormTools.toPrettyString(bestand.getTradeform())) +
                             SYSConst.html_table_td(df.format(bestand.getOpened())) +
                             SYSConst.html_table_td("&nbsp;") +
                             SYSConst.html_table_td("&nbsp;") +
@@ -553,31 +602,31 @@ public class MedStockTools {
     }
 
     /**
-     * This method calculates the effective UPR as it acually was during the lifetime of that particular medstock.
-     * It is vital, that this calculation is only done, when a package is empty. Otherwise the estimation
-     * of the UPR is wrong.
+     * This method calculates the effective UPR as it acually was during the lifetime of that particular medstock. It is
+     * vital, that this calculation is only done, when a package is empty. Otherwise the estimation of the UPR is
+     * wrong.
      * <p>
      * Stichwort: berechnetes APVn
      *
      * @param medstock, für den das Verhältnis neu berechnet werden soll.
      */
     public static BigDecimal getEffectiveUPR(MedStock medstock) {
-        if (medstock.getTradeForm().getDosageForm().isUPR1()) {
+        if (DosageFormService.isUPR1(medstock.getTradeform().getDosageForm())) {
             return BigDecimal.ONE;
         }
-        if (medstock.getTradeForm().getConstantUPRn() != null) {
-            return medstock.getTradeForm().getConstantUPRn();
+        if (medstock.getTradeform().getConstantUPRn() != null) {
+            return medstock.getTradeform().getConstantUPRn();
         }
 
         OPDE.debug("<--- recalculateUPR ");
-        OPDE.debug("MedStock ID: " + medstock.getID());
+        OPDE.debug("MedStock ID: " + medstock.getId());
 
         // this is the amount of content, which was in that package before it was opened
         // package unit
-        BigDecimal startContent = MedStockTools.getStartTX(medstock).getAmount();
+        BigDecimal startContent = MedStockService.getStartTX(medstock).getAmount();
 
         // usage unit
-        BigDecimal theoreticalSum = MedStockTools.getSumOfDosesInBHP(medstock);
+        BigDecimal theoreticalSum = MedStockService.getSumOfDosesInBHP(medstock);
 
         // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
         // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
@@ -604,18 +653,18 @@ public class MedStockTools {
     }
 
     /**
-     * calculates a starting UPR for a newly opened stock. If there is no UPR yet, it creates a new one and marks it as dummy,
-     * so it will be replaced by the first calculated result, when this package is closed.
-     * For DosageForms with type STATE_UPR1, there is no calculation at all. Those values are constantly 1.
+     * calculates a starting UPR for a newly opened stock. If there is no UPR yet, it creates a new one and marks it as
+     * dummy, so it will be replaced by the first calculated result, when this package is closed. For DosageForms with
+     * type STATE_UPR1, there is no calculation at all. Those values are constantly 1.
      */
     public static BigDecimal getEstimatedUPR(TradeForm tradeForm) {
         OPDE.debug("<--- calcProspectiveUPR");
         BigDecimal upr = null;
-        if (tradeForm.getDosageForm().getUPRState() == DosageFormService.STATE_DONT_CALC) {
+        if (tradeForm.getDosageForm().getUprstate() == DosageFormService.STATE_DONT_CALC) {
             OPDE.debug("STATE_DONT_CALC");
             // no calculation for gel or ointments. they wont work out anyways.
             upr = BigDecimal.ONE;// getEstimatedUPR_BY_RESIDENT(tradeForm, resident);
-        } else if (tradeForm.getDosageForm().getUPRState() == DosageFormService.STATE_UPRn) {
+        } else if (tradeForm.getDosageForm().getUprstate() == DosageFormService.STATE_UPRn) {
             OPDE.debug("STATE_UPRn");
 
             if (tradeForm.getConstantUPRn() != null) {
@@ -693,8 +742,8 @@ public class MedStockTools {
 
 
     /**
-     * this method returns true, when a given tradeform is still busy with it's first stock, and this stock is a UPRn one. This effective UPR cannot be calculated yet.
-     * That first stock is still open.
+     * this method returns true, when a given tradeform is still busy with it's first stock, and this stock is a UPRn
+     * one. This effective UPR cannot be calculated yet. That first stock is still open.
      *
      * @param tradeForm
      * @return
@@ -740,7 +789,7 @@ public class MedStockTools {
         set.addAll(query2.getResultList());
 
         for (MedStock stock : set) {
-            if (stock.expiresIn(days)) {
+            if (expiresIn(stock, days)) {
                 list.add(stock);
             }
         }
@@ -769,7 +818,7 @@ public class MedStockTools {
 
 
             listStocks.forEach(stock -> {
-                html.append(SYSConst.html_h2("[" + stock.getID() + "] " + getAsHTML(stock) + ", " + ResidentTools.getLabelText(stock.getInventory().getResident())));
+                html.append(SYSConst.html_h2("[" + stock.getId() + "] " + getAsHTML(stock) + ", " + ResidentTools.getLabelText(stock.getInventory().getResident())));
 
                 final StringBuffer tableContent = new StringBuffer(SYSConst.html_table_tr(SYSConst.html_table_th("Zeit") + SYSConst.html_table_th("Gewicht") + SYSConst.html_table_th("Diff-Gewicht") + SYSConst.html_table_th("Menge") + SYSConst.html_table_th("Diff-Menge") + SYSConst.html_table_th("Verhältnis")));
 
@@ -821,12 +870,11 @@ public class MedStockTools {
     public static String getHTMLColor(MedStock stock) {
         String color;
 
-        if (stock.isExpired()) color = "red";
-        else if (stock.expiresIn(DAYS_TO_EXPIRE_SOON)) color = "orange";
+        if (isExpired(stock)) color = "red";
+        else if (expiresIn(stock, DAYS_TO_EXPIRE_SOON)) color = "orange";
         else color = "black";
 
         return color;
-
 
 
     }

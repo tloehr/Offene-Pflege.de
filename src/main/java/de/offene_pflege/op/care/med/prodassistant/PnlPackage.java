@@ -6,8 +6,8 @@ package de.offene_pflege.op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.prescription.MedPackage;
-import de.offene_pflege.backend.services.MedPackageTools;
+import de.offene_pflege.backend.entity.done.MedPackage;
+import de.offene_pflege.backend.services.MedPackageService;
 import de.offene_pflege.backend.entity.prescription.TradeForm;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -49,7 +49,7 @@ public class PnlPackage extends JPanel {
     }
 
     private void initPanel() {
-        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackageTools.GROESSE));
+        cmbGroesse.setModel(new DefaultComboBoxModel(MedPackageService.GROESSE));
         txtPZN.setText(template);
     }
 
@@ -60,8 +60,8 @@ public class PnlPackage extends JPanel {
     private void txtPZNActionPerformed(ActionEvent e) {
 
         try {
-            pzn = MedPackageTools.parsePZN(txtPZN.getText().trim());
-            if (MedPackageTools.checkNewPZN(pzn, null) == null) {
+            pzn = MedPackageService.parsePZN(txtPZN.getText().trim());
+            if (MedPackageService.checkNewPZN(pzn, null) == null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.medication.medproduct.wizard.package.ppn.inuse", DisplayMessage.WARNING));
                 pzn = null;
             }

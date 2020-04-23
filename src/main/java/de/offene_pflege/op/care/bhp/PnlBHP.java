@@ -36,9 +36,8 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.utils.ColorUtils;
 import com.toedter.calendar.JDateChooser;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.done.BHP;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -672,7 +671,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     Prescription involvedPresciption = null;
                     if (myBHP.shouldBeCalculated()) {
                         MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
-                        MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), weight, myBHP);
+                        MedInventoryService.withdraw(em, em.merge(inventory), myBHP.getDose(), weight, myBHP);
                         // Was the prescription closed during this withdraw ?
                         involvedPresciption = em.find(Prescription.class, myBHP.getPrescription().getID());
                     }
@@ -761,7 +760,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
         MedStock stock = mapPrescription2Stock.get(bhp.getPrescription());
         if (bhp.hasMed() && stock == null) {
-            stock = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(resident, bhp.getTradeForm()));
+            stock = MedStockService.getStockInUse(TradeFormTools.getInventory4TradeForm(resident, bhp.getTradeForm()));
             mapPrescription2Stock.put(bhp.getPrescription(), stock);
         }
 
@@ -771,7 +770,7 @@ public class PnlBHP extends NursingRecordsPanel {
         if (bhp.isOutcomeText()) {
             title = "<html><font size=+1>" +
                     SYSConst.html_italic(
-                            SYSTools.left("&ldquo;" + PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
+                            SYSTools.left("&ldquo;" + PrescriptionService.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                                     BHPService.getScheduleText(bhp, "&rdquo;, ", "")
                     )
                     // https://github.com/tloehr/Offene-Pflege.de/issues/63
@@ -786,7 +785,7 @@ public class PnlBHP extends NursingRecordsPanel {
 //                OPDE.debug(bhp.getPrescription());
 //            }
             title = "<html><font size=+1>" +
-                    SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
+                    SYSTools.left(PrescriptionService.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                     (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
                             " " + DosageFormService.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                     BHPService.getScheduleText(bhp, ", ", "") +
@@ -858,7 +857,7 @@ public class PnlBHP extends NursingRecordsPanel {
                  *      \___/| .__/ \___|_| |_|____/ \__\___/ \___|_|\_\
                  *           |_|
                  */
-                if (bhp.hasMed() && stock == null && MedInventoryTools.getNextToOpen(TradeFormTools.getInventory4TradeForm(resident, bhp.getTradeForm())) != null) {
+                if (bhp.hasMed() && stock == null && MedInventoryService.getNextToOpen(TradeFormTools.getInventory4TradeForm(resident, bhp.getTradeForm())) != null) {
                     final JButton btnOpenStock = new JButton(SYSConst.icon22ledGreenOn);
                     btnOpenStock.setPressedIcon(SYSConst.icon22ledGreenOff);
                     btnOpenStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -876,7 +875,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
                             em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
 
-                            MedStock myStock = em.merge(MedInventoryTools.openNext(TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm())));
+                            MedStock myStock = em.merge(MedInventoryService.openNext(TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm())));
                             em.lock(myStock, LockModeType.OPTIMISTIC);
                             em.getTransaction().commit();
 
@@ -1058,7 +1057,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 if (myBHP.shouldBeCalculated()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
                                     if (inventory != null) {
-                                        MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), weight, myBHP);
+                                        MedInventoryService.withdraw(em, em.merge(inventory), myBHP.getDose(), weight, myBHP);
                                     } else {
                                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.NoInventory"));
                                     }
@@ -1285,7 +1284,7 @@ public class PnlBHP extends NursingRecordsPanel {
         bhpPane.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                contentPane.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(bhp.getPrescription(), false, false, true, false)));
+                contentPane.setText(SYSTools.toHTML(PrescriptionService.getPrescriptionAsHTML(bhp.getPrescription(), false, false, true, false)));
             }
         });
 

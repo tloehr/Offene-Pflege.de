@@ -13,10 +13,10 @@ import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.done.Rooms;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.prescription.GP;
-import de.offene_pflege.backend.services.GPTools;
-import de.offene_pflege.backend.entity.prescription.Hospital;
-import de.offene_pflege.backend.services.HospitalTools;
+import de.offene_pflege.backend.entity.done.GP;
+import de.offene_pflege.backend.services.GPService;
+import de.offene_pflege.backend.entity.done.Hospital;
+import de.offene_pflege.backend.services.HospitalService;
 import de.offene_pflege.backend.entity.values.ResValue;
 import de.offene_pflege.backend.entity.values.ResValueTools;
 import de.offene_pflege.backend.entity.values.Resvaluetypes;
@@ -1305,7 +1305,7 @@ public class PnlEditResInfo implements HasLogger {
                         gpText = "--";
                     } else {
                         gpid = ((GP) o).getArztID();
-                        gpText = GPTools.getCompleteAddress((GP) o);
+                        gpText = GPService.getCompleteAddress((GP) o);
                     }
                     content.put(thisGroupName + ".id", Long.toString(gpid));
                     content.put(thisGroupName + ".text", gpText);
@@ -1407,7 +1407,7 @@ public class PnlEditResInfo implements HasLogger {
                         hText = "--";
                     } else {
                         hid = ((Hospital) o).getKhid();
-                        hText = HospitalTools.getCompleteAddress((Hospital) o);
+                        hText = HospitalService.getCompleteAddress((Hospital) o);
                     }
                     content.put(thisGroupName + ".id", Long.toString(hid));
                     content.put(thisGroupName + ".text", hText);

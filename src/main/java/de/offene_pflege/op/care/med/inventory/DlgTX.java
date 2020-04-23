@@ -29,9 +29,9 @@ package de.offene_pflege.op.care.med.inventory;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.services.MedStockTools;
-import de.offene_pflege.backend.entity.prescription.MedStockTransaction;
-import de.offene_pflege.backend.services.MedStockTransactionTools;
+import de.offene_pflege.backend.services.MedStockService;
+import de.offene_pflege.backend.entity.done.MedStockTransaction;
+import de.offene_pflege.backend.services.MedStockTransactionService;
 import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.DocumentSizeFilter;
@@ -95,7 +95,7 @@ public class DlgTX extends MyJDialog {
 
 
     boolean isWeightOk() {
-        if (!tx.getStock().getTradeForm().isWeightControlled()) return true;
+        if (!tx.getStock().getTradeform().isWeightControlled()) return true;
         boolean weightOK = weight.compareTo(BigDecimal.ZERO) > 0;
         return weightOK;
     }
@@ -163,15 +163,15 @@ public class DlgTX extends MyJDialog {
         lblValue.setText(SYSTools.xx("misc.msg.amount"));
         lblWeightControl.setText(SYSTools.xx("opde.medication.tx.controlWeight"));
         lblUnit2.setText("g");
-        bestandsumme = MedStockTools.getSum(tx.getStock());
+        bestandsumme = MedStockService.getSum(tx.getStock());
         weight = null;
-        txtWeightControlled.setVisible(tx.getStock().getTradeForm().isWeightControlled());
-        lblWeightControl.setVisible(tx.getStock().getTradeForm().isWeightControlled());
+        txtWeightControlled.setVisible(tx.getStock().getTradeform().isWeightControlled());
+        lblWeightControl.setVisible(tx.getStock().getTradeform().isWeightControlled());
 
-        lblUnit.setText(TradeFormTools.getPackUnit(tx.getStock().getTradeForm()));
+        lblUnit.setText(TradeFormTools.getPackUnit(tx.getStock().getTradeform()));
 
-        if (tx.getStock().hasPackage()) {
-            packgroesse = tx.getStock().getPackage().getContent();
+        if (tx.getStock().getaPackage() != null) {
+            packgroesse = tx.getStock().getaPackage().getInhalt();
         } else {
             packgroesse = BigDecimal.valueOf(Double.MAX_VALUE);
         }
@@ -320,8 +320,8 @@ public class DlgTX extends MyJDialog {
 
     private void btnBuchungActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnBuchungActionPerformed
         tx.setAmount(amount);
-        tx.setWeight(weight);
-        tx.setState(MedStockTransactionTools.STATE_EDIT_MANUAL);
+        tx.setWeight(weight == null ? BigDecimal.ZERO : weight);
+        tx.setState(MedStockTransactionService.STATE_EDIT_MANUAL);
         tx.setText(txtText.getText().trim());
         actionBlock.execute(tx);
         dispose();

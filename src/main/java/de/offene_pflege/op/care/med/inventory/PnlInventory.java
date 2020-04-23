@@ -34,9 +34,11 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.done.MedInventory;
+import de.offene_pflege.backend.entity.done.MedStock;
+import de.offene_pflege.backend.entity.done.MedStockTransaction;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -298,7 +300,7 @@ public class PnlInventory extends NursingRecordsPanel {
             if (singleInventory != null) {
                 lstInventories.add(singleInventory);
             } else {
-                lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+                lstInventories = tbClosedInventory.isSelected() ? MedInventoryService.getAll(resident) : MedInventoryService.getAllActive(resident);
             }
         }
 
@@ -376,7 +378,7 @@ public class PnlInventory extends NursingRecordsPanel {
             BigDecimal sumInventory = BigDecimal.ZERO;
             try {
                 EntityManager em = OPDE.createEM();
-                sumInventory = MedInventoryTools.getSum(em, inventory);
+                sumInventory = MedInventoryService.getSum(em, inventory);
                 em.close();
             } catch (Exception e) {
                 OPDE.fatal(e);
@@ -387,7 +389,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
                     "<td width=\"520\" align=\"left\"><font size=+1>" +
                     inventory.getText() + "</font></td>" +
-                    "<td width=\"200\" align=\"right\"><font size=+1>" + SYSTools.formatBigDecimal(sumInventory) + " " + DosageFormService.getPackageText(MedInventoryTools.getForm(inventory)) + "</font></td>" +
+                    "<td width=\"200\" align=\"right\"><font size=+1>" + SYSTools.formatBigDecimal(sumInventory) + " " + DosageFormService.getPackageText(MedInventoryService.getForm(inventory)) + "</font></td>" +
 
                     "</tr>" +
                     "</table>" +
@@ -403,7 +405,7 @@ public class PnlInventory extends NursingRecordsPanel {
             });
             cpMap.get(key).setTitleLabelComponent(cptitle.getMain());
             cpMap.get(key).setSlidingDirection(SwingConstants.SOUTH);
-            cptitle.getButton().setIcon(MedInventoryTools.isClosed(inventory) ? SYSConst.icon22stopSign : null);
+            cptitle.getButton().setIcon(MedInventoryService.isClosed(inventory) ? SYSConst.icon22stopSign : null);
 
 
             // https://github.com/tloehr/Offene-Pflege.de/issues/42
@@ -471,7 +473,7 @@ public class PnlInventory extends NursingRecordsPanel {
                     });
                     currentEditor.setVisible(true);
                 });
-                btnEditInvName.setEnabled(!MedInventoryTools.isClosed(inventory));
+                btnEditInvName.setEnabled(!MedInventoryService.isClosed(inventory));
                 cptitle.getRight().add(btnEditInvName);
             }
 
@@ -504,12 +506,12 @@ public class PnlInventory extends NursingRecordsPanel {
                                 em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
 
                                 // close all stocks
-                                for (MedStock stock : MedStockTools.getAll(myInventory)) {
+                                for (MedStock stock : MedStockService.getAll(myInventory)) {
                                     if (!stock.isClosed()) {
                                         MedStock mystock = em.merge(stock);
                                         em.lock(mystock, LockModeType.OPTIMISTIC);
                                         mystock.setNextStock(null);
-                                        MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
+                                        MedStockService.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.inventory_closed"), MedStockTransactionService.STATE_EDIT_INVENTORY_CLOSED);
                                     }
                                 }
                                 // close inventory
@@ -542,7 +544,7 @@ public class PnlInventory extends NursingRecordsPanel {
                     });
                     currentEditor.setVisible(true);
                 });
-                btnCloseInventory.setEnabled(!MedInventoryTools.isClosed(inventory));
+                btnCloseInventory.setEnabled(!MedInventoryService.isClosed(inventory));
                 cptitle.getRight().add(btnCloseInventory);
             }
 
@@ -610,11 +612,11 @@ public class PnlInventory extends NursingRecordsPanel {
 
             final JToggleButton tbClosedStock = GUITools.getNiceToggleButton(null);
             tbClosedStock.setToolTipText(SYSTools.xx("nursingrecords.inventory.showclosedstocks"));
-            if (!MedInventoryTools.isClosed(inventory)) {
+            if (!MedInventoryService.isClosed(inventory)) {
                 tbClosedStock.addItemListener(e -> cpMap.get(key).setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected())));
             }
-            tbClosedStock.setSelected(MedInventoryTools.isClosed(inventory));
-            tbClosedStock.setEnabled(!MedInventoryTools.isClosed(inventory));
+            tbClosedStock.setSelected(MedInventoryService.isClosed(inventory));
+            tbClosedStock.setEnabled(!MedInventoryService.isClosed(inventory));
 
             mapKey2ClosedToggleButton.put(key, tbClosedStock);
 
@@ -651,7 +653,7 @@ public class PnlInventory extends NursingRecordsPanel {
     private JPanel createContentPanel4(final MedInventory inventory, boolean closed2) {
         final JPanel pnlContent = new JPanel(new VerticalLayout());
 //        Collections.sort(inventory.getMedStocks());
-        for (MedStock stock : MedStockTools.getAll(inventory)) {
+        for (MedStock stock : MedStockService.getAll(inventory)) {
             if (closed2 || !stock.isClosed()) {
                 pnlContent.add(createCP4(stock));
             }
@@ -685,7 +687,7 @@ public class PnlInventory extends NursingRecordsPanel {
             BigDecimal sumStock = BigDecimal.ZERO;
             try {
                 EntityManager em = OPDE.createEM();
-                sumStock = MedStockTools.getSum(em, stock);
+                sumStock = MedStockService.getSum(em, stock);
                 em.close();
             } catch (Exception e) {
                 OPDE.fatal(e);
@@ -694,8 +696,8 @@ public class PnlInventory extends NursingRecordsPanel {
             String title = "<html><table border=\"0\">" +
                     "<tr>" +
                     (stock.isClosed() ? "<s>" : "") +
-                    "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + "</td>" +
-                    "<td width=\"200\" align=\"right\">" + SYSTools.formatBigDecimal(sumStock) + " " + DosageFormService.getPackageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
+                    "<td width=\"600\" align=\"left\">" + MedStockService.getAsHTML(stock) + "</td>" +
+                    "<td width=\"200\" align=\"right\">" + SYSTools.formatBigDecimal(sumStock) + " " + DosageFormService.getPackageText(MedInventoryService.getForm(stock.getInventory())) + "</td>" +
                     (stock.isClosed() ? "</s>" : "") +
                     "</tr>" +
                     "</table>" +
@@ -718,7 +720,7 @@ public class PnlInventory extends NursingRecordsPanel {
             cptitle.getRight().add(new StockPanel(stock));
 
 
-            if (!MedInventoryTools.isClosed(stock.getInventory())) {
+            if (!MedInventoryService.isClosed(stock.getInventory())) {
                 /***
                  *      ____       _       _   _          _          _
                  *     |  _ \ _ __(_)_ __ | |_| |    __ _| |__   ___| |
@@ -889,8 +891,8 @@ public class PnlInventory extends NursingRecordsPanel {
                         em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
                         em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
                         myStock.setNextStock(null);
-                        MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.inventory.stockpanel.STATE_EDIT_STOCK_CLOSED"), MedStockTransactionTools.STATE_EDIT_STOCK_CLOSED);
-                        myStock.setState(MedStockTools.STATE_NOTHING);
+                        MedStockService.close(em, myStock, SYSTools.xx("nursingrecords.inventory.stockpanel.STATE_EDIT_STOCK_CLOSED"), MedStockTransactionService.STATE_EDIT_STOCK_CLOSED);
+                        myStock.setState(MedStockService.STATE_NOTHING);
                         em.getTransaction().commit();
 //                            synchronized (lstInventories) {
 //                                int index = lstInventories.indexOf(myStock.getInventory());
@@ -944,7 +946,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 ;
                 if (ie.getStateChange() == ItemEvent.SELECTED) {
                     if (!stock.isToBeClosedSoon()) {
-                        MedStock openedStock = MedInventoryTools.getCurrentOpened(stock.getInventory());
+                        MedStock openedStock = MedInventoryService.getCurrentOpened(stock.getInventory());
                         if (openedStock != null) {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.inventory.stockpanel.anotherStockIsOpened"));
                             reset();
@@ -983,7 +985,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                 myStock.setOpened(new Date());
                             }
                         }
-                        myStock.setState(MedStockTools.STATE_NOTHING);
+                        myStock.setState(MedStockService.STATE_NOTHING);
                         myStock.setNextStock(null);
                         em.getTransaction().commit();
 //                            synchronized (lstInventories) {
@@ -1058,7 +1060,7 @@ public class PnlInventory extends NursingRecordsPanel {
                         em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
                         myStock.setOut(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                         myStock.setOpened(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-                        myStock.setState(MedStockTools.STATE_NOTHING);
+                        myStock.setState(MedStockService.STATE_NOTHING);
                         em.getTransaction().commit();
 //                            synchronized (lstInventories) {
 //                                int index = lstInventories.indexOf(myStock.getInventory());
@@ -1135,7 +1137,7 @@ public class PnlInventory extends NursingRecordsPanel {
          *
          */
         JideButton btnAddTX = GUITools.createHyperlinkButton("nursingrecords.inventory.newmedstocktx", SYSConst.icon22add, e -> {
-            currentEditor = new DlgTX(new MedStockTransaction(stock, BigDecimal.ONE, MedStockTransactionTools.STATE_EDIT_MANUAL), o -> {
+            currentEditor = new DlgTX(new MedStockTransaction(stock, BigDecimal.ONE, MedStockTransactionService.STATE_EDIT_MANUAL), o -> {
                 if (o != null) {
                     EntityManager em = OPDE.createEM();
                     try {
@@ -1194,10 +1196,10 @@ public class PnlInventory extends NursingRecordsPanel {
                 int progress = 0;
 
 
-                List<MedStockTransaction> listTX = MedStockTransactionTools.getAll(stock);
+                List<MedStockTransaction> listTX = MedStockTransactionService.getAll(stock);
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listTX.size()));
 
-                BigDecimal rowsum = MedStockTools.getSum(stock);
+                BigDecimal rowsum = MedStockService.getSum(stock);
 //                BigDecimal rowsum = MedStockTools.getSum(stock);
 //                Collections.sort(stock.getStockTransaction());
                 for (final MedStockTransaction tx : listTX) {
@@ -1303,7 +1305,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
                         });
-                        btnDelTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
+                        btnDelTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionService.STATE_DEBIT || tx.getState() == MedStockTransactionService.STATE_EDIT_MANUAL));
                         pnlTitle.getRight().add(btnDelTX);
                     }
 
@@ -1333,8 +1335,8 @@ public class PnlInventory extends NursingRecordsPanel {
                                     MedStock myStock = em.merge(stock);
                                     final MedStockTransaction myOldTX = em.merge(tx);
 
-                                    myOldTX.setState(MedStockTransactionTools.STATE_CANCELLED);
-                                    final MedStockTransaction myNewTX = em.merge(new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC));
+                                    myOldTX.setState(MedStockTransactionService.STATE_CANCELLED);
+                                    final MedStockTransaction myNewTX = em.merge(new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionService.STATE_CANCEL_REC));
                                     myOldTX.setText(SYSTools.xx("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
                                     myNewTX.setText(SYSTools.xx("misc.msg.reversalFor") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myOldTX.getPit()));
 
@@ -1393,7 +1395,7 @@ public class PnlInventory extends NursingRecordsPanel {
                         currentEditor.setVisible(true);
 
                     });
-                    btnUndoTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
+                    btnUndoTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionService.STATE_DEBIT || tx.getState() == MedStockTransactionService.STATE_EDIT_MANUAL));
                     pnlTitle.getRight().add(btnUndoTX);
 
                     if (stock.getTradeForm().isWeightControlled() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "nursingrecords.inventory")) {
@@ -1426,7 +1428,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                         MedStock myStock = em.merge(stock);
                                         final MedStockTransaction myTX = em.merge(tx);
                                         em.lock(myTX, LockModeType.OPTIMISTIC);
-                                        myTX.setWeight(weight1);
+                                        myTX.setWeight(weight1== null ? BigDecimal.ZERO : weight1);
                                         em.lock(myStock, LockModeType.OPTIMISTIC);
                                         em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
 
@@ -1471,7 +1473,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
                         });
-                        btnSetWeight.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_CREDIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
+                        btnSetWeight.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionService.STATE_DEBIT || tx.getState() == MedStockTransactionService.STATE_CREDIT || tx.getState() == MedStockTransactionService.STATE_EDIT_MANUAL));
                         pnlTitle.getRight().add(btnSetWeight);
                     }
 
@@ -1582,7 +1584,7 @@ public class PnlInventory extends NursingRecordsPanel {
         synchronized (lstInventories) {
             if (reloadListInventory) {
                 lstInventories.clear();
-                lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+                lstInventories = tbClosedInventory.isSelected() ? MedInventoryService.getAll(resident) : MedInventoryService.getAllActive(resident);
             }
 
             int row = 0;
@@ -1624,7 +1626,7 @@ public class PnlInventory extends NursingRecordsPanel {
              */
             final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.inventory.stock.btndelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.addActionListener(actionEvent -> {
-                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + SYSTools.xx("nursingrecords.inventory.search.stockid") + ": " + stock.getID() + "</b>" +
+                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + SYSTools.xx("nursingrecords.inventory.search.stockid") + ": " + stock.getId() + "</b>" +
                         "<br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
                     if (answer.equals(JOptionPane.YES_OPTION)) {
                         EntityManager em = OPDE.createEM();

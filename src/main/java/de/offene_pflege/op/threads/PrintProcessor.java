@@ -1,7 +1,7 @@
 package de.offene_pflege.op.threads;
 
-import de.offene_pflege.backend.entity.prescription.MedStock;
-import de.offene_pflege.backend.services.MedStockTools;
+import de.offene_pflege.backend.entity.done.MedStock;
+import de.offene_pflege.backend.services.MedStockService;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.LogicalPrinter;
@@ -196,7 +196,7 @@ public class PrintProcessor extends Thread {
             MedStock bestand = (MedStock) element.getObject();
             OPDE.debug("PrintProcessor prints StockID: " + bestand.getID());
 
-            printableObject = element.getPrinterForm().getFormtext(MedStockTools.getStock4Printing(bestand));
+            printableObject = element.getPrinterForm().getFormtext(MedStockService.getStock4Printing(bestand));
         }
         return printableObject;
     }

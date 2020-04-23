@@ -7,8 +7,8 @@ package de.offene_pflege.op.residents.bwassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.backend.entity.prescription.GP;
-import de.offene_pflege.backend.services.GPTools;
+import de.offene_pflege.backend.entity.done.GP;
+import de.offene_pflege.backend.services.GPService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.residents.PnlEditGP;
 import org.apache.commons.collections.Closure;
@@ -32,11 +32,11 @@ public class PnlGP extends JPanel {
     }
 
     private void initPanel() {
-        ArrayList<GP> listGPs = GPTools.getAllActive();
+        ArrayList<GP> listGPs = GPService.getAllActive();
         listGPs.add(0, null);
 
         cmbArzt.setModel(new DefaultComboBoxModel(listGPs.toArray()));
-        cmbArzt.setRenderer(GPTools.getRenderer());
+        cmbArzt.setRenderer(GPService.getRenderer());
     }
 
     private void btnAddActionPerformed(ActionEvent e) {

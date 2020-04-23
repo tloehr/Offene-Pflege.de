@@ -27,11 +27,9 @@ package de.offene_pflege.backend.entity.done;
 
 import de.offene_pflege.backend.entity.Allowance;
 import de.offene_pflege.backend.entity.DefaultStringIDEntity;
-import de.offene_pflege.backend.entity.prescription.GP;
 import de.offene_pflege.backend.entity.system.OPUsers;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
@@ -40,7 +38,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "resident")
-public class Resident extends DefaultStringIDEntity implements Serializable, Comparable<Resident> {
+public class Resident extends DefaultStringIDEntity implements Comparable<Resident> {
 
     private String name;
     private String firstname;
@@ -149,7 +147,7 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
         this.station = station;
     }
 
-    @JoinColumn(name = "BV1UKennung", referencedColumnName = "UKennung")
+    @JoinColumn(name = "BV1UKennung", referencedColumnName = "id")
     @ManyToOne
     public OPUsers getPn1() {
         return pn1;
@@ -159,7 +157,7 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
         this.pn1 = pn1;
     }
 
-    @JoinColumn(name = "BV2UKennung", referencedColumnName = "UKennung")
+    @JoinColumn(name = "BV2UKennung", referencedColumnName = "id")
     @ManyToOne
     public OPUsers getPn2() {
         return pn2;
@@ -169,7 +167,7 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
         this.pn2 = pn2;
     }
 
-    @JoinColumn(name = "ArztID", referencedColumnName = "ArztID")
+    @JoinColumn(name = "ArztID", referencedColumnName = "id")
     @ManyToOne
     public GP getGp() {
         return gp;
@@ -179,7 +177,7 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
         this.gp = gp;
     }
 
-    @JoinColumn(name = "Editor", referencedColumnName = "UKennung")
+    @JoinColumn(name = "Editor", referencedColumnName = "id")
     @ManyToOne
     public OPUsers getEditor() {
         return editor;
@@ -205,7 +203,7 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
     }
 
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "getResident")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resident")
     public Collection<ResInfo> getResInfoCollection() {
         return resInfoCollection;
     }

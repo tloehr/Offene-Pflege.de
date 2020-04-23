@@ -9,7 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import de.offene_pflege.backend.entity.done.ACME;
 import de.offene_pflege.backend.services.ACMEService;
-import de.offene_pflege.backend.entity.prescription.MedProducts;
+import de.offene_pflege.backend.entity.done.MedProducts;
 import de.offene_pflege.op.OPDE;
 import org.apache.commons.collections.Closure;
 

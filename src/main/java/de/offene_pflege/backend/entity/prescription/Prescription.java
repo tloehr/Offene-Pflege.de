@@ -5,12 +5,10 @@
 
 package de.offene_pflege.backend.entity.prescription;
 
+import de.offene_pflege.backend.entity.DefaultEntity;
 import de.offene_pflege.backend.entity.Ownable;
-import de.offene_pflege.backend.entity.done.SYSPRE2FILE;
-import de.offene_pflege.backend.entity.done.ResInfo;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.done.Resident;
-import de.offene_pflege.backend.entity.done.Intervention;
 import de.offene_pflege.backend.entity.process.QProcess;
 import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.SYSPRE2PROCESS;
@@ -30,7 +28,6 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -91,15 +88,9 @@ import java.util.List;
 @Entity
 @Table(name = "prescription")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class Prescription extends Ownable implements Serializable, QElement, Cloneable, Comparable<Prescription>, Attachable {
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "VerID")
-    private Long id;
-    @Version
-    @Column(name = "version")
-    private Long version;
+public class Prescription extends DefaultEntity implements Ownable, QElement, Comparable<Prescription>, Attachable {
+
+
     @Basic(optional = false)
     @Column(name = "AnDatum")
     @Temporal(TemporalType.TIMESTAMP)
@@ -119,29 +110,18 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
     @Basic(optional = false)
     @Column(name = "Stellplan")
     private boolean showOnDailyPlan;
-//    @Basic(optional = false)
-//    @Column(name = "weightcontrol")
-//    private boolean weightControl;
 
-
-    // ==
-    // 1:N Relationen
-    // ==
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2FILE> attachedFilesConnections;
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2PROCESS> attachedProcessConnections;
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
+
     // these are the annotations for a prescription. currently only used for the MRE studies
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private Collection<ResInfo> annotations;
 
-    //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
-//    private List<BHP> bhps;
-    // ==
-    // N:1 Relationen
-    // ==
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private OPUsers userON;
@@ -184,114 +164,6 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
     public Prescription() {
     }
 
-    public Prescription(Resident resident) {
-        this.resident = resident;
-        this.attachedFilesConnections = new ArrayList<SYSPRE2FILE>();
-        this.attachedProcessConnections = new ArrayList<SYSPRE2PROCESS>();
-        this.pSchedule = new ArrayList<PrescriptionSchedule>();
-        this.from = new Date();
-        this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
-        this.userON = OPDE.getLogin().getUser();
-        this.commontags = new ArrayList<>();
-        this.annotations = new ArrayList<>();
-//        this.weightControl = false;
-    }
-
-    public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, OPUsers userON, OPUsers userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
-        this.from = from;
-        this.to = to;
-        this.toEndOfPackage = toEndOfPackage;
-        this.relation = relation;
-        this.text = SYSTools.tidy(text);
-        this.showOnDailyPlan = showOnDailyPlan;
-        this.attachedFilesConnections = attachedFilesConnections;
-        this.attachedProcessConnections = attachedProcessConnections;
-        this.userON = userON;
-        this.userOFF = userOFF;
-        this.resident = resident;
-        this.intervention = intervention;
-        this.tradeform = tradeform;
-        this.situation = situation;
-        this.hospitalON = hospitalON;
-        this.hospitalOFF = hospitalOFF;
-        this.docON = docON;
-        this.docOFF = docOFF;
-        this.pSchedule = new ArrayList<PrescriptionSchedule>();
-        this.commontags = new ArrayList<Commontags>();
-        this.annotations = new ArrayList<>();
-    }
-
-    public Collection<Commontags> getCommontags() {
-        return commontags;
-    }
-
-    public Collection<ResInfo> getAnnotations() {
-        return annotations;
-    }
-
-    public Date getFrom() {
-        return from;
-    }
-
-    public void setFrom(Date from) {
-        this.from = from;
-    }
-
-    public Date getTo() {
-        return to;
-    }
-
-    public void setTo(Date to) {
-        this.to = to;
-    }
-
-    public Hospital getHospitalON() {
-        return hospitalON;
-    }
-
-    public void setHospitalON(Hospital anKH) {
-        this.hospitalON = anKH;
-    }
-
-    public Hospital getHospitalOFF() {
-        return hospitalOFF;
-    }
-
-    public void setHospitalOFF(Hospital abKH) {
-        this.hospitalOFF = abKH;
-    }
-
-    public GP getDocON() {
-        return docON;
-    }
-
-    public void setDocON(GP anDoc) {
-        this.docON = anDoc;
-    }
-
-    public GP getDocOFF() {
-        return docOFF;
-    }
-
-    public void setDocOFF(GP abDoc) {
-        this.docOFF = abDoc;
-    }
-
-    public boolean isUntilEndOfPackage() {
-        return toEndOfPackage;
-    }
-
-    public void setUntilEndOfPackage(boolean tillEndOfPackage) {
-        this.toEndOfPackage = tillEndOfPackage;
-    }
-
-    public long getRelation() {
-        return relation;
-    }
-
-    public void setRelation(long verKennung) {
-        this.relation = verKennung;
-    }
 
     public String getText() {
         return SYSTools.catchNull(text);
@@ -299,22 +171,6 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
 
     public void setText(String bemerkung) {
         this.text = SYSTools.tidy(bemerkung);
-    }
-
-    public boolean isOnDailyPlan() {
-        return showOnDailyPlan;
-    }
-
-    public void setShowOnDailyPlan(boolean show) {
-        this.showOnDailyPlan = show;
-    }
-
-    public OPUsers getUserOFF() {
-        return userOFF;
-    }
-
-    public Situations getSituation() {
-        return situation;
     }
 
     public boolean hasMed() {
@@ -330,39 +186,6 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
         return hasMed() && tradeform.isWeightControlled();
     }
 
-    public void setSituation(Situations situation) {
-        this.situation = situation;
-    }
-
-    public TradeForm getTradeForm() {
-        return tradeform;
-    }
-
-    public void setTradeForm(TradeForm tradeform) {
-        this.tradeform = tradeform;
-    }
-
-    public Intervention getIntervention() {
-        return intervention;
-    }
-
-    public void setIntervention(Intervention massnahme) {
-        this.intervention = massnahme;
-    }
-
-    public void setUserOFF(OPUsers userOFF) {
-        this.userOFF = userOFF;
-    }
-
-    public OPUsers getUserON() {
-        return userON;
-    }
-
-    public void setUserON(OPUsers userON) {
-        this.userON = userON;
-    }
-
-
     @Override
     public OPUsers getOwner() {
         return userON;
@@ -370,7 +193,7 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
 
     @Override
     public String titleAsString() {
-        return SYSTools.xx("nursingrecords.prescription") + ": " + PrescriptionTools.getShortDescriptionAsCompactText(this);
+        return SYSTools.xx("nursingrecords.prescription") + ": " + PrescriptionService.getShortDescriptionAsCompactText(this);
     }
 
     public Resident getResident() {
@@ -432,7 +255,7 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
 
     @Override
     public String contentAsHTML() {
-        return PrescriptionTools.getPrescriptionAsHTML(this, false, false, true, false);
+        return PrescriptionService.getPrescriptionAsHTML(this, false, false, true, false);
     }
 
     @Override
@@ -455,16 +278,16 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
             result += "</tr>\n";
             if (docON != null || docOFF != null) {
                 result += "<tr>";
-                result += "<td valign=\"top\">" + GPTools.getFullName(docON) + "</td>";
+                result += "<td valign=\"top\">" + GPService.getFullName(docON) + "</td>";
                 result += "<td valign=\"top\">&raquo;</td>";
-                result += "<td valign=\"top\">" + GPTools.getFullName(docOFF) + "</td>";
+                result += "<td valign=\"top\">" + GPService.getFullName(docOFF) + "</td>";
                 result += "</tr>\n";
             }
             if (hospitalON != null || hospitalOFF != null) {
                 result += "<tr>";
-                result += "<td valign=\"top\">" + HospitalTools.getFullName(hospitalON) + "</td>";
+                result += "<td valign=\"top\">" + HospitalService.getFullName(hospitalON) + "</td>";
                 result += "<td valign=\"top\">&raquo;</td>";
-                result += "<td valign=\"top\">" + HospitalTools.getFullName(hospitalOFF) + "</td>";
+                result += "<td valign=\"top\">" + HospitalService.getFullName(hospitalOFF) + "</td>";
                 result += "</tr>\n";
             }
             result += "</table>\n";
@@ -480,11 +303,11 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
             result += "<br/>" + userON.getFullname();
             if (docON != null) {
                 result += "<br/>";
-                result += GPTools.getFullName(docON);
+                result += GPService.getFullName(docON);
             }
             if (hospitalON != null) {
                 result += "<br/>";
-                result += HospitalTools.getFullName(hospitalON);
+                result += HospitalService.getFullName(hospitalON);
             }
         }
 
@@ -493,126 +316,11 @@ public class Prescription extends Ownable implements Serializable, QElement, Clo
         return result;
     }
 
-    @Override
-    public long getID() {
-        return id;
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
 
-        Prescription that = (Prescription) o;
 
-        if (toEndOfPackage != that.toEndOfPackage) return false;
-        if (showOnDailyPlan != that.showOnDailyPlan) return false;
-        if (relation != that.relation) return false;
-        if (docOFF != null ? !docOFF.equals(that.docOFF) : that.docOFF != null) return false;
-        if (to != null ? !to.equals(that.to) : that.to != null) return false;
-        if (hospitalOFF != null ? !hospitalOFF.equals(that.hospitalOFF) : that.hospitalOFF != null) return false;
-        if (userOFF != null ? !userOFF.equals(that.userOFF) : that.userOFF != null)
-            return false;
-        if (docON != null ? !docON.equals(that.docON) : that.docON != null) return false;
-        if (from != null ? !from.equals(that.from) : that.from != null) return false;
-        if (hospitalON != null ? !hospitalON.equals(that.hospitalON) : that.hospitalON != null) return false;
-        if (userON != null ? !userON.equals(that.userON) : that.userON != null)
-            return false;
-        if (attachedFilesConnections != null ? !attachedFilesConnections.equals(that.attachedFilesConnections) : that.attachedFilesConnections != null)
-            return false;
-        if (attachedProcessConnections != null ? !attachedProcessConnections.equals(that.attachedProcessConnections) : that.attachedProcessConnections != null)
-            return false;
-        if (text != null ? !text.equals(that.text) : that.text != null) return false;
-        if (intervention != null ? !intervention.equals(that.intervention) : that.intervention != null) return false;
 
-        if (resident != null ? !resident.equals(that.resident) : that.resident != null) return false;
-        if (situation != null ? !situation.equals(that.situation) : that.situation != null) return false;
-        if (tradeform != null ? !tradeform.equals(that.tradeform) : that.tradeform != null) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (version != null ? !version.equals(that.version) : that.version != null) return false;
 
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (from != null ? from.hashCode() : 0);
-        result = 31 * result + (to != null ? to.hashCode() : 0);
-        result = 31 * result + (toEndOfPackage ? 1 : 0);
-        result = 31 * result + (int) (relation ^ (relation >>> 32));
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (showOnDailyPlan ? 1 : 0);
-        result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
-        result = 31 * result + (attachedProcessConnections != null ? attachedProcessConnections.hashCode() : 0);
-        result = 31 * result + (userON != null ? userON.hashCode() : 0);
-        result = 31 * result + (userOFF != null ? userOFF.hashCode() : 0);
-        result = 31 * result + (resident != null ? resident.hashCode() : 0);
-        result = 31 * result + (intervention != null ? intervention.hashCode() : 0);
-        result = 31 * result + (tradeform != null ? tradeform.hashCode() : 0);
-        result = 31 * result + (situation != null ? situation.hashCode() : 0);
-        result = 31 * result + (hospitalON != null ? hospitalON.hashCode() : 0);
-        result = 31 * result + (hospitalOFF != null ? hospitalOFF.hashCode() : 0);
-        result = 31 * result + (docON != null ? docON.hashCode() : 0);
-        result = 31 * result + (docOFF != null ? docOFF.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public Prescription clone() {
-        final Prescription prescriptionClone = new Prescription(from, to, toEndOfPackage, relation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, OPDE.getLogin().getUser(), userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
-
-        CollectionUtils.forAllDo(pSchedule, new Closure() {
-            public void execute(Object o) {
-                PrescriptionSchedule scheduleCopy = ((PrescriptionSchedule) o).createCopy(prescriptionClone);
-                prescriptionClone.getPrescriptionSchedule().add(scheduleCopy);
-            }
-        });
-
-        for (Commontags ctag : commontags) {
-            prescriptionClone.getCommontags().add(ctag);
-        }
-
-        for (ResInfo annotation : annotations) {
-            ResInfo annotationClone = ResInfoService.clone(annotation);
-            annotationClone.setPrescription(prescriptionClone);
-
-            prescriptionClone.getAnnotations().add(annotationClone);
-        }
-
-        return prescriptionClone;
-    }
-
-    @Override
-    public int compareTo(Prescription them) {
-//        int result = ((Boolean) isClosed()).compareTo(them.isClosed()) * -1;
-        int result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;
-        if (result == 0) {
-            result = ((Boolean) hasMed()).compareTo(them.hasMed());
-        }
-        if (result == 0) {
-            String mytitle = hasMed() ? getTradeForm().getMedProduct().getText() : getIntervention().getBezeichnung();
-            String thattitle = hasMed() ? them.getTradeForm().getMedProduct().getText() : them.getIntervention().getBezeichnung();
-            result = mytitle.compareTo(thattitle);
-        }
-        if (result == 0) {
-            result = Long.valueOf(relation).compareTo(them.getRelation());
-        }
-        if (result == 0) {
-            result = ((Boolean) isClosed()).compareTo(them.isClosed());
-        }
-        if (result == 0) {
-            result = from.compareTo(them.getFrom()) * -1;
-        }
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Prescription{" +
-                "verid=" + id;
-    }
 
     @Override
     public boolean isActive() {

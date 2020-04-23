@@ -5,7 +5,7 @@
     <persistence-unit name="OPDEPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>de.offene_pflege.backend.entity.system.Acl</class>
-        <class>de.offene_pflege.backend.entity.prescription.GP</class>
+        <class>de.offene_pflege.backend.entity.done.GP</class>
         <class>de.offene_pflege.backend.entity.values.ResValue</class>
         <class>de.offene_pflege.backend.entity.Allowance</class>
         <class>de.offene_pflege.backend.entity.done.LCustodian</class>
@@ -15,7 +15,7 @@
         <class>de.offene_pflege.backend.entity.system.OPGroups</class>
         <class>de.offene_pflege.backend.entity.done.ICD</class>
         <class>de.offene_pflege.backend.entity.done.HInsurance</class>
-        <class>de.offene_pflege.backend.entity.prescription.Hospital</class>
+        <class>de.offene_pflege.backend.entity.done.Hospital</class>
         <class>de.offene_pflege.backend.entity.done.InterventionSchedule</class>
         <class>de.offene_pflege.backend.entity.done.Intervention</class>
         <class>de.offene_pflege.backend.entity.reports.NR2User</class>
@@ -43,13 +43,13 @@
         <class>de.offene_pflege.backend.entity.system.Unique</class>
         <class>de.offene_pflege.backend.entity.done.BHP</class>
         <class>de.offene_pflege.backend.entity.prescription.TradeForm</class>
-        <class>de.offene_pflege.backend.entity.prescription.MedStock</class>
-        <class>de.offene_pflege.backend.entity.prescription.MedStockTransaction</class>
+        <class>de.offene_pflege.backend.entity.done.MedStock</class>
+        <class>de.offene_pflege.backend.entity.done.MedStockTransaction</class>
         <class>de.offene_pflege.backend.entity.done.DosageForm</class>
         <class>de.offene_pflege.backend.entity.done.ACME</class>
-        <class>de.offene_pflege.backend.entity.prescription.MedPackage</class>
-        <class>de.offene_pflege.backend.entity.prescription.MedProducts</class>
-        <class>de.offene_pflege.backend.entity.prescription.MedInventory</class>
+        <class>de.offene_pflege.backend.entity.done.MedPackage</class>
+        <class>de.offene_pflege.backend.entity.done.MedProducts</class>
+        <class>de.offene_pflege.backend.entity.done.MedInventory</class>
         <class>de.offene_pflege.backend.entity.prescription.Situations</class>
         <class>de.offene_pflege.backend.entity.prescription.Prescription</class>
         <class>de.offene_pflege.backend.entity.prescription.PrescriptionSchedule</class>

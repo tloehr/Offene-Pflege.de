@@ -29,9 +29,11 @@ package de.offene_pflege.op.care.prescription;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import de.offene_pflege.backend.entity.done.GP;
+import de.offene_pflege.backend.entity.done.Hospital;
 import de.offene_pflege.backend.entity.prescription.*;
-import de.offene_pflege.backend.services.GPTools;
-import de.offene_pflege.backend.services.HospitalTools;
+import de.offene_pflege.backend.services.GPService;
+import de.offene_pflege.backend.services.HospitalService;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.MyJDialog;
@@ -191,11 +193,11 @@ public class DlgDiscontinue extends MyJDialog {
         listKH.add(0, null);
 
         cmbArztAb.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArztAb.setRenderer(GPTools.getRenderer());
+        cmbArztAb.setRenderer(GPService.getRenderer());
         cmbArztAb.setSelectedIndex(0);
 
         cmbKHAb.setModel(new DefaultComboBoxModel(listKH.toArray()));
-        cmbKHAb.setRenderer(HospitalTools.getKHRenderer());
+        cmbKHAb.setRenderer(HospitalService.getKHRenderer());
         cmbKHAb.setSelectedIndex(0);
 
         em.close();

@@ -14,10 +14,10 @@ import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.backend.services.ResInfoService;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.services.ResidentTools;
-import de.offene_pflege.backend.entity.prescription.MedStock;
-import de.offene_pflege.backend.services.MedStockTools;
+import de.offene_pflege.backend.entity.done.MedStock;
+import de.offene_pflege.backend.services.MedStockService;
 import de.offene_pflege.backend.entity.prescription.Prescription;
-import de.offene_pflege.backend.services.PrescriptionTools;
+import de.offene_pflege.backend.services.PrescriptionService;
 import de.offene_pflege.backend.entity.process.QProcess;
 import de.offene_pflege.backend.entity.process.QProcessTools;
 import de.offene_pflege.backend.entity.values.ResValue;
@@ -197,7 +197,7 @@ public class PnlWelcome extends CleanablePanel {
 //                emptyStocksList = PrescriptionTools.getAllActiveWithEmptyInventories();
                 processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
                 birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
-                expiryList = MedStockTools.getExpiryList(7);
+                expiryList = MedStockService.getExpiryList(7);
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
                 strangeWeightList = ResValueTools.findNotableWeightChanges(WEIGHT_MONTHSBACK, WEIGHT_PERCENT);    // 3 monate, 5%
@@ -580,7 +580,7 @@ public class PnlWelcome extends CleanablePanel {
 
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
-                "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + " (" + ResidentTools.getNameAndFirstname(stock.getInventory().getResident()) + ")</td>" +
+                "<td width=\"600\" align=\"left\">" + MedStockService.getAsHTML(stock) + " (" + ResidentTools.getNameAndFirstname(stock.getInventory().getResident()) + ")</td>" +
                 "</tr>" +
                 "</table>" +
 
@@ -600,7 +600,7 @@ public class PnlWelcome extends CleanablePanel {
 
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
-                "<td width=\"600\" align=\"left\">" + PrescriptionTools.toPrettyHTML(prescription) + " (" + ResidentTools.getNameAndFirstname(prescription.getResident()) + ")</td>" +
+                "<td width=\"600\" align=\"left\">" + PrescriptionService.toPrettyHTML(prescription) + " (" + ResidentTools.getNameAndFirstname(prescription.getResident()) + ")</td>" +
                 "</tr>" +
                 "</table>" +
                 "</html>";

@@ -9,8 +9,8 @@ import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.done.Rooms;
 import de.offene_pflege.backend.entity.done.Station;
-import de.offene_pflege.backend.entity.prescription.GP;
-import de.offene_pflege.backend.services.GPTools;
+import de.offene_pflege.backend.entity.done.GP;
+import de.offene_pflege.backend.services.GPService;
 import de.offene_pflege.backend.entity.system.Unique;
 import de.offene_pflege.backend.entity.system.UniqueTools;
 import de.offene_pflege.backend.entity.system.OPUsers;
@@ -364,7 +364,7 @@ public class AddBWWizard {
             result += "<li>" + ResidentTools.getFullName(resident) + "</li>";
             result += "<li>" + SYSTools.xx("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDob()) + "</li>";
             result += "<li>" + SYSTools.xx("misc.msg.primaryNurse") + ": " + (resident.getPn1() == null ? SYSTools.xx("misc.msg.noentryyet") : resident.getPn1().getFullname()) + "</li>";
-            result += "<li>" + SYSTools.xx("misc.msg.gp") + ": " + GPTools.getFullName(resident.getGp()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.gp") + ": " + GPService.getFullName(resident.getGp()) + "</li>";
 //            result += "<li>" + SYSTools.xx("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
 
             result += "<li>" + SYSTools.xx("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(resinfo_hauf.getFrom()) + "</li>";

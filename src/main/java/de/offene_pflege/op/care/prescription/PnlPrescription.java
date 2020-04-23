@@ -32,9 +32,8 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.backend.entity.EntityTools;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.done.ResInfo;
-import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.process.*;
 import de.offene_pflege.backend.entity.system.Commontags;
@@ -153,9 +152,9 @@ public class PnlPrescription extends NursingRecordsPanel {
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstPrescriptions.size()));
 
                     if (tbClosed.isSelected()) {
-                        lstPrescriptions = PrescriptionTools.getAll(resident);
+                        lstPrescriptions = PrescriptionService.getAll(resident);
                     } else {
-                        lstPrescriptions = PrescriptionTools.getAllActive(resident);
+                        lstPrescriptions = PrescriptionService.getAllActive(resident);
                     }
                     Collections.sort(lstPrescriptions);
 
@@ -185,9 +184,9 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         } else {
             if (tbClosed.isSelected()) {
-                lstPrescriptions = PrescriptionTools.getAll(resident);
+                lstPrescriptions = PrescriptionService.getAll(resident);
             } else {
-                lstPrescriptions = PrescriptionTools.getAllActive(resident);
+                lstPrescriptions = PrescriptionService.getAllActive(resident);
             }
             Collections.sort(lstPrescriptions);
             for (Prescription prescription : lstPrescriptions) {
@@ -232,13 +231,13 @@ public class PnlPrescription extends NursingRecordsPanel {
                 "<tr valign=\"top\">" +
                 "<td width=\"280\" align=\"left\">" + prescription.pitAsHTML() + "</td>" +
                 "<td width=\"380\" align=\"left\">" +
-                "<font size=+1>" + PrescriptionTools.getShortDescription(prescription) + "</font>" +
-                PrescriptionTools.getDoseAsHTML(prescription) +
-                PrescriptionTools.getInventoryInformationAsHTML(prescription) +
+                "<font size=+1>" + PrescriptionService.getShortDescription(prescription) + "</font>" +
+                PrescriptionService.getDoseAsHTML(prescription) +
+                PrescriptionService.getInventoryInformationAsHTML(prescription) +
                 "</td>" +
                 "<td width=\"200\" align=\"left\">" +
-                PrescriptionTools.getOriginalPrescription(prescription) +
-                PrescriptionTools.getRemark(prescription) +
+                PrescriptionService.getOriginalPrescription(prescription) +
+                PrescriptionService.getRemark(prescription) +
                 "</td>";
 
         if (!prescription.getCommontags().isEmpty()) {
@@ -247,9 +246,9 @@ public class PnlPrescription extends NursingRecordsPanel {
                     "  </tr>";
         }
 
-        if (PrescriptionTools.isAnnotationNecessary(prescription)) {
+        if (PrescriptionService.isAnnotationNecessary(prescription)) {
             title += "<tr>" +
-                    "    <td colspan=\"3\">" + PrescriptionTools.getAnnontationsAsHTML(prescription) + "</td>" +
+                    "    <td colspan=\"3\">" + PrescriptionService.getAnnontationsAsHTML(prescription) + "</td>" +
                     "  </tr>";
         }
 
@@ -461,14 +460,14 @@ public class PnlPrescription extends NursingRecordsPanel {
             icon = null;
             if (mypres.shouldBeCalculated()) {
                 MedInventory inventory = TradeFormTools.getInventory4TradeForm(mypres.getResident(), mypres.getTradeForm());
-                MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+                MedStock stockInUse = MedStockService.getStockInUse(inventory);
                 if (stockInUse == null) {
                     icon = SYSConst.icon22ledRedOn;
                 } else if (stockInUse.isExpired()) {
                     icon = SYSConst.icon22ledOrangeOn;
-                } else if (stockInUse.expiresIn(MedStockTools.DAYS_TO_EXPIRE_SOON)) {
+                } else if (stockInUse.expiresIn(MedStockService.DAYS_TO_EXPIRE_SOON)) {
                     icon = SYSConst.icon22ledOrangeOff;
-                } else if (!stockInUse.getTradeForm().getDosageForm().isDontCALC() && MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
+                } else if (!stockInUse.getTradeForm().getDosageForm().isDontCALC() && MedStockService.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
                     icon = SYSConst.icon22ledYellowOn;
                 } else {
                     icon = null;
@@ -585,7 +584,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             pnlTags.setOpaque(false);
 
             for (final Commontags commontag : listUsedCommontags) {
-                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesService.print(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag), true, true, false, tbClosed.isSelected(), true), true));
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesService.print(PrescriptionService.getPrescriptionsAsHTML(PrescriptionService.getPrescriptions4Tags(resident, commontag), true, true, false, tbClosed.isSelected(), true), true));
                 btnTag.setForeground(GUITools.getColor(commontag.getColor()));
                 pnlTags.add(btnTag);
             }
@@ -725,7 +724,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
-            JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, actionEvent -> SYSFilesService.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected(), true), true));
+            JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, actionEvent -> SYSFilesService.print(PrescriptionService.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected(), true), true));
             list.add(printPrescription);
 
 //            JideButton printDaily = GUITools.createHyperlinkButton("nursingrecords.prescription.printdailyplan", SYSConst.icon22print2, new ActionListener() {
@@ -761,7 +760,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         JPanel pnlMenu = new JPanel(new VerticalLayout());
         long numBHPs = BHPService.getConfirmedBHPs(prescription);
         final MedInventory inventory = prescription.shouldBeCalculated() ? TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm()) : null;
-        final MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+        final MedStock stockInUse = MedStockService.getStockInUse(inventory);
 
         // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
@@ -1208,7 +1207,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 currentEditor.setVisible(true);
 
             });
-            btnAnnotation.setEnabled(prescription.isMine() && !prescription.isClosed() && prescription.hasMed() && PrescriptionTools.isAnnotationNecessary(prescription));
+            btnAnnotation.setEnabled(prescription.isMine() && !prescription.isClosed() && prescription.hasMed() && PrescriptionService.isAnnotationNecessary(prescription));
             pnlMenu.add(btnAnnotation);
         }
 
@@ -1226,7 +1225,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(actionEvent -> {
 
-                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/>" + PrescriptionTools.toPrettyString(prescription) + "</br>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
+                currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/>" + PrescriptionService.toPrettyString(prescription) + "</br>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
                     if (answer.equals(JOptionPane.YES_OPTION)) {
 
                         EntityManager em = OPDE.createEM();
@@ -1243,7 +1242,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             delQuery.executeUpdate();
                             em.getTransaction().commit();
 
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.Deleted") + ": " + PrescriptionTools.toPrettyString(myverordnung)));
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.Deleted") + ": " + PrescriptionService.toPrettyString(myverordnung)));
                             lstPrescriptions.remove(prescription);
                             buildPanel();
                         } catch (OptimisticLockException ole) {

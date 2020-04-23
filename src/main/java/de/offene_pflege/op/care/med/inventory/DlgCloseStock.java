@@ -29,9 +29,9 @@ package de.offene_pflege.op.care.med.inventory;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.backend.services.DosageFormService;
-import de.offene_pflege.backend.entity.prescription.MedStock;
-import de.offene_pflege.backend.services.MedStockTools;
-import de.offene_pflege.backend.services.MedStockTransactionTools;
+import de.offene_pflege.backend.entity.done.MedStock;
+import de.offene_pflege.backend.services.MedStockService;
+import de.offene_pflege.backend.services.MedStockTransactionService;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.MyJDialog;
@@ -232,7 +232,7 @@ public class DlgCloseStock extends MyJDialog {
 
     private void initDialog() {
         String text = SYSTools.xx("nursingrecords.prescription.dlgCloseStock.youWantToClose1a") + medStock.getID() + SYSTools.xx("nursingrecords.prescription.dlgCloseStock.youWantToClose1b");
-        text += "<br/>" + MedStockTools.getTextASHTML(medStock) + "</br>";
+        text += "<br/>" + MedStockService.getTextASHTML(medStock) + "</br>";
         text += "<br/>" + SYSTools.xx("nursingrecords.prescription.dlgCloseStock.chooseAReason") + ":";
         txtInfo.setContentType("text/html");
         txtInfo.setText(SYSTools.toHTML(SYSConst.html_div(text)));
@@ -295,7 +295,7 @@ public class DlgCloseStock extends MyJDialog {
             cmbBestID.setToolTipText(null);
         } else {
             MedStock myBestand = (MedStock) cmbBestID.getSelectedItem();
-            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getTextASHTML(myBestand)));
+            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockService.getTextASHTML(myBestand)));
         }
     }//GEN-LAST:event_cmbBestIDItemStateChanged
 
@@ -326,18 +326,18 @@ public class DlgCloseStock extends MyJDialog {
 
             if (rbStellen.isSelected()) {
                 BigDecimal inhalt =  SYSTools.parseDecimal(txtLetzte.getText());
-                MedStockTools.setStockTo(em, myStock, inhalt, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
-                myStock.setState(MedStockTools.STATE_WILL_BE_CLOSED_SOON);
+                MedStockService.setStockTo(em, myStock, inhalt, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionService.STATE_EDIT_EMPTY_SOON);
+                myStock.setState(MedStockService.STATE_WILL_BE_CLOSED_SOON);
                 OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
             } else {
                 if (rbGefallen.isSelected()) {
-                    MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_BROKEN_OR_LOST"), MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
+                    MedStockService.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_BROKEN_OR_LOST"), MedStockTransactionService.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
                     OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_BROKEN_OR_LOST"));
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_PAST_EXPIRY"), MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
+                    MedStockService.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_PAST_EXPIRY"), MedStockTransactionService.STATE_EDIT_EMPTY_PAST_EXPIRY);
                     OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_PAST_EXPIRY"));
                 } else {
-                    MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_NOW"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                    MedStockService.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_NOW"), MedStockTransactionService.STATE_EDIT_EMPTY_NOW);
                     OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_NOW"));
                 }
             }

@@ -6,8 +6,8 @@ package de.offene_pflege.op.care.med.structure;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.prescription.MedStock;
-import de.offene_pflege.backend.services.MedStockTools;
+import de.offene_pflege.backend.entity.done.MedStock;
+import de.offene_pflege.backend.services.MedStockService;
 import de.offene_pflege.backend.entity.prescription.TradeForm;
 import de.offene_pflege.backend.services.TradeFormTools;
 import de.offene_pflege.op.OPDE;
@@ -80,7 +80,7 @@ public class DlgUPREditor extends MyJDialog {
                     txtUPR.setText(SYSTools.formatBigDecimal(tradeForm.getConstantUPRn().setScale(2, RoundingMode.HALF_UP)));
                     rbUPRConst.setSelected(true);
                 } else {
-                    txtSetUPR.setText(SYSTools.formatBigDecimal(MedStockTools.getEstimatedUPR(tradeForm).setScale(2, RoundingMode.HALF_UP)));
+                    txtSetUPR.setText(SYSTools.formatBigDecimal(MedStockService.getEstimatedUPR(tradeForm).setScale(2, RoundingMode.HALF_UP)));
                     rbUPRAuto.setSelected(true);
                 }
 
@@ -95,7 +95,7 @@ public class DlgUPREditor extends MyJDialog {
                     progress++;
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listStocks.size()));
                     if (stock.isClosed()) {
-                        mapEffectiveUPRs.put(stock, new Pair<BigDecimal, BigDecimal>(MedStockTools.getSumOfDosesInBHP(stock), MedStockTools.getEffectiveUPR(stock)));
+                        mapEffectiveUPRs.put(stock, new Pair<BigDecimal, BigDecimal>(MedStockService.getSumOfDosesInBHP(stock), MedStockService.getEffectiveUPR(stock)));
                     }
                 }
                 return null;
@@ -204,7 +204,7 @@ public class DlgUPREditor extends MyJDialog {
                                     em.lock(stock, LockModeType.OPTIMISTIC);
                                     em.lock(stock.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                     stock.setUPR(upr);
-                                    stock.setUPRDummyMode(MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
+                                    stock.setUPRDummyMode(MedStockService.ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
                                 }
 
                             } else {
@@ -408,7 +408,7 @@ public class DlgUPREditor extends MyJDialog {
                     break;
                 }
                 case 4: {
-                    result = SYSTools.formatBigDecimal(MedStockTools.getStartTX(listStocks.get(rowIndex)).getAmount().setScale(2, RoundingMode.HALF_UP));
+                    result = SYSTools.formatBigDecimal(MedStockService.getStartTX(listStocks.get(rowIndex)).getAmount().setScale(2, RoundingMode.HALF_UP));
                     break;
                 }
                 case 5: {

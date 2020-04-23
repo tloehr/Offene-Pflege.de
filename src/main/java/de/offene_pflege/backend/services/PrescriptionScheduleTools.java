@@ -443,7 +443,7 @@ public class PrescriptionScheduleTools {
             phrase.add(Chunk.NEWLINE);
         }
 
-        phrase.add(PrescriptionTools.getOriginalPrescriptionAsPhrase(schedule.getPrescription()));
+        phrase.add(PrescriptionService.getOriginalPrescriptionAsPhrase(schedule.getPrescription()));
 
         Phrase repeat = getRepeatPatternAsPhrase(schedule, false);
         phrase.add(repeat);
@@ -484,7 +484,7 @@ public class PrescriptionScheduleTools {
         String wiederholung = getRepeatPattern(schedule, false);
         result += wiederholung;
 
-        String substitution = PrescriptionTools.getOriginalPrescription(schedule.getPrescription());
+        String substitution = PrescriptionService.getOriginalPrescription(schedule.getPrescription());
         if (!substitution.isEmpty()) {
             result += substitution;
         }

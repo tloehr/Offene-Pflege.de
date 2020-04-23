@@ -32,7 +32,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.*;
 import com.jidesoft.wizard.WizardDialog;
-import de.offene_pflege.backend.entity.done.Resident;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.backend.services.*;
@@ -118,7 +118,7 @@ public class DlgNewStocks extends MyJDialog {
 
             String pzn = null;
             try {
-                pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
+                pzn = MedPackageService.parsePZN(txtMedSuche.getText());
             } catch (NumberFormatException nfe) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(nfe.getMessage(), DisplayMessage.WARNING));
                 pzn = null;
@@ -551,37 +551,37 @@ public class DlgNewStocks extends MyJDialog {
             if (aPackage != null) {
                 aPackage = em.merge(aPackage);
                 if (amount == null) {
-                    amount = aPackage.getContent();
+                    amount = aPackage.getInhalt();
                 }
             }
 
             tradeForm = em.merge(tradeForm);
             inventory = em.merge(inventory);
 
-            if (inventory.getID() == null) { // create a new MedInvetory.
-                inventory.setText(TradeFormTools.toPrettyString(tradeForm) + "; " + ACMEService.toPrettyStringShort(tradeForm.getMedProduct().getACME()));
+            if (inventory.getId() == null) { // create a new MedInvetory.
+                inventory.setText(TradeFormTools.toPrettyString(tradeForm) + "; " + ACMEService.toPrettyStringShort(tradeForm.getMedProduct().getAcme()));
             }
 
             // https://github.com/tloehr/Offene-Pflege.de/issues/16
             BigDecimal estimatedUPR = BigDecimal.ONE;
 
-            int dummyMode = MedStockTools.DONT_REPLACE_UPR;
-            if (tradeForm.getDosageForm().isUPRn()) {
+            int dummyMode = MedStockService.DONT_REPLACE_UPR;
+            if (DosageFormService.isUPRn(tradeForm.getDosageForm())) {
                 if (tradeForm.getMedStocks().isEmpty()) {
                     // first of its kind. will calculate real UPR when it's closed
-                    dummyMode = MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING;
-                } else if (MedStockTools.stillWorkingOnTheFirstOneToCalculateUPRn(tradeForm)) {
-                    dummyMode = MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING;
+                    dummyMode = MedStockService.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING;
+                } else if (MedStockService.stillWorkingOnTheFirstOneToCalculateUPRn(tradeForm)) {
+                    dummyMode = MedStockService.REPLACE_WITH_EFFECTIVE_UPR_WHEN_FIRST_STOCK_OF_THIS_KIND_IS_CLOSING;
                 } else {
-                    dummyMode = MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING;
-                    estimatedUPR = MedStockTools.getEstimatedUPR(tradeForm);
+                    dummyMode = MedStockService.ADD_TO_AVERAGES_UPR_WHEN_CLOSING;
+                    estimatedUPR = MedStockService.getEstimatedUPR(tradeForm);
                 }
             }
 
-            MedStock newStock = em.merge(new MedStock(inventory, tradeForm, aPackage, txtBemerkung.getText(), estimatedUPR, dummyMode));
+            MedStock newStock = em.merge(MedStockService.create(inventory, tradeForm, aPackage, txtBemerkung.getText(), estimatedUPR, dummyMode));
             newStock.setExpires(expiry);
-            MedStockTransaction tx = em.merge(new MedStockTransaction(newStock, amount));
-            tx.setWeight(weight);
+            MedStockTransaction tx = em.merge(MedStockTransactionService.create(newStock, amount));
+            tx.setWeight(weight == null ? BigDecimal.ZERO: weight);
 
             em.getTransaction().commit();
             amount = null;
@@ -596,7 +596,7 @@ public class DlgNewStocks extends MyJDialog {
             }
 
             // if the label printer is not used, the new number is shown until the next message, so the user has time to write the number down manually.
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("newstocks.registration.success.1") + " <b>" + newStock.getID() + "</b> " + SYSTools.xx("newstocks.registration.success.2"), btnPrint.isSelected() ? 2 : 0));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("newstocks.registration.success.1") + " <b>" + newStock.getId() + "</b> " + SYSTools.xx("newstocks.registration.success.2"), btnPrint.isSelected() ? 2 : 0));
         } catch (OptimisticLockException ole) {
             OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
@@ -672,10 +672,10 @@ public class DlgNewStocks extends MyJDialog {
                 ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_EAST);
                 attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen müssen größer 0 sein.</i>"));
                 amount = null;
-            } else if (aPackage != null && amount.compareTo(aPackage.getContent()) > 0) {
+            } else if (aPackage != null && amount.compareTo(aPackage.getInhalt()) > 0) {
                 ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_EAST);
                 attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen dürfen nicht größer als der Packungsinhalt sein.</i>"));
-                amount = aPackage.getContent();
+                amount = aPackage.getInhalt();
             } else {
                 ovrMenge.addOverlayComponent(correctIconMenge, DefaultOverlayable.SOUTH_EAST);
             }
@@ -770,7 +770,7 @@ public class DlgNewStocks extends MyJDialog {
 //
 
 
-            cmbVorrat.setRenderer(MedInventoryTools.getInventoryRenderer());
+            cmbVorrat.setRenderer(MedInventoryService.getInventoryRenderer());
             if (tradeForm == null) {
                 cmbVorrat.setModel(new DefaultComboBoxModel());
                 inventory = null;
@@ -790,7 +790,7 @@ public class DlgNewStocks extends MyJDialog {
             if (tradeForm != null) {
                 if (inventory == null) {
                     DefaultComboBoxModel dcbm = (DefaultComboBoxModel) cmbVorrat.getModel();
-                    dcbm.insertElementAt(new MedInventory(resident, "<AUTOMATISCH>"), 0);
+                    dcbm.insertElementAt(MedInventoryService.create(resident, "<AUTOMATISCH>"), 0);
                     cmbVorrat.setSelectedIndex(0);
 
                     if (dcbm.getSize() > 1) {
@@ -825,7 +825,7 @@ public class DlgNewStocks extends MyJDialog {
             lblWeightControl.setVisible(tradeForm.isWeightControlled());
             dcbm.insertElementAt("<Sonderpackung>", 0);
             cmbPackung.setModel(dcbm);
-            cmbPackung.setRenderer(MedPackageTools.getMedPackungRenderer());
+            cmbPackung.setRenderer(MedPackageService.getMedPackungRenderer());
             if (aPackage == null) {
                 cmbPackung.setSelectedIndex(cmbPackung.getModel().getSize() - 1);
             } else {

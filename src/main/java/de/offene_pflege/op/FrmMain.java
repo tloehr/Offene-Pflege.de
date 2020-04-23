@@ -45,7 +45,7 @@ import de.offene_pflege.backend.entity.done.ResInfoType;
 import de.offene_pflege.backend.entity.done.Resident;
 import de.offene_pflege.backend.entity.done.Station;
 import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.services.PrescriptionTools;
+import de.offene_pflege.backend.services.PrescriptionService;
 import de.offene_pflege.backend.entity.system.SYSLoginTools;
 import de.offene_pflege.backend.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
@@ -771,7 +771,7 @@ public class FrmMain extends JFrame {
         }
 
         if (!residentList.isEmpty() && station != null) {
-            JideButton button = GUITools.createHyperlinkButton("opde.mainframe.printdailyplan", SYSConst.icon22print2, e -> PrescriptionTools.printDailyPlan(station));
+            JideButton button = GUITools.createHyperlinkButton("opde.mainframe.printdailyplan", SYSConst.icon22print2, e -> PrescriptionService.printDailyPlan(station));
             button.setBackground(Color.WHITE);
             labelPanel.add(button);
         }

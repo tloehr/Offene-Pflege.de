@@ -363,7 +363,7 @@ public class MREPrevalenceSheets implements HasLogger {
         content[SHEET2_RUNNING_NO] = Integer.toString(runningNumber);
         content[SHEET2_MED] = prescription.getTradeForm().getMedProduct().getText();
         content[SHEET2_STRENGTH] = prescription.getTradeForm().getSubtext();
-        content[SHEET2_DOSE] = PrescriptionTools.getDoseAsCompactText(prescription);
+        content[SHEET2_DOSE] = PrescriptionService.getDoseAsCompactText(prescription);
 
         content[SHEET2_APPLICATION_LOCAL] = getCellContent(properties, "application", "local");
         content[SHEET2_APPLICATION_SYSTEM] = getCellContent(properties, "application", "systemic");
@@ -501,7 +501,7 @@ public class MREPrevalenceSheets implements HasLogger {
         content[CARELEVEL4] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg4");
         content[CARELEVEL5] = getCellContent(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade", "pg5");
 
-        ArrayList<Prescription> listPrescripitons = PrescriptionTools.getPrescriptions4Tags(resident, antibiotics);
+        ArrayList<Prescription> listPrescripitons = PrescriptionService.getPrescriptions4Tags(resident, antibiotics);
         // Gemäß Definition vom MRE Netzwerk
         // "Für die Erhebung der Antibiotika muss der Bewohner an dem Tag und am Vortag anwesend sein und ein Antibiotikum an dem Tag erhalten haben."
         ArrayList<Prescription> listAntibiotics = new ArrayList<>();

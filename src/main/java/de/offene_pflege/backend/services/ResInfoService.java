@@ -771,7 +771,7 @@ public class ResInfoService implements HasLogger {
                 long hid = Long.parseLong(khid);
                 if (hid > 0) {
                     Hospital hospital = EntityTools.find(Hospital.class, hid);
-                    confirmedBy += SYSConst.html_bold(HospitalTools.getFullName(hospital));
+                    confirmedBy += SYSConst.html_bold(HospitalService.getFullName(hospital));
                 }
             }
             String arztid = content.getProperty("arztid", "null");
@@ -779,7 +779,7 @@ public class ResInfoService implements HasLogger {
                 long gpid = Long.parseLong(arztid);
                 if (gpid > 0) {
                     GP gp = EntityTools.find(GP.class, gpid);
-                    confirmedBy += SYSConst.html_bold(GPTools.getFullName(gp));
+                    confirmedBy += SYSConst.html_bold(GPService.getFullName(gp));
                 }
             }
             if (!confirmedBy.isEmpty()) {
@@ -811,7 +811,7 @@ public class ResInfoService implements HasLogger {
                 long hid = Long.parseLong(khid);
                 if (hid > 0) {
                     Hospital hospital = EntityTools.find(Hospital.class, hid);
-                    strHospital = SYSConst.html_bold(HospitalTools.getFullName(hospital));
+                    strHospital = SYSConst.html_bold(HospitalService.getFullName(hospital));
                 }
 
                 OPDE.debug(resInfo.getID());
@@ -1119,7 +1119,7 @@ public class ResInfoService implements HasLogger {
             if (OPDE.isAnonym()) {
                 result += SYSTools.xx("misc.msg.anon");
             } else {
-                result += GPTools.getFullName(resident.getGp()) + ", " + resident.getGp().getStreet();
+                result += GPService.getFullName(resident.getGp()) + ", " + resident.getGp().getStreet();
                 result += ", " + resident.getGp().getZIP() + " " + resident.getGp().getCity();
                 result += ", " + SYSTools.xx("misc.msg.phone") + ": " + resident.getGp().getTel() + ", " + SYSTools.xx("misc.msg.fax") + ": " + resident.getGp().getFax();
             }
@@ -1222,7 +1222,7 @@ public class ResInfoService implements HasLogger {
             query.setParameter("now", new Date());
             List listeVerordnungen = query.getResultList();
             Collections.sort(listeVerordnungen);
-            result += PrescriptionTools.getPrescriptionsAsHTML(listeVerordnungen, true, false, false, false, false);
+            result += PrescriptionService.getPrescriptionsAsHTML(listeVerordnungen, true, false, false, false, false);
             em.close();
         }
 

@@ -6,8 +6,8 @@ package de.offene_pflege.op.care.med.prodassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.prescription.MedProducts;
-import de.offene_pflege.backend.services.MedProductsTools;
+import de.offene_pflege.backend.entity.done.MedProducts;
+import de.offene_pflege.backend.services.MedProductsService;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -64,7 +64,7 @@ public class PnlProduct extends JPanel {
             DefaultListModel lmProd;
             lmProd = SYSTools.list2dlm(listProd);
             lstProd.setModel(lmProd);
-            lstProd.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
+            lstProd.setCellRenderer(MedProductsService.getMedProdukteRenderer());
         } else {
             produkt = txtProd.getText().trim().isEmpty() ? null : new MedProducts(txtProd.getText().trim());
             lblProdMsg.setVisible(false);

@@ -31,7 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.backend.entity.EntityTools;
-import de.offene_pflege.backend.entity.done.Intervention;
+import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.services.*;
 import de.offene_pflege.backend.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
@@ -192,7 +192,7 @@ public class DlgOnDemand extends MyJDialog {
 
             String pzn = null;
             try {
-                pzn = MedPackageTools.parsePZN(txtMed.getText());
+                pzn = MedPackageService.parsePZN(txtMed.getText());
             } catch (NumberFormatException nfe) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(nfe.getMessage(), DisplayMessage.WARNING));
                 pzn = null;
@@ -871,11 +871,11 @@ public class DlgOnDemand extends MyJDialog {
         em.close();
 
         cmbDocON.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbDocON.setRenderer(GPTools.getRenderer());
+        cmbDocON.setRenderer(GPService.getRenderer());
         cmbDocON.setSelectedIndex(0);
 
         cmbHospitalON.setModel(new DefaultComboBoxModel(listKH.toArray()));
-        cmbHospitalON.setRenderer(HospitalTools.getKHRenderer());
+        cmbHospitalON.setRenderer(HospitalService.getKHRenderer());
         cmbHospitalON.setSelectedIndex(0);
 
 

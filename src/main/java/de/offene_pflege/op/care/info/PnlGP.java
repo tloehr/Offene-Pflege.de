@@ -5,8 +5,8 @@
 package de.offene_pflege.op.care.info;
 
 import com.jidesoft.popup.JidePopup;
-import de.offene_pflege.backend.entity.prescription.GP;
-import de.offene_pflege.backend.services.GPTools;
+import de.offene_pflege.backend.entity.done.GP;
+import de.offene_pflege.backend.services.GPService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.residents.PnlEditGP;
@@ -67,12 +67,12 @@ public class PnlGP extends JPanel {
         }
 
         if (neurologist == null) {
-            listGPs.addAll(GPTools.getAllActive());
+            listGPs.addAll(GPService.getAllActive());
         }
 
         listGPs.add(0, null);
         cmbGP.setModel(new DefaultComboBoxModel(listGPs.toArray()));
-        cmbGP.setRenderer(GPTools.getRenderer());
+        cmbGP.setRenderer(GPService.getRenderer());
 
     }
 

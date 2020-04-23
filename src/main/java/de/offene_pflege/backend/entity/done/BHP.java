@@ -2,7 +2,6 @@ package de.offene_pflege.backend.entity.done;
 
 
 import de.offene_pflege.backend.entity.DefaultEntity;
-import de.offene_pflege.backend.entity.prescription.MedStockTransaction;
 import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.prescription.PrescriptionSchedule;
 import de.offene_pflege.backend.entity.prescription.TradeForm;
