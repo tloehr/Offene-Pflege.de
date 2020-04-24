@@ -2,11 +2,14 @@ package de.offene_pflege.backend.services;
 
 import de.offene_pflege.backend.entity.EntityTools;
 import de.offene_pflege.backend.entity.done.*;
-import de.offene_pflege.backend.entity.prescription.*;
+import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.process.QElement;
+import de.offene_pflege.backend.entity.process.QProcess;
+import de.offene_pflege.backend.entity.process.SYSINF2PROCESS;
 import de.offene_pflege.backend.entity.reports.NReportTools;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
+import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.backend.entity.system.UniqueTools;
 import de.offene_pflege.backend.entity.values.ResValue;
 import de.offene_pflege.backend.entity.values.ResValueTools;
@@ -46,6 +49,66 @@ import java.util.*;
  * Templates.
  */
 public class ResInfoService implements HasLogger {
+
+    public static Comparator<ResInfo> getComparator() {
+        return (us, them) -> {
+            int compare = us.getResInfoType().getDeprecated().compareTo(them.getResInfoType().getDeprecated()) * -1;
+            if (compare == 0) {
+                compare = us.getTo().compareTo(them.getTo());
+            }
+            if (compare == 0) {
+                compare = us.getFrom().compareTo(them.getFrom());
+            }
+            return compare * -1;
+        };
+    }
+
+
+    @Override
+    public long pitInMillis() {
+        return from.getTime();
+    }
+
+    @Override
+    public ArrayList<QProcess> findAttachedProcesses() {
+        ArrayList<QProcess> list = new ArrayList<>();
+        for (SYSINF2PROCESS att : attachedProcessConnections) {
+            list.add(att.getQProcess());
+        }
+        return list;
+    }
+
+    @Override
+    public String contentAsHTML() {
+        return ResInfoService.getContentAsHTML(this);
+    }
+
+    @Override
+    public String titleAsString() {
+        return null;
+    }
+
+    @Override
+    public String pitAsHTML() {
+        return ResInfoService.getPITAsHTML(this);
+    }
+
+    @Override
+    public OPUsers findOwner() {
+        return null;
+    }
+
+
+    @Override
+    public boolean active() {
+        return ResidentTools.isActive(resident) && !ResInfoService.isClosed(this);
+    }
+
+
+    @Override
+    public long findPrimaryKey() {
+        return getId();
+    }
 
     public static boolean isCurrentlyValid(ResInfo resInfo) {
         Date now = new Date();
@@ -184,25 +247,7 @@ public class ResInfoService implements HasLogger {
         }
     }
 
-    public static ResInfo clone(ResInfo source) {
-        ResInfo resInfo = new ResInfo();
-        resInfo.setFrom(source.getFrom());
-        resInfo.setTo(source.getTo());
-//        resInfo.setHtml(source.getHtml());
-        resInfo.setProperties(source.getProperties());
-        resInfo.setBemerkung(source.getBemerkung());
-        resInfo.setResInfoType(source.getResInfoType());
-        resInfo.setUserON(source.getUserON());
-        resInfo.setUserOFF(source.getUserOFF());
-        resInfo.setResident(source.getResident());
-        resInfo.setResValue(source.getResValue());
-        resInfo.setAttachedFilesConnections(new ArrayList<>());
-        resInfo.setAttachedProcessConnections(new ArrayList<>());
-        resInfo.setCommontags(new HashSet<>());
-        resInfo.setPrescription(source.getPrescription());
-        resInfo.setConnectionid(source.getConnectionid());
-        return resInfo;
-    }
+
 
     /**
      * sucht den letzten Eintrag eines bestimmten Types.

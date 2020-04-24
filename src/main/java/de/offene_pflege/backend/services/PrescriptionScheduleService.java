@@ -4,6 +4,7 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Phrase;
+import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.prescription.PrescriptionSchedule;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.tools.HTMLTools;
@@ -15,6 +16,7 @@ import org.joda.time.DateTime;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,10 +25,53 @@ import java.text.SimpleDateFormat;
  * Time: 15:35
  * To change this template use File | Settings | File Templates.
  */
-public class PrescriptionScheduleTools {
+public class PrescriptionScheduleService {
     public static final int ROUGHLY = 0;
     public static final int EXACTTIME = 1;
     public static final int MAXDOSE = 2;
+
+    public static  PrescriptionSchedule create(Prescription prescription) {
+
+         nachtMo = BigDecimal.ZERO;
+         mittags = BigDecimal.ZERO;
+         nachmittags = BigDecimal.ZERO;
+         abends = BigDecimal.ZERO;
+         nachtAb = BigDecimal.ZERO;
+         uhrzeitDosis = BigDecimal.ZERO;
+         uhrzeit = null;
+         taeglich = 1;
+         woechentlich = 0;
+         monatlich = 0;
+         tagNum = 0;
+         lDatum = new Date();
+
+         this.prescription = prescription;
+
+         if (prescription.isOnDemand()) {
+             morgens = BigDecimal.ZERO;
+             maxAnzahl = 1;
+             maxEDosis = BigDecimal.ONE;
+         } else {
+             morgens = BigDecimal.ONE;
+             maxAnzahl = 0;
+             maxEDosis = BigDecimal.ZERO;
+         }
+
+         mon = 0;
+         die = 0;
+         mit = 0;
+         don = 0;
+         fre = 0;
+         sam = 0;
+         son = 0;
+
+     }
+
+
+      public Object clone() {
+          return new PrescriptionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, prescription);
+      }
+
 
 
     public static int getTerminStatus(PrescriptionSchedule planung) {

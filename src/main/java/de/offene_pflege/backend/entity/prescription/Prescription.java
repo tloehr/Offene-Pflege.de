@@ -6,37 +6,19 @@
 package de.offene_pflege.backend.entity.prescription;
 
 import de.offene_pflege.backend.entity.DefaultEntity;
-import de.offene_pflege.backend.entity.Ownable;
 import de.offene_pflege.backend.entity.done.*;
-import de.offene_pflege.backend.services.*;
-import de.offene_pflege.backend.entity.process.QProcess;
-import de.offene_pflege.backend.entity.process.QElement;
 import de.offene_pflege.backend.entity.process.SYSPRE2PROCESS;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.OPUsers;
-import de.offene_pflege.interfaces.Attachable;
-import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.tools.SYSCalendar;
-import de.offene_pflege.op.tools.SYSConst;
-import de.offene_pflege.op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
-import org.eclipse.persistence.annotations.OptimisticLocking;
-import org.eclipse.persistence.annotations.OptimisticLockingType;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
 
 import javax.persistence.*;
-import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 /**
- * OPDE kann verschiedene Arten von wiederkehrenden Terminen für die Anwendung einer ärztlichen Verordnung
- * speichern. Dazu sind zwei Entity Classes nötig. Verordnungen und VerordnungPlanung.
+ * OPDE kann verschiedene Arten von wiederkehrenden Terminen für die Anwendung einer ärztlichen Verordnung speichern.
+ * Dazu sind zwei Entity Classes nötig. Verordnungen und VerordnungPlanung.
  * <ul>
  * <li><b>Verordnungen</b> enthält die Angaben über die Medikamente und Maßnahmen. Ärzte und Krankenhäuser, sowie Situations bei
  * Bedarfsmedikattion.</li>
@@ -87,10 +69,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "prescription")
-@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class Prescription extends DefaultEntity implements Ownable, QElement, Comparable<Prescription>, Attachable {
-
-
+public class Prescription extends DefaultEntity { //  implements Ownable, QElement, Comparable<Prescription>, Attachable
     @Basic(optional = false)
     @Column(name = "AnDatum")
     @Temporal(TemporalType.TIMESTAMP)
@@ -110,90 +89,176 @@ public class Prescription extends DefaultEntity implements Ownable, QElement, Co
     @Basic(optional = false)
     @Column(name = "Stellplan")
     private boolean showOnDailyPlan;
-
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2FILE> attachedFilesConnections;
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2PROCESS> attachedProcessConnections;
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
-
     // these are the annotations for a prescription. currently only used for the MRE studies
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private Collection<ResInfo> annotations;
-
-    @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
+    @JoinColumn(name = "AnUKennung", referencedColumnName = "id")
     @ManyToOne
     private OPUsers userON;
-    @JoinColumn(name = "AbUKennung", referencedColumnName = "UKennung")
+    @JoinColumn(name = "AbUKennung", referencedColumnName = "id")
     @ManyToOne
     private OPUsers userOFF;
     @JoinColumn(name = "BWKennung", referencedColumnName = "id")
     @ManyToOne
     private Resident resident;
-    @JoinColumn(name = "MassID", referencedColumnName = "MassID")
+    @JoinColumn(name = "MassID", referencedColumnName = "id")
     @ManyToOne
     private Intervention intervention;
-    @JoinColumn(name = "DafID", referencedColumnName = "DafID")
+
+    @JoinColumn(name = "DafID", referencedColumnName = "id")
     @ManyToOne
     private TradeForm tradeform;
-    @JoinColumn(name = "SitID", referencedColumnName = "SitID")
+    @JoinColumn(name = "SitID", referencedColumnName = "id")
     @ManyToOne
     private Situations situation;
-    @JoinColumn(name = "AnKHID", referencedColumnName = "KHID")
+
+    @JoinColumn(name = "AnKHID", referencedColumnName = "id")
     @ManyToOne
     private Hospital hospitalON;
-    @JoinColumn(name = "AbKHID", referencedColumnName = "KHID")
+    @JoinColumn(name = "AbKHID", referencedColumnName = "id")
     @ManyToOne
     private Hospital hospitalOFF;
-    @JoinColumn(name = "AnArztID", referencedColumnName = "ArztID")
+
+    @JoinColumn(name = "AnArztID", referencedColumnName = "id")
     @ManyToOne
     private GP docON;
-    @JoinColumn(name = "AbArztID", referencedColumnName = "ArztID")
+
+    @JoinColumn(name = "AbArztID", referencedColumnName = "id")
     @ManyToOne
     private GP docOFF;
-
-
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "prescription2tags", joinColumns =
     @JoinColumn(name = "prescid"), inverseJoinColumns =
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
 
-
     public Prescription() {
     }
 
+    public Prescription(Prescription other) {
+        this.from = other.from;
+        this.to = other.to;
+        this.toEndOfPackage = other.toEndOfPackage;
+        this.relation = other.relation;
+        this.text = other.text;
+        this.showOnDailyPlan = other.showOnDailyPlan;
+        this.attachedFilesConnections = other.attachedFilesConnections;
+        this.attachedProcessConnections = other.attachedProcessConnections;
+        this.pSchedule = other.pSchedule;
+        this.annotations = other.annotations;
+        this.userON = other.userON;
+        this.userOFF = other.userOFF;
+        this.resident = other.resident;
+        this.intervention = other.intervention;
+        this.tradeform = other.tradeform;
+        this.situation = other.situation;
+        this.hospitalON = other.hospitalON;
+        this.hospitalOFF = other.hospitalOFF;
+        this.docON = other.docON;
+        this.docOFF = other.docOFF;
+        this.commontags = other.commontags;
+    }
+
+    public Date getFrom() {
+        return from;
+    }
+
+    public void setFrom(Date from) {
+        this.from = from;
+    }
+
+    public Date getTo() {
+        return to;
+    }
+
+    public void setTo(Date to) {
+        this.to = to;
+    }
+
+    public boolean isToEndOfPackage() {
+        return toEndOfPackage;
+    }
+
+    public void setToEndOfPackage(boolean toEndOfPackage) {
+        this.toEndOfPackage = toEndOfPackage;
+    }
+
+    public long getRelation() {
+        return relation;
+    }
+
+    public void setRelation(long relation) {
+        this.relation = relation;
+    }
 
     public String getText() {
-        return SYSTools.catchNull(text);
+        return text;
     }
 
-    public void setText(String bemerkung) {
-        this.text = SYSTools.tidy(bemerkung);
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public boolean hasMed() {
-        return tradeform != null;
+    public boolean isShowOnDailyPlan() {
+        return showOnDailyPlan;
     }
 
-    public boolean shouldBeCalculated() {
-        // TODO: distinction between the several UPR modes
-        return hasMed() && resident.getCalcMediUPR1();
+    public void setShowOnDailyPlan(boolean showOnDailyPlan) {
+        this.showOnDailyPlan = showOnDailyPlan;
     }
 
-    public boolean isWeightControlled() {
-        return hasMed() && tradeform.isWeightControlled();
+    public List<SYSPRE2FILE> getAttachedFilesConnections() {
+        return attachedFilesConnections;
     }
 
-    @Override
-    public OPUsers getOwner() {
+    public void setAttachedFilesConnections(List<SYSPRE2FILE> attachedFilesConnections) {
+        this.attachedFilesConnections = attachedFilesConnections;
+    }
+
+    public List<SYSPRE2PROCESS> getAttachedProcessConnections() {
+        return attachedProcessConnections;
+    }
+
+    public void setAttachedProcessConnections(List<SYSPRE2PROCESS> attachedProcessConnections) {
+        this.attachedProcessConnections = attachedProcessConnections;
+    }
+
+    public List<PrescriptionSchedule> getpSchedule() {
+        return pSchedule;
+    }
+
+    public void setpSchedule(List<PrescriptionSchedule> pSchedule) {
+        this.pSchedule = pSchedule;
+    }
+
+    public Collection<ResInfo> getAnnotations() {
+        return annotations;
+    }
+
+    public void setAnnotations(Collection<ResInfo> annotations) {
+        this.annotations = annotations;
+    }
+
+    public OPUsers getUserON() {
         return userON;
     }
 
-    @Override
-    public String titleAsString() {
-        return SYSTools.xx("nursingrecords.prescription") + ": " + PrescriptionService.getShortDescriptionAsCompactText(this);
+    public void setUserON(OPUsers userON) {
+        this.userON = userON;
+    }
+
+    public OPUsers getUserOFF() {
+        return userOFF;
+    }
+
+    public void setUserOFF(OPUsers userOFF) {
+        this.userOFF = userOFF;
     }
 
     public Resident getResident() {
@@ -204,126 +269,67 @@ public class Prescription extends DefaultEntity implements Ownable, QElement, Co
         this.resident = resident;
     }
 
-    public boolean isClosed() {
-        return new DateTime(to).isBeforeNow();
+    public Intervention getIntervention() {
+        return intervention;
     }
 
-    public boolean isActiveOn(LocalDate day) {
-        return new Interval(new DateTime(from), new DateTime(to)).overlaps(new Interval(day.toDateTimeAtStartOfDay(), SYSCalendar.eod(day)));
+    public void setIntervention(Intervention intervention) {
+        this.intervention = intervention;
     }
 
-    public boolean isLimited() {
-        return to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+    public TradeForm getTradeform() {
+        return tradeform;
     }
 
-
-    public boolean isOnDemand() {
-        return situation != null;
+    public void setTradeform(TradeForm tradeform) {
+        this.tradeform = tradeform;
     }
 
-    public List<SYSPRE2FILE> getAttachedFilesConnections() {
-        return attachedFilesConnections;
+    public Situations getSituation() {
+        return situation;
     }
 
-    public List<SYSPRE2PROCESS> getAttachedProcessConnections() {
-        return attachedProcessConnections;
+    public void setSituation(Situations situation) {
+        this.situation = situation;
     }
 
-    public List<PrescriptionSchedule> getPrescriptionSchedule() {
-        return pSchedule;
+    public Hospital getHospitalON() {
+        return hospitalON;
     }
 
-    @Override
-    public OPUsers findOwner() {
-        return userON;
+    public void setHospitalON(Hospital hospitalON) {
+        this.hospitalON = hospitalON;
     }
 
-    @Override
-    public long pitInMillis() {
-        return from.getTime();
+    public Hospital getHospitalOFF() {
+        return hospitalOFF;
     }
 
-    @Override
-    public ArrayList<QProcess> findAttachedProcesses() {
-        ArrayList<QProcess> list = new ArrayList<QProcess>();
-        for (SYSPRE2PROCESS att : attachedProcessConnections) {
-            list.add(att.getQProcess());
-        }
-        return list;
+    public void setHospitalOFF(Hospital hospitalOFF) {
+        this.hospitalOFF = hospitalOFF;
     }
 
-
-    @Override
-    public String contentAsHTML() {
-        return PrescriptionService.getPrescriptionAsHTML(this, false, false, true, false);
+    public GP getDocON() {
+        return docON;
     }
 
-    @Override
-    public String pitAsHTML() {
-        String result = "";
-        DateFormat df = DateFormat.getDateInstance();
-
-        if (isClosed()) {
-
-            result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
-            result += "<tr>";
-            result += "<td valign=\"top\"><b>" + df.format(from) + "</b></td>";
-            result += "<td valign=\"top\">&raquo;</td>";
-            result += "<td valign=\"top\"><b>" + df.format(to) + "</b></td>";
-            result += "</tr>\n";
-            result += "<tr>";
-            result += "<td valign=\"top\">" + userON.getFullname() + "</td>";
-            result += "<td valign=\"top\">&raquo;</td>";
-            result += "<td valign=\"top\">" + userOFF.getFullname() + "</td>";
-            result += "</tr>\n";
-            if (docON != null || docOFF != null) {
-                result += "<tr>";
-                result += "<td valign=\"top\">" + GPService.getFullName(docON) + "</td>";
-                result += "<td valign=\"top\">&raquo;</td>";
-                result += "<td valign=\"top\">" + GPService.getFullName(docOFF) + "</td>";
-                result += "</tr>\n";
-            }
-            if (hospitalON != null || hospitalOFF != null) {
-                result += "<tr>";
-                result += "<td valign=\"top\">" + HospitalService.getFullName(hospitalON) + "</td>";
-                result += "<td valign=\"top\">&raquo;</td>";
-                result += "<td valign=\"top\">" + HospitalService.getFullName(hospitalOFF) + "</td>";
-                result += "</tr>\n";
-            }
-            result += "</table>\n";
-
-        } else {
-
-            if (to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
-                result += SYSConst.html_bold(df.format(from)) + "&nbsp;&raquo;&nbsp;" + SYSConst.html_bold(df.format(to));
-            } else {
-                result += SYSConst.html_bold(df.format(from)) + "&nbsp;&raquo;&raquo;";
-            }
-
-            result += "<br/>" + userON.getFullname();
-            if (docON != null) {
-                result += "<br/>";
-                result += GPService.getFullName(docON);
-            }
-            if (hospitalON != null) {
-                result += "<br/>";
-                result += HospitalService.getFullName(hospitalON);
-            }
-        }
-
-        result += "<br>" + "[" + id + "]";
-
-        return result;
+    public void setDocON(GP docON) {
+        this.docON = docON;
     }
 
+    public GP getDocOFF() {
+        return docOFF;
+    }
 
+    public void setDocOFF(GP docOFF) {
+        this.docOFF = docOFF;
+    }
 
+    public Collection<Commontags> getCommontags() {
+        return commontags;
+    }
 
-
-
-
-    @Override
-    public boolean isActive() {
-        return ResidentTools.isActive(resident) && !isClosed();
+    public void setCommontags(Collection<Commontags> commontags) {
+        this.commontags = commontags;
     }
 }

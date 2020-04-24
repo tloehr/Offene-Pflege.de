@@ -14,7 +14,7 @@ import java.util.GregorianCalendar;
 @Entity
 @Table(name = "pschedule")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class PrescriptionSchedule implements Serializable, Cloneable, Comparable<PrescriptionSchedule> {
+public class PrescriptionSchedule implements Serializable, Comparable<PrescriptionSchedule> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,69 +78,36 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
 
     }
 
-    public PrescriptionSchedule(Prescription prescription) {
-
-        nachtMo = BigDecimal.ZERO;
-        mittags = BigDecimal.ZERO;
-        nachmittags = BigDecimal.ZERO;
-        abends = BigDecimal.ZERO;
-        nachtAb = BigDecimal.ZERO;
-        uhrzeitDosis = BigDecimal.ZERO;
-        uhrzeit = null;
-        taeglich = 1;
-        woechentlich = 0;
-        monatlich = 0;
-        tagNum = 0;
-        lDatum = new Date();
-
-        this.prescription = prescription;
-
-        if (prescription.isOnDemand()) {
-            morgens = BigDecimal.ZERO;
-            maxAnzahl = 1;
-            maxEDosis = BigDecimal.ONE;
-        } else {
-            morgens = BigDecimal.ONE;
-            maxAnzahl = 0;
-            maxEDosis = BigDecimal.ZERO;
-        }
-
-        mon = 0;
-        die = 0;
-        mit = 0;
-        don = 0;
-        fre = 0;
-        sam = 0;
-        son = 0;
-
+    public PrescriptionSchedule(PrescriptionSchedule other) {
+        this.bhppid = other.bhppid;
+        this.version = other.version;
+        this.nachtMo = other.nachtMo;
+        this.morgens = other.morgens;
+        this.mittags = other.mittags;
+        this.nachmittags = other.nachmittags;
+        this.abends = other.abends;
+        this.nachtAb = other.nachtAb;
+        this.uhrzeitDosis = other.uhrzeitDosis;
+        this.uhrzeit = other.uhrzeit;
+        this.maxAnzahl = other.maxAnzahl;
+        this.maxEDosis = other.maxEDosis;
+        this.taeglich = other.taeglich;
+        this.woechentlich = other.woechentlich;
+        this.monatlich = other.monatlich;
+        this.tagNum = other.tagNum;
+        this.mon = other.mon;
+        this.die = other.die;
+        this.mit = other.mit;
+        this.don = other.don;
+        this.fre = other.fre;
+        this.sam = other.sam;
+        this.son = other.son;
+        this.lDatum = other.lDatum;
+        this.checkAfterHours = other.checkAfterHours;
+        this.prescription = other.prescription;
     }
 
-    public PrescriptionSchedule(BigDecimal nachtMo, BigDecimal morgens, BigDecimal mittags, BigDecimal nachmittags, BigDecimal abends, BigDecimal nachtAb, BigDecimal uhrzeitDosis, Date uhrzeit, Integer maxAnzahl, BigDecimal maxEDosis, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Date lDatum, Prescription prescription) {
-        this.nachtMo = nachtMo;
-        this.morgens = morgens;
-        this.mittags = mittags;
-        this.nachmittags = nachmittags;
-        this.abends = abends;
-        this.nachtAb = nachtAb;
-        this.uhrzeitDosis = uhrzeitDosis;
-        this.uhrzeit = uhrzeit;
-        this.maxAnzahl = maxAnzahl;
-        this.maxEDosis = maxEDosis;
-        this.taeglich = taeglich;
-        this.woechentlich = woechentlich;
-        this.monatlich = monatlich;
-        this.tagNum = tagNum;
-        this.mon = mon;
-        this.die = die;
-        this.mit = mit;
-        this.don = don;
-        this.fre = fre;
-        this.sam = sam;
-        this.son = son;
-        this.lDatum = lDatum;
-        this.prescription = prescription;
-//        this.prescription.getPlanungen().add(this);
-    }
+
 
     public Long getBhppid() {
         return bhppid;
@@ -632,14 +599,6 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         return result;
     }
 
-    @Override
-    public Object clone() {
-        return new PrescriptionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, prescription);
-    }
-
-    public PrescriptionSchedule createCopy(Prescription myprescription) {
-        return new PrescriptionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, myprescription);
-    }
 
     /**
      * Vergleichsoperator für die Sortierung. Die Sortierung soll in folgender Reihenfolge sein:

@@ -6,15 +6,15 @@ package de.offene_pflege.op.care.sysfiles;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import de.offene_pflege.backend.entity.done.SYSFiles;
-import de.offene_pflege.backend.services.SYSFilesService;
-import de.offene_pflege.backend.entity.done.ResInfo;
 import de.offene_pflege.backend.entity.done.NursingProcess;
+import de.offene_pflege.backend.entity.done.ResInfo;
+import de.offene_pflege.backend.entity.done.SYSFiles;
 import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.reports.NReport;
 import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.backend.entity.values.ResValue;
-import de.offene_pflege.interfaces.Attachable;
+import de.offene_pflege.backend.services.PrescriptionService;
+import de.offene_pflege.backend.services.SYSFilesService;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.FileDrop;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -39,7 +39,7 @@ import java.util.Collections;
  * @author Torsten Löhr
  */
 public class DlgFiles extends MyJDialog {
-    private Attachable attachable;
+    private Object attachable;
     //    private boolean filesAttached = false;
     private Closure afterAttachAction;
     private JList list;
@@ -50,7 +50,7 @@ public class DlgFiles extends MyJDialog {
      * @param attachable        object to add the files to
      * @param afterAttachAction what to do, after files have been attached. if this is <code>null</code>, file drops are not possible.
      */
-    public DlgFiles(Attachable attachable, Closure afterAttachAction) {
+    public DlgFiles(Object attachable, Closure afterAttachAction) {
         super(false);
         this.attachable = attachable;
         this.afterAttachAction = afterAttachAction;
@@ -59,7 +59,7 @@ public class DlgFiles extends MyJDialog {
     }
 
     private void initDialog() {
-        if (!attachable.isActive()) {
+        if (!isActive(attachable)) {
             contentPanel.add(getFileListPanel(), CC.xywh(1, 1, 3, 1));
         } else {
             contentPanel.add(getFileDropPanel(), CC.xy(1, 1));
@@ -154,7 +154,7 @@ public class DlgFiles extends MyJDialog {
         return pnlFilesList;
     }
 
-    private ArrayList<SYSFiles> getAttachedFilesList(Attachable attachable) {
+    private ArrayList<SYSFiles> getAttachedFilesList(Object attachable) {
         ArrayList<SYSFiles> files = null;
         EntityManager em = OPDE.createEM();
         if (attachable instanceof NReport) {
@@ -175,11 +175,11 @@ public class DlgFiles extends MyJDialog {
             Query query = em.createQuery(" SELECT s "
                     + " FROM SYSFiles s "
                     + " JOIN s.bwiAssignCollection sf "
-                    + " WHERE sf.bwinfo = :bwinfo ");
+                    + " WHERE sf.resInfo = :bwinfo ");
             query.setParameter("bwinfo", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof ResValue) {
-            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.valAssignCollection sf WHERE sf.value = :resval ");
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.valAssignCollection sf WHERE sf.resValue = :resval ");
             query.setParameter("resval", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof NursingProcess) {
@@ -187,7 +187,7 @@ public class DlgFiles extends MyJDialog {
             query.setParameter("np", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof OPUsers) {
-            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.usersAssignCollection uf WHERE uf.user = :user ");
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.usersAssignCollection uf WHERE uf.opUsers = :user ");
             query.setParameter("user", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         }
@@ -197,6 +197,25 @@ public class DlgFiles extends MyJDialog {
         em.close();
         return files;
     }
+
+    private boolean isActive(Object attachable) {
+
+           if (attachable instanceof NReport) {
+               return ((NReport) attachable).isActive();
+           } else if (attachable instanceof Prescription) {
+               return !PrescriptionService.isClosed((Prescription) attachable);
+           } else if (attachable instanceof ResInfo) {
+
+           } else if (attachable instanceof ResValue) {
+
+           } else if (attachable instanceof NursingProcess) {
+               ((NursingProcess) attachable).active();
+           } else if (attachable instanceof OPUsers) {
+
+           }
+
+           return false;
+       }
 
 
     private void btnCancelActionPerformed(ActionEvent e) {

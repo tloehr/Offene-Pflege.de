@@ -47,7 +47,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "resinfo")
-public class ResInfo extends DefaultEntity implements QElement, Comparable<ResInfo>, Attachable {
+public class ResInfo extends DefaultEntity {//implements QElement, Comparable<ResInfo>, Attachable {
     private Date from;
     private Date to;
     private String properties;
@@ -65,6 +65,23 @@ public class ResInfo extends DefaultEntity implements QElement, Comparable<ResIn
 
 
     public ResInfo() {
+    }
+
+    public ResInfo(ResInfo other) {
+        this.from = other.from;
+        this.to = other.to;
+        this.properties = other.properties;
+        this.bemerkung = other.bemerkung;
+        this.connectionid = other.connectionid;
+        this.resInfoType = other.resInfoType;
+        this.userON = other.userON;
+        this.userOFF = other.userOFF;
+        this.resident = other.resident;
+        this.resValue = other.resValue;
+        this.prescription = other.prescription;
+        this.commontags = other.commontags;
+        this.attachedFilesConnections = other.attachedFilesConnections;
+        this.attachedProcessConnections = other.attachedProcessConnections;
     }
 
     @Basic(optional = false)
@@ -218,61 +235,5 @@ public class ResInfo extends DefaultEntity implements QElement, Comparable<ResIn
         this.attachedProcessConnections = attachedProcessConnections;
     }
 
-    @Override
-    public int compareTo(ResInfo resInfo) {
-        int compare = this.getResInfoType().isDeprecated().compareTo(resInfo.getResInfoType().isDeprecated()) * -1;
-        if (compare == 0) {
-            compare = to.compareTo(resInfo.getTo());
-        }
-        if (compare == 0) {
-            compare = from.compareTo(resInfo.getFrom());
-        }
-        return compare * -1;
-    }
 
-    @Override
-    public long pitInMillis() {
-        return from.getTime();
-    }
-
-    @Override
-    public ArrayList<QProcess> findAttachedProcesses() {
-        ArrayList<QProcess> list = new ArrayList<>();
-        for (SYSINF2PROCESS att : attachedProcessConnections) {
-            list.add(att.getQProcess());
-        }
-        return list;
-    }
-
-    @Override
-    public String contentAsHTML() {
-        return ResInfoService.getContentAsHTML(this);
-    }
-
-    @Override
-    public String titleAsString() {
-        return null;
-    }
-
-    @Override
-    public String pitAsHTML() {
-        return ResInfoService.getPITAsHTML(this);
-    }
-
-    @Override
-    public OPUsers findOwner() {
-        return null;
-    }
-
-
-    @Override
-    public boolean active() {
-        return ResidentTools.isActive(resident) && !ResInfoService.isClosed(this);
-    }
-
-
-    @Override
-    public long findPrimaryKey() {
-        return getId();
-    }
 }

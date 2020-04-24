@@ -48,10 +48,4 @@ public interface QElement {
 
     Resident getResident();
 
-    /**
-     * Gibt eine ID des Objektes zurück. Das ist der Primary Key aus der Datenbank.
-     *
-     * @return
-     */
-    long findPrimaryKey();
 }

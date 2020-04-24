@@ -28,7 +28,7 @@
 package de.offene_pflege.op.care.prescription;
 
 import de.offene_pflege.backend.entity.prescription.Prescription;
-import de.offene_pflege.backend.services.PrescriptionScheduleTools;
+import de.offene_pflege.backend.services.PrescriptionScheduleService;
 import de.offene_pflege.op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
@@ -72,7 +72,7 @@ public class TMDose
         String result = "";
         switch (col) {
             case COL_Dosis: {
-                result = SYSTools.toHTML(PrescriptionScheduleTools.getDoseAsHTML(verordnung.getPrescriptionSchedule().get(row), null, true));
+                result = SYSTools.toHTML(PrescriptionScheduleService.getDoseAsHTML(verordnung.getPrescriptionSchedule().get(row), null, true));
                 break;
             }
             default: {

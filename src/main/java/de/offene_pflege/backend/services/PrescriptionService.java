@@ -12,21 +12,18 @@ import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import de.offene_pflege.backend.entity.done.*;
 import de.offene_pflege.backend.entity.prescription.Prescription;
 import de.offene_pflege.backend.entity.prescription.PrescriptionSchedule;
-import de.offene_pflege.backend.entity.prescription.Situations;
-import de.offene_pflege.backend.entity.prescription.TradeForm;
+import de.offene_pflege.backend.entity.process.QProcess;
 import de.offene_pflege.backend.entity.process.SYSPRE2PROCESS;
 import de.offene_pflege.backend.entity.system.Commontags;
 import de.offene_pflege.backend.entity.system.CommontagsTools;
-import de.offene_pflege.backend.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -47,79 +44,201 @@ import java.util.concurrent.ExecutionException;
  */
 public class PrescriptionService {
 
+    public static Comparator<Prescription> getComparator() {
+        return (us, them) -> {
+            int result = ((Boolean) isOnDemand(us)).compareTo(isOnDemand(them)) * -1;
+            if (result == 0) {
+                result = ((Boolean) hasMed(us)).compareTo(hasMed(them));
+            }
+            if (result == 0) {
+                String mytitle = hasMed(us) ? us.getTradeform().getMedProduct().getText() : us.getIntervention().getBezeichnung();
+                String thattitle = hasMed(us) ? them.getTradeform().getMedProduct().getText() : them.getIntervention().getBezeichnung();
+                result = mytitle.compareTo(thattitle);
+            }
+            if (result == 0) {
+                result = Long.valueOf(us.getRelation()).compareTo(them.getRelation());
+            }
+            if (result == 0) {
+                result = ((Boolean) isClosed(us)).compareTo(isClosed(them));
+            }
+            if (result == 0) {
+                result = us.getFrom().compareTo(them.getFrom()) * -1;
+            }
+            return result;
+        };
+    }
 
     public static Prescription create(Resident resident) {
-           create(new Date(), SYSConst.DATE_UNTIL_FURTHER_NOTICE)
+        Prescription p = new Prescription();
+        p.setFrom(new Date());
+        p.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        p.setResident(resident);
+        p.setUserON(OPDE.getLogin().getUser());
+        p.setAttachedFilesConnections(new ArrayList<>());
+        p.setAttachedProcessConnections(new ArrayList<>());
+        p.setpSchedule(new ArrayList<>());
+        p.setCommontags(new ArrayList<>());
+        p.setAnnotations(new ArrayList<>());
+        return p;
+    }
+
+    public static Prescription create(Prescription source) { // ursprünglich clone
+        final Prescription clone = new Prescription(source);
+        clone.setpSchedule(new ArrayList<>());
+        source.getpSchedule().forEach(ps ->
+                clone.getpSchedule().add(new PrescriptionSchedule(ps))
+        );
+
+        source.getAnnotations().forEach(annotation -> {
+            ResInfo annotationClone = new ResInfo(annotation);
+            annotationClone.setAttachedFilesConnections(new ArrayList<>());
+            annotationClone.setAttachedProcessConnections(new ArrayList<>());
+            annotationClone.setCommontags(new HashSet<>());
+            annotationClone.setPrescription(clone);
+            clone.getAnnotations().add(annotationClone);
+        });
+
+        source.getCommontags().forEach(commontag -> clone.getCommontags().add(commontag));
+
+        return clone;
+    }
+
+    // todo: wo wird das benutzt ?
+//    public static  String getText() {
+//        return SYSTools.catchNull(text);
+//    }
+
+//    public static  void setText(String bemerkung) {
+//        this.text = SYSTools.tidy(bemerkung);
+//    }
+
+    public static boolean hasMed(Prescription p) {
+        return p.getTradeform() != null;
+    }
+
+    public static boolean shouldBeCalculated(Prescription p) {
+        // TODO: distinction between the several UPR modes
+        return hasMed(p) && p.getResident().getCalcMediUPR1();
+    }
+
+    public static boolean isWeightControlled(Prescription p) {
+        return hasMed(p) && p.getTradeform().isWeightControlled();
+    }
+
+    public static boolean isClosed(Prescription p) {
+        return new DateTime(p.getTo()).isBeforeNow() && ResidentTools.isActive(p.getResident());
+    }
+
+    public static boolean isActiveOn(Prescription p, LocalDate day) {
+        return new Interval(new DateTime(p.getFrom()), new DateTime(p.getTo())).overlaps(new Interval(day.toDateTimeAtStartOfDay(), SYSCalendar.eod(day)));
+    }
+
+    public static boolean isLimited(Prescription p) {
+        return p.getTo().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+    }
 
 
-           this.resident = resident;
+    public static boolean isOnDemand(Prescription p) {
+        return p.getSituation() != null;
+    }
 
-           this.from = new Date();
-           this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
-           this.userON = OPDE.getLogin().getUser();
-
-
-       }
-
-       public static Prescription create(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, OPUsers userON, OPUsers userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
-           this.from = from;
-           this.to = to;
-           this.toEndOfPackage = toEndOfPackage;
-           this.relation = relation;
-           this.text = SYSTools.tidy(text);
-           this.showOnDailyPlan = showOnDailyPlan;
-           this.attachedFilesConnections = attachedFilesConnections;
-           this.attachedProcessConnections = attachedProcessConnections;
-           this.userON = userON;
-           this.userOFF = userOFF;
-           this.resident = resident;
-           this.intervention = intervention;
-           this.tradeform = tradeform;
-           this.situation = situation;
-           this.hospitalON = hospitalON;
-           this.hospitalOFF = hospitalOFF;
-           this.docON = docON;
-           this.docOFF = docOFF;
-
-       }
+//    @Override
+//    public OPUsers getOwner(Prescription p) {
+//        return userON;
+//    }
 
 
-      public Prescription create(Prescription source) {
-          final Prescription prescriptionClone = new Prescription(from, to, toEndOfPackage, relation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, OPDE.getLogin().getUser(), userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
+    public static String getTitle(Prescription p) {
+        return SYSTools.xx("nursingrecords.prescription") + ": " + getShortDescriptionAsCompactText(p);
+    }
 
-          CollectionUtils.forAllDo(pSchedule, new Closure() {
-              public void execute(Object o) {
-                  PrescriptionSchedule scheduleCopy = ((PrescriptionSchedule) o).createCopy(prescriptionClone);
-                  prescriptionClone.getPrescriptionSchedule().add(scheduleCopy);
-              }
-          });
+    @Override
+    public ArrayList<QProcess> findAttachedProcesses() {
+        ArrayList<QProcess> list = new ArrayList<QProcess>();
+        for (SYSPRE2PROCESS att : attachedProcessConnections) {
+            list.add(att.getQProcess());
+        }
+        return list;
+    }
 
-          for (Commontags ctag : commontags) {
-              prescriptionClone.getCommontags().add(ctag);
-          }
 
-          for (ResInfo annotation : annotations) {
-              ResInfo annotationClone = ResInfoService.clone(annotation);
-              annotationClone.setPrescription(prescriptionClone);
+//    @Override
+//    public String contentAsHTML() {
+//        return PrescriptionService.getPrescriptionAsHTML(this, false, false, true, false);
+//    }
+//
+//    @Override
+//    public String pitAsHTML() {
+//        String result = "";
+//        DateFormat df = DateFormat.getDateInstance();
+//
+//        if (isClosed()) {
+//
+//            result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
+//            result += "<tr>";
+//            result += "<td valign=\"top\"><b>" + df.format(from) + "</b></td>";
+//            result += "<td valign=\"top\">&raquo;</td>";
+//            result += "<td valign=\"top\"><b>" + df.format(to) + "</b></td>";
+//            result += "</tr>\n";
+//            result += "<tr>";
+//            result += "<td valign=\"top\">" + userON.getFullname() + "</td>";
+//            result += "<td valign=\"top\">&raquo;</td>";
+//            result += "<td valign=\"top\">" + userOFF.getFullname() + "</td>";
+//            result += "</tr>\n";
+//            if (docON != null || docOFF != null) {
+//                result += "<tr>";
+//                result += "<td valign=\"top\">" + GPService.getFullName(docON) + "</td>";
+//                result += "<td valign=\"top\">&raquo;</td>";
+//                result += "<td valign=\"top\">" + GPService.getFullName(docOFF) + "</td>";
+//                result += "</tr>\n";
+//            }
+//            if (hospitalON != null || hospitalOFF != null) {
+//                result += "<tr>";
+//                result += "<td valign=\"top\">" + HospitalService.getFullName(hospitalON) + "</td>";
+//                result += "<td valign=\"top\">&raquo;</td>";
+//                result += "<td valign=\"top\">" + HospitalService.getFullName(hospitalOFF) + "</td>";
+//                result += "</tr>\n";
+//            }
+//            result += "</table>\n";
+//
+//        } else {
+//
+//            if (to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
+//                result += SYSConst.html_bold(df.format(from)) + "&nbsp;&raquo;&nbsp;" + SYSConst.html_bold(df.format(to));
+//            } else {
+//                result += SYSConst.html_bold(df.format(from)) + "&nbsp;&raquo;&raquo;";
+//            }
+//
+//            result += "<br/>" + userON.getFullname();
+//            if (docON != null) {
+//                result += "<br/>";
+//                result += GPService.getFullName(docON);
+//            }
+//            if (hospitalON != null) {
+//                result += "<br/>";
+//                result += HospitalService.getFullName(hospitalON);
+//            }
+//        }
+//
+//        result += "<br>" + "[" + id + "]";
+//
+//        return result;
+//    }
+//
 
-              prescriptionClone.getAnnotations().add(annotationClone);
-          }
-
-          return prescriptionClone;
-      }
     /**
-     * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
-     * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
-     * Aufgrund der ungleichen HTML Standards (insbesonders der Druckdarstellung im CSS2.0 und später auch CSS2.1)
-     * muss ich hier einen Trick anwenden, damit das auf verschiedenen Browsern halbwegs gleich aussieht.
+     * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format. Eine Besonderheit bei der
+     * Implementierung muss ich hier erläutern. Aufgrund der ungleichen HTML Standards (insbesonders der
+     * Druckdarstellung im CSS2.0 und später auch CSS2.1) muss ich hier einen Trick anwenden, damit das auf
+     * verschiedenen Browsern halbwegs gleich aussieht.
      * <p>
-     * Daher addiere ich jedes größere Element auf einer Seite (also Header, Tabellen Zeilen) mit dem Wert 1.
-     * Nach einer bestimmten Anzahl von Elementen erzwinge ich einen Pagebreak.
+     * Daher addiere ich jedes größere Element auf einer Seite (also Header, Tabellen Zeilen) mit dem Wert 1. Nach einer
+     * bestimmten Anzahl von Elementen erzwinge ich einen Pagebreak.
      * <p>
      * Nach einem Pagebreak wird der Name des aktuellen Bewohner nocheinmal wiederholt.
      * <p>
-     * Ein Mac OS Safari druckt mit diesen Werten sehr gut.
-     * Beim Firefox (about:settings) sollten die Ränder wie folgt eingestellt werden:
+     * Ein Mac OS Safari druckt mit diesen Werten sehr gut. Beim Firefox (about:settings) sollten die Ränder wie folgt
+     * eingestellt werden:
      * <ul>
      * <li>print.print_margin_bottom = 0.3</li>
      * <li>print.print_margin_left = 0.1</li>
@@ -350,7 +469,7 @@ public class PrescriptionService {
                     table.getDefaultCell().setVerticalAlignment(Element.ALIGN_JUSTIFIED);
                     table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_TOP);
 
-                    table.addCell(PrescriptionScheduleTools.getRemarkAsPhrase(schedule));
+                    table.addCell(PrescriptionScheduleService.getRemarkAsPhrase(schedule));
 
                     table.getDefaultCell().setBackgroundColor(null);
 
@@ -781,7 +900,7 @@ public class PrescriptionService {
             result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
         } else {
             for (PrescriptionSchedule schedule : listSchedules) {
-                result += PrescriptionScheduleTools.getDoseAsCompactText(schedule) + "; ";
+                result += PrescriptionScheduleService.getDoseAsCompactText(schedule) + "; ";
             }
             result = result.substring(0, result.length() - 2);
         }
@@ -803,10 +922,10 @@ public class PrescriptionService {
             PrescriptionSchedule schedule = null;
             while (planungen.hasNext()) {
                 schedule = planungen.next();
-                result += PrescriptionScheduleTools.getDoseAsHTML(schedule, previousSchedule, false);
+                result += PrescriptionScheduleService.getDoseAsHTML(schedule, previousSchedule, false);
                 previousSchedule = schedule;
             }
-            if (PrescriptionScheduleTools.getTerminStatus(schedule) != PrescriptionScheduleTools.MAXDOSE) {
+            if (PrescriptionScheduleService.getTerminStatus(schedule) != PrescriptionScheduleService.MAXDOSE) {
                 // Wenn die letzte Planung eine Tabelle benötigte (das tut sie dann, wenn
                 // es keine Bedarfsverordnung war), dann müssen wir die Tabelle hier noch
                 // schließen.
@@ -917,8 +1036,9 @@ public class PrescriptionService {
     }
 
     /**
-     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
-     * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
+     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können
+     * verschiedene Vorräte mit verschiedenen Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der
+     * Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getPrescriptionsByInventory(MedInventory inventory) {
         long begin = System.currentTimeMillis();
@@ -1101,8 +1221,9 @@ public class PrescriptionService {
     }
 
     /**
-     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
-     * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
+     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können
+     * verschiedene Vorräte mit verschiedenen Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der
+     * Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getOnDemandPrescriptions(Resident resident, Date date) {
         EntityManager em = OPDE.createEM();
