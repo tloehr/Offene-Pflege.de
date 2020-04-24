@@ -5,9 +5,11 @@ import de.offene_pflege.entity.DefaultEntity;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "resvaluetypes")
 public class Resvaluetypes extends DefaultEntity {
     private String text;
     private String label1;

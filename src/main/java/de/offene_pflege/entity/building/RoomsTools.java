@@ -43,7 +43,6 @@ public class RoomsTools {
     public static ArrayList<Rooms> getAllActive() {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" SELECT r FROM Rooms r WHERE r.active = TRUE AND r.floor.home.active = TRUE ORDER BY r.floor.home.id, r.floor.level, r.text ");
-        //SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname");
         ArrayList<Rooms> list = new ArrayList<Rooms>(query.getResultList());
         em.close();
 
@@ -63,7 +62,6 @@ public class RoomsTools {
     public static int getMaxLevel(Homes home) {
 
         Integer total = 0;
-        //        int inUse = 0;
 
         try {
             EntityManager em = OPDE.createEM();
@@ -79,15 +77,6 @@ public class RoomsTools {
         return total;
     }
 
-
-//    public static int countBeds(Homes home) {
-//        int total = 0;
-//        for (Rooms room : getAllActive(home)) {
-//            total++;
-//            if (!room.getSingle()) total++;
-//        }
-//        return total;
-//    }
 
     public static int countBeds(Homes home, short level) {
 
@@ -106,19 +95,6 @@ public class RoomsTools {
             if (!room.getSingle()) total++;
         }
 
-//        ResInfoType rooms = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM);
-//        for (Resident resident : ResidentTools.getAllActive(date, date)) {
-//            for (ResInfo resInfo : ResInfoTools.getAll(resident, rooms, SYSCalendar.midOfDay(date), SYSCalendar.midOfDay(date))) { // this is only one, sometimes none
-//                Properties props = SYSTools.getProperties(resInfo.getProperties());
-//                long rid = Long.parseLong(SYSTools.catchNull(props.getProperty("room.id"), "-1"));
-//                if (rid > 0) {
-//                    Rooms room = EntityTools.find(Rooms.class, rid);
-//                    if (room.getStation().equals(station)){
-//                        inUse++;
-//                    }
-//                }
-//            }
-//        }
 
         return total;
     }
@@ -147,54 +123,5 @@ public class RoomsTools {
         return room1;
     }
 
-
-//    /**
-//     * @param resident
-//     * @param day
-//     * @return
-//     * @relates #9
-//     */
-//    public static Rooms getRoomFor(Resident resident, LocalDate day) {
-//        Rooms room = null;
-//
-//        ArrayList<Resident2Rooms> list = getRoomsFor(resident, day);
-//        room = !list.isEmpty() ? list.get(list.size() - 1).getRoom() : null;
-//
-//        return room;
-//    }
-
-//    /**
-//     * @param em
-//     * @param resident
-//     * @param enddate
-//     * @throws Exception
-//     * @relates #9
-//     */
-//    public static void closeAll(EntityManager em, Resident resident, Date enddate) throws Exception {
-//        Query query = em.createQuery("" +
-//                " SELECT r FROM Resident2Rooms r WHERE r.resident = :resident" +
-//                "      AND r.to = :to ");
-//
-//        query.setParameter("resident", resident);
-//        query.setParameter("to", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-//
-//        ArrayList<Resident2Rooms> list = new ArrayList(query.getResultList());
-//
-//        if (!list.isEmpty()) {
-//            Resident2Rooms r2r = em.merge(list.get(0));
-//            em.lock(r2r, LockModeType.OPTIMISTIC);
-//            r2r.setTo(enddate);
-//        }
-//
-//    }
-
-//    public static DefaultComboBoxModel getCombobox4Levels() {
-//
-//        ArrayList<Station> listStat = new ArrayList();
-//
-//        DefaultComboBoxModel result = new DefaultComboBoxModel(listStat.toArray());
-//
-//        return result;
-//    }
 
 }

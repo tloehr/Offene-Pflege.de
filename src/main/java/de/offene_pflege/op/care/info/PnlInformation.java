@@ -2160,7 +2160,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             if (room != null) {
                                 ResInfo resinfo_room = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident));
                                 Properties props = new Properties();
-                                props.put("room.id", Long.toString(room.getRoomID()));
+                                props.put("room.id", Long.toString(room.getId()));
                                 props.put("room.text", room.toString());
                                 ResInfoTools.setContent(resinfo_room, props);
                                 ResInfoTools.setFrom(resinfo_room, stay);

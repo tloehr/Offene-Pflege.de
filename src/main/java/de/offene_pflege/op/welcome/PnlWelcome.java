@@ -22,7 +22,7 @@ import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.ResvaluetypesTools;
+import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
@@ -360,7 +360,7 @@ public class PnlWelcome extends CleanablePanel {
 
     private DefaultCPTitle createCP4NoStool(Object[] ns) {
         final Resident resident = (Resident) ns[0];
-        ResValue lastStool = (ResValue) ns[1];
+        Optional<ResValue> lastStool = (Optional<ResValue>) ns[1];
         int daysControl = (Integer) ns[2];
 
         String title = "<html><table border=\"0\">" +
@@ -368,7 +368,7 @@ public class PnlWelcome extends CleanablePanel {
                 "<td width=\"200\" align=\"left\">" +
                 "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
                 "<td width=\"200\" align=\"left\">" + SYSTools.xx("opde.welcome.lastStool") + ": " +
-                (lastStool == null ? SYSTools.xx("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.getPit())) + "</td>" +
+                (!lastStool.isPresent() ? SYSTools.xx("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.get().getPit())) + "</td>" +
                 "<td width=\"200\" align=\"left\">" + SYSTools.xx("controlling.misc.controlPeriod") + ": " +
                 daysControl + " " + SYSTools.xx("misc.msg.Days2") + "</td>" +
                 "</tr>" +
@@ -389,6 +389,7 @@ public class PnlWelcome extends CleanablePanel {
 
         return cptitle;
     }
+
 
 
     private DefaultCPTitle createCP4HighLowIn(Object[] ns) {
@@ -470,8 +471,8 @@ public class PnlWelcome extends CleanablePanel {
         BigDecimal absolut = entry.getValue3();
         BigDecimal prozent = entry.getValue4();
 
-        Optional<ResValue> height = ResValueTools.getLast(resident, ResvaluetypesTools.HEIGHT);
-        Optional<ResValue> weight = ResValueTools.getLast(resident, ResvaluetypesTools.WEIGHT);
+        Optional<ResValue> height = ResValueTools.getLast(resident, ResvaluetypesService.HEIGHT);
+        Optional<ResValue> weight = ResValueTools.getLast(resident, ResvaluetypesService.WEIGHT);
 
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +

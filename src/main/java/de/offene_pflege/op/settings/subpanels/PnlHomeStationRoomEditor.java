@@ -25,6 +25,8 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.FloorService;
+import de.offene_pflege.services.RoomsService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
@@ -274,7 +276,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
         ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate = cre -> {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-            Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
+            Floors myFloor = EntityTools.find(Floors.class, floor.getId());
             dcp.setTitleButtonText(myFloor.getName());
             dcp.getTitleButton().setForeground(GUITools.blend(floor.getHome().getColor(), Color.BLACK, 0.85f));
             dcp.setBackground(GUITools.blend(floor.getHome().getColor(), Color.WHITE, 0.18f));
@@ -282,7 +284,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
         ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-            Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
+            Floors myFloor = EntityTools.find(Floors.class, floor.getId());
             dcp.setContentPane(createContent(myFloor, (DefaultCollapsiblePane<Floors>) cre.getSource()));
         };
 
@@ -296,7 +298,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         DefaultCollapsiblePanes dcps = new DefaultCollapsiblePanes();
         dcps.setBackground(GUITools.blend(floor.getHome().getColor(), Color.WHITE, 0.2f));
         try {
-            PnlBeanEditor<Floors> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Floors.class, floor.getFloorid()), Floors.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+            PnlBeanEditor<Floors> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Floors.class, floor.getId()), Floors.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
 
             pbe.addDataChangeListener(new JPADataChangeListener<Floors>(evt -> {
                 pbe.reload(evt.getData());
@@ -317,7 +319,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
             ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
                 DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-                Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
+                Floors myFloor = EntityTools.find(Floors.class, floor.getId());
 
                 DefaultCollapsiblePanes dcps1 = new DefaultCollapsiblePanes();
                 dcps1.setBackground(GUITools.blend(myFloor.getHome().getColor(), Color.WHITE, 0.29f));
@@ -346,7 +348,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     private DefaultCollapsiblePane createCP(final Rooms room) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         ContentRequestedEventListener<DefaultCollapsiblePane> headerUpdate = cre -> {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-            Rooms myRoom = EntityTools.find(Rooms.class, room.getRoomID());
+            Rooms myRoom = EntityTools.find(Rooms.class, room.getId());
             dcp.setTitleButtonText(myRoom.getText());
             dcp.getTitleButton().setForeground(GUITools.blend(room.getFloor().getHome().getColor(), Color.BLACK, 0.85f));
             dcp.setBackground(GUITools.blend(room.getFloor().getHome().getColor(), Color.WHITE, 0.29f));
@@ -354,7 +356,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
         ContentRequestedEventListener<DefaultCollapsiblePane> contentUpdate = cre -> {
             DefaultCollapsiblePane dcp = (DefaultCollapsiblePane) cre.getSource();
-            Rooms myRoom = EntityTools.find(Rooms.class, room.getRoomID());
+            Rooms myRoom = EntityTools.find(Rooms.class, room.getId());
             dcp.setContentPane(createContent(myRoom, (DefaultCollapsiblePane<Rooms>) cre.getSource()));
         };
 
@@ -367,7 +369,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     private JPanel createContent(final Rooms room, DefaultCollapsiblePane<Rooms> dcl) {
         JPanel result = null;
         try {
-            PnlBeanEditor<Rooms> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Rooms.class, room.getRoomID()), Rooms.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
+            PnlBeanEditor<Rooms> pbe = new PnlBeanEditor<>(() -> EntityTools.find(Rooms.class, room.getId()), Rooms.class, PnlBeanEditor.SAVE_MODE_IMMEDIATE);
             pbe.setOpaque(true);
             pbe.setBackground(GUITools.blend(room.getFloor().getHome().getColor(), Color.WHITE, 0.33f));
             pbe.addDataChangeListener(new JPADataChangeListener<>(evt -> {
@@ -462,7 +464,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                newFloor = em.merge(new Floors(em.merge(myHome), SYSTools.xx("opde.settings.home.btnAddFloor")));
+                newFloor = em.merge(FloorService.create(em.merge(myHome), SYSTools.xx("opde.settings.home.btnAddFloor")));
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 em.getTransaction().rollback();
@@ -487,13 +489,13 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.home.btnAddRoom", SYSConst.icon22add, null);
         btnAddHome.addActionListener(e -> {
 
-            Floors myFloor = EntityTools.find(Floors.class, floor.getFloorid());
+            Floors myFloor = EntityTools.find(Floors.class, floor.getId());
 
             Rooms newRoom = null;
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                newRoom = em.merge(new Rooms(SYSTools.xx("opde.settings.home.btnAddRoom"), true, true, em.merge(myFloor)));
+                newRoom = em.merge(RoomsService.create(SYSTools.xx("opde.settings.home.btnAddRoom"), true, true, em.merge(myFloor)));
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 em.getTransaction().rollback();
@@ -588,17 +590,17 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             Container c = pnlMenu.getParent();
             ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
 
-            String message = EntityTools.mayBeDeleted(EntityTools.find(Floors.class, floor.getFloorid()));
+            String message = EntityTools.mayBeDeleted(EntityTools.find(Floors.class, floor.getId()));
             if (message != null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
                 return;
             }
 
-            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + floor.getName() + " (#" + floor.getFloorid() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + floor.getName() + " (#" + floor.getId() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     Floors myFloor = floor;
                     String key = getKey(myFloor);
-                    EntityTools.delete(EntityTools.find(Floors.class, floor.getFloorid()));
+                    EntityTools.delete(EntityTools.find(Floors.class, floor.getId()));
 
                     parentCPS.get(getKey(myFloor.getHome()) + ":floors").remove(cpMap.get(key));
                     cpMap.remove(key);
@@ -620,17 +622,17 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             Container c = pnlMenu.getParent();
             ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
 
-            String message = EntityTools.mayBeDeleted(EntityTools.find(Rooms.class, room.getRoomID()));
+            String message = EntityTools.mayBeDeleted(EntityTools.find(Rooms.class, room.getId()));
             if (message != null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
                 return;
             }
 
-            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + room.getText() + " (#" + room.getRoomID() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
+            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + room.getText() + " (#" + room.getId() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelFloor", SYSConst.icon48delete, o -> {
                 if (o.equals(JOptionPane.YES_OPTION)) {
                     parentCPS.get(getKey(room)).remove(cpMap.get(getKey(room)));
                     cpMap.remove(getKey(room));
-                    EntityTools.delete(EntityTools.find(Rooms.class, room.getRoomID()));
+                    EntityTools.delete(EntityTools.find(Rooms.class, room.getId()));
                 }
                 mainView();
             }));
@@ -676,11 +678,11 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
         if (object instanceof DefaultMutableTreeNode)
             object = ((DefaultMutableTreeNode) object).getUserObject();
         if (object instanceof Rooms)
-            return "room:" + ((Rooms) object).getRoomID();
+            return "room:" + ((Rooms) object).getId();
         if (object instanceof Homes)
             return "home:" + ((Homes) object).getId();
         if (object instanceof Floors)
-            return "floor:" + ((Floors) object).getFloorid();
+            return "floor:" + ((Floors) object).getId();
         if (object instanceof Station)
             return "station:" + ((Station) object).getId();
 

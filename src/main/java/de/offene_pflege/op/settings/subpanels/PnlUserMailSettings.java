@@ -9,6 +9,7 @@ import de.offene_pflege.gui.events.RelaxedDocumentListener;
 import de.offene_pflege.gui.interfaces.BoundedTextField;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.gui.interfaces.YesNoToggleButton;
+
 import de.offene_pflege.gui.parser.IntegerParser;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.settings.databeans.PersonalMailBean;

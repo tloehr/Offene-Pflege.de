@@ -9,6 +9,7 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.*;
+import de.offene_pflege.services.ResvaluetypesService;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.javatuples.Quintet;
@@ -277,7 +278,7 @@ public class ResValueTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 > 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("type", ResvaluetypesTools.LIQUIDBALANCE);
+        query.setParameter("type", ResvaluetypesService.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
         BigDecimal sumwert = (BigDecimal) query.getSingleResult();
@@ -292,7 +293,7 @@ public class ResValueTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 < 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("type", ResvaluetypesTools.LIQUIDBALANCE);
+        query.setParameter("type", ResvaluetypesService.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
         BigDecimal sumwert = (BigDecimal) query.getSingleResult();
@@ -389,7 +390,7 @@ public class ResValueTools {
                 " AND rv.vtype.valType = :type" +
                 " AND rv.editedBy IS NULL " +
                 " ORDER BY rv.pit DESC ");
-        query.setParameter("type", ResvaluetypesTools.PAIN);
+        query.setParameter("type", ResvaluetypesService.PAIN);
         query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
@@ -475,12 +476,12 @@ public class ResValueTools {
         String result = (rv.isDeleted() || rv.isReplaced() ? "<s>" : "");
 //        NumberFormat dcf = DecimalFormat.getNumberInstance();
 
-        if (rv.getType().getValType() == ResvaluetypesTools.RR) {
+        if (rv.getType().getValType() == ResvaluetypesService.RR) {
             DecimalFormat dcf1 = new DecimalFormat(rv.getType().getFormat1());
             DecimalFormat dcf2 = new DecimalFormat(rv.getType().getFormat2());
             DecimalFormat dcf3 = new DecimalFormat(rv.getType().getFormat3());
             result += "<b>" + dcf1.format(rv.getVal1()) + "/" + dcf2.format(rv.getVal2()) + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + dcf3.format(rv.getVal3()) + " " + rv.getType().getUnit3() + "</b>";
-        } else if (rv.getType().getValType() == ResvaluetypesTools.STOOL || rv.getType().getValType() == ResvaluetypesTools.VOMIT || rv.getType().getValType() == ResvaluetypesTools.ASPIRATION) {
+        } else if (rv.getType().getValType() == ResvaluetypesService.STOOL || rv.getType().getValType() == ResvaluetypesService.VOMIT || rv.getType().getValType() == ResvaluetypesService.ASPIRATION) {
             result += "<i>" + SYSTools.catchNull(rv.getText(), "--") + "</i>";
         } else {
             DecimalFormat dcf = new DecimalFormat(rv.getType().getFormat1());
@@ -586,7 +587,7 @@ public class ResValueTools {
                 " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
 
         Query query = em.createQuery(retiredToo ? jpqlWithRetired : jpqlWithoutRetired);
-        query.setParameter("valType", ResvaluetypesTools.WEIGHT);
+        query.setParameter("valType", ResvaluetypesService.WEIGHT);
         query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<ResValue> listVal = new ArrayList<ResValue>(query.getResultList());
         em.close();
@@ -605,8 +606,8 @@ public class ResValueTools {
         html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nutrition.weightstats")));
         html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
-        Resvaluetypes heightType = ResvaluetypesTools.getType(ResvaluetypesTools.HEIGHT);
-        Resvaluetypes weightType = ResvaluetypesTools.getType(ResvaluetypesTools.WEIGHT);
+        Resvaluetypes heightType = ResvaluetypesService.getType(ResvaluetypesService.HEIGHT);
+        Resvaluetypes weightType = ResvaluetypesService.getType(ResvaluetypesService.WEIGHT);
         p = 0;
 
         for (Resident resident : listResidents) {
@@ -615,7 +616,7 @@ public class ResValueTools {
 
             html.append(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
 
-            Optional<ResValue> height = getLast(resident, ResvaluetypesTools.HEIGHT);
+            Optional<ResValue> height = getLast(resident, ResvaluetypesService.HEIGHT);
 
             html.append(
                     SYSConst.html_div(
@@ -713,7 +714,7 @@ public class ResValueTools {
                 " ORDER BY rv.resident.id, rv.pit ";
 
         Query query = em.createQuery(jpqlWithoutRetired);
-        query.setParameter("valType", ResvaluetypesTools.WEIGHT);
+        query.setParameter("valType", ResvaluetypesService.WEIGHT);
         query.setParameter("from", DateUtils.asDate(from.atStartOfDay()));
         ArrayList<ResValue> listVal = new ArrayList<ResValue>(query.getResultList());
         em.close();
@@ -770,7 +771,7 @@ public class ResValueTools {
                 " AND rv.pit <= :to" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
-        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
+        query.setParameter("valType", ResvaluetypesService.LIQUIDBALANCE);
         query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         query.setParameter("to", SYSCalendar.eod(to).toDate());
         ArrayList<ResValue> list = null;
@@ -881,7 +882,7 @@ public class ResValueTools {
                 " AND rv.pit >= :from" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
-        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
+        query.setParameter("valType", ResvaluetypesService.LIQUIDBALANCE);
         query.setParameter("from", from.toDate());
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
         em.close();
@@ -964,10 +965,10 @@ public class ResValueTools {
                     if (startingOn == null || now.minusDays(days).compareTo(startingOn) >= 0) {
                         startingOn = now.minusDays(days);
                     }
-                    Optional<ResValue> lastStool = getLast(resident, ResvaluetypesTools.STOOL);
+                    Optional<ResValue> lastStool = getLast(resident, ResvaluetypesService.STOOL);
 
-                    if (lastStool.isPresent() || new DateTime(lastStool.get().getPit()).toLocalDate().isBefore(startingOn)) {
-                        result.add(new Object[]{resident, lastStool.get(), days});
+                    if (!lastStool.isPresent() || new DateTime(lastStool.get().getPit()).toLocalDate().isBefore(startingOn)) {
+                        result.add(new Object[]{resident, lastStool, days});
                     }
                 }
             }
@@ -1233,7 +1234,7 @@ public class ResValueTools {
 
 
         Query trinkQuery = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype AND rv.pit >= :after AND rv.pit <= :before AND rv.editedBy = NULL ORDER BY rv.pit");
-        trinkQuery.setParameter("vtype", ResvaluetypesTools.getType(ResvaluetypesTools.LIQUIDBALANCE));
+        trinkQuery.setParameter("vtype", ResvaluetypesService.getType(ResvaluetypesService.LIQUIDBALANCE));
         trinkQuery.setParameter("resident", resident);
         trinkQuery.setParameter("after", JavaTimeConverter.toDate(after.atStartOfDay()));
         trinkQuery.setParameter("before", JavaTimeConverter.toDate(before.atTime(23, 59, 59)));

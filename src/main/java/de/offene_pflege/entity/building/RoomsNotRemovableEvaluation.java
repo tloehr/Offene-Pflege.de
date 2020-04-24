@@ -18,7 +18,7 @@ public class RoomsNotRemovableEvaluation implements NotRemovableEvaluation<Rooms
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT e FROM ResInfo e WHERE e.properties LIKE :pattern");
-        query.setParameter("pattern", "%room.id=" + checkme.getRoomID()+"%");
+        query.setParameter("pattern", "%room.id=" + checkme.getId()+"%");
         query.setMaxResults(1);
         ArrayList<Rooms> list = new ArrayList<Rooms>(query.getResultList());
         em.close();

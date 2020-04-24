@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
 public class PasswordBean {
 
     @NotEmpty(message = "opde.settings.personal.oldpw.empty")
-    @EditorComponent(label = "opde.settings.personal.oldpw", parserClass = "gui.parser.OldPasswordParser", component = {"textfield"})
+    @EditorComponent(label = "opde.settings.personal.oldpw", parserClass = "de.offene_pflege.gui.parser.OldPasswordParser", component = {"textfield"})
     String oldPassword;
 
     @NotEmpty(message = "opde.settings.personal.newpw.empty")

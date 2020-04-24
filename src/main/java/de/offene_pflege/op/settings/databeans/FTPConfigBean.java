@@ -16,7 +16,7 @@ public class FTPConfigBean {
     @EditorComponent(label = "opde.settings.ftp.host", component = {"textfield"})
     String host;
     @Size(min = 1, max = 200, message = "msg.string.length.error")
-    @EditorComponent(label = "opde.settings.ftp.port", parserClass = "gui.parser.IntegerParser", component = {"textfield"})
+    @EditorComponent(label = "opde.settings.ftp.port", parserClass = "de.offene_pflege.gui.parser.IntegerParser", component = {"textfield"})
     String port;
     @Size(min = 1, max = 200, message = "msg.string.length.error")
     @EditorComponent(label = "opde.settings.ftp.user", component = {"textfield"})

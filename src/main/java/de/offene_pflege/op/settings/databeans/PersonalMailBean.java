@@ -11,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
 public class PersonalMailBean {
 
     @NotEmpty
-    @EditorComponent(label = "opde.settings.personal.mailaddress", parserClass = "gui.parser.MailParser", component = {"textfield"})
+    @EditorComponent(label = "opde.settings.personal.mailaddress", parserClass = "de.offene_pflege.gui.parser.MailParser", component = {"textfield"})
     String mail;
 
     public PersonalMailBean() {

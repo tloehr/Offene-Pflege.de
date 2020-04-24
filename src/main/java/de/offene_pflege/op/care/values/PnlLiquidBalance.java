@@ -19,7 +19,7 @@ import de.offene_pflege.entity.process.SYSVAL2PROCESS;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
 import de.offene_pflege.entity.values.Resvaluetypes;
-import de.offene_pflege.entity.values.ResvaluetypesTools;
+import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
@@ -75,7 +75,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         super("nursingrecords.liquidbalances");
         this.resident = resident;
         this.jspSearch = jspSearch;
-        LIQUIDBALANCE = ResvaluetypesTools.getType(ResvaluetypesTools.LIQUIDBALANCE);
+        LIQUIDBALANCE = ResvaluetypesService.getType(ResvaluetypesService.LIQUIDBALANCE);
         listOfDays = new ArrayList<>();
         initComponents();
         initPanel();
@@ -376,7 +376,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         if (listValues != null) {
             listValues.clear();
         }
-        listValues = ResValueTools.getResValuesNoEdits(resident, ResvaluetypesTools.LIQUIDBALANCE, from, to);
+        listValues = ResValueTools.getResValuesNoEdits(resident, ResvaluetypesService.LIQUIDBALANCE, from, to);
 
         Object[][] data = new Object[listValues.size()][5];
         int row = 0;

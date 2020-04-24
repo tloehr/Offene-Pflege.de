@@ -32,6 +32,7 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.util.HashSet;
@@ -92,12 +93,6 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         this(dataProvider, clazz, SAVE_MODE_CUSTOM);
     }
 
-//    public PnlBeanEditor(DataProvider<T> dataProvider, Class<T> clazz, Closure cancelCallback)
-//            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-//        this(dataProvider, clazz, SAVE_MODE_OK_CANCEL);
-//        this.cancelCallback = cancelCallback;
-//    }
-
     public void setCustomPanel(JPanel customPanel) {
         add(customPanel, CC.xyw(1, componentSet.size() * 2 + 2, 5, CC.FILL, CC.FILL));
     }
@@ -137,12 +132,15 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
         // fields means the fields of the BeanClass which defines the bahavior of the editor
         Field[] fields = data.getClass().getDeclaredFields();
 
-//        Method[] methods = data.getClass().getDeclaredMethods();
+        Method[] methods = data.getClass().getDeclaredMethods();
+
+
 
         // I have to count them first.
         // makes sure, that we only care about fields which are meant for this editor.
         int numfields = 0;
         for (final Field field : fields) {
+
             if (field.isAnnotationPresent(EditorComponent.class)) {
                 numfields++;
             }
@@ -218,7 +216,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 //                            logger.debug(String.format("Content of the 'data' object: %s", ((Properties) data).getProperty(field.getName())));
 
                             if (saveMode == SAVE_MODE_IMMEDIATE) {
-                                broadcast(); // spread the news, that the data object was updated. in case of a contraint violation, an exception is thrown
+                                broadcast(); // spread the news, that the data object was updated. in case of a constraint violation, an exception is thrown
                             }
 
                             OPDE.getDisplayManager().clearSubMessages();

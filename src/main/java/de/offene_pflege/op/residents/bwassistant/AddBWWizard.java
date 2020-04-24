@@ -305,7 +305,7 @@ public class AddBWWizard {
                     resinfo_room = ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
 
                     Properties props = new Properties();
-                    props.put("room.id", Long.toString(room.getRoomID()));
+                    props.put("room.id", Long.toString(room.getId()));
                     props.put("room.text", room.toString());
                     ResInfoTools.setContent(resinfo_room, props);
                     ResInfoTools.setFrom(resinfo_room, hauf);

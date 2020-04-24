@@ -13,7 +13,7 @@ import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.entity.system.UniqueTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.entity.values.ResvaluetypesTools;
+import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.exceptions.MissingInformationException;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.*;
@@ -902,7 +902,7 @@ public class ResInfoTools implements HasLogger {
         }
 
 
-        Optional<ResValue> weight = ResValueTools.getLast(resident, ResvaluetypesTools.WEIGHT);
+        Optional<ResValue> weight = ResValueTools.getLast(resident, ResvaluetypesService.WEIGHT);
 
         BigDecimal theoreticalweight = weight.isPresent() ? weight.get().getVal1() : null;
 
@@ -932,7 +932,7 @@ public class ResInfoTools implements HasLogger {
 
 
         if (ResidentTools.isActive(resident)) {
-            Optional<ResValue> height = ResValueTools.getLast(resident, ResvaluetypesTools.HEIGHT);
+            Optional<ResValue> height = ResValueTools.getLast(resident, ResvaluetypesService.HEIGHT);
             result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
             if (height.isPresent()) {
                 result += SYSTools.formatBigDecimal(height.get().getVal1()) + " " + height.get().getType().getUnit1() + " (" + DateFormat.getDateInstance().format(height.get().getPit()) + ")";
@@ -965,13 +965,13 @@ public class ResInfoTools implements HasLogger {
             if (ubw == null) {
                 result += "Das übliche Gewicht ist bisher unbekannt.<br/>";
             } else {
-                result += "Übliches Gewicht: " + ubw.setScale(2, RoundingMode.HALF_UP) + " " + ResvaluetypesTools.getType(ResvaluetypesTools.WEIGHT).getUnit1() + "<br/>";
+                result += "Übliches Gewicht: " + ubw.setScale(2, RoundingMode.HALF_UP) + " " + ResvaluetypesService.getType(ResvaluetypesService.WEIGHT).getUnit1() + "<br/>";
             }
 
             if (ibw == null) {
                 result += "Das Idealgewicht konnte noch nicht bestimmt werden.<br/>";
             } else {
-                result += "Idealgewicht: " + ibw.setScale(2, RoundingMode.HALF_UP) + " " + ResvaluetypesTools.getType(ResvaluetypesTools.WEIGHT).getUnit1() + "<br/>";
+                result += "Idealgewicht: " + ibw.setScale(2, RoundingMode.HALF_UP) + " " + ResvaluetypesService.getType(ResvaluetypesService.WEIGHT).getUnit1() + "<br/>";
             }
 
             if (bmr == null) {
@@ -994,7 +994,7 @@ public class ResInfoTools implements HasLogger {
             result += "</b></td></tr>";
         }
 
-        Optional<ResValue> bz = ResValueTools.getLast(resident, ResvaluetypesTools.GLUCOSE);
+        Optional<ResValue> bz = ResValueTools.getLast(resident, ResvaluetypesService.GLUCOSE);
         result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
         if (bz.isPresent()) {
             result += SYSTools.formatBigDecimal(bz.get().getVal1()) + " " + bz.get().getType().getUnit1() + " (" + DateFormat.getDateInstance().format(bz.get().getPit()) + ")";

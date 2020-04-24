@@ -1644,9 +1644,20 @@ alter table bhp
 alter table dfn
     drop column Dauer;
 --
-alter table Resvaluetypes
+alter table resvaluetypes
     add active bool default true not null,
     add version  bigint(20) not null;
-UPDATE Resvaluetypes t
+UPDATE resvaluetypes t
 SET t.active = 0
-WHERE t.ID = 14
+WHERE t.ID = 14;
+--
+alter table floors
+  change floorid id bigint unsigned auto_increment;
+alter table rooms
+  change RID id bigint unsigned auto_increment;
+--
+drop table training;
+drop table training2file;
+drop table training2tags;
+drop table training2users;
+drop table trainatt2file;

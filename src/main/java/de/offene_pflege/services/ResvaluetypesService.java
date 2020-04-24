@@ -1,5 +1,6 @@
-package de.offene_pflege.entity.values;
+package de.offene_pflege.services;
 
+import de.offene_pflege.entity.values.Resvaluetypes;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 
@@ -14,7 +15,7 @@ import java.awt.*;
  * Time: 13:55
  * To change this template use File | Settings | File Templates.
  */
-public class ResvaluetypesTools {
+public class ResvaluetypesService {
     public static final short RR = 1;
     public static final short PULSE = 2;
     public static final short TEMP = 3;
@@ -42,55 +43,55 @@ public class ResvaluetypesTools {
     public static Color getColor(Resvaluetypes Resvaluetypes) {
           String color = "black";
           switch (Resvaluetypes.getValType()) {
-              case ResvaluetypesTools.STOOL: {
+              case ResvaluetypesService.STOOL: {
                   color = "006600";
                   break;
               }
-              case ResvaluetypesTools.LIQUIDBALANCE: {
+              case ResvaluetypesService.LIQUIDBALANCE: {
                   color = "00cccc";
                   break;
               }
-              case ResvaluetypesTools.GLUCOSE: {
+              case ResvaluetypesService.GLUCOSE: {
                   color = "3399ff";
                   break;
               }
-              case ResvaluetypesTools.HEIGHT: {
+              case ResvaluetypesService.HEIGHT: {
                   color = "ff00ff";
                   break;
               }
-              case ResvaluetypesTools.VOMIT: {
+              case ResvaluetypesService.VOMIT: {
                   color = "ffcc00";
                   break;
               }
-              case ResvaluetypesTools.QUICK: {
+              case ResvaluetypesService.QUICK: {
                   color = "9900ff";
                   break;
               }
-              case ResvaluetypesTools.RR: {
+              case ResvaluetypesService.RR: {
                   color = "ff99cc";
                   break;
               }
-              case ResvaluetypesTools.PULSE: {
+              case ResvaluetypesService.PULSE: {
                   color = "ff0000";
                   break;
               }
-              case ResvaluetypesTools.TEMP: {
+              case ResvaluetypesService.TEMP: {
                   color = "00ff66";
                   break;
               }
-              case ResvaluetypesTools.BREATHING: {
+              case ResvaluetypesService.BREATHING: {
                   color = "cccc00";
                   break;
               }
-              case ResvaluetypesTools.WEIGHT: {
+              case ResvaluetypesService.WEIGHT: {
                   color = "cc99ff";
                   break;
               }
-              case ResvaluetypesTools.O2SATURATION: {
+              case ResvaluetypesService.O2SATURATION: {
                   color = "GRAY";
                   break;
               }
-              case ResvaluetypesTools.ASPIRATION: {
+              case ResvaluetypesService.ASPIRATION: {
                   color = "0000cc";
                   break;
               }

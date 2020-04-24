@@ -7,6 +7,7 @@ package de.offene_pflege.entity.building;
 
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.FloorService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -89,7 +90,7 @@ public class HomesTools {
         home.setMaxcap(10);
 
         Station newStation = StationTools.createStation(SYSTools.xx("opde.settings.home.btnAddStation"), home);
-        Floors newFloor = new Floors(home, SYSTools.xx("opde.settings.home.btnAddFloor"));
+        Floors newFloor = FloorService.create(home, SYSTools.xx("opde.settings.home.btnAddFloor"));
 
         home.setStation(new ArrayList<>());
         home.getStation().add(newStation);
