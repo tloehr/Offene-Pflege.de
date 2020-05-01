@@ -17,7 +17,15 @@ import java.math.RoundingMode;
  * User: tloehr
  * Date: 07.05.13
  * Time: 16:49
- * To change this template use File | Settings | File Templates.
+ *
+ * A document is created in 5 steps:
+ *
+ * 1. Create a document. This document doesn't know anything about the presentation of the document, only about its content.
+ * 2. Create a writer. You are creating a PdfWriter that will translate the content into a presentation, more specifically into a PDF document with one or more pages.
+ * 3. Open the document.
+ * 4. Add content.
+ * 5. Close the document.
+ *
  */
 public class PDF {
 
@@ -98,16 +106,10 @@ public class PDF {
     }
 
     private void init() throws FileNotFoundException, DocumentException {
-
-
         document = new Document(PAGESIZE, Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(20), Utilities.millimetersToPoints(20));
-
-
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(output));
 
-
         writer.setPageEvent(new PdfPageEventHelper() {
-//            int pagenumber = 0;
             PdfTemplate totalPages;
 
             @Override
@@ -146,7 +148,8 @@ public class PDF {
 
             @Override
             public void onCloseDocument(PdfWriter writer, Document document) {
-                ColumnText.showTextAligned(totalPages, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - 1), plain(12)), 2, 8, 0);
+                // 20200501 - der Footer zeigte die falsche maximale Seitenzahl an. Immer eine zu wenig.
+                ColumnText.showTextAligned(totalPages, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber()), plain(12)), 2, 8, 0);
             }
         });
         document.open();
