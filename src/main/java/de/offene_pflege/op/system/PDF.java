@@ -3,6 +3,7 @@ package de.offene_pflege.op.system;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.SYSTools;
 
 import java.io.File;
@@ -13,21 +14,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Created with IntelliJ IDEA.
- * User: tloehr
- * Date: 07.05.13
- * Time: 16:49
- *
+ * Created with IntelliJ IDEA. User: tloehr Date: 07.05.13 Time: 16:49
+ * <p>
  * A document is created in 5 steps:
- *
- * 1. Create a document. This document doesn't know anything about the presentation of the document, only about its content.
- * 2. Create a writer. You are creating a PdfWriter that will translate the content into a presentation, more specifically into a PDF document with one or more pages.
- * 3. Open the document.
- * 4. Add content.
- * 5. Close the document.
- *
+ * <p>
+ * 1. Create a document. This document doesn't know anything about the presentation of the document, only about its
+ * content. 2. Create a writer. You are creating a PdfWriter that will translate the content into a presentation, more
+ * specifically into a PDF document with one or more pages. 3. Open the document. 4. Add content. 5. Close the
+ * document.
  */
-public class PDF {
+public class PDF implements HasLogger {
 
 //    Paragraph footer, endofreport;
 
@@ -41,6 +37,7 @@ public class PDF {
     private final File output;
     String footer = "";
     private Document document;
+    private int mypagecounter;
 
     public static Font bold(int size) {
         return new Font(FAMILY, size, Font.BOLD);
@@ -96,7 +93,7 @@ public class PDF {
         } else {
             this.output = output;
         }
-
+        mypagecounter = 0;
         init();
     }
 
@@ -119,6 +116,7 @@ public class PDF {
 
             @Override
             public void onStartPage(PdfWriter writer, Document document) {
+                mypagecounter++;
             }
 
             @Override
@@ -149,6 +147,8 @@ public class PDF {
             @Override
             public void onCloseDocument(PdfWriter writer, Document document) {
                 // 20200501 - der Footer zeigte die falsche maximale Seitenzahl an. Immer eine zu wenig.
+                getLogger().debug("mypagecounter: " + mypagecounter);
+                getLogger().debug("writer.getPageNumber(): " + writer.getPageNumber());
                 ColumnText.showTextAligned(totalPages, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber()), plain(12)), 2, 8, 0);
             }
         });
