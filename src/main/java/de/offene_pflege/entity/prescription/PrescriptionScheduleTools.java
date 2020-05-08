@@ -302,6 +302,8 @@ public class PrescriptionScheduleTools {
             }
         }
 
+
+
         return phrase;
     }
 
@@ -442,6 +444,7 @@ public class PrescriptionScheduleTools {
             phrase.add(Chunk.NEWLINE);
         }
 
+        // ursprünglich verordnet
         phrase.add(PrescriptionTools.getOriginalPrescriptionAsPhrase(schedule.getPrescription()));
 
         Phrase repeat = getRepeatPatternAsPhrase(schedule, false);
@@ -449,10 +452,12 @@ public class PrescriptionScheduleTools {
 
 
         if (!SYSTools.catchNull(schedule.getPrescription().getText()).isEmpty()) {
-            Chunk comment = PDF.chunk("misc.msg.comment", PDF.bold());
-            comment.setUnderline(0.4f, -1f);
-            phrase.add(comment);
-            phrase.add(": ");
+            // rausgenommen. Da muss nicht jedes mal BEMERKUNG: vorstehen.
+//            Chunk comment = PDF.chunk("misc.msg.comment", PDF.bold());
+//            comment.setUnderline(0.4f, -1f);
+//            phrase.add(comment);
+//            phrase.add(": ");
+            if (!phrase.getContent().isEmpty()) phrase.add(Chunk.NEWLINE);
             phrase.add(PDF.chunk(schedule.getPrescription().getText()));
         }
 

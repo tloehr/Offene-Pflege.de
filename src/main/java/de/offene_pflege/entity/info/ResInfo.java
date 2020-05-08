@@ -429,6 +429,7 @@ public class ResInfo implements Serializable, QProcessElement, Comparable<ResInf
                 ", from=" + from +
                 ", to=" + to +
                 ", bwinfotyp=" + bwinfotyp.getID() +
+                ", properties=" +properties+
                 ", userON=" + userON +
                 ", userOFF=" + userOFF +
                 ", resident=" + resident +

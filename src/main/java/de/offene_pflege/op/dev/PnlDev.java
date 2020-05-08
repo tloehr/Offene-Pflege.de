@@ -60,15 +60,6 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         initComponents();
         txtCountry.setText(Locale.getDefault().getCountry().toLowerCase());
 
-
-//        cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
-//
-//
-//        tabbedPane1.insertTab("JavaFX", null, new RepCtrl(), "no tips", 0);
-//        tabbedPane1.setSelectedIndex(0);
-
-//        tabbedPane1.setComponentAt(1, new PnlCommonTags(new HashSet<Commontags>()));
-
     }
 
     @Override
@@ -675,8 +666,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                        "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
-                        "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                    "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
+                    "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //======== scrollPane1 ========
                 {
@@ -713,8 +704,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel3 ========
             {
                 panel3.setLayout(new FormLayout(
-                        "pref, $lcgap, default, $lcgap, default:grow",
-                        "pref, 4*($lgap, default), $lgap, default:grow, 3*($lgap, default)"));
+                    "pref, $lcgap, default, $lcgap, default:grow",
+                    "pref, 4*($lgap, default), $lgap, default:grow, 3*($lgap, default)"));
 
                 //---- txtResInfoID ----
                 txtResInfoID.addActionListener(e -> txtResInfoIDActionPerformed(e));
@@ -751,8 +742,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                        "left:default:grow, $ugap, default",
-                        "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
+                    "left:default:grow, $ugap, default",
+                    "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----
@@ -787,8 +778,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel4 ========
             {
                 panel4.setLayout(new FormLayout(
-                        "5*(default, $lcgap), default",
-                        "10*(default, $lgap), default"));
+                    "5*(default, $lcgap), default",
+                    "10*(default, $lgap), default"));
 
                 //---- txtResSearch ----
                 txtResSearch.addActionListener(e -> txtResSearchActionPerformed(e));
@@ -819,8 +810,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel5 ========
             {
                 panel5.setLayout(new FormLayout(
-                        "default, $rgap, default:grow",
-                        "fill:default, $lgap, default:grow"));
+                    "default, $rgap, default:grow",
+                    "fill:default, $lgap, default:grow"));
 
                 //======== scrollPane3 ========
                 {

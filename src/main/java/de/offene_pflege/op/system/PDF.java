@@ -207,7 +207,12 @@ public class PDF implements HasLogger {
         Phrase phrase = new Phrase();
         phrase.setFont(plain());
 
-        phrase.add(SYSTools.formatBigDecimal(bd.setScale(2, RoundingMode.HALF_UP)));
+        String formattedbd = SYSTools.formatBigDecimal(bd.setScale(2, RoundingMode.HALF_UP));
+        if (formattedbd.equals("0")) phrase.add("");
+//        else if (formattedbd.equals("0,5")) phrase.add(Character.toString(frac12));
+//        else if (formattedbd.equals("0,25")) phrase.add(Character.toString(frac14));
+//        else if (formattedbd.equals("0,75")) phrase.add(Character.toString(frac34));
+        else phrase.add(SYSTools.formatBigDecimal(bd.setScale(2, RoundingMode.HALF_UP)));
 
 //        if (bd.compareTo(BigDecimal.ZERO) == 0) {
 //            // nop

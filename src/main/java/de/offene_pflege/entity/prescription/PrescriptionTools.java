@@ -45,18 +45,18 @@ import java.util.concurrent.ExecutionException;
 public class PrescriptionTools {
 
     /**
-     * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
-     * Eine Besonderheit bei der Implementierung muss ich hier erläutern.
-     * Aufgrund der ungleichen HTML Standards (insbesonders der Druckdarstellung im CSS2.0 und später auch CSS2.1)
-     * muss ich hier einen Trick anwenden, damit das auf verschiedenen Browsern halbwegs gleich aussieht.
+     * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format. Eine Besonderheit bei der
+     * Implementierung muss ich hier erläutern. Aufgrund der ungleichen HTML Standards (insbesonders der
+     * Druckdarstellung im CSS2.0 und später auch CSS2.1) muss ich hier einen Trick anwenden, damit das auf
+     * verschiedenen Browsern halbwegs gleich aussieht.
      * <p>
-     * Daher addiere ich jedes größere Element auf einer Seite (also Header, Tabellen Zeilen) mit dem Wert 1.
-     * Nach einer bestimmten Anzahl von Elementen erzwinge ich einen Pagebreak.
+     * Daher addiere ich jedes größere Element auf einer Seite (also Header, Tabellen Zeilen) mit dem Wert 1. Nach einer
+     * bestimmten Anzahl von Elementen erzwinge ich einen Pagebreak.
      * <p>
      * Nach einem Pagebreak wird der Name des aktuellen Bewohner nocheinmal wiederholt.
      * <p>
-     * Ein Mac OS Safari druckt mit diesen Werten sehr gut.
-     * Beim Firefox (about:settings) sollten die Ränder wie folgt eingestellt werden:
+     * Ein Mac OS Safari druckt mit diesen Werten sehr gut. Beim Firefox (about:settings) sollten die Ränder wie folgt
+     * eingestellt werden:
      * <ul>
      * <li>print.print_margin_bottom = 0.3</li>
      * <li>print.print_margin_left = 0.1</li>
@@ -215,10 +215,8 @@ public class PrescriptionTools {
                     table.getDefaultCell().setVerticalAlignment(Element.ALIGN_LEFT);
                     table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_TOP);
 
-                    if (gray) {
-                        table.getDefaultCell().setBackgroundColor(BaseColor.LIGHT_GRAY);
-                    }
-
+                    if (gray) table.getDefaultCell().setBackgroundColor(BaseColor.LIGHT_GRAY);
+                    
                     Phrase col1 = getShortDescriptionAsPhrase(prescription);
                     if (bestid != null) {
                         MedStock stock = em.find(MedStock.class, bestid.longValue());
@@ -250,6 +248,7 @@ public class PrescriptionTools {
 
                     if (schedule.usesTime()) {
                         PdfPCell cellTime = new PdfPCell();
+                        if (gray) cellTime.setBackgroundColor(BaseColor.LIGHT_GRAY);
                         cellTime.setHorizontalAlignment(Element.ALIGN_CENTER);
                         cellTime.setVerticalAlignment(Element.ALIGN_MIDDLE);
                         cellTime.setColspan(6);
@@ -315,6 +314,10 @@ public class PrescriptionTools {
 
 
     }
+
+//    private static String formatDose(BigDecimal dose){
+//        return dose.equals(BigDecimal.ZERO) ? "" : dose.toString();
+//    }
 
 
     public static String getShortDescription(Prescription prescription) {
@@ -696,8 +699,9 @@ public class PrescriptionTools {
     }
 
     /**
-     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
-     * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
+     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können
+     * verschiedene Vorräte mit verschiedenen Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der
+     * Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getPrescriptionsByInventory(MedInventory inventory) {
         long begin = System.currentTimeMillis();
@@ -880,8 +884,9 @@ public class PrescriptionTools {
     }
 
     /**
-     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
-     * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
+     * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können
+     * verschiedene Vorräte mit verschiedenen Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der
+     * Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getOnDemandPrescriptions(Resident resident, Date date) {
         EntityManager em = OPDE.createEM();

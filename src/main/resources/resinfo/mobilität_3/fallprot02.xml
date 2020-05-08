@@ -1,4 +1,4 @@
-<resinfotype bwinftyp="fallprot01" sinceversion="7" category="3" abstract_type="30" equivalent="0" intervalmode="3"
+<resinfotype bwinftyp="fallprot02" sinceversion="14" category="3" abstract_type="30" equivalent="2" intervalmode="3"
              infokurz="Sturzprotokoll" infolang="" tx="false" qpr="true">
     <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
            label="1. Grundlegende Angaben"/>
@@ -38,7 +38,7 @@
     </optiongroup>
     <textfield name="aufgefundentext" default="" label="Beschreiben Sie, wie der BW aufgefunden wurde." length="30"
                hfill="true"
-               size="12" fontstyle="bold" layout="left" depends-on="aufgefunden" visible-when-dependency-eq="sonst"
+               layout="br left" depends-on="aufgefunden" visible-when-dependency-eq="sonst"
                       default-value-when-shown=""/>
 
     <optiongroup label="Körperstellung unmittelbar vor dem Sturz" name="b4fall">

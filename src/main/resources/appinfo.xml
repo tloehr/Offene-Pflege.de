@@ -26,15 +26,6 @@
             <manager langbundle="opde.controlling.acl.manager"/>
             <user1 langbundle="opde.controlling.acl.user1"/>
         </class>
-        <!--<class name="opde.training" short="opde.training.appinfo.short"-->
-        <!--long="opde.training.appinfo.long" helpurl="opde.training.appinfo.helpurl"-->
-        <!--main="true"-->
-        <!--javaclass="op.training.PnlTraining" icon="teacher_blackboard.png">-->
-        <!--<execute langbundle="appinfo.default.acl.execute"/>-->
-        <!--<update langbundle="opde.training.acl.update"/>-->
-        <!--<delete langbundle="opde.training.acl.delete"/>-->
-        <!--<print langbundle="opde.training.acl.print"/>-->
-        <!--</class>-->
         <class name="opde.settings" short="opde.settings.appinfo.short"
                long="opde.settings.appinfo.long" main="true"
                javaclass="op.settings.PnlSettings" icon="config.png">
