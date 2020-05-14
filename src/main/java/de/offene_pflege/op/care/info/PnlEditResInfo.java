@@ -10,7 +10,6 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.OverlayTextArea;
 import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.building.Rooms;
-import de.offene_pflege.entity.building.RoomsTools;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.*;
 import de.offene_pflege.entity.prescription.GP;
@@ -26,6 +25,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import de.offene_pflege.services.RoomsService;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -1344,13 +1344,13 @@ public class PnlEditResInfo implements HasLogger {
                 pnlRoom.setLayout(new BorderLayout());
                 pnlRoom.setName("roomSelect");
 
-                DefaultComboBoxModel<Rooms> dcmb = SYSTools.list2cmb(RoomsTools.getAllActive());
+                DefaultComboBoxModel<Rooms> dcmb = SYSTools.list2cmb(RoomsService.getAllActive());
                 dcmb.insertElementAt(null, 0);
 
                 JComboBox<Rooms> cmbRooms = new JComboBox<>(dcmb);
                 cmbRooms.setSelectedIndex(0);
 
-                cmbRooms.setRenderer(RoomsTools.getRenderer());
+                cmbRooms.setRenderer(RoomsService.getRenderer());
 
                 cmbRooms.addItemListener(e -> {
                     if (e.getStateChange() == ItemEvent.SELECTED) {

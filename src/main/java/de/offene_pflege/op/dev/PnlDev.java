@@ -54,7 +54,46 @@ import java.util.*;
  */
 public class PnlDev extends CleanablePanel implements HasLogger {
     Resident resident = null;
-
+    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    private JTabbedPane tabbedPane1;
+    private JPanel panel1;
+    private JScrollPane scrollPane1;
+    private JTextArea txtXML;
+    private JScrollPane scrollPane2;
+    private JTextArea txtException;
+    private JButton button1;
+    private JPanel panel3;
+    private JTextField txtResInfoID;
+    private JScrollPane scrollPane6;
+    private JTextPane textArea2;
+    private JButton button5;
+    private JButton button6;
+    private JButton button3;
+    private JButton button4;
+    private JPanel panel2;
+    private JComboBox cmbMonth;
+    private JButton button2;
+    private JTextField txtPZN;
+    private JTextField txtCountry;
+    private JButton btnMod11;
+    private JButton btnImportMedDB;
+    private JPanel panel4;
+    private JTextField txtResSearch;
+    private JLabel lblResname;
+    private JLabel label3;
+    private JDateChooser dcFrom;
+    private JLabel label4;
+    private JDateChooser dcTo;
+    private JButton btnVKontrole;
+    private DateExComboBox dateExComboBox1;
+    private JPanel panel5;
+    private JScrollPane scrollPane3;
+    private JTree tree1;
+    private JSplitPane splitPane1;
+    private JScrollPane scrollPane5;
+    private JTable table1;
+    private JScrollPane scrollPane4;
+    private JTextArea textArea1;
     public PnlDev() {
         super("opde.dev");
         initComponents();
@@ -98,7 +137,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         } else {
 
             String exc = pnlEditResInfo.getLastParsingException().getMessage() + "\n";
-            for (StackTraceElement ste : Arrays.asList(pnlEditResInfo.getLastParsingException().getStackTrace())) {
+            for (StackTraceElement ste : pnlEditResInfo.getLastParsingException().getStackTrace()) {
                 exc += ste.toString() + "\n";
             }
 
@@ -111,7 +150,6 @@ public class PnlDev extends CleanablePanel implements HasLogger {
     private void txtXMLFocusGained(FocusEvent e) {
         txtXML.selectAll();
     }
-
 
     private void txtPZNCaretUpdate(CaretEvent e) {
         try {
@@ -614,7 +652,6 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         });
     }
 
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabbedPane1 = new JTabbedPane();
@@ -666,8 +703,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                    "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
-                    "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
+                        "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //======== scrollPane1 ========
                 {
@@ -704,8 +741,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel3 ========
             {
                 panel3.setLayout(new FormLayout(
-                    "pref, $lcgap, default, $lcgap, default:grow",
-                    "pref, 4*($lgap, default), $lgap, default:grow, 3*($lgap, default)"));
+                        "pref, $lcgap, default, $lcgap, default:grow",
+                        "pref, 4*($lgap, default), $lgap, default:grow, 3*($lgap, default)"));
 
                 //---- txtResInfoID ----
                 txtResInfoID.addActionListener(e -> txtResInfoIDActionPerformed(e));
@@ -742,8 +779,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "left:default:grow, $ugap, default",
-                    "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
+                        "left:default:grow, $ugap, default",
+                        "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----
@@ -778,8 +815,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel4 ========
             {
                 panel4.setLayout(new FormLayout(
-                    "5*(default, $lcgap), default",
-                    "10*(default, $lgap), default"));
+                        "5*(default, $lcgap), default",
+                        "10*(default, $lgap), default"));
 
                 //---- txtResSearch ----
                 txtResSearch.addActionListener(e -> txtResSearchActionPerformed(e));
@@ -810,8 +847,8 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             //======== panel5 ========
             {
                 panel5.setLayout(new FormLayout(
-                    "default, $rgap, default:grow",
-                    "fill:default, $lgap, default:grow"));
+                        "default, $rgap, default:grow",
+                        "fill:default, $lgap, default:grow"));
 
                 //======== scrollPane3 ========
                 {
@@ -846,46 +883,5 @@ public class PnlDev extends CleanablePanel implements HasLogger {
     private void button2ActionPerformed(ActionEvent e) {
 
     }
-
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JTabbedPane tabbedPane1;
-    private JPanel panel1;
-    private JScrollPane scrollPane1;
-    private JTextArea txtXML;
-    private JScrollPane scrollPane2;
-    private JTextArea txtException;
-    private JButton button1;
-    private JPanel panel3;
-    private JTextField txtResInfoID;
-    private JScrollPane scrollPane6;
-    private JTextPane textArea2;
-    private JButton button5;
-    private JButton button6;
-    private JButton button3;
-    private JButton button4;
-    private JPanel panel2;
-    private JComboBox cmbMonth;
-    private JButton button2;
-    private JTextField txtPZN;
-    private JTextField txtCountry;
-    private JButton btnMod11;
-    private JButton btnImportMedDB;
-    private JPanel panel4;
-    private JTextField txtResSearch;
-    private JLabel lblResname;
-    private JLabel label3;
-    private JDateChooser dcFrom;
-    private JLabel label4;
-    private JDateChooser dcTo;
-    private JButton btnVKontrole;
-    private DateExComboBox dateExComboBox1;
-    private JPanel panel5;
-    private JScrollPane scrollPane3;
-    private JTree tree1;
-    private JSplitPane splitPane1;
-    private JScrollPane scrollPane5;
-    private JTable table1;
-    private JScrollPane scrollPane4;
-    private JTextArea textArea1;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

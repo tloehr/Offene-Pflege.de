@@ -1,10 +1,11 @@
 package de.offene_pflege.entity.info;
 
 import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.entity.building.HomesTools;
+import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.building.Rooms;
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.building.StationTools;
+import de.offene_pflege.services.RoomsService;
+import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.reports.NReportTools;
@@ -884,19 +885,19 @@ public class ResInfoTools implements HasLogger {
 
         if (withlongheader) {
             if (resident.getStation() != null) {
-                result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesTools.getAsText(resident.getStation().getHome()) + "</b></td></tr>";
+                result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesService.getAsText(resident.getStation().getHome()) + "</b></td></tr>";
             }
         }
 
 
         for (ResInfo resInfo : ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay().toDate(), SYSCalendar.midOfDay().toDate())) {
-            Rooms rooms1 = getRoomFrom(resInfo);
+//            Rooms rooms1 = getRoomFrom(resInfo);
             result += SYSConst.html_table_tr(
                     SYSConst.html_table_td(
                             "misc.msg.room.of.resident", "left", "top"
                     ) +
                             SYSConst.html_table_td(
-                                    SYSConst.html_bold(getRoomFrom(resInfo).toString()), "left", "top"
+                                    SYSConst.html_bold(RoomsService.toPrettyString(getRoomFrom(resInfo))), "left", "top"
                             )
             );
         }
@@ -1096,7 +1097,7 @@ public class ResInfoTools implements HasLogger {
                 result += "[" + SYSTools.xx("misc.msg.anon") + "]";
             } else {
                 for (ResInfo specialist : specialists) {
-                    result += getContentAsHTML(specialist);
+                    result += HTMLTools.p(getContentAsHTML(specialist));
                 }
             }
             result += "</div>";
@@ -1140,8 +1141,6 @@ public class ResInfoTools implements HasLogger {
         if (withlongheader) {
             result += "<h2 id=\"fonth2\">" + ResidentTools.getLabelText(resident) + "</h2>";
         }
-
-
         result += getTXReportHeader(resident, withlongheader);
 
         /***
@@ -1410,7 +1409,7 @@ public class ResInfoTools implements HasLogger {
         em.close();
 
         // virtual station. is never persisted
-        Station exResident = StationTools.createStation(SYSTools.xx("opde.controlling.exResidents"), null);
+        Station exResident = StationService.createStation(SYSTools.xx("opde.controlling.exResidents"), null);
 
         // Init Maps
         HashMap<LocalDate, HashMap<Station, Integer>> statMap = new HashMap<LocalDate, HashMap<Station, Integer>>();

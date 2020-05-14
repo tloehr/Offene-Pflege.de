@@ -3,7 +3,7 @@ package de.offene_pflege.op.settings.subpanels;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.building.StationTools;
+import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.op.OPDE;
@@ -19,8 +19,8 @@ public class PnlStation extends DefaultPanel {
     public PnlStation() {
         super("opde.settings.default.station");
         initComponents();
-        cmbStation.setModel(StationTools.getAll4Combobox(false));
-        cmbStation.setSelectedItem(StationTools.getStationForThisHost());
+        cmbStation.setModel(StationService.getAll4Combobox(false));
+        cmbStation.setSelectedItem(StationService.getStationForThisHost());
 
         cmbStation.addItemListener(e -> {
             if (cmbStation.getSelectedItem() == null) return;

@@ -3,9 +3,11 @@
  * and open the template in the editor.
  */
 
-package de.offene_pflege.entity.building;
+package de.offene_pflege.services;
 
 import de.offene_pflege.entity.EntityTools;
+import de.offene_pflege.entity.building.Homes;
+import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
@@ -19,7 +21,7 @@ import java.util.ArrayList;
 /**
  * @author tloehr
  */
-public class StationTools {
+public class StationService {
 
     /**
      * Erstellt ein Combobox Modell aus allen aktiven Stationen.

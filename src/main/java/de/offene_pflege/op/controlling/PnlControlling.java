@@ -34,9 +34,9 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
 import de.offene_pflege.entity.building.Homes;
-import de.offene_pflege.entity.building.HomesTools;
+import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.building.StationTools;
+import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.*;
 import de.offene_pflege.entity.prescription.MedStockTools;
@@ -363,7 +363,7 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
         final JDateChooser jdc = new JDateChooser(new Date());
         final JCheckBox cbAnonymous = new JCheckBox(SYSTools.xx("misc.msg.anon"));
         final JComboBox<Homes> cmbHomes = new JComboBox<>();
-        HomesTools.setComboBox(cmbHomes);
+        HomesService.setComboBox(cmbHomes);
 
 
         SYSPropsTools.restoreState("opde.controlling:prevalence::cbAnonymous", cbAnonymous);
@@ -946,7 +946,7 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
          */
         JPanel pnlDrugControl = new JPanel(new BorderLayout());
         final JButton btnDrugControl = GUITools.createHyperlinkButton("opde.controlling.drugs.controllist", null, null);
-        final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox(false));
+        final JComboBox cmbStation = new JComboBox(StationService.getAll4Combobox(false));
         btnDrugControl.addActionListener(e -> {
             OPDE.getMainframe().setBlocked(true);
             SwingWorker worker = new SwingWorker() {

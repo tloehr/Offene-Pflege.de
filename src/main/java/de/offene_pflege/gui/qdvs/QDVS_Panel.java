@@ -10,7 +10,7 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import de.offene_pflege.entity.building.Homes;
-import de.offene_pflege.entity.building.HomesTools;
+import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
@@ -300,7 +300,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
 
         JComboBox<Homes> cmbHome = new JComboBox<>();
-        HomesTools.setComboBox(cmbHome);
+        HomesService.setComboBox(cmbHome);
         home = (Homes) cmbHome.getSelectedItem();
         cmbHome.addItemListener(e -> {
             home = (Homes) e.getItem();

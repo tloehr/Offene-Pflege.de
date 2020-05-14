@@ -33,7 +33,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.entity.building.Homes;
-import de.offene_pflege.entity.building.HomesTools;
+import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
@@ -1029,7 +1029,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
         cmbHomes = new JComboBox();
         cmbHomes.setFont(SYSConst.ARIAL14);
-        HomesTools.setComboBox(cmbHomes);
+        HomesService.setComboBox(cmbHomes);
         cmbHomes.addItemListener(itemEvent -> {
             if (itemEvent.getStateChange() != ItemEvent.SELECTED) return;
             reloadDisplay();

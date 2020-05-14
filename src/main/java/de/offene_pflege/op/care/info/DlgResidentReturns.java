@@ -8,9 +8,9 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import de.offene_pflege.entity.building.Rooms;
-import de.offene_pflege.entity.building.RoomsTools;
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.building.StationTools;
+import de.offene_pflege.services.RoomsService;
+import de.offene_pflege.services.StationService;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -48,9 +48,9 @@ public class DlgResidentReturns extends MyJDialog {
         lblRoom.setText(SYSTools.xx("misc.msg.room"));
 
         lblTitle.setText(SYSTools.xx("opde.info.dlg.resident.returns.title"));
-        cmbStation.setModel(StationTools.getAll4Combobox(false));
+        cmbStation.setModel(StationService.getAll4Combobox(false));
 
-        cmbRoom.setModel(SYSTools.list2cmb(RoomsTools.getAllActive()));
+        cmbRoom.setModel(SYSTools.list2cmb(RoomsService.getAllActive()));
         cmbRoom.setSelectedItem(null);
 
         jdcHAUF.setMaxSelectableDate(new Date());

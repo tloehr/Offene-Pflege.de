@@ -68,9 +68,8 @@
         <class>de.offene_pflege.entity.QdvsLaufend</class>
         <class>de.offene_pflege.entity.values.Resvaluetypes</class>
         <properties>
-<!--            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>-->
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-<!--            <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>-->
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+<!--            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>-->
         </properties>
     </persistence-unit>
 </persistence>

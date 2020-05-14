@@ -83,4 +83,5 @@ public class Rooms extends DefaultEntity {
     public void setFloor(Floors floor) {
         this.floor = floor;
     }
+
 }

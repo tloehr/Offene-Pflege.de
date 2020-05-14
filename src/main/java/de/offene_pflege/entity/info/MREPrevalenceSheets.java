@@ -5,7 +5,6 @@ import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.building.Floors;
 import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.building.Rooms;
-import de.offene_pflege.entity.building.RoomsTools;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.system.Commontags;
@@ -17,6 +16,7 @@ import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.RoomsService;
 import org.apache.commons.collections.Closure;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
@@ -167,17 +167,17 @@ public class MREPrevalenceSheets implements HasLogger {
 
         // Belegung wird ermittelt. Alle BW die um 08 Uhr morgens anwesend waren.
 //        LocalTime morning8 = new LocalTime(8, 0); // eight o'clock
-        int maxLevel = RoomsTools.getMaxLevel(home);
+        int maxLevel = RoomsService.getMaxLevel(home);
         bedsTotalPerLevel = new int[maxLevel + 1];
         bedsInUserPerLevel = new int[maxLevel + 1];
         for (short level = 0; level <= maxLevel; level++) {
-            bedsTotalPerLevel[level] = RoomsTools.countBeds(home, level);
+            bedsTotalPerLevel[level] = RoomsService.countBeds(home, level);
             bedsInUserPerLevel[level] = 0;
         }
 
         roomsTotal = 0;
         singleRooms = 0;
-        for (Rooms room : RoomsTools.getRooms(home)) {
+        for (Rooms room : RoomsService.getRooms(home)) {
             roomsTotal++;
             if (room.getSingle()) singleRooms++;
         }
@@ -411,7 +411,8 @@ public class MREPrevalenceSheets implements HasLogger {
     }
 
     /**
-     * Füllt eine Zeile in Sheet1 und erstellt gleichzeit eine Liste von Antibiotika Verordnungen, die dann zurück gegeben wird.
+     * Füllt eine Zeile in Sheet1 und erstellt gleichzeit eine Liste von Antibiotika Verordnungen, die dann zurück
+     * gegeben wird.
      *
      * @param resident
      * @return

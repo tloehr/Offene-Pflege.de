@@ -2,12 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.offene_pflege.entity.building;
+package de.offene_pflege.services;
 
 
+import de.offene_pflege.entity.building.Floors;
+import de.offene_pflege.entity.building.Homes;
+import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
-import de.offene_pflege.services.FloorService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -19,7 +21,7 @@ import java.util.Vector;
 /**
  * @author tloehr
  */
-public class HomesTools {
+public class HomesService {
 
     /**
      * Erstellt eine Textdarstellung der betreffenden Einrichtung. Kann man für Ausdrucke und so brauchen.
@@ -89,7 +91,7 @@ public class HomesTools {
         home.setColor("ffffff");
         home.setMaxcap(10);
 
-        Station newStation = StationTools.createStation(SYSTools.xx("opde.settings.home.btnAddStation"), home);
+        Station newStation = StationService.createStation(SYSTools.xx("opde.settings.home.btnAddStation"), home);
         Floors newFloor = FloorService.create(home, SYSTools.xx("opde.settings.home.btnAddFloor"));
 
         home.setStation(new ArrayList<>());

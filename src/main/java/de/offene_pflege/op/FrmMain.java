@@ -41,7 +41,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideSplitPane;
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.building.StationTools;
+import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.info.*;
 import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.system.SYSLoginTools;
@@ -755,7 +755,7 @@ public class FrmMain extends JFrame {
 
         CollapsiblePane mypane = new CollapsiblePane(station == null ? SYSTools.xx("misc.msg.Archive") : station.getName());
         mypane.setFont(SYSConst.ARIAL14);
-        mypane.setEmphasized(station != null && station.equals(StationTools.getStationForThisHost()));
+        mypane.setEmphasized(station != null && station.equals(StationService.getStationForThisHost()));
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
 
         JPanel labelPanel = new JPanel();

@@ -4,7 +4,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import de.offene_pflege.entity.building.HomesTools;
+import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.nursingprocess.*;
 import de.offene_pflege.entity.prescription.*;
@@ -522,8 +522,8 @@ public class TXEssenDoc implements HasLogger {
             content.put(TXEAF.RESIDENT_ZIP, resident.getStation().getHome().getZip());
             content.put(TXEAF.RESIDENT_PHONE, resident.getStation().getHome().getTel());
             content.put(TXEAF.PAGE2_PHONE, resident.getStation().getHome().getTel());
-            content.put(TXEAF.PAGE1_LOGO_TEXTFIELD, HomesTools.getAsTextForTX(resident.getStation().getHome()));
-            content.put(TXEAF.PAGE3_LOGO_TEXTFIELD, HomesTools.getAsText(resident.getStation().getHome()));
+            content.put(TXEAF.PAGE1_LOGO_TEXTFIELD, HomesService.getAsTextForTX(resident.getStation().getHome()));
+            content.put(TXEAF.PAGE3_LOGO_TEXTFIELD, HomesService.getAsText(resident.getStation().getHome()));
         }
 
         content.put(TXEAF.TX_DATE, DateFormat.getDateInstance().format(new Date()));
@@ -1806,7 +1806,7 @@ public class TXEssenDoc implements HasLogger {
         content.put(TXEAF.MRE_RESIDENT_DOB, DateFormat.getDateInstance().format(ResidentTools.getDob(resident)));
         content.put(TXEAF.MRE_RESIDENT_HINSURANCE, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
         if (ResidentTools.isActive(resident)) {
-            content.put(TXEAF.MRE_LOGO_TEXTFIELD, HomesTools.getAsTextForTX(resident.getStation().getHome()));
+            content.put(TXEAF.MRE_LOGO_TEXTFIELD, HomesService.getAsTextForTX(resident.getStation().getHome()));
             content.put(TXEAF.MRE_RESIDENT_PHONE, resident.getStation().getHome().getTel());
             content.put(TXEAF.MRE_RESIDENT_STREET, resident.getStation().getHome().getStreet());
             content.put(TXEAF.MRE_RESIDENT_CITY, resident.getStation().getHome().getCity());
@@ -1894,7 +1894,7 @@ public class TXEssenDoc implements HasLogger {
         content.put(TXEAF.PSYCH_RESIDENT_DOB, DateFormat.getDateInstance().format(ResidentTools.getDob(resident)));
         content.put(TXEAF.PSYCH_RESIDENT_HINSURANCE, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
         if (ResidentTools.isActive(resident)) {
-            content.put(TXEAF.PSYCH_LOGO_TEXTFIELD, HomesTools.getAsTextForTX(resident.getStation().getHome()));
+            content.put(TXEAF.PSYCH_LOGO_TEXTFIELD, HomesService.getAsTextForTX(resident.getStation().getHome()));
             content.put(TXEAF.PSYCH_RESIDENT_PHONE, resident.getStation().getHome().getTel());
             content.put(TXEAF.PSYCH_RESIDENT_STREET, resident.getStation().getHome().getStreet());
             content.put(TXEAF.PSYCH_RESIDENT_CITY, resident.getStation().getHome().getCity());

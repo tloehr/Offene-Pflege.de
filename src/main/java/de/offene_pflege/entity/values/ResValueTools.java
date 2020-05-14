@@ -2,7 +2,7 @@ package de.offene_pflege.entity.values;
 
 
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.entity.building.StationTools;
+import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
@@ -941,7 +941,7 @@ public class ResValueTools {
     public static ArrayList<Object[]> getNoStool() {
 
         ArrayList<Object[]> result = new ArrayList<Object[]>();
-        Station currentStation = StationTools.getStationForThisHost();
+        Station currentStation = StationService.getStationForThisHost();
         ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 
 //        DateTime now = new DateTime();
@@ -1015,7 +1015,7 @@ public class ResValueTools {
     public static ArrayList<Object[]> getHighLowIn() {
 
         ArrayList<Object[]> result = new ArrayList();
-        Station currentStation = StationTools.getStationForThisHost();
+        Station currentStation = StationService.getStationForThisHost();
         ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 
         LocalDate now = new LocalDate();

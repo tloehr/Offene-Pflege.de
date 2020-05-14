@@ -3,13 +3,13 @@ package de.offene_pflege.services.qdvs;
 
 import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.building.Rooms;
-import de.offene_pflege.entity.building.RoomsTools;
 import de.offene_pflege.entity.info.*;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
 import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.gui.events.AddTextListener;
 import de.offene_pflege.op.tools.*;
+import de.offene_pflege.services.RoomsService;
 import de.offene_pflege.services.qdvs.schema.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -404,7 +404,7 @@ public class QdvsService implements HasLogger {
         /** 1 */qsMdsData.setIDBEWOHNER(of.createDasQsDataMdsTypeIDBEWOHNER());
         qsMdsData.getIDBEWOHNER().setValue(NF_IDBEWOHNER.format(resident.getIdbewohner()));
 
-        Optional<Rooms> room = RoomsTools.getRoom(resident, JavaTimeConverter.toJodaLocalDateTime(STICHTAG).toDateTime());
+        Optional<Rooms> room = RoomsService.getRoom(resident, JavaTimeConverter.toJodaLocalDateTime(STICHTAG).toDateTime());
         /** 2 */qsMdsData.setWOHNBEREICH(of.createDasQsDataMdsTypeWOHNBEREICH());
         qsMdsData.getWOHNBEREICH().setValue(room.get().getFloor().getName());
         getLogger().debug(room.get().toString());
@@ -447,7 +447,7 @@ public class QdvsService implements HasLogger {
         qsData.setIDBEWOHNER(of.createDasQsDataTypeIDBEWOHNER());
         qsData.getIDBEWOHNER().setValue(NF_IDBEWOHNER.format(resident.getIdbewohner()));
 
-        Optional<Rooms> room = RoomsTools.getRoom(resident, JavaTimeConverter.toJodaLocalDateTime(STICHTAG).toDateTime());
+        Optional<Rooms> room = RoomsService.getRoom(resident, JavaTimeConverter.toJodaLocalDateTime(STICHTAG).toDateTime());
         qsData.setWOHNBEREICH(of.createDasQsDataTypeWOHNBEREICH());
         qsData.getWOHNBEREICH().setValue(room.get().getFloor().getName());
 
