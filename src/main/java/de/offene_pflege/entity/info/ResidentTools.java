@@ -311,7 +311,8 @@ public class ResidentTools {
     }
 
     public static List<Resident> getAll(Homes home, java.time.LocalDateTime target_date) {
-        LocalDateTime target = JavaTimeConverter.toJodaLocalDateTime(target_date);
+        LocalDateTime target = JavaTimeConverter.toJodaLocalDateTime(target_date);         
+        //todo: das geht so nicht. station ist null wenn die BWs nicht mehr da sind.
         return getAll(target.toDateTime(), target.toDateTime()).stream().filter(resident -> resident.getStation().getHome().equals(home)).collect(Collectors.toList());
     }
 

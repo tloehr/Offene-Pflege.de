@@ -60,7 +60,6 @@ public class SYSPropsTools {
     public static final String KEY_DB_VERSION = "dbstructure";
 
 
-
     public static final String KEY_MYSQLDUMP_EXEC = "mysqldump";
     public static final String KEY_MYSQLDUMP_DIRECTORY = "mysqldump.folder";
     public static final String KEY_JDBC_HOST = "javax.persistence.jdbc.host";
@@ -116,7 +115,8 @@ public class SYSPropsTools {
 //    public static final String KEY_OUTCOME_BGITEM = "OUTCOME_BGITEM";
 
     public static final String KEY_QDVS_STICHTAG = "qdvs_stichtag";
-        public static final String KEY_QDVS_WORKPATH = "qdvs_path";
+    public static final String KEY_QDVS_LETZTER_STICHTAG = "qdvs_letzter_stichtag";
+    public static final String KEY_QDVS_WORKPATH = "qdvs_path";
 
 
     //should be useless in future
@@ -228,8 +228,8 @@ public class SYSPropsTools {
 
 
     /**
-     * Lädt Properties aus der Tabelle OCProps ein.
-     * Passend zu einer IP bzw. IP='*', wenn die Properties für alle gedacht sind.
+     * Lädt Properties aus der Tabelle OCProps ein. Passend zu einer IP bzw. IP='*', wenn die Properties für alle
+     * gedacht sind.
      */
     public static Properties loadProps(OPUsers user) {
         EntityManager em = OPDE.createEM();

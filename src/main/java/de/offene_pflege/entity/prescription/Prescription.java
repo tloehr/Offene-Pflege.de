@@ -598,14 +598,15 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
             result = mytitle.compareTo(thattitle);
         }
         if (result == 0) {
-            result = Long.valueOf(relation).compareTo(them.getRelation());
-        }
-        if (result == 0) {
-            result = ((Boolean) isClosed()).compareTo(them.isClosed());
-        }
-        if (result == 0) {
-            result = from.compareTo(them.getFrom()) * -1;
-        }
+                    result = from.compareTo(them.getFrom()) * -1;
+                }
+//        if (result == 0) {
+//            result = Long.valueOf(relation).compareTo(them.getRelation());
+//        }
+//        if (result == 0) {
+//            result = ((Boolean) isClosed()).compareTo(them.isClosed());
+//        }
+//        
         return result;
     }
 

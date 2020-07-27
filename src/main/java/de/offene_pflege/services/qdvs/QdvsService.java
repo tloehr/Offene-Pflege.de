@@ -6,9 +6,9 @@ import de.offene_pflege.entity.building.Rooms;
 import de.offene_pflege.entity.info.*;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.gui.events.AddTextListener;
 import de.offene_pflege.op.tools.*;
+import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.services.RoomsService;
 import de.offene_pflege.services.qdvs.schema.*;
 import org.apache.commons.collections4.CollectionUtils;
@@ -91,21 +91,28 @@ public class QdvsService implements HasLogger {
     private Homes home;
 
 
+    /**
+     * Diese Service Klasse wertet die Pflegedaten aus und erzeugt eine passende XML Datei, die an DAS-PFLEGE
+     * hochgeladen werden kann.
+     *
+     * @param textListener meldet alle Protokoll Einträge an den Textlistener. Der kann das dann hinterher anzeigen.
+     */
     public QdvsService(AddTextListener textListener) {
         this.textListener = textListener;
+        // ein paar Hilfs-Variablen.
+
         FALLTYPE = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALL);
         FALLAUSWIRKUNG = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALL_AUSWIRKUNG);
         FIXIERUNGSPROTOKOLLE = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FIXIERUNGPROTOKOLL);
         of = new ObjectFactory();
         rootType = of.createRootType();
-//        fehler_protokoll = new HashMap<>();
-//        mapBWAusschlussMitGrund = new HashMap<>();
+
         listeBWFehlerfrei = new ArrayList<>();
         residentInfoObjectMap = new HashMap<>();
 
-
         /**
          * das sind alte resinfotypes die unbedingt durch die neuen ersetzt werden müssen, damit die Auswertung funktioniert.
+         * Sobald einmal die alte Version aktualisiert wurde und die Daten geändert sind, kommt das Problem nicht mehr vor.
          *
          * Wenn es noch einen von diesen Types gibt, dann ablehnen
          *
@@ -119,7 +126,6 @@ public class QdvsService implements HasLogger {
          * Die muss es auf jeden fall geben, sonst ablehnen
          */
         mandantoryTypes = new HashSet<>();
-
         for (String pk : new String[]{BEWUSST, ORIENT, MOBIL, AUSSCHEID, KPFLEGE, ERN, ALLTAG, SCHLAF, SOZIAL, NINSUR, ROOM, RESPIRAT}) {
             mandantoryTypes.add(ResInfoTypeTools.getByID(pk));
         }
@@ -143,8 +149,13 @@ public class QdvsService implements HasLogger {
     }
 
     private void createQDVS() {
-        rootType.setHeader(createHeaderType());
-        rootType.setBody(createBodyType());
+        try {
+            rootType.setHeader(createHeaderType());
+            rootType.setBody(createBodyType());
+        } catch (Exception e) {
+            getLogger().error(e);
+
+        }
     }
 
     private HeaderType createHeaderType() {
@@ -166,7 +177,7 @@ public class QdvsService implements HasLogger {
     }
 
 
-    private BodyType createBodyType() {
+    private BodyType createBodyType() throws Exception {
 
         BodyType body = of.createBodyType();
         body.setDataContainer(of.createCareDataType());
@@ -188,9 +199,12 @@ public class QdvsService implements HasLogger {
         runningNumber = 0;
         residentInfoObjectMap.values().forEach(infoObject -> {
             runningNumber++;
+            textListener.addLog(infoObject.getResident().toString());
             // unterscheidung ob Ausschluss oder nicht
+
             ResidentType residentType = infoObject.getAusschluss_grund() == QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS ? createResidentType(infoObject.getResident()) : createResidentAusschlussType(infoObject.getResident());
             body.getDataContainer().getResidents().getResident().add(residentType);
+
         });
 
         return body;
@@ -206,10 +220,12 @@ public class QdvsService implements HasLogger {
         vorpruefung();
 
         // fehlerfrei? wenn nur einer nicht fehlerfrei ist, gehts hier nicht weiter
-        if (residentInfoObjectMap.values().stream().anyMatch(qdvsResidentInfoObject -> !qdvsResidentInfoObject.isFehlerfrei())) {
-            textListener.addLog("qdvs.vorpruefung.fehler.gefunden");
-            return;
-        }
+        residentInfoObjectMap.values().stream().filter(qdvsResidentInfoObject -> !qdvsResidentInfoObject.isFehlerfrei()).forEach(qdvsResidentInfoObject ->
+                {
+                    textListener.addLog("qdvs.vorpruefung.fehler.gefunden");
+                    getLogger().info("ERROR: " + qdvsResidentInfoObject.getFehler());
+                }
+        );
 
         hauptpruefung();
     }
@@ -466,8 +482,6 @@ public class QdvsService implements HasLogger {
         qsData.setPFLEGEGRAD(of.createDasQsDataTypePFLEGEGRAD());
         qsData.getPFLEGEGRAD().setValue(Integer.valueOf(ResInfoTools.getContent(ResInfoTools.getValidOn(resident, NINSUR, ERHEBUNGSDATUM).get()).getProperty("grade")));
 
-        getLogger().debug("");
-
     }
 
     private void krankenhaus_und_einzug(DasQsDataType qsData, Resident resident) {
@@ -521,9 +535,9 @@ public class QdvsService implements HasLogger {
             }
         }
 
-        if (resident.getId().equalsIgnoreCase("SG3")) {
-            getLogger().debug("hier ist sie");
-        }
+//        if (resident.getId().equalsIgnoreCase("SG3")) {
+//            getLogger().debug("hier ist sie");
+//        }
 
         //____ _  _ ___  _  _ ___ ____ ___ _ ____ _  _
         //|__| |\/| |__] |  |  |  |__|  |  | |  | |\ |
@@ -553,7 +567,7 @@ public class QdvsService implements HasLogger {
             Properties props = ResInfoTools.getContent(away);
             if (props.getProperty("type").equalsIgnoreCase(ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL)) {
 
-                long diese_periode_in_tagen = ResInfoTools.getDays(away);
+                long diese_periode_in_tagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(away.getFrom()).toLocalDate(), JavaTimeConverter.toJavaLocalDateTime(away.getTo()).toLocalDate()) + 1;
                 if (diese_periode_in_tagen > 0) {
                     khbanzahltage += diese_periode_in_tagen;
                     khbanzahlaufenhalte++;
@@ -564,7 +578,8 @@ public class QdvsService implements HasLogger {
                     laengsterAufenthalt = Optional.of(away);
                 }
 
-                getLogger().debug("KH Aufenthalt " + away.getFrom().toLocaleString() + " " + away.getTo().toLocaleString() + " Period " + diese_periode_in_tagen);
+                getLogger().debug("KH Aufenthalt " + DateFormat.getDateInstance().format(away.getFrom()) + " " + DateFormat.getDateInstance().format(away.getTo()) + " Period " + diese_periode_in_tagen);
+                getLogger().debug("Länge der Abwesenheitsperiode: " + diese_periode_in_tagen);
             }
         }
 
@@ -691,22 +706,19 @@ public class QdvsService implements HasLogger {
         /** 41 */qsData.setSVERNAEHRUNG(of.createDasQsDataTypeSVERNAEHRUNG());
         /** 42 */qsData.setSVFREMDHILFE(of.createDasQsDataTypeSVFREMDHILFE());
         /** 43 */qsData.setSVERNAEHRUNGUMFANG(of.createDasQsDataTypeSVERNAEHRUNGUMFANG());
-        // Standarwert für NEIN. Bleiben so stehen wenn keine "kern01" vorliegt.
-        qsData.getSVERNAEHRUNG().setValue(0);
 
-        // "kern01" ist eine optionale resinfo. Falls sie nicht existiert, wird Frage 41. einfach auf 0 gesetzt.
+        // "kern01" künstliche Ernährung ist eine optionale resinfo. Falls sie nicht existiert, wird Frage 41. einfach auf 0 gesetzt.
         Optional<ResInfo> kern = ResInfoTools.getValidOn(resident, KERN, ERHEBUNGSDATUM);
-        if (kern.isPresent()) {
-            int svernaehrung = Integer.valueOf(ResInfoTools.getContent(kern.get()).getProperty("SVERNAEHRUNG"));
-            qsData.getSVERNAEHRUNG().setValue(svernaehrung);
-            if (svernaehrung == 1) {
-                int svfremdhilfe = Integer.valueOf(ResInfoTools.getContent(kern.get()).getProperty("SVFREMDHILFE"));
-                qsData.getSVFREMDHILFE().setValue(svfremdhilfe);
-                if (svfremdhilfe == 1) {
-                    int svernaehrungumfang = Integer.valueOf(ResInfoTools.getContent(kern.get()).getProperty("SVERNAEHRUNGUMFANG"));
-                    qsData.getSVERNAEHRUNGUMFANG().setValue(svernaehrungumfang);
-                }
+        if (kern.isPresent()) { // Sobald ein kern01 Eintrag Vorliergt ist die SVERNAEHRUNG gesetzt.
+            qsData.getSVERNAEHRUNG().setValue(1);
+            int svfremdhilfe = Integer.valueOf(ResInfoTools.getContent(kern.get()).getProperty("SVFREMDHILFE"));
+            qsData.getSVFREMDHILFE().setValue(svfremdhilfe);
+            if (svfremdhilfe == 1) {
+                int svernaehrungumfang = Integer.valueOf(ResInfoTools.getContent(kern.get()).getProperty("SVERNAEHRUNGUMFANG"));
+                qsData.getSVERNAEHRUNGUMFANG().setValue(svernaehrungumfang);
             }
+        } else {
+            qsData.getSVERNAEHRUNG().setValue(0);
         }
 
         //┏━┓╻ ╻┏━┓┏━┓┏━╸╻ ╻┏━╸╻╺┳┓╻ ╻┏┓╻┏━╸┏━╸┏┓╻
@@ -1052,9 +1064,17 @@ public class QdvsService implements HasLogger {
         return new ImmutablePair<>(gurt, seitengitter);
     }
 
+    /**
+     * diese methode ermittelt die Schmerzsituation. Dabei wird die Frage nach "Schmerzfrei durch Medikamente" NUR
+     * berücksichtigt bei einem NRS > 3. Ansonsten stellt sich die Frage nicht und würde auch bei der Auswertung zu
+     * einem Validationsfehler #60047 führen.
+     *
+     * @param qsData
+     * @param resident
+     */
     private void schmerzen(DasQsDataType qsData, Resident resident) {
         int SCHMERZEN = 0;
-        int SCHMERZFREI = 1; // durch medikamente
+        int SCHMERZFREI = 0; // durch medikamente
 
         // das macht keinen sinn. nur der letzte Eintrag zählt
         int max = 0;
@@ -1070,13 +1090,13 @@ public class QdvsService implements HasLogger {
             boolean chronisch = props.getProperty("schmerztyp", "0").equalsIgnoreCase("1");
             // Schmerzen hat er dann, wenn sie chronisch und NRS >3 sind.
             /**
-             * Es geht in dieser Frage um die Feststellung, ob überhaupt eine Schmerzproblemak besteht (und somit ein Bedarf,
+             * Es geht in dieser Frage um die Feststellung, ob überhaupt eine Schmerzproblematik besteht (und somit ein Bedarf,
              * den Bewohner bzw. die Bewohnerin im Umgang mit seinen bzw. ihren Schmerzen ärztlich und/oder pflegerisch zu unterstützen).
              * Beantworten Sie die Frage mit „ja“, wenn aus den Äußerungen des Bewohners
-             * bzw. der Bewohnerin oder der Dokumentaon hervorgeht, dass Schmerzen über mehrere Wochen oder Monate bestehen oder eine
-             * Schmerzproblemak zwar mit Unterbrechungen, aber wiederholt auri. Auch die regelmäßige Einnahme von Schmerzmedikamenten oder die
-             * regelmäßige Anwendung anderer schmerzlindernder Maßnahmen lassen auf eine bestehende Schmerzproblemak schließen.
-             * Einmalig auretende Schmerzen, z.B. Kopfschmerzen am Tag der Erhebung, sind nicht zu berücksichgen.
+             * bzw. der Bewohnerin oder der Dokumentation hervorgeht, dass Schmerzen über mehrere Wochen oder Monate bestehen oder eine
+             * Schmerzproblematik zwar mit Unterbrechungen, aber wiederholt äußert. Auch die regelmäßige Einnahme von Schmerzmedikamenten oder die
+             * regelmäßige Anwendung anderer schmerzlindernder Maßnahmen lassen auf eine bestehende Schmerzproblematik schließen.
+             * Einmalig auftretende Schmerzen, z.B. Kopfschmerzen am Tag der Erhebung, sind nicht zu berücksichtigen.
              */
             SCHMERZEN = (nrs >= 4 && chronisch ? 1 : 0);
             SCHMERZFREI = props.getProperty("schmerzfrei", "false").equalsIgnoreCase("true") ? 1 : 0;
@@ -1091,7 +1111,6 @@ public class QdvsService implements HasLogger {
             pit = JavaTimeConverter.toJavaLocalDateTime(letzter_besd.get().getFrom()).toLocalDate();
         }
 
-
         /** 82 */qsData.setSCHMERZEN(of.createDasQsDataTypeSCHMERZEN());
         qsData.getSCHMERZEN().setValue(SCHMERZEN);
         /** 83 */qsData.setSCHMERZFREI(of.createDasQsDataTypeSCHMERZFREI());
@@ -1099,10 +1118,6 @@ public class QdvsService implements HasLogger {
         /** 85 */qsData.setSCHMERZEINSCHDATUM(of.createDasQsDataTypeSCHMERZEINSCHDATUM());
 
         if (SCHMERZEN == 1) {
-            qsData.getSCHMERZFREI().setValue(SCHMERZFREI);
-        }
-
-        if (SCHMERZFREI == 0) {
             // Bei den verwendeten Formularen gehe ich immer von einer differenzierten Einschätzung aus
             qsData.getSCHMERZEINSCH().setValue(1); // JA
             qsData.getSCHMERZEINSCHDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(pit)); // JA
@@ -1121,11 +1136,17 @@ public class QdvsService implements HasLogger {
             qsData.getSCHMERZEINSCHINFO().add(info2);
             qsData.getSCHMERZEINSCHINFO().add(info3);
             qsData.getSCHMERZEINSCHINFO().add(info4);
-        } else {
+
+            // erhält nur einen Value, wenn es Schmerzen gibt. Sonst nicht.
+            qsData.getSCHMERZFREI().setValue(SCHMERZFREI);
+
+        } else { // hat er keine Schmerzen ist gar keine differenzierte Einschätzung nötig.
             // ein leerer Eintrag ist nötig, sonst schimpft die XSD
             DasQsDataType.SCHMERZEINSCHINFO infoleer = of.createDasQsDataTypeSCHMERZEINSCHINFO();
             qsData.getSCHMERZEINSCHINFO().add(infoleer);
         }
+
+
     }
 
     private void einzug(DasQsDataType qsData, Resident resident) {

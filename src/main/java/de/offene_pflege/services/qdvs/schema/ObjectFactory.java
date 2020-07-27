@@ -1030,7 +1030,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "https://www.das-pflege.de", name = "xsi:schemaLocation=\"https://www.das-pflege.de ../das_interface.xsd\"")
     public JAXBElement<RootType> createRoot(RootType value) {
-        return new JAXBElement<RootType>(_Root_QNAME, RootType.class, null, value);
+        return new JAXBElement<>(_Root_QNAME, RootType.class, null, value);
     }
 
 }

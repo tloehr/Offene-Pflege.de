@@ -118,7 +118,6 @@ public class LocalMachine {
     }
 
     public static final String getAppDataPath() {
-
         if (SystemUtils.IS_OS_WINDOWS) {
             return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
         }

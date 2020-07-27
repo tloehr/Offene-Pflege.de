@@ -309,7 +309,7 @@ public class MedInventoryTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT inv FROM MedInventory inv WHERE inv.resident = :resident AND inv.to = :to AND inv.resident.adminonly <> 2 ORDER BY inv.text");
         query.setParameter("resident", resident);
-        query.setParameter("to", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        query.setParameter("to", SYSConst.LD_UNTIL_FURTHER_NOTICE);
 
         result = new ArrayList<MedInventory>(query.getResultList());
         em.close();

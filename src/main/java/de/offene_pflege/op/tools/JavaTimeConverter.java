@@ -113,6 +113,10 @@ public class JavaTimeConverter {
         return to_iso8601(toJavaLocalDateTime(date));
     }
 
+    public static String to_iso8601(GregorianCalendar gc) {
+        return to_iso8601(toJavaLocalDateTime(gc.getTime()));
+    }
+
     public static String to_iso8601(LocalDateTime now) {
         return now.atZone(ZoneId.systemDefault()).toString();
     }

@@ -10,7 +10,6 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import de.offene_pflege.entity.building.Homes;
-import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
@@ -22,6 +21,7 @@ import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.HomesService;
 import de.offene_pflege.services.qdvs.DAS_REGELN;
 import de.offene_pflege.services.qdvs.MyErrorHandler;
 import de.offene_pflege.services.qdvs.QSData;
@@ -30,6 +30,7 @@ import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -61,10 +62,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
@@ -86,6 +85,11 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     MultiKeyMap<MultiKey<Integer>, ArrayList<String>> ERRORS;
     MultiKeyMap<MultiKey<Integer>, Long> LOOKUP;
 
+    /**
+     * Diese Klasse erzeugt das Panel für die QDVS Auswertung
+     *
+     * @param jspSearch
+     */
     public QDVS_Panel(JScrollPane jspSearch) {
         super("de.offene_pflege.gui.qdvs");
         this.jspSearch = jspSearch;
@@ -98,13 +102,25 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
         txtLog = new JTextArea();
         right.add(new JScrollPane(txtLog));
-        right.add(new JButton("Something"));
+//        right.add(new JButton("Something"));
 
         ERRORS = new MultiKeyMap<>();
         LOOKUP = new MultiKeyMap<>();
 
-        STICHTAG = LocalDate.now();
-        LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
+        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_STICHTAG))
+            STICHTAG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_STICHTAG)).toLocalDate();
+        else
+            STICHTAG = LocalDate.now();
+
+//        STICHTAG =  OPDE.getLocalProps().getProperty():
+
+        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_STICHTAG))
+            LETZTE_ERFASSUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG)).toLocalDate();
+        else
+            LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
+
+
+//        LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         tblResidents = new JTree();
@@ -127,7 +143,6 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         File path = new File(workdir, home.getCareproviderid() + File.separator);
         File csv = new File(path, "DAS_Plausibilitaetsregeln.csv");
         REGELN = lese_DAS_REGELN(csv);
-
 
         setParameters(); // einmal am Anfang, damit die Liste der BW ausgefüllt ist
     }
@@ -204,8 +219,6 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 ERRORS = validateFile(target, xsd); // welche Fehler
                 LOOKUP = getLookupTable(target); // welcher Bewohner
 
-                tblResidents.setModel(new DefaultTreeModel(createTree()));
-
                 addLog("qdvs.erfassung.abgeschlossen");
 
                 return null;
@@ -213,7 +226,14 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
             @Override
             protected void done() {
-                tblResidents.setModel(new DefaultTreeModel(createTree()));
+                DefaultMutableTreeNode root = createTree();
+                tblResidents.setModel(new DefaultTreeModel(root));
+                try {
+                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebis.html"), toHTML(root));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 OPDE.getMainframe().setBlockedTransparent(false);
             }
         };
@@ -222,11 +242,12 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     }
 
     /**
-     * bei jeder Änderung der Auswahlen für Zeitraum, Einrihtung usw. werden einmal die Parameter dem QDVS Service
+     * bei jeder Änderung der Auswahlen für Zeitraum, Einrichtung usw. werden einmal die Parameter dem QDVS Service
      * mitgeteilt.
      */
     void setParameters() {
         getLogger().debug("setParameters()");
+        // Die Auswertung kommt immer in ein eigenes Verzeichnis.
         String dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         File path = new File(workdir, home.getCareproviderid() + File.separator + dir + File.separator);
         target = new File(path, "qs-data.xml");
@@ -268,6 +289,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
 
     private java.util.List<Component> addCommands() {
+
         FolderChooserComboBox fcWorkdir = new FolderChooserComboBox();
         fcWorkdir.setSelectedItem(workdir);
         fcWorkdir.addPropertyChangeListener("selectedItem", evt -> {
@@ -283,9 +305,11 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         dcmbStichtag.getDateModel().setMaxDate(new GregorianCalendar());
         dcmbStichtag.setDate(JavaTimeConverter.toDate(STICHTAG));
         dcmbStichtag.addPropertyChangeListener("selectedItem", evt -> {
-            STICHTAG = JavaTimeConverter.toJavaLocalDateTime(((GregorianCalendar) evt.getNewValue()).getTime()).toLocalDate();
-            LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
-            dcmbLetzte.setDate(JavaTimeConverter.toDate(LETZTE_ERFASSUNG));
+            GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
+            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_STICHTAG, JavaTimeConverter.to_iso8601(gc));
+            STICHTAG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
+//            LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
+//            dcmbLetzte.setDate(JavaTimeConverter.toDate(LETZTE_ERFASSUNG));
             setParameters();
         });
 
@@ -294,7 +318,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         dcmbLetzte.getDateModel().setMaxDate(new GregorianCalendar());
         dcmbLetzte.setDate(JavaTimeConverter.toDate(LETZTE_ERFASSUNG));
         dcmbLetzte.addPropertyChangeListener("selectedItem", evt -> {
-            LETZTE_ERFASSUNG = JavaTimeConverter.toJavaLocalDateTime(((GregorianCalendar) evt.getNewValue()).getTime()).toLocalDate();
+            GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
+            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG, JavaTimeConverter.to_iso8601(gc));
+            LETZTE_ERFASSUNG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
             setParameters();
         });
 
@@ -309,11 +335,15 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
 
         java.util.List<Component> list = new ArrayList();
-        list.add(new JLabel(SYSTools.xx("qdvs.stichtag")));
         list.add(cmbHome);
+        list.add(new JLabel(SYSTools.xx("qdvs.stichtag")));
         list.add(dcmbStichtag);
+        list.add(new JLabel(SYSTools.xx("qdvs.letzte.erhebung")));
+        list.add(dcmbLetzte);
+        list.add(new JLabel(SYSTools.xx("qdvs.workdir")));
         list.add(fcWorkdir);
-        list.add(GUITools.createHyperlinkButton(SYSTools.xx("qdvs.ergebniserfassung"), SYSConst.icon22add, e -> {
+        list.add(new JSeparator());
+        list.add(GUITools.createHyperlinkButton(SYSTools.xx("qdvs.ergebniserfassung"), SYSConst.icon22exec, e -> {
             ergebniserfasung();
         }));
 
@@ -321,9 +351,14 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         return list;
     }
 
+    /**
+     * Die Klartext-Darstellung der Fehlermeldungen steht in einer CSV Datei. Die muss ich hier einlesen, damit ich da
+     * nachher drauf zugreifen kann.
+     *
+     * @param csv
+     * @return
+     */
     private HashMap<String, DAS_REGELN> lese_DAS_REGELN(File csv) {
-
-
         HashMap<String, DAS_REGELN> regeln = new HashMap<>();
 
         BufferedReader reader;
@@ -348,13 +383,13 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     }
 
     // erzeugt eine Multikey Map
-    // der key ist eine paar aus zeile und spalte des closing tags mit dem Fehler
+    // der key ist ein Paar aus zeile und spalte des closing tags der zu dem Fehler gehört
     // der value ist eine Liste aller Fehler die dazu gehören
     // diese Fehlerliste lässt sich mit den Regeln der CSV Datei Matchen um die restlichen Daten zu den Regeln zu erhalten.
     private MultiKeyMap<MultiKey<Integer>, ArrayList<String>> validateFile(File xmlFile, File xsdFile) throws SAXException, IOException, XMLStreamException {
         // 1. Lookup a factory for the W3C XML Schema language
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
-        //        factory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.VALIDATE_ANNOTATIONS_FEATURE, true);
+//                factory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.VALIDATE_ANNOTATIONS_FEATURE, true);
 
         // 2. Compile the schema.
         File schemaLocation = xsdFile;
@@ -385,7 +420,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     }
 
     /**
-     * Erzeugt einen Lookup Table der zu jedem zeile, spalte paar die idbewohner enthält.
+     * Erzeugt einen Lookup Table der zu jedem zeile, spalte paar die idbewohner enthält. Das ist ein Trick, weil ich
+     * das nicht direkt aus dem Parser rauslesen kann. Ich muss ja die Fehler dem BW zuordnen können.
      *
      * @param xmlFile
      * @return
@@ -404,6 +440,37 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
 
         return struktur.getLookup();
+    }
+
+    String toHTML(DefaultMutableTreeNode node) {
+//        String html = tree.isRoot() ? "ROOT" : tree.getUserObject();
+        String html = "";
+        final StringBuffer buffer = new StringBuffer();
+
+        if (node instanceof TreeInfoNode) {
+
+            TreeInfoNode tnode = (TreeInfoNode) node;
+
+            if (tnode.getType() == TreeInfoNode.RESIDENT) {
+                String resident = QdvsService.toString((Resident) tnode.getUserObject());
+
+                Collections.list(tnode.children()).forEach(treeNode -> buffer.append(toHTML((DefaultMutableTreeNode) treeNode)));
+
+                if (buffer.length() > 0)
+                    html = SYSConst.html_ul(SYSConst.html_li(resident + SYSConst.html_ul(buffer.toString())));
+                else html = SYSConst.html_ul(SYSConst.html_li(resident));
+            } else if (tnode.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
+                html = SYSConst.html_li(tnode.getUserObject().toString());
+            } else if (tnode.getType() == TreeInfoNode.ERROR_BY_DAS) {
+                html = SYSConst.html_li("DAS: " + tnode.getUserObject().toString());
+            }
+        } else {
+            Collections.list(node.children()).forEach(treeNode -> buffer.append(toHTML((DefaultMutableTreeNode) treeNode)));
+            html = buffer.toString();
+        }
+
+        return html;
+
     }
 
     @Override
@@ -436,34 +503,34 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         }
     }
 
-    private class TreeRenderer extends DefaultTreeCellRenderer {
-        TreeRenderer() {
-            super();
-        }
-
-        @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-
-
-            JLabel component = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
-            component.setText("empty");
-
-            if (value instanceof TreeInfoNode) {
-                TreeInfoNode node = (TreeInfoNode) value;
-                Object userObject = node.getUserObject();
-
-                if (node.getType() == TreeInfoNode.RESIDENT)
-                    component.setText(QdvsService.toString((Resident) userObject));
-                if (node.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
-                    component.setText(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(userObject.toString())));
-                }
-                if (node.getType() == TreeInfoNode.ERROR_BY_DAS) component.setText(userObject.toString());
-            }
-            return component;
-        }
-
-
-    }
+//    private class TreeRenderer extends DefaultTreeCellRenderer {
+//        TreeRenderer() {
+//            super();
+//        }
+//
+//        @Override
+//        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+//
+//
+//            JLabel component = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+//            component.setText("empty");
+//
+//            if (value instanceof TreeInfoNode) {
+//                TreeInfoNode node = (TreeInfoNode) value;
+//                Object userObject = node.getUserObject();
+//
+//                if (node.getType() == TreeInfoNode.RESIDENT)
+//                    component.setText(QdvsService.toString((Resident) userObject));
+//                if (node.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
+//                    component.setText(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(userObject.toString())));
+//                }
+//                if (node.getType() == TreeInfoNode.ERROR_BY_DAS) component.setText(userObject.toString());
+//            }
+//            return component;
+//        }
+//
+//
+//    }
 
     class DelegateDefaultCellRenderer extends DefaultTreeCellRenderer {
         TextAreaRenderer taRenderer = new TextAreaRenderer();
@@ -548,7 +615,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 if (node.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
                     textarea.setText(userObject.toString());
                 }
-                if (node.getType() == TreeInfoNode.ERROR_BY_DAS) textarea.setText(userObject.toString());
+                if (node.getType() == TreeInfoNode.ERROR_BY_DAS) {
+                    textarea.setText(userObject.toString());
+                }
             } else {
                 textarea.setText("empty");
             }

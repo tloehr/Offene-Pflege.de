@@ -194,7 +194,6 @@ public class PnlWelcome extends CleanablePanel {
             protected Object doInBackground() throws Exception {
                 int progress = -1;
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
-//                emptyStocksList = PrescriptionTools.getAllActiveWithEmptyInventories();
                 processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
                 birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
                 expiryList = MedStockTools.getExpiryList(7);

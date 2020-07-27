@@ -690,7 +690,7 @@ public class ResValueTools {
      * @param monthsback          - der zu prüfende Zeitraum in Monaten von jetzt an gerechnet. Wenn innerhalb des zu
      *                            prüfenden Zeitraums nicht mindestens zwei Werte vorhanden sind, kommt der BW nicht in
      *                            die Liste.
-     * @param changeRateInPercent - Die Gewichtsveränderung in Prozent, aber eine Meldung in die Liste mit aufgenommen
+     * @param changeRateInPercent - Die Gewichtsveränderung in Prozent, ab der eine Meldung in die Liste mit aufgenommen
      *                            werden soll.
      * @return eine Liste aus 4-Tupeln (Bewohner, Betrachteter Zeitraum in Tagen, Veränderung absolut, Veränderung in
      * Prozent). In die Liste kommt man nur rein, wenn man die "changeRate" erfüllt. Oder wenn die Rate nicht
@@ -701,7 +701,7 @@ public class ResValueTools {
 
 
         EntityManager em = OPDE.createEM();
-        DateFormat df = DateFormat.getDateInstance();
+//        DateFormat df = DateFormat.getDateInstance();
 
         String jpqlWithoutRetired = " " +
                 " SELECT rv " +

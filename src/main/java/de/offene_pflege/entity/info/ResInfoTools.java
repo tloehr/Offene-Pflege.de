@@ -1,11 +1,8 @@
 package de.offene_pflege.entity.info;
 
 import de.offene_pflege.entity.EntityTools;
-import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.building.Rooms;
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.services.RoomsService;
-import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.reports.NReportTools;
@@ -14,10 +11,13 @@ import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.entity.system.UniqueTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
-import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.exceptions.MissingInformationException;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.*;
+import de.offene_pflege.services.HomesService;
+import de.offene_pflege.services.ResvaluetypesService;
+import de.offene_pflege.services.RoomsService;
+import de.offene_pflege.services.StationService;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -370,7 +370,7 @@ public class ResInfoTools implements HasLogger {
                 resInfo = Optional.of(myResInfo);
         }
 
-        OPDE.debug(debugOutput(resInfo));
+        resInfo.ifPresent(resInfo1 -> OPDE.debug(resInfo1.getResident().getId() + " " + resInfo1.getResInfoType().getID()));
 
         return resInfo;
     }
@@ -1872,11 +1872,16 @@ public class ResInfoTools implements HasLogger {
         return hasSevereFallRisk(getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALLRISK)));
     }
 
-    public static long getDays(ResInfo resInfo) {
-        Date from = resInfo.getFrom();
-        Date to = resInfo.getTo();
-        return ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(from).toLocalDate(), JavaTimeConverter.toJavaLocalDateTime(to).toLocalDate());
-    }
+//    /**
+//     * Ermittelt die Dauer in Tage in der eine
+//     * @param resInfo
+//     * @return
+//     */
+//    public static long getDays(ResInfo resInfo) {
+//        Date from = resInfo.getFrom();
+//        Date to = resInfo.getTo();
+//        return ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(from).toLocalDate(), JavaTimeConverter.toJavaLocalDateTime(to).toLocalDate());
+//    }
 
 
 }
