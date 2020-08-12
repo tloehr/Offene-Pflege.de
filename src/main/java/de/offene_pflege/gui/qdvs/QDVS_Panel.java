@@ -72,7 +72,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     private final JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JTree tblResidents;
-    LocalDate STICHTAG, LETZTE_ERFASSUNG;
+    LocalDate STICHTAG, LETZTE_ERFASSUNG, ERHEBUNG;
     Homes home;
     File workdir;
     QdvsService qdvsService;
@@ -101,6 +101,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         right = new JPanel();
         right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
         txtLog = new JTextArea();
+        txtLog.setLineWrap(true);
         right.add(new JScrollPane(txtLog));
 //        right.add(new JButton("Something"));
 
@@ -112,15 +113,17 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         else
             STICHTAG = LocalDate.now();
 
-//        STICHTAG =  OPDE.getLocalProps().getProperty():
-
-        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_STICHTAG))
+        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG))
             LETZTE_ERFASSUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG)).toLocalDate();
         else
             LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
 
+        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_ERHEBUNG))
+            ERHEBUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG)).toLocalDate();
+        else
+            ERHEBUNG = LocalDate.now();
 
-//        LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
+
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         tblResidents = new JTree();
@@ -144,7 +147,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         File csv = new File(path, "DAS_Plausibilitaetsregeln.csv");
         REGELN = lese_DAS_REGELN(csv);
 
-        setParameters(); // einmal am Anfang, damit die Liste der BW ausgefüllt ist
+        prepareListOFResidents(); // einmal am Anfang, damit die Liste der BW ausgefüllt ist
     }
 
 
@@ -203,13 +206,24 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
 
     void ergebniserfasung() {
+
         OPDE.getMainframe().setBlockedTransparent(true);
+
+        // Die Auswertung kommt immer in ein eigenes Verzeichnis.
+        String dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        File path = new File(workdir, home.getCareproviderid() + File.separator + dir + File.separator);
+        target = new File(path, "qs-data.xml");
+
+        qdvsService.setParameters(STICHTAG, ERHEBUNG, LETZTE_ERFASSUNG, home, liste_bewohner, target);
+
+        ERRORS.clear();
+        LOOKUP.clear();
 
         SwingWorker worker = new SwingWorker() {
 
             @Override
             protected Object doInBackground() throws Exception {
-                qdvsService.ergebniserfassung();
+                if (!qdvsService.ergebniserfassung()) return null;
 
                 addLog("qdvs.plausibilitaet.pruefen");
 
@@ -229,7 +243,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 DefaultMutableTreeNode root = createTree();
                 tblResidents.setModel(new DefaultTreeModel(root));
                 try {
-                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebis.html"), toHTML(root));
+                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebnis.html"), toHTML(root));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -245,12 +259,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
      * bei jeder Änderung der Auswahlen für Zeitraum, Einrichtung usw. werden einmal die Parameter dem QDVS Service
      * mitgeteilt.
      */
-    void setParameters() {
+    void prepareListOFResidents() {
         getLogger().debug("setParameters()");
-        // Die Auswertung kommt immer in ein eigenes Verzeichnis.
-        String dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-        File path = new File(workdir, home.getCareproviderid() + File.separator + dir + File.separator);
-        target = new File(path, "qs-data.xml");
+
 
 //        try {
 //            // copy xsd from resources
@@ -279,11 +290,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 //            getLogger().error(e);
 //            // bad luck
 //        }
-
         liste_bewohner = ResidentTools.getAll(home, STICHTAG.atTime(23, 59, 59));
-        qdvsService.setParameters(STICHTAG, LocalDate.now(), LETZTE_ERFASSUNG, home, liste_bewohner, target);
-        ERRORS.clear();
-        LOOKUP.clear();
+
         tblResidents.setModel(new DefaultTreeModel(createTree()));
     }
 
@@ -295,11 +303,12 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         fcWorkdir.addPropertyChangeListener("selectedItem", evt -> {
             OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_WORKPATH, evt.getNewValue().toString());
             workdir = (File) evt.getNewValue();
-            setParameters();
+            prepareListOFResidents();
         });
 
-        final DateExComboBox dcmbLetzte = new DateExComboBox();
-        final DateExComboBox dcmbStichtag = new DateExComboBox();
+        final DateExComboBox dcmbLetzte = new DateExComboBox(); // wann zuletzt eine Erhebung durchgeführt wurde
+        final DateExComboBox dcmbStichtag = new DateExComboBox(); // welcher Stichtag verwendet werden soll.
+        final DateExComboBox dcmbErhebung = new DateExComboBox(); // Bis zu welchem Datum die ResInfos verwendet werden. Das ist meist das aktuelle Datum, aber man kann es einstellen. Ist wichtig, wenn man nach einer Fehlermeldung durch DAS-PFLEGE Korrekturen vornimmt.
         dcmbStichtag.setShowNoneButton(false);
         dcmbStichtag.setInvalidValueAllowed(false);
         dcmbStichtag.getDateModel().setMaxDate(new GregorianCalendar());
@@ -308,9 +317,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
             OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_STICHTAG, JavaTimeConverter.to_iso8601(gc));
             STICHTAG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
-//            LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
-//            dcmbLetzte.setDate(JavaTimeConverter.toDate(LETZTE_ERFASSUNG));
-            setParameters();
+            prepareListOFResidents();
         });
 
         dcmbLetzte.setShowNoneButton(false);
@@ -321,16 +328,24 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
             OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG, JavaTimeConverter.to_iso8601(gc));
             LETZTE_ERFASSUNG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
-            setParameters();
         });
 
+        dcmbErhebung.setShowNoneButton(false);
+        dcmbErhebung.setInvalidValueAllowed(false);
+        dcmbErhebung.getDateModel().setMaxDate(new GregorianCalendar());
+        dcmbErhebung.setDate(JavaTimeConverter.toDate(STICHTAG));
+        dcmbErhebung.addPropertyChangeListener("selectedItem", evt -> {
+            GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
+            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG, JavaTimeConverter.to_iso8601(gc));
+            ERHEBUNG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
+        });
 
         JComboBox<Homes> cmbHome = new JComboBox<>();
         HomesService.setComboBox(cmbHome);
         home = (Homes) cmbHome.getSelectedItem();
         cmbHome.addItemListener(e -> {
             home = (Homes) e.getItem();
-            setParameters();
+            prepareListOFResidents();
         });
 
 
@@ -338,6 +353,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         list.add(cmbHome);
         list.add(new JLabel(SYSTools.xx("qdvs.stichtag")));
         list.add(dcmbStichtag);
+        list.add(new JLabel(SYSTools.xx("qdvs.erhebungsdatum")));
+        list.add(dcmbErhebung);
         list.add(new JLabel(SYSTools.xx("qdvs.letzte.erhebung")));
         list.add(dcmbLetzte);
         list.add(new JLabel(SYSTools.xx("qdvs.workdir")));
@@ -475,9 +492,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
     @Override
     public void addLog(String log) {
+        getLogger().debug(SYSTools.xx(log));
         SwingUtilities.invokeLater(() -> {
             txtLog.append(SYSTools.xx(log) + "\n");
-            OPDE.getDisplayManager().addSubMessage(log);
         });
 
     }

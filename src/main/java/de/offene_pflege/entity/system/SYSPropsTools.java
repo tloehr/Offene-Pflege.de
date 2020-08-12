@@ -115,6 +115,7 @@ public class SYSPropsTools {
 //    public static final String KEY_OUTCOME_BGITEM = "OUTCOME_BGITEM";
 
     public static final String KEY_QDVS_STICHTAG = "qdvs_stichtag";
+    public static final String KEY_QDVS_ERHEBUNG = "qdvs_erhebung";
     public static final String KEY_QDVS_LETZTER_STICHTAG = "qdvs_letzter_stichtag";
     public static final String KEY_QDVS_WORKPATH = "qdvs_path";
 

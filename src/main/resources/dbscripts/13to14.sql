@@ -1646,6 +1646,66 @@ VALUES ('fallprot02', 'Sturzprotokoll', '', '3', '30', '3',
          link="https://www.offene-pflege.de/de/sources-de"/>
 ');
 --
+-- Interpretationsfehler bei der Schmerzauswertung. Schmerzfrei durch Medikamente erst bei einer NRS größer 0 nicht gleich 0.
+UPDATE resinfotype t
+SET t.XML = '  <label size="16" label="Allgemeine Einschätzung" color="blue"/>
+    <qdvs tooltip="Zeile(n) 82 - 86 im DAS Dokumentationsbogen (Abschnitt &quot;Schmerz&quot;)"/>
+    <combobox label="Schmerzintensität (Numerische Rating Skala)" name="schmerzint">
+        <item label="0 - kein Schmerz" name="0"/>
+        <item label="1 - kaum Schmerzen" name="1"/>
+        <item label="2 - kaum Schmerzen" name="2"/>
+        <item label="3 - erträgliche Schmerzen" name="3"/>
+        <item label="4 - erträgliche Schmerzen" name="4"/>
+        <item label="5 - stärkere Schmerzen" name="5"/>
+        <item label="6 - starke Schmerzen" name="6"/>
+        <item label="7 - starke Schmerzen" name="7"/>
+        <item label="8 - sehr starke Schmerzen" name="8"/>
+        <item label="9 - fast unerträgliche Schmerzen" name="9"/>
+        <item label="10 - unerträgliche Schmerzen" name="10"/>
+    </combobox>
+    <checkbox name="schmerzfrei" label="Schmerzfrei durch Medikamente" layout="br left" depends-on="schmerzint"
+              visible-when-dependency-neq="0" default-value-when-shown="false" size="14"
+              qdvs="Zeile(n) 83 im DAS Dokumentationsbogen."/>
+    <label label="Akutschmerz i.d.R. weniger als 3 Monate, Chronischer Schmerz zwischen 6 Wochen und 3 Monaten, oder länger"
+           depends-on="schmerzint" visible-when-dependency-neq="0" size="14" fontstyle="bold"/>
+    <combobox label="Schmerztyp" name="schmerztyp"
+              tooltip="[h1]Akuter Schmerz, „sinnvoller Schmerz“[/h1] [p] Der akute Schmerz gilt als Alarmzeichen des Körpers. Schon die alten Griechen nannten den Schmerz den „bellenden Wächter der Gesundheit“ (Hypokrates). Der akute Schmerz macht uns aufmerksam, dass etwas nicht stimmt und ist zeitlich begrenzt. Ist die Ursache behoben verschwindet der Schmerz meistens wieder. Wenn wir wissen warum wir Schmerzen haben (z.B. den Fuss verstaucht), können wir den Schmerz auch eher akzeptieren. Hier spielt die individuelle Wahrnehmung und das Erlernte „umgehen mit dem Schmerz“ eine wichtige Rolle. [/p] [p] Akuter Schmerz ist ein plötzlich auftretender und nur kurze Zeit andauern der Schmerz. Er wird als existentielle Erfahrung wahrgenommen, die eine lebenserhaltende Alarm- und Schutzfunktion einnimmt. Akuter Schmerz steht in einem offensichtlichen und direkten Zusammenhang mit einer Gewebe oder Organschädigung, also einer körperlichen Ursache. Nonverbale und verbale Signale, die wir im akuten Schmerz aussenden, verursachen unwillkürlich Empathie und das Beduürfnis für Abhilfe zu sorgen. Akuter Schmerz geht mit physiologischen Begleiterscheinungen einher, wie einem Anstieg des Blutdrucks, des Pulses, Schweißausbrüchen und Anstieg der Atemfrequenz. Insbesondere diese Begleiterscheinungen, die in der akuten Versorgungssituation unmittelbar erkennbar sind, zeigt der Mensch mit ausschließlich chronischen Schmerzen nicht. [/p]  [h1]Chronischer Schmerz, „sinnloser Schmerz“[/h1] [p] Der chronische Schmerz hat an sich keine Warnfunktion mehr. Seine Ursache ist nicht (mehr) ausschaltbar, er nimmt dem Menschen sinnlos die Kraft weg und zehrt allmählich seinen Lebensmut auf. Wenn die Tage zur Qual werden, erschöpft sich die Tragfähigkeit, der Leidende wünscht nur mehr ein Ende herbei, unter Umständen sogar um den Preis seines Lebens, denn es genügt nicht nur am Leben zu sein, man muss auch sein Leben haben. Der chronische Schmerz kann zur eigenständigen Schmerzkrankheit werden, der alle Ebenen des Menschseins beeinflusst und beeinträchtigt. Man spricht dann von „total pain“. Dieser Schmerz ist oft losgelöst von der ursprünglichen Krankheit. Gerade wenn die Ursache unbekannt ist, kann die Chronifizierung schnell eintreten. [/p] [p] Der Übergang zwischen akutem und chronischem Schmerz verläuft kontinuierlich. Gleichwohl werden verschiedene Zeiträume angenommen, ab wann ein Schmerz als chronischer, oder anhaltender Schmerz zu betrachten ist. Je nach Lokalisation des Schmerzes wird hierbei von mehr als 6 Wochen bis hin zu 3 Monaten ausgegangen. In erster Linie wird die Entstehung des chronischen Schmerzes durch drei grundlegende Elemente beschrieben: [/p] [ul] [li]Es handelt sich um einen Entstehungsprozess, der durch ein Zusammenwirken von krankheitsbedingten und psychosozialen Prozessen gekennzeichnet ist.[/li] [li]Chronischer Schmerz ist Schmerz, der über einen Punkt, an dem die Heilung abgeschlossen sein sollte hinaus, anhält oder weiter auftritt. Chronischer Schmerz kann häufig nicht (mehr) mit einem Gewebeschaden oder einer Verletzung in Verbindung gebracht werden.[/li] [li]Der Chronifizierung akuter Schmerzen kann durch angemessene Therapie des akuten Schmerzes entgegengewirkt werden. Eine frühzeitige Linderung von akutem Schmerz kann eine Entwicklung von chronischen Schmerzen verhindern. Bestimmte operative Verfahren, z. B. Amputationen, Mastektomien oder Thorakotomien bewirken häufig chronische Schmerzen.[/li] [/ul]"
+              depends-on="schmerzint" visible-when-dependency-neq="0" default-value-when-shown="0">
+        <item label="akute Schmerzen" name="0"/>
+        <item label="chronische Schmerzen" name="1"/>
+    </combobox>
+    <textfield name="schmerzort" label="Wo tritt der Schmerz auf ?" depends-on="schmerzint"
+               visible-when-dependency-neq="0"/>
+    <textfield name="schmerzart" label="Beschreibung der Schmerzart"
+               tooltip="Beispiele für Schmerzarten: dumpf, pulsierend, nagelnd, schießend, brennen, steched, bohrend, ausstrahlend"
+               depends-on="schmerzint" visible-when-dependency-neq="0"/>
+    <textfield name="lindernd" label="Lindernde Faktoren" depends-on="schmerzint" visible-when-dependency-neq="0"/>
+    <textfield name="verstaerkend" label="Verstärkende Faktoren" depends-on="schmerzint"
+               visible-when-dependency-neq="0"/>
+    <label size="16" label="Folgen für Lebensalltag" color="blue"/>
+    <combobox label="Stuhlgang" name="stuhl">
+        <item label="unabhängig vom Schmerz" name="0"/>
+        <item label="normal" name="1"/>
+        <item label="schlechter" name="2"/>
+    </combobox>
+    <combobox label="Schlaf" name="schlaf">
+        <item label="unabhängig vom Schmerz" name="0"/>
+        <item label="normal" name="1"/>
+        <item label="schlechter" name="2"/>
+    </combobox>
+    <combobox label="Wohlbefinden" name="wohlb">
+        <item label="unabhängig vom Schmerz" name="0"/>
+        <item label="normal" name="1"/>
+        <item label="schlechter" name="2"/>
+    </combobox>
+    <combobox label="Beeinträchtigung der Tagesaktivität durch Schmerzen" name="tagaktiv">
+        <item label="unabhängig vom Schmerz" name="0"/>
+        <item label="leicht" name="1"/>
+        <item label="mittel" name="2"/>
+        <item label="stark" name="3"/>
+    </combobox>'
+WHERE t.BWINFTYP LIKE 'schmerze2';
+--
 alter table `groups`
     change `System` sysflag tinyint(1) default 0 not null;
 rename table `groups` to opgroups;

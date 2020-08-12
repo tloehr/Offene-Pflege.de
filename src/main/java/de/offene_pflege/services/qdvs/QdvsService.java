@@ -70,7 +70,7 @@ public class QdvsService implements HasLogger {
 
     private LocalDateTime STICHTAG; // ist das vorher festgelegte Zieldatum (2x im Jahr). Das bleibt auch bei den Nachkorrekturen gleich
     private LocalDateTime LETZTE_ERGEBNISERFASSUNG; // ist das vorher festgelegte Zieldatum (2x im Jahr)
-    private LocalDateTime ERHEBUNGSDATUM;
+    private LocalDateTime ERHEBUNGSDATUM; // Gibt an, zu welchem Datum die ResInfos ausgewertet werden sollen. Das kann durchaus nach dem Stichtag sein, wenn Fehler korrigiert werden mussten.
 
     static final String SPECIFICATION = "V01"; // die Version der jeweilig eingereichten Datenstruktur, die zum Zeitpunkt der Verwendung gültig war.
     static DecimalFormat NF_IDBEWOHNER = new DecimalFormat("000000");
@@ -132,17 +132,25 @@ public class QdvsService implements HasLogger {
     }
 
 
-    public Map<Resident, QdvsResidentInfoObject> getResidentInfoObjectMap() {
-        return residentInfoObjectMap;
-    }
+//    public Map<Resident, QdvsResidentInfoObject> getResidentInfoObjectMap() {
+//        return residentInfoObjectMap;
+//    }
 
-
+    /**
+     * diese Methode wird von der GUI aus aufgerufen und setzt die Parameter für die Auswertung
+     *
+     * @param stichtag
+     * @param erhebungsdatum
+     * @param letzte_ergebniserfassung
+     * @param home
+     * @param listeAlleBewohnerAmStichtag
+     * @param target
+     */
     public void setParameters(LocalDate stichtag, LocalDate erhebungsdatum, LocalDate letzte_ergebniserfassung, Homes home, List<Resident> listeAlleBewohnerAmStichtag, File target) {
         ERHEBUNGSDATUM = erhebungsdatum.atTime(23, 59, 59);
         LETZTE_ERGEBNISERFASSUNG = letzte_ergebniserfassung.atStartOfDay();
         STICHTAG = stichtag.atTime(23, 59, 59);
         this.home = home;
-//        this.listeAlleBewohnerAmStichtag = listeAlleBewohnerAmStichtag;
         this.target = target;
         residentInfoObjectMap.clear();
         listeAlleBewohnerAmStichtag.forEach(resident -> residentInfoObjectMap.put(resident, new QdvsResidentInfoObject(resident)));
@@ -211,23 +219,24 @@ public class QdvsService implements HasLogger {
     }
 
 
-    public void ergebniserfassung() throws JAXBException, IOException {
-
+    public boolean ergebniserfassung() throws JAXBException, IOException {
 
         listeBWFehlerfrei.clear();
-        if (STICHTAG == null) return;
+        if (STICHTAG == null) return false;
 
         vorpruefung();
 
         // fehlerfrei? wenn nur einer nicht fehlerfrei ist, gehts hier nicht weiter
         residentInfoObjectMap.values().stream().filter(qdvsResidentInfoObject -> !qdvsResidentInfoObject.isFehlerfrei()).forEach(qdvsResidentInfoObject ->
-                {
-                    textListener.addLog("qdvs.vorpruefung.fehler.gefunden");
-                    getLogger().info("ERROR: " + qdvsResidentInfoObject.getFehler());
-                }
+                textListener.addLog(SYSTools.xx("qdvs.vorpruefung.fehler.gefunden") + ": " + qdvsResidentInfoObject.getResident() + " " + qdvsResidentInfoObject.getFehler())
         );
 
-        hauptpruefung();
+        // Nur wenn Fehlerfrei gehts hier weiter.
+        boolean fehlerfrei = residentInfoObjectMap.values().stream().allMatch(qdvsResidentInfoObject -> qdvsResidentInfoObject.isFehlerfrei());
+        if (fehlerfrei)
+            hauptpruefung();
+
+        return fehlerfrei;
     }
 
     private void hauptpruefung() throws JAXBException, IOException {
@@ -276,7 +285,7 @@ public class QdvsService implements HasLogger {
          * Siehe "Massstaebe-und-Grundsaetze-Anlage-3-23.11.2018.pdf" Seite 29ff
          */
 
-        int numResidents = residentInfoObjectMap.size();
+//        int numResidents = residentInfoObjectMap.size();
         runningNumber = 0;
 
         // 1. Durchlauf

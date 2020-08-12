@@ -18,7 +18,7 @@
         <item label="10 - unerträgliche Schmerzen" name="10"/>
     </combobox>
     <checkbox name="schmerzfrei" label="Schmerzfrei durch Medikamente" layout="br left" depends-on="schmerzint"
-              visible-when-dependency-eq="0" default-value-when-shown="false" size="14"
+              visible-when-dependency-neq="0" default-value-when-shown="false" size="14"
               qdvs="Zeile(n) 83 im DAS Dokumentationsbogen."/>
     <label label="Akutschmerz i.d.R. weniger als 3 Monate, Chronischer Schmerz zwischen 6 Wochen und 3 Monaten, oder länger"
            depends-on="schmerzint" visible-when-dependency-neq="0" size="14" fontstyle="bold"/>
