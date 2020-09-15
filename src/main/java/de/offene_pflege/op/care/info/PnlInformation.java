@@ -46,6 +46,7 @@ import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
