@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -23,11 +22,11 @@ public class Encryption {
     private final Key aesKey;
     private final Logger logger;
 
-    public Encryption() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Encryption() throws NoSuchAlgorithmException {
         this(LocalMachine.getSerialNumber());
     }
 
-    public Encryption(String keyphrase) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Encryption(String keyphrase) throws NoSuchAlgorithmException {
         logger = Logger.getLogger(getClass());
 
         byte[] k1 = keyphrase.getBytes();

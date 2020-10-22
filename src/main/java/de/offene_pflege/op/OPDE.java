@@ -437,6 +437,7 @@ public class OPDE {
         opts.addOption("t", "setup-database", false, SYSTools.xx("cmdline.setup-database.description"));
         opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
         opts.addOption("p", "keyphrase", true, SYSTools.xx("cmdline.keyphrase.description"));
+        opts.addOption("e", "encrypt-key", true, SYSTools.xx("cmdline.encrypt.key.description"));
 //        opts.addOption("q", "qdvs", false, SYSTools.xx("Erstellt QDVS - Testbetrieb"));
 
         opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(SYSTools.xx("cmdline.jdbc.description")).create("j"));
@@ -517,11 +518,18 @@ public class OPDE {
             loadLocalProperties();
 
             // different encryption keyphrase ?
-            if (cl.hasOption("p")) { // anonym Modus
+            if (cl.hasOption("p")) {
                 encryption = new Encryption(cl.getOptionValue("p"));
             } else {
                 encryption = new Encryption();
             }
+
+            //generate a key and exit
+            if (cl.hasOption("e")) {
+                System.out.println(encryption.encrypt(cl.getOptionValue("e")));
+                System.exit(0);
+            }
+
 
             try {
                 css = SYSTools.readFileAsString(AppInfo.getTemplate(AppInfo.fileStandardCSS).getAbsolutePath());
