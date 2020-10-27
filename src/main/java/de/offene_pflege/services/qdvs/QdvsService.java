@@ -77,6 +77,10 @@ public class QdvsService implements HasLogger {
     private File target;
     int runningNumber = 0;
     List<Resident> listeBWFehlerfrei;
+
+    public Map<Resident, QdvsResidentInfoObject> getResidentInfoObjectMap() {
+        return residentInfoObjectMap;
+    }
     Map<Resident, QdvsResidentInfoObject> residentInfoObjectMap;
 
     RootType rootType;
@@ -228,13 +232,18 @@ public class QdvsService implements HasLogger {
 
         // fehlerfrei? wenn nur einer nicht fehlerfrei ist, gehts hier nicht weiter
         residentInfoObjectMap.values().stream().filter(qdvsResidentInfoObject -> !qdvsResidentInfoObject.isFehlerfrei()).forEach(qdvsResidentInfoObject ->
-                textListener.addLog(SYSTools.xx("qdvs.vorpruefung.fehler.gefunden") + ": " + qdvsResidentInfoObject.getResident() + " " + qdvsResidentInfoObject.getFehler())
+                textListener.addLog(SYSTools.xx("qdvs.vorpruefung.fehler.gefunden") + ": " + qdvsResidentInfoObject.getResident() + " " + qdvsResidentInfoObject.getFehler() + "\n")
         );
 
         // Nur wenn Fehlerfrei gehts hier weiter.
         boolean fehlerfrei = residentInfoObjectMap.values().stream().allMatch(qdvsResidentInfoObject -> qdvsResidentInfoObject.isFehlerfrei());
-        if (fehlerfrei)
+        if (fehlerfrei){
+            textListener.addLog("qdvs.vorpruefung.abgeschlossen");
             hauptpruefung();
+        } else {
+            textListener.addLog("qdvs.vorpruefung.gescheitert");
+        }
+
 
         return fehlerfrei;
     }
@@ -304,18 +313,18 @@ public class QdvsService implements HasLogger {
                         Date abwesendSeit = ResInfoTools.absentSince(resident);
                         long abwesenheitsZeitraumInTagen = abwesendSeit == null ? 0l : ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(abwesendSeit).toLocalDate(), STICHTAG.toLocalDate());
 
-                        // Ausschlussgrund (1)
+                        // Ausschlussgrund (4)
                         if (abwesenheitsZeitraumInTagen >= 21) {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
                             getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen);
-                        } else if (aufenthaltszeitraumInTagen < 14) {
+                        } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
                             getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.getFrom() + " // " + aufenthaltszeitraumInTagen);
                         } else { // kein Ausschluss
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
 //                            listeBWErfassung.add(resident);
                         }
-                        // todo: sterbephase einbauen (3)
+                        // todo: sterbephase einbauen (3) Wie definiert man eine Sterbephase ?
                         // todo: KZP einbauen (2)
                     }
                 }
@@ -325,7 +334,6 @@ public class QdvsService implements HasLogger {
         // 2. Durchlauf
         // Prüfen, welche BW noch fehlerhafte Einträge haben
         residentInfoObjectMap.keySet().forEach(resident -> {
-
 
             Set<ResInfoType> vorhandeneTypen = ResInfoTools.getUsedActiveTypes(resident, LETZTE_ERGEBNISERFASSUNG, ERHEBUNGSDATUM);
             boolean schmerze2 = vorhandeneTypen.stream().anyMatch(resInfoType -> resInfoType.getID().equals("schmerze2"));
@@ -366,10 +374,6 @@ public class QdvsService implements HasLogger {
             }
 
         });
-
-        textListener.addLog("qdvs.vorpruefung.abgeschlossen");
-        getLogger().debug("Vorprüfung abgeschlossen");
-
 
     }
 
@@ -429,7 +433,7 @@ public class QdvsService implements HasLogger {
         /** 1 */qsMdsData.setIDBEWOHNER(of.createDasQsDataMdsTypeIDBEWOHNER());
         qsMdsData.getIDBEWOHNER().setValue(NF_IDBEWOHNER.format(resident.getIdbewohner()));
 
-        Optional<Rooms> room = RoomsService.getRoom(resident, JavaTimeConverter.toJodaLocalDateTime(STICHTAG).toDateTime());
+        Optional<Rooms> room = RoomsService.getRoom(resident, STICHTAG);
         /** 2 */qsMdsData.setWOHNBEREICH(of.createDasQsDataMdsTypeWOHNBEREICH());
         qsMdsData.getWOHNBEREICH().setValue(room.get().getFloor().getName());
         getLogger().debug(room.get().toString());
@@ -472,7 +476,7 @@ public class QdvsService implements HasLogger {
         qsData.setIDBEWOHNER(of.createDasQsDataTypeIDBEWOHNER());
         qsData.getIDBEWOHNER().setValue(NF_IDBEWOHNER.format(resident.getIdbewohner()));
 
-        Optional<Rooms> room = RoomsService.getRoom(resident, JavaTimeConverter.toJodaLocalDateTime(STICHTAG).toDateTime());
+        Optional<Rooms> room = RoomsService.getRoom(resident,STICHTAG);
         qsData.setWOHNBEREICH(of.createDasQsDataTypeWOHNBEREICH());
         qsData.getWOHNBEREICH().setValue(room.get().getFloor().getName());
 

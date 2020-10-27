@@ -9,15 +9,15 @@ import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.ResInfoTypeTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.tools.SYSCalendar;
+import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSTools;
-import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -124,9 +124,17 @@ public class RoomsService {
     }
 
 
-    public static Optional<Rooms> getRoom(Resident resident, DateTime datetime) {
+    /**
+     * Ermittelt den Raum, in dem der BW am Stichtag gewohnt hat. Wenn es denn einen gab.
+     *
+     * @param resident
+     * @param ldt
+     * @return
+     */
+    public static Optional<Rooms> getRoom(Resident resident, java.time.LocalDateTime ldt) {
         Optional<Rooms> room1 = Optional.empty();
-        for (ResInfo resInfo : ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay(datetime).toDate(), SYSCalendar.midOfDay(datetime).toDate())) {
+        Date noon = JavaTimeConverter.toDate(ldt.withHour(12).withMinute(0).withSecond(0));
+        for (ResInfo resInfo : ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), noon, noon)) {
             Properties p1 = ResInfoTools.getContent(resInfo);
             long rid1 = Long.parseLong(SYSTools.catchNull(p1.getProperty("room.id"), "-1"));
             room1 = Optional.ofNullable(EntityTools.find(Rooms.class, rid1));

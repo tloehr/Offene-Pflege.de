@@ -84,6 +84,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     private HashMap<String, DAS_REGELN> REGELN;
     MultiKeyMap<MultiKey<Integer>, ArrayList<String>> ERRORS;
     MultiKeyMap<MultiKey<Integer>, Long> LOOKUP;
+    boolean vorpruefungOK;
 
     /**
      * Diese Klasse erzeugt das Panel für die QDVS Auswertung
@@ -158,19 +159,27 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             map_zur_zuordnung_der_fehler.put(resident.getIdbewohner(), new TreeInfoNode(resident));
             root.add(map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()));
         });
-
-        // Das hier matched die ERRORS (zeile, spalte des fehlers - closing tag) zu den Bewohnern (ebenfalls zeile, spalte des closing tags)
-        ERRORS.forEach((multiKey, strings) -> {
-            long idbewohner = LOOKUP.get(multiKey);
-            strings.forEach(s -> {
-                String regel = s;
-                if (REGELN.containsKey(s)) {
-                    regel = REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text();
-                }
-                map_zur_zuordnung_der_fehler.get(idbewohner).add(new TreeInfoNode(regel, TreeInfoNode.SELF_FOUND_ERROR));
+        if (vorpruefungOK) {
+            // Das hier matched die ERRORS (zeile, spalte des fehlers - closing tag) zu den Bewohnern (ebenfalls zeile, spalte des closing tags)
+            ERRORS.forEach((multiKey, strings) -> {
+                long idbewohner = LOOKUP.get(multiKey);
+                strings.forEach(s -> {
+                    String regel = s;
+                    if (REGELN.containsKey(s)) {
+                        regel = REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text();
+                    }
+                    map_zur_zuordnung_der_fehler.get(idbewohner).add(new TreeInfoNode(regel, TreeInfoNode.SELF_FOUND_ERROR));
+                });
             });
-        });
-
+        } else {
+            qdvsService.getResidentInfoObjectMap().forEach((resident, qdvsResidentInfoObject) -> {
+                TreeInfoNode node = map_zur_zuordnung_der_fehler.get(resident.getIdbewohner());
+                qdvsResidentInfoObject.getFehler().forEach(fehler -> {
+                    node.add(new TreeInfoNode(fehler, TreeInfoNode.VORPRUEFUNG_FEHLER));
+                    node.setType(TreeInfoNode.RESIDENT_RED);
+                });
+            });
+        }
         return root;
     }
 
@@ -223,17 +232,18 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
             @Override
             protected Object doInBackground() throws Exception {
-                if (!qdvsService.ergebniserfassung()) return null;
+                vorpruefungOK = qdvsService.ergebniserfassung();
+                if (vorpruefungOK) {
+                    addLog("qdvs.plausibilitaet.pruefen");
 
-                addLog("qdvs.plausibilitaet.pruefen");
+                    File path = new File(workdir, home.getCareproviderid() + File.separator);
+                    File xsd = new File(path, "interface_qs_data/das_interface.xsd");
 
-                File path = new File(workdir, home.getCareproviderid() + File.separator);
-                File xsd = new File(path, "interface_qs_data/das_interface.xsd");
+                    ERRORS = validateFile(target, xsd); // welche Fehler
+                    LOOKUP = getLookupTable(target); // welcher Bewohner
 
-                ERRORS = validateFile(target, xsd); // welche Fehler
-                LOOKUP = getLookupTable(target); // welcher Bewohner
-
-                addLog("qdvs.erfassung.abgeschlossen");
+                    addLog("qdvs.erfassung.abgeschlossen");
+                }
 
                 return null;
             }
@@ -468,11 +478,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
             TreeInfoNode tnode = (TreeInfoNode) node;
 
-            if (tnode.getType() == TreeInfoNode.RESIDENT) {
+            if (tnode.getType() <= TreeInfoNode.RESIDENT_RED) { // mieser Trick. :-D
                 String resident = QdvsService.toString((Resident) tnode.getUserObject());
-
                 Collections.list(tnode.children()).forEach(treeNode -> buffer.append(toHTML((DefaultMutableTreeNode) treeNode)));
-
                 if (buffer.length() > 0)
                     html = SYSConst.html_ul(SYSConst.html_li(resident + SYSConst.html_ul(buffer.toString())));
                 else html = SYSConst.html_ul(SYSConst.html_li(resident));
@@ -480,6 +488,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 html = SYSConst.html_li(tnode.getUserObject().toString());
             } else if (tnode.getType() == TreeInfoNode.ERROR_BY_DAS) {
                 html = SYSConst.html_li("DAS: " + tnode.getUserObject().toString());
+            } else if (tnode.getType() == TreeInfoNode.VORPRUEFUNG_FEHLER) {
+                html = SYSConst.html_li(tnode.getUserObject().toString());
             }
         } else {
             Collections.list(node.children()).forEach(treeNode -> buffer.append(toHTML((DefaultMutableTreeNode) treeNode)));
@@ -500,18 +510,26 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     }
 
     private class TreeInfoNode extends DefaultMutableTreeNode {
-        public static final int RESIDENT = 0;
-        public static final int SELF_FOUND_ERROR = 1;
-        public static final int ERROR_BY_DAS = 2;
+        public static final int RESIDENT_GREY = 0;
+        public static final int RESIDENT_GREEN = 1;
+        public static final int RESIDENT_YELLOW = 2;
+        public static final int RESIDENT_RED = 3;
+        public static final int SELF_FOUND_ERROR = 4;
+        public static final int ERROR_BY_DAS = 5;
+        public static final int VORPRUEFUNG_FEHLER = 6;
         private int type = 0;
 
         public TreeInfoNode(Resident resident) {
             setUserObject(resident);
-            type = RESIDENT;
+            type = RESIDENT_GREY;
         }
 
         public TreeInfoNode(String error, int type) {
             setUserObject(error);
+            this.type = type;
+        }
+
+        public void setType(int type) {
             this.type = type;
         }
 
@@ -562,12 +580,26 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         public Component getTreeCellRendererComponent(JTree tree, Object value,
                                                       boolean selected, boolean expanded, boolean leaf,
                                                       int row, boolean hasFocus) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+
+            if (!(value instanceof TreeInfoNode)) return new JLabel();
+
+            TreeInfoNode node = (TreeInfoNode) value;
             Object userObject = node.getUserObject();
 
-            if (userObject instanceof Resident || !leaf) {
-                return super.getTreeCellRendererComponent(tree, value, selected,
+            if (node.getType() <= TreeInfoNode.RESIDENT_RED) {
+
+                Icon icon = SYSConst.findIcon("/artwork/12x12/person-green.png");
+                if (node.getType() == TreeInfoNode.RESIDENT_RED)
+                    icon = SYSConst.findIcon("/artwork/12x12/person-red.png");
+                if (node.getType() == TreeInfoNode.RESIDENT_YELLOW)
+                    icon = SYSConst.findIcon("/artwork/12x12/person-yellow.png");
+                if (node.getType() == TreeInfoNode.RESIDENT_GREY)
+                    icon = SYSConst.findIcon("/artwork/12x12/person-grey.png");
+
+                JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, selected,
                         expanded, leaf, row, hasFocus);
+                lbl.setIcon(icon);
+                return lbl;
             } else {
                 return taRenderer.getTreeCellRendererComponent(tree, value, selected,
                         expanded, leaf, row, hasFocus);
@@ -575,7 +607,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         }
     }
 
-    class TextAreaRenderer extends JScrollPane implements TreeCellRenderer {
+    class TextAreaRenderer extends JPanel implements TreeCellRenderer {
         JTextArea textarea;
         Color backgroundNonSelectionColor;
         Color backgroundSelectionColor;
@@ -583,11 +615,11 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         Color textSelectionColor;
 
         public TextAreaRenderer() {
-            textarea = new JTextArea(6, 40);
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            textarea = new JTextArea();
             textarea.setLineWrap(true);
             textarea.setWrapStyleWord(true);
-//          textarea.setBorder(new TitledBorder(&amp;amp;quot;This is a JTextArea&amp;amp;quot;));
-            getViewport().add(textarea);
+            add(textarea);
         }
 
         public void setBackgroundNonSelectionColor(Color c) {
@@ -627,9 +659,13 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 TreeInfoNode node = (TreeInfoNode) value;
                 Object userObject = node.getUserObject();
 
-                if (node.getType() == TreeInfoNode.RESIDENT)
+                if (node.getType() <= TreeInfoNode.RESIDENT_RED) {
                     textarea.setText(QdvsService.toString((Resident) userObject));
+                }
                 if (node.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
+                    textarea.setText(userObject.toString());
+                }
+                if (node.getType() == TreeInfoNode.VORPRUEFUNG_FEHLER) {
                     textarea.setText(userObject.toString());
                 }
                 if (node.getType() == TreeInfoNode.ERROR_BY_DAS) {

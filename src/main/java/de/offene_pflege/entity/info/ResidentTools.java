@@ -6,6 +6,7 @@ package de.offene_pflege.entity.info;
 
 import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.building.Homes;
+import de.offene_pflege.entity.building.Rooms;
 import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.entity.nursingprocess.NursingProcessTools;
 import de.offene_pflege.entity.prescription.MedInventoryTools;
@@ -15,6 +16,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.RoomsService;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.joda.time.DateTime;
@@ -311,9 +313,12 @@ public class ResidentTools {
     }
 
     public static List<Resident> getAll(Homes home, java.time.LocalDateTime target_date) {
-        LocalDateTime target = JavaTimeConverter.toJodaLocalDateTime(target_date);         
-        //todo: das geht so nicht. station ist null wenn die BWs nicht mehr da sind.
-        return getAll(target.toDateTime(), target.toDateTime()).stream().filter(resident -> resident.getStation().getHome().equals(home)).collect(Collectors.toList());
+        LocalDateTime target = JavaTimeConverter.toJodaLocalDateTime(target_date);
+        // hier muss ich prüfen, in welchem Zimmer die betreffende Person an dem betreffenden Stichtag gewohnt hatte
+        return getAll(target.toDateTime(), target.toDateTime()).stream().filter(resident -> {
+            Optional<Rooms> room = RoomsService.getRoom(resident, target_date);
+            return room.isPresent() && room.get().getFloor().getHome().equals(home);
+        }).collect(Collectors.toList());
     }
 
 

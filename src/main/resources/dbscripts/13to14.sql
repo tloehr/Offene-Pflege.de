@@ -1,4 +1,4 @@
--- Ab Version 1.14.4.x
+-- Ab Version 1.15.2.x
 UPDATE `sysprops`
 SET V = '14'
 WHERE K = 'dbstructure';
@@ -13,22 +13,6 @@ alter table station
     modify eid VARCHAR(36) NOT NULL;
 alter table floors
     modify homeid VARCHAR(36) NOT NULL;
---
-create table qdvs_laufend
-(
-    id       bigint auto_increment,
-    lfd      smallint   not null,
-    version  bigint(20) not null,
-    stichtag date       not null,
-    homeid   bigint     not null,
-    status   smallint   not null,
-    constraint qdvs_laufend_pk
-        primary key (id)
-)
-    comment 'Liste aller QDVS Erhebungen';
---
-create unique index qdvs_laufend_lfd_uindex
-    on qdvs_laufend (lfd);
 --
 UPDATE resinfotype
 SET deprecated = '1'
