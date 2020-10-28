@@ -10,6 +10,7 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import de.offene_pflege.entity.building.Homes;
+import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
@@ -17,6 +18,7 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.events.AddTextListener;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSConst;
@@ -104,7 +106,14 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         txtLog = new JTextArea();
         txtLog.setLineWrap(true);
         right.add(new JScrollPane(txtLog));
-//        right.add(new JButton("Something"));
+
+
+        JButton printButton = new JButton("misc.commands.print", SYSConst.icon22print2);
+        printButton.addActionListener(e -> {
+            File ergebnis = new File(target.getParentFile(), "ergebnis.html");
+            if (ergebnis.exists()) SYSFilesTools.handleFile(ergebnis, Desktop.Action.OPEN);
+        });
+        right.add(printButton);
 
         ERRORS = new MultiKeyMap<>();
         LOOKUP = new MultiKeyMap<>();
@@ -371,9 +380,12 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         list.add(fcWorkdir);
         list.add(new JSeparator());
         list.add(GUITools.createHyperlinkButton(SYSTools.xx("qdvs.ergebniserfassung"), SYSConst.icon22exec, e -> {
-            ergebniserfasung();
+            if (workdir.exists()) {
+                ergebniserfasung();
+            } else {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("qdvs.workdir.invalid", DisplayMessage.WARNING));
+            }
         }));
-
 
         return list;
     }
@@ -584,7 +596,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             if (!(value instanceof TreeInfoNode)) return new JLabel();
 
             TreeInfoNode node = (TreeInfoNode) value;
-            Object userObject = node.getUserObject();
+//            Object userObject = node.getUserObject();
 
             if (node.getType() <= TreeInfoNode.RESIDENT_RED) {
 
@@ -607,19 +619,19 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         }
     }
 
-    class TextAreaRenderer extends JPanel implements TreeCellRenderer {
-        JTextArea textarea;
+    class TextAreaRenderer extends JLabel implements TreeCellRenderer {
+        //        JTextArea textarea;
         Color backgroundNonSelectionColor;
         Color backgroundSelectionColor;
         Color textNonSelectionColor;
         Color textSelectionColor;
 
         public TextAreaRenderer() {
-            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-            textarea = new JTextArea();
-            textarea.setLineWrap(true);
-            textarea.setWrapStyleWord(true);
-            add(textarea);
+//            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+//            textarea = new JTextArea();
+//            textarea.setLineWrap(true);
+//            textarea.setWrapStyleWord(true);
+//            add(textarea);
         }
 
         public void setBackgroundNonSelectionColor(Color c) {
@@ -645,13 +657,13 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             if (selected) {
                 setForeground(textSelectionColor);
                 setBackground(backgroundSelectionColor);
-                textarea.setForeground(textSelectionColor);
-                textarea.setBackground(backgroundSelectionColor);
+//                textarea.setForeground(textSelectionColor);
+//                textarea.setBackground(backgroundSelectionColor);
             } else {
                 setForeground(textNonSelectionColor);
                 setBackground(backgroundNonSelectionColor);
-                textarea.setForeground(textNonSelectionColor);
-                textarea.setBackground(backgroundNonSelectionColor);
+//                textarea.setForeground(textNonSelectionColor);
+//                textarea.setBackground(backgroundNonSelectionColor);
             }
 
 
@@ -660,19 +672,19 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 Object userObject = node.getUserObject();
 
                 if (node.getType() <= TreeInfoNode.RESIDENT_RED) {
-                    textarea.setText(QdvsService.toString((Resident) userObject));
+                    setText(QdvsService.toString((Resident) userObject));
                 }
                 if (node.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
-                    textarea.setText(userObject.toString());
+                    setText(userObject.toString());
                 }
                 if (node.getType() == TreeInfoNode.VORPRUEFUNG_FEHLER) {
-                    textarea.setText(userObject.toString());
+                    setText(userObject.toString());
                 }
                 if (node.getType() == TreeInfoNode.ERROR_BY_DAS) {
-                    textarea.setText(userObject.toString());
+                    setText(userObject.toString());
                 }
             } else {
-                textarea.setText("empty");
+                setText("empty");
             }
 
             return this;

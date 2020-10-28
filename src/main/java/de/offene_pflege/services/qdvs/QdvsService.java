@@ -1256,8 +1256,6 @@ public class QdvsService implements HasLogger {
         Marshaller mar = context.createMarshaller();
         mar.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         mar.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "https://www.das-pflege.de ../das_interface.xsd");
-        // todo: unterverzeichnis - Ergebniserfessaung, auswertung usw...
-//        target.mkdirs();
         target.toPath().getParent().toFile().mkdirs();
         textListener.addLog("qdvs.erzeuge.xml");
         textListener.addLog(target.toString());
