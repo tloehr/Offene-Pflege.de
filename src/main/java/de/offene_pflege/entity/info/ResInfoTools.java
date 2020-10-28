@@ -28,6 +28,7 @@ import org.xml.sax.XMLReader;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.parsers.SAXParser;
@@ -42,7 +43,6 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -335,11 +335,21 @@ public class ResInfoTools implements HasLogger {
                         ", from=" + resInfo.get().getFrom() +
                         ", to=" + resInfo.get().getTo() +
                         '}' : "RESINFO nicht vorhanden";
-
     }
 
 
-    public static Optional<ResInfo> getValidOn(Resident resident, String type, java.time.LocalDateTime pit) {
+    /**
+     * Sucht die am nächsten gültige INFO raus. Jedoch nichts danach.
+     *
+     * @param resident
+     * @param type
+     * @param pit
+     * @return
+     */
+    public static Optional<ResInfo> getValidClosestTo(Resident resident, String type, java.time.LocalDateTime pit) {
+        ResInfoType resInfoType = ResInfoTypeTools.getByID(type);
+        if (resInfoType.getIntervalMode() != ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) return Optional.empty();
+
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(
                 " SELECT rinfo FROM ResInfo rinfo " +
@@ -354,24 +364,43 @@ public class ResInfoTools implements HasLogger {
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
 
-        Optional<ResInfo> resInfo = Optional.empty();
+        return resInfos.isEmpty() ? Optional.empty() : Optional.of(resInfos.get(0));
+    }
 
-        if (!resInfos.isEmpty()) {
-            ResInfo myResInfo = resInfos.get(0);
-            // Single Incidents dann gibts den am nächsten gültigen
-            // sonst gibts den aktuell gültigen
-            // bei dont care gibts gar nichts
-            if (myResInfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS)
-                resInfo = Optional.of(myResInfo);
+    /**
+     * Valid on gilt nur für INTERVAL BY SECONDS. Sonst gibts Empty.
+     *
+     * @param resident
+     * @param type
+     * @param pit
+     * @return
+     */
+    public static Optional<ResInfo> getValidOn(Resident resident, String type, java.time.LocalDateTime pit) {
+        ResInfoType resInfoType = ResInfoTypeTools.getByID(type);
+        if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS)
+            return getValidClosestTo(resident, type, pit);
+        if (resInfoType.getIntervalMode() != ResInfoTypeTools.MODE_INTERVAL_BYSECOND) return Optional.empty();
 
-            else if (myResInfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS)
-                resInfo = Optional.empty();
-            else if (!myResInfo.isClosed())
-                resInfo = Optional.of(myResInfo);
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(
+                " SELECT rinfo FROM ResInfo rinfo " +
+                        " WHERE rinfo.resident = :resident AND  rinfo.bwinfotyp.bwinftyp = :type " +
+                        " AND rinfo.from <= :pit " +
+                        " AND rinfo.to >= :pit " +
+                        " ORDER BY rinfo.from DESC "
+        );
+        query.setMaxResults(1);
+        query.setParameter("type", type);
+        query.setParameter("resident", resident);
+        query.setParameter("pit", JavaTimeConverter.toDate(pit));
+
+        Optional<ResInfo> resInfo;
+
+        try {
+            resInfo = Optional.of((ResInfo) query.getSingleResult());
+        } catch (NoResultException e) {
+            resInfo = Optional.empty();
         }
-
-        resInfo.ifPresent(resInfo1 -> OPDE.debug(resInfo1.getResident().getId() + " " + resInfo1.getResInfoType().getID()));
-
         return resInfo;
     }
 
@@ -632,15 +661,20 @@ public class ResInfoTools implements HasLogger {
         return kzp;
     }
 
-    public static Set<ResInfoType> getUsedActiveTypes(Resident resident, java.time.LocalDateTime from, java.time.LocalDateTime to) {
+    /**
+     * Erstellt eine Liste aller Resinfotypes, die zwischen from und to benutzt wurden und am to aktiv waren.
+     *
+     * @param resident
+     * @param from
+     * @param to
+     * @return
+     */
+    public static Set<ResInfoType> getUsedActiveTypesBetween(Resident resident, java.time.LocalDateTime from, java.time.LocalDateTime to) {
         final HashSet<ResInfoType> set = new HashSet<>();
         getAll(resident, from, to).forEach(resInfo -> {
-
-            if (!resInfo.isClosed())
-                set.add(resInfo.getResInfoType());
-            // else spare ich mir hier. ist ja ein set
-//            if (!resInfo.getResInfoType().isDeprecated()) set.add(resInfo.getResInfoType());
-
+            if (resInfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) set.add(resInfo.getResInfoType());
+            if (resInfo.getTo().compareTo(JavaTimeConverter.toDate(to)) > 0)
+                set.add(resInfo.getResInfoType());             
         });
         return set;
     }

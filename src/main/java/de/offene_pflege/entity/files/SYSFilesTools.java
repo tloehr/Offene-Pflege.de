@@ -34,8 +34,8 @@ import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.reports.NReport;
-import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
@@ -82,7 +82,8 @@ public class SYSFilesTools {
 
 
     /**
-     * <code>putFile(String)</code> speichert eine Datei auf dem FTP Server ab und erstellt eine SYSFiles EntityBean. Die Methode geht dabei wie folgt vor:
+     * <code>putFile(String)</code> speichert eine Datei auf dem FTP Server ab und erstellt eine SYSFiles EntityBean.
+     * Die Methode geht dabei wie folgt vor:
      * <ol>
      * <li>Zuerst wird der MD5 der zu speichernden Datei berechnet.</li>
      * <li>Anhand dieser MD5 Signatur wird ermittelt, ob es schon einen entsprechenden Eintrag in der Datenbank gibt.
@@ -414,10 +415,8 @@ public class SYSFilesTools {
 //    }
 
     /**
-     * Diese Methode findet aus den properties eine lokal definierte Applikation
-     * heraus. Das braucht man nur dann, wenn die Funktionen der Java eigenen
-     * Desktop API nicht funktionieren.
-     * z.B. linux-html=/usr/
+     * Diese Methode findet aus den properties eine lokal definierte Applikation heraus. Das braucht man nur dann, wenn
+     * die Funktionen der Java eigenen Desktop API nicht funktionieren. z.B. linux-html=/usr/
      *
      * @param file
      * @return String[] der das passende command array für den EXEC Aufruf erhält.
@@ -446,11 +445,10 @@ public class SYSFilesTools {
     }
 
     /**
-     * Diese Methode ermittelt zu einer gebenen Datei und einer gewünschten Aktion das passende Anzeigeprogramm.
-     * Falls die Desktop API nicht passendes hat, werdne die lokal definierten Anzeigeprogramme verwendet.
+     * Diese Methode ermittelt zu einer gebenen Datei und einer gewünschten Aktion das passende Anzeigeprogramm. Falls
+     * die Desktop API nicht passendes hat, werdne die lokal definierten Anzeigeprogramme verwendet.
      * <p>
-     * Bei Linux müssen dafür unbedingt die Gnome Libraries installiert sein.
-     * apt-get install libgnome2-0
+     * Bei Linux müssen dafür unbedingt die Gnome Libraries installiert sein. apt-get install libgnome2-0
      *
      * @param file
      * @param action
@@ -492,8 +490,8 @@ public class SYSFilesTools {
     }
 
     /**
-     * Methode zum vereinfachten Anzeigen von Dateien, die nur über SYSFiles definiert wurden.
-     * Sie holt sich die Datei selbst vom FTP Server.
+     * Methode zum vereinfachten Anzeigen von Dateien, die nur über SYSFiles definiert wurden. Sie holt sich die Datei
+     * selbst vom FTP Server.
      *
      * @param sysfile
      * @param action
@@ -563,8 +561,8 @@ public class SYSFilesTools {
     }
 
     /**
-     * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit.
-     * Erstellt temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
+     * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit. Erstellt
+     * temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
      *
      * @param html
      * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
@@ -575,27 +573,9 @@ public class SYSFilesTools {
             // Create temp file.
             temp = File.createTempFile("opde", ".html");
 
-            String text = "<html><head>";
-            // https://github.com/tloehr/Offene-Pflege.de/issues/32
-            text += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
-            if (addPrintJScript) {
-                text += "<script type=\"text/javascript\">" +
-                        "window.onload = function() {"
-                        + "window.print();"
-                        + "}</script>";
-            }
-            text += OPDE.getCSS();
-            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
-                    + "<hr/>" +
-                    "<div id=\"fonttext\">" +
-                    "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
-                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "</div></body></html>";
-
-
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            out.write(text);
+            out.write(getHTML4Printout(html, addPrintJScript));
 
             out.close();
             if (handleTheFile) SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
@@ -603,6 +583,27 @@ public class SYSFilesTools {
             OPDE.error(e);
         }
         return temp;
+    }
+
+    public static String getHTML4Printout(String html, boolean addPrintJScript) {
+        String text = "<html><head>";
+        // https://github.com/tloehr/Offene-Pflege.de/issues/32
+        text += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
+        if (addPrintJScript) {
+            text += "<script type=\"text/javascript\">" +
+                    "window.onload = function() {"
+                    + "window.print();"
+                    + "}</script>";
+        }
+        text += OPDE.getCSS();
+        text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
+                + "<hr/>" +
+                "<div id=\"fonttext\">" +
+                "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
+                + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
+                + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "</div></body></html>";
+
+        return text;
     }
 
 

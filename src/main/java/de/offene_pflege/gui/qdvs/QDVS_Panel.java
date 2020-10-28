@@ -63,7 +63,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.*;
 
@@ -105,15 +107,24 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
         txtLog = new JTextArea();
         txtLog.setLineWrap(true);
+        txtLog.setEditable(false);
         right.add(new JScrollPane(txtLog));
 
-
-        JButton printButton = new JButton("misc.commands.print", SYSConst.icon22print2);
+        JPanel btnpnl = new JPanel();
+        btnpnl.setLayout(new BoxLayout(btnpnl, BoxLayout.LINE_AXIS));
+        JButton printButton = new JButton(SYSTools.xx("misc.commands.print"), SYSConst.icon22print2);
         printButton.addActionListener(e -> {
+            if (target == null) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.nodata", DisplayMessage.WARNING));
+                return;
+            }
             File ergebnis = new File(target.getParentFile(), "ergebnis.html");
             if (ergebnis.exists()) SYSFilesTools.handleFile(ergebnis, Desktop.Action.OPEN);
         });
-        right.add(printButton);
+        printButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnpnl.add(printButton);
+        right.add(btnpnl);
+
 
         ERRORS = new MultiKeyMap<>();
         LOOKUP = new MultiKeyMap<>();
@@ -169,6 +180,10 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             root.add(map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()));
         });
         if (vorpruefungOK) {
+
+            // icons auf grün
+            liste_bewohner.forEach(resident -> map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()).setType(TreeInfoNode.RESIDENT_GREEN));
+
             // Das hier matched die ERRORS (zeile, spalte des fehlers - closing tag) zu den Bewohnern (ebenfalls zeile, spalte des closing tags)
             ERRORS.forEach((multiKey, strings) -> {
                 long idbewohner = LOOKUP.get(multiKey);
@@ -178,6 +193,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                         regel = REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text();
                     }
                     map_zur_zuordnung_der_fehler.get(idbewohner).add(new TreeInfoNode(regel, TreeInfoNode.SELF_FOUND_ERROR));
+                    // icon auf gelb
+                    map_zur_zuordnung_der_fehler.get(idbewohner).setType(TreeInfoNode.RESIDENT_YELLOW);
                 });
             });
         } else {
@@ -242,6 +259,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             @Override
             protected Object doInBackground() throws Exception {
                 vorpruefungOK = qdvsService.ergebniserfassung();
+
                 if (vorpruefungOK) {
                     addLog("qdvs.plausibilitaet.pruefen");
 
@@ -262,11 +280,16 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 DefaultMutableTreeNode root = createTree();
                 tblResidents.setModel(new DefaultTreeModel(root));
                 try {
-                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebnis.html"), toHTML(root));
+                    String html = SYSConst.html_h1("qdvs.header.printout");
+                    html += SYSConst.html_h2(SYSTools.xx("misc.msg.Date") + " " + ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)));
+                    html += toHTML(root);
+                    html += SYSConst.html_bold(SYSTools.xx("qdvs.workdir") + ": " + target.getParent());
+
+                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebnis.html"), SYSFilesTools.getHTML4Printout(html, true));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
+                OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlockedTransparent(false);
             }
         };
@@ -281,34 +304,6 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     void prepareListOFResidents() {
         getLogger().debug("setParameters()");
 
-
-//        try {
-//            // copy xsd from resources
-//            final File jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
-//            if (jarFile.isFile()) getLogger().info("JARFILE" + jarFile.toString());
-//
-//            String strResourcePath = "/das-pflege/v01.3";
-//            URL inputUrl = getClass().getResource(strResourcePath);
-////            final File apps = new File(inputUrl.toURI());
-//            Files.walk(Paths.get(inputUrl.toURI()))
-//                    .filter(Files::isRegularFile)
-//                    .forEach(path1 -> {
-//                        try {
-//                            getLogger().debug(path1);
-//
-//                            FileUtils.copyFileToDirectory(path1.toFile(), path.getParentFile());
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    });
-//
-////            File dest = new File("/path/to/destination/file");
-//
-////            FileUtils.copyURLToFile(inputUrl, dest);
-//        } catch (URISyntaxException | IOException e) {
-//            getLogger().error(e);
-//            // bad luck
-//        }
         liste_bewohner = ResidentTools.getAll(home, STICHTAG.atTime(23, 59, 59));
 
         tblResidents.setModel(new DefaultTreeModel(createTree()));
@@ -352,7 +347,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         dcmbErhebung.setShowNoneButton(false);
         dcmbErhebung.setInvalidValueAllowed(false);
         dcmbErhebung.getDateModel().setMaxDate(new GregorianCalendar());
-        dcmbErhebung.setDate(JavaTimeConverter.toDate(STICHTAG));
+        dcmbErhebung.setDate(JavaTimeConverter.toDate(ERHEBUNG));
         dcmbErhebung.addPropertyChangeListener("selectedItem", evt -> {
             GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
             OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG, JavaTimeConverter.to_iso8601(gc));
@@ -521,6 +516,11 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
     }
 
+    @Override
+    public void setProgress(int running, int max) {
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), running, max));
+    }
+
     private class TreeInfoNode extends DefaultMutableTreeNode {
         public static final int RESIDENT_GREY = 0;
         public static final int RESIDENT_GREEN = 1;
@@ -550,34 +550,6 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         }
     }
 
-//    private class TreeRenderer extends DefaultTreeCellRenderer {
-//        TreeRenderer() {
-//            super();
-//        }
-//
-//        @Override
-//        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-//
-//
-//            JLabel component = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
-//            component.setText("empty");
-//
-//            if (value instanceof TreeInfoNode) {
-//                TreeInfoNode node = (TreeInfoNode) value;
-//                Object userObject = node.getUserObject();
-//
-//                if (node.getType() == TreeInfoNode.RESIDENT)
-//                    component.setText(QdvsService.toString((Resident) userObject));
-//                if (node.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
-//                    component.setText(SYSTools.toHTMLForScreen(SYSConst.html_paragraph(userObject.toString())));
-//                }
-//                if (node.getType() == TreeInfoNode.ERROR_BY_DAS) component.setText(userObject.toString());
-//            }
-//            return component;
-//        }
-//
-//
-//    }
 
     class DelegateDefaultCellRenderer extends DefaultTreeCellRenderer {
         TextAreaRenderer taRenderer = new TextAreaRenderer();
