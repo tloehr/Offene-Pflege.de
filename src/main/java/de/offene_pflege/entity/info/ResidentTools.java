@@ -312,14 +312,14 @@ public class ResidentTools {
         return getAll(target.toDateTime(), target.toDateTime());
     }
 
-    public static List<Resident> getAll(Homes home, java.time.LocalDateTime target_date) {
-        LocalDateTime target = JavaTimeConverter.toJodaLocalDateTime(target_date);
-        // hier muss ich prüfen, in welchem Zimmer die betreffende Person an dem betreffenden Stichtag gewohnt hatte
-        return getAll(target.toDateTime(), target.toDateTime()).stream().filter(resident -> {
-            Optional<Rooms> room = RoomsService.getRoom(resident, target_date);
-            return room.isPresent() && room.get().getFloor().getHome().equals(home);
-        }).collect(Collectors.toList());
-    }
+//    public static List<Resident> getAll(Homes home, java.time.LocalDateTime target_date) {
+//        LocalDateTime target = JavaTimeConverter.toJodaLocalDateTime(target_date);
+//        // hier muss ich prüfen, in welchem Zimmer die betreffende Person an dem betreffenden Stichtag gewohnt hatte
+//        return getAll(target.toDateTime(), target.toDateTime()).stream().filter(resident -> {
+//            Optional<Rooms> room = RoomsService.getRoom(resident, target_date);
+//            return room.isPresent() && room.get().getFloor().getHome().equals(home);
+//        }).collect(Collectors.toList());
+//    }
 
 
     /**
