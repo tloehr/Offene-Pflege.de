@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1">
+	<xs:complexType name="text_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="255"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="long_text_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="5000"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="number_type">
+		<xs:attribute name="value" type="xs:integer" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="non_neg_number_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:nonNegativeInteger">
+					<xs:minInclusive value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="float_type">
+		<xs:attribute name="value" type="xs:float" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="decimal_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:decimal">
+					<xs:fractionDigits value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="date_type">
+		<xs:attribute name="value" type="xs:date" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="dateTime_type">
+		<xs:attribute name="value" type="xs:dateTime" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="bool_type">
+		<xs:attribute name="value" type="xs:boolean" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="guid_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="registration_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:int">
+					<xs:pattern value="[0-9]{6}"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="specification_type">
+		<xs:attribute name="value" use="required" fixed="V01"/>
+	</xs:complexType>
+	<xs:complexType name="iknr_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="[0-9]{9}"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="eval_period_type">
+		<xs:attribute name="value" type="enum_eval_period_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_eval_period_type">
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Auswertungszeitraum 1</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Auswertungszeitraum 2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="random_number_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:int">
+					<xs:minInclusive value="1"/>
+					<xs:maxInclusive value="20"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="global_result_type">
+		<xs:attribute name="value" type="enum_global_result_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_global_result_type">
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Indikatorauswertung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Vollzähligkeitsanalyse und statistische Plausibilitätskontrolle</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="status_type">
+		<xs:attribute name="value" type="enum_status_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_status_type">
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Normal - Es liegt eine Auswertung vor</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Es liegt keine Indikatorauswertung vor: Der Datensatz weist bei über 25 % der Datensätze Auffälligkeiten in Bezug auf die statistische Plausibilitätskontrolle auf</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Es liegt keine Auswertung vor: Es wurden keine Daten zur Auswertung übermittelt bzw. es liegen zum Zeitpunkt der Auswertung keine Datensätze vor</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="indicator_type">
+		<xs:attribute name="value" type="enum_indicator_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_indicator_type">
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Qualitätsindikator</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Auffälligkeitskriterium der statistischen Plausibilitätskontrolle</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Auffälligkeitskriterium der Vollzähligkeitsanalyse</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="5">
+				<xs:annotation>
+					<xs:documentation>Auffälligkeitskriterium der statistischen Plausibilitätskontrolle (aggregiert auf Einrichtungsebene)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="classification_type">
+		<xs:attribute name="value" type="enum_classification_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_classification_type">
+		<xs:annotation>
+			<xs:documentation>Einstufung der Ergebnisse</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Es wird keine Einstufung vorgenommen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Ergebnisqualität liegt weit unter dem
+						Durchschnitt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Ergebnisqualität liegt leicht unter dem
+						Durchschnitt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Ergebnisqualität liegt nahe beim Durchschnitt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Ergebnisqualität liegt leicht über dem Durchschnitt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="5">
+				<xs:annotation>
+					<xs:documentation>Ergebnisqualität liegt weit über dem Durchschnitt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="6">
+				<xs:annotation>
+					<xs:documentation>Keine Einstufung vorgenommen - Die Mindestanzahl an Bewohnern und Bewohnerinnen im Nenner ist für den Indikator ist nicht erreicht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="7">
+				<xs:annotation>
+					<xs:documentation>Keine Einstufung vorgenommen - Einzelfall</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="operator_type">
+		<xs:attribute name="value" type="enum_operator_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_operator_type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="&lt;">
+				<xs:annotation>
+					<xs:documentation>kleiner</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="&lt;=">
+				<xs:annotation>
+					<xs:documentation>kleiner oder gleich</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="=">
+				<xs:annotation>
+					<xs:documentation>gleich</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="&gt;=">
+				<xs:annotation>
+					<xs:documentation>größer oder gleich</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="&gt;">
+				<xs:annotation>
+					<xs:documentation>größer</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="operator_lower_only_type">
+		<xs:attribute name="value" type="enum_operator_lower_only_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_operator_lower_only_type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="&lt;">
+				<xs:annotation>
+					<xs:documentation>kleiner</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="&lt;=">
+				<xs:annotation>
+					<xs:documentation>kleiner oder gleich</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="subgroup_type">
+		<xs:attribute name="value" type="enum_subgroup_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_subgroup_type">
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Subgruppe 1: Bewohner bzw. Bewohnerinnen, die in beiden Bereichen (BI-Module 1 und 2)
+						mindestens erhebliche Beeinträchtigungen aufweisen (Modulwertung jeweils > 1)
+						</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Subgruppe 2: Bewohner bzw. Bewohnerinnen, die im Bereich der Mobilität
+						mindestens erhebliche Beeinträchtigungen aufweisen (Modulwertung > 1), aber
+						keine oder eine geringe Beeinträchtigung der kognitiven und kommunikativen
+						Fähigkeiten (Modulwertung 0 oder 1) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Subgruppe 3: Bewohner bzw. Bewohnerinnen, die im Bereich der Mobilität
+						keine oder eine geringe Beeinträchtigung aufweisen (Modulwertung 0 oder 1),
+						aber mindestens erhebliche Beeinträchtigungen der kognitiven und
+						kommunikativen Fähigkeiten (Modulwertung > 1) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="reference_value_type">
+		<xs:attribute name="value" type="enum_reference_value_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_reference_value_type">
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>nicht definiert</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Fester Wert</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Sentinel-Event</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="yesno_type">
+		<xs:attribute name="value" type="enum_yesno_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_yesno_type">
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>nein</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>ja</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

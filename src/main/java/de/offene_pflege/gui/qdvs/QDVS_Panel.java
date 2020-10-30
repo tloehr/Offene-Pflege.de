@@ -18,11 +18,9 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.events.AddTextListener;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
-import de.offene_pflege.op.tools.HasLogger;
-import de.offene_pflege.op.tools.JavaTimeConverter;
-import de.offene_pflege.op.tools.SYSConst;
-import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.op.tools.*;
 import de.offene_pflege.services.HomesService;
 import de.offene_pflege.services.qdvs.DAS_REGELN;
 import de.offene_pflege.services.qdvs.MyErrorHandler;
@@ -73,6 +71,9 @@ import java.util.*;
  * @author Torsten Löhr
  */
 public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextListener {
+    private static final String DAS_SPEZIFIKATION = "DAS_Pflege_Spezifikation_V01.4/02_XSD/interface_qs_data/das_interface.xsd";
+    private static final String DAS_REGELN_CSV =  "DAS_Pflege_Spezifikation_V01.4/03_Dokumentationsbogen/DAS_Plausibilitaetsregeln.csv";
+
     private final JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JTree tblResidents;
@@ -165,7 +166,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
         // Einmal die Lookup-Regeln lesen
         File path = new File(workdir, home.getCareproviderid() + File.separator);
-        File csv = new File(path, "DAS_Plausibilitaetsregeln.csv");
+        
+//        File csv = new File(path, "DAS_Plausibilitaetsregeln.csv");
+        File csv = new File(LocalMachine.getProgrammPath(), DAS_REGELN_CSV);
         REGELN = lese_DAS_REGELN(csv);
 
         prepareListOFResidents(); // einmal am Anfang, damit die Liste der BW ausgefüllt ist
@@ -263,8 +266,10 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 if (vorpruefungOK) {
                     addLog("qdvs.plausibilitaet.pruefen");
 
-                    File path = new File(workdir, home.getCareproviderid() + File.separator);
-                    File xsd = new File(path, "interface_qs_data/das_interface.xsd");
+//                    File path = new File(workdir, home.getCareproviderid() + File.separator);
+//                    File xsd = new File(path, "interface_qs_data/das_interface.xsd");
+
+                    File xsd = new File(LocalMachine.getProgrammPath(), DAS_SPEZIFIKATION);
 
                     ERRORS = validateFile(target, xsd); // welche Fehler
                     LOOKUP = getLookupTable(target); // welcher Bewohner

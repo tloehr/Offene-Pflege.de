@@ -1,0 +1,904 @@
+﻿<root xmlns="https://www.das-pflege.de"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="https://www.das-pflege.de ../das_report_interface.xsd">
+  <header>
+    <document>
+      <guid value="5BC223AE-7661-47B4-A640-AB7F1AE7549B" />
+      <creation_date value="2019-10-01T12:46:57.650" />
+      <specification value="V01" />
+    </document>
+    <care_provider>
+      <registration value="100001" />
+      <iknr value="234987456" />
+      <name value="Seniorenwohn- und Pflegeeinrichtung Beispielhaus" />
+      <target_date value="2019-10-01" />
+      <period value="1" />
+      <eval_period value="2" />
+    </care_provider>
+  </header>
+  <body>
+    <result_provider>
+      <type value="1" />
+      <status value="1" />
+      <indicators>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="22" />
+            <external_id value="1.1.1" />
+            <name value="Erhaltene Mobilität bei Bewohnern und Bewohnerinnen, die keine oder nur geringe kognitive Einbußen aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, deren Punktwert im BI-Modul 1 sich im Erhebungszeitraum verringert hat, gleich geblieben ist oder sich um maximal 1 Punkt erhöht hat." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 keine oder nur geringe kognitive Beeinträchtigungen aufweisen und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="• Komatöse und somnolente Bewohner und Bewohnerinnen, sowie Bewohner und Bewohnerinnen mit apallischem Syndrom&#xD;&#xA;• Bewohner und Bewohnerinnen mit den Diagnosen: Bösartige Tumorerkrankung, Tetraplegie, Tetraparese, Chorea Huntington&#xD;&#xA;• Bewohner und Bewohnerinnen, die seit der letzten Ergebniserfassung, die in der Einrichtung vor ca. 6 Monaten durchgeführt wurde, einen Schlaganfall, einen Herzinfarkt, eine Fraktur oder eine Amputation erlebt haben&#xD;&#xA;• Bewohner und Bewohnerinnen, die im Erhebungszeitraum einen Krankenhausaufenthalt von mindestens 2 Wochen Dauer hatten&#xD;&#xA;• Bewohner und Bewohnerinnen, deren Summenwert im BI-Modul 1 bei der vorangegangenen Ergebniserfassung &gt; 12 war" />
+            <text_target value="Bei möglichst vielen Bewohnern und Bewohnerinnen soll die Mobilität erhalten bleiben oder verbessert werden." />
+            <minimum_number value="10" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="6" />
+            <value_z value="1" />
+            <value_n value="1" />
+            <rate value="100.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&gt;=" />
+            <ref_value value="88.400" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&lt;" />
+              <value_1 value="80.497" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="80.497" />
+              <operator_2 value="&lt;" />
+              <value_2 value="85.754" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="85.754" />
+              <operator_2 value="&lt;" />
+              <value_2 value="91.011" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="91.011" />
+              <operator_2 value="&lt;" />
+              <value_2 value="96.268" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="96.268" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="23" />
+            <external_id value="1.1.2" />
+            <name value="Erhaltene Mobilität bei Bewohnern und Bewohnerinnen mit mindestens erheblichen kognitiven Einbußen" />
+            <text_z value="Bewohner und Bewohnerinnen, deren Punktwert im BI‐Modul 1 sich im Erhebungszeitraum verringert hat, gleich geblieben ist oder sich um maximal 1 Punkt erhöht hat." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 mindestens erhebliche kognitive Beeinträchtigungen aufweisen und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="• Komatöse und somnolente Bewohner und Bewohnerinnen, sowie Bewohner und Bewohnerinnen mit apallischem Syndrom&#xD;&#xA;• Bewohner und Bewohnerinnen mit den Diagnosen: Bösartige Tumorerkrankung, Tetraplegie, Tetraparese, Chorea Huntington&#xD;&#xA;• Bewohner und Bewohnerinnen, die seit der letzten Ergebniserfassung, die in der Einrichtung vor ca. 6 Monaten durchgeführt wurde, einen Schlaganfall, einen Herzinfarkt, eine Fraktur oder eine Amputation erlebt haben&#xD;&#xA;• Bewohner und Bewohnerinnen, die im Erhebungszeitraum einen Krankenhausaufenthalt von mindestens 2 Wochen Dauer hatten&#xD;&#xA;• Bewohner und Bewohnerinnen, deren Summenwert im BI-Modul 1 bei der vorangegangenen Ergebniserfassung &gt; 12 war" />
+            <text_target value="Bei möglichst vielen Bewohnern und Bewohnerinnen soll die Mobilität erhalten bleiben oder verbessert werden." />
+            <minimum_number value="10" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="6" />
+            <value_z value="5" />
+            <value_n value="5" />
+            <rate value="100.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&gt;=" />
+            <ref_value value="69.400" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&lt;" />
+              <value_1 value="58.623" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="58.623" />
+              <operator_2 value="&lt;" />
+              <value_2 value="65.776" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="65.776" />
+              <operator_2 value="&lt;" />
+              <value_2 value="72.929" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="72.929" />
+              <operator_2 value="&lt;" />
+              <value_2 value="80.082" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="80.082" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="25" />
+            <external_id value="1.2.1" />
+            <name value="Erhaltene Selbständigkeit bei alltäglichen Verrichtungen bei Bewohnern und Bewohnerinnen, die keine oder geringe kognitive Einbußen aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, deren Punktwert im BI‐Modul 4 sich verringert hat, gleich geblieben ist oder sich um maximal 3 Punkte erhöht hat." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 keine oder nur geringe kognitive Beeinträchtigungen aufweisen und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="• Komatöse und somnolente Bewohner und Bewohnerinnen, sowie Bewohner und Bewohnerinnen mit apallischem Syndrom&#xD;&#xA;• Bewohner und Bewohnerinnen mit den Diagnosen: Bösartige Tumorerkrankung, Tetraplegie, Tetraparese, Chorea Huntington&#xD;&#xA;• Bewohner und Bewohnerinnen, die seit der letzten Ergebniserfassung, die in der Einrichtung vor ca. 6 Monaten durchgeführt wurde, einen Schlaganfall, einen Herzinfarkt, eine Fraktur oder eine Amputation erlebt haben&#xD;&#xA;• Bewohner und Bewohnerinnen, die im Erhebungszeitraum einen Krankenhausaufenthalt von mindestens 2 Wochen Dauer hatten&#xD;&#xA;• Bewohner und Bewohnerinnen, deren Summenwert im BI-Modul 4 bei der vorangegangenen Ergebniserfassung &gt; 40 war" />
+            <text_target value="Bei möglichst vielen Bewohnern und Bewohnerinnen soll die Selbstständigkeit bei alltäglichen Verrichtungen erhalten bleiben oder verbessert werden." />
+            <minimum_number value="10" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="6" />
+            <value_z value="0" />
+            <value_n value="1" />
+            <rate value="0.000" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&gt;=" />
+            <ref_value value="83.800" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&lt;" />
+              <value_1 value="75.278" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="75.278" />
+              <operator_2 value="&lt;" />
+              <value_2 value="80.970" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="80.970" />
+              <operator_2 value="&lt;" />
+              <value_2 value="86.662" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="86.662" />
+              <operator_2 value="&lt;" />
+              <value_2 value="92.354" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="92.354" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="26" />
+            <external_id value="1.2.2" />
+            <name value="Erhaltene Selbständigkeit bei alltäglichen Verrichtungen bei Bewohnern und Bewohnerinnen, die mindestens erhebliche kognitive Einbußen aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, deren Punktwert im BI‐Modul 4 sich verringert hat, gleich geblieben ist oder sich um maximal 3 Punkte erhöht hat." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 mindestens erhebliche kognitive Beeinträchtigungen aufweisen und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="• Komatöse und somnolente Bewohner und Bewohnerinnen, sowie Bewohner und Bewohnerinnen mit apallischem Syndrom&#xD;&#xA;• Bewohner und Bewohnerinnen mit den Diagnosen: Bösartige Tumorerkrankung, Tetraplegie, Tetraparese, Chorea Huntington&#xD;&#xA;• Bewohner und Bewohnerinnen, die seit der letzten Ergebniserfassung, die in der Einrichtung vor ca. 6 Monaten durchgeführt wurde, einen Schlaganfall, einen Herzinfarkt, eine Fraktur oder eine Amputation erlebt haben&#xD;&#xA;• Bewohner und Bewohnerinnen, die im Erhebungszeitraum einen Krankenhausaufenthalt von mindestens 2 Wochen Dauer hatten&#xD;&#xA;• Bewohner und Bewohnerinnen, deren Summenwert im BI-Modul 4 bei der vorangegangenen Ergebniserfassung &gt; 40 war" />
+            <text_target value="Bei möglichst vielen Bewohnern und Bewohnerinnen soll die Selbstständigkeit bei alltäglichen Verrichtungen erhalten bleiben oder verbessert werden." />
+            <minimum_number value="10" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="6" />
+            <value_z value="2" />
+            <value_n value="5" />
+            <rate value="40.000" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&gt;=" />
+            <ref_value value="57.900" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&lt;" />
+              <value_1 value="45.440" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="45.440" />
+              <operator_2 value="&lt;" />
+              <value_2 value="53.719" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="53.719" />
+              <operator_2 value="&lt;" />
+              <value_2 value="61.998" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="61.998" />
+              <operator_2 value="&lt;" />
+              <value_2 value="70.277" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="70.277" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="27" />
+            <external_id value="1.3" />
+            <name value="Erhaltene Selbständigkeit bei der Gestaltung des Alltagslebens und sozialer Kontakte" />
+            <text_z value="Bewohner und Bewohnerinnen, deren Punktwert im BI‐Modul 6 sich verringert hat, gleich geblieben ist oder sich um maximal 1 Punkt erhöht hat." />
+            <text_n value="Alle Bewohner und Bewohnerinnen für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="• Komatöse und somnolente Bewohner und Bewohnerinnen, sowie Bewohner und Bewohnerinnen mit apallischem Syndrom&#xD;&#xA;• Bewohner und Bewohnerinnen mit den Diagnosen: Bösartige Tumorerkrankung, Tetraplegie, Tetraparese, Chorea Huntington&#xD;&#xA;• Bewohner und Bewohnerinnen, die seit der letzten Ergebniserfassung, die in der Einrichtung vor ca. 6 Monaten durchgeführt wurde, einen Schlaganfall, einen Herzinfarkt, eine Fraktur oder eine Amputation erlebt haben&#xD;&#xA;• Bewohner und Bewohnerinnen, die im Erhebungszeitraum einen Krankenhausaufenthalt von mindestens 2 Wochen Dauer hatten&#xD;&#xA;• Bewohner und Bewohnerinnen mit schwersten Beeinträchtigungen im Bereich der kognitiven und kommunikativen Fähigkeiten (gemäß Wertung des BI-Moduls 2)&#xD;&#xA;• Bewohner und Bewohnerinnen, deren Summenwert im BI-Modul 6 bei der vorangegangenen Ergebniserfassung &gt; 15 war" />
+            <text_target value="Bei möglichst vielen Bewohnern und Bewohnerinnen soll die Selbstständigkeit bei der Gestaltung des Alltagslebens und der sozialen Kontakte erhalten bleiben oder verbessert werden." />
+            <minimum_number value="10" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="6" />
+            <value_z value="5" />
+            <value_n value="6" />
+            <rate value="83.333" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&gt;=" />
+            <ref_value value="74.800" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&lt;" />
+              <value_1 value="64.030" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="64.030" />
+              <operator_2 value="&lt;" />
+              <value_2 value="71.198" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="71.198" />
+              <operator_2 value="&lt;" />
+              <value_2 value="78.366" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="78.366" />
+              <operator_2 value="&lt;" />
+              <value_2 value="85.534" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="85.534" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="29" />
+            <external_id value="2.1.1" />
+            <name value="Dekubitusentstehung bei Bewohnern und Bewohnerinnen, die in liegender Position keine oder nur geringe Einbußen der Mobilität aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, die innerhalb der letzten 6 Monate in der Einrichtung einen Dekubitus Kategorie/Stadium 2 bis 4 entwickelt haben." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß Merkmal 1 im BI-Modul 1 beim Positionswechsel im Bett selbständig oder überwiegend selbständig sind." />
+            <text_target value="Möglichst wenige Bewohner und Bewohnerinnen sollen einen Dekubitus entwickeln." />
+            <minimum_number value="5" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="1" />
+            <value_z value="2" />
+            <value_n value="52" />
+            <rate value="3.846" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="1.600" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&gt;" />
+              <value_1 value="3.091" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;" />
+              <value_1 value="2.091" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="3.091" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;" />
+              <value_1 value="1.091" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="2.091" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;" />
+              <value_1 value="0.091" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="1.091" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&lt;=" />
+              <value_1 value="0.091" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="30" />
+            <external_id value="2.1.2" />
+            <name value="Dekubitusentstehung bei Bewohnern und Bewohnerinnen, die in liegender Position starke Einbußen der Mobilität aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, die innerhalb der letzten 6 Monate in der Einrichtung einen Dekubitus Kategorie/Stadium 2 bis 4 entwickelt haben." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß Merkmal 1 im BI-Modul 1 beim Positionswechsel im Bett überwiegend unselbständig oder unselbständig sind." />
+            <text_target value="Möglichst wenige Bewohner und Bewohnerinnen sollen einen Dekubitus entwickeln." />
+            <minimum_number value="5" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="6" />
+            <value_z value="0" />
+            <value_n value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="8.400" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&gt;" />
+              <value_1 value="16.083" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;" />
+              <value_1 value="10.955" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="16.083" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;" />
+              <value_1 value="5.827" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="10.955" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;" />
+              <value_1 value="2.914" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="5.827" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&lt;=" />
+              <value_1 value="2.914" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="32" />
+            <external_id value="2.2.1" />
+            <name value="Stürze mit gravierenden Folgen bei Bewohnern und Bewohnerinnen, die keine oder nur geringe kognitive Einbußen aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, bei denen es in den vergangenen 6 Monaten in der Einrichtung zu einem Sturz und zu einer der aufgeführten gravierenden Folgen gekommen ist: Fraktur, ärztlich behandlungsbedürftige Wunde, erhöhter Hilfebedarf bei Alltagsverrichtungen oder erhöhter Hilfebedarf bei der Mobilität" />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 keine oder nur geringe kognitive Beeinträchtigungen aufweisen und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="Bewohner und Bewohnerinnen, die beim Positionswechsel im Bett gänzlich unselbständig sind (Merkmal 1 im BI-Modul 1)" />
+            <text_target value="Bei möglichst wenigen Bewohnern und Bewohnerinnen soll es zu Stürzen mit gravierenden körperlichen Folgen kommen." />
+            <minimum_number value="5" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="5" />
+            <value_z value="0" />
+            <value_n value="8" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="6.900" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&gt;" />
+              <value_1 value="11.089" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;" />
+              <value_1 value="8.312" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="11.089" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;" />
+              <value_1 value="5.535" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="8.312" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;" />
+              <value_1 value="2.758" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="5.535" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&lt;=" />
+              <value_1 value="2.758" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="33" />
+            <external_id value="2.2.2" />
+            <name value="Stürze mit gravierenden Folgen bei Bewohnern und Bewohnerinnen, die mindestens erhebliche kognitive Einbußen aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, bei denen es in den vergangenen 6 Monaten in der Einrichtung zu einem Sturz und zu einer der aufgeführten gravierenden Folgen gekommen ist: Fraktur, ärztlich behandlungsbedürftige Wunde, erhöhter Hilfebedarf bei Alltagsverrichtungen oder erhöhter Hilfebedarf bei der Mobilität" />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 mindestens erhebliche kognitive Beeinträchtigungen aufweisen und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="Bewohner und Bewohnerinnen, die beim Positionswechsel im Bett gänzlich unselbständig sind (Merkmal 1 im BI-Modul 1)" />
+            <text_target value="Bei möglichst wenigen Bewohnern und Bewohnerinnen soll es zu Stürzen mit gravierenden körperlichen Folgen kommen." />
+            <minimum_number value="5" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="5" />
+            <value_z value="1" />
+            <value_n value="44" />
+            <rate value="2.273" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="12.900" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&gt;" />
+              <value_1 value="18.464" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;" />
+              <value_1 value="14.768" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="18.464" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;" />
+              <value_1 value="11.072" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="14.768" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;" />
+              <value_1 value="7.376" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="11.072" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&lt;=" />
+              <value_1 value="7.376" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="35" />
+            <external_id value="2.3.1" />
+            <name value="Unbeabsichtigter Gewichtsverlust bei Bewohnern und Bewohnerinnen, die keine oder nur geringe kognitive Einbußen aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, die in den vergangenen 6 Monaten unbeabsichtigt mehr als 10 % ihres Körpergewichtes abgenommen haben." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 keine oder nur geringe kognitive Beeinträchtigungen aufweisen und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="Bewohner und Bewohnerinnen, die eines der folgenden Merkmale aufweisen:&#xD;&#xA;• Bösartige Tumorerkrankung&#xD;&#xA;• Amputation von Gliedmaßen bzw. Teilen von Gliedmaßen&#xD;&#xA;• Gewichtsverlust durch medikamentöse Ausschwemmung (ärztlich verordnete Diurese)&#xD;&#xA;• Gewichtsverlust aufgrund ärztlich angeordneter oder ärztlich genehmigter Diät&#xD;&#xA;• Mindestens 10 % Gewichtsverlust während eines Krankenhausaufenthalts&#xD;&#xA;• Bewohner bzw. Bewohnerin wird aufgrund einer Entscheidung des Arztes bzw. der Ärztin oder der Angehörigen oder eines Betreuers bzw. einer Betreuerin nicht mehr gewogen&#xD;&#xA;• Bewohner bzw. Bewohnerin möchte nicht gewogen werden" />
+            <text_target value="Möglichst wenige Bewohner und Bewohnerinnen sollen einen unbeabsichtigten Gewichtsverlust aufweisen." />
+            <minimum_number value="5" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="6" />
+            <value_z value="2" />
+            <value_n value="4" />
+            <rate value="50.000" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="2.100" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&gt;" />
+              <value_1 value="3.562" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;" />
+              <value_1 value="2.562" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="3.562" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;" />
+              <value_1 value="1.562" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="2.562" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;" />
+              <value_1 value="0.562" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="1.562" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&lt;=" />
+              <value_1 value="0.562" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="36" />
+            <external_id value="2.3.2" />
+            <name value="Unbeabsichtigter Gewichtsverlust bei Bewohnern und Bewohnerinnen, die mindestens erhebliche kognitive Einbußen aufweisen" />
+            <text_z value="Bewohner und Bewohnerinnen, die in den vergangenen 6 Monaten unbeabsichtigt mehr als 10 % ihres Körpergewichtes abgenommen haben." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 mindestens erhebliche kognitive Beeinträchtigungen aufweisen und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="Bewohner und Bewohnerinnen, die eines der folgenden Merkmale aufweisen:&#xD;&#xA;• Bösartige Tumorerkrankung&#xD;&#xA;• Amputation von Gliedmaßen bzw. Teilen von Gliedmaßen&#xD;&#xA;• Gewichtsverlust durch medikamentöse Ausschwemmung (ärztlich verordnete Diurese)&#xD;&#xA;• Gewichtsverlust aufgrund ärztlich angeordneter oder ärztlich genehmigter Diät&#xD;&#xA;• Mindestens 10 % Gewichtsverlust während eines Krankenhausaufenthalts&#xD;&#xA;• Bewohner bzw. Bewohnerin wird aufgrund einer Entscheidung des Arztes bzw. der Ärztin oder der Angehörigen oder eines Betreuers bzw. einer Betreuerin nicht mehr gewogen&#xD;&#xA;• Bewohner bzw. Bewohnerin möchte nicht gewogen werden" />
+            <text_target value="Möglichst wenige Bewohner und Bewohnerinnen sollen einen unbeabsichtigten Gewichtsverlust aufweisen." />
+            <minimum_number value="5" />
+            <standardization value="1" />
+          </definition>
+          <result>
+            <classification value="1" />
+            <value_z value="6" />
+            <value_n value="11" />
+            <rate value="54.545" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="4.900" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&gt;" />
+              <value_1 value="9.103" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;" />
+              <value_1 value="6.325" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="9.103" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;" />
+              <value_1 value="3.547" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="6.325" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;" />
+              <value_1 value="0.769" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="3.547" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&lt;=" />
+              <value_1 value="0.769" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="37" />
+            <external_id value="3.1" />
+            <name value="Integrationsgespräch für Bewohner und Bewohnerinnen nach dem Einzug" />
+            <text_z value="Bewohner und Bewohnerinnen, mit denen und/oder ggf. deren Angehörigen oder anderen Bezugspersonen frühestens 7 Tage und spätestens 8 Wochen nach dem Einzug ein Integrationsgespräch durchgeführt, ausgewertet und dokumentiert wurde." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die in den letzten 6 Monaten eingezogen sind und für die kein Ausschlussgrund vorliegt. (Bei Bewohnern und Bewohnerinnen, die ohne Unterbrechung direkt aus der Kurzzeit‐ in die Langzeitpflege wechselten, entspricht der Beginn der Kurzzeitpflege dem Einzugsdatum)." />
+            <text_exclusion value="• Bewohner und Bewohnerinnen, die schon länger als 6 Monate in der Einrichtung leben&#xD;&#xA;• Kognitiv beeinträchtigte Bewohner und Bewohnerinnen, für die keine Bezugspersonen verfügbar sind&#xD;&#xA;• Bewohner und Bewohnerinnen, die innerhalb der ersten 8 Wochen nach dem Einzug länger als 3 Tage in einem Krankenhaus behandelt wurden" />
+            <text_target value="Bei möglichst vielen Bewohnern und Bewohnerinnen soll ein Integrationsgespräch nach Einzug durchgeführt werden." />
+            <minimum_number value="4" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="6" />
+            <value_z value="0" />
+            <value_n value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&gt;=" />
+            <ref_value value="50.700" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&lt;" />
+              <value_1 value="20.659" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="20.659" />
+              <operator_2 value="&lt;" />
+              <value_2 value="40.659" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="40.659" />
+              <operator_2 value="&lt;" />
+              <value_2 value="60.659" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="60.659" />
+              <operator_2 value="&lt;" />
+              <value_2 value="80.659" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="80.659" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="38" />
+            <external_id value="3.2" />
+            <name value="Anwendung von Gurten bei kognitiv beeinträchtigten Bewohnern und Bewohnerinnen" />
+            <text_z value="Bewohner und Bewohnerinnen, bei denen in den 4 Wochen vor dem Erhebungstag Gurtfixierungen angewendet wurden." />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 mindestens erhebliche kognitive Beeinträchtigungen aufweisen." />
+            <text_target value="Bei möglichst wenigen Bewohnern und Bewohnerinnen mit kognitiven Beeinträchtigungen sollen Gurtfixierungen angewendet werden." />
+            <minimum_number value="5" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="1" />
+            <value_z value="8" />
+            <value_n value="44" />
+            <rate value="18.182" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="2.800" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&gt;" />
+              <value_1 value="5.210" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;" />
+              <value_1 value="3.623" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="5.210" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;" />
+              <value_1 value="2.036" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="3.623" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;" />
+              <value_1 value="0.449" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="2.036" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&lt;=" />
+              <value_1 value="0.449" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="39" />
+            <external_id value="3.3" />
+            <name value="Anwendung von Bettseitenteilen bei kognitiv beeinträchtigten Bewohnern und Bewohnerinnen" />
+            <text_z value="Bewohner und Bewohnerinnen, bei denen in den 4 Wochen vor dem Erhebungstag durchgehende Bettseitenteile angewendet wurden. " />
+            <text_n value="Alle Bewohner und Bewohnerinnen, die gemäß BI-Modul 2 mindestens erhebliche kognitive Beeinträchtigungen aufweisen." />
+            <text_target value="Bei möglichst wenigen Bewohnern und Bewohnerinnen mit kognitiven Beeinträchtigungen sollen durchgehende Bettseitenteile angewendet werden." />
+            <minimum_number value="5" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="1" />
+            <value_z value="15" />
+            <value_n value="44" />
+            <rate value="34.091" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="18.700" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&gt;" />
+              <value_1 value="32.311" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;" />
+              <value_1 value="23.222" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="32.311" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;" />
+              <value_1 value="14.133" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="23.222" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;" />
+              <value_1 value="5.044" />
+              <operator_2 value="&lt;=" />
+              <value_2 value="14.133" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&lt;=" />
+              <value_1 value="5.044" />
+            </threshold>
+          </thresholds>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="1" />
+            <internal_id value="40" />
+            <external_id value="3.4" />
+            <name value="Aktualität der Schmerzeinschätzung" />
+            <text_z value="Bewohner und Bewohnerinnen, für die eine Schmerzeinschätzung vorliegt, die nicht älter als 3 Monate ist, und für die mindestens Angaben zur Schmerzintensität und zur Schmerzlokalisation vorliegen." />
+            <text_n value="Alle Bewohner und Bewohnerinnen mit bestehender Schmerzsymptomatik und für die kein Ausschlussgrund vorliegt." />
+            <text_exclusion value="Bewohner und Bewohnerinnen, die aufgrund einer Schmerzmedikation zum Zeitpunkt der Ergebniserfassung schmerzfrei sind." />
+            <text_target value="Bei möglichst vielen Bewohnern und Bewohnerinnen mit bestehender Schmersymptomatik sollen regelmäßig Schmerzeinschätzungen durchgeführt werden." />
+            <minimum_number value="5" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="1" />
+            <value_z value="0" />
+            <value_n value="9" />
+            <rate value="0.000" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&gt;=" />
+            <ref_value value="79.000" />
+          </reference_value>
+          <thresholds>
+            <threshold>
+              <classification value="1" />
+              <operator_1 value="&lt;" />
+              <value_1 value="63.965" />
+            </threshold>
+            <threshold>
+              <classification value="2" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="63.965" />
+              <operator_2 value="&lt;" />
+              <value_2 value="73.966" />
+            </threshold>
+            <threshold>
+              <classification value="3" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="73.966" />
+              <operator_2 value="&lt;" />
+              <value_2 value="83.967" />
+            </threshold>
+            <threshold>
+              <classification value="4" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="83.967" />
+              <operator_2 value="&lt;" />
+              <value_2 value="93.968" />
+            </threshold>
+            <threshold>
+              <classification value="5" />
+              <operator_1 value="&gt;=" />
+              <value_1 value="93.968" />
+            </threshold>
+          </thresholds>
+        </indicator>
+      </indicators>
+    </result_provider>
+  </body>
+</root>

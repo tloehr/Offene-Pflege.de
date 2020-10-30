@@ -1,0 +1,457 @@
+﻿<root xmlns="https://www.das-pflege.de"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="https://www.das-pflege.de ../das_report_interface.xsd">
+  <header>
+    <document>
+      <guid value="BAEBA6F0-2348-4E09-9DAA-920EAE3C792E" />
+      <creation_date value="2019-10-01T12:46:57.650" />
+      <specification value="V01" />
+    </document>
+    <care_provider>
+      <registration value="100001" />
+      <iknr value="234987456" />
+      <name value="Seniorenwohn- und Pflegeeinrichtung Beispielhaus" />
+      <target_date value="2019-10-01" />
+      <period value="1" />
+      <eval_period value="2" />
+    </care_provider>
+  </header>
+  <body>
+    <result_provider>
+      <type value="2" />
+      <status value="1" />
+      <indicators>
+        <indicator>
+          <definition>
+            <type value="4" />
+            <internal_id value="2" />
+            <external_id value="VZ 1" />
+            <name value="Vollzähligkeit in Bezug auf die Belegungskapazität" />
+            <text_z value="Bewohner und Bewohnerinnen für die ein vollständiger und valider Datensatz oder ein Ausschlussgrund für die aktuelle Ergebniserfassung vorliegt" />
+            <text_n value="Aktuelle Belegungskapazität der Pflegeeinrichtung" />
+            <text_target value="Für möglichst alle Bewohner und Bewohnerinnen soll entweder ein vollständiger und valider Datensatz oder ggf. ein Ausschlussgrund dokumentiert werden" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="52" />
+            <value_n value="58" />
+            <rate value="89.655" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&gt;=" />
+            <ref_value value="75.000" />
+            <operator_2 value="&lt;=" />
+            <ref_value_2 value="110.000" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="4" />
+            <internal_id value="3" />
+            <external_id value="VZ 2" />
+            <name value="Vollzähligkeit in Bezug auf die aktuelle Belegungszahl am Stichtag" />
+            <text_z value="Bewohner und Bewohnerinnen für die ein vollständiger und valider Datensatz oder ein Ausschlussgrund für die aktuelle Ergebniserfassung vorliegt" />
+            <text_n value="Aktuelle Belegungszahl der Pflegeeinrichtung" />
+            <text_target value="Für möglichst alle Bewohner und Bewohnerinnen soll entweder ein vollständiger und valider Datensatz oder ggf. ein Ausschlussgrund dokumentiert werden" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="52" />
+            <value_n value="56" />
+            <rate value="92.857" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="=" />
+            <ref_value value="100.000" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="4" />
+            <external_id value="AK 1" />
+            <name value="Übernahme vorheriger Ergebnisse für die Einschätzung der Mobilität" />
+            <text_z value="Bewohner und Bewohnerinnen bei denen die Angaben für die Einschätzung der Mobilität exakt den Angaben der vorherigen Ergebniserfassung entsprechen" />
+            <text_n value="Alle Bewohner und Bewohnerinnen bei denen der Summenwert für die Einschätzung der Mobilität über 2 und unter 11 liegt" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="12" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="5" />
+            <external_id value="AK 2" />
+            <name value="Übernahme vorheriger Ergebnisse für die Einschätzung der kognitiven und kommunikativen Fähigkeiten" />
+            <text_z value="Bewohner und Bewohnerinnen bei denen die Angaben für die Einschätzung der kognitiven und kommunikativen Fähigkeiten exakt den Angaben der vorherigen Ergebniserfassung entsprechen" />
+            <text_n value="Alle Bewohner und Bewohnerinnen bei denen der Summenwert für die Einschätzung der kognitiven und kommunikativen Fähigkeiten über 3 und unter 26 liegt" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="26" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="6" />
+            <external_id value="AK 3" />
+            <name value="Übernahme vorheriger Ergebnisse für die Einschätzung der Selbstständigkeit bei der Selbstversorgung" />
+            <text_z value="Bewohner und Bewohnerinnen bei denen die Angaben für die Einschätzung der Selbstständigkeit bei der Selbstversorgung exakt den Angaben der vorherigen Ergebniserfassung entsprechen" />
+            <text_n value="Alle Bewohner und Bewohnerinnen bei denen der Summenwert für die Einschätzung der Selbstständigkeit bei der Selbstversorgung über 4 und unter 31 liegt" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="27" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="7" />
+            <external_id value="AK 4" />
+            <name value="Übernahme vorheriger Ergebnisse für die Einschätzung der Selbstständigkeit bei der Gestaltung des Alltagslebens und sozialer Kontakte" />
+            <text_z value="Bewohner und Bewohnerinnen bei denen die Angaben für die Einschätzung der Selbstständigkeit bei der Gestaltung des Alltagslebens und sozialer Kontakte exakt den Angaben der vorherigen Ergebniserfassung entsprechen" />
+            <text_n value="Alle Bewohner und Bewohnerinnen bei denen der Summenwert für die Einschätzung der Selbstständigkeit bei der Gestaltung des Alltagslebens und sozialer Kontakte über 3 und unter 16 liegt" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="25" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="8" />
+            <external_id value="AK 5" />
+            <name value="Widersprüchliche Angaben zur Mobilität 1" />
+            <text_z value="Bewohner und Bewohnerinnen die überwiegend unselbstständig oder unselbstständig die Position im Bett oder eine stabile Sitzposition halten können, aber überwiegend selbstständig oder selbständig sich innerhalb des Wohnbereichs fortbewegen oder Treppensteigen können" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="9" />
+            <external_id value="AK 6" />
+            <name value="Widersprüchliche Angaben zur Mobilität 2" />
+            <text_z value="Bewohner und Bewohnerinnen die sich überwiegend unselbstständig oder unselbstständig umsetzen können, aber überwiegend selbstständig oder selbständig Treppensteigen können" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="10" />
+            <external_id value="AK 7" />
+            <name value="Widersprüchliche Angaben zu kognitiven Fähigkeiten 1" />
+            <text_z value="Bewohner und Bewohnerinnen die sich nur in geringem Maße oder gar nicht an wesentliche Ereignisse oder Beobachtungen erinnern können, aber größtenteils oder unbeeinträchtigt in der Lage sind im Alltagsleben Entscheidungen zu treffen oder Sachverhalten und Informationen zu verstehen" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="11" />
+            <external_id value="AK 8" />
+            <name value="Widersprüchliche Angaben zu kognitiven Fähigkeiten 2" />
+            <text_z value="Bewohner und Bewohnerinnen die sich unbeeinträchtigt an wesentliche Ereignisse oder Beobachtungen erinnern können, aber Personen aus dem näheren Umfeld nicht erkennen können bzw. örtlich oder zeitlich desorientiert sind" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="12" />
+            <external_id value="AK 9" />
+            <name value="Widersprüchliche Angaben zu kognitiven Fähigkeiten 3" />
+            <text_z value="Bewohner und Bewohnerinnen die unbeeinträchtigt Sachverhalte und Informationen verstehen können, aber Personen aus dem näheren Umfeld nicht oder nur in geringem Maße erkennen können bzw. örtlich oder zeitlich desorientiert sind" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="13" />
+            <external_id value="AK 10" />
+            <name value="Widersprüchliche Angaben zur Selbständigkeit in der Selbstversorgung 1" />
+            <text_z value="Bewohner und Bewohnerinnen die überwiegend unselbstständig oder unselbstständig Duschen oder Baden können, aber selbstständig den Oberkörper, den Bereich des Kopfes oder den Intimbereich waschen können" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="14" />
+            <external_id value="AK 11" />
+            <name value="Widersprüchliche Angaben zur Selbständigkeit in der Selbstversorgung 2" />
+            <text_z value="Bewohner und Bewohnerinnen die selbstständig Duschen oder Baden können, aber überwiegend unselbstständig oder unselbstständig den Oberkörper, den Bereich des Kopfes oder den Intimbereich waschen können" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="15" />
+            <external_id value="AK 12" />
+            <name value="Widersprüchliche Angaben zur Selbständigkeit in der Selbstversorgung 3" />
+            <text_z value="Bewohner und Bewohnerinnen die selbstständig den Oberkörper An- und Auskleiden können, aber überwiegend unselbstständig oder unselbstständig den Oberkörper, den Bereich des Kopfes oder den Intimbereich waschen können" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="16" />
+            <external_id value="AK 13" />
+            <name value="Widersprüchliche Angaben zur Selbständigkeit in der Selbstversorgung 4" />
+            <text_z value="Bewohner und Bewohnerinnen die selbstständig Nahrung mundgerecht zubereiten und Getränke eingießen können, aber überwiegend unselbstständig oder unselbstständig den Oberkörper, den Bereich des Kopfes oder den Intimbereich waschen können" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="17" />
+            <external_id value="AK 14" />
+            <name value="Widersprüchliche Angaben zur Selbständigkeit in der Selbstversorgung 5" />
+            <text_z value="Bewohner und Bewohnerinnen die selbstständig oder überwiegend selbstständig Nahrung mundgerecht zubereiten und Getränke eingießen können, aber überwiegend unselbstständig oder unselbstständig essen können" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="18" />
+            <external_id value="AK 15" />
+            <name value="Widersprüchliche Angaben zur Selbständigkeit bei der Gestaltung des Alltagslebens und sozialer Kontakte 1" />
+            <text_z value="Bewohner und Bewohnerinnen bei denen der Summenwert für die Einschätzung der kognitiven und kommunikativen Fähigkeiten (BI-Modul 4) über 4 und für die Einschätzung der Selbstständigkeit bei der Gestaltung des Alltagslebens und sozialer Kontakte (BI-Modul 6) unter 4 liegt" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="19" />
+            <external_id value="AK 16" />
+            <name value="Widersprüchliche Angaben zur Selbständigkeit bei der Gestaltung des Alltagslebens und sozialer Kontakte 2" />
+            <text_z value="Bewohner und Bewohnerinnen die beim Vornehmen von in die Zukunft gerichteter Planungen den Angaben nach weniger stark eingeschränkt sind, als bei der Gestaltung des Tagesablaufs und der Anpassung an Veränderungen" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="0" />
+            <value_n value="52" />
+            <rate value="0.000" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="3" />
+            <internal_id value="20" />
+            <external_id value="AK 17" />
+            <name value="Widersprüchliche Angaben zur Selbständigkeit bei der Gestaltung des Alltagslebens und sozialer Kontakte 3" />
+            <text_z value="Bewohner und Bewohnerinnen die sich selbstständig beschäftigen können, aber überwiegend unselbstständig oder unselbstständig in der Gestaltung des Tagesablaufs und der Anpassung an Veränderungen sind" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="1" />
+            <value_n value="52" />
+            <rate value="1.923" />
+            <result_out_of_range value="1" />
+          </result>
+          <reference_value>
+            <type value="2" />
+          </reference_value>
+        </indicator>
+        <indicator>
+          <definition>
+            <type value="5" />
+            <internal_id value="1" />
+            <external_id value="AK GESAMT" />
+            <name value="Ergebnis der statistischen Plausibilitätskontrolle auf Einrichtungsebene" />
+            <text_z value="Bewohner und Bewohnerinnen die in mindestens einem Kriterium der statistischen Plausibilitätskontrolle Auffälligkeiten aufweisen" />
+            <text_n value="Alle Bewohner und Bewohnerinnen" />
+            <standardization value="0" />
+          </definition>
+          <result>
+            <classification value="0" />
+            <value_z value="1" />
+            <value_n value="52" />
+            <rate value="1.923" />
+            <result_out_of_range value="0" />
+          </result>
+          <reference_value>
+            <type value="1" />
+            <operator value="&lt;=" />
+            <ref_value value="25.000" />
+          </reference_value>
+        </indicator>
+      </indicators>
+    </result_provider>
+  </body>
+</root>

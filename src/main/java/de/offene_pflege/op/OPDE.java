@@ -61,10 +61,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 /*! \mainpage My Personal Index Page
  *
@@ -549,9 +546,9 @@ public class OPDE {
 //                logger.setLevel(Level.DEBUG);
             }
 
-//            for (Map.Entry<String, Object> obj : com.install4j.api.launcher.Variables.getInstallerVariables().entrySet()) {
-//                logger.debug(obj.toString());
-//            }
+
+
+
 
             Logger.getLogger("org.hibernate").setLevel(Level.OFF);
 

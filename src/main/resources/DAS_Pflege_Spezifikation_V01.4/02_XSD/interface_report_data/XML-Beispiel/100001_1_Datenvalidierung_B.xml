@@ -1,0 +1,49 @@
+﻿<root xmlns="https://www.das-pflege.de"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="https://www.das-pflege.de ../das_report_interface.xsd">
+  <header>
+    <document>
+      <guid value="474A196E-FB0A-4AC4-A412-EFEF8AB2D8B7" />
+      <creation_date value="2019-10-01T12:46:57.650" />
+      <specification value="V01" />
+    </document>
+    <care_provider>
+      <registration value="100001" />
+      <iknr value="234987456" />
+      <name value="Seniorenwohn- und Pflegeeinrichtung Beispielhaus" />
+      <target_date value="2019-10-01" />
+      <period value="1" />
+      <eval_period value="2" />
+    </care_provider>
+  </header>
+  <body>
+    <result_resident>
+      <type value="2" />
+      <status value="1" />
+      <residents>
+        <resident>
+          <IDBEWOHNER value="100001" />
+          <indicators>
+            <indicator>
+              <internal_id value="20" />
+              <external_id value="AK 17" />
+            </indicator>
+          </indicators>
+        </resident>
+        <resident>
+          <IDBEWOHNER value="100005" />
+          <indicators>
+            <indicator>
+              <internal_id value="8" />
+              <external_id value="AK 5" />
+            </indicator>
+            <indicator>
+              <internal_id value="14" />
+              <external_id value="AK 11" />
+            </indicator>
+          </indicators>
+        </resident>
+      </residents>
+    </result_resident>
+  </body>
+</root>

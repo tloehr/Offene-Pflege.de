@@ -243,6 +243,14 @@ public class ResInfoTools implements HasLogger {
     }
 
 
+    /**
+     * Sucht für eine bestimmten Info Typ denjenigen raus, der an dem betreffenden Tag (dazu erweitern wir die PIT auf morgens bis nachts)
+     * gültig ist.
+     * @param resident
+     * @param resinfoid
+     * @param pit
+     * @return  Gibt es mehrere, dann immer den neuesten. Gibts keinen, dann empty.
+     */
     public static Optional<ResInfo> getValidOnThatDayIfAny(Resident resident, String resinfoid, java.time.LocalDateTime pit) {
         List<ResInfo> list = getAll(resident, resinfoid, pit);
         if (list.isEmpty()) return Optional.empty();

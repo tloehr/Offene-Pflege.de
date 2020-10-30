@@ -257,7 +257,6 @@ public class QdvsService implements HasLogger {
     }
 
 
-
     /**
      * Führt eine Vor Überprüfung durch. Wenn das Fehlerprotokoll danach nicht leer ist, gibts Gründe warum der
      * Auswertungslauf nicht vollendet werden kann.
@@ -293,38 +292,32 @@ public class QdvsService implements HasLogger {
                     // gehen wir mal davon aus, das HAUF existiert
                     getLogger().debug("Vorprüfung step1 - " + resident.toString());
 
-                    try {
+                    Optional<ResInfo> hauf = ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, STICHTAG);
+                    runningNumber++;
+                    textListener.setProgress(runningNumber, numResidents * 3);
 
-                        Optional<ResInfo> hauf = ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, STICHTAG);
-                        runningNumber++;
-                        textListener.setProgress(runningNumber, numResidents * 3);
+                    if (!hauf.isPresent()) {
+                        residentInfoObjectMap.get(resident).addLog("Kein Heimaufenthalt HAUF.");
+                        getLogger().debug("Bewohner " + resident + " kein HAUF ");
+                    } else {
 
-                        if (hauf.isPresent()) {
-                            residentInfoObjectMap.get(resident).addLog("Kein Heimaufenthalt HAUF.");
-                            getLogger().debug("Bewohner " + resident + " kein HAUF ");
-                        } else {
+                        long aufenthaltszeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(hauf.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate());
+                        Date abwesendSeit = ResInfoTools.absentSince(resident);
+                        long abwesenheitsZeitraumInTagen = abwesendSeit == null ? 0l : ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(abwesendSeit).toLocalDate(), STICHTAG.toLocalDate());
 
-                            long aufenthaltszeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(hauf.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate());
-                            Date abwesendSeit = ResInfoTools.absentSince(resident);
-                            long abwesenheitsZeitraumInTagen = abwesendSeit == null ? 0l : ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(abwesendSeit).toLocalDate(), STICHTAG.toLocalDate());
-
-                            // Ausschlussgrund (4)
-                            if (abwesenheitsZeitraumInTagen >= 21) {
-                                residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
-                                getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen);
-                            } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
-                                residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
-                                getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
-                            } else { // kein Ausschluss
-                                residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
+                        // Ausschlussgrund (4)
+                        if (abwesenheitsZeitraumInTagen >= 21) {
+                            residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
+                            getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen);
+                        } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
+                            residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
+                            getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
+                        } else { // kein Ausschluss
+                            residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
 //                            listeBWErfassung.add(resident);
-                            }
-                            // todo: sterbephase einbauen (3) Wie definiert man eine Sterbephase ?
-                            // todo: KZP einbauen (2)
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.exit(1);
+                        // todo: sterbephase einbauen (3) Wie definiert man eine Sterbephase ?
+                        // todo: KZP einbauen (2)
                     }
                 }
         );
@@ -417,7 +410,10 @@ public class QdvsService implements HasLogger {
         getLogger().debug("====                                                            ====");
         getLogger().debug("====------------------------------------------------------------====");
         getLogger().debug("====================================================================");
-
+        getLogger().debug("");
+        getLogger().debug("");
+        getLogger().debug("");
+        
         return residentType;
     }
 
@@ -1291,10 +1287,13 @@ public class QdvsService implements HasLogger {
         listInfos.forEach(info -> {
             Properties myProperties = ResInfoTools.getContent(info);
             if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
+                // Jede Diagnose Resinfo hat jeden der 9 diagnosen_schluessel gesetzt. Entweder auf TRUE oder FALSE
+                // Daher bilden wir hier die Schnittmenge zwischen den Properties aus der Entity und der Liste der diagnosen_schlüssel.
                 CollectionUtils.intersection(myProperties.stringPropertyNames(), diagnosen_schluessel).forEach(o -> {
-                    boolean wert_vorher = Boolean.valueOf(myprops.getProperty(o.toString()));
-                    boolean neuer_wert = wert_vorher || Boolean.valueOf(myProperties.getProperty(o.toString())); // logisches OR, wenn irgendeine INFO das auf TRUE setzt bleibt das so.
-                    myProperties.setProperty(o.toString(), Boolean.toString(neuer_wert));
+                    // die booleans parsen true oder false
+                    boolean wert_vorher = Boolean.valueOf(myprops.getProperty(o));
+                    boolean neuer_wert = wert_vorher || Boolean.valueOf(myProperties.getProperty(o)); // logisches OR, wenn irgendeine INFO das auf TRUE setzt bleibt das so.
+                    myProperties.setProperty(o, Boolean.toString(neuer_wert));
                 });
             } else if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES) {
                 // Hier reicht schon die Tatsache, dass es einen Diabetes Eintrag gibt, der z.Zt. gültig ist

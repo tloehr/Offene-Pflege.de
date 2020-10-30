@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns="https://www.das-pflege.de"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="https://www.das-pflege.de ../das_interface.xsd">
+    <header>
+        <document>
+            <guid value="2d72c378-cf41-4647-a3ad-a30243412345"/>
+            <creation_date value="2019-11-28T17:00:00Z"/>
+            <specification value="V01"/>
+        </document>
+        <care_provider>
+            <registration value="100001"/>
+            <target_date value="2019-11-15"/>
+        </care_provider>
+        <software>
+            <provider value="Pflegesoftware Hersteller"/>
+            <name value="Pflegesoftware"/>
+            <version value="2"/>
+            <release value="1"/>
+        </software>
+    </header>
+    <body>
+        <data_container>
+            <facility>
+                <qs_data>
+                    <BELEGUNGSKAPAZITAET value="52"/>
+                    <BELEGUNGAMSTICHTAG value="52"/>
+                </qs_data>
+            </facility>
+            <residents>
+                <resident>
+                    <qs_data>
+                        <IDBEWOHNER value="000001"/>
+                        <WOHNBEREICH value="3"/>
+                        <ERHEBUNGSDATUM value="2019-10-01"/>
+                        <EINZUGSDATUM value="2019-05-27"/>
+                        <GEBURTSMONAT value="1"/>
+                        <GEBURTSJAHR value="1938"/>
+                        <GESCHLECHT value="2"/>
+                        <PFLEGEGRAD value="3"/>
+                        <APOPLEX value="1"/>
+                        <APOPLEXDATUM value="2019-05-29"/>
+                        <FRAKTUR value="0"/>
+                        <FRAKTURDATUM/>
+                        <HERZINFARKT value="0"/>
+                        <HERZINFARKTDATUM/>
+                        <AMPUTATION value="0"/>
+                        <AMPUTATIONDATUM/>
+                        <KHBEHANDLUNG value="2"/>
+                        <KHBEGINNDATUM value="2019-08-09"/>
+                        <KHENDEDATUM value="2019-08-20"/>
+                        <KHBANZAHLAUFENTHALTE value="3"/>
+                        <KHBANZAHLTAGE value="23"/>
+                        <BEATMUNG value="2"/>
+                        <BEWUSSTSEINSZUSTAND value="3"/>
+                        <DIAGNOSEN value="0"/>
+                        <MOBILPOSWECHSEL value="0"/>
+                        <MOBILSITZPOSITION value="1"/>
+                        <MOBILUMSETZEN value="1"/>
+                        <MOBILFORTBEWEGUNG value="0"/>
+                        <MOBILTREPPENSTEIGEN value="1"/>
+                        <KKFERKENNEN value="1"/>
+                        <KKFORIENTOERTLICH value="1"/>
+                        <KKFORIENTZEITLICH value="0"/>
+                        <KKFERINNERN value="1"/>
+                        <KKFHANDLUNGEN value="1"/>
+                        <KKFENTSCHEIDUNGEN value="0"/>
+                        <KKFVERSTEHENINFO value="0"/>
+                        <KKFGEFAHRERKENNEN value="1"/>
+                        <KKFMITTEILEN value="0"/>
+                        <KKFVERSTEHENAUF value="0"/>
+                        <KKFBETEILIGUNG value="2"/>
+                        <SVERNAEHRUNG value="0"/>
+                        <SVFREMDHILFE/>
+                        <SVERNAEHRUNGUMFANG/>
+                        <SVHARNKONTINENZ value="0"/>
+                        <SVSTUHLKONTINENZ value="2"/>
+                        <SVOBERKOERPER value="2"/>
+                        <SVKOPF value="0"/>
+                        <SVINTIMBEREICH value="0"/>
+                        <SVDUSCHENBADEN value="1"/>
+                        <SVANAUSOBERKOERPER value="3"/>
+                        <SVANAUSUNTERKOERPER value="3"/>
+                        <SVNAHRUNGZUBEREITEN value="3"/>
+                        <SVESSEN value="9"/>
+                        <SVTRINKEN value="6"/>
+                        <SVTOILETTE value="4"/>
+                        <SVHARNKONTINENZBEW/>
+                        <SVSTUHLKONTINENZBEW value="1"/>
+                        <GATAGESABLAUF value="3"/>
+                        <GARUHENSCHLAFEN value="0"/>
+                        <GABESCHAEFTIGEN value="1"/>
+                        <GAPLANUNGEN value="3"/>
+                        <GAINTERAKTION value="1"/>
+                        <GAKONTAKTPFLEGE value="0"/>
+                        <DEKUBITUS value="1"/>
+                        <DEKUBITUSSTADIUM value="3" />
+                        <DEKUBITUS1BEGINNDATUM value="2019-05-11"/>
+                        <DEKUBITUS1ENDEDATUM value="2019-06-23"/>
+                        <DEKUBITUS1LOK value="1"/>
+                        <DEKUBITUS2BEGINNDATUM/>
+                        <DEKUBITUS2ENDEDATUM/>
+                        <DEKUBITUS2LOK/>
+                        <KOERPERGROESSE value="178"/>
+                        <KOERPERGEWICHT value="98.7"/>
+                        <KOERPERGEWICHTDATUM value="2019-07-23"/>
+                        <KOERPERGEWICHTDOKU value="3"/>
+                        <STURZ value="1"/>
+                        <STURZFOLGEN value="2"/>
+                        <STURZFOLGEN value="3"/>
+                        <GURT value="1"/>
+                        <GURTHAUFIGKEIT value="2"/>
+                        <SEITENTEILE value="0"/>
+                        <SEITENTEILEHAUFIGKEIT/>
+                        <SCHMERZEN value="1"/>
+                        <SCHMERZFREI value="0"/>
+                        <SCHMERZEINSCH value="0"/>
+                        <SCHMERZEINSCHDATUM/>
+                        <SCHMERZEINSCHINFO/>
+                        <NEUEINZUG value="1"/>
+                        <EINZUGNACHKZ value="0"/>
+                        <EINZUGNACHKZDATUM/>
+                        <EINZUGKHBEHANDLUNG value="0"/>
+                        <EINZUGKHBEGINNDATUM/>
+                        <EINZUGKHENDEDATUM/>
+                        <EINZUGGESPR value="2"/>
+                        <EINZUGGESPRDATUM/>
+                        <EINZUGGESPRTEILNEHMER/>
+                        <EINZUGGESPRDOKU/>
+                    </qs_data>
+                </resident>
+                <resident>
+                    <qs_data_mds>
+                        <IDBEWOHNER value="000002"/>
+                        <WOHNBEREICH value="3"/>
+                        <ERHEBUNGSDATUM value="2019-10-15"/>
+                        <EINZUGSDATUM value="2019-10-02"/>
+                        <GEBURTSMONAT value="3"/>
+                        <GEBURTSJAHR value="1943"/>
+                        <GESCHLECHT value="1"/>
+                        <AUSSCHLUSSGRUND value="3"/>
+                    </qs_data_mds>
+                </resident>
+            </residents>
+        </data_container>
+    </body>
+</root>
