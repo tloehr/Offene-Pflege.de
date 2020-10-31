@@ -413,7 +413,7 @@ public class QdvsService implements HasLogger {
         getLogger().debug("");
         getLogger().debug("");
         getLogger().debug("");
-        
+
         return residentType;
     }
 
