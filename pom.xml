@@ -17,7 +17,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 <!--        <mysql.connector.version>5.1.47</mysql.connector.version>-->
-        <mysql.connector.version>8.0.21</mysql.connector.version>
+        <mysql.connector.version>8.0.22</mysql.connector.version>
         <eclipselink.version>2.7.6</eclipselink.version>
         <jide.version>3.7.7</jide.version>
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>

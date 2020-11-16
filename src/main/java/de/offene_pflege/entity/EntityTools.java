@@ -222,7 +222,10 @@ public class EntityTools {
         int version = -1;
 
         String query = " SELECT p.V FROM sysprops p WHERE p.K = ? ";
-        PreparedStatement stmt = jdbcConnection.prepareStatement(query);
+        // seit Connector/J 8.0.20 ist das so nötig. Sonst Exception.
+        PreparedStatement stmt = jdbcConnection.prepareStatement(query,
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY);
         stmt.setString(1, SYSPropsTools.KEY_DB_VERSION);
         ResultSet rs = stmt.executeQuery();
 
@@ -230,6 +233,9 @@ public class EntityTools {
             String v = rs.getString("V");
             version = Integer.parseInt(v);
         }
+
+        rs.close();
+        stmt.close();
 
         return version;
     }
