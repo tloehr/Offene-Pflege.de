@@ -350,6 +350,10 @@ public class SYSConst {
         return "<b>" + SYSTools.xx(content) + "</b>";
     }
 
+    public static String html_critical(String content) {
+            return html_bold(html_color(Color.red, content));
+        }
+
     public static String html_italic(String content) {
         return "<i>" + SYSTools.xx(content) + "</i>";
     }

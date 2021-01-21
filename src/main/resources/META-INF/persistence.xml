@@ -65,7 +65,6 @@
         <class>de.offene_pflege.entity.files.Resident2File</class>
         <class>de.offene_pflege.entity.system.Commontags</class>
         <class>de.offene_pflege.entity.building.Floors</class>
-        <class>de.offene_pflege.entity.QdvsLaufend</class>
         <class>de.offene_pflege.entity.values.Resvaluetypes</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>

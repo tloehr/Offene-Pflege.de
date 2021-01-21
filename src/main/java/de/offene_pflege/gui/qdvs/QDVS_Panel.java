@@ -18,7 +18,6 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.events.AddTextListener;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import de.offene_pflege.services.HomesService;
@@ -37,6 +36,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -72,7 +75,7 @@ import java.util.*;
  */
 public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextListener {
     private static final String DAS_SPEZIFIKATION = "DAS_Pflege_Spezifikation_V01.4/02_XSD/interface_qs_data/das_interface.xsd";
-    private static final String DAS_REGELN_CSV =  "DAS_Pflege_Spezifikation_V01.4/03_Dokumentationsbogen/DAS_Plausibilitaetsregeln.csv";
+    private static final String DAS_REGELN_CSV = "DAS_Pflege_Spezifikation_V01.4/03_Dokumentationsbogen/DAS_Plausibilitaetsregeln.csv";
 
     private final JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
@@ -85,8 +88,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     private File target;
     private JSplitPane content;
     private JPanel right;
-    private JTextArea txtLog;
+    private JEditorPane txtLog;
     private HashMap<String, DAS_REGELN> REGELN;
+
     MultiKeyMap<MultiKey<Integer>, ArrayList<String>> ERRORS;
     MultiKeyMap<MultiKey<Integer>, Long> LOOKUP;
     boolean vorpruefungOK;
@@ -106,9 +110,15 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     void initPanel() {
         right = new JPanel();
         right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
-        txtLog = new JTextArea();
-        txtLog.setLineWrap(true);
+        txtLog = new JTextPane();
+        txtLog.setEditorKit(new HTMLEditorKit());
         txtLog.setEditable(false);
+        txtLog.setEnabled(true);
+//        txtLog.setContentType("text/html");
+        txtLog.setText(SYSTools.toHTML(SYSConst.html_h1("QDVS Prüfung")));
+//        txtLog = new JTextArea();
+//        txtLog.setLineWrap(true);
+
         right.add(new JScrollPane(txtLog));
 
         JPanel btnpnl = new JPanel();
@@ -164,10 +174,6 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_WORKPATH, workdir.getAbsolutePath());
         prepareSearchArea();
 
-        // Einmal die Lookup-Regeln lesen
-        File path = new File(workdir, home.getCareproviderid() + File.separator);
-        
-//        File csv = new File(path, "DAS_Plausibilitaetsregeln.csv");
         File csv = new File(LocalMachine.getProgrammPath(), DAS_REGELN_CSV);
         REGELN = lese_DAS_REGELN(csv);
 
@@ -178,12 +184,12 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     DefaultMutableTreeNode createTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
         HashMap<Long, TreeInfoNode> map_zur_zuordnung_der_fehler = new HashMap<>();
+
         liste_bewohner.forEach(resident -> {
             map_zur_zuordnung_der_fehler.put(resident.getIdbewohner(), new TreeInfoNode(resident));
             root.add(map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()));
         });
         if (vorpruefungOK) {
-
             // icons auf grün
             liste_bewohner.forEach(resident -> map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()).setType(TreeInfoNode.RESIDENT_GREEN));
 
@@ -264,7 +270,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 vorpruefungOK = qdvsService.ergebniserfassung();
 
                 if (vorpruefungOK) {
-                    addLog("qdvs.plausibilitaet.pruefen");
+                    addLog(SYSConst.html_h1("qdvs.plausibilitaet.pruefen"));
 
 //                    File path = new File(workdir, home.getCareproviderid() + File.separator);
 //                    File xsd = new File(path, "interface_qs_data/das_interface.xsd");
@@ -274,7 +280,31 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                     ERRORS = validateFile(target, xsd); // welche Fehler
                     LOOKUP = getLookupTable(target); // welcher Bewohner
 
-                    addLog("qdvs.erfassung.abgeschlossen");
+                    if (!ERRORS.isEmpty()) {
+                        ERRORS.forEach((multiKey, strings) -> {
+                            long idbewohner = LOOKUP.get(multiKey);
+                            strings.forEach(s -> {
+                                String regel = s;
+                                if (REGELN.containsKey(s)) {
+                                    regel = REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text();
+                                }
+
+                                addLog(SYSConst.html_li(regel));
+                            });
+                        });
+                    }
+
+                    addLog(SYSConst.html_h1("qdvs.erfassung.abgeschlossen"));
+                } else {
+
+                    addLog(SYSConst.html_h2("Fehler in der Vorprüfung"));
+
+                    qdvsService.getResidentInfoObjectMap().forEach((resident, qdvsResidentInfoObject) -> {
+                        addLog(SYSConst.html_h3(resident.toString()));
+                        qdvsResidentInfoObject.getFehler().forEach(fehler -> {
+                            addLog(SYSConst.html_li(fehler));
+                        });
+                    });
                 }
 
                 return null;
@@ -282,11 +312,16 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
             @Override
             protected void done() {
-                DefaultMutableTreeNode root = createTree();
+                DefaultMutableTreeNode root = createTree(); // hier wird der Bewohner Baum neu erstellt.
                 tblResidents.setModel(new DefaultTreeModel(root));
                 try {
                     String html = SYSConst.html_h1("qdvs.header.printout");
-                    html += SYSConst.html_h2(SYSTools.xx("misc.msg.Date") + " " + ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)));
+
+                    html += SYSConst.html_h2(SYSTools.xx("qdvs.stichtag") + ": " + STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
+                    html += SYSConst.html_h2(SYSTools.xx("qdvs.erhebungsdatum") + ": " + ERHEBUNG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
+                    html += SYSConst.html_h2(SYSTools.xx("qdvs.letzte.erhebung") + ": " + LETZTE_ERFASSUNG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
+                    html += SYSConst.html_h2(SYSTools.xx("misc.msg.Date") + ": " + ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)));
+                    html += "<hline/>";
                     html += toHTML(root);
                     html += SYSConst.html_bold(SYSTools.xx("qdvs.workdir") + ": " + target.getParent());
 
@@ -517,7 +552,20 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     public void addLog(String log) {
         getLogger().debug(SYSTools.xx(log));
         SwingUtilities.invokeLater(() -> {
-            txtLog.append(SYSTools.xx(log) + "\n");
+//            HTMLDocument doc = (HTMLDocument) txtLog.getStyledDocument();
+//            HTMLEditorKit kit = (HTMLEditorKit) txtLog.getEditorKit();
+            HTMLDocument doc = (HTMLDocument) txtLog.getDocument();
+            // Anhängen von HTML Logs
+
+            Element elem = doc.getElement("body");
+//            String line = LocalTime.now().toString();
+
+            try {
+                doc.insertBeforeEnd(elem, log);
+            } catch (BadLocationException | IOException ex) {
+                ex.printStackTrace();
+            }
+
         });
 
     }
@@ -553,6 +601,12 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 
         public int getType() {
             return type;
+        }
+
+        @Override
+        public String toString() {
+            Resident resident = (Resident) userObject;
+            return ResidentTools.getTextCompact(resident);
         }
     }
 

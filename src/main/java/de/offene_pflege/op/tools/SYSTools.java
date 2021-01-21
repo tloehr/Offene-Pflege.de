@@ -362,23 +362,25 @@ public class SYSTools {
         String name = in;
         if (OPDE.isAnonym()) {
             String ersterBuchstabe = in.toLowerCase().substring(0, 1);
-            int random = in.charAt(1) % 5;
-            name = ((String[]) OPDE.anonymize[arrayindex].get(ersterBuchstabe))[random];
+//            int random = in.charAt(1) % 5;
+//            name = ((String[]) OPDE.anonymize[arrayindex].get(ersterBuchstabe))[random];
+            name = ersterBuchstabe + "??????";
         }
         return name;
     }
 
     public static String anonymizeRID(String in) {
-        String rid = in;
-        if (OPDE.isAnonym()) {
-            Random rnd = new Random(System.currentTimeMillis());
-
-            char c1 = (char) (65 + rnd.nextInt(25));
-            char c2 = (char) (65 + rnd.nextInt(25));
-
-            rid = new String(new char[]{c1, c2}) + rnd.nextInt(9);
-        }
-        return rid;
+        return in;
+//        String rid = in;
+//        if (OPDE.isAnonym()) {
+//            Random rnd = new Random(System.currentTimeMillis());
+//
+//            char c1 = (char) (65 + rnd.nextInt(25));
+//            char c2 = (char) (65 + rnd.nextInt(25));
+//
+//            rid = new String(new char[]{c1, c2}) + rnd.nextInt(9);
+//        }
+//        return rid;
     }
 
     public static String anonymizeString(String in) {
@@ -691,7 +693,7 @@ public class SYSTools {
                     + "<title>" + OPDE.getAppInfo().getProgname() + "</title>"
                     + OPDE.getCSS()
                     + "</head>"
-                    + "<body>" + xx(in) + "</body></html>";
+                    + "<body id='body'>" + xx(in) + "</body></html>";
         }
         return htmlUmlautConversion(out);
     }

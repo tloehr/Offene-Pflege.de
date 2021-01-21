@@ -209,12 +209,11 @@ public class QdvsService implements HasLogger {
 
         // Residents
         body.getDataContainer().setResidents(of.createResidentsType());
-        textListener.addLog("qdvs.hauptprüfung.laeuft");
 
         residentInfoObjectMap.values().forEach(infoObject -> {
             runningNumber++;
             textListener.setProgress(runningNumber, numResidents * 3);
-            textListener.addLog(infoObject.getResident().toString());
+            textListener.addLog(SYSConst.html_li(infoObject.getResident().toString()));
             // unterscheidung ob Ausschluss oder nicht
 
             ResidentType residentType = infoObject.getAusschluss_grund() == QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS ? createResidentType(infoObject.getResident()) : createResidentAusschlussType(infoObject.getResident());
@@ -235,16 +234,16 @@ public class QdvsService implements HasLogger {
 
         // fehlerfrei? wenn nur einer nicht fehlerfrei ist, gehts hier nicht weiter
         residentInfoObjectMap.values().stream().filter(qdvsResidentInfoObject -> !qdvsResidentInfoObject.isFehlerfrei()).forEach(qdvsResidentInfoObject ->
-                textListener.addLog(SYSTools.xx("qdvs.vorpruefung.fehler.gefunden") + ": " + qdvsResidentInfoObject.getResident() + " " + qdvsResidentInfoObject.getFehler() + "\n")
+                textListener.addLog(SYSConst.html_li(SYSConst.html_bold("qdvs.vorpruefung.fehler.gefunden") + ": " + qdvsResidentInfoObject.getResident() + " " + qdvsResidentInfoObject.getFehler()))
         );
 
         // Nur wenn Fehlerfrei gehts hier weiter.
         boolean fehlerfrei = residentInfoObjectMap.values().stream().allMatch(qdvsResidentInfoObject -> qdvsResidentInfoObject.isFehlerfrei());
         if (fehlerfrei) {
-            textListener.addLog("qdvs.vorpruefung.abgeschlossen");
+            textListener.addLog(SYSConst.html_h2("qdvs.vorpruefung.abgeschlossen"));
             hauptpruefung();
         } else {
-            textListener.addLog("qdvs.vorpruefung.gescheitert");
+            textListener.addLog(SYSConst.html_h2("qdvs.vorpruefung.gescheitert"));
         }
 
 
@@ -252,8 +251,16 @@ public class QdvsService implements HasLogger {
     }
 
     private void hauptpruefung() throws JAXBException, IOException {
-        createQDVS();
-        marshal(of.createRoot(rootType));
+        textListener.addLog(SYSConst.html_h2("qdvs.hauptprüfung.laeuft"));
+        try {
+            createQDVS();
+            marshal(of.createRoot(rootType));
+        } catch (Exception e){
+            e.printStackTrace();
+            getLogger().fatal(e);
+            textListener.addLog(e.getMessage());
+        }
+        textListener.addLog(SYSConst.html_h2("qdvs.hauptprüfung.abgeschlossen"));
     }
 
 
@@ -273,7 +280,7 @@ public class QdvsService implements HasLogger {
      * anschließend leer ist.
      */
     private void vorpruefung() {
-        textListener.addLog("qdvs.vorpruefung.laeuft.step1");
+        textListener.addLog(SYSConst.html_h2("qdvs.vorpruefung.laeuft.step1"));
         /**
          * Ausschlussgründe ( dann minimaldatensatz MDS erzeugen)
          * (1) Einzugsdatum liegt weniger als 14 Tage vor dem Stichtag.
@@ -300,7 +307,6 @@ public class QdvsService implements HasLogger {
                         residentInfoObjectMap.get(resident).addLog("Kein Heimaufenthalt HAUF.");
                         getLogger().debug("Bewohner " + resident + " kein HAUF ");
                     } else {
-
                         long aufenthaltszeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(hauf.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate());
                         Date abwesendSeit = ResInfoTools.absentSince(resident);
                         long abwesenheitsZeitraumInTagen = abwesendSeit == null ? 0l : ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(abwesendSeit).toLocalDate(), STICHTAG.toLocalDate());
@@ -309,19 +315,21 @@ public class QdvsService implements HasLogger {
                         if (abwesenheitsZeitraumInTagen >= 21) {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
                             getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen);
+                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen));
+
                         } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
                             getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
+                            textListener.addLog(("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident)  + ": Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen));
                         } else { // kein Ausschluss
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
-//                            listeBWErfassung.add(resident);
                         }
                         // todo: sterbephase einbauen (3) Wie definiert man eine Sterbephase ?
                         // todo: KZP einbauen (2)
                     }
                 }
         );
-        textListener.addLog("qdvs.vorpruefung.laeuft.step2");
+        textListener.addLog(SYSConst.html_h2("qdvs.vorpruefung.laeuft.step2"));
 
         // 2. Durchlauf
         // Prüfen, welche BW noch fehlerhafte Einträge haben
@@ -338,6 +346,7 @@ public class QdvsService implements HasLogger {
 
             if (!(schmerze2 || besd2)) {
                 residentInfoObjectMap.get(resident).addLog("Schmerzeinschätzung fehlt (SCHMERZE2 oder BESD2)");
+                textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident)  + ": Schmerzeinschätzung fehlt (SCHMERZE2 oder BESD2)"));
                 listeBWFehlerfrei.remove(resident);
             }
 
@@ -350,7 +359,11 @@ public class QdvsService implements HasLogger {
             if (notwendigeTypen.size() != mandantoryTypes.size()) { // zu wenig ? dann müssen wir hier die fehlenen reinschreiben
                 HashSet<ResInfoType> copyMandantoryTypes = new HashSet<>(mandantoryTypes);
                 copyMandantoryTypes.removeAll(notwendigeTypen);
-                copyMandantoryTypes.forEach(resInfoType -> residentInfoObjectMap.get(resident).addLog(SYSTools.xx("qdvs.error.new.type.missing.please.add") + " " + resInfoType));
+                copyMandantoryTypes.forEach(resInfoType -> {
+                    residentInfoObjectMap.get(resident).addLog(SYSTools.xx("qdvs.error.new.type.missing.please.add") + " " + resInfoType);
+                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident)  + ": "+SYSTools.xx("qdvs.error.new.type.missing.please.add") + " " + resInfoType));
+                });
+
                 listeBWFehlerfrei.remove(resident);
             }
 
@@ -361,10 +374,11 @@ public class QdvsService implements HasLogger {
 
             if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, ERHEBUNGSDATUM).isPresent()) {
                 residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
+                textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident)  + ": " + SYSTools.xx("qdvs.error.weight.missing")));
                 listeBWFehlerfrei.remove(resident);
             }
             if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, ERHEBUNGSDATUM).isPresent()) {
-                residentInfoObjectMap.get(resident).addLog("qdvs.error.height.missing");
+                textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident)  + ": " + SYSTools.xx("qdvs.error.height.missing")));
                 listeBWFehlerfrei.remove(resident);
             }
 
@@ -1091,8 +1105,12 @@ public class QdvsService implements HasLogger {
         LocalDate pit = null;
 
         // Letzten Eintrag suchen
-        Optional<ResInfo> letzter_schmerz = ResInfoTools.getValidOnThatDayIfAny(resident, SCHMERZ, ERHEBUNGSDATUM);
-        Optional<ResInfo> letzter_besd = ResInfoTools.getValidOnThatDayIfAny(resident, BESD, ERHEBUNGSDATUM);
+
+        List<ResInfo> list_schmerz = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_PAIN), LETZTE_ERGEBNISERFASSUNG, STICHTAG);
+        List<ResInfo> list_besd = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BESD), LETZTE_ERGEBNISERFASSUNG, STICHTAG);
+
+        Optional<ResInfo> letzter_schmerz = list_schmerz.stream().findFirst();
+        Optional<ResInfo> letzter_besd = list_besd.stream().findFirst();
         // falls es beide gibt (BESD UND SCHMERZ) macht das keinen Sinn. Dann nehme ich nur Schmerz
         if (letzter_schmerz.isPresent()) { // bei einer NRS Angabe durch den BW selbst
             Properties props = ResInfoTools.getContent(letzter_schmerz.get());
@@ -1325,7 +1343,7 @@ public class QdvsService implements HasLogger {
         String result = ResidentTools.getName(resident) + ", " + ResidentTools.getFirstname(resident) + " (*" + df.format(resident.getDob()) + "), ";
 
 
-        result += " [" + SYSTools.anonymizeRID(resident.getId()) + "]";
+        result += " [" + resident.getId() + "]";
         return result + " (" + NF_IDBEWOHNER.format(resident.getIdbewohner()) + ")";
     }
 
