@@ -37,7 +37,7 @@ public class Homes extends DefaultStringIDEntity implements Serializable {
     private String fax;
     @EditorComponent(label = "misc.msg.maxcap", component = {"textfield"})
     private int maxcap;
-    @EditorComponent(label = "misc.msg.careproviderid", component = {"textfield"})
+    @EditorComponent(label = "misc.msg.careproviderid", component = {"textfield"}, tooltip="misc.tooltip.careproviderid")
     private int careproviderid;
     @EditorComponent(label = "misc.msg.colorset", component = {"colorset"}, triggersReload = "true")
     private String color;
@@ -131,6 +131,9 @@ public class Homes extends DefaultStringIDEntity implements Serializable {
     @Column(name = "careproviderid", nullable = false, insertable = true, updatable = true)
     @Digits(integer = 10, fraction = 0, message = "Integer only")
     @NotNull
+    /**
+     * Das hier ist nicht die IK-Nummer der Pflegekasse, sondern die von DAS-PFLEGE zugeordnete ID Nummer.
+     */
     public int getCareproviderid() {
         return careproviderid;
     }

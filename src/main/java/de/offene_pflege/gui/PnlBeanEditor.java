@@ -439,7 +439,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
                 SYSTools.setXEnabled(comp, editorComponent.readonly().equals("false"));
 //                comp.setPanelEnabled();
-                comp.setToolTipText(editorComponent.tooltip().isEmpty() ? null : SYSTools.xx(editorComponent.tooltip()));
+                lblName.setToolTipText(editorComponent.tooltip().isEmpty() ? null : SYSTools.xx(editorComponent.tooltip()));
                 componentSet.add(comp);
 
 

@@ -62,6 +62,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -193,6 +194,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             // icons auf grün
             liste_bewohner.forEach(resident -> map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()).setType(TreeInfoNode.RESIDENT_GREEN));
 
+            Map<Resident, ArrayList<String>> fehlerMapFuerLogfile = new HashMap<>();
+
             // Das hier matched die ERRORS (zeile, spalte des fehlers - closing tag) zu den Bewohnern (ebenfalls zeile, spalte des closing tags)
             ERRORS.forEach((multiKey, strings) -> {
                 long idbewohner = LOOKUP.get(multiKey);
@@ -202,10 +205,27 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                         regel = REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text();
                     }
                     map_zur_zuordnung_der_fehler.get(idbewohner).add(new TreeInfoNode(regel, TreeInfoNode.SELF_FOUND_ERROR));
+                    Resident resident = ((Resident) map_zur_zuordnung_der_fehler.get(idbewohner).getUserObject());
+                    fehlerMapFuerLogfile.putIfAbsent(resident, new ArrayList<>());
+                    fehlerMapFuerLogfile.get(resident).add(regel);
                     // icon auf gelb
                     map_zur_zuordnung_der_fehler.get(idbewohner).setType(TreeInfoNode.RESIDENT_YELLOW);
                 });
             });
+
+            // Schreibt die Fehler in das Logfile
+            if (!fehlerMapFuerLogfile.isEmpty()) {
+                addLog(SYSConst.html_h2("qdvs.plausibilitaet.auffellig"));
+
+                fehlerMapFuerLogfile.forEach((resident, strings) -> {
+                    addLog(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
+                    StringBuffer s2 = new StringBuffer();
+                    strings.forEach(s -> s2.append(SYSConst.html_li(s)));
+                    addLog(SYSConst.html_ul(s2.toString()));
+                });
+                
+            }
+
         } else {
             qdvsService.getResidentInfoObjectMap().forEach((resident, qdvsResidentInfoObject) -> {
                 TreeInfoNode node = map_zur_zuordnung_der_fehler.get(resident.getIdbewohner());
@@ -270,7 +290,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                 vorpruefungOK = qdvsService.ergebniserfassung();
 
                 if (vorpruefungOK) {
-                    addLog(SYSConst.html_h1("qdvs.plausibilitaet.pruefen"));
+                    addLog(SYSConst.html_h2("qdvs.plausibilitaet.pruefen"));
 
 //                    File path = new File(workdir, home.getCareproviderid() + File.separator);
 //                    File xsd = new File(path, "interface_qs_data/das_interface.xsd");
@@ -280,30 +300,14 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                     ERRORS = validateFile(target, xsd); // welche Fehler
                     LOOKUP = getLookupTable(target); // welcher Bewohner
 
-                    if (!ERRORS.isEmpty()) {
-                        ERRORS.forEach((multiKey, strings) -> {
-                            long idbewohner = LOOKUP.get(multiKey);
-                            strings.forEach(s -> {
-                                String regel = s;
-                                if (REGELN.containsKey(s)) {
-                                    regel = REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text();
-                                }
-
-                                addLog(SYSConst.html_li(regel));
-                            });
-                        });
-                    }
-
-                    addLog(SYSConst.html_h1("qdvs.erfassung.abgeschlossen"));
                 } else {
 
                     addLog(SYSConst.html_h2("Fehler in der Vorprüfung"));
 
-                    qdvsService.getResidentInfoObjectMap().forEach((resident, qdvsResidentInfoObject) -> {
-                        addLog(SYSConst.html_h3(resident.toString()));
-                        qdvsResidentInfoObject.getFehler().forEach(fehler -> {
-                            addLog(SYSConst.html_li(fehler));
-                        });
+                    qdvsService.getResidentInfoObjectMap().keySet().stream().sorted().forEach(resident -> {
+                        addLog(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
+                        qdvsService.getResidentInfoObjectMap().get(resident).getFehler().forEach(fehler ->
+                                addLog(SYSConst.html_li(fehler)));
                     });
                 }
 
@@ -325,7 +329,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                     html += toHTML(root);
                     html += SYSConst.html_bold(SYSTools.xx("qdvs.workdir") + ": " + target.getParent());
 
-                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebnis.html"), SYSFilesTools.getHTML4Printout(html, true));
+                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebnis.html"), SYSFilesTools.getHTML4Printout(html, true), Charset.defaultCharset());
+
+                    addLog(SYSConst.html_h2("qdvs.erfassung.abgeschlossen"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -571,8 +577,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     }
 
     @Override
-    public void setProgress(int running, int max) {
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), running, max));
+    public void setProgress(int running, int max, String msg) {
+        if (msg.isEmpty()) msg = "misc.msg.wait";
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(msg, running, max));
     }
 
     private class TreeInfoNode extends DefaultMutableTreeNode {

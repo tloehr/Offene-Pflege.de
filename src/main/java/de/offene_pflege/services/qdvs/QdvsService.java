@@ -210,15 +210,13 @@ public class QdvsService implements HasLogger {
         // Residents
         body.getDataContainer().setResidents(of.createResidentsType());
 
-        residentInfoObjectMap.values().forEach(infoObject -> {
+        residentInfoObjectMap.values().stream().sorted(Comparator.comparing(QdvsResidentInfoObject::getResident)).forEach(infoObject -> {
             runningNumber++;
-            textListener.setProgress(runningNumber, numResidents * 3);
-            textListener.addLog(SYSConst.html_li(infoObject.getResident().toString()));
-            // unterscheidung ob Ausschluss oder nicht
-
+            textListener.setProgress(runningNumber, numResidents * 3, ResidentTools.getTextCompact(infoObject.getResident()));
+//            textListener.addLog(SYSConst.html_li(ResidentTools.getTextCompact(infoObject.getResident())));
+            // Unterscheidung, ob Ausschluss oder nicht
             ResidentType residentType = infoObject.getAusschluss_grund() == QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS ? createResidentType(infoObject.getResident()) : createResidentAusschlussType(infoObject.getResident());
             body.getDataContainer().getResidents().getResident().add(residentType);
-
         });
 
         return body;
@@ -255,7 +253,7 @@ public class QdvsService implements HasLogger {
         try {
             createQDVS();
             marshal(of.createRoot(rootType));
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             getLogger().fatal(e);
             textListener.addLog(e.getMessage());
@@ -301,7 +299,7 @@ public class QdvsService implements HasLogger {
 
                     Optional<ResInfo> hauf = ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, STICHTAG);
                     runningNumber++;
-                    textListener.setProgress(runningNumber, numResidents * 3);
+                    textListener.setProgress(runningNumber, numResidents * 3,"");
 
                     if (!hauf.isPresent()) {
                         residentInfoObjectMap.get(resident).addLog("Kein Heimaufenthalt HAUF.");
@@ -315,12 +313,12 @@ public class QdvsService implements HasLogger {
                         if (abwesenheitsZeitraumInTagen >= 21) {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
                             getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen);
-                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen));
+                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen  + " Tage"));
 
                         } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
                             getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
-                            textListener.addLog(("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident)  + ": Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen));
+                            textListener.addLog(SYSConst.html_bold(("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen + " Tage")));
                         } else { // kein Ausschluss
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
                         }
@@ -335,53 +333,55 @@ public class QdvsService implements HasLogger {
         // Prüfen, welche BW noch fehlerhafte Einträge haben
         residentInfoObjectMap.keySet().forEach(resident -> {
 
-            runningNumber++;
-            textListener.setProgress(runningNumber, numResidents * 3);
+            // BW, die bereits von der Auswertung ausgeschlossen wurden, brauchen auch keine weitere Vorprüfung.
+            if (residentInfoObjectMap.get(resident).getAusschluss_grund() == QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS) {
+                runningNumber++;
+                textListener.setProgress(runningNumber, numResidents * 3,"");
 
-            Set<ResInfoType> vorhandeneTypen = ResInfoTools.getUsedActiveTypesBetween(resident, LETZTE_ERGEBNISERFASSUNG, ERHEBUNGSDATUM);
-            boolean schmerze2 = vorhandeneTypen.stream().anyMatch(resInfoType -> resInfoType.getID().equals("schmerze2"));
-            boolean besd2 = vorhandeneTypen.stream().anyMatch(resInfoType -> resInfoType.getID().equals("besd2"));
+                Set<ResInfoType> vorhandeneTypen = ResInfoTools.getUsedActiveTypesBetween(resident, LETZTE_ERGEBNISERFASSUNG, ERHEBUNGSDATUM);
+                boolean schmerze2 = vorhandeneTypen.stream().anyMatch(resInfoType -> resInfoType.getID().equals("schmerze2"));
+                boolean besd2 = vorhandeneTypen.stream().anyMatch(resInfoType -> resInfoType.getID().equals("besd2"));
 
-            listeBWFehlerfrei.add(resident);
+                listeBWFehlerfrei.add(resident);
 
-            if (!(schmerze2 || besd2)) {
-                residentInfoObjectMap.get(resident).addLog("Schmerzeinschätzung fehlt (SCHMERZE2 oder BESD2)");
-                textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident)  + ": Schmerzeinschätzung fehlt (SCHMERZE2 oder BESD2)"));
-                listeBWFehlerfrei.remove(resident);
+                if (!(schmerze2 || besd2)) {
+                    residentInfoObjectMap.get(resident).addLog("Schmerzeinschätzung fehlt (SCHMERZE2 oder BESD2)");
+                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": Schmerzeinschätzung fehlt (SCHMERZE2 oder BESD2)"));
+                    listeBWFehlerfrei.remove(resident);
+                }
+
+                Set<ResInfoType> notwendigeTypen = new HashSet<>(vorhandeneTypen);
+                Set<ResInfoType> verboteneTypen = new HashSet<>(vorhandeneTypen);
+
+                notwendigeTypen.retainAll(mandantoryTypes); // alles hier rein, was notwendig und bereits vorhanden ist
+                verboteneTypen.retainAll(forbiddenTypes); // alles hier rein, was verboten und immer noch vorhanden ist
+
+                if (notwendigeTypen.size() != mandantoryTypes.size()) { // zu wenig ? dann müssen wir hier die fehlenen reinschreiben
+                    HashSet<ResInfoType> copyMandantoryTypes = new HashSet<>(mandantoryTypes);
+                    copyMandantoryTypes.removeAll(notwendigeTypen);
+                    copyMandantoryTypes.forEach(resInfoType -> {
+                        residentInfoObjectMap.get(resident).addLog(SYSTools.xx("qdvs.error.new.type.missing.please.add") + " " + resInfoType);
+                        textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.new.type.missing.please.add") + " " + resInfoType));
+                    });
+
+                    listeBWFehlerfrei.remove(resident);
+                }
+
+                if (verboteneTypen.size() != 0) { // immer noch verbotene ? dann bitte auflisten
+                    verboteneTypen.forEach(resInfoType -> residentInfoObjectMap.get(resident).addLog(SYSTools.xx("qdvs.error.old.type.found.please.replace") + " " + resInfoType));
+                    listeBWFehlerfrei.remove(resident);
+                }
+
+                if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, ERHEBUNGSDATUM).isPresent()) {
+                    residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
+                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.weight.missing")));
+                    listeBWFehlerfrei.remove(resident);
+                }
+                if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, ERHEBUNGSDATUM).isPresent()) {
+                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.height.missing")));
+                    listeBWFehlerfrei.remove(resident);
+                }
             }
-
-            Set<ResInfoType> notwendigeTypen = new HashSet<>(vorhandeneTypen);
-            Set<ResInfoType> verboteneTypen = new HashSet<>(vorhandeneTypen);
-
-            notwendigeTypen.retainAll(mandantoryTypes); // alles hier rein, was notwendig und bereits vorhanden ist
-            verboteneTypen.retainAll(forbiddenTypes); // alles hier rein, was verboten und immer noch vorhanden ist
-
-            if (notwendigeTypen.size() != mandantoryTypes.size()) { // zu wenig ? dann müssen wir hier die fehlenen reinschreiben
-                HashSet<ResInfoType> copyMandantoryTypes = new HashSet<>(mandantoryTypes);
-                copyMandantoryTypes.removeAll(notwendigeTypen);
-                copyMandantoryTypes.forEach(resInfoType -> {
-                    residentInfoObjectMap.get(resident).addLog(SYSTools.xx("qdvs.error.new.type.missing.please.add") + " " + resInfoType);
-                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident)  + ": "+SYSTools.xx("qdvs.error.new.type.missing.please.add") + " " + resInfoType));
-                });
-
-                listeBWFehlerfrei.remove(resident);
-            }
-
-            if (verboteneTypen.size() != 0) { // immer noch verbotene ? dann bitte auflisten
-                verboteneTypen.forEach(resInfoType -> residentInfoObjectMap.get(resident).addLog(SYSTools.xx("qdvs.error.old.type.found.please.replace") + " " + resInfoType));
-                listeBWFehlerfrei.remove(resident);
-            }
-
-            if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, ERHEBUNGSDATUM).isPresent()) {
-                residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
-                textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident)  + ": " + SYSTools.xx("qdvs.error.weight.missing")));
-                listeBWFehlerfrei.remove(resident);
-            }
-            if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, ERHEBUNGSDATUM).isPresent()) {
-                textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident)  + ": " + SYSTools.xx("qdvs.error.height.missing")));
-                listeBWFehlerfrei.remove(resident);
-            }
-
         });
 
     }
@@ -1271,8 +1271,8 @@ public class QdvsService implements HasLogger {
         mar.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         mar.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "https://www.das-pflege.de ../das_interface.xsd");
         target.toPath().getParent().toFile().mkdirs();
-        textListener.addLog("qdvs.erzeuge.xml");
-        textListener.addLog(target.toString());
+        textListener.addLog(SYSConst.html_h3(SYSTools.xx("qdvs.erzeuge.xml") +": "+target.toString()));
+//        textListener.addLog(target.toString());
         mar.marshal(root, target);
     }
 

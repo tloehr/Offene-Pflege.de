@@ -362,9 +362,9 @@ public class SYSTools {
         String name = in;
         if (OPDE.isAnonym()) {
             String ersterBuchstabe = in.toLowerCase().substring(0, 1);
-//            int random = in.charAt(1) % 5;
-//            name = ((String[]) OPDE.anonymize[arrayindex].get(ersterBuchstabe))[random];
-            name = ersterBuchstabe + "??????";
+            int random = in.charAt(1) % 5;
+            name = ((String[]) OPDE.anonymize[arrayindex].get(ersterBuchstabe))[random];
+//            name = ersterBuchstabe + "??????";
         }
         return name;
     }
