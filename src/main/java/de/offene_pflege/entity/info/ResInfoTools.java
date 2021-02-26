@@ -310,8 +310,8 @@ public class ResInfoTools implements HasLogger {
         return resInfos;
     }
 
-    public static Set<ResInfo> getAll(Resident resident, int[] types, java.time.LocalDateTime from, java.time.LocalDateTime to) {
-        HashSet<ResInfo> set = new HashSet<>();
+    public static ArrayList<ResInfo> getAll(Resident resident, int[] types, java.time.LocalDateTime from, java.time.LocalDateTime to) {
+        ArrayList<ResInfo> set = new ArrayList<>();
         for (int type : types) {
             set.addAll(getAll(resident, ResInfoTypeTools.getByType(type), from, to));
         }
@@ -337,6 +337,16 @@ public class ResInfoTools implements HasLogger {
         em.close();
         return resInfos;
     }
+
+
+    public static ArrayList<ResInfo> getAll(Long connectionID) {
+           EntityManager em = OPDE.createEM();
+           Query query = em.createQuery(" SELECT rinfo FROM ResInfo rinfo WHERE rinfo.connectionid = :connectionID  ORDER BY rinfo.from DESC");
+           query.setParameter("connectionID", connectionID);
+           ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+           em.close();
+           return resInfos;
+       }
 
     public static String getBWDebug(Resident bewohner) {
         return bewohner.getName() + ";" + bewohner.getFirstname() + ";" + SimpleDateFormat.getDateInstance().format(bewohner.getDob()) + ";" + bewohner.getId() + ";" + new DecimalFormat("000000").format(bewohner.getIdbewohner());
@@ -693,9 +703,9 @@ public class ResInfoTools implements HasLogger {
     }
 
     /**
-     * Tells since when a resident was away.
+     * Sucht den aktuellen Abwesenheitszeitraum raus, gibt den Beginn dieses Zeitraums zurück.
      *
-     * @return Date of the departure. null if not away.
+     * @return Datum des Abwesenheitsbeginss, NULL wenn BW nicht abwesend ist.
      */
     public static Date absentSince(Resident resident) {
         ResInfo lastabsence = getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE));

@@ -15,7 +15,7 @@
 
     <combobox label="Kategorien nach EPUAP" name="epuap"
               tooltip="Denken Sie bitte daran, dass auch im weiteren Heilungs-Verlauf die anfängliche Dekubitus-Kategorie [b]nicht mehr geändert[/b] wird. Sie bleibt bis zur Epithalisierung bestehen. Ein Dekubitus entwickelt sich also nicht rückwärts."
-              lockedforchanges="true" depends-on="dekubitus" visible-when-dependency-eq="true"
+              lockedforchanges="false" depends-on="dekubitus" visible-when-dependency-eq="true"
               default-value-when-shown="1">
         <item label="Kategorie I: Nicht wegdrückbare Rötung" name="1"
               tooltip="Nicht wegdrückbare, umschriebene Rötung bei intakter Haut, gewöhnlich über einem knöchernen Vorsprung. Bei dunkel pigmentierter Haut ist ein Verblassen möglicherweise nicht sichtbar, die Farbe kann sich aber von der umgebenden Haut unterscheiden. Der Bereich kann schmerzempfindlich, verhärtet, weich, wärmer oder kälter sein als das umgebende Gewebe. Diese Symptome können auf eine (Dekubitus-) Gefährdung hinweisen."/>

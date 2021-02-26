@@ -622,6 +622,19 @@ SET t.XML = '<textfield name="gericht" label="Amtsgericht"/>
 WHERE t.BWINFTYP = 'FIXATION1';
 --
 UPDATE resinfotype t
+SET t.XML = '<imagelabel image="/artwork/48x48/diabetes.png"/>
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 16."/>
+    <qdvs tooltip="Wird bei der Auswertung zur QDVS herangezogen."/>
+    <textfield name="description" label="Diabetes" length="30" hfill="false"/>
+    <optiongroup name="application" label="Verabreichung per">
+        <option label="nicht insulinpflichtig" name="none" default="true"/>
+        <option label="Pen" name="pen"/>
+        <option label="Spritze" name="syringe"/>
+        <option label="Pumpe" name="pump"/>
+    </optiongroup>'
+WHERE t.BWINFTYP = 'DIABETES1';
+--
+UPDATE resinfotype t
 SET t.XML = ' <qdvs
                   tooltip="Zeile(n) 72 - 75 im DAS Dokumentationsbogen (Abschnitt &quot;Körpergewicht und Größe&quot;)"/>
           <tabgroup size="18" fontstyle="bold"
@@ -971,7 +984,7 @@ SET t.XML = '  <tx tooltip="Diese Eintragungen werden in den Überleitbogen übe
         <option label="nicht vorhanden" name="3" tooltip="bi2.personen.selbst3"/>
     </optiongroup>
 
-    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"
+    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Ö̈rtliche Orientierung" tooltip="bi2.orte.erklaerung"
                  qdvs="Zeile(n) 31 im DAS Dokumentationsbogen.">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.orte.selbst0"/>
         <option label="größtenteils vorhanden" name="1" tooltip="bi2.orte.selbst1"/>
@@ -1689,6 +1702,128 @@ SET t.XML = '  <label size="16" label="Allgemeine Einschätzung" color="blue"/>
         <item label="stark" name="3"/>
     </combobox>'
 WHERE t.BWINFTYP LIKE 'schmerze2';
+--
+SET @wundxml = '<tx tooltip="Wunden werden auf dem Überleitbogen auf Seite 2 Abschnitt 19 eingetragen. Ebenso wirken sich die Eintragunegn auf den Abschnitt 10 aus (Wundschmerz, Wunden)"/>
+    <qdvs
+            tooltip="Zeile(n) 64 - 71 im DAS Dokumentationsbogen (Abschnitt &quot;Dekubitus&quot;)"/>
+    <label
+            label="Sie können mehr als eine Stelle markieren, aber beschreiben Sie unbedingt nur *eine* Wunde pro Formular."
+            size="16" fontstyle="bold"/>
+    <bodyscheme name="bs1"/>
+
+    <checkbox name="dekubitus" label="Diese Wunde ist ein Druckgeschwür (Dekubitus)"
+              tx="Erscheint auf dem Überleitbogen auf Seite 1 Abschnitt 7."
+              lockedforchanges="true" default="true"/>
+
+    <combobox label="Kategorien nach EPUAP" name="epuap"
+              tooltip="Denken Sie bitte daran, dass auch im weiteren Heilungs-Verlauf die anfängliche Dekubitus-Kategorie [b]nicht mehr geändert[/b] wird. Sie bleibt bis zur Epithalisierung bestehen. Ein Dekubitus entwickelt sich also nicht rückwärts."
+              lockedforchanges="false" depends-on="dekubitus" visible-when-dependency-eq="true"
+              default-value-when-shown="1">
+        <item label="Kategorie I: Nicht wegdrückbare Rötung" name="1"
+              tooltip="Nicht wegdrückbare, umschriebene Rötung bei intakter Haut, gewöhnlich über einem knöchernen Vorsprung. Bei dunkel pigmentierter Haut ist ein Verblassen möglicherweise nicht sichtbar, die Farbe kann sich aber von der umgebenden Haut unterscheiden. Der Bereich kann schmerzempfindlich, verhärtet, weich, wärmer oder kälter sein als das umgebende Gewebe. Diese Symptome können auf eine (Dekubitus-) Gefährdung hinweisen."/>
+        <item label="Kategorie II: Teilverlust der Haut" name="2"
+              tooltip="Teilzerstörung der Haut (bis zur Dermis), die als flaches, offenes Ulcus mit einem rot bis rosafarbenen Wundbett ohne Beläge in Erscheinung tritt. Kann sich auch als intakte oder offene/rupturierte, serumgefüllte Blase darstellen. Manifestiert sich als glänzendes oder trockenes, flaches Ulcus ohne nekrotisches Gewebe oder Bluterguss10. Diese Kategorie sollte nicht benutzt werden um Skin Tears (Gewebezerreißungen), Verbands- oder pflasterbedingte Hautschädigungen, feuchtigkeitsbedingte Läsionen, Mazerationen oder Abschürfungen zu beschreiben."/>
+        <item label="Kategorie III: Verlust der Haut" name="3"
+              tooltip="Zerstörung aller Hautschichten. Subkutanes Fett kann sichtbar sein, jedoch keine Knochen, Muskeln oder Sehnen. Es kann ein Belag vorliegen, der jedoch nicht die Tiefe der Gewebsschädigung verschleiert. Es können Tunnel oder Unterminierungen vorliegen. Die Tiefe des Dekubitus der Kategorie III variiert je nach anatomischer Lokalisation. Der Nasenrücken, das Ohr, der Hinterkopf und das Gehörknöchelchen haben kein subkutanes Gewebe, daher können Kategorie III Wunden dort auch sehr oberflächlich sein. Im Gegensatz dazu können an besonders adipösen Körperstellen extrem tiefe Kategorie III Wunden auftreten. Knochen und Sehnen sind nicht sichtbar oder tastbar."/>
+        <item label="Kategorie IV: vollständiger Haut oder Gewebeverlust" name="4"
+              tooltip="Totaler Gewebsverlust mit freiliegenden Knochen, Sehnen oder Muskeln. Belag und Schorf können vorliegen. Tunnel oder Unterminierungen liegen oft vor. Die Tiefe des Kategorie IV Dekubitus hängt von der anatomischen Lokalisation ab. Der Nasenrücken, das Ohr, der Hinterkopf und der Knochenvorsprung am Fußknöchel haben kein subkutanes Gewebe, daher können Wunden dort auch sehr oberflächlich sein. Kategorie IV Wunden können sich in Muskeln oder unterstützende Strukturen ausbreiten (Fascien, Sehnen oder Gelenkkapseln) und können dabei leicht Osteomyelitis oder Ostitis verursachen. Knochen und Sehnen sind sichtbar oder tastbar."/>
+    </combobox>
+
+    <combobox label="Wo ist der Dekubitus entstanden ?" name="dekubituslok"
+              tooltip="Solange diese Wunde nicht abgeheilt ist, bleibt der Entstehungsort gleich."
+              lockedforchanges="true" depends-on="dekubitus" visible-when-dependency-eq="true"
+              default-value-when-shown="1" qdvs="Verwendung im Abschnitt &quot;Dekubitus&quot;">
+        <item label="bei uns" name="1"/>
+        <item label="Im Krankenhaus" name="2"/>
+        <item label="zu Hause (vor dem Einzug)" name="3"/>
+        <item label="woanders" name="4"/>
+    </combobox>
+
+    <combobox label="Wund-Stadium nach Daniel" name="daniel" depends-on="dekubitus"
+              visible-when-dependency-neq="true" default-value-when-shown="1">
+        <item label="1. Grad Hautrötung" name="1"
+              tooltip="Erythem, scharf begrenzt, schmerzlos, reversibel umschriebene Hautrötung bei intakter Epidermis (Oberhaut)"/>
+        <item label="2. Grad Blasenbildung" name="2"
+              tooltip="Blasenbildung der Haut (Cutis), oberflächliche Ulcerationen der Epidermis (Oberhaut) bis zur Dermis (Lederhaut)"/>
+        <item label="3. Grad offener Hautdefekt" name="3" tooltip="Ulcerationen bis in die Subcutis (Unterhaut)"/>
+        <item label="4. Grad Muskulatur sichtbar" name="4"
+              tooltip="Ulcerationen bis auf die Faszie auch Mitbefall der Muskulatur möglich"/>
+        <item label="5. Grad Knochen befallen" name="5"
+              tooltip="Mitbefall von Knochen, Gelenken oder Beckenorganen (Rectum, Vagina usw.)"/>
+    </combobox>
+
+    <label label="Die Schmerzintensität tragen Sie gesondert unter &quot;Schmerzeinschätzung&quot; ein." size="16"
+           fontstyle="bold" layout="p"/>
+
+    <textfield name="laenge" label="Länge (cm)" layout="br tab" length="6" hfill="false"/>
+    <textfield name="breite" label="Breite (cm)" layout="tab" length="6" hfill="false"/>
+    <textfield name="tiefe" label="Tiefe (cm)" layout="tab" length="6" hfill="false"/>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundfläche" name="tg1">
+        <checkbox name="epi" label="Epithelisierung" layout="left"/>
+        <checkbox name="ggran" label="gute Granulation" layout="left"/>
+        <checkbox name="sgran" label="schlechte Granulation" layout="left"/>
+        <checkbox name="fibrin" label="Fibrinbelag" layout="left"/>
+        <checkbox name="fnekr" label="Feuchte Nekrose" layout="left"/>
+        <checkbox name="tnekr" label="Trockene Nekrose" layout="br"/>
+        <checkbox name="inseln" label="Wundheilungsinseln" layout="left"/>
+        <checkbox name="hyper" label="Hypergranulation" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundumgebung" name="tg2">
+        <checkbox name="rosig1" label="rosig" layout="left"/>
+        <checkbox name="rot1" label="rot" layout="left"/>
+        <checkbox name="blau1" label="bläulich verfärbt" layout="left"/>
+        <checkbox name="marz1" label="marzeriert" layout="left"/>
+        <checkbox name="verh1" label="verhärtet" layout="left"/>
+        <checkbox name="oedem1" label="Ödembildung" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundrand" name="tg3">
+        <checkbox name="rosig2" label="rosig" layout="left"/>
+        <checkbox name="rot2" label="rot" layout="left"/>
+        <checkbox name="glatt2" label="glatt" layout="left"/>
+        <checkbox name="geschw2" label="geschwollen" layout="left"/>
+        <checkbox name="marz2" label="marzeriert" layout="left"/>
+        <checkbox name="nekr2" label="Nekrose" layout="left"/>
+        <checkbox name="taschen2" label="Taschenbildung" layout="br left" default="false"/>
+        <textfield name="ttasche" default="0" label="Tiefe der Tasche (cm)" length="6" hfill="false" size="16"
+                   fontstyle="bold" layout="left" depends-on="taschen2" visible-when-dependency-eq="true"
+                   default-value-when-shown="1"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundexsudat" name="tg4">
+        <checkbox name="kein3" label="kein" layout="left"/>
+        <checkbox name="wenig3" label="wenig" layout="left"/>
+        <checkbox name="viel3" label="viel" layout="left"/>
+        <checkbox name="klar3" label="klar" layout="left"/>
+        <checkbox name="blut3" label="blutig" layout="left"/>
+        <checkbox name="eitr3" label="eitrig" layout="left"/>
+        <checkbox name="gruen3" label="grün" layout="left"/>
+        <checkbox name="braun3" label="braun" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundgeruch (vor VW)" name="tg5">
+        <checkbox name="unauf4" label="unauffällig" layout="left"/>
+        <checkbox name="leicht4" label="leicht" layout="left"/>
+        <checkbox name="uebel4" label="übelriechend" layout="left"/>
+        <checkbox name="suebel4" label="stark übelriechend" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundgeruch (während VW)" name="tg6">
+        <checkbox name="unauf5" label="unauffällig" layout="left"/>
+        <checkbox name="leicht5" label="leicht" layout="left"/>
+        <checkbox name="uebel5" label="übelriechend" layout="left"/>
+        <checkbox name="suebel5" label="stark übelriechend" layout="left"/>
+    </tabgroup>
+
+    <tabgroup size="16" fontstyle="bold" label="Wundgeruch (nach VW)" name="tg7">
+        <checkbox name="unauf6" label="unauffällig" layout="left"/>
+        <checkbox name="leicht6" label="leicht" layout="left"/>
+        <checkbox name="uebel6" label="übelriechend" layout="left"/>
+        <checkbox name="suebel6" label="stark übelriechend" layout="left"/>
+    </tabgroup>';
+UPDATE `resinfotype` SET `XML` = @wundxml WHERE resinfotype.BWINFTYP LIKE "WUNDE%c";
 --
 alter table `groups`
     change `System` sysflag tinyint(1) default 0 not null;

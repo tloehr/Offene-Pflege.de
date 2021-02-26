@@ -15,6 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.javatuples.Quintet;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Bis 2019 wurden unter Begleitung des Qualitätsausschuss Pflege vom Institut für Pflegewissenschaft an der Universität
@@ -174,6 +176,11 @@ public class QdvsService implements HasLogger {
         }
     }
 
+    /**
+     * Erstellt den Kopf der Testdatei. Enthält die nötigen Angaben zur Prüfung, wie Datum, ID der Einrichtung usw.
+     *
+     * @return
+     */
     private HeaderType createHeaderType() {
         HeaderType header = of.createHeaderType();
         // Document
@@ -210,10 +217,10 @@ public class QdvsService implements HasLogger {
         // Residents
         body.getDataContainer().setResidents(of.createResidentsType());
 
+        // Hier ist die Schleife, die das ganze XML Dokument erzeugt.
         residentInfoObjectMap.values().stream().sorted(Comparator.comparing(QdvsResidentInfoObject::getResident)).forEach(infoObject -> {
             runningNumber++;
             textListener.setProgress(runningNumber, numResidents * 3, ResidentTools.getTextCompact(infoObject.getResident()));
-//            textListener.addLog(SYSConst.html_li(ResidentTools.getTextCompact(infoObject.getResident())));
             // Unterscheidung, ob Ausschluss oder nicht
             ResidentType residentType = infoObject.getAusschluss_grund() == QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS ? createResidentType(infoObject.getResident()) : createResidentAusschlussType(infoObject.getResident());
             body.getDataContainer().getResidents().getResident().add(residentType);
@@ -299,7 +306,7 @@ public class QdvsService implements HasLogger {
 
                     Optional<ResInfo> hauf = ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, STICHTAG);
                     runningNumber++;
-                    textListener.setProgress(runningNumber, numResidents * 3,"");
+                    textListener.setProgress(runningNumber, numResidents * 3, "");
 
                     if (!hauf.isPresent()) {
                         residentInfoObjectMap.get(resident).addLog("Kein Heimaufenthalt HAUF.");
@@ -313,7 +320,7 @@ public class QdvsService implements HasLogger {
                         if (abwesenheitsZeitraumInTagen >= 21) {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
                             getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen);
-                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen  + " Tage"));
+                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen + " Tage"));
 
                         } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
@@ -336,7 +343,7 @@ public class QdvsService implements HasLogger {
             // BW, die bereits von der Auswertung ausgeschlossen wurden, brauchen auch keine weitere Vorprüfung.
             if (residentInfoObjectMap.get(resident).getAusschluss_grund() == QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS) {
                 runningNumber++;
-                textListener.setProgress(runningNumber, numResidents * 3,"");
+                textListener.setProgress(runningNumber, numResidents * 3, "");
 
                 Set<ResInfoType> vorhandeneTypen = ResInfoTools.getUsedActiveTypesBetween(resident, LETZTE_ERGEBNISERFASSUNG, ERHEBUNGSDATUM);
                 boolean schmerze2 = vorhandeneTypen.stream().anyMatch(resInfoType -> resInfoType.getID().equals("schmerze2"));
@@ -386,7 +393,12 @@ public class QdvsService implements HasLogger {
 
     }
 
-
+    /**
+     * In diesem Abschnitt wird, jeweils für einen BW, der gesamte Datenabschnitt zusammengestellt.
+     *
+     * @param resident
+     * @return
+     */
     private ResidentType createResidentType(Resident resident) {
         getLogger().debug("====================================================================");
         getLogger().debug("====------------------------------------------------------------====");
@@ -399,7 +411,7 @@ public class QdvsService implements HasLogger {
         getLogger().debug(String.format("===---%s---===", StringUtils.center("Allgemeine Angaben", 60)));
         allgemeine_angaben(residentType.getQsData(), resident);
         getLogger().debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", 60)));
-        krankenhaus_und_einzug(residentType.getQsData(), resident);
+        krankenhaus(residentType.getQsData(), resident);
         getLogger().debug(String.format("===---%s---===", StringUtils.center("Mobilität", 60)));
         bi_modul1_mobilitaet(residentType.getQsData(), resident);
         getLogger().debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", 60)));
@@ -409,7 +421,12 @@ public class QdvsService implements HasLogger {
         getLogger().debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", 60)));
         bi_modul6_alltag_soziales(residentType.getQsData(), resident);
         getLogger().debug(String.format("===---%s---===", StringUtils.center("Dekubitus", 60)));
-        dekubitus(residentType.getQsData(), resident);
+        try {
+            dekubitus(residentType.getQsData(), resident);
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(0);
+        }
         getLogger().debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", 60)));
         groesse_gewicht(residentType.getQsData(), resident);
         getLogger().debug(String.format("===---%s---===", StringUtils.center("Sturz", 60)));
@@ -508,7 +525,7 @@ public class QdvsService implements HasLogger {
 
     }
 
-    private void krankenhaus_und_einzug(DasQsDataType qsData, Resident resident) {
+    private void krankenhaus(DasQsDataType qsData, Resident resident) {
 
         //____ ___  ____ ___  _    ____ _  _
         //|__| |__] |  | |__] |    |___  \/
@@ -641,11 +658,7 @@ public class QdvsService implements HasLogger {
         qsData.getBEWUSSTSEINSZUSTAND().setValue(Integer.valueOf(ResInfoTools.getContent(bewusst).getProperty("BEWUSSTSEINSZUSTAND")));
 
         /** 24 */qsData.getDIAGNOSEN().addAll(getAktuelleDiagnosenFuerQDVS(resident));
-//
-//          Hier GEHTS WEITER.
-//                Jetzt testen testen testen.
-//                Dann die HTML und TXT Darstellung bei ResInfos reparieren
-//                Dann TX testen
+
     }
 
     private void bi_modul1_mobilitaet(DasQsDataType qsData, Resident resident) {
@@ -817,24 +830,78 @@ public class QdvsService implements HasLogger {
          * Gemeint sind alle Dekubitalulcera, die in den vergangenen 6 Monaten beim Bewohner bzw. bei der Bewohnerin bestanden oder bis heute bestehen.
          * Auch wenn der Zeitpunkt der Entstehung länger als 6 Monate zurückliegt, der Dekubitus aber noch nicht abgeheilt war,
          * ist die Frage mit „ja“ zu beantworten und das Entstehungsdatum anzugeben.
+         *
+         * Wenn es mehr als einen Dekubitus gab, dann werden davon maximal 2 übermittelt. Ich nehme dann die schlimmsten zwei davon, also, die das höchste Stadium hatten und erst danach den aktuelleren von denen.
+         *
+         * Testdatensätze
+         *
+         * 4 Wunden. also eigentlich 5.
+         *
+         * 1. WOUND1 1.9.2020 - 5.9.2020 Stadium 1 - 5.9.2020 - 10.9.2020 Stadium 2 - 10.9.2020 - 20.9.2020 Stadium 3 - 20.9.2020 - 25.09.2020 Stadium 1 - ENDE
+         * 2. WOUND2 9.8.2020 - 20.8.2020 Stadium 2 - 20.8.2020 - 25.8.2020 Stadium 1 - ENDE PAUSE 30.8.2020 - 11.9.2020 Stadium 3 - 11.9.2020 - JETZT Stadium 2
+         * 3. WOUND3 15.7.2020 - 31.7.2020 KEIN DEKUBITUS
+         * 4. WOUND4 21.12.2020 - JETZT STADIUM 4
+         *
          */
-        // Wunden einsammeln und die Dekubitalulcera raussuchen
-//        if (resident.getId().equalsIgnoreCase("EW2")) {
-//            getLogger().debug("hier ist sie");
-//        }
-        ArrayList<ResInfo> dekubitalulcera = new ArrayList<>();
-        int maximales_dekubitus_stadium = 0;
-        //todo: das ist falsch. Damit würden auch wunden mehrfach erkannt, die einfach nur einen verlauf zeigen.
-        // wir müssen hier mindestens unterscheiden zwischen WOUND1 und WOUND2 usw. und auch innerhalb derselben WOUND wenn eine Pause von 1 Woche dazwischen liegt.
-        // Ansonsten sehen wir die alsdieselbe an.
-        for (ResInfo resInfo : ResInfoTools.getAll(resident, ResInfoTypeTools.TYPE_ALL_WOUNDS, LETZTE_ERGEBNISERFASSUNG, STICHTAG)) {
-            Properties props = ResInfoTools.getContent(resInfo);
-            if (props.getProperty("dekubitus").equalsIgnoreCase("true")) {
-                dekubitalulcera.add(resInfo);
-            }
-        }
+        // zuerst hole ich alle Wunden, die in dem besagten Zeitraum bestanden haben.
+        ArrayList<ResInfo> liste_wunden = ResInfoTools.getAll(resident, ResInfoTypeTools.TYPE_ALL_WOUNDS, LETZTE_ERGEBNISERFASSUNG, STICHTAG);
 
-        // Auch wenn wir sie nicht immer brauchen, sie müssen trotzdem mit im XML stehen. dann eben leer.
+        // Dann ermittele ich alle ConnectionIDs, die es in diesem Zeitraum gab.
+        // Denn der Wundbeginn könnte ja auch VOR dem Betrachtungszeitraum liegen
+        HashSet<Long> connectionIDs = new HashSet<>();
+
+        // Die statistischen Informationen sammele ich pro ConnectionID in einem Quartet (connectionid, entstehungsort, max_grade, beginn (der wunde), ende (der wunde) - BAW wenn noch aktiv)
+        // Das sammele ich dann in dieser Map, der key ist die ConnectionID und der Value die zugehörige statistik
+        // (ConnectionID, entehungsort, grad, beginn, ende)
+        HashMap<Long, Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> auswertung_dekubitus = new HashMap<>();
+        liste_wunden.forEach(resInfo -> {
+            connectionIDs.add(resInfo.getConnectionid());
+            auswertung_dekubitus.put(resInfo.getConnectionid(), Quintet.with(resInfo.getConnectionid(), 1, 0, SYSConst.LD_UNTIL_FURTHER_NOTICE, SYSConst.LD_VERY_BEGINNING)); // Basisfall, 1 ist bei uns. Wird aber sowieso überschrieben.
+        });
+        getLogger().debug(String.format("%d Wunden gefunden", liste_wunden.size()));
+
+        // Jetzt nehme ich mir jeden Wundverlauf einzeln vor und möchte wissen:
+        // entstehungsort
+        // maximaler Grad
+        // Beginn der Wunde.
+        // Ende der Wunde (oder noch nicht beendet)
+        // mich interessieren nur dekubitus einträge
+        connectionIDs.forEach(aConnectionID -> {
+            ArrayList<ResInfo> wundverlauf = ResInfoTools.getAll(aConnectionID); // sind bereits nach startdatum sortiert
+
+            wundverlauf.forEach(resInfo -> {
+                Properties props = ResInfoTools.getContent(resInfo);
+                // uns interessieren hier nur die Dekubitalgeschwüre
+                if (props.getProperty("dekubitus").equalsIgnoreCase("true")) {
+                    int dekubituslok = Integer.parseInt(props.getProperty("dekubituslok"));
+                    int epuap = Integer.parseInt(props.getProperty("epuap"));
+                    LocalDateTime beginn = JavaTimeConverter.toJavaLocalDateTime(resInfo.getFrom());
+                    LocalDateTime ende = JavaTimeConverter.toJavaLocalDateTime(resInfo.getTo());
+
+                    // was stand vorher drin ?
+                    Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime> auswertung = auswertung_dekubitus.get(aConnectionID);
+                    // höchster wert, frühesten beginn, spätestes ende suchen
+
+                    int max_epuap = Math.max(epuap, auswertung.getValue2());
+                    LocalDateTime _beginn = JavaTimeConverter.min(beginn, auswertung.getValue3());
+                    LocalDateTime _ende = JavaTimeConverter.max(beginn, auswertung.getValue4());
+
+                    auswertung_dekubitus.put(aConnectionID, Quintet.with(aConnectionID, dekubituslok, max_epuap, _beginn, _ende));
+                } else {
+                    auswertung_dekubitus.remove(aConnectionID); // kein dekubitus -> kein interesse
+                }
+            });
+        });
+
+        // hier stehen genau eine auswertung pro dekubitus drin. Jetzt umgekehrt nach beginn sortieren.
+        // sortiert nach maxgrad
+        ArrayList<Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> listDekubitus = new ArrayList<>(auswertung_dekubitus.values().stream().sorted(Comparator.comparing(Quintet::getValue2)).collect(Collectors.toList()));
+        // Aus dieser Liste nehme ich nun die ersten beiden Einträge, wenn es denn welche gibt.
+        Collections.reverse(listDekubitus);
+        Optional<Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> optWunde1 = Optional.ofNullable(listDekubitus.size() >= 1 ? listDekubitus.get(0) : null);
+        Optional<Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> optWunde2 = Optional.ofNullable(listDekubitus.size() > 1 ? listDekubitus.get(1) : null);
+
+        // Formalitäten
         /** 66 */qsData.setDEKUBITUS1BEGINNDATUM(of.createDasQsDataTypeDEKUBITUS1BEGINNDATUM());
         /** 67 */qsData.setDEKUBITUS1ENDEDATUM(of.createDasQsDataTypeDEKUBITUS1ENDEDATUM());
         /** 68 */qsData.setDEKUBITUS1LOK(of.createDasQsDataTypeDEKUBITUS1LOK());
@@ -842,54 +909,25 @@ public class QdvsService implements HasLogger {
         /** 70 */qsData.setDEKUBITUS2ENDEDATUM(of.createDasQsDataTypeDEKUBITUS2ENDEDATUM());
         /** 71 */qsData.setDEKUBITUS2LOK(of.createDasQsDataTypeDEKUBITUS2LOK());
 
-        // Jetzt die Details
-        if (!dekubitalulcera.isEmpty()) { // falls es welche gab
-            dekubitalulcera.sort(Comparator.comparing(ResInfo::getFrom).reversed()); // nach Entstehungsdatum sortieren, die letzten zuerst
-            ArrayList<Pair<ResInfo, Integer>> dekubitalulcera_fuer_report = new ArrayList<>(); // nur für die Stadien > 1
 
-            // erneute Auswertung
-            for (ResInfo resInfo : dekubitalulcera) {
-                Properties props = ResInfoTools.getContent(resInfo);
-                // größtes Stadium suchen
-                int stadium = Integer.valueOf(props.getProperty("epuap"));
-                if (stadium > maximales_dekubitus_stadium) maximales_dekubitus_stadium = stadium;
-                /**
-                 * Zu Dekubitus in Kategorie/Stadium 1 sollen keine Datumsangaben gemacht werden. Gab es mehr als zwei
-                 * Dekubitusepisoden in den letzten 6 Monaten, sind die beiden zeitlich letzten zu berücksichtigen.
-                 */
-                if (stadium > 1) {
-                    // suche mir die relevanten sachen zusammen und packe sie in ein Pair als Container
-                    dekubitalulcera_fuer_report.add(new ImmutablePair<>(resInfo, Integer.valueOf(props.getProperty("dekubituslok"))));
-                }
-            }
+        optWunde1.ifPresent(wunde1 -> {
+            qsData.getDEKUBITUS1BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde1.getValue3()));
+            // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
+            qsData.getDEKUBITUS1ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde1.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
+            qsData.getDEKUBITUS1LOK().setValue(wunde1.getValue1());
+        });
+        int maximales_dekubitus_stadium = optWunde1.isEmpty() ? 9 : optWunde1.get().getValue2(); // 9 wenn es keine wunde gab. wunde 1 ist immer die schlimmste
 
-            // todo: noch nicht getestet mit stadien größer 1
-            int dekub_nummer = 1; // für den break
-            for (Pair<ResInfo, Integer> pair : dekubitalulcera_fuer_report) {
-                if (dekub_nummer > 2) break; // mehr als 2 brauchen wir nicht
-                ResInfo dek = pair.getLeft();
-                int lok = pair.getRight();
-                if (dekub_nummer == 1) {
-                    qsData.getDEKUBITUS1BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(dek.getFrom()));
-                    // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
-                    qsData.getDEKUBITUS1ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(SYSCalendar.min(dek.getTo(), JavaTimeConverter.toDate(STICHTAG))));
-                    qsData.getDEKUBITUS1LOK().setValue(lok);
-                } else { // == 2
-                    qsData.getDEKUBITUS2BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(dek.getFrom()));
-                    // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
-                    qsData.getDEKUBITUS2ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(SYSCalendar.min(dek.getTo(), JavaTimeConverter.toDate(STICHTAG))));
-                    qsData.getDEKUBITUS2LOK().setValue(lok);
-                }
-                dekub_nummer++;
-            }
-        }
-
-        if (maximales_dekubitus_stadium == 0)
-            maximales_dekubitus_stadium = 9; // das passiert nur dann, wenn es keine Wunden gab. Dann wirds auch nicht verwendet.
+        optWunde2.ifPresent(wunde1 -> {
+            qsData.getDEKUBITUS2BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde1.getValue3()));
+            // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
+            qsData.getDEKUBITUS2ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde1.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
+            qsData.getDEKUBITUS2LOK().setValue(wunde1.getValue1());
+        });
 
         int dekubitus_schluessel = 0; // wenn kein dekubitus
-        if (dekubitalulcera.size() == 1) dekubitus_schluessel = 1;
-        if (dekubitalulcera.size() > 1) dekubitus_schluessel = 2;
+        if (listDekubitus.size() == 1) dekubitus_schluessel = 1; // genau einer
+        if (listDekubitus.size() > 1) dekubitus_schluessel = 2; // mehr als einer
         /** 64 */qsData.setDEKUBITUS(of.createDasQsDataTypeDEKUBITUS());
         qsData.getDEKUBITUS().setValue(dekubitus_schluessel);
 
@@ -1271,7 +1309,7 @@ public class QdvsService implements HasLogger {
         mar.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         mar.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "https://www.das-pflege.de ../das_interface.xsd");
         target.toPath().getParent().toFile().mkdirs();
-        textListener.addLog(SYSConst.html_h3(SYSTools.xx("qdvs.erzeuge.xml") +": "+target.toString()));
+        textListener.addLog(SYSConst.html_h3(SYSTools.xx("qdvs.erzeuge.xml") + ": " + target.toString()));
 //        textListener.addLog(target.toString());
         mar.marshal(root, target);
     }

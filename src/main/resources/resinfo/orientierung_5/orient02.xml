@@ -36,7 +36,7 @@
         <option label="nicht vorhanden" name="3" tooltip="bi2.personen.selbst3"/>
     </optiongroup>
 
-    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"
+    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Ö̈rtliche Orientierung" tooltip="bi2.orte.erklaerung"
                  qdvs="Zeile(n) 31 im DAS Dokumentationsbogen."
                  tx="Verwendung bei Orientierung/Psyche: örtlich, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.orte.selbst0"/>

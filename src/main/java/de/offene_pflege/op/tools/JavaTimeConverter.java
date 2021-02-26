@@ -91,10 +91,25 @@ public class JavaTimeConverter {
     }
 
     public static LocalDate min(LocalDate a, LocalDate b) {
-        long la = a.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        long lb = b.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return min(a.atStartOfDay(), b.atStartOfDay()).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
 
-        return Instant.ofEpochMilli(Math.min(la, lb)).atZone(ZoneId.systemDefault()).toLocalDate();
+    public static LocalDate max(LocalDate a, LocalDate b) {
+        return max(a.atStartOfDay(), b.atStartOfDay()).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    public static LocalDateTime min(LocalDateTime a, LocalDateTime b) {
+        long la = a.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long lb = b.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        return Instant.ofEpochMilli(Math.min(la, lb)).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static LocalDateTime max(LocalDateTime a, LocalDateTime b) {
+        long la = a.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long lb = b.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        return Instant.ofEpochMilli(Math.max(la, lb)).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     public static String parseDateIfPossible(String value, FormatStyle style) {

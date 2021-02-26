@@ -11,9 +11,10 @@ equivalence-id: 27
 MODE_INTERVAL_BYSECOND = 0
 TYPE_DIABETES = 98
 -->
-<resinfotype>
+<resinfotype tx="true" qpr="true">
     <imagelabel image="/artwork/48x48/diabetes.png"/>
     <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 16."/>
+    <qdvs tooltip="Wird bei der Auswertung zur QDVS herangezogen."/>
     <textfield name="description" label="Diabetes" length="30" hfill="false"/>
     <optiongroup name="application" label="Verabreichung per">
         <option label="nicht insulinpflichtig" name="none" default="true"/>
