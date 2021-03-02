@@ -63,15 +63,14 @@ public class JavaTimeConverter {
     }
 
     public static XMLGregorianCalendar toXMLGregorianCalendar(LocalDateTime ldt) {
-        return toXMLGregorianCalendar(GregorianCalendar.from(ldt.atZone(ZoneId.systemDefault())));
-    }
-
-    public static XMLGregorianCalendar toXMLGregorianCalendar(LocalDate localDate) {
-        XMLGregorianCalendar x = toXMLGregorianCalendar(localDate.atStartOfDay());
+        XMLGregorianCalendar x = toXMLGregorianCalendar(GregorianCalendar.from(ldt.atZone(ZoneId.systemDefault())));
         x.setTimezone(DatatypeConstants.FIELD_UNDEFINED);
         return x;
     }
 
+    public static XMLGregorianCalendar toXMLGregorianCalendar(LocalDate localDate) {
+        return toXMLGregorianCalendar(localDate.atStartOfDay());
+    }
 
     public static XMLGregorianCalendar toXMLGregorianCalendar(GregorianCalendar cal) {
         try {

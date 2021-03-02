@@ -407,37 +407,39 @@ public class QdvsService implements HasLogger {
         getLogger().debug(ResidentTools.getLabelText(resident) + " (" + NF_IDBEWOHNER.format(resident.getIdbewohner()) + ")");
         ResidentType residentType = of.createResidentType();
 
-        residentType.setQsData(of.createDasQsDataType());
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Allgemeine Angaben", 60)));
-        allgemeine_angaben(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", 60)));
-        krankenhaus(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Mobilität", 60)));
-        bi_modul1_mobilitaet(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", 60)));
-        bi_modul2_kognitiv_kommunikativ(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Selbstversorgung", 60)));
-        bi_modul4_selbstversorgung(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", 60)));
-        bi_modul6_alltag_soziales(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Dekubitus", 60)));
         try {
+
+            residentType.setQsData(of.createDasQsDataType());
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Allgemeine Angaben", 60)));
+            allgemeine_angaben(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", 60)));
+            krankenhaus(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Mobilität", 60)));
+            bi_modul1_mobilitaet(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", 60)));
+            bi_modul2_kognitiv_kommunikativ(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Selbstversorgung", 60)));
+            bi_modul4_selbstversorgung(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", 60)));
+            bi_modul6_alltag_soziales(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Dekubitus", 60)));
+
             dekubitus(residentType.getQsData(), resident);
-        } catch (Exception e){
+
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", 60)));
+            groesse_gewicht(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Sturz", 60)));
+            sturz(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Fixierung", 60)));
+            fixierung(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Schmerzen", 60)));
+            schmerzen(residentType.getQsData(), resident);
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Informationen zum Einzug", 60)));
+            einzug(residentType.getQsData(), resident);
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
         }
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", 60)));
-        groesse_gewicht(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Sturz", 60)));
-        sturz(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Fixierung", 60)));
-        fixierung(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Schmerzen", 60)));
-        schmerzen(residentType.getQsData(), resident);
-        getLogger().debug(String.format("===---%s---===", StringUtils.center("Informationen zum Einzug", 60)));
-        einzug(residentType.getQsData(), resident);
-
         getLogger().debug("====                                                            ====");
         getLogger().debug("====------------------------------------------------------------====");
         getLogger().debug("====================================================================");
@@ -823,26 +825,21 @@ public class QdvsService implements HasLogger {
         qsData.getGAKONTAKTPFLEGE().setValue(Integer.valueOf(ResInfoTools.getContent(sozial).getProperty("GAKONTAKTPFLEGE")));
     }
 
+    /**
+     * Hatte der Bewohner bzw. die Bewohnerin in der Zeit seit der letzten Ergebniserfassung einen Dekubitus?
+     * <p>
+     * Gemeint sind alle Dekubitalulcera, die in den vergangenen 6 Monaten beim Bewohner bzw. bei der Bewohnerin
+     * bestanden oder bis heute bestehen. Auch wenn der Zeitpunkt der Entstehung länger als 6 Monate zurückliegt, der
+     * Dekubitus aber noch nicht abgeheilt war, ist die Frage mit „ja“ zu beantworten und das Entstehungsdatum
+     * anzugeben.
+     * <p>
+     * Wenn es mehr als einen Dekubitus gab, dann werden davon maximal 2 übermittelt. Gab es mehr als zwei
+     * Dekubitusepisoden in den letzten 6 Monaten, sind die beiden zeitlich letzten zu berücksichtigen.
+     *
+     * @param qsData
+     * @param resident
+     */
     private void dekubitus(DasQsDataType qsData, Resident resident) {
-        /**
-         * Hatte der Bewohner bzw. die Bewohnerin in der Zeit seit der letzten Ergebniserfassung einen Dekubitus?
-         *
-         * Gemeint sind alle Dekubitalulcera, die in den vergangenen 6 Monaten beim Bewohner bzw. bei der Bewohnerin bestanden oder bis heute bestehen.
-         * Auch wenn der Zeitpunkt der Entstehung länger als 6 Monate zurückliegt, der Dekubitus aber noch nicht abgeheilt war,
-         * ist die Frage mit „ja“ zu beantworten und das Entstehungsdatum anzugeben.
-         *
-         * Wenn es mehr als einen Dekubitus gab, dann werden davon maximal 2 übermittelt. Ich nehme dann die schlimmsten zwei davon, also, die das höchste Stadium hatten und erst danach den aktuelleren von denen.
-         *
-         * Testdatensätze
-         *
-         * 4 Wunden. also eigentlich 5.
-         *
-         * 1. WOUND1 1.9.2020 - 5.9.2020 Stadium 1 - 5.9.2020 - 10.9.2020 Stadium 2 - 10.9.2020 - 20.9.2020 Stadium 3 - 20.9.2020 - 25.09.2020 Stadium 1 - ENDE
-         * 2. WOUND2 9.8.2020 - 20.8.2020 Stadium 2 - 20.8.2020 - 25.8.2020 Stadium 1 - ENDE PAUSE 30.8.2020 - 11.9.2020 Stadium 3 - 11.9.2020 - JETZT Stadium 2
-         * 3. WOUND3 15.7.2020 - 31.7.2020 KEIN DEKUBITUS
-         * 4. WOUND4 21.12.2020 - JETZT STADIUM 4
-         *
-         */
         // zuerst hole ich alle Wunden, die in dem besagten Zeitraum bestanden haben.
         ArrayList<ResInfo> liste_wunden = ResInfoTools.getAll(resident, ResInfoTypeTools.TYPE_ALL_WOUNDS, LETZTE_ERGEBNISERFASSUNG, STICHTAG);
 
@@ -867,7 +864,7 @@ public class QdvsService implements HasLogger {
         // Ende der Wunde (oder noch nicht beendet)
         // mich interessieren nur dekubitus einträge
         connectionIDs.forEach(aConnectionID -> {
-            ArrayList<ResInfo> wundverlauf = ResInfoTools.getAll(aConnectionID); // sind bereits nach startdatum sortiert
+            ArrayList<ResInfo> wundverlauf = ResInfoTools.getAll(aConnectionID);
 
             wundverlauf.forEach(resInfo -> {
                 Properties props = ResInfoTools.getContent(resInfo);
@@ -884,7 +881,7 @@ public class QdvsService implements HasLogger {
 
                     int max_epuap = Math.max(epuap, auswertung.getValue2());
                     LocalDateTime _beginn = JavaTimeConverter.min(beginn, auswertung.getValue3());
-                    LocalDateTime _ende = JavaTimeConverter.max(beginn, auswertung.getValue4());
+                    LocalDateTime _ende = JavaTimeConverter.max(ende, auswertung.getValue4());
 
                     auswertung_dekubitus.put(aConnectionID, Quintet.with(aConnectionID, dekubituslok, max_epuap, _beginn, _ende));
                 } else {
@@ -893,15 +890,17 @@ public class QdvsService implements HasLogger {
             });
         });
 
-        // hier stehen genau eine auswertung pro dekubitus drin. Jetzt umgekehrt nach beginn sortieren.
-        // sortiert nach maxgrad
-        ArrayList<Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> listDekubitus = new ArrayList<>(auswertung_dekubitus.values().stream().sorted(Comparator.comparing(Quintet::getValue2)).collect(Collectors.toList()));
-        // Aus dieser Liste nehme ich nun die ersten beiden Einträge, wenn es denn welche gibt.
+        // sortiere die Liste nach startdatum (zeitlich letzten) - (ConnectionID, entehungsort, grad, beginn - Value3, ende)
+        ArrayList<Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> listDekubitus = new ArrayList<>(auswertung_dekubitus.values().stream().sorted(Comparator.comparing(Quintet::getValue3)).collect(Collectors.toList()));
+        // danach drehe ich die Liste um und nehme mir die ersten beiden, falls vorhanden.
         Collections.reverse(listDekubitus);
+        // Aus dieser Liste nehme ich nun die ersten beiden Einträge, wenn es denn welche gibt.
         Optional<Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> optWunde1 = Optional.ofNullable(listDekubitus.size() >= 1 ? listDekubitus.get(0) : null);
         Optional<Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> optWunde2 = Optional.ofNullable(listDekubitus.size() > 1 ? listDekubitus.get(1) : null);
 
         // Formalitäten
+        /** 64 */qsData.setDEKUBITUS(of.createDasQsDataTypeDEKUBITUS());
+        /** 65 */qsData.setDEKUBITUSSTADIUM(of.createDasQsDataTypeDEKUBITUSSTADIUM());
         /** 66 */qsData.setDEKUBITUS1BEGINNDATUM(of.createDasQsDataTypeDEKUBITUS1BEGINNDATUM());
         /** 67 */qsData.setDEKUBITUS1ENDEDATUM(of.createDasQsDataTypeDEKUBITUS1ENDEDATUM());
         /** 68 */qsData.setDEKUBITUS1LOK(of.createDasQsDataTypeDEKUBITUS1LOK());
@@ -909,32 +908,35 @@ public class QdvsService implements HasLogger {
         /** 70 */qsData.setDEKUBITUS2ENDEDATUM(of.createDasQsDataTypeDEKUBITUS2ENDEDATUM());
         /** 71 */qsData.setDEKUBITUS2LOK(of.createDasQsDataTypeDEKUBITUS2LOK());
 
+        // Die Analyse der XML Auswertungen hat ergeben, dass wenn der maximale Wert für DEKUBITUS >1, dann werden alle Beginn- und Enddaten erwartet. Auch wenn eine von den beiden Wunden nicht über 1 hinausgekommen ist.
+        int maximales_dekubitus_stadium = optWunde1.isPresent() ? optWunde1.get().getValue2() : 0;
+        maximales_dekubitus_stadium = Math.max(maximales_dekubitus_stadium, optWunde2.isPresent() ? optWunde2.get().getValue2() : 0);
 
-        optWunde1.ifPresent(wunde1 -> {
-            qsData.getDEKUBITUS1BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde1.getValue3()));
-            // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
-            qsData.getDEKUBITUS1ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde1.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
-            qsData.getDEKUBITUS1LOK().setValue(wunde1.getValue1());
-        });
-        int maximales_dekubitus_stadium = optWunde1.isEmpty() ? 9 : optWunde1.get().getValue2(); // 9 wenn es keine wunde gab. wunde 1 ist immer die schlimmste
-
-        optWunde2.ifPresent(wunde1 -> {
-            qsData.getDEKUBITUS2BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde1.getValue3()));
-            // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
-            qsData.getDEKUBITUS2ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde1.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
-            qsData.getDEKUBITUS2LOK().setValue(wunde1.getValue1());
-        });
-
-        int dekubitus_schluessel = 0; // wenn kein dekubitus
+        int dekubitus_schluessel = 0; // wenn kein dekubitus vorhanden
         if (listDekubitus.size() == 1) dekubitus_schluessel = 1; // genau einer
         if (listDekubitus.size() > 1) dekubitus_schluessel = 2; // mehr als einer
-        /** 64 */qsData.setDEKUBITUS(of.createDasQsDataTypeDEKUBITUS());
-        qsData.getDEKUBITUS().setValue(dekubitus_schluessel);
 
-        /** 65 */qsData.setDEKUBITUSSTADIUM(of.createDasQsDataTypeDEKUBITUSSTADIUM());
+        if (maximales_dekubitus_stadium > 1) { // Zu Dekubitus in Kategorie/Stadium 1 sollen keine Datumsangaben gemacht werden.
+            optWunde1.ifPresent(wunde1 -> {
+                qsData.getDEKUBITUS1BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde1.getValue3()));
+                // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
+                qsData.getDEKUBITUS1ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde1.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
+                qsData.getDEKUBITUS1LOK().setValue(wunde1.getValue1());
+            });
+
+            optWunde2.ifPresent(wunde2 -> {
+                qsData.getDEKUBITUS2BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde2.getValue3()));
+                // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
+                qsData.getDEKUBITUS2ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde2.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
+                qsData.getDEKUBITUS2LOK().setValue(wunde2.getValue1());
+            });
+        }
+
         if (dekubitus_schluessel > 0) {
             qsData.getDEKUBITUSSTADIUM().setValue(maximales_dekubitus_stadium);
         }
+        qsData.getDEKUBITUS().setValue(dekubitus_schluessel);
+
     }
 
     private void groesse_gewicht(DasQsDataType qsData, Resident resident) {
