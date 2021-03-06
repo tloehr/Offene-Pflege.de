@@ -61,8 +61,8 @@ public class DlgEditResidentBaseData extends MyJDialog {
         lblGender.setText(SYSTools.xx("misc.msg.gender"));
 //        lblRoom.setText(SYSTools.xx("misc.msg.room"));
         lblStation.setText(SYSTools.xx("misc.msg.subdivision"));
-        lblPrimNurse1.setText(SYSTools.xx("misc.msg.primaryNurse") + " 1");
-        lblPrimNurse2.setText(SYSTools.xx("misc.msg.primaryNurse") + " 2");
+        lblPrimNurse1.setText(SYSTools.xx("misc.msg.bv") + " 1");
+        lblPrimNurse2.setText(SYSTools.xx("misc.msg.bv") + " 2");
         lblGP.setText(SYSTools.xx("misc.msg.gp"));
         rbMale.setText(SYSTools.xx("misc.msg.male"));
         rbFemale.setText(SYSTools.xx("misc.msg.female"));

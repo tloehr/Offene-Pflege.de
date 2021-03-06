@@ -553,7 +553,7 @@ public class NReportTools {
             if (resident.getPn1() == null) {
                 html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("opde.controlling.orga.bvactivities.nobv"))));
             } else {
-                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.primaryNurse")) + ": " + resident.getPn1().getFullname()));
+                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.bv")) + ": " + resident.getPn1().getFullname()));
             }
 
             if (listReports.isEmpty()) {

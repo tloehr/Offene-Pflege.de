@@ -26,7 +26,8 @@ public class DlgYesNo extends MyJDialog {
     private boolean editorMode;
 
     public DlgYesNo(String message, Icon icon, Closure actionBlock) {
-        super(false);
+        super(true);
+        setResizable(true);
         validator = null;
         editorMode = false;
         initComponents();
@@ -34,7 +35,8 @@ public class DlgYesNo extends MyJDialog {
         txtMessage.setText(SYSTools.toHTML("<div id=\"fonttext\">" + message + "</div>"));
         lblTitle.setText(null);
         lblIcon.setIcon(icon);
-        pack();
+
+//        pack();
 //        setVisible(true);
     }
 
@@ -48,7 +50,6 @@ public class DlgYesNo extends MyJDialog {
         super(true);
         setResizable(true);
         this.validator = validator;
-
 
         editorMode = true;
         initComponents();

@@ -359,7 +359,7 @@ public class AddBWWizard {
             result += "<ul>";
             result += "<li>" + ResidentTools.getFullName(resident) + "</li>";
             result += "<li>" + SYSTools.xx("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDob()) + "</li>";
-            result += "<li>" + SYSTools.xx("misc.msg.primaryNurse") + ": " + (resident.getPn1() == null ? SYSTools.xx("misc.msg.noentryyet") : resident.getPn1().getFullname()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.bv") + ": " + (resident.getPn1() == null ? SYSTools.xx("misc.msg.noentryyet") : resident.getPn1().getFullname()) + "</li>";
             result += "<li>" + SYSTools.xx("misc.msg.gp") + ": " + GPTools.getFullName(resident.getGp()) + "</li>";
 //            result += "<li>" + SYSTools.xx("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
 

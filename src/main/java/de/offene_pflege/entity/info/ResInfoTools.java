@@ -44,6 +44,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
 
+import static de.offene_pflege.services.qdvs.QdvsService.NF_IDBEWOHNER;
+
 /**
  * Created by IntelliJ IDEA. User: tloehr Date: 24.10.11 Time: 16:10 To change this template use File | Settings | File
  * Templates.
@@ -946,6 +948,10 @@ public class ResInfoTools implements HasLogger {
             }
         }
 
+        // MDK ID Bewohner
+        result += SYSConst.html_table_tr(SYSConst.html_table_td("misc.msg.resident.qdvs.id", "left", "top") +
+                        SYSConst.html_table_td(SYSConst.html_bold(NF_IDBEWOHNER.format(resident.getIdbewohner())), "left", "top")
+        );
 
         for (ResInfo resInfo : ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay().toDate(), SYSCalendar.midOfDay().toDate())) {
 //            Rooms rooms1 = getRoomFrom(resInfo);
@@ -1088,7 +1094,7 @@ public class ResInfoTools implements HasLogger {
         }
 
         if (resident.getPn1() != null) {
-            result += "<tr id=\"fonttext\"><td valign=\"top\">" + SYSTools.xx("misc.msg.primaryNurse") + "</td><td valign=\"top\">";
+            result += "<tr id=\"fonttext\"><td valign=\"top\">" + SYSTools.xx("misc.msg.bv") + "</td><td valign=\"top\">";
             result += resident.getPn1().getFullname();
             result += "</td></tr>";
         }

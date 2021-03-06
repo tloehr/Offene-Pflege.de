@@ -75,7 +75,7 @@ public class QdvsService implements HasLogger {
     private LocalDateTime ERHEBUNGSDATUM; // Gibt an, zu welchem Datum die ResInfos ausgewertet werden sollen. Das kann durchaus nach dem Stichtag sein, wenn Fehler korrigiert werden mussten.
 
     static final String SPECIFICATION = "V01"; // die Version der jeweilig eingereichten Datenstruktur, die zum Zeitpunkt der Verwendung gültig war.
-    static DecimalFormat NF_IDBEWOHNER = new DecimalFormat("000000");
+    public static DecimalFormat NF_IDBEWOHNER = new DecimalFormat("000000");
     private File target;
     int runningNumber = 0;
     int numResidents;
@@ -415,13 +415,13 @@ public class QdvsService implements HasLogger {
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", 60)));
             krankenhaus(residentType.getQsData(), resident);
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Mobilität", 60)));
-            bi_modul1_mobilitaet(residentType.getQsData(), resident);
+            mobilitaet(residentType.getQsData(), resident);
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", 60)));
-            bi_modul2_kognitiv_kommunikativ(residentType.getQsData(), resident);
+            kognitiv_kommunikativ(residentType.getQsData(), resident);
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Selbstversorgung", 60)));
-            bi_modul4_selbstversorgung(residentType.getQsData(), resident);
+            selbstversorgung(residentType.getQsData(), resident);
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", 60)));
-            bi_modul6_alltag_soziales(residentType.getQsData(), resident);
+            alltag_soziales(residentType.getQsData(), resident);
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Dekubitus", 60)));
 
             dekubitus(residentType.getQsData(), resident);
@@ -663,7 +663,7 @@ public class QdvsService implements HasLogger {
 
     }
 
-    private void bi_modul1_mobilitaet(DasQsDataType qsData, Resident resident) {
+    private void mobilitaet(DasQsDataType qsData, Resident resident) {
         // das nennen wir dann letzter_abfragezeitpunkt
         ResInfo mobil = ResInfoTools.getValidOnThatDayIfAny(resident, MOBIL, ERHEBUNGSDATUM).get();
 
@@ -689,7 +689,7 @@ public class QdvsService implements HasLogger {
 
     }
 
-    private void bi_modul2_kognitiv_kommunikativ(DasQsDataType qsData, Resident resident) {
+    private void kognitiv_kommunikativ(DasQsDataType qsData, Resident resident) {
         ResInfo orient = ResInfoTools.getValidOnThatDayIfAny(resident, ORIENT, ERHEBUNGSDATUM).get();
 
         // 30. Erkennen von Personen aus dem näheren Umfeld
@@ -738,7 +738,7 @@ public class QdvsService implements HasLogger {
 
     }
 
-    private void bi_modul4_selbstversorgung(DasQsDataType qsData, Resident resident) {
+    private void selbstversorgung(DasQsDataType qsData, Resident resident) {
         //╻┏ ╻ ╻┏━╸┏┓╻┏━┓╺┳╸╻  ╻┏━╸╻ ╻┏━╸   ┏━╸┏━┓┏┓╻┏━┓┏━╸╻ ╻┏━┓╻ ╻┏┓╻┏━╸
         //┣┻┓┃ ┃┣╸ ┃┗┫┗━┓ ┃ ┃  ┃┃  ┣━┫┣╸    ┣╸ ┣┳┛┃┗┫┣━┫┣╸ ┣━┫┣┳┛┃ ┃┃┗┫┃╺┓
         //╹ ╹┗━┛┗━╸╹ ╹┗━┛ ╹ ┗━╸╹┗━╸╹ ╹┗━╸   ┗━╸╹┗╸╹ ╹╹ ╹┗━╸╹ ╹╹┗╸┗━┛╹ ╹┗━┛
@@ -805,7 +805,7 @@ public class QdvsService implements HasLogger {
         qsData.getSVTRINKEN().setValue(Integer.valueOf(ResInfoTools.getContent(ern).getProperty("SVTRINKEN")));
     }
 
-    private void bi_modul6_alltag_soziales(DasQsDataType qsData, Resident resident) {
+    private void alltag_soziales(DasQsDataType qsData, Resident resident) {
         ResInfo alltag = ResInfoTools.getValidOnThatDayIfAny(resident, ALLTAG, ERHEBUNGSDATUM).get();
         ResInfo schlaf = ResInfoTools.getValidOnThatDayIfAny(resident, SCHLAF, ERHEBUNGSDATUM).get();
 
@@ -976,9 +976,12 @@ public class QdvsService implements HasLogger {
                     qsData.getKOERPERGEWICHTDOKU().add(kd);
                 }
             });
+            // Falls der Eintrag vorhanden, aber leer ist, dann wird auch das hier berücksichtigt.
             if (qsData.getKOERPERGEWICHTDOKU().isEmpty()) {
                 DasQsDataType.KOERPERGEWICHTDOKU kd = of.createDasQsDataTypeKOERPERGEWICHTDOKU();
+                kd.setValue(0);
                 qsData.getKOERPERGEWICHTDOKU().add(kd);
+                getLogger().debug("Eintrag vorhanden, aber nicht angekreuzt. Gilt als 0");
             }
         }
     }
@@ -1048,7 +1051,7 @@ public class QdvsService implements HasLogger {
     }
 
     private void fixierung(DasQsDataType qsData, Resident resident) {
-        // Frage 78 bzw. 80 beziehe ich auf die 4 Wochen.
+        // Frage 78 bzw. 80 beziehe ich auf die letzten 4 Wochen.
         // Frage 79 und 81 dann nur auf die letzte Woche
         // vom Support und VDAB kamen keine brauchabaren Antworten. Ist im Gesetz nicht genau dargelegt.
         int gurt_haeufigkeit = 10;
@@ -1057,10 +1060,10 @@ public class QdvsService implements HasLogger {
         boolean woche_ohne_gitter = false;
 
         for (int weekminus = 1; weekminus <= 4; weekminus++) {
-            // (gurt_anzahl, gurt_häufigkeit, bettgitter_anzahl, bettgitter_häufigkeit)
-            Pair<Integer, Integer> result = analyse_fixierung(resident, STICHTAG.minusWeeks(weekminus).toLocalDate());
+            // wie oft wurde in der genannten Woche mit Gurt oder Bettseitenteil fixiert ?
+            Pair<Integer, Integer> result = analyse_fixierung_innerhalb_einer_woche(resident, STICHTAG.minusWeeks(weekminus).toLocalDate());  // (gurt_häufigkeit, bettgitter_häufigkeit)
             gurt_haeufigkeit = Math.min(gurt_haeufigkeit, result.getLeft());
-            woche_ohne_gurte |= result.getLeft() == 10; // 10 steht für keine verwendung von fixierungen.
+            woche_ohne_gurte |= result.getLeft() == 10; // 10 steht für keine verwendung von fixierungen. Hat technische gründe, weil kleinere Zahlen im DAS Bogen für Häufiger stehen.
 
             gitter_haeufigkeit = Math.min(gitter_haeufigkeit, result.getRight());
             woche_ohne_gitter |= result.getRight() == 10; // 10 steht für keine verwendung von fixierungen.
@@ -1068,7 +1071,7 @@ public class QdvsService implements HasLogger {
 
 
         /** 78 */qsData.setGURT(of.createDasQsDataTypeGURT());
-        qsData.getGURT().setValue(gurt_haeufigkeit == 10 ? 0 : 1);
+        qsData.getGURT().setValue(gurt_haeufigkeit == 10 ? 0 : 1); // umwandlung der Häufigkeit auf eine JA/NEIN Antwort
         /** 79 */qsData.setGURTHAUFIGKEIT(of.createDasQsDataTypeGURTHAUFIGKEIT());
         if (gurt_haeufigkeit < 10) { // es gab also gurt fixierungen
             // das ist der kleineste Wert, der über die Wochen ermittelt wurde. Je kleiner, je häufiger.
@@ -1091,13 +1094,13 @@ public class QdvsService implements HasLogger {
      * ResInfoTypeTools.TYPE_FIXIERUNGPROTOKOLL.
      *
      * @param resident
-     * @param week     - irgendein Tag dieser Woche. Anfang und Ende des Zeitraums wird berechnet.
-     * @return ein Quartet bestehend aus (gurt_anzahl, gurt_häufigkeit, bettgitter_anzahl, bettgitter_häufigkeit).
+     * @param tag_in_der_woche - ein Tag in dieser Woche.
+     * @return ein Pair bestehend aus (gurt_häufigkeit, bettgitter_häufigkeit).
      * Häufigkeit ist dann: 10 = gar nicht, 2 = mehrmals wöchentlich // 3 = 1x wöchentlich
      */
-    private Pair<Integer, Integer> analyse_fixierung(Resident resident, LocalDate week) {
-        LocalDateTime start = week.with(DayOfWeek.MONDAY).atStartOfDay();
-        LocalDateTime end = week.with(DayOfWeek.SUNDAY).atTime(23, 59, 59);
+    private Pair<Integer, Integer> analyse_fixierung_innerhalb_einer_woche(Resident resident, LocalDate tag_in_der_woche) {
+        LocalDateTime start = tag_in_der_woche.with(DayOfWeek.MONDAY).atStartOfDay();
+        LocalDateTime end = tag_in_der_woche.with(DayOfWeek.SUNDAY).atTime(23, 59, 59);
 
         final Set<LocalDate> gurtList = new HashSet();
         final Set bettgitterList = new HashSet();
@@ -1115,7 +1118,7 @@ public class QdvsService implements HasLogger {
         int gurt = 0;
         int seitengitter = 0;
 
-        if (gurtList.isEmpty()) gurt = 10; // gar nicht
+        if (gurtList.isEmpty()) gurt = 10; // gar nicht. Nehme die 10, weil hier gilt, je kleiner desto häufiger.
         if (gurtList.size() == 1) gurt = 3; // 1x wöchentlich
         if (gurtList.size() > 1) gurt = 2; // mehrmals wöchentlich
         if (gurtList.size() == 7) gurt = 1; // täglich
@@ -1146,13 +1149,24 @@ public class QdvsService implements HasLogger {
 
         // Letzten Eintrag suchen
 
-        List<ResInfo> list_schmerz = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_PAIN), LETZTE_ERGEBNISERFASSUNG, STICHTAG);
-        List<ResInfo> list_besd = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BESD), LETZTE_ERGEBNISERFASSUNG, STICHTAG);
+        List<ResInfo> list_schmerz = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_PAIN), LETZTE_ERGEBNISERFASSUNG, STICHTAG); // DESC sortiert
+        List<ResInfo> list_besd = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BESD), LETZTE_ERGEBNISERFASSUNG, STICHTAG); // DESC sortiert
 
         Optional<ResInfo> letzter_schmerz = list_schmerz.stream().findFirst();
         Optional<ResInfo> letzter_besd = list_besd.stream().findFirst();
-        // falls es beide gibt (BESD UND SCHMERZ) macht das keinen Sinn. Dann nehme ich nur Schmerz
-        if (letzter_schmerz.isPresent()) { // bei einer NRS Angabe durch den BW selbst
+        
+        // falls es mehrere Einträge gibt, dann verwende ich immer den aktuelleren (also falls ein BESD und ein SCHMERZE2 vorliegt.
+        // einer von beiden muss mindestens da sein
+        boolean verwende_schmerze2_zur_auswertung;
+        if (letzter_besd.isPresent() && letzter_schmerz.isPresent()){ // sehr seltener Fall
+            verwende_schmerze2_zur_auswertung = letzter_besd.get().getFrom().compareTo(letzter_schmerz.get().getFrom()) < 0;
+        } else {
+            verwende_schmerze2_zur_auswertung = letzter_schmerz.isPresent();
+        }
+
+        // todo: muss getestet werden mit AU1
+
+        if (verwende_schmerze2_zur_auswertung) { // bei einer NRS Angabe durch den BW selbst
             Properties props = ResInfoTools.getContent(letzter_schmerz.get());
             int nrs = Integer.valueOf(props.getProperty("schmerzint"));
             boolean chronisch = props.getProperty("schmerztyp", "0").equalsIgnoreCase("1");
@@ -1169,12 +1183,12 @@ public class QdvsService implements HasLogger {
             SCHMERZEN = (nrs >= 4 && chronisch ? 1 : 0);
             SCHMERZFREI = props.getProperty("schmerzfrei", "false").equalsIgnoreCase("true") ? 1 : 0;
             pit = JavaTimeConverter.toJavaLocalDateTime(letzter_schmerz.get().getFrom()).toLocalDate();
-        } else if (letzter_besd.isPresent()) { // Bei fremdbestimmter Ermittlung
+        } else { // Bei fremdbestimmter Ermittlung
             Properties props = ResInfoTools.getContent(letzter_besd.get());
             // Schmerzen hat er dann, wenn sie chronisch und die Rating ==1 sind.
-            int nrs = Integer.valueOf(props.getProperty("rating"));
+            int rating = Integer.valueOf(props.getProperty("rating"));
             boolean chronisch = props.getProperty("schmerztyp", "0").equalsIgnoreCase("1");
-            SCHMERZEN = (nrs >= 4 && chronisch ? 1 : 0);
+            SCHMERZEN = (rating >= 1 && chronisch ? 1 : 0);
             SCHMERZFREI = props.getProperty("schmerzfrei", "false").equalsIgnoreCase("true") ? 1 : 0;
             pit = JavaTimeConverter.toJavaLocalDateTime(letzter_besd.get().getFrom()).toLocalDate();
         }
