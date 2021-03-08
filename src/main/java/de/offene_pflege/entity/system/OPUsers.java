@@ -254,7 +254,7 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
 
     @Override
     public String toString() {
-        return getFullname() + " [" + uid + "]";
+        return getFullname() + (OPDE.isAnonym() ? "" : " [" + uid + "]");
     }
 
     public String getFullname() {

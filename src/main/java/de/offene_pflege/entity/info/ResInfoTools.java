@@ -834,7 +834,23 @@ public class ResInfoTools implements HasLogger {
                     html = SYSConst.html_italic("misc.msg.otherreasons") + SYSConst.html_paragraph(resInfo.getText());
                 }
             }
-        } else {
+        } else if (resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY) {
+            Properties content = getContent(resInfo);
+            boolean kzp = content.getProperty(ResInfoTypeTools.KZP_KEY, "false").equalsIgnoreCase("true");
+            boolean dead = content.getProperty(ResInfoTypeTools.STAY_KEY).equalsIgnoreCase(ResInfoTypeTools.STAY_VALUE_DEAD);
+            boolean left = content.getProperty(ResInfoTypeTools.STAY_KEY).equalsIgnoreCase(ResInfoTypeTools.STAY_VALUE_LEFT);
+            boolean ex_kzp = content.getProperty(ResInfoTypeTools.STAY_KEY).equalsIgnoreCase(ResInfoTypeTools.STAY_VALUE_NOW_PERMANENT);
+            boolean present = content.getProperty(ResInfoTypeTools.STAY_KEY).equals(ResInfoTypeTools.STAY_VALUE_PRESENT);
+
+            if (present) html = SYSConst.html_bold("nursingrecords.info.msg.stay");
+            if (dead) html = SYSConst.html_bold("nursingrecords.info.resident.died");
+            if (left) html = SYSConst.html_bold("nursingrecords.info.resident.movedout");
+            if (ex_kzp) html = SYSConst.html_bold("nursingrecords.info.msg.isPermanentNow");
+            if (!ex_kzp && kzp) html += SYSConst.html_paragraph("misc.msg.kzp");
+
+            return html;
+        }
+        else {
             html = parseResInfo(resInfo).render(new ResInfoHTMLRenderer());
         }
         return html;

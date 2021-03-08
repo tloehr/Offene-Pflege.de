@@ -46,7 +46,7 @@ public class RoomsService {
                 //            } else if (o instanceof Rooms) {
                 //                text = o.toString();
             } else {
-                text = o.toString();
+                text = toPrettyString((Rooms) o);
             }
             return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };

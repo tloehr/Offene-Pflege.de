@@ -18,32 +18,32 @@ public class MyJDialog extends JDialog {
     private JPanel content;
 
     public MyJDialog(boolean decorated) {
-        this(OPDE.getMainframe(), decorated);
+        this();
     }
+
+//    public MyJDialog() {
+//        this(true);
+//    }
+
+//    public MyJDialog(JFrame owner) {
+//        this(owner, true);
+//    }
 
     public MyJDialog() {
-        this(true);
-    }
-
-    public MyJDialog(JFrame owner) {
-        this(owner, true);
-    }
-
-    public MyJDialog(Dialog owner, boolean decorated) {
-        super(owner, true);
+        super(OPDE.getMainframe(), true);
         setLocationRelativeTo(getParent());
         initContent();
-        setResizable(false);
-        setUndecorated(!decorated);
+        setResizable(true);
+//        setUndecorated(!decorated);
     }
 
-    public MyJDialog(JFrame owner, boolean decorated) {
-        super(owner, true);
-        setLocationRelativeTo(getParent());
-        initContent();
-        setResizable(false);
-        setUndecorated(!decorated);
-    }
+//    public MyJDialog(JFrame owner, boolean decorated) {
+//        super(owner, true);
+//        setLocationRelativeTo(getParent());
+//        initContent();
+//        setResizable(false);
+//        setUndecorated(!decorated);
+//    }
 
     @Override
     public Dimension getPreferredSize() {
@@ -55,9 +55,9 @@ public class MyJDialog extends JDialog {
         return dim;
     }
 
-    public MyJDialog(Dialog owner) {
-        this(owner, true);
-    }
+//    public MyJDialog(Dialog owner) {
+//        this(owner, true);
+//    }
 
     private void initContent() {
         content = new JPanel();

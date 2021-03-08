@@ -1164,8 +1164,6 @@ public class QdvsService implements HasLogger {
             verwende_schmerze2_zur_auswertung = letzter_schmerz.isPresent();
         }
 
-        // todo: muss getestet werden mit AU1
-
         if (verwende_schmerze2_zur_auswertung) { // bei einer NRS Angabe durch den BW selbst
             Properties props = ResInfoTools.getContent(letzter_schmerz.get());
             int nrs = Integer.valueOf(props.getProperty("schmerzint"));
@@ -1227,8 +1225,6 @@ public class QdvsService implements HasLogger {
             DasQsDataType.SCHMERZEINSCHINFO infoleer = of.createDasQsDataTypeSCHMERZEINSCHINFO();
             qsData.getSCHMERZEINSCHINFO().add(infoleer);
         }
-
-
     }
 
     private void einzug(DasQsDataType qsData, Resident resident) {
@@ -1242,7 +1238,6 @@ public class QdvsService implements HasLogger {
         int NEUEINZUG = beginn_aktueller_aufenthalt.isAfter(LETZTE_ERGEBNISERFASSUNG.toLocalDate()) ? 1 : 0;
         qsData.getNEUEINZUG().setValue(NEUEINZUG);
 
-        //todo: dummy, muss ich noch richtig machen.
         /** 88 */qsData.setEINZUGNACHKZ(of.createDasQsDataTypeEINZUGNACHKZ());
         /** 89 */qsData.setEINZUGNACHKZDATUM(of.createDasQsDataTypeEINZUGNACHKZDATUM());
 

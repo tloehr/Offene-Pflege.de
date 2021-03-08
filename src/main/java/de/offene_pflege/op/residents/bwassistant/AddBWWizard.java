@@ -17,6 +17,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.RoomsService;
 import org.apache.commons.collections.Closure;
 import org.javatuples.Quartet;
 
@@ -165,7 +166,6 @@ public class AddBWWizard {
     }
 
     private class BasisInfoPage extends DefaultWizardPage {
-//        boolean alreadyexecute = false;
 
         public BasisInfoPage(String title, String description) {
             super(title, description);
@@ -364,7 +364,7 @@ public class AddBWWizard {
 //            result += "<li>" + SYSTools.xx("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
 
             result += "<li>" + SYSTools.xx("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(resinfo_hauf.getFrom()) + "</li>";
-            result += "<li>" + SYSTools.xx("misc.msg.room") + ": " + (resinfo_room == null ? SYSTools.xx("misc.msg.noentryyet") : ResInfoTools.getRoomFrom(resinfo_room).toString()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.room") + ": " + (resinfo_room == null ? SYSTools.xx("misc.msg.noentryyet") : RoomsService.toPrettyString(ResInfoTools.getRoomFrom(resinfo_room)) + "</li>");
             result += "<li>" + SYSTools.xx("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";
             if (ResInfoTools.isKZP(resinfo_hauf)) {
                 result += SYSConst.html_li(SYSConst.html_color(Color.RED, SYSTools.xx("misc.msg.kzp")));

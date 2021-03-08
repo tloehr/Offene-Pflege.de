@@ -43,10 +43,10 @@ public class PnlHAUF extends JPanel {
         lblRoom.setText(SYSTools.xx("misc.msg.room"));
         cbKZP.setText(SYSTools.xx("misc.msg.kzp"));
 
-
         cmbStation.setModel(StationService.getAll4Combobox(false));
 
         cmbRoom.setModel(SYSTools.list2cmb(RoomsService.getAllActive()));
+        cmbRoom.setRenderer(RoomsService.getRenderer());
         cmbRoom.setSelectedItem(null);
 
         jdcHAUF.setMaxSelectableDate(new Date());

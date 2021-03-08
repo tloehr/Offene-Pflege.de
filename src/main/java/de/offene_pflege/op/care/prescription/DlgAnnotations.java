@@ -33,7 +33,7 @@ public class DlgAnnotations extends MyJDialog {
     private final Closure actionEvent;
 
     public DlgAnnotations(Prescription prescription, Closure actionEvent) {
-        super(OPDE.getMainframe(), true);
+        super();
         this.prescription = prescription;
         this.actionEvent = actionEvent;
         setTitle(SYSTools.xx("nursingrecords.prescription.edit.annotations"));
