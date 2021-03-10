@@ -199,8 +199,8 @@ public class PnlAway extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, fill:default:grow, $lgap, fill:default, $lgap, default"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, fill:default:grow, $lgap, fill:default, $lgap, default"));
 
         //======== tab1 ========
         {
@@ -220,8 +220,8 @@ public class PnlAway extends JPanel {
                     //======== panel5 ========
                     {
                         panel5.setLayout(new FormLayout(
-                                "default:grow, default",
-                                "pref, $ugap, default, $lgap, fill:default:grow"));
+                            "default:grow, default",
+                            "pref, $ugap, default, $lgap, fill:default:grow"));
 
                         //---- cmbHospital ----
                         cmbHospital.setFont(new Font("Arial", Font.PLAIN, 14));

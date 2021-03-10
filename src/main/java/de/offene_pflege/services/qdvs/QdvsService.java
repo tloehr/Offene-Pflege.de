@@ -1095,8 +1095,8 @@ public class QdvsService implements HasLogger {
      *
      * @param resident
      * @param tag_in_der_woche - ein Tag in dieser Woche.
-     * @return ein Pair bestehend aus (gurt_häufigkeit, bettgitter_häufigkeit).
-     * Häufigkeit ist dann: 10 = gar nicht, 2 = mehrmals wöchentlich // 3 = 1x wöchentlich
+     * @return ein Pair bestehend aus (gurt_häufigkeit, bettgitter_häufigkeit). Häufigkeit ist dann: 10 = gar nicht, 2 =
+     * mehrmals wöchentlich // 3 = 1x wöchentlich
      */
     private Pair<Integer, Integer> analyse_fixierung_innerhalb_einer_woche(Resident resident, LocalDate tag_in_der_woche) {
         LocalDateTime start = tag_in_der_woche.with(DayOfWeek.MONDAY).atStartOfDay();
@@ -1154,11 +1154,11 @@ public class QdvsService implements HasLogger {
 
         Optional<ResInfo> letzter_schmerz = list_schmerz.stream().findFirst();
         Optional<ResInfo> letzter_besd = list_besd.stream().findFirst();
-        
+
         // falls es mehrere Einträge gibt, dann verwende ich immer den aktuelleren (also falls ein BESD und ein SCHMERZE2 vorliegt.
         // einer von beiden muss mindestens da sein
         boolean verwende_schmerze2_zur_auswertung;
-        if (letzter_besd.isPresent() && letzter_schmerz.isPresent()){ // sehr seltener Fall
+        if (letzter_besd.isPresent() && letzter_schmerz.isPresent()) { // sehr seltener Fall
             verwende_schmerze2_zur_auswertung = letzter_besd.get().getFrom().compareTo(letzter_schmerz.get().getFrom()) < 0;
         } else {
             verwende_schmerze2_zur_auswertung = letzter_schmerz.isPresent();

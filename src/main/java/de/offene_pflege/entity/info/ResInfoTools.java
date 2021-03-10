@@ -62,7 +62,8 @@ public class ResInfoTools implements HasLogger {
         props.put(ResInfoTypeTools.STAY_KEY, "");
         props.put(ResInfoTypeTools.KZP_KEY, kzp.toString());
         ResInfoTools.setContent(resInfo, props);
-//        resInfo.setHtml(SYSConst.html_ul((kzp ? SYSConst.html_li("misc.msg.kzp") : "")));
+
+
 
         return resInfo;
     }
@@ -598,7 +599,7 @@ public class ResInfoTools implements HasLogger {
                     html += resInfo.isClosed() ? "<br/>" + SYSConst.html_22x22_StopSign : "";
                     html += "</td>";
                     html += "<td valign=\"top\">" + getContentAsHTML(resInfo);
-                    html += !SYSTools.catchNull(resInfo.getText()).isEmpty() ? "<p>" + SYSTools.xx("misc.msg.comment") + ": " + resInfo.getText() + "</p>" : "";
+//                    html += !SYSTools.catchNull(resInfo.getText()).isEmpty() ? "<p>" + SYSTools.xx("misc.msg.comment") + ": " + resInfo.getText() + "</p>" : "";
                     html += "</td>";
                     html += "</tr>\n";
                 }
@@ -757,9 +758,7 @@ public class ResInfoTools implements HasLogger {
     }
 
     /**
-     * Ermittelt für eine ResInfo eine passende HTML Darstellung. Diese Methode wird nur bei einer Neueingabe oder
-     * Änderung verwendet. ResInfo Beans speichert die HTML Darstellung aus Performance Gründen kurz nach Ihrer
-     * Entstehung ab.
+     * Ermittelt für eine ResInfo eine passende HTML Darstellung.
      *
      * @param resInfo
      * @return
@@ -808,12 +807,9 @@ public class ResInfoTools implements HasLogger {
             qdvstags += Boolean.parseBoolean(content.getProperty("osteo", "false")) ? SYSConst.html_li("misc.msg.diag.cbosteo") : "";
             qdvstags += Boolean.parseBoolean(content.getProperty("ms", "false")) ? SYSConst.html_li("misc.msg.diag.cbms") : "";
 
-
             html += qdvstags.isEmpty() ? "" : "<h4>" + SYSTools.xx("misc.msg.diag.qdvstitle") + "</h4><ul>" + qdvstags + "</ul>";
         } else if (resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE && !resInfo.getResInfoType().isDeprecated()) { // die alten ABWE laufen gut mit dem normalen parser
             Properties content = getContent(resInfo);
-
-
             String strHospital = "";
             String khid = content.getProperty("khid", "null");
             if (!khid.equalsIgnoreCase("null")) {
@@ -846,13 +842,28 @@ public class ResInfoTools implements HasLogger {
             if (dead) html = SYSConst.html_bold("nursingrecords.info.resident.died");
             if (left) html = SYSConst.html_bold("nursingrecords.info.resident.movedout");
             if (ex_kzp) html = SYSConst.html_bold("nursingrecords.info.msg.isPermanentNow");
-            if (!ex_kzp && kzp) html += SYSConst.html_paragraph("misc.msg.kzp");
+            if (!ex_kzp && kzp) html = SYSConst.html_paragraph("misc.msg.kzp");
+            
+        } else if (resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ROOM) {
+            Properties content = getContent(resInfo);
+            long rid1 = Long.parseLong(SYSTools.catchNull(content.getProperty("room.id"), "-1"));
+            Optional<Rooms> room = Optional.ofNullable(EntityTools.find(Rooms.class, rid1));
+            html = SYSConst.html_bold("misc.msg.room") + ": ";
 
-            return html;
-        }
-        else {
+            if (room.isPresent()) html += RoomsService.toPrettyString(room.get());
+            else html += "keins";
+            
+        } else {
             html = parseResInfo(resInfo).render(new ResInfoHTMLRenderer());
         }
+
+
+        String text = SYSTools.catchNull(resInfo.getText());
+        if (!text.isEmpty()){
+             html += SYSConst.html_h3("misc.msg.comment");
+             html += SYSConst.html_paragraph(text);
+        }
+
         return html;
     }
 

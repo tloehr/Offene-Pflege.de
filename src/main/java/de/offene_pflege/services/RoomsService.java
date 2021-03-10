@@ -43,8 +43,6 @@ public class RoomsService {
             String text;
             if (o == null) {
                 text = SYSTools.xx("misc.commands.>>noselection<<");
-                //            } else if (o instanceof Rooms) {
-                //                text = o.toString();
             } else {
                 text = toPrettyString((Rooms) o);
             }
@@ -145,4 +143,5 @@ public class RoomsService {
     public static String toPrettyString(Rooms rooms) {
         return SYSTools.xx("misc.msg.room") + " " + rooms.getText() + ", " + rooms.getFloor().getName() + ", " + rooms.getFloor().getHome().getName();
     }
+
 }

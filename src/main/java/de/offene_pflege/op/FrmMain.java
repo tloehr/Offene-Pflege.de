@@ -41,7 +41,6 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideSplitPane;
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.info.*;
 import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.system.SYSLoginTools;
@@ -67,6 +66,7 @@ import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.op.users.PnlUser;
 import de.offene_pflege.op.welcome.PnlWelcome;
+import de.offene_pflege.services.StationService;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -303,6 +303,16 @@ public class FrmMain extends JFrame {
     public void removeBesonderheitKZP(final Resident resident) {
         synchronized (markierung_fuer_bewohner) {
             markierung_fuer_bewohner.get(TYPE_BESONDERHEIT_KURZZEITPFLEGE).remove(resident);
+        }
+        synchronized (iconPanels) {
+            setIconPanel(iconPanels.get(resident), resident);
+        }
+        SwingUtilities.invokeLater(() -> iconPanels.get(resident).repaint());
+    }
+
+    public void addBesonderheitKZP(final Resident resident) {
+        synchronized (markierung_fuer_bewohner) {
+            markierung_fuer_bewohner.get(TYPE_BESONDERHEIT_KURZZEITPFLEGE).add(resident);
         }
         synchronized (iconPanels) {
             setIconPanel(iconPanels.get(resident), resident);
@@ -912,23 +922,23 @@ public class FrmMain extends JFrame {
     }
 
     public void setBlockedTransparent(boolean blocked) {
-            if (blocked) {
+        if (blocked) {
 
-                JPanel glass = new JPanel();
-                glass.addMouseListener(new MouseAdapter() {
-                });
-                glass.addMouseMotionListener(new MouseMotionAdapter() {
-                });
-                glass.addKeyListener(new KeyAdapter() {
-                });
-                glass.setOpaque(false);
-                setGlassPane(glass);
-                getGlassPane().setVisible(true);
-            } else {
-                getGlassPane().setVisible(false);
-                setGlassPane(new JPanel());
-            }
+            JPanel glass = new JPanel();
+            glass.addMouseListener(new MouseAdapter() {
+            });
+            glass.addMouseMotionListener(new MouseMotionAdapter() {
+            });
+            glass.addKeyListener(new KeyAdapter() {
+            });
+            glass.setOpaque(false);
+            setGlassPane(glass);
+            getGlassPane().setVisible(true);
+        } else {
+            getGlassPane().setVisible(false);
+            setGlassPane(new JPanel());
         }
+    }
 
 //    public Point getLocationForDialog(Dimension dimOfDialog) {
 //        Point point = new Point((getSize().width - dimOfDialog.width) / 2, pnlMainMessage.getHeight() + 10);

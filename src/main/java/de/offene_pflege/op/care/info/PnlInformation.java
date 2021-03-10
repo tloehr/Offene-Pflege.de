@@ -42,7 +42,6 @@ import de.offene_pflege.op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.javatuples.Quartet;
-import org.javatuples.Triplet;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
@@ -1219,7 +1218,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         cptitle.getRight().add(btnMenu);
 //        btnMenu.setPanelEnabled(normalInfoType);
 
-
+        // CONTENT
         CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
@@ -1600,6 +1599,61 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
             }
         }
 
+        if (OPDE.isAdmin() && resInfo.isActive() && resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY && resInfo.getConnectionid() == 0l) {
+            /***
+             *      _____                 _        _  __ _________
+             *     |_   _|__   __ _  __ _| | ___  | |/ /|__  /  _ \
+             *       | |/ _ \ / _` |/ _` | |/ _ \ | ' /   / /| |_) |
+             *       | | (_) | (_| | (_| | |  __/ | . \  / /_|  __/
+             *       |_|\___/ \__, |\__, |_|\___| |_|\_\/____|_|
+             *                |___/ |___/
+             */
+            final JButton btnToggleKZP = GUITools.createHyperlinkButton("nursingrecords.info.btnToggleKZP.tooltip", SYSConst.findIcon(SYSConst.icon22kzp), null);
+            btnToggleKZP.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnToggleKZP.addActionListener(actionEvent -> {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    ResInfo editinfo = em.merge(resInfo);
+
+                    Properties content = ResInfoTools.getContent(resInfo);
+                    boolean kzp = content.getProperty("kzp", "false").equalsIgnoreCase("true");
+                    content.setProperty("kzp", Boolean.toString(!kzp)); // toggle kzp
+                    ResInfoTools.setContent(editinfo, content);
+                    
+                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                    em.lock(editinfo, LockModeType.OPTIMISTIC);
+
+                    em.getTransaction().commit();
+
+                    switchResident(resident);
+
+                    if (kzp) OPDE.getMainframe().addBesonderheitKZP(resident);
+                    else OPDE.getMainframe().removeBesonderheitKZP(resident);
+                    
+                } catch (OptimisticLockException ole) {
+                    OPDE.warn(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
+                    currentEditor = null;
+                }
+            });
+            pnlMenu.add(btnToggleKZP);
+        }
+
         /**
          *
          *
@@ -1767,7 +1821,9 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
          */
         final JButton btnTAGs = GUITools.createHyperlinkButton("misc.msg.editTags", SYSConst.icon22tagPurple, null);
         btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnTAGs.addActionListener(actionEvent -> {
+        btnTAGs.addActionListener(actionEvent ->
+
+        {
             final JidePopup popup = new JidePopup();
 
             final JPanel pnl = new JPanel(new BorderLayout(5, 5));
@@ -1847,9 +1903,13 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         pnlMenu.add(btnTAGs);
 
 
-        pnlMenu.add(new JSeparator());
+        pnlMenu.add(new
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+                JSeparator());
+
+        if (OPDE.getAppInfo().
+
+                isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *      _     _         _____ _ _
              *     | |__ | |_ _ __ |  ___(_) | ___  ___
@@ -2073,13 +2133,18 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             Wenn die KZP endet und der BW dann für immer bleibt, endet die bestehende HAUF (die mit KZP=TRUE) und eine neue HAUF wird nahtlos
                             angehangen. Dann mit KZP = FALSE UND STAY=""
                             Bei der alten HAUF wird STAY=ResInfoTypeTools.STAY_VALUE_NOW_PERMANENT gesetzt.
+
+                            Damit die KZP und die darauffolgende DAUERHAFTE STAY zusammenbleibt erhält STAY nur in diesem Sonderfall eine ConnectionID.
+                            Sonst bleibt die auf 0.
+
                              */
 
                             ResInfo bwinfo_kzp_hauf = em.merge(ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY)));
                             if (datum_des_dauerhaften_verbleibs.after(bwinfo_kzp_hauf.getFrom())) {
 
-
                                 ResInfo bwinfo_hauf_nach_kzp = em.merge(ResInfoTools.createStayResInfo(resident, datum_des_dauerhaften_verbleibs, false));
+                                ResInfoTools.setConnectionId(em, bwinfo_kzp_hauf);
+                                bwinfo_hauf_nach_kzp.setConnectionid(bwinfo_kzp_hauf.getConnectionid()); // Verbindung zwischen KZP und dem neuen STAY herstellen.
 
                                 // Bei dem alten den STAY ändern und die Props zurückschreiben
                                 Properties kzp_props = ResInfoTools.getContent(bwinfo_kzp_hauf);
@@ -2175,7 +2240,8 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
 
                             Resident myResident = em.merge(resident);
                             myResident.setStation(station);
-                            em.merge(ResInfoTools.createStayResInfo(myResident, stay, isKZP));
+                            ResInfo newStay = em.merge(ResInfoTools.createStayResInfo(myResident, stay, isKZP));
+//                            ResInfoTools.setConnectionId(em, newStay);
 
                             if (room != null) {
                                 ResInfo resinfo_room = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident));
