@@ -214,7 +214,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DateTimeType } todo: https://stackoverflow.com/questions/13568543/how-do-you-specify-the-date-format-used-when-jaxb-marshals-xsddatetime
+     * Create an instance of {@link DateTimeType }  https://stackoverflow.com/questions/13568543/how-do-you-specify-the-date-format-used-when-jaxb-marshals-xsddatetime
      */
     public DateTimeType createDateTimeType(LocalDateTime ldt) {
         DateTimeType dateTimeType = new DateTimeType();

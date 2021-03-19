@@ -441,7 +441,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
                     content.setProperty("requested", "false");
                     content.setProperty("grade", result);
 
-                    ResInfo newInfo = em.merge(ResInfoTools.createResInfo(ninsurance, resident));
+                    ResInfo newInfo = em.merge(ResInfoTools.createResInfo(ninsurance, resident, OPDE.getLogin().getUser()));
                     newInfo.setText(oldinfo.getText());
                     ResInfoTools.setContent(newInfo, content);
 //                    newInfo.setHtml(ResInfoTools.getContentAsHTML(newInfo));
@@ -599,7 +599,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
                     content.setProperty("GAINTERAKTION", "0");
                     content.setProperty("GAKONTAKTPFLEGE", "0");
 
-                    ResInfo newInfo = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_SOZIALES), resident));
+                    ResInfo newInfo = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_SOZIALES), resident, OPDE.getLogin().getUser()));
                     newInfo.setText(oldinfo.getText());
                     ResInfoTools.setContent(newInfo, content);
 //                    newInfo.setHtml(ResInfoTools.getContentAsHTML(newInfo));

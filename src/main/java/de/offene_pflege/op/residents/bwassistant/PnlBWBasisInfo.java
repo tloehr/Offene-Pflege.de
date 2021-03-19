@@ -73,7 +73,7 @@ public class PnlBWBasisInfo extends JPanel {
             if (query.getResultList().size() > 0) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.admin.bw.wizard.page2.alreadyexists"), DisplayMessage.WARNING));
             } else {
-                resident = ResidentTools.createResident(em, nachname, vorname, geschlecht, gebdatum);
+                resident = ResidentTools.createResident(nachname, vorname, geschlecht, gebdatum, OPDE.getLogin().getUser(), OPDE.isCalcMediUPR1());
                 OPDE.getDisplayManager().clearSubMessages();
             }
             em.close();

@@ -149,7 +149,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG))
             LETZTE_ERFASSUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG)).toLocalDate();
         else
-            LETZTE_ERFASSUNG = STICHTAG.minusMonths(6);
+            LETZTE_ERFASSUNG = STICHTAG.minusDays(186); // Es gibt Plausibilitätsregeln, die eine 186 Tage Regel streng befolgen.
 
         if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_ERHEBUNG))
             ERHEBUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG)).toLocalDate();
@@ -195,25 +195,36 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             liste_bewohner.forEach(resident -> map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()).setType(TreeInfoNode.RESIDENT_GREEN));
 
             Map<Resident, ArrayList<String>> fehlerMapFuerLogfile = new HashMap<>();
+            ArrayList<String> systemFehlerListe = new ArrayList<>();
 
             // Das hier matched die ERRORS (zeile, spalte des fehlers - closing tag) zu den Bewohnern (ebenfalls zeile, spalte des closing tags)
             ERRORS.forEach((multiKey, strings) -> {
-                long idbewohner = LOOKUP.get(multiKey);
-                strings.forEach(s -> {
-                    String regel = s;
-                    if (REGELN.containsKey(s)) {
-                        regel = REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text();
-                    }
-                    map_zur_zuordnung_der_fehler.get(idbewohner).add(new TreeInfoNode(regel, TreeInfoNode.SELF_FOUND_ERROR));
-                    Resident resident = ((Resident) map_zur_zuordnung_der_fehler.get(idbewohner).getUserObject());
-                    fehlerMapFuerLogfile.putIfAbsent(resident, new ArrayList<>());
-                    fehlerMapFuerLogfile.get(resident).add(regel);
-                    // icon auf gelb
-                    map_zur_zuordnung_der_fehler.get(idbewohner).setType(TreeInfoNode.RESIDENT_YELLOW);
-                });
+                if (LOOKUP.containsKey(multiKey)) {
+                    long idbewohner = LOOKUP.get(multiKey);
+                    strings.forEach(s -> {
+                        String regel = s;
+                        if (REGELN.containsKey(s)) {
+                            regel = REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text();
+                        }
+                        map_zur_zuordnung_der_fehler.get(idbewohner).add(new TreeInfoNode(regel, TreeInfoNode.SELF_FOUND_ERROR));
+                        Resident resident = ((Resident) map_zur_zuordnung_der_fehler.get(idbewohner).getUserObject());
+                        fehlerMapFuerLogfile.putIfAbsent(resident, new ArrayList<>());
+                        fehlerMapFuerLogfile.get(resident).add(regel);
+                        // icon auf gelb
+                        map_zur_zuordnung_der_fehler.get(idbewohner).setType(TreeInfoNode.RESIDENT_YELLOW);
+                    });
+                } else { // Fehler, die nicht einem einzelnen BW zugeordnet werden
+                    strings.forEach(s -> {
+                        if (REGELN.containsKey(s)) {
+                            systemFehlerListe.add(REGELN.get(s).getRule_id() + ": " + REGELN.get(s).getRule_text());
+                        } else {
+                            systemFehlerListe.add(s);
+                        }
+                    });
+                }
             });
 
-            // Schreibt die Fehler in das Logfile
+            // Schreibt die BW Fehler in das Logfile
             if (!fehlerMapFuerLogfile.isEmpty()) {
                 addLog(SYSConst.html_h2("qdvs.plausibilitaet.auffellig"));
 
@@ -223,7 +234,11 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                     strings.forEach(s -> s2.append(SYSConst.html_li(s)));
                     addLog(SYSConst.html_ul(s2.toString()));
                 });
-                
+            }
+
+            if (!systemFehlerListe.isEmpty()) {
+                addLog(SYSConst.html_h2("qdvs.system.fehler"));
+                systemFehlerListe.forEach(s -> addLog(SYSConst.html_ul(s.toString())));
             }
 
         } else {
@@ -518,7 +533,6 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         QSData struktur = new QSData();
         reader.setContentHandler(struktur);
         reader.parse(new InputSource(source.getSystemId()));
-
 
         return struktur.getLookup();
     }

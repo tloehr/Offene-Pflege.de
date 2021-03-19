@@ -102,7 +102,7 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
 
     public OPUsers() {
         uid = null;
-        groups = new ArrayList<OPGroups>();
+        groups = new ArrayList<>();
         userstatus = UsersTools.STATUS_ACTIVE;
         mailConfirmed = UsersTools.MAIL_UNCONFIRMED;
         cipherid = 12;  //todo: berechnen

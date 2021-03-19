@@ -32,6 +32,10 @@ public class JavaTimeConverter {
         return new Date(ldt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
     }
 
+    public static Date toDate(String iso8601){
+        return toDate(from_iso8601(iso8601));
+    }
+
     public static Period between(Date one, Date two) {
         return Period.between(toJavaLocalDateTime(one).toLocalDate(), toJavaLocalDateTime(two).toLocalDate());
     }

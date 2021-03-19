@@ -39,9 +39,12 @@ import de.offene_pflege.op.tools.SYSTools;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author tloehr
@@ -425,16 +428,9 @@ public class ResInfo implements Serializable, QProcessElement, Comparable<ResInf
     @Override
     public String toString() {
         return "ResInfo{" +
-                "bwinfoid=" + bwinfoid +
-                ", from=" + from +
-                ", to=" + to +
                 ", bwinfotyp=" + bwinfotyp.getID() +
-                ", properties=" +properties+
-                ", userON=" + userON +
-                ", userOFF=" + userOFF +
-                ", resident=" + resident +
-                ", attachedFilesConnections=" + attachedFilesConnections.size() +
-                ", attachedProcessConnections=" + attachedProcessConnections.size() +
+                ", from=" + SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.GERMANY).format(from) +
+                ", to=" + SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, Locale.GERMANY).format(to) +
                 '}';
     }
 

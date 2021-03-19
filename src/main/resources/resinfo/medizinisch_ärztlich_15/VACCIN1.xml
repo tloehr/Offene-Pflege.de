@@ -1,5 +1,6 @@
-<resinfotype>
+<resinfotype intervalmode="3">
     <combobox label="word.vaccine" name="vaccinetype">
+        <item label="Covid19" name="14"/>
         <item label="Diphterie" name="0"/>
         <item label="HPV (Humane Papillomviren)" name="1"/>
         <item label="Hepatitis B" name="2"/>
@@ -17,13 +18,15 @@
         <item label="Varizellen" name="13"/>
     </combobox>
 
+    <datefield label="Datum der Impfung" name="vdate" default="now"/>
+
     <optiongroup name="type" label="Art der Impfung">
-        <option label="Grundimmunisierung 1" name="g1" default="true"/>
+        <option label="Grundimmunisierung 1" name="g1"/>
         <option label="Grundimmunisierung 2" name="g2"/>
         <option label="Grundimmunisierung 3" name="g3"/>
         <option label="Grundimmunisierung 4" name="g4"/>
         <option label="Auffrischimpfung" name="a" layout="br tab"/>
-        <option label="Standardimpfung" name="s"/>
+        <option label="Standardimpfung" name="s" default="true"/>
         <option label="Nachholimpfung" name="n"/>
     </optiongroup>
 </resinfotype>

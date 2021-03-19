@@ -19,12 +19,12 @@ import de.offene_pflege.entity.prescription.HospitalTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
 import de.offene_pflege.entity.values.Resvaluetypes;
-import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.services.RoomsService;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
@@ -178,7 +178,7 @@ public class PnlEditResInfo implements HasLogger {
      */
     public PnlEditResInfo(String xml, Closure closure) {
         aktuelle_phase = PHASE_AUFBAU;
-        this.resInfo = ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FOOD), ResidentTools.getAllActive().get(1)); // irgendwelche zufalls werte für den DEV Mode
+        this.resInfo = ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FOOD), ResidentTools.getAllActive().get(1), OPDE.getLogin().getUser()); // irgendwelche zufalls werte für den DEV Mode
         this.closure = closure;
         this.mode = NEW;
         try {
@@ -880,6 +880,7 @@ public class PnlEditResInfo implements HasLogger {
     }
 
     private class DateExComboboxListener implements ItemListener {
+        //datefield
         public void itemStateChanged(ItemEvent evt) {
             if (aktuelle_phase == PHASE_AUFBAU) return;
             if (evt.getStateChange() != ItemEvent.SELECTED) return;
@@ -1261,11 +1262,15 @@ public class PnlEditResInfo implements HasLogger {
                 date_component.addItemListener(new DateExComboboxListener());
                 createComponent(outerpanel, date_component, attributes);
 
+                if (SYSTools.catchNull(attributes.getValue("default")).equals("now")) {
+                    date_component.setDate(new Date());
+                }
+
                 // für den späteren Direktzugriff
                 components.put(groupname, date_component);
 
                 // default content setzen
-                content.put(groupname, (date_component.getDate() == null ? "" : JavaTimeConverter.toXMLGregorianCalendar(date_component.getDate())));
+                content.put(groupname, (date_component.getDate() == null ? "" : JavaTimeConverter.to_iso8601(date_component.getDate())));
             }
 
 

@@ -56,6 +56,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 
@@ -450,7 +451,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                     if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
                                         final JideButton btnAdd = GUITools.createHyperlinkButton("nursingrecords.info.noconstraints", SYSConst.icon22add, null);
                                         btnAdd.addActionListener(e -> {
-                                            currentEditor = new DlgDiag(ResInfoTools.createResInfo(resInfoType, resident), o -> {
+                                            currentEditor = new DlgDiag(ResInfoTools.createResInfo(resInfoType, resident, OPDE.getLogin().getUser()), o -> {
                                                 if (o != null) {
                                                     EntityManager em = OPDE.createEM();
                                                     try {
@@ -528,7 +529,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                         btnAdd.addActionListener(e -> {
                                             // https://github.com/tloehr/Offene-Pflege.de/issues/35
                                             final MyJDialog dlgPopup = new MyJDialog(true);
-                                            PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(ResInfoTools.createResInfo(resInfoType, resident), o -> {
+                                            PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(ResInfoTools.createResInfo(resInfoType, resident, OPDE.getLogin().getUser()), o -> {
                                                 dlgPopup.dispose();
                                                 if (o != null) {
 
@@ -865,7 +866,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo)  && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             cptitle.getRight().add(btnProcess);
         }
 
@@ -1183,7 +1184,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         });
 
         // Only active ones can be edited, and only by the same user that started it or the admin.
-        btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
+        btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && (OPDE.isAdmin() ||
                 (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new LocalDate(resInfo.getFrom()).equals(new LocalDate()))  // The same user only on the same day.
         ));
 
@@ -1595,7 +1596,6 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     });
                     pnlMenu.add(btnDelete);
                 }
-
             }
         }
 
@@ -1620,7 +1620,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     boolean kzp = content.getProperty("kzp", "false").equalsIgnoreCase("true");
                     content.setProperty("kzp", Boolean.toString(!kzp)); // toggle kzp
                     ResInfoTools.setContent(editinfo, content);
-                    
+
                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                     em.lock(editinfo, LockModeType.OPTIMISTIC);
 
@@ -1630,7 +1630,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
 
                     if (kzp) OPDE.getMainframe().addBesonderheitKZP(resident);
                     else OPDE.getMainframe().removeBesonderheitKZP(resident);
-                    
+
                 } catch (OptimisticLockException ole) {
                     OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {
@@ -1657,159 +1657,158 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         /**
          *
          *
-         *              *      ____           _           _
-         *              *     |  _ \ ___ _ __(_) ___   __| |
-         *              *     | |_) / _ \ '__| |/ _ \ / _` |
-         *              *     |  __/  __/ |  | | (_) | (_| |
-         *              *     |_|   \___|_|  |_|\___/ \__,_|
-         *              *
-         * Die Periods nehme ich erstmal raus. Besonders durch die QDVS Wund Analyse braucht man hier eine Kontinuität.
-         * Dieser Editor muss überarbeitet werden.
-
-         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-
-         final JButton btnChangePeriod = GUITools.createHyperlinkButton("nursingrecords.info.btnChangePeriod.tooltip", SYSConst.icon22changePeriod, null);
-         btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
-         btnChangePeriod.addActionListener(actionEvent -> {
-         if (resInfo.isSingleIncident()) {
-         final JidePopup popup = new JidePopup();
-         PnlPIT pnlPIT = new PnlPIT(new DateTime(resInfo.getFrom()), null, null, o -> {
-         popup.hidePopup();
-         if (o != null) {
-         EntityManager em = OPDE.createEM();
-         try {
-         em.getTransaction().begin();
-         ResInfo editinfo = em.merge(resInfo);
-         em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-         em.lock(editinfo, LockModeType.OPTIMISTIC);
-         DateTime date = (DateTime) o;
-         ResInfoTools.setFrom(editinfo, date.toDate());
-         ResInfoTools.setTo(editinfo, date.toDate());
-         em.getTransaction().commit();
-
-         synchronized (mapType2ResInfos) {
-         int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
-         mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
-         mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
-         }
-         synchronized (listAllInfos) {
-         listAllInfos.remove(resInfo);
-         listAllInfos.add(editinfo);
-         }
-         synchronized (mapKey2CP) {
-         mapKey2CP.remove(keyResInfo);
-         }
-         sortData();
-         reloadDisplay();
-         if (editinfo.getResInfoType().isAlertType() || editinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE) {
-         GUITools.setResidentDisplay(resident);
-         if (editinfo.isClosed()) {
-         OPDE.getMainframe().removeBesonderheit(editinfo.getResInfoType(), resident);
-         } else {
-         OPDE.getMainframe().addBesonderheit(editinfo.getResInfoType(), resident);
-         }
-         }
-         } catch (OptimisticLockException ole) {
-         OPDE.warn(ole);
-         if (em.getTransaction().isActive()) {
-         em.getTransaction().rollback();
-         }
-         if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-         OPDE.getMainframe().emptyFrame();
-         OPDE.getMainframe().afterLogin();
-         }
-         OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-         } catch (Exception e) {
-         if (em.getTransaction().isActive()) {
-         em.getTransaction().rollback();
-         }
-         OPDE.fatal(e);
-         } finally {
-         em.close();
-         }
-         }
-         });
-         popup.setMovable(false);
-         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-
-         popup.setOwner(pnlMenu);
-         popup.removeExcludedComponent(pnlMenu);
-         popup.getContentPane().add(pnlPIT);
-         popup.setDefaultFocusComponent(pnlPIT);
-         GUITools.showPopup(popup, SwingConstants.WEST);
-         } else {
-         final JidePopup popup = new JidePopup();
-         Pair<Date, Date> expansion = ResInfoTools.getMinMaxExpansion(resInfo, mapType2ResInfos.get(resInfo.getResInfoType()));
-         PnlPeriod pnlPeriod = new PnlPeriod(expansion.getFirst(), expansion.getSecond(), resInfo.getFrom(), resInfo.getTo(), o -> {
-         popup.hidePopup();
-         if (o != null) {
-         EntityManager em = OPDE.createEM();
-         try {
-         em.getTransaction().begin();
-         ResInfo editinfo = em.merge(resInfo);
-         em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-         em.lock(editinfo, LockModeType.OPTIMISTIC);
-         Pair<Date, Date> period = (Pair<Date, Date>) o;
-         ResInfoTools.setFrom(editinfo, period.getFirst());
-         ResInfoTools.setTo(editinfo, period.getSecond());
-         editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
-         em.getTransaction().commit();
-
-         synchronized (mapType2ResInfos) {
-         int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
-         mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
-         mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
-         }
-         synchronized (listAllInfos) {
-         listAllInfos.remove(resInfo);
-         listAllInfos.add(editinfo);
-         }
-         synchronized (mapKey2CP) {
-         mapKey2CP.remove(keyResInfo);
-         }
-         sortData();
-         reloadDisplay();
-         } catch (OptimisticLockException ole) {
-         OPDE.warn(ole);
-         if (em.getTransaction().isActive()) {
-         em.getTransaction().rollback();
-         }
-         if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-         OPDE.getMainframe().emptyFrame();
-         OPDE.getMainframe().afterLogin();
-         }
-         OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-         } catch (Exception e) {
-         if (em.getTransaction().isActive()) {
-         em.getTransaction().rollback();
-         }
-         OPDE.fatal(e);
-         } finally {
-         em.close();
-         }
-         }
-
-         });
-         popup.setMovable(false);
-         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-
-         popup.setOwner(pnlMenu);
-         popup.removeExcludedComponent(pnlMenu);
-         popup.getContentPane().add(pnlPeriod);
-         popup.setDefaultFocusComponent(pnlPeriod);
-         GUITools.showPopup(popup, SwingConstants.WEST);
-         }
-
-         });
-         btnChangePeriod.setEnabled((ResInfoTools.isEditable(resInfo) || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY)
-         && (OPDE.isAdmin() ||
-         (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new LocalDate(resInfo.getFrom()).equals(new LocalDate()))  // The same user only on the same day.
-         ));
-         pnlMenu.add(btnChangePeriod);
-
-         pnlMenu.add(new JSeparator());
-         }
+         *      ____           _           _
+         *     |  _ \ ___ _ __(_) ___   __| |
+         *     | |_) / _ \ '__| |/ _ \ / _` |
+         *     |  __/  __/ |  | | (_) | (_| |
+         *     |_|   \___|_|  |_|\___/ \__,_|
+         *
          */
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+
+            final JButton btnChangePeriod = GUITools.createHyperlinkButton(resInfo.isSingleIncident() ? "nursingrecords.info.change.pit" : "nursingrecords.info.change.pit", SYSConst.icon22changePeriod, null);
+            btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnChangePeriod.addActionListener(actionEvent -> {
+                if (resInfo.isSingleIncident()) {
+                    final JidePopup popup = new JidePopup();
+                    PnlPIT pnlPIT = new PnlPIT(new DateTime(resInfo.getFrom()), null, null, o -> {
+                        popup.hidePopup();
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                ResInfo editinfo = em.merge(resInfo);
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                em.lock(editinfo, LockModeType.OPTIMISTIC);
+                                DateTime date = (DateTime) o;
+                                ResInfoTools.setFrom(editinfo, date.toDate());
+                                ResInfoTools.setTo(editinfo, date.toDate());
+                                em.getTransaction().commit();
+
+                                synchronized (mapType2ResInfos) {
+                                    int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
+                                    mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
+                                    mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+                                }
+                                synchronized (listAllInfos) {
+                                    listAllInfos.remove(resInfo);
+                                    listAllInfos.add(editinfo);
+                                }
+                                synchronized (mapKey2CP) {
+                                    mapKey2CP.remove(keyResInfo);
+                                }
+                                sortData();
+                                reloadDisplay();
+                                if (editinfo.getResInfoType().isAlertType() || editinfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE) {
+                                    GUITools.setResidentDisplay(resident);
+                                    if (editinfo.isClosed()) {
+                                        OPDE.getMainframe().removeBesonderheit(editinfo.getResInfoType(), resident);
+                                    } else {
+                                        OPDE.getMainframe().addBesonderheit(editinfo.getResInfoType(), resident);
+                                    }
+                                }
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    });
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                    popup.setOwner(pnlMenu);
+                    popup.removeExcludedComponent(pnlMenu);
+                    popup.getContentPane().add(pnlPIT);
+                    popup.setDefaultFocusComponent(pnlPIT);
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+                } else {
+                    final JidePopup popup = new JidePopup();
+                    ResInfo firstHauf = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+                    org.javatuples.Pair<LocalDateTime, LocalDateTime> expansion = ResInfoTools.getMinMaxExpansion(resInfo, mapType2ResInfos.get(resInfo.getResInfoType()), firstHauf);
+                    PnlPeriod pnlPeriod = new PnlPeriod(JavaTimeConverter.toDate(expansion.getValue0()), JavaTimeConverter.toDate(expansion.getValue1()), resInfo.getFrom(), resInfo.getTo(), o -> {
+                        popup.hidePopup();
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                ResInfo editinfo = em.merge(resInfo);
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                em.lock(editinfo, LockModeType.OPTIMISTIC);
+                                Pair<Date, Date> period = (Pair<Date, Date>) o;
+                                ResInfoTools.setFrom(editinfo, period.getFirst());
+                                ResInfoTools.setTo(editinfo, period.getSecond());
+                                editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
+                                em.getTransaction().commit();
+
+                                synchronized (mapType2ResInfos) {
+                                    int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
+                                    mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
+                                    mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+                                }
+                                synchronized (listAllInfos) {
+                                    listAllInfos.remove(resInfo);
+                                    listAllInfos.add(editinfo);
+                                }
+                                synchronized (mapKey2CP) {
+                                    mapKey2CP.remove(keyResInfo);
+                                }
+                                sortData();
+                                reloadDisplay();
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+
+                    });
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                    popup.setOwner(pnlMenu);
+                    popup.removeExcludedComponent(pnlMenu);
+                    popup.getContentPane().add(pnlPeriod);
+                    popup.setDefaultFocusComponent(pnlPeriod);
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+                }
+
+            });
+            btnChangePeriod.setEnabled((ResInfoTools.isEditable(resInfo) || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY)
+                    && (OPDE.isAdmin() ||
+                    (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new LocalDate(resInfo.getFrom()).equals(new LocalDate()))  // The same user only on the same day.
+            ));
+            pnlMenu.add(btnChangePeriod);
+
+            pnlMenu.add(new JSeparator());
+        }
+
 
         /***
          *      _     _       _____  _    ____
@@ -2244,7 +2243,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
 //                            ResInfoTools.setConnectionId(em, newStay);
 
                             if (room != null) {
-                                ResInfo resinfo_room = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident));
+                                ResInfo resinfo_room = em.merge(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), myResident, OPDE.getLogin().getUser()));
                                 Properties props = new Properties();
                                 props.put("room.id", Long.toString(room.getId()));
                                 props.put("room.text", room.toString());
@@ -2449,7 +2448,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
              */
             btnResIsAway.addActionListener(actionEvent -> {
                 final JidePopup popup = new JidePopup();
-                PnlAway pnlAway = new PnlAway(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE), resident), o -> {
+                PnlAway pnlAway = new PnlAway(ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE), resident, OPDE.getLogin().getUser()), o -> {
                     popup.hidePopup();
                     if (o != null) {
                         EntityManager em = OPDE.createEM();

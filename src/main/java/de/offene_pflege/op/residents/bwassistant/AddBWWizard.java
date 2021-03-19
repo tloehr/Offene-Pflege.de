@@ -302,7 +302,7 @@ public class AddBWWizard {
                     resinfo_hauf = null;
                 }
                 if (room != null) {
-                    resinfo_room = ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident);
+                    resinfo_room = ResInfoTools.createResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), resident, OPDE.getLogin().getUser());
 
                     Properties props = new Properties();
                     props.put("room.id", Long.toString(room.getId()));

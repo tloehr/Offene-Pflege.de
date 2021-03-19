@@ -12,6 +12,7 @@ import de.offene_pflege.entity.nursingprocess.NursingProcessTools;
 import de.offene_pflege.entity.prescription.MedInventoryTools;
 import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.process.QProcessTools;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSCalendar;
@@ -60,16 +61,16 @@ public class ResidentTools {
     public static final short ADMINONLY = 2;
     public static final short NORMAL = 0;
 
-    public static Resident createResident(EntityManager em, String nachname, String vorname, int geschlecht, Date gebdatum) {
+    public static Resident createResident(String nachname, String vorname, int geschlecht, Date gebdatum, OPUsers editor, boolean calcmediupr1) {
         Resident resident = new Resident();
         resident.setName(nachname);
         resident.setFirstname(vorname);
         resident.setGender(geschlecht);
         resident.setDob(gebdatum);
-        resident.setEditor(OPDE.getLogin().getUser());
+        resident.setEditor(editor);
         resident.setAdminonly((short) 0);
         setControlling(resident, null);
-        resident.setCalcMediUPR1(OPDE.isCalcMediUPR1());
+        resident.setCalcMediUPR1(calcmediupr1);
         return resident;
     }
 

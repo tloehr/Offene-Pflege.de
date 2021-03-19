@@ -35,7 +35,7 @@ public class DlgYesNo extends MyJDialog {
         txtMessage.setText(SYSTools.toHTML("<div id=\"fonttext\">" + message + "</div>"));
         lblTitle.setText(null);
         lblIcon.setIcon(icon);
-
+        pack();
 //        pack();
 //        setVisible(true);
     }

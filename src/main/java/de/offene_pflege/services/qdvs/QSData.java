@@ -45,7 +45,7 @@ public class QSData extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (qName.equalsIgnoreCase("qs_data")) {
+        if (qName.equalsIgnoreCase("qs_data") || qName.equalsIgnoreCase("qs_data_mds")) {
             lookup.put(new MultiKey(locator.getLineNumber(), locator.getColumnNumber()), idbewohner);
         }
     }

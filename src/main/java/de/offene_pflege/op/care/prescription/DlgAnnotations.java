@@ -79,7 +79,7 @@ public class DlgAnnotations extends MyJDialog {
         int mode = PnlEditResInfo.EDIT;
         ResInfo annotation = ResInfoTools.getAnnotation4Prescription(prescription, tag);
         if (annotation == null) {
-            annotation = ResInfoTools.createResInfo(ResInfoTypeTools.getResInfoType4Annotation(tag), prescription.getResident());
+            annotation = ResInfoTools.createResInfo(ResInfoTypeTools.getResInfoType4Annotation(tag), prescription.getResident(), OPDE.getLogin().getUser());
             annotation.setPrescription(prescription);
             mode = PnlEditResInfo.NEW;
         }

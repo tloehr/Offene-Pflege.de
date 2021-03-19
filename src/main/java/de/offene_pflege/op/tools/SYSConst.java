@@ -351,7 +351,7 @@ public class SYSConst {
     }
 
     public static String html_critical(String content) {
-            return html_bold(html_color(Color.red, content));
+            return html_paragraph(html_color(Color.red, content));
         }
 
     public static String html_italic(String content) {
