@@ -1863,6 +1863,8 @@ WHERE t.BWINFTYP = 'vaccin1';
 UPDATE resinfo r SET r.Bis = r.Von
 WHERE r.BWINFTYP = 'vaccin1';
 --
+INSERT INTO sysprops (K, V, UKennung) VALUES ('qdvs.tage.erfassungsperiode', '183', null);
+--
 alter table `groups`
     change `System` sysflag tinyint(1) default 0 not null;
 rename table `groups` to opgroups;

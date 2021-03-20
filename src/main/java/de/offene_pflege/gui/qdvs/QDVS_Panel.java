@@ -81,7 +81,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     private final JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JTree tblResidents;
-    LocalDate STICHTAG, LETZTE_ERFASSUNG, ERHEBUNG;
+    LocalDate STICHTAG, BEGINN_ERFASSUNGSZEITRAUM;
     Homes home;
     File workdir;
     QdvsService qdvsService;
@@ -146,15 +146,12 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         else
             STICHTAG = LocalDate.now();
 
-        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG))
-            LETZTE_ERFASSUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG)).toLocalDate();
-        else
-            LETZTE_ERFASSUNG = STICHTAG.minusDays(186); // Es gibt Plausibilitätsregeln, die eine 186 Tage Regel streng befolgen.
+//        VORHERIGER_STICHTAG = STICHTAG.minusDays(SYSPropsTools.getInteger(SYSPropsTools.KEY_QDVS_TAGE_ERFASSUNGSPERIODE) + 1); // der vorh.stichtag liegt AUSSERHALB der 183 Tage... daher +1
 
-        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_ERHEBUNG))
-            ERHEBUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG)).toLocalDate();
-        else
-            ERHEBUNG = LocalDate.now();
+//        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_ERHEBUNG))
+//            ERHEBUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG)).toLocalDate();
+//        else
+//            ERHEBUNG = LocalDate.now();
 
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -178,7 +175,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         File csv = new File(LocalMachine.getProgrammPath(), DAS_REGELN_CSV);
         REGELN = lese_DAS_REGELN(csv);
 
-        prepareListOFResidents(); // einmal am Anfang, damit die Liste der BW ausgefüllt ist
+        //prepareListOFResidents(); // einmal am Anfang, damit die Liste der BW ausgefüllt ist
     }
 
 
@@ -293,7 +290,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         File path = new File(workdir, home.getCareproviderid() + File.separator + dir + File.separator);
         target = new File(path, "qs-data.xml");
 
-        qdvsService.setParameters(STICHTAG, ERHEBUNG, LETZTE_ERFASSUNG, home, liste_bewohner, target);
+        qdvsService.setParameters(STICHTAG, BEGINN_ERFASSUNGSZEITRAUM, home, liste_bewohner, target);
 
         ERRORS.clear();
         LOOKUP.clear();
@@ -337,8 +334,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                     String html = SYSConst.html_h1("qdvs.header.printout");
 
                     html += SYSConst.html_h2(SYSTools.xx("qdvs.stichtag") + ": " + STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
-                    html += SYSConst.html_h2(SYSTools.xx("qdvs.erhebungsdatum") + ": " + ERHEBUNG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
-                    html += SYSConst.html_h2(SYSTools.xx("qdvs.letzte.erhebung") + ": " + LETZTE_ERFASSUNG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
+                    html += SYSConst.html_h2(SYSTools.xx("qdvs.vorheriger.stichtag") + ": " + BEGINN_ERFASSUNGSZEITRAUM.minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
                     html += SYSConst.html_h2(SYSTools.xx("misc.msg.Date") + ": " + ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)));
                     html += "<hline/>";
                     html += toHTML(root);
@@ -367,54 +363,47 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         // die morgens noch einen gültigen Heimvertrag hatten. Wird auch so in der
         // QDVS Vorgabe beschrieben. Selbst wenn der über Tag stirbt oder auszieht, war er
         // doch am Tag der Erhebung noch da.
-        liste_bewohner = ResidentTools.getAll(STICHTAG.atStartOfDay());
+        liste_bewohner = ResidentTools.getAll(STICHTAG.atTime(23,59,59));
         tblResidents.setModel(new DefaultTreeModel(createTree()));
     }
 
 
     private java.util.List<Component> addCommands() {
-
         FolderChooserComboBox fcWorkdir = new FolderChooserComboBox();
         fcWorkdir.setSelectedItem(workdir);
         fcWorkdir.addPropertyChangeListener("selectedItem", evt -> {
             OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_WORKPATH, evt.getNewValue().toString());
             workdir = (File) evt.getNewValue();
-            prepareListOFResidents();
+//            prepareListOFResidents();
         });
 
-        final DateExComboBox dcmbLetzte = new DateExComboBox(); // wann zuletzt eine Erhebung durchgeführt wurde
+        final JLabel lblVorherigerStichtag = new JLabel();
+        lblVorherigerStichtag.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 16));
         final DateExComboBox dcmbStichtag = new DateExComboBox(); // welcher Stichtag verwendet werden soll.
-        final DateExComboBox dcmbErhebung = new DateExComboBox(); // Bis zu welchem Datum die ResInfos verwendet werden. Das ist meist das aktuelle Datum, aber man kann es einstellen. Ist wichtig, wenn man nach einer Fehlermeldung durch DAS-PFLEGE Korrekturen vornimmt.
+        //addLog(SYSConst.html_paragraph(SYSConst.html_bold("Zeitraum zur Ergebniserfassung: ")+ String.format("%s bis einschließlich %s", BEGINN_ERFASSUNGSZEITRAUM.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)), STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))));
         dcmbStichtag.setShowNoneButton(false);
         dcmbStichtag.setInvalidValueAllowed(false);
         dcmbStichtag.getDateModel().setMaxDate(new GregorianCalendar());
-        dcmbStichtag.setDate(JavaTimeConverter.toDate(STICHTAG));
         dcmbStichtag.addPropertyChangeListener("selectedItem", evt -> {
             GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
             OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_STICHTAG, JavaTimeConverter.to_iso8601(gc));
             STICHTAG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
+            BEGINN_ERFASSUNGSZEITRAUM = STICHTAG.minusDays(SYSPropsTools.getInteger(SYSPropsTools.KEY_QDVS_TAGE_ERFASSUNGSPERIODE));
+            lblVorherigerStichtag.setText(BEGINN_ERFASSUNGSZEITRAUM.minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
+            addLog(SYSConst.html_paragraph(SYSConst.html_bold("Zeitraum zur Ergebniserfassung: ")+ String.format("%s bis einschließlich %s", BEGINN_ERFASSUNGSZEITRAUM.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)), STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))));
             prepareListOFResidents();
         });
-
-        dcmbLetzte.setShowNoneButton(false);
-        dcmbLetzte.setInvalidValueAllowed(false);
-        dcmbLetzte.getDateModel().setMaxDate(new GregorianCalendar());
-        dcmbLetzte.setDate(JavaTimeConverter.toDate(LETZTE_ERFASSUNG));
-        dcmbLetzte.addPropertyChangeListener("selectedItem", evt -> {
-            GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
-            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_LETZTER_STICHTAG, JavaTimeConverter.to_iso8601(gc));
-            LETZTE_ERFASSUNG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
-        });
-
-        dcmbErhebung.setShowNoneButton(false);
-        dcmbErhebung.setInvalidValueAllowed(false);
-        dcmbErhebung.getDateModel().setMaxDate(new GregorianCalendar());
-        dcmbErhebung.setDate(JavaTimeConverter.toDate(ERHEBUNG));
-        dcmbErhebung.addPropertyChangeListener("selectedItem", evt -> {
-            GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
-            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG, JavaTimeConverter.to_iso8601(gc));
-            ERHEBUNG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
-        });
+        //dcmbStichtag.setDate(JavaTimeConverter.toDate(STICHTAG));
+        dcmbStichtag.setSelectedItem(JavaTimeConverter.toDate(STICHTAG));
+//        dcmbErhebung.setShowNoneButton(false);
+//        dcmbErhebung.setInvalidValueAllowed(false);
+//        dcmbErhebung.getDateModel().setMaxDate(new GregorianCalendar());
+//        dcmbErhebung.setDate(JavaTimeConverter.toDate(ERHEBUNG));
+//        dcmbErhebung.addPropertyChangeListener("selectedItem", evt -> {
+//            GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
+//            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG, JavaTimeConverter.to_iso8601(gc));
+//            ERHEBUNG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
+//        });
 
         JComboBox<Homes> cmbHome = new JComboBox<>();
         HomesService.setComboBox(cmbHome);
@@ -429,10 +418,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         list.add(cmbHome);
         list.add(new JLabel(SYSTools.xx("qdvs.stichtag")));
         list.add(dcmbStichtag);
-        list.add(new JLabel(SYSTools.xx("qdvs.erhebungsdatum")));
-        list.add(dcmbErhebung);
-        list.add(new JLabel(SYSTools.xx("qdvs.letzte.erhebung")));
-        list.add(dcmbLetzte);
+        list.add(new JLabel(SYSTools.xx("qdvs.vorheriger.stichtag")));
+        list.add(lblVorherigerStichtag);
         list.add(new JLabel(SYSTools.xx("qdvs.workdir")));
         list.add(fcWorkdir);
         list.add(new JSeparator());

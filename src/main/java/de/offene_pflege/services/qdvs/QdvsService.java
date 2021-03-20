@@ -30,6 +30,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,7 +74,7 @@ public class QdvsService implements HasLogger {
 
     private LocalDateTime STICHTAG; // ist das vorher festgelegte Zieldatum (2x im Jahr). Das bleibt auch bei den Nachkorrekturen gleich
     private LocalDateTime BEGINN_ERFASSUNGSZEITRAUM; // ist der letzt Stichtag.
-    private LocalDateTime ERHEBUNGSDATUM; // Gibt an, zu welchem Datum die ResInfos ausgewertet werden sollen. Das kann durchaus nach dem Stichtag sein, wenn Fehler korrigiert werden mussten.
+//    private LocalDateTime ERHEBUNGSDATUM; // Gibt an, zu welchem Datum die ResInfos ausgewertet werden sollen. Das kann durchaus nach dem Stichtag sein, wenn Fehler korrigiert werden mussten.
 
     static final String SPECIFICATION = "V01"; // die Version der jeweilig eingereichten Datenstruktur, die zum Zeitpunkt der Verwendung gültig war.
     public static DecimalFormat NF_IDBEWOHNER = new DecimalFormat("000000");
@@ -152,16 +154,14 @@ public class QdvsService implements HasLogger {
      * diese Methode wird von der GUI aus aufgerufen und setzt die Parameter für die Auswertung
      *
      * @param stichtag
-     * @param erhebungsdatum
-     * @param vorheriger_stichtag
+     * @param beginn_erfassungszeitraum
      * @param home
      * @param listeAlleBewohnerAmStichtag
      * @param target
      */
-    public void setParameters(LocalDate stichtag, LocalDate erhebungsdatum, LocalDate vorheriger_stichtag, Homes home, List<Resident> listeAlleBewohnerAmStichtag, File target) {
-        BEGINN_ERFASSUNGSZEITRAUM = vorheriger_stichtag.plusDays(1).atStartOfDay();
-        ERHEBUNGSDATUM = erhebungsdatum.atTime(23, 59, 59);
-        STICHTAG = stichtag.atStartOfDay();
+    public void setParameters(LocalDate stichtag, LocalDate beginn_erfassungszeitraum, Homes home, List<Resident> listeAlleBewohnerAmStichtag, File target) {
+        BEGINN_ERFASSUNGSZEITRAUM = beginn_erfassungszeitraum.atStartOfDay(); // beginnt unmittelbar nach dem vorherigen STICHTAG
+        STICHTAG = stichtag.atTime(23, 59, 59); // der Stichtag gehört mit zum Erhebungszeitraum
         this.home = home;
         this.target = target;
         residentInfoObjectMap.clear();
@@ -345,7 +345,7 @@ public class QdvsService implements HasLogger {
         // 2. Durchlauf
         // Prüfen, welche BW noch fehlerhafte Einträge haben
         residentInfoObjectMap.keySet().forEach(resident -> {
-            Set<ResInfoType> used_resinfotypes_for_this_resident = ResInfoTools.getUsedActiveTypesBetween(resident, BEGINN_ERFASSUNGSZEITRAUM, ERHEBUNGSDATUM);
+            Set<ResInfoType> used_resinfotypes_for_this_resident = ResInfoTools.getUsedActiveTypesBetween(resident, BEGINN_ERFASSUNGSZEITRAUM, STICHTAG);
             Set<ResInfoType> notwendigeTypen = new HashSet<>(used_resinfotypes_for_this_resident);
             listeBWFehlerfrei.add(resident);
 
@@ -354,8 +354,8 @@ public class QdvsService implements HasLogger {
                 runningNumber++;
                 textListener.setProgress(runningNumber, numResidents * 3, "");
 
-                boolean schmerze2 = used_resinfotypes_for_this_resident.stream().anyMatch(resInfoType -> resInfoType.getID().equals("schmerze2"));
-                boolean besd2 = used_resinfotypes_for_this_resident.stream().anyMatch(resInfoType -> resInfoType.getID().equals("besd2"));
+                boolean schmerze2 = used_resinfotypes_for_this_resident.stream().anyMatch(resInfoType -> resInfoType.getID().equals(SCHMERZ));
+                boolean besd2 = used_resinfotypes_for_this_resident.stream().anyMatch(resInfoType -> resInfoType.getID().equals(BESD));
 
 
                 if (!(schmerze2 || besd2)) {
@@ -375,12 +375,12 @@ public class QdvsService implements HasLogger {
                     listeBWFehlerfrei.remove(resident);
                 }
 
-                if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, ERHEBUNGSDATUM).isPresent()) {
+                if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG).isPresent()) {
                     residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
                     textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.weight.missing")));
                     listeBWFehlerfrei.remove(resident);
                 }
-                if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, ERHEBUNGSDATUM).isPresent()) {
+                if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, STICHTAG).isPresent()) {
                     textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.height.missing")));
                     listeBWFehlerfrei.remove(resident);
                 }
@@ -486,7 +486,7 @@ public class QdvsService implements HasLogger {
 
         // Datum der Erhebung
         /** 3 */qsMdsData.setERHEBUNGSDATUM(of.createDasQsDataMdsTypeERHEBUNGSDATUM());
-        qsMdsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ERHEBUNGSDATUM.toLocalDate()));
+        qsMdsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(STICHTAG.toLocalDate()));
 
         // Datum des Einzugs
         /** 4 */qsMdsData.setEINZUGSDATUM(of.createDasQsDataMdsTypeEINZUGSDATUM());
@@ -502,7 +502,7 @@ public class QdvsService implements HasLogger {
         qsMdsData.getAUSSCHLUSSGRUND().setValue(residentInfoObjectMap.get(resident).getAusschluss_grund()); // in der map stehen die ausschlussgründe drin
         if (residentInfoObjectMap.get(resident).getAusschluss_grund() != QdvsResidentInfoObject.MDS_GRUND_KURZZEIT){
             // Bei KZP darf das Einzugsdatum nicht stehen. Denn das bezieht sich nur auf den DAUERHAFTEN Aufenthalt.
-            qsMdsData.getEINZUGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, ERHEBUNGSDATUM).get().getFrom()));
+            qsMdsData.getEINZUGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, STICHTAG).get().getFrom()));
         }
 
         getLogger().debug("XXXX------------------------------------------------------------XXXX");
@@ -531,7 +531,7 @@ public class QdvsService implements HasLogger {
 
         // Datum der Erhebung
         qsData.setERHEBUNGSDATUM(of.createDasQsDataTypeERHEBUNGSDATUM());
-        qsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ERHEBUNGSDATUM.toLocalDate())); // Das Erhebungsdatum ist immer das Datum an dem die Eingabe erfolgte.
+        qsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(STICHTAG.toLocalDate())); // Das Erhebungsdatum ist immer das Datum an dem die Eingabe erfolgte.
 
 
         qsData.setGEBURTSMONAT(of.createDasQsDataTypeGEBURTSMONAT());
@@ -542,7 +542,7 @@ public class QdvsService implements HasLogger {
         qsData.getGESCHLECHT().setValue(resident.getGender());
         // weiter bei Pflegegrad
         qsData.setPFLEGEGRAD(of.createDasQsDataTypePFLEGEGRAD());
-        qsData.getPFLEGEGRAD().setValue(Integer.valueOf(ResInfoTools.getContent(ResInfoTools.getValidOnThatDayIfAny(resident, NINSUR, ERHEBUNGSDATUM).get()).getProperty("grade")));
+        qsData.getPFLEGEGRAD().setValue(Integer.valueOf(ResInfoTools.getContent(ResInfoTools.getValidOnThatDayIfAny(resident, NINSUR, STICHTAG).get()).getProperty("grade")));
 
     }
 
@@ -671,11 +671,11 @@ public class QdvsService implements HasLogger {
         qsData.getBEATMUNG().setValue(0); // default ist NEIN
 //        if (resinfos.containsKey(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_RESPIRATION))) {
 
-        qsData.getBEATMUNG().setValue(Integer.valueOf(ResInfoTools.getContent(ResInfoTools.getValidOnThatDayIfAny(resident, RESPIRAT, ERHEBUNGSDATUM).get()).getProperty("BEATMUNG")));
+        qsData.getBEATMUNG().setValue(Integer.valueOf(ResInfoTools.getContent(ResInfoTools.getValidOnThatDayIfAny(resident, RESPIRAT, STICHTAG).get()).getProperty("BEATMUNG")));
 //        }
 
         /** 23 */qsData.setBEWUSSTSEINSZUSTAND(of.createDasQsDataTypeBEWUSSTSEINSZUSTAND());
-        ResInfo bewusst = ResInfoTools.getValidOnThatDayIfAny(resident, BEWUSST, ERHEBUNGSDATUM).get();
+        ResInfo bewusst = ResInfoTools.getValidOnThatDayIfAny(resident, BEWUSST, STICHTAG).get();
         qsData.getBEWUSSTSEINSZUSTAND().setValue(Integer.valueOf(ResInfoTools.getContent(bewusst).getProperty("BEWUSSTSEINSZUSTAND")));
 
         /** 24 */qsData.getDIAGNOSEN().addAll(getAktuelleDiagnosenFuerQDVS(resident));
@@ -684,7 +684,7 @@ public class QdvsService implements HasLogger {
 
     private void mobilitaet(DasQsDataType qsData, Resident resident) {
         // das nennen wir dann letzter_abfragezeitpunkt
-        ResInfo mobil = ResInfoTools.getValidOnThatDayIfAny(resident, MOBIL, ERHEBUNGSDATUM).get();
+        ResInfo mobil = ResInfoTools.getValidOnThatDayIfAny(resident, MOBIL, STICHTAG).get();
 
         // 25. Positionswechsel im Bett
         qsData.setMOBILPOSWECHSEL(of.createDasQsDataTypeMOBILPOSWECHSEL());
@@ -709,7 +709,7 @@ public class QdvsService implements HasLogger {
     }
 
     private void kognitiv_kommunikativ(DasQsDataType qsData, Resident resident) {
-        ResInfo orient = ResInfoTools.getValidOnThatDayIfAny(resident, ORIENT, ERHEBUNGSDATUM).get();
+        ResInfo orient = ResInfoTools.getValidOnThatDayIfAny(resident, ORIENT, STICHTAG).get();
 
         // 30. Erkennen von Personen aus dem näheren Umfeld
         qsData.setKKFERKENNEN(of.createDasQsDataTypeKKFERKENNEN());
@@ -766,7 +766,7 @@ public class QdvsService implements HasLogger {
         /** 43 */qsData.setSVERNAEHRUNGUMFANG(of.createDasQsDataTypeSVERNAEHRUNGUMFANG());
 
         // "kern01" künstliche Ernährung ist eine optionale resinfo. Falls sie nicht existiert, wird Frage 41. einfach auf 0 gesetzt.
-        Optional<ResInfo> kern = ResInfoTools.getValidOnThatDayIfAny(resident, KERN, ERHEBUNGSDATUM);
+        Optional<ResInfo> kern = ResInfoTools.getValidOnThatDayIfAny(resident, KERN, STICHTAG);
         if (kern.isPresent()) { // Sobald ein kern01 Eintrag Vorliergt ist die SVERNAEHRUNG gesetzt.
             qsData.getSVERNAEHRUNG().setValue(1);
             int svfremdhilfe = Integer.valueOf(ResInfoTools.getContent(kern.get()).getProperty("SVFREMDHILFE"));
@@ -782,7 +782,7 @@ public class QdvsService implements HasLogger {
         //┏━┓╻ ╻┏━┓┏━┓┏━╸╻ ╻┏━╸╻╺┳┓╻ ╻┏┓╻┏━╸┏━╸┏┓╻
         //┣━┫┃ ┃┗━┓┗━┓┃  ┣━┫┣╸ ┃ ┃┃┃ ┃┃┗┫┃╺┓┣╸ ┃┗┫
         //╹ ╹┗━┛┗━┛┗━┛┗━╸╹ ╹┗━╸╹╺┻┛┗━┛╹ ╹┗━┛┗━╸╹ ╹
-        ResInfo aus = ResInfoTools.getValidOnThatDayIfAny(resident, AUSSCHEID, ERHEBUNGSDATUM).get();
+        ResInfo aus = ResInfoTools.getValidOnThatDayIfAny(resident, AUSSCHEID, STICHTAG).get();
         /** 44 */qsData.setSVHARNKONTINENZ(of.createDasQsDataTypeSVHARNKONTINENZ());
         qsData.getSVHARNKONTINENZ().setValue(Integer.valueOf(ResInfoTools.getContent(aus).getProperty("SVHARNKONTINENZ")));
         /** 45 */qsData.setSVSTUHLKONTINENZ(of.createDasQsDataTypeSVSTUHLKONTINENZ());
@@ -801,7 +801,7 @@ public class QdvsService implements HasLogger {
         //┏┓ ┏━╸╻ ╻┏━╸┏━┓╺┳╸╻ ╻┏┓╻┏━╸
         //┣┻┓┣╸ ┃╻┃┣╸ ┣┳┛ ┃ ┃ ┃┃┗┫┃╺┓
         //┗━┛┗━╸┗┻┛┗━╸╹┗╸ ╹ ┗━┛╹ ╹┗━┛
-        ResInfo kpflege = ResInfoTools.getValidOnThatDayIfAny(resident, KPFLEGE, ERHEBUNGSDATUM).get();
+        ResInfo kpflege = ResInfoTools.getValidOnThatDayIfAny(resident, KPFLEGE, STICHTAG).get();
         /** 46 */qsData.setSVOBERKOERPER(of.createDasQsDataTypeSVOBERKOERPER());
         qsData.getSVOBERKOERPER().setValue(Integer.valueOf(ResInfoTools.getContent(kpflege).getProperty("SVOBERKOERPER")));
         /** 47 */qsData.setSVKOPF(of.createDasQsDataTypeSVKOPF());
@@ -815,7 +815,7 @@ public class QdvsService implements HasLogger {
         /** 51 */qsData.setSVANAUSUNTERKOERPER(of.createDasQsDataTypeSVANAUSUNTERKOERPER());
         qsData.getSVANAUSUNTERKOERPER().setValue(Integer.valueOf(ResInfoTools.getContent(kpflege).getProperty("SVANAUSUNTERKOERPER")));
 
-        ResInfo ern = ResInfoTools.getValidOnThatDayIfAny(resident, ERN, ERHEBUNGSDATUM).get();
+        ResInfo ern = ResInfoTools.getValidOnThatDayIfAny(resident, ERN, STICHTAG).get();
         /** 52 */qsData.setSVNAHRUNGZUBEREITEN(of.createDasQsDataTypeSVNAHRUNGZUBEREITEN());
         qsData.getSVNAHRUNGZUBEREITEN().setValue(Integer.valueOf(ResInfoTools.getContent(ern).getProperty("SVNAHRUNGZUBEREITEN")));
         /** 53 */qsData.setSVESSEN(of.createDasQsDataTypeSVESSEN());
@@ -825,8 +825,8 @@ public class QdvsService implements HasLogger {
     }
 
     private void alltag_soziales(DasQsDataType qsData, Resident resident) {
-        ResInfo alltag = ResInfoTools.getValidOnThatDayIfAny(resident, ALLTAG, ERHEBUNGSDATUM).get();
-        ResInfo schlaf = ResInfoTools.getValidOnThatDayIfAny(resident, SCHLAF, ERHEBUNGSDATUM).get();
+        ResInfo alltag = ResInfoTools.getValidOnThatDayIfAny(resident, ALLTAG, STICHTAG).get();
+        ResInfo schlaf = ResInfoTools.getValidOnThatDayIfAny(resident, SCHLAF, STICHTAG).get();
 
         /** 58 */qsData.setGATAGESABLAUF(of.createDasQsDataTypeGATAGESABLAUF());
         qsData.getGATAGESABLAUF().setValue(Integer.valueOf(ResInfoTools.getContent(alltag).getProperty("GATAGESABLAUF")));
@@ -837,7 +837,7 @@ public class QdvsService implements HasLogger {
         /** 61 */qsData.setGAPLANUNGEN(of.createDasQsDataTypeGAPLANUNGEN());
         qsData.getGAPLANUNGEN().setValue(Integer.valueOf(ResInfoTools.getContent(alltag).getProperty("GAPLANUNGEN")));
 
-        ResInfo sozial = ResInfoTools.getValidOnThatDayIfAny(resident, SOZIAL, ERHEBUNGSDATUM).get();
+        ResInfo sozial = ResInfoTools.getValidOnThatDayIfAny(resident, SOZIAL, STICHTAG).get();
         /** 62 */qsData.setGAINTERAKTION(of.createDasQsDataTypeGAINTERAKTION());
         qsData.getGAINTERAKTION().setValue(Integer.valueOf(ResInfoTools.getContent(sozial).getProperty("GAINTERAKTION")));
         /** 63 */qsData.setGAKONTAKTPFLEGE(of.createDasQsDataTypeGAKONTAKTPFLEGE());
@@ -959,8 +959,8 @@ public class QdvsService implements HasLogger {
     }
 
     private void groesse_gewicht(DasQsDataType qsData, Resident resident) {
-        ResValue weight = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, ERHEBUNGSDATUM).get();
-        ResValue height = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, ERHEBUNGSDATUM).get();
+        ResValue weight = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG).get();
+        ResValue height = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, STICHTAG).get();
 
         getLogger().debug("Gewicht: " + weight.toString());
         getLogger().debug("Größe: " + height.toString());
@@ -979,7 +979,7 @@ public class QdvsService implements HasLogger {
         // Ich suche den letzten ResInfo mit einem Gewichts Kommentar. Wenn es einen gibt
         // dann werte ich den aus. Wenn nicht ist das Ergebnis 0, wenn er älter als das letzte Datum
         // ist setze ich den ebenfalls auf 0.
-        Optional<ResInfo> gewichtdoku = ResInfoTools.getValidOnThatDayIfAny(resident, KOERPERGEWICHTDOKU, ERHEBUNGSDATUM);
+        Optional<ResInfo> gewichtdoku = ResInfoTools.getValidOnThatDayIfAny(resident, KOERPERGEWICHTDOKU, STICHTAG);
         // wenn sie fehlt oder zu alt ist, dann setzen wir das auf 0
         if (!gewichtdoku.isPresent() || JavaTimeConverter.toJavaLocalDateTime(gewichtdoku.get().getFrom()).isBefore(BEGINN_ERFASSUNGSZEITRAUM)) {
             DasQsDataType.KOERPERGEWICHTDOKU kd = of.createDasQsDataTypeKOERPERGEWICHTDOKU();
@@ -1019,7 +1019,7 @@ public class QdvsService implements HasLogger {
         /** 77 */
         if (sturz > 0) { // es gab also mindestens einen Sturz
             // erhöter Unterstützungsbedarf
-            ArrayList<ResInfo> auswirkungen = ResInfoTools.getAll(resident, FALLAUSWIRKUNG, BEGINN_ERFASSUNGSZEITRAUM, ERHEBUNGSDATUM);
+            ArrayList<ResInfo> auswirkungen = ResInfoTools.getAll(resident, FALLAUSWIRKUNG, BEGINN_ERFASSUNGSZEITRAUM, STICHTAG);
             if (!auswirkungen.isEmpty()) {
                 Properties auswirkung_props = ResInfoTools.getContent(auswirkungen.get(auswirkungen.size() - 1));
                 if (auswirkung_props.getProperty("erhoehter_bedarf_alltag").equalsIgnoreCase("true")) {
@@ -1293,7 +1293,7 @@ public class QdvsService implements HasLogger {
                     break;
                 }
             }
-            //todo: teste die KZP auswertung und die aufnahme gespräche
+            //todo: teste  aufnahme gespräche
 
             // Ist in den Wochen nach dem Einzug mit dem Bewohner bzw. der Bewohnerin und/oder einer seiner bzw. ihrer Angehörigen
             // oder sonstigen Vertrauenspersonen ein Gespräch über sein bzw. ihr Einleben und die zuküntiige Versorgung geführt worden?
@@ -1362,10 +1362,10 @@ public class QdvsService implements HasLogger {
         diagnosen_schluessel.forEach(s -> myprops.put(s, "false"));
 
         // Alle in eine Liste zusammenfassen
-        ArrayList<ResInfo> listInfos = ResInfoTools.getAll(resident, typeDiagnosen.getID(), ERHEBUNGSDATUM);
+        ArrayList<ResInfo> listInfos = ResInfoTools.getAll(resident, typeDiagnosen.getID(), STICHTAG);
 
-        ResInfoTools.getValidOnThatDayIfAny(resident, typeDiabetes.getID(), ERHEBUNGSDATUM).ifPresent(resInfo -> listInfos.add(resInfo));
-        ResInfoTools.getValidOnThatDayIfAny(resident, typeDemenz.getID(), ERHEBUNGSDATUM).ifPresent(resInfo -> listInfos.add(resInfo));
+        ResInfoTools.getValidOnThatDayIfAny(resident, typeDiabetes.getID(), STICHTAG).ifPresent(resInfo -> listInfos.add(resInfo));
+        ResInfoTools.getValidOnThatDayIfAny(resident, typeDemenz.getID(), STICHTAG).ifPresent(resInfo -> listInfos.add(resInfo));
 
         // Properties auswerten
         listInfos.forEach(info -> {

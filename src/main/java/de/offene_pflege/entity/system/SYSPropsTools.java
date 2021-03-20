@@ -116,9 +116,8 @@ public class SYSPropsTools {
 
     public static final String KEY_QDVS_STICHTAG = "qdvs_stichtag";
     public static final String KEY_QDVS_ERHEBUNG = "qdvs_erhebung";
-    public static final String KEY_QDVS_LETZTER_STICHTAG = "qdvs_letzter_stichtag";
+    public static final String KEY_QDVS_TAGE_ERFASSUNGSPERIODE = "qdvs.tage.erfassungsperiode";
     public static final String KEY_QDVS_WORKPATH = "qdvs_path";
-
 
     //should be useless in future
     public static final String LOCAL_KEY_CIPHER_NIC = "cipher.nic.id";
