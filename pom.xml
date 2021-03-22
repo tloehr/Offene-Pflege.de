@@ -16,7 +16,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        
+
         <!-- Library Versions -->
         <com.itextpdf.version>5.5.13.2</com.itextpdf.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
@@ -58,7 +58,7 @@
         <swingx.core.version>1.6.5-1</swingx.core.version>
         <timing.framework.version>7.3.1</timing.framework.version>
         <xerces.version>2.12-beta-r1667115</xerces.version>
-
+        <commons.net.version>3.8.0</commons.net.version>
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>
         <opde.major>1</opde.major>
         <opde.minor>15</opde.minor>
@@ -271,7 +271,7 @@
 
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
-               <artifactId>jaxb-core</artifactId>
+            <artifactId>jaxb-core</artifactId>
             <version>${jaxb.core.version}</version>
         </dependency>
 
@@ -316,11 +316,17 @@
             <artifactId>icu4j</artifactId>
             <version>${icu4j.version}</version>
         </dependency>
+        <!-- https://github.com/tloehr/Offene-Pflege.de/issues/116 -->
         <dependency>
-            <groupId>com.enterprisedt</groupId>
-            <artifactId>edtftpj</artifactId>
-            <version>${edtftpj.version}</version>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commons.net.version}</version>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.enterprisedt</groupId>-->
+        <!--            <artifactId>edtftpj</artifactId>-->
+        <!--            <version>${edtftpj.version}</version>-->
+        <!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/com.install4j/install4j-runtime -->
         <dependency>
             <groupId>com.install4j</groupId>

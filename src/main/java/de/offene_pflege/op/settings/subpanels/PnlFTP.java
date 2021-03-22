@@ -1,13 +1,13 @@
 package de.offene_pflege.op.settings.subpanels;
 
-import com.enterprisedt.net.ftp.FileTransferClient;
-import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.PnlBeanEditor;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.settings.databeans.FTPConfigBean;
 import de.offene_pflege.op.threads.DisplayMessage;
+import de.offene_pflege.op.tools.FtpClient;
+import de.offene_pflege.op.tools.FtpUploadDownloadUtil;
 import de.offene_pflege.op.tools.LocalMachine;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.io.FileUtils;
@@ -63,7 +63,8 @@ public class PnlFTP extends DefaultPanel {
                     boolean success = false;
                     try {
 
-                        FileTransferClient ftp = SYSFilesTools.getFTPClient(OPDE.getProps());
+                        FtpClient ftpClient = new FtpClient();
+                        ftpClient.open();
 
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.creating.testfile", 1));
                         // creating a testfile for the ftp test
@@ -85,9 +86,9 @@ public class PnlFTP extends DefaultPanel {
 
 //                        File file = new File(OPDE.getOPWD() + File.separator + "opdestart.jar");
                         String md5a = SYSTools.getMD5Checksum(file);
-                        ftp.uploadFile(file.getPath(), "ftptest.file");
+                        ftpClient.putFile(file, "ftptest.file");
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.upload", 1));
-                        ftp.downloadFile(LocalMachine.getAppDataPath() + File.separator + "ftptest.file", "ftptest.file");
+                        ftpClient.getFile("ftptest.file", LocalMachine.getAppDataPath() + File.separator + "ftptest.file");
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.download", 1));
                         File file2 = new File(LocalMachine.getAppDataPath() + File.separator + "ftptest.file");
                         String md5b = SYSTools.getMD5Checksum(file2);
@@ -100,10 +101,12 @@ public class PnlFTP extends DefaultPanel {
                             throw new Exception("MD5 error");
                         }
                         FileUtils.deleteQuietly(file2);
-                        ftp.deleteFile("ftptest.file");
-                        ftp.disconnect();
+                        ftpClient.delete("ftptest.file");
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.msg.test.ok", 2));
                         SYSPropsTools.storeProp(SYSPropsTools.KEY_FTP_IS_WORKING, "true");
+
+                        ftpClient.close();
+
                     } catch (Exception ftpEx) {
 //                        OPDE.fatal(ftpEx);
                         logger.error(ftpEx);

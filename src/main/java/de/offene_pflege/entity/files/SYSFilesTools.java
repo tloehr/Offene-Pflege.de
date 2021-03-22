@@ -25,22 +25,18 @@
  */
 package de.offene_pflege.entity.files;
 
-import com.enterprisedt.net.ftp.EventListener;
-import com.enterprisedt.net.ftp.FTPConnectMode;
-import com.enterprisedt.net.ftp.FTPException;
-import com.enterprisedt.net.ftp.FileTransferClient;
 import de.offene_pflege.entity.info.ResInfo;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.entity.system.OPUsers;
-import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
+import de.offene_pflege.op.tools.FtpClient;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.io.FileUtils;
 
@@ -57,7 +53,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author tloehr
@@ -99,7 +94,7 @@ public class SYSFilesTools {
      * @param file File Objekt der zu speichernden Datei
      * @return EB der neuen Datei. null bei Fehler.
      */
-    private static SYSFiles putFile(EntityManager em, FileTransferClient ftp, File file) throws Exception {
+    private static SYSFiles putFile(EntityManager em, File file) throws Exception {
         SYSFiles sysfile = null;
 
         String md5 = SYSTools.getMD5Checksum(file);
@@ -111,27 +106,13 @@ public class SYSFilesTools {
         // Gibts die Datei schon ?
         if (alreadyExistingFiles.isEmpty()) { // nein, noch nicht
             sysfile = em.merge(new SYSFiles(file.getName(), md5, new Date(file.lastModified()), file.length(), OPDE.getLogin().getUser()));
-//            FileInputStream fis = new FileInputStream(file);
-            ftp.uploadFile(file.getPath(), sysfile.getRemoteFilename());
-
-//            ftp.storeF.storeFile(file.getPath(),sysfile.getRemoteFilename());
+            FtpClient ftpClient = new FtpClient();
+            ftpClient.open();
+            ftpClient.putFile(file, sysfile.getRemoteFilename());
+            ftpClient.close();
             OPDE.info(SYSTools.xx("misc.msg.upload") + ": " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
-//            fis.close();
         } else { // Ansonsten die bestehende Datei zurückgeben
-
             sysfile = alreadyExistingFiles.get(0);
-
-
-            // Does the User own this file already ?
-//            for (SYSFiles mySYSfile : alreadyExistingFiles) {
-//                if (mySYSfile.getResident().equals(resident)) {
-//                    sysfile = mySYSfile;
-//                    break;
-//                }
-//            }
-//            if (sysfile == null) {
-//                sysfile = em.merge(new SYSFiles(file.getName(), md5, new Date(file.lastModified()), file.length(), OPDE.getLogin().getUser(), resident));
-//            }
         }
 
         return sysfile;
@@ -140,167 +121,154 @@ public class SYSFilesTools {
 
     public static List<SYSFiles> putFiles(File[] files, Object attachable) {
         ArrayList<SYSFiles> successful = new ArrayList<SYSFiles>(files.length);
-        FileTransferClient ftp = getFTPClient();
 
-        if (ftp != null) {
-            EntityManager em = OPDE.createEM();
-            try {
-                em.getTransaction().begin();
 
-                for (File file : files) {
-                    if (file.isFile()) { // prevents exceptions if somebody has the bright idea to include directories.
-                        SYSFiles sysfile = putFile(em, ftp, file);
-                        if (attachable != null) {
-                            if (attachable instanceof NReport) {
-                                SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getNrAssignCollection().add(link);
-                                ((NReport) attachable).getAttachedFilesConnections().add(link);
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
 
-                                // backup link to prevent orphaned files
-                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
-                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((NReport) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getResidentAssignCollection().add(link2);
+            for (File file : files) {
+                if (file.isFile()) { // prevents exceptions if somebody has the bright idea to include directories.
+                    SYSFiles sysfile = putFile(em, file);
+                    if (attachable != null) {
+                        if (attachable instanceof NReport) {
+                            SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getNrAssignCollection().add(link);
+                            ((NReport) attachable).getAttachedFilesConnections().add(link);
 
-                            } else if (attachable instanceof Prescription) {
-                                SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescription) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getPreAssignCollection().add(link);
-                                ((Prescription) attachable).getAttachedFilesConnections().add(link);
+                            // backup link to prevent orphaned files
+                            // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                            Resident2File link2 = em.merge(new Resident2File(sysfile, ((NReport) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getResidentAssignCollection().add(link2);
 
-                                // backup link to prevent orphaned files
-                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
-                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((Prescription) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getResidentAssignCollection().add(link2);
+                        } else if (attachable instanceof Prescription) {
+                            SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescription) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getPreAssignCollection().add(link);
+                            ((Prescription) attachable).getAttachedFilesConnections().add(link);
 
-                            } else if (attachable instanceof ResInfo) {
-                                SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (ResInfo) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getBwiAssignCollection().add(link);
-                                ((ResInfo) attachable).getAttachedFilesConnections().add(link);
+                            // backup link to prevent orphaned files
+                            // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                            Resident2File link2 = em.merge(new Resident2File(sysfile, ((Prescription) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getResidentAssignCollection().add(link2);
 
-                                // backup link to prevent orphaned files
-                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
-                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((ResInfo) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getResidentAssignCollection().add(link2);
+                        } else if (attachable instanceof ResInfo) {
+                            SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (ResInfo) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getBwiAssignCollection().add(link);
+                            ((ResInfo) attachable).getAttachedFilesConnections().add(link);
 
-                            } else if (attachable instanceof ResValue) {
-                                SYSVAL2FILE link = em.merge(new SYSVAL2FILE(sysfile, (ResValue) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getValAssignCollection().add(link);
-                                ((ResValue) attachable).getAttachedFilesConnections().add(link);
+                            // backup link to prevent orphaned files
+                            // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                            Resident2File link2 = em.merge(new Resident2File(sysfile, ((ResInfo) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getResidentAssignCollection().add(link2);
 
-                                // backup link to prevent orphaned files
-                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
-                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((ResValue) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getResidentAssignCollection().add(link2);
+                        } else if (attachable instanceof ResValue) {
+                            SYSVAL2FILE link = em.merge(new SYSVAL2FILE(sysfile, (ResValue) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getValAssignCollection().add(link);
+                            ((ResValue) attachable).getAttachedFilesConnections().add(link);
 
-                            } else if (attachable instanceof NursingProcess) {
-                                SYSNP2FILE link = em.merge(new SYSNP2FILE(sysfile, (NursingProcess) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getNpAssignCollection().add(link);
-                                ((NursingProcess) attachable).getAttachedFilesConnections().add(link);
+                            // backup link to prevent orphaned files
+                            // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                            Resident2File link2 = em.merge(new Resident2File(sysfile, ((ResValue) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getResidentAssignCollection().add(link2);
 
-                                // backup link to prevent orphaned files
-                                // https://github.com/tloehr/Offene-Pflege.de/issues/45
-                                Resident2File link2 = em.merge(new Resident2File(sysfile, ((NursingProcess) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getResidentAssignCollection().add(link2);
+                        } else if (attachable instanceof NursingProcess) {
+                            SYSNP2FILE link = em.merge(new SYSNP2FILE(sysfile, (NursingProcess) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getNpAssignCollection().add(link);
+                            ((NursingProcess) attachable).getAttachedFilesConnections().add(link);
 
-                            } else if (attachable instanceof OPUsers) {
-                                User2File link = em.merge(new User2File(sysfile, (OPUsers) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getUsersAssignCollection().add(link);
-                                ((OPUsers) attachable).getAttachedFilesConnections().add(link);
-                            } else if (attachable instanceof Resident) {
-                                Resident2File link = em.merge(new Resident2File(sysfile, (Resident) attachable, OPDE.getLogin().getUser(), new Date()));
-                                sysfile.getResidentAssignCollection().add(link);
-                                ((Resident) attachable).getAttachedFilesConnections().add(link);
-                            }
+                            // backup link to prevent orphaned files
+                            // https://github.com/tloehr/Offene-Pflege.de/issues/45
+                            Resident2File link2 = em.merge(new Resident2File(sysfile, ((NursingProcess) attachable).getResident(), OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getResidentAssignCollection().add(link2);
+
+                        } else if (attachable instanceof OPUsers) {
+                            User2File link = em.merge(new User2File(sysfile, (OPUsers) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getUsersAssignCollection().add(link);
+                            ((OPUsers) attachable).getAttachedFilesConnections().add(link);
+                        } else if (attachable instanceof Resident) {
+                            Resident2File link = em.merge(new Resident2File(sysfile, (Resident) attachable, OPDE.getLogin().getUser(), new Date()));
+                            sysfile.getResidentAssignCollection().add(link);
+                            ((Resident) attachable).getAttachedFilesConnections().add(link);
                         }
-                        successful.add(sysfile);
                     }
-                    if (successful.size() != files.length) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.nodirectories")));
-                    }
+                    successful.add(sysfile);
                 }
-                em.getTransaction().commit();
-            } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                    OPDE.getMainframe().emptyFrame();
-                    OPDE.getMainframe().afterLogin();
-                }
-                // Bereits gespeicherte wieder löschen
-//                for (SYSFiles sysfile : successful) {
-//                    try {
-//                        ftp.deleteFile(sysfile.getRemoteFilename());
-//                    } catch (IOException e) {
-//                        OPDE.fatal(e);
-//                    }
-//                }
-                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-            } catch (Exception ex) {
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                // Bereits gespeicherte wieder löschen
-//                for (SYSFiles sysfile : successful) {
-//                    try {
-//                        ftp.deleteFile(sysfile.getRemoteFilename());
-//                    } catch (IOException e) {
-//                        OPDE.fatal(e);
-//                    }
-//                }
-                OPDE.fatal(ex);
-            } finally {
-                em.close();
-                try {
-                    ftp.disconnect();
-                } catch (Exception e) {
-                    OPDE.error(e);
+                if (successful.size() != files.length) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.nodirectories")));
                 }
             }
+            em.getTransaction().commit();
+        } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            // Bereits gespeicherte wieder löschen
+//                for (SYSFiles sysfile : successful) {
+//                    try {
+//                        ftp.deleteFile(sysfile.getRemoteFilename());
+//                    } catch (IOException e) {
+//                        OPDE.fatal(e);
+//                    }
+//                }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+
         }
+
         return successful;
     }
 
-    public static void detachFiles(SYSFiles[] files, SYSFilesContainer sysFilesContainer) {
-
-        FileTransferClient ftp = getFTPClient();
-
-        if (ftp != null) {
-            EntityManager em = OPDE.createEM();
-            try {
-                em.getTransaction().begin();
-
-                for (SYSFiles sysfile : files) {
-                    SYSFilesLink link = em.merge(sysFilesContainer.detachFile(sysfile));
-                    em.remove(link);
-                }
-
-                em.getTransaction().commit();
-            } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                    OPDE.getMainframe().emptyFrame();
-                    OPDE.getMainframe().afterLogin();
-                }
-                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-            } catch (Exception ex) {
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                OPDE.fatal(ex);
-            } finally {
-                em.close();
-                try {
-                    ftp.disconnect();
-                } catch (Exception e) {
-                    OPDE.error(e);
-                }
-            }
-        }
-    }
+//    public static void detachFiles(SYSFiles[] files, SYSFilesContainer sysFilesContainer) {
+//
+//        FileTransferClient ftp = getFTPClient();
+//
+//        if (ftp != null) {
+//            EntityManager em = OPDE.createEM();
+//            try {
+//                em.getTransaction().begin();
+//
+//                for (SYSFiles sysfile : files) {
+//                    SYSFilesLink link = em.merge(sysFilesContainer.detachFile(sysfile));
+//                    em.remove(link);
+//                }
+//
+//                em.getTransaction().commit();
+//            } catch (OptimisticLockException ole) {
+//                OPDE.warn(ole);
+//                if (em.getTransaction().isActive()) {
+//                    em.getTransaction().rollback();
+//                }
+//                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+//                    OPDE.getMainframe().emptyFrame();
+//                    OPDE.getMainframe().afterLogin();
+//                }
+//                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+//            } catch (Exception ex) {
+//                if (em.getTransaction().isActive()) {
+//                    em.getTransaction().rollback();
+//                }
+//                OPDE.fatal(ex);
+//            } finally {
+//                em.close();
+//                try {
+//                    ftp.disconnect();
+//                } catch (Exception e) {
+//                    OPDE.error(e);
+//                }
+//            }
+//        }
+//    }
 
 
     /**
@@ -321,16 +289,9 @@ public class SYSFilesTools {
      * @param sysfile - Datei, die vom FTP Server geholt werden soll.
      * @return File Objekt der geladenen Datei, null bei Fehler.
      */
-    private static File getFile(SYSFiles sysfile, EventListener eventListener) {
+    private static File getFile(SYSFiles sysfile) {
         File target = null;
         try {
-            FileTransferClient ftp = getFTPClient();
-
-            // https://github.com/tloehr/Offene-Pflege.de/issues/38
-            if (ftp == null) {
-                throw new FTPException("FTP server unreachable");
-            }
-
 
             String sep = System.getProperties().getProperty("file.separator"); // Fileseparator
 
@@ -340,18 +301,18 @@ public class SYSFilesTools {
                 OPDE.info(SYSTools.xx("misc.msg.download") + ": " + OPDE.getProps().getProperty("FTPServer") + "://" + OPDE.getProps().getProperty("FTPWorkingDirectory") + "/" + sysfile.getFilename());
                 FileUtils.deleteQuietly(target);
 
-                ftp.setEventListener(eventListener);
-                ftp.downloadFile(AppInfo.getOPCache() + sep + sysfile.getFilename(), sysfile.getRemoteFilename());
+                FtpClient ftpClient = new FtpClient();
+                ftpClient.open();
+                ftpClient.getFile(sysfile.getRemoteFilename(), AppInfo.getOPCache() + sep + sysfile.getFilename());
+                ftpClient.close();
+
                 target = new File(AppInfo.getOPCache() + sep + sysfile.getFilename());
                 target.setLastModified(sysfile.getFiledate().getTime());
-            }
 
-            ftp.disconnect();
-        } catch (FTPException ftpex) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("FTPError: " + ftpex.getMessage(), "SYSFilesTools.getFile(SYSFiles, EventListener)"));
-            target = null;
+            }
         } catch (Exception ex) {
-            OPDE.fatal(ex);
+            OPDE.error(ex);
+            target = null;
         }
         return target;
     }
@@ -390,9 +351,10 @@ public class SYSFilesTools {
 
         if (success) {
             try {
-                FileTransferClient ftp = getFTPClient();
-                ftp.deleteFile(sysfile.getRemoteFilename());
-                ftp.disconnect();
+                FtpClient ftpClient = new FtpClient();
+                ftpClient.open();
+                ftpClient.delete(sysfile.getRemoteFilename());
+                ftpClient.close();
                 OPDE.info("DELETING FILE FROM FTPSERVER: " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
             } catch (Exception e) {
                 OPDE.error(e);
@@ -500,53 +462,52 @@ public class SYSFilesTools {
         if (sysfile == null) {
             return;
         }
-        handleFile(getFile(sysfile, null), action);
+        handleFile(getFile(sysfile), action);
     }
 
-    public static FileTransferClient getFTPClient(Properties ftpProps) throws Exception {
-        FileTransferClient ftp = new FileTransferClient();
-
-        ftp.setRemoteHost(ftpProps.getProperty(SYSPropsTools.KEY_FTP_HOST));
-        ftp.setUserName(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER));
-        ftp.setPassword(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
-        OPDE.debug(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT));
-        ftp.setRemotePort(Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));
-        ftp.connect();
-        ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
-        if (!ftpProps.getProperty(SYSPropsTools.KEY_FTP_WD).isEmpty()) {
-            ftp.changeDirectory(ftpProps.getProperty(SYSPropsTools.KEY_FTP_WD));
-        }
-
-
-        return ftp;
-    }
-
-
-    public static FileTransferClient getFTPClient() {
-        FileTransferClient ftp;
-        try {
-            ftp = getFTPClient(OPDE.getProps());
-        } catch (Exception e) {
-            OPDE.error(e);
-            ftp = null;
-
-        }
-        return ftp;
-    }
-
-    public static boolean isFTPServerReady() {
-        FileTransferClient ftp = getFTPClient();
-        boolean ready = ftp != null;
-        if (ready) {
-            try {
-                ftp.disconnect();
-            } catch (Exception e) {
-                OPDE.error(e);
-                ready = false;
-            }
-        }
-        return ready;
-    }
+//    public static FileTransferClient getFTPClient(Properties ftpProps) throws Exception {
+//        FileTransferClient ftp = new FileTransferClient();
+//
+//        ftp.setRemoteHost(ftpProps.getProperty(SYSPropsTools.KEY_FTP_HOST));
+//        ftp.setUserName(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER));
+//        ftp.setPassword(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
+//        ftp.setRemotePort(Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));
+//        ftp.connect();
+//        ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
+//        if (!ftpProps.getProperty(SYSPropsTools.KEY_FTP_WD).isEmpty()) {
+//            ftp.changeDirectory(ftpProps.getProperty(SYSPropsTools.KEY_FTP_WD));
+//        }
+//
+//
+//        return ftp;
+//    }
+//
+//
+//    public static FileTransferClient getFTPClient() {
+//        FileTransferClient ftp;
+//        try {
+//            ftp = getFTPClient(OPDE.getProps());
+//        } catch (Exception e) {
+//            OPDE.error(e);
+//            ftp = null;
+//
+//        }
+//        return ftp;
+//    }
+//
+//    public static boolean isFTPServerReady() {
+//        FileTransferClient ftp = getFTPClient();
+//        boolean ready = ftp != null;
+//        if (ready) {
+//            try {
+//                ftp.disconnect();
+//            } catch (Exception e) {
+//                OPDE.error(e);
+//                ready = false;
+//            }
+//        }
+//        return ready;
+//    }
 
 //    public static String getDatumUndUser(SYSFiles sysFiles) {
 //        String result = "";
