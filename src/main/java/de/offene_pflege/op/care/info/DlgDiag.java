@@ -212,7 +212,7 @@ public class DlgDiag extends MyJDialog {
         btnOK = new JButton();
 
         //======== this ========
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
         //======== jPanel1 ========

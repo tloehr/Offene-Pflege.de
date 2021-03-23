@@ -363,7 +363,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         // die morgens noch einen gültigen Heimvertrag hatten. Wird auch so in der
         // QDVS Vorgabe beschrieben. Selbst wenn der über Tag stirbt oder auszieht, war er
         // doch am Tag der Erhebung noch da.
-        liste_bewohner = ResidentTools.getAll(STICHTAG.atTime(23,59,59));
+        liste_bewohner = ResidentTools.getAll(STICHTAG.atStartOfDay());
         tblResidents.setModel(new DefaultTreeModel(createTree()));
     }
 

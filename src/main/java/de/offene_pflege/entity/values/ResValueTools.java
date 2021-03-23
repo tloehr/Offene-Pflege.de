@@ -139,11 +139,9 @@ public class ResValueTools {
     }
 
     public static Optional<ResValue> getMostRecentBefore(Resident resident, short type, LocalDateTime before) {
-
-
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
-                " SELECT b FROM ResValue b WHERE b.resident = :bewohner AND b.pit <= :before AND b.replacedBy IS NULL AND b.vtype.valType = :type " +
+                " SELECT b FROM ResValue b WHERE b.resident = :bewohner AND b.pit <= :before AND b.editedBy IS NULL AND b.vtype.valType = :type " +
                 " ORDER BY b.pit DESC ");
         query.setMaxResults(1);
         query.setParameter("bewohner", resident);
@@ -170,7 +168,6 @@ public class ResValueTools {
      * @return der Wert. <code>null</code>, wenn es keinen gibt.
      */
     public static Optional<ResValue> getLast(Resident resident, short type) {
-
         return getMostRecentBefore(resident, type, LocalDateTime.now());
     }
 
@@ -276,7 +273,7 @@ public class ResValueTools {
         boolean result = false;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 > 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
+        Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 > 0 AND b.editedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
         query.setParameter("type", ResvaluetypesService.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
@@ -291,7 +288,7 @@ public class ResValueTools {
         boolean result = false;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 < 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
+        Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 < 0 AND b.editedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
         query.setParameter("type", ResvaluetypesService.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
@@ -764,7 +761,6 @@ public class ResValueTools {
         Query query = em.createQuery("" +
                 " SELECT rv FROM ResValue rv " +
                 " WHERE rv.resident = :resident " +
-                " AND rv.replacedBy IS NULL " +
                 " AND rv.editedBy IS NULL " +
                 " AND rv.vtype.valType = :valType" +
                 " AND rv.pit >= :from" +
@@ -800,83 +796,12 @@ public class ResValueTools {
     }
 
 
-//    public static BigDecimal getIngestion(Resident resident, LocalDate day) {
-//        // First BD is for the influx, second for the outflow
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("" +
-//                " SELECT SUM(rv.val1) FROM ResValue rv " +
-//                " WHERE rv.resident = :resident " +
-//                " AND rv.replacedBy IS NULL " +
-//                " AND rv.editedBy IS NULL " +
-//                " AND rv.val1 > 0 " +
-//                " AND rv.vtype.valType = :valType " +
-//                " AND rv.pit >= :from " +
-//                " AND rv.pit <= :to ");
-//
-//        query.setParameter("resident", resident);
-//        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
-//        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
-//        query.setParameter("to", SYSCalendar.eod(day).toDate());
-//        BigDecimal sum = (BigDecimal) query.getSingleResult();
-//        em.close();
-//
-//        return sum == null ? BigDecimal.ZERO : sum;
-//    }
-//
-//    public static BigDecimal getEgestion(Resident resident, LocalDate day) {
-//        // First BD is for the influx, second for the outflow
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("" +
-//                " SELECT SUM(rv.val1) FROM ResValue rv " +
-//                " WHERE rv.resident = :resident " +
-//                " AND rv.replacedBy IS NULL " +
-//                " AND rv.editedBy IS NULL " +
-//                " AND rv.val1 < 0 " +
-//                " AND rv.vtype.valType = :valType " +
-//                " AND rv.pit >= :from " +
-//                " AND rv.pit <= :to ");
-//
-//        query.setParameter("resident", resident);
-//        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
-//        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
-//        query.setParameter("to", SYSCalendar.eod(day).toDate());
-//        BigDecimal sum = (BigDecimal) query.getSingleResult();
-//        em.close();
-//
-//        return sum == null ? BigDecimal.ZERO : sum;
-//    }
-
-//    public static BigDecimal getAvgIn(Resident resident, DateMidnight month) {
-//        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
-//        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
-//
-//        // First BD is for the influx, second for the outflow
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("" +
-//                " SELECT AVG(rv.val1) FROM ResValue rv " +
-//                " WHERE rv.resident = :resident " +
-//                " AND rv.replacedBy IS NULL " +
-//                " AND rv.vtype.valType = :valType" +
-//                " AND rv.val1 >= 0 " +
-//                " AND rv.pit >= :from" +
-//                " AND rv.pit <= :to" +
-//                " ORDER BY rv.pit DESC ");
-//        query.setParameter("resident", resident);
-//        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
-//        query.setParameter("from", from.toDate());
-//        query.setParameter("from", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
-//        BigDecimal avg = (BigDecimal) query.getSingleResult();
-//        em.close();
-//
-//        return avg == null ? BigDecimal.ZERO : avg;
-//    }
-
     public static HashMap<LocalDate, BigDecimal> getLiquidIn(Resident resident, LocalDate from) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
                 " SELECT rv FROM ResValue rv " +
                 " WHERE rv.resident = :resident " +
-                " AND rv.replacedBy IS NULL " +
+                " AND rv.editedBy IS NULL " +
                 " AND rv.vtype.valType = :valType " +
                 " AND rv.val1 > 0 " +
                 " AND rv.pit >= :from" +
@@ -899,36 +824,6 @@ public class ResValueTools {
 
         return hm;
     }
-
-//    public static HashMap<DateMidnight, BigDecimal> getLiquidOut(Resident resident, DateMidnight from) {
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("" +
-//                " SELECT rv FROM ResValue rv " +
-//                " WHERE rv.resident = :resident " +
-//                " AND rv.replacedBy IS NULL " +
-//                " AND rv.vtype.valType = :valType " +
-//                " AND rv.val1 < 0 " +
-//                " AND rv.pit >= :from" +
-//                " ORDER BY rv.pit DESC ");
-//        query.setParameter("resident", resident);
-//        query.setParameter("valType", ResvaluetypesTools.LIQUIDBALANCE);
-//        query.setParameter("from", from.toDate());
-//        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
-//        em.close();
-//
-//        HashMap<DateMidnight, BigDecimal> hm = new HashMap<DateMidnight, BigDecimal>();
-//        for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
-//            hm.put(day, BigDecimal.ZERO);
-//        }
-//
-//        for (ResValue val : list) {
-//            BigDecimal bd = hm.get(new DateMidnight(val.getPit()));
-//            hm.put(new DateMidnight(val.getPit()), bd.add(val.getVal1()));
-//        }
-//
-//        return hm;
-//    }
-
 
     /**
      * Ermittelt eine Liste von Bewohner, die über eine bestimtme Zeit keinen Stuhlgang hatten. Aber nur falls eine

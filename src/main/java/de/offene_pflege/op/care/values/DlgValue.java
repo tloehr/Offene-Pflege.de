@@ -93,11 +93,16 @@ public class DlgValue extends MyJDialog {
 
     private void txtWert1FocusLost(FocusEvent e) {
         if (resValue == null) return;
+        BigDecimal min = resValue.getType().getMin1() == null ? BigDecimal.valueOf(-1000L) : resValue.getType().getMin1();
+        BigDecimal max = resValue.getType().getMax1() == null ? BigDecimal.valueOf(1000L) : resValue.getType().getMax1();
 
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+
         if (bd == null) {
             ((JTextField) e.getSource()).setText(dcf1.format(resValue.getVal1()));
         } else {
+            bd = bd.min(max);
+            bd = bd.max(min);
             ((JTextField) e.getSource()).setText(dcf1.format(bd));
         }
     }
@@ -203,7 +208,7 @@ public class DlgValue extends MyJDialog {
                 thisWindowClosing(e);
             }
         });
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
                 "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",
                 "14dlu, $lgap, pref, 3*($lgap, default), 2*($lgap, fill:default:grow), $lgap, 14dlu"));

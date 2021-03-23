@@ -11,10 +11,11 @@
         <checkbox label="Mindestens 10% Gewichtsverlust während eines Krankenhausaufenthalts" name="3"
                   layout="br left"/>
         <checkbox
-                label="Aktuelles Gewicht liegt nicht vor. BW wird aufgrund einer Entscheidung des Arztes oder der Angehörigen oder eines Betreuers nicht mehr gewogen"
+                label="Aktuelles Gewicht bzw. Körpergröße liegt nicht vor. BW wird aufgrund einer Entscheidung des Arztes oder der Angehörigen oder eines Betreuers nicht mehr gewogen"
                 name="4" layout="br left"/>
         <checkbox
-                label="Aktuelles Gewicht liegt nicht vor. BW möchte nicht gewogen werden" name="5" layout="br left"/>
+                label="Aktuelles Gewicht bzw. Körpergröße liegt nicht vor. BW möchte nicht gewogen werden" name="5"
+                layout="br left"/>
     </tabgroup>
 
 

@@ -26,6 +26,12 @@ public class Resvaluetypes extends DefaultEntity {
     private String format2;
     private String format3;
     private boolean active;
+    private BigDecimal min1;
+    private BigDecimal min2;
+    private BigDecimal min3;
+    private BigDecimal max1;
+    private BigDecimal max2;
+    private BigDecimal max3;
 
     @Basic
     @Column(name = "Text", nullable = false, length = 100)
@@ -177,4 +183,63 @@ public class Resvaluetypes extends DefaultEntity {
         this.active = active;
     }
 
+    @Basic
+    @Column(name = "min1", nullable = true, precision = 2)
+    public BigDecimal getMin1() {
+        return min1;
+    }
+
+    public void setMin1(BigDecimal min1) {
+        this.min1 = min1;
+    }
+
+    @Basic
+    @Column(name = "min2", nullable = true, precision = 2)
+    public BigDecimal getMin2() {
+        return min2;
+    }
+
+    public void setMin2(BigDecimal min2) {
+        this.min2 = min2;
+    }
+
+    @Basic
+    @Column(name = "min3", nullable = true, precision = 2)
+    public BigDecimal getMin3() {
+        return min3;
+    }
+
+    public void setMin3(BigDecimal min3) {
+        this.min3 = min3;
+    }
+
+    @Basic
+    @Column(name = "max1", nullable = true, precision = 2)
+    public BigDecimal getMax1() {
+        return max1;
+    }
+
+    public void setMax1(BigDecimal max1) {
+        this.max1 = max1;
+    }
+
+    @Basic
+    @Column(name = "max2", nullable = true, precision = 2)
+    public BigDecimal getMax2() {
+        return max2;
+    }
+
+    public void setMax2(BigDecimal max2) {
+        this.max2 = max2;
+    }
+
+    @Basic
+    @Column(name = "max3", nullable = true, precision = 2)
+    public BigDecimal getMax3() {
+        return max3;
+    }
+
+    public void setMax3(BigDecimal max3) {
+        this.max3 = max3;
+    }
 }

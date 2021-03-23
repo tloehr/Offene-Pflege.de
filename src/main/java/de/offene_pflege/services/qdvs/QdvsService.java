@@ -30,8 +30,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -375,15 +373,33 @@ public class QdvsService implements HasLogger {
                     listeBWFehlerfrei.remove(resident);
                 }
 
-                if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG).isPresent()) {
-                    residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
-                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.weight.missing")));
-                    listeBWFehlerfrei.remove(resident);
+                /**
+                 * Aus der FAQ:
+                 * Körpergröße und Gewicht
+                 * Was gibt man an, wenn der Bewohner, bzw. die Bewohnerin die Messung der Körpergröße ablehnt?
+                 * In diesem Fall kann die Angabe „0“ erfolgen.
+                 */
+                Optional<ResInfo> gewichtdoku = ResInfoTools.getValidOnThatDayIfAny(resident, KOERPERGEWICHTDOKU, STICHTAG);
+                boolean groesse_gewicht_noetig = true;
+                if (gewichtdoku.isPresent()) {
+                    Properties content = ResInfoTools.getContent(gewichtdoku.get());
+                    // wenn eine gewichtsdoku vorhanden ist und die Felder 4 und/oder 5 ausgefüllt wurden, dann ist es egal ob gewicht oder größe vorhanden sind
+                    // also beides ist nötig, WENN 4 UND 5 nicht ausgefüllt sind.
+                    groesse_gewicht_noetig = content.getProperty("4", "false").equalsIgnoreCase("false") && content.getProperty("5", "false").equalsIgnoreCase("false");
                 }
-                if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, STICHTAG).isPresent()) {
-                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.height.missing")));
-                    listeBWFehlerfrei.remove(resident);
+
+                if (groesse_gewicht_noetig) {
+                    if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG).isPresent()) {
+                        residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
+                        textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.weight.missing")));
+                        listeBWFehlerfrei.remove(resident);
+                    }
+                    if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, STICHTAG).isPresent()) {
+                        textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.height.missing")));
+                        listeBWFehlerfrei.remove(resident);
+                    }
                 }
+
             } else { // Mindestprüfung ausgeschlossene BW (Minimaldatensatz)
 
                 notwendigeTypen.retainAll(necessary_resinfotypes_for_excluded_residents); // alles hier rein, was notwendig und bereits vorhanden ist
@@ -500,7 +516,7 @@ public class QdvsService implements HasLogger {
 
         /** 8 */qsMdsData.setAUSSCHLUSSGRUND(of.createDasQsDataMdsTypeAUSSCHLUSSGRUND());
         qsMdsData.getAUSSCHLUSSGRUND().setValue(residentInfoObjectMap.get(resident).getAusschluss_grund()); // in der map stehen die ausschlussgründe drin
-        if (residentInfoObjectMap.get(resident).getAusschluss_grund() != QdvsResidentInfoObject.MDS_GRUND_KURZZEIT){
+        if (residentInfoObjectMap.get(resident).getAusschluss_grund() != QdvsResidentInfoObject.MDS_GRUND_KURZZEIT) {
             // Bei KZP darf das Einzugsdatum nicht stehen. Denn das bezieht sich nur auf den DAUERHAFTEN Aufenthalt.
             qsMdsData.getEINZUGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, STICHTAG).get().getFrom()));
         }
@@ -959,21 +975,23 @@ public class QdvsService implements HasLogger {
     }
 
     private void groesse_gewicht(DasQsDataType qsData, Resident resident) {
-        ResValue weight = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG).get();
-        ResValue height = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, STICHTAG).get();
+        Optional<ResValue> weight = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG);
+        Optional<ResValue> height = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, STICHTAG);
 
-        getLogger().debug("Gewicht: " + weight.toString());
-        getLogger().debug("Größe: " + height.toString());
+        // wenn die groesse nicht da ist, dann muss es eine passende Gewichtsdoku gegeben haben (Feld 4 oder 5).
+        // sonst wäre das bereits in der Vorprüfung gestoppt worden.
 
         /** 72 */qsData.setKOERPERGROESSE(of.createDasQsDataTypeKOERPERGROESSE());
-        qsData.getKOERPERGROESSE().setValue(height.getVal1().multiply(BigDecimal.valueOf(100)).intValue()); // umrechnung von meter in centimeter
+        if (height.isPresent())
+            qsData.getKOERPERGROESSE().setValue(height.get().getVal1().multiply(BigDecimal.valueOf(100)).intValue());
+
 
         /** 73 */qsData.setKOERPERGEWICHT(of.createDasQsDataTypeKOERPERGEWICHT());
-        qsData.getKOERPERGEWICHT().setValue(weight.getVal1());
-
         /** 74 */qsData.setKOERPERGEWICHTDATUM(of.createDasQsDataTypeKOERPERGEWICHTDATUM());
-        qsData.getKOERPERGEWICHTDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(weight.getPit()));
-
+        if (weight.isPresent()) {
+            qsData.getKOERPERGEWICHT().setValue(weight.get().getVal1());
+            qsData.getKOERPERGEWICHTDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(weight.get().getPit()));
+        }
 
         /** 75 */
         // Ich suche den letzten ResInfo mit einem Gewichts Kommentar. Wenn es einen gibt
@@ -1276,6 +1294,7 @@ public class QdvsService implements HasLogger {
                 /** 88 */qsData.getEINZUGNACHKZ().setValue(1);
                 Optional<ResInfo> kzp = ResInfoTools.getKZPvorDauerhaft(aufenthalt.get());
                 /** 89 */
+                // Datum: Beginn des Kurzzeitpflegeaufenthalts
                 kzp.ifPresent(resInfo -> qsData.getEINZUGNACHKZDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(resInfo.getFrom())));
             }
 

@@ -645,10 +645,10 @@ SET t.XML = ' <qdvs
               <checkbox label="Mindestens 10% Gewichtsverlust während eines Krankenhausaufenthalts" name="3"
                         layout="br left"/>
               <checkbox
-                      label="Aktuelles Gewicht liegt nicht vor. BW wird aufgrund einer Entscheidung des Arztes oder der Angehörigen oder eines Betreuers nicht mehr gewogen"
+                      label="Aktuelles Gewicht bzw. Körpergröße liegt nicht vor. Wird aufgrund einer Entscheidung des Arztes oder der Angehörigen oder eines Betreuers nicht mehr ermittelt."
                       name="4" layout="br left"/>
               <checkbox
-                      label="Aktuelles Gewicht liegt nicht vor. BW möchte nicht gewogen werden" name="5" layout="br left"/>
+                      label="Aktuelles Gewicht bzw. Körpergröße liegt nicht vor. BW möchte nicht gewogen werden." name="5" layout="br left"/>
           </tabgroup>
           '
 WHERE t.BWINFTYP = 'gewdoku1';
@@ -1885,10 +1885,20 @@ alter table dfn
 --
 alter table resvaluetypes
     add active bool default true not null,
-    add version  bigint(20) not null;
+    add version  bigint(20) not null,
+    add min1 DECIMAL(9,2) default null comment 'minimum value for value1',
+    add min2 DECIMAL(9,2) default null comment 'minimum value for value2',
+    add min3 DECIMAL(9,2) default null comment 'minimum value for value3',
+    add max1 DECIMAL(9,2) default null comment 'minimum value for value1',
+    add max2 DECIMAL(9,2) default null comment 'minimum value for value2',
+    add max3 DECIMAL(9,2) default null comment 'minimum value for value3';
 UPDATE resvaluetypes t
 SET t.active = 0
 WHERE t.ID = 14;
+UPDATE resvaluetypes t SET t.min1 = 0.1 WHERE t.ID = 6;
+UPDATE resvaluetypes t SET t.min1 = 1.00 WHERE t.ID = 5;
+UPDATE opde.resvaluetypes t SET t.max1 = 3.00 WHERE t.ID = 6;
+UPDATE opde.resvaluetypes t SET t.max1 = 500.00 WHERE t.ID = 5;
 --
 alter table floors
   change floorid id bigint unsigned auto_increment;
