@@ -88,45 +88,38 @@ public class DlgValue extends MyJDialog {
         lblText.setText(SYSTools.xx("misc.msg.comment"));
         lblNoValue.setText(SYSTools.xx("misc.msg.novaluesneeded"));
         lblNoValue.setVisible(resValue.getVal1() == null && resValue.getVal2() == null && resValue.getVal3() == null);
+    }
 
+    private void txtWertFocusLost(JTextField txt, BigDecimal min, BigDecimal max) {
+        BigDecimal bd = SYSTools.parseDecimal(txt.getText());
+        if (bd == null) {
+            txt.setText(dcf1.format(resValue.getVal1()));
+        } else {
+            bd = bd.min(max);
+            bd = bd.max(min);
+            txt.setText(dcf1.format(bd));
+        }
     }
 
     private void txtWert1FocusLost(FocusEvent e) {
         if (resValue == null) return;
         BigDecimal min = resValue.getType().getMin1() == null ? BigDecimal.valueOf(-1000L) : resValue.getType().getMin1();
         BigDecimal max = resValue.getType().getMax1() == null ? BigDecimal.valueOf(1000L) : resValue.getType().getMax1();
-
-        BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
-
-        if (bd == null) {
-            ((JTextField) e.getSource()).setText(dcf1.format(resValue.getVal1()));
-        } else {
-            bd = bd.min(max);
-            bd = bd.max(min);
-            ((JTextField) e.getSource()).setText(dcf1.format(bd));
-        }
+        txtWertFocusLost((JTextField) e.getSource(), min, max);
     }
 
     private void txtWert2FocusLost(FocusEvent e) {
         if (resValue == null) return;
-
-        BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
-        if (bd == null) {
-            ((JTextField) e.getSource()).setText(dcf2.format(resValue.getVal2()));
-        } else {
-            ((JTextField) e.getSource()).setText(dcf2.format(bd));
-        }
+        BigDecimal min = resValue.getType().getMin1() == null ? BigDecimal.valueOf(-1000L) : resValue.getType().getMin2();
+        BigDecimal max = resValue.getType().getMax1() == null ? BigDecimal.valueOf(1000L) : resValue.getType().getMax2();
+        txtWertFocusLost((JTextField) e.getSource(), min, max);
     }
 
     private void txtWert3FocusLost(FocusEvent e) {
         if (resValue == null) return;
-
-        BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
-        if (bd == null) {
-            ((JTextField) e.getSource()).setText(dcf3.format(resValue.getVal3()));
-        } else {
-            ((JTextField) e.getSource()).setText(dcf3.format(bd));
-        }
+        BigDecimal min = resValue.getType().getMin1() == null ? BigDecimal.valueOf(-1000L) : resValue.getType().getMin3();
+        BigDecimal max = resValue.getType().getMax1() == null ? BigDecimal.valueOf(1000L) : resValue.getType().getMax3();
+        txtWertFocusLost((JTextField) e.getSource(), min, max);
     }
 
     private boolean saveOK() {

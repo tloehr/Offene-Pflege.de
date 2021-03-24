@@ -455,9 +455,7 @@ public class QdvsService implements HasLogger {
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", 60)));
             alltag_soziales(residentType.getQsData(), resident);
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Dekubitus", 60)));
-
             dekubitus(residentType.getQsData(), resident);
-
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", 60)));
             groesse_gewicht(residentType.getQsData(), resident);
             getLogger().debug(String.format("===---%s---===", StringUtils.center("Sturz", 60)));
@@ -890,7 +888,7 @@ public class QdvsService implements HasLogger {
             connectionIDs.add(resInfo.getConnectionid());
             auswertung_dekubitus.put(resInfo.getConnectionid(), Quintet.with(resInfo.getConnectionid(), 1, 0, SYSConst.LD_UNTIL_FURTHER_NOTICE, SYSConst.LD_VERY_BEGINNING)); // Basisfall, 1 ist bei uns. Wird aber sowieso überschrieben.
         });
-        getLogger().debug(String.format("%d Wunden gefunden", liste_wunden.size()));
+//        getLogger().debug(String.format("%d Wunden gefunden", liste_wunden.size()));
 
         // Jetzt nehme ich mir jeden Wundverlauf einzeln vor und möchte wissen:
         // entstehungsort
@@ -1284,7 +1282,6 @@ public class QdvsService implements HasLogger {
         /** 92 */qsData.setEINZUGKHENDEDATUM(of.createDasQsDataTypeEINZUGKHENDEDATUM());
         /** 93 */qsData.setEINZUGGESPR(of.createDasQsDataTypeEINZUGGESPR());
         /** 94 */qsData.setEINZUGGESPRDATUM(of.createDasQsDataTypeEINZUGGESPRDATUM());
-        /** 95 */qsData.getEINZUGGESPRTEILNEHMER().add(of.createDasQsDataTypeEINZUGGESPRTEILNEHMER()); // leer
         /** 96 */qsData.setEINZUGGESPRDOKU(of.createDasQsDataTypeEINZUGGESPRDOKU());
 
         if (NEUEINZUG == 1) { /** 87 */
@@ -1312,18 +1309,18 @@ public class QdvsService implements HasLogger {
                     break;
                 }
             }
-            //todo: teste  aufnahme gespräche
-
             // Ist in den Wochen nach dem Einzug mit dem Bewohner bzw. der Bewohnerin und/oder einer seiner bzw. ihrer Angehörigen
             // oder sonstigen Vertrauenspersonen ein Gespräch über sein bzw. ihr Einleben und die zuküntiige Versorgung geführt worden?
             ResInfo integration = ResInfoTools.getLastResinfo(resident, INTEGRATION);
-            if (integration == null) { // kann sein, wenn der Einzug kurz vor dem Ende des EEZ (Ergebniserfassungszeitraum) war und das Integrationsgespräch noch nicht stattgefunden hat.
+            // kann sein, wenn der Einzug kurz vor dem Ende des EEZ (Ergebniserfassungszeitraum) war und das Integrationsgespräch noch nicht stattgefunden hat.
+            if (integration == null || integration.getFrom().after(JavaTimeConverter.toDate(STICHTAG))) {
+                /** 95 */qsData.getEINZUGGESPRTEILNEHMER().add(of.createDasQsDataTypeEINZUGGESPRTEILNEHMER()); // leer
                 /** 93 */qsData.getEINZUGGESPR().setValue(3); // nein aus anderen Gründen
             } else {
                 Properties content = ResInfoTools.getContent(integration);
                 qsData.getEINZUGGESPR().setValue(Integer.valueOf(content.getProperty("EINZUGGESPR")));
                 if (qsData.getEINZUGGESPR().getValue() == 1) {
-                    qsData.getEINZUGGESPRDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.toLocalDateTime(content.getProperty("EINZUGGESPRDATUM")).toLocalDate()));
+                    qsData.getEINZUGGESPRDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(integration.getFrom()));
 
                     /** 95 */DasQsDataType.EINZUGGESPRTEILNEHMER et0 = of.createDasQsDataTypeEINZUGGESPRTEILNEHMER();
                     DasQsDataType.EINZUGGESPRTEILNEHMER et1 = of.createDasQsDataTypeEINZUGGESPRTEILNEHMER();
@@ -1348,6 +1345,8 @@ public class QdvsService implements HasLogger {
                     qsData.getEINZUGGESPRDOKU().setValue(Integer.valueOf(content.getProperty("EINZUGGESPRDOKU")));
                 }
             }
+        } else {
+            /** 95 */qsData.getEINZUGGESPRTEILNEHMER().add(of.createDasQsDataTypeEINZUGGESPRTEILNEHMER()); // leer
         }
     }
 

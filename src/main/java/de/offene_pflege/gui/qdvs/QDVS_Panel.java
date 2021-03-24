@@ -85,7 +85,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     Homes home;
     File workdir;
     QdvsService qdvsService;
-    private List<Resident> liste_bewohner;
+    private final List<Resident> liste_bewohner_zum_stichtag;
+    private final List<Resident> liste_bewohner_zur_auswertung;
     private File target;
     private JSplitPane content;
     private JPanel right;
@@ -105,6 +106,10 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         super("de.offene_pflege.gui.qdvs");
         this.jspSearch = jspSearch;
         qdvsService = new QdvsService(this);
+
+        liste_bewohner_zum_stichtag = new ArrayList<>();
+        liste_bewohner_zur_auswertung = new ArrayList<>();
+
         initPanel();
     }
 
@@ -115,11 +120,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         txtLog.setEditorKit(new HTMLEditorKit());
         txtLog.setEditable(false);
         txtLog.setEnabled(true);
-//        txtLog.setContentType("text/html");
         txtLog.setText(SYSTools.toHTML(SYSConst.html_h1("QDVS Prüfung")));
-//        txtLog = new JTextArea();
-//        txtLog.setLineWrap(true);
-
         right.add(new JScrollPane(txtLog));
 
         JPanel btnpnl = new JPanel();
@@ -183,13 +184,14 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
         HashMap<Long, TreeInfoNode> map_zur_zuordnung_der_fehler = new HashMap<>();
 
-        liste_bewohner.forEach(resident -> {
+        liste_bewohner_zum_stichtag.forEach(resident -> {
             map_zur_zuordnung_der_fehler.put(resident.getIdbewohner(), new TreeInfoNode(resident));
             root.add(map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()));
         });
+
         if (vorpruefungOK) {
-            // icons auf grün
-            liste_bewohner.forEach(resident -> map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()).setType(TreeInfoNode.RESIDENT_GREEN));
+            // icons auf grün für alle die dabei waren
+            liste_bewohner_zur_auswertung.forEach(resident -> map_zur_zuordnung_der_fehler.get(resident.getIdbewohner()).setType(TreeInfoNode.RESIDENT_GREEN));
 
             Map<Resident, ArrayList<String>> fehlerMapFuerLogfile = new HashMap<>();
             ArrayList<String> systemFehlerListe = new ArrayList<>();
@@ -290,7 +292,17 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         File path = new File(workdir, home.getCareproviderid() + File.separator + dir + File.separator);
         target = new File(path, "qs-data.xml");
 
-        qdvsService.setParameters(STICHTAG, BEGINN_ERFASSUNGSZEITRAUM, home, liste_bewohner, target);
+        liste_bewohner_zur_auswertung.clear();
+        // aus testrgründen kann man einzelne BW markieren
+        if (tblResidents.getSelectionModel().getSelectionPaths().length > 0) {
+            Arrays.stream(tblResidents.getSelectionModel().getSelectionPaths()).filter(treePath -> treePath.getLastPathComponent() instanceof TreeInfoNode).forEach(treePath -> {
+                liste_bewohner_zur_auswertung.add((Resident) ((TreeInfoNode) treePath.getLastPathComponent()).getUserObject());
+            });
+        } else {
+            liste_bewohner_zur_auswertung.addAll(liste_bewohner_zum_stichtag);
+        }
+
+        qdvsService.setParameters(STICHTAG, BEGINN_ERFASSUNGSZEITRAUM, home, liste_bewohner_zur_auswertung, target);
 
         ERRORS.clear();
         LOOKUP.clear();
@@ -359,11 +371,11 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
      * mitgeteilt.
      */
     void prepareListOFResidents() {
-        getLogger().debug("setParameters()");
         // die morgens noch einen gültigen Heimvertrag hatten. Wird auch so in der
         // QDVS Vorgabe beschrieben. Selbst wenn der über Tag stirbt oder auszieht, war er
         // doch am Tag der Erhebung noch da.
-        liste_bewohner = ResidentTools.getAll(STICHTAG.atStartOfDay());
+        liste_bewohner_zum_stichtag.clear();
+        liste_bewohner_zum_stichtag.addAll(ResidentTools.getAll(STICHTAG.atStartOfDay()));
         tblResidents.setModel(new DefaultTreeModel(createTree()));
     }
 
@@ -390,20 +402,11 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             STICHTAG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
             BEGINN_ERFASSUNGSZEITRAUM = STICHTAG.minusDays(SYSPropsTools.getInteger(SYSPropsTools.KEY_QDVS_TAGE_ERFASSUNGSPERIODE));
             lblVorherigerStichtag.setText(BEGINN_ERFASSUNGSZEITRAUM.minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
-            addLog(SYSConst.html_paragraph(SYSConst.html_bold("Zeitraum zur Ergebniserfassung: ")+ String.format("%s bis einschließlich %s", BEGINN_ERFASSUNGSZEITRAUM.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)), STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))));
+            addLog(SYSConst.html_paragraph(SYSConst.html_bold("Zeitraum zur Ergebniserfassung: ") + String.format("%s bis einschließlich %s", BEGINN_ERFASSUNGSZEITRAUM.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)), STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))));
             prepareListOFResidents();
         });
-        //dcmbStichtag.setDate(JavaTimeConverter.toDate(STICHTAG));
+
         dcmbStichtag.setSelectedItem(JavaTimeConverter.toDate(STICHTAG));
-//        dcmbErhebung.setShowNoneButton(false);
-//        dcmbErhebung.setInvalidValueAllowed(false);
-//        dcmbErhebung.getDateModel().setMaxDate(new GregorianCalendar());
-//        dcmbErhebung.setDate(JavaTimeConverter.toDate(ERHEBUNG));
-//        dcmbErhebung.addPropertyChangeListener("selectedItem", evt -> {
-//            GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
-//            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG, JavaTimeConverter.to_iso8601(gc));
-//            ERHEBUNG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
-//        });
 
         JComboBox<Homes> cmbHome = new JComboBox<>();
         HomesService.setComboBox(cmbHome);
@@ -534,11 +537,13 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             TreeInfoNode tnode = (TreeInfoNode) node;
 
             if (tnode.getType() <= TreeInfoNode.RESIDENT_RED) { // mieser Trick. :-D
-                String resident = QdvsService.toString((Resident) tnode.getUserObject());
+                Resident bw = (Resident) tnode.getUserObject();
+                String strResident = QdvsService.toString(bw);
+                if (!liste_bewohner_zur_auswertung.contains(bw)) strResident = "<strike>"+strResident+"</strike>";
                 Collections.list(tnode.children()).forEach(treeNode -> buffer.append(toHTML((DefaultMutableTreeNode) treeNode)));
                 if (buffer.length() > 0)
-                    html = SYSConst.html_ul(SYSConst.html_li(resident + SYSConst.html_ul(buffer.toString())));
-                else html = SYSConst.html_ul(SYSConst.html_li(resident));
+                    html = SYSConst.html_ul(SYSConst.html_li(strResident + SYSConst.html_ul(buffer.toString())));
+                else html = SYSConst.html_ul(SYSConst.html_li(strResident));
             } else if (tnode.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
                 html = SYSConst.html_li(tnode.getUserObject().toString());
             } else if (tnode.getType() == TreeInfoNode.ERROR_BY_DAS) {
@@ -636,10 +641,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             if (!(value instanceof TreeInfoNode)) return new JLabel();
 
             TreeInfoNode node = (TreeInfoNode) value;
-//            Object userObject = node.getUserObject();
 
             if (node.getType() <= TreeInfoNode.RESIDENT_RED) {
-
                 Icon icon = SYSConst.findIcon("/artwork/12x12/person-green.png");
                 if (node.getType() == TreeInfoNode.RESIDENT_RED)
                     icon = SYSConst.findIcon("/artwork/12x12/person-red.png");

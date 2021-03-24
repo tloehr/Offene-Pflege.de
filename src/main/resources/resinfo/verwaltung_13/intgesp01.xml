@@ -1,5 +1,5 @@
 <resinfotype bwinftyp="intgesp01" sinceversion="13" category="13" abstract_type="168" equivalent="150"
-             intervalmode="0" infokurz="Integrationsgespräch" infolang="" tx="false" qdvs="true">
+             intervalmode="3" infokurz="Integrationsgespräch" infolang="" tx="false" qdvs="true">
 
     <optiongroup size="18" name="EINZUGGESPR"
                  label="Integrationsgespräch"
@@ -10,9 +10,6 @@
                 name="2" layout="br left"/>
         <option label="nein, aus anderen Gründen" name="3" layout="br left"/>
     </optiongroup>
-
-    <datefield label="Datum des Integrationsgesprächs" name="EINZUGGESPRDATUM" depends-on="EINZUGGESPR"
-               visible-when-dependency-eq="1" default-value-when-shown="now" qdvs="Zeile 94"/>
 
     <tabgroup size="18" fontstyle="bold" label="Wer hat an dem Integrationsgespräch teilgenommen?" qdvs="Zeile 95"
               name="tab1">

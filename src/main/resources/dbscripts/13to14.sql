@@ -732,9 +732,6 @@ SET t.XML = ' <optiongroup size="18" name="EINZUGGESPR"
               <option label="nein, aus anderen Gründen" name="3" layout="br left"/>
           </optiongroup>
 
-          <datefield label="Datum des Integrationsgesprächs" name="EINZUGGESPRDATUM" depends-on="EINZUGGESPR"
-                     visible-when-dependency-eq="1" default-value-when-shown="now" qdvs="Zeile 94"/>
-
           <tabgroup size="18" fontstyle="bold" label="Wer hat an dem Integrationsgespräch teilgenommen?" qdvs="Zeile 95"
                     name="tab1">
               <checkbox name="1" label="Bewohner/Bewohnerin" default="true" layout="br left"/>
@@ -749,8 +746,10 @@ SET t.XML = ' <optiongroup size="18" name="EINZUGGESPR"
                        qdvs="Zeile 96">
               <option label="nein" name="0"/>
               <option label="ja" name="1" default="true"/>
-          </optiongroup>'
+          </optiongroup>',
+t.IntervalMode = 3
 WHERE t.BWINFTYP = 'intgesp01';
+UPDATE resinfo r set r.Bis = r.Von WHERE r.BWINFTYP = 'intgesp01';
 --
 UPDATE resinfotype t
 SET t.XML = '<optiongroup size="18" name="BEWUSSTSEINSZUSTAND"
@@ -1895,10 +1894,26 @@ alter table resvaluetypes
 UPDATE resvaluetypes t
 SET t.active = 0
 WHERE t.ID = 14;
-UPDATE resvaluetypes t SET t.min1 = 0.1 WHERE t.ID = 6;
-UPDATE resvaluetypes t SET t.min1 = 1.00 WHERE t.ID = 5;
-UPDATE opde.resvaluetypes t SET t.max1 = 3.00 WHERE t.ID = 6;
-UPDATE opde.resvaluetypes t SET t.max1 = 500.00 WHERE t.ID = 5;
+-- Blutdruck / Puls
+UPDATE resvaluetypes t SET t.min1 = 10, t.min2 = 10, t.min3 = 1, t.max1 = 500, t.max2 = 500, t.max3 = 500 WHERE t.ID = 1;
+-- Puls
+UPDATE resvaluetypes t SET t.min1 = 1, t.max1 = 500 WHERE t.ID = 2;
+-- Temperatur
+UPDATE resvaluetypes t SET t.min1 = 15, t.max1 = 44 WHERE t.ID = 3;
+-- BZ
+UPDATE resvaluetypes t SET t.min1 = 5, t.max1 = 1000 WHERE t.ID = 4;
+-- Gewicht
+UPDATE resvaluetypes t SET t.min1 = 1.00, t.max1 = 500.0 WHERE t.ID = 5;
+-- Größe
+UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 3.00 WHERE t.ID = 6;
+-- Atemfrequenz
+UPDATE resvaluetypes t SET t.min1 = 2, t.max1 = 100 WHERE t.ID = 7;
+-- Quickwert
+UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 100 WHERE t.ID = 8;
+-- Ein-Ausfuhr
+UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 5000 WHERE t.ID = 11;
+-- Sauerstoffsättigung
+UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 100 WHERE t.ID = 12;
 --
 alter table floors
   change floorid id bigint unsigned auto_increment;
