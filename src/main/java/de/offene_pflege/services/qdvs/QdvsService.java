@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  */
 public class QdvsService implements HasLogger {
     private static final String HAUF = "hauf";
-    private static final String ABWESENHEIT = "abwe";
+    private static final String ABWESENHEIT = "abwe1";
     private static final String BEWUSST = "bewusst01";
     private static final String ORIENT = "orient02";
     private static final String MOBIL = "mobil02";
@@ -314,15 +314,21 @@ public class QdvsService implements HasLogger {
                         residentInfoObjectMap.get(resident).addLog("Kein Heimaufenthalt HAUF.");
                         getLogger().error("Bewohner " + resident + " kein HAUF. Das darf nicht sein. Hier läuft etwas schief. ");
                     } else {
-                        long aufenthaltszeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(hauf.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate());
-                        Date abwesendSeit = ResInfoTools.absentSince(resident);
-                        long abwesenheitsZeitraumInTagen = abwesendSeit == null ? 0l : ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(abwesendSeit).toLocalDate(), STICHTAG.toLocalDate());
+                        // +1, weil abreise und ankunftstag mitgerechnet werden als abwesenheit
+                        long aufenthaltszeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(hauf.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate()) + 1;
+                        Optional<ResInfo> absent = ResInfoTools.getValidOnThatDayIfAny(resident, ABWESENHEIT, STICHTAG.toLocalDate().atStartOfDay());
+//                        Date abwesendSeit = ResInfoTools.absentSince(resident);
+
+                        long abwesenheitsZeitraumInTagen = 0L;
+                        if (absent.isPresent()) {
+                            abwesenheitsZeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(absent.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate());
+                        }
 
                         // Ausschlussgrund (4)
                         if (abwesenheitsZeitraumInTagen >= 21) {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
-                            getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen);
-                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit länger als 21 Tage :" + abwesendSeit + " // " + abwesenheitsZeitraumInTagen + " Tage"));
+                            getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen);
+                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit länger als 21 Tage :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen + " Tage"));
                         } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
                             getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
@@ -643,6 +649,7 @@ public class QdvsService implements HasLogger {
             Properties props = ResInfoTools.getContent(away);
             if (props.getProperty("type").equalsIgnoreCase(ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL)) {
 
+                // +1, weil abreise und ankunftstag mitgerechnet werden als abwesenheit
                 long diese_periode_in_tagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(away.getFrom()).toLocalDate(), JavaTimeConverter.toJavaLocalDateTime(away.getTo()).toLocalDate()) + 1;
                 if (diese_periode_in_tagen > 0) {
                     khbanzahltage += diese_periode_in_tagen;
@@ -670,7 +677,7 @@ public class QdvsService implements HasLogger {
 
         if (laengsterAufenthalt.isPresent()) { // <==> khbehandlung > 0
             qsData.getKHBEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(laengsterAufenthalt.get().getFrom()));
-            Date to = SYSCalendar.min(laengsterAufenthalt.get().getTo(), new Date()); // nicht weiter als heute
+            Date to = SYSCalendar.min(laengsterAufenthalt.get().getTo(), JavaTimeConverter.toDate(STICHTAG)); // nicht weiter als heute
             qsData.getKHENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(to));
         }
 
@@ -1297,12 +1304,14 @@ public class QdvsService implements HasLogger {
 
             // Ist der Bewohner bzw. die Bewohnerin innerhalb der ersten 8 Wochen nach dem Einzug länger als drei Tage in einem Krankenhaus versorgt worden?
             /** 90 */qsData.getEINZUGKHBEHANDLUNG().setValue(0);
-            for (ResInfo resInfo : ResInfoTools.getAll(resident, ABWESENHEIT, beginn_aktueller_aufenthalt.atStartOfDay(), beginn_aktueller_aufenthalt.plusWeeks(8).atTime(23, 59, 59))) {
+            for (ResInfo resInfo : ResInfoTools.getAll(resident, ABWESENHEIT, beginn_aktueller_aufenthalt.atStartOfDay(), beginn_aktueller_aufenthalt.plusWeeks(8).atTime(23, 59, 59)).stream().sorted(Comparator.comparing(ResInfo::getFrom)).collect(Collectors.toList())) {
                 LocalDate start = JavaTimeConverter.toJavaLocalDateTime(resInfo.getFrom()).toLocalDate();
-                Date from = resInfo.getTo().compareTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE) == 0 ? new Date() : resInfo.getTo();
+                Date from = resInfo.getTo().after(JavaTimeConverter.toDate(STICHTAG)) ? JavaTimeConverter.toDate(STICHTAG) : resInfo.getTo();
                 LocalDate ende = JavaTimeConverter.toJavaLocalDateTime(from).toLocalDate();
 
-                if (ChronoUnit.DAYS.between(start, ende) > 3) {
+                // todo: das hier muss ich testen
+                // +1, weil abreise und ankunftstag mitgerechnet werden als abwesenheit
+                if (ChronoUnit.DAYS.between(start, ende) + 1 > 3) { // der erste aufenthalt, der länger als 3 Tage ist.
                     /** 90 */qsData.getEINZUGKHBEHANDLUNG().setValue(1);
                     /** 91 */qsData.getEINZUGKHBEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(start));
                     /** 92 */qsData.getEINZUGKHENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ende));
