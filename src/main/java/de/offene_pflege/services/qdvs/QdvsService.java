@@ -317,18 +317,17 @@ public class QdvsService implements HasLogger {
                         // +1, weil abreise und ankunftstag mitgerechnet werden als abwesenheit
                         long aufenthaltszeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(hauf.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate()) + 1;
                         Optional<ResInfo> absent = ResInfoTools.getValidOnThatDayIfAny(resident, ABWESENHEIT, STICHTAG.toLocalDate().atStartOfDay());
-//                        Date abwesendSeit = ResInfoTools.absentSince(resident);
 
                         long abwesenheitsZeitraumInTagen = 0L;
                         if (absent.isPresent()) {
-                            abwesenheitsZeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(absent.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate());
+                            abwesenheitsZeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(absent.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate()) + 1;
                         }
 
                         // Ausschlussgrund (4)
                         if (abwesenheitsZeitraumInTagen >= 21) {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
                             getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen);
-                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit länger als 21 Tage :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen + " Tage"));
+                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit 21 Tage oder länger :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen + " Tage"));
                         } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
                             getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
@@ -447,31 +446,33 @@ public class QdvsService implements HasLogger {
 
         try {
 
+            final int WIDTH = 57;
             residentType.setQsData(of.createDasQsDataType());
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Allgemeine Angaben", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Allgemeine Angaben", WIDTH)));
             allgemeine_angaben(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", WIDTH)));
             krankenhaus(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Mobilität", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Mobilität", WIDTH)));
             mobilitaet(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", WIDTH)));
             kognitiv_kommunikativ(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Selbstversorgung", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Selbstversorgung", WIDTH)));
             selbstversorgung(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", WIDTH)));
             alltag_soziales(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Dekubitus", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Dekubitus", WIDTH)));
             dekubitus(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", WIDTH)));
             groesse_gewicht(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Sturz", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Sturz", WIDTH)));
             sturz(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Fixierung", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Fixierung", WIDTH)));
             fixierung(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Schmerzen", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Schmerzen", WIDTH)));
             schmerzen(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Informationen zum Einzug", 60)));
+            getLogger().debug(String.format("===---%s---===", StringUtils.center("Informationen zum Einzug", WIDTH)));
             einzug(residentType.getQsData(), resident);
+
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
@@ -506,7 +507,7 @@ public class QdvsService implements HasLogger {
 
         // Datum der Erhebung
         /** 3 */qsMdsData.setERHEBUNGSDATUM(of.createDasQsDataMdsTypeERHEBUNGSDATUM());
-        qsMdsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(STICHTAG.toLocalDate()));
+        qsMdsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(LocalDate.now())); // Ist immer das Datum an dem die Erhebung durchgeführt wurde. Also jetzt.
 
         // Datum des Einzugs
         /** 4 */qsMdsData.setEINZUGSDATUM(of.createDasQsDataMdsTypeEINZUGSDATUM());
@@ -1304,12 +1305,12 @@ public class QdvsService implements HasLogger {
 
             // Ist der Bewohner bzw. die Bewohnerin innerhalb der ersten 8 Wochen nach dem Einzug länger als drei Tage in einem Krankenhaus versorgt worden?
             /** 90 */qsData.getEINZUGKHBEHANDLUNG().setValue(0);
-            for (ResInfo resInfo : ResInfoTools.getAll(resident, ABWESENHEIT, beginn_aktueller_aufenthalt.atStartOfDay(), beginn_aktueller_aufenthalt.plusWeeks(8).atTime(23, 59, 59)).stream().sorted(Comparator.comparing(ResInfo::getFrom)).collect(Collectors.toList())) {
+            List<ResInfo> listKH8WochenNachEinzug = ResInfoTools.getAll(resident, ABWESENHEIT, beginn_aktueller_aufenthalt.atStartOfDay(), beginn_aktueller_aufenthalt.plusWeeks(8).atTime(23, 59, 59)).stream().sorted(Comparator.comparing(ResInfo::getFrom)).collect(Collectors.toList());
+            for (ResInfo resInfo : listKH8WochenNachEinzug) {
                 LocalDate start = JavaTimeConverter.toJavaLocalDateTime(resInfo.getFrom()).toLocalDate();
                 Date from = resInfo.getTo().after(JavaTimeConverter.toDate(STICHTAG)) ? JavaTimeConverter.toDate(STICHTAG) : resInfo.getTo();
                 LocalDate ende = JavaTimeConverter.toJavaLocalDateTime(from).toLocalDate();
 
-                // todo: das hier muss ich testen
                 // +1, weil abreise und ankunftstag mitgerechnet werden als abwesenheit
                 if (ChronoUnit.DAYS.between(start, ende) + 1 > 3) { // der erste aufenthalt, der länger als 3 Tage ist.
                     /** 90 */qsData.getEINZUGKHBEHANDLUNG().setValue(1);
