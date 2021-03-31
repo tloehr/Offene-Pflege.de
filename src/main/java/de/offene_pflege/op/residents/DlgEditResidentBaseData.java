@@ -8,7 +8,6 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.GP;
@@ -21,6 +20,7 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.StationService;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 
@@ -40,7 +40,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
     private Resident resident;
     private Closure actionBlock;
     private boolean ignoreEvent = false;
-    private JToggleButton tbAdminOnly, tbCalcMediUPR1;
+    private JToggleButton tbCalcMediUPR1, tbSterbephase;
     Date dob = null;
 
     public DlgEditResidentBaseData(Resident resident, Closure actionBlock) {
@@ -59,7 +59,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
         lblFirstname.setText(SYSTools.xx("misc.msg.firstname"));
         lblDOB.setText(SYSTools.xx("misc.msg.dob"));
         lblGender.setText(SYSTools.xx("misc.msg.gender"));
-//        lblRoom.setText(SYSTools.xx("misc.msg.room"));
         lblStation.setText(SYSTools.xx("misc.msg.subdivision"));
         lblPrimNurse1.setText(SYSTools.xx("misc.msg.bv") + " 1");
         lblPrimNurse2.setText(SYSTools.xx("misc.msg.bv") + " 2");
@@ -84,21 +83,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
         cmbStation.setModel(StationService.getAll4Combobox(false));
         cmbStation.setRenderer(SYSTools.getDefaultRenderer());
         cmbStation.setSelectedItem(resident.getStation());
-//        cmbStation.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                if (e.getStateChange() == ItemEvent.SELECTED) {
-//                    if (ignoreEvent) return;
-//                    ignoreEvent = true;
-////                    if (cmbRoom.getSelectedItem() != null && ((Rooms) cmbRoom.getSelectedItem()).getStation() != e.getItem()) {
-////                        // somebody changed the station so that the room doesnt fit anymore
-////                        // set to null then
-////                        cmbRoom.setSelectedItem(null);
-////                    }
-//                    ignoreEvent = false;
-//                }
-//            }
-//        });
 
         ArrayList<OPUsers> listUsers = UsersTools.getUsers(false);
         listUsers.add(0, null);
@@ -109,40 +93,27 @@ public class DlgEditResidentBaseData extends MyJDialog {
         cmbPrimNurse2.setRenderer(UsersTools.getRenderer());
         cmbPrimNurse2.setSelectedItem(resident.getPn2());
 
-//        ArrayList<Rooms> listRooms = RoomsTools.getAllActive();
-//        listGPs.add(0, null);
-//        cmbRoom.setModel(new DefaultComboBoxModel(listRooms.toArray()));
-//        cmbRoom.setRenderer(SYSTools.getDefaultRenderer());
-//        cmbRoom.setSelectedItem(resident.getRoom());
-//        cmbRoom.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                if (ignoreEvent) return;
-//                ignoreEvent = true;
-//                if (e.getStateChange() == ItemEvent.SELECTED && e.getItem() != null) {
-//                    cmbStation.setSelectedItem(((Rooms) e.getItem()).getStation());
-//                }
-//                ignoreEvent = false;
-//            }
-//        });
-
-        tbCalcMediUPR1 = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID+".tbCalcMediUPR1"));
-        tbCalcMediUPR1.setToolTipText(SYSTools.xx(internalClassID+".tooltip.tbCalcMediUPR1"));
+        tbCalcMediUPR1 = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.info.DlgEditResidentBaseData.tbCalcMediUPR1"));
+        tbCalcMediUPR1.setToolTipText(SYSTools.xx("nursingrecords.info.DlgEditResidentBaseData.tooltip.tbCalcMediUPR1"));
         tbCalcMediUPR1.setSelected(resident.getCalcMediUPR1());
         add(tbCalcMediUPR1, CC.xywh(3, 21, 3, 1, CC.LEFT, CC.FILL));
+        
+        tbSterbephase = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.dying"));
+        tbSterbephase.setSelected(resident.getSterbePhase());
+        add(tbSterbephase, CC.xywh(3, 23, 3, 1, CC.LEFT, CC.FILL));
 
-        tbAdminOnly = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.adminonly"));
-        tbAdminOnly.setSelected(resident.getAdminonly() == 2);
-        add(tbAdminOnly, CC.xywh(3, 23, 3, 1, CC.LEFT, CC.FILL));
+//        tbAdminOnly = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.adminonly"));
+//        tbAdminOnly.setSelected(resident.getAdminonly() == 2);
+//        add(tbAdminOnly, CC.xywh(3, 25, 3, 1, CC.LEFT, CC.FILL));
     }
 
     private boolean saveOK() {
         if (txtName.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".nameXX", DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.DlgEditResidentBaseData.nameXX", DisplayMessage.WARNING));
             return false;
         }
         if (txtFirstname.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".firstnameXX", DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.info.DlgEditResidentBaseData.firstnameXX", DisplayMessage.WARNING));
             return false;
         }
 
@@ -152,7 +123,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
             dob = null;
         }
         if (!SYSCalendar.isBirthdaySane(dob)) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".dobXX"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.info.DlgEditResidentBaseData.dobXX"), DisplayMessage.WARNING));
             return false;
         }
 
@@ -184,7 +155,8 @@ public class DlgEditResidentBaseData extends MyJDialog {
 //        resident.setRoom((Rooms) cmbRoom.getSelectedItem());
         resident.setStation((Station) cmbStation.getSelectedItem());
         resident.setCalcMediUPR1(tbCalcMediUPR1.isSelected());
-        resident.setAdminonly(tbAdminOnly.isSelected() ? ResidentTools.ADMINONLY : ResidentTools.NORMAL);
+        resident.setSterbePhase(tbSterbephase.isSelected());
+//        resident.setAdminonly(tbAdminOnly.isSelected() ? ResidentTools.ADMINONLY : ResidentTools.NORMAL);
 
         dispose();
     }
@@ -239,7 +211,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
     }
 
 
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         lblName = new JLabel();
@@ -268,10 +239,10 @@ public class DlgEditResidentBaseData extends MyJDialog {
         btnApply = new JButton();
 
         //======== this ========
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-            "13dlu, 11*($lgap, default), $lgap, 13dlu"));
+            "13dlu, 12*($lgap, default), $lgap, 13dlu"));
 
         //---- lblName ----
         lblName.setText("text");
@@ -403,7 +374,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         setLocationRelativeTo(getOwner());
 
         //---- buttonGroup1 ----
-        ButtonGroup buttonGroup1 = new ButtonGroup();
+        var buttonGroup1 = new ButtonGroup();
         buttonGroup1.add(rbMale);
         buttonGroup1.add(rbFemale);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

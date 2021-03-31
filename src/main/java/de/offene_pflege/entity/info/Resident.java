@@ -56,6 +56,7 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
     private OPUsers pn1;
     private OPUsers pn2;
     private OPUsers editor;
+    private Boolean sterbePhase;
     private long idbewohner;
     private Collection<Allowance> allowance;
     private Collection<ResInfo> resInfoCollection;
@@ -69,6 +70,16 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
 
     public void setIdbewohner(long idbewohner) {
         this.idbewohner = idbewohner;
+    }
+
+    @Basic(optional = false)
+    @Column(name = "sterbephase")
+    public Boolean getSterbePhase() {
+        return sterbePhase;
+    }
+
+    public void setSterbePhase(Boolean sterbePhase) {
+        this.sterbePhase = sterbePhase;
     }
 
     @Column(name = "Nachname")

@@ -13,6 +13,8 @@ alter table station
     modify eid VARCHAR(36) NOT NULL;
 alter table floors
     modify homeid VARCHAR(36) NOT NULL;
+alter table resident
+	add sterbephase tinyint(1) default 0 not null;
 --
 UPDATE resinfotype
 SET deprecated = '1'

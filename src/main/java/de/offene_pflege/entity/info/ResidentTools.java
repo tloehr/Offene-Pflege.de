@@ -178,8 +178,10 @@ public class ResidentTools {
         ResInfo stay1 = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
 
         DateFormat df = DateFormat.getDateInstance();
-        String result = ResidentTools.getName(resident) + ", " + ResidentTools.getFirstname(resident) + " (*" + df.format(getDob(resident)) + "), ";
 
+        String sterbephase = (resident.getSterbePhase() ? "//"+SYSTools.xx("misc.msg.dying")+"// " : "");
+
+        String result = sterbephase+ ResidentTools.getName(resident) + ", " + ResidentTools.getFirstname(resident) + " (*" + df.format(getDob(resident)) + "), ";
 
         result += getAge(resident).getYears() + " " + SYSTools.xx("misc.msg.Years") + " [" + SYSTools.anonymizeRID(resident.getId()) + "]";
 

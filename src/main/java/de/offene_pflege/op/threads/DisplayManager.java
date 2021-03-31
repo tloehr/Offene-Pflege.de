@@ -122,7 +122,6 @@ public class DisplayManager extends Thread {
 
     public void setMainMessage(final String message, final String tooltip) {
         SwingUtilities.invokeLater(() -> {
-//                OPDE.debug("DisplayManager.setMainMessage");
             lblMain.setText(SYSTools.xx(message));
             lblMain.setIcon(null);
             lblMain.setToolTipText(tooltip);

@@ -336,10 +336,13 @@ public class QdvsService implements HasLogger {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KURZZEIT);
                             getLogger().debug("Bewohner " + resident.getId() + " in Kurzzeitpflege");
                             textListener.addLog(SYSConst.html_bold(("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": Kurzzeitpflege")));
+                        } else if (resident.getSterbePhase()) { // Ausschlussgrund (3)
+                            residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_PALLIATIV);
+                            getLogger().debug("Bewohner " + resident.getId() + " befindet sich in der Sterbephase");
+                            textListener.addLog(SYSConst.html_bold(("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + " befindet sich in der Sterbephase")));
                         } else { // kein Ausschluss
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
                         }
-                        // todo: sterbephase einbauen (3) Wie definiert man eine Sterbephase ?
                     }
                 }
         );
@@ -1355,6 +1358,8 @@ public class QdvsService implements HasLogger {
                     qsData.getEINZUGGESPRDOKU().setValue(Integer.valueOf(content.getProperty("EINZUGGESPRDOKU")));
                 }
             }
+
+            //todo: integration dokumentieren und testen.
         } else {
             /** 95 */qsData.getEINZUGGESPRTEILNEHMER().add(of.createDasQsDataTypeEINZUGGESPRTEILNEHMER()); // leer
         }
