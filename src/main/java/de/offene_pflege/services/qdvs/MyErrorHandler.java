@@ -18,8 +18,8 @@ public class MyErrorHandler implements ErrorHandler {
     public static final int RESULT_ERROR = 2;
     public static final int RESULT_FATAL = 3;
     private int RESULT;
-    private MultiKeyMap<MultiKey<Integer>,  ArrayList<String>> ERRORS;
-//    private int errno = 0;
+    private MultiKeyMap<MultiKey<Integer>, ArrayList<String>> ERRORS;
+    //    private int errno = 0;
 //    private Pattern p1 = Pattern.compile("\\((.*?)\\)");
     private Pattern p2 = Pattern.compile("(?<=if)(.*)(?=then)");
 
@@ -53,14 +53,18 @@ public class MyErrorHandler implements ErrorHandler {
         }
 
         strippedMessage = strippedMessage.trim();
-        strippedMessage = strippedMessage.substring(1, strippedMessage.length() - 1); // Klammern weg
+
+        if (!strippedMessage.isEmpty())
+            strippedMessage = strippedMessage.substring(1, strippedMessage.length() - 1); // Klammern weg
+        else
+            strippedMessage = e.getMessage();  // bei SYStemfehlern, die nicht BW bezogen sind
 
         ERRORS.putIfAbsent(new MultiKey(e.getLineNumber(), e.getColumnNumber()), new ArrayList<>());
         ERRORS.get(e.getLineNumber(), e.getColumnNumber()).add(strippedMessage);
 
     }
 
-    public MultiKeyMap<MultiKey<Integer>,  ArrayList<String>> getERRORS() {
+    public MultiKeyMap<MultiKey<Integer>, ArrayList<String>> getERRORS() {
         return ERRORS;
     }
 }

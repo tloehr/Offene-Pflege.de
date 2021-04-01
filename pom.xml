@@ -16,7 +16,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-
+        <!-- Damit die Tests nicht jedes mal vor dem Package ablaunfen -->
+        <maven.test.skip>true</maven.test.skip>
         <!-- Library Versions -->
         <com.itextpdf.version>5.5.13.2</com.itextpdf.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
@@ -29,7 +30,7 @@
         <commons.lang3.version>3.11</commons.lang3.version>
         <commons.log4j.version>1.2.17</commons.log4j.version>
         <commons.text.version>1.9</commons.text.version>
-<!--        <dom4j.version>2.1.3</dom4j.version>-->
+        <!--        <dom4j.version>2.1.3</dom4j.version>-->
         <eclipselink.version>2.7.6</eclipselink.version>
         <edtftpj.version>2.5.0</edtftpj.version>
         <hibernate.validator.version>6.1.6.Final</hibernate.validator.version>

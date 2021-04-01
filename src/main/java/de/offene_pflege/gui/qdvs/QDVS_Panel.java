@@ -120,7 +120,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         txtLog.setEditorKit(new HTMLEditorKit());
         txtLog.setEditable(false);
         txtLog.setEnabled(true);
-        txtLog.setText(SYSTools.toHTML(SYSConst.html_h1("QDVS Prüfung")));
+//        txtLog.setText(SYSTools.toHTML(SYSConst.html_h1("de.offene_pflege.gui.qdvs")));
         right.add(new JScrollPane(txtLog));
 
         JPanel btnpnl = new JPanel();
@@ -286,6 +286,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     void ergebniserfasung() {
 
         OPDE.getMainframe().setBlockedTransparent(true);
+
+        txtLog.setText(null); // Inhalt löschen
+        txtLog.setText(SYSTools.toHTML(SYSConst.html_h1("de.offene_pflege.gui.qdvs")));
 
         // Die Auswertung kommt immer in ein eigenes Verzeichnis.
         String dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
@@ -496,7 +499,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         try {
             validator.validate(new StAXSource(reader));
             System.out.println(xmlFile.getName() + " is valid.");
-        } catch (SAXException ex) {
+        } catch (Exception ex) {
             System.out.println(xmlFile.getName() + " is not valid because ");
             System.out.println(ex.getMessage());
         }

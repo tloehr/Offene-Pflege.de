@@ -749,7 +749,8 @@ SET t.XML = ' <optiongroup size="18" name="EINZUGGESPR"
               <option label="nein" name="0"/>
               <option label="ja" name="1" default="true"/>
           </optiongroup>',
-t.IntervalMode = 3
+t.IntervalMode = 3,
+t.BWIKID = 12
 WHERE t.BWINFTYP = 'intgesp01';
 UPDATE resinfo r set r.Bis = r.Von WHERE r.BWINFTYP = 'intgesp01';
 --

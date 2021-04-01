@@ -327,19 +327,19 @@ public class QdvsService implements HasLogger {
                         if (abwesenheitsZeitraumInTagen >= 21) {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
                             getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen);
-                            textListener.addLog(SYSConst.html_bold("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit 21 Tage oder länger :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen + " Tage"));
+                            textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit 21 Tage oder länger :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen + " Tage"));
                         } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
                             getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
-                            textListener.addLog(SYSConst.html_bold(("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen + " Tage")));
+                            textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen + " Tage"));
                         } else if (ResInfoTools.isKZP(hauf.get())) { // Ausschlussgrund (2)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KURZZEIT);
                             getLogger().debug("Bewohner " + resident.getId() + " in Kurzzeitpflege");
-                            textListener.addLog(SYSConst.html_bold(("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": Kurzzeitpflege")));
+                            textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": Kurzzeitpflege"));
                         } else if (resident.getSterbePhase()) { // Ausschlussgrund (3)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_PALLIATIV);
                             getLogger().debug("Bewohner " + resident.getId() + " befindet sich in der Sterbephase");
-                            textListener.addLog(SYSConst.html_bold(("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + " befindet sich in der Sterbephase")));
+                            textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + " befindet sich in der Sterbephase"));
                         } else { // kein Ausschluss
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
                         }

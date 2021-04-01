@@ -37,7 +37,7 @@ public class Homes extends DefaultStringIDEntity implements Serializable {
     private String fax;
     @EditorComponent(label = "misc.msg.maxcap", component = {"textfield"})
     private int maxcap;
-    @EditorComponent(label = "misc.msg.careproviderid", component = {"textfield"}, tooltip="misc.tooltip.careproviderid")
+    @EditorComponent(label = "misc.msg.careproviderid", parserClass = "de.offene_pflege.gui.parser.IntegerParser", component = {"textfield"}, tooltip="misc.tooltip.careproviderid")
     private int careproviderid;
     @EditorComponent(label = "misc.msg.colorset", component = {"colorset"}, triggersReload = "true")
     private String color;
