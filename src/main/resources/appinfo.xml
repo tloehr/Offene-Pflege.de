@@ -35,7 +35,7 @@
         </class>
         <class name="opde.qdvs" short="opde.qdvs.appinfo.short"
                long="opde.qdvs.appinfo.long" main="true"
-               javaclass="de.offene_pflege.gui.qdvs" icon="mdk48.png">
+               javaclass="de.offene_pflege.gui.qdvs" icon="tasks-solid-48.png">
             <execute langbundle="opde.qdvs.acl.execute"/>
         </class>
         <class name="admin.residents.cash" short="admin.residents.cash.appinfo.short"

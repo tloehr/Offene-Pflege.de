@@ -734,10 +734,10 @@ public class SYSConst {
     public static String icon16kzp = "/artwork/16x16/stopwatch.png";
     public static String strIcon16ambulance = "/artwork/16x16/ambulance2.png";
     public static String strIcon22ambulance = "/artwork/22x22/ambulance2.png";
-    public static String icon16bi = "/artwork/16x16/bi16.png";
-    public static String icon16qi = "/artwork/16x16/mdk16.png";
+//    public static String icon16bi = "/artwork/16x16/bi16.png";
+    public static String icon16qi = "/artwork/16x16/tasks-solid-16.png";
     public static String icon22bi = "/artwork/22x22/bi22.png";
-    public static String icon22qi = "/artwork/22x22/mdk22.png";
+    public static String icon22qi = "/artwork/32x32/tasks-solid-35.png";
     public static String strIconFalling = "hillslope.png";
 
     public static String icon16falling = "/artwork/16x16/hillslope.png";
