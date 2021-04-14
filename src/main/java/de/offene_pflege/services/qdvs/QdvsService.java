@@ -29,7 +29,6 @@ import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -555,7 +554,7 @@ public class QdvsService implements HasLogger {
 
         // Datum der Erhebung
         qsData.setERHEBUNGSDATUM(of.createDasQsDataTypeERHEBUNGSDATUM());
-        qsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(STICHTAG.toLocalDate())); // Das Erhebungsdatum ist immer das Datum an dem die Eingabe erfolgte.
+        qsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(STICHTAG.toLocalDate())); // Das Erhebungsdatum ist immer das Datum an dem die Eingabe erfolgte. Ich nehme hier STICHTAG.
 
 
         qsData.setGEBURTSMONAT(of.createDasQsDataTypeGEBURTSMONAT());
@@ -581,11 +580,9 @@ public class QdvsService implements HasLogger {
         qsData.getAPOPLEX().setValue(0);
         if (!list_apoplex.isEmpty()) {
             ResInfo last = list_apoplex.get(list_apoplex.size() - 1);
-            LocalDate ereignis = ZonedDateTime.parse(ResInfoTools.getContent(last).getProperty("datum")).toLocalDate();
-            if (ereignis.compareTo(BEGINN_ERFASSUNGSZEITRAUM.toLocalDate()) >= 0) {
-                qsData.getAPOPLEX().setValue(1);
-                qsData.getAPOPLEXDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ereignis));
-            }
+            qsData.getAPOPLEX().setValue(1);
+            qsData.getAPOPLEXDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(last.getFrom()));
+
         }
 
         //____ ____ ____ _  _ ___ _  _ ____
@@ -598,11 +595,8 @@ public class QdvsService implements HasLogger {
         qsData.getFRAKTUR().setValue(0);
         if (!list_fraktur.isEmpty()) {
             ResInfo last = list_fraktur.get(list_fraktur.size() - 1);
-            LocalDate ereignis = ZonedDateTime.parse(ResInfoTools.getContent(last).getProperty("datum")).toLocalDate();
-            if (ereignis.compareTo(BEGINN_ERFASSUNGSZEITRAUM.toLocalDate()) >= 0) {
-                qsData.getFRAKTUR().setValue(1);
-                qsData.getFRAKTURDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ereignis));
-            }
+            qsData.getFRAKTUR().setValue(1);
+            qsData.getFRAKTURDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(last.getFrom()));
         }
 
         //_  _ ____ ____ ___  _ _  _ ____ ____ ____ _  _ ___
@@ -614,11 +608,8 @@ public class QdvsService implements HasLogger {
         qsData.getHERZINFARKT().setValue(0);
         if (!list_herzinfarkt.isEmpty()) {
             ResInfo last = list_herzinfarkt.get(list_herzinfarkt.size() - 1);
-            LocalDate ereignis = ZonedDateTime.parse(ResInfoTools.getContent(last).getProperty("datum")).toLocalDate();
-            if (ereignis.compareTo(BEGINN_ERFASSUNGSZEITRAUM.toLocalDate()) >= 0) {
-                qsData.getHERZINFARKT().setValue(1);
-                qsData.getHERZINFARKTDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ereignis));
-            }
+            qsData.getHERZINFARKT().setValue(1);
+            qsData.getHERZINFARKTDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(last.getFrom()));
         }
 
 //        if (resident.getId().equalsIgnoreCase("SG3")) {

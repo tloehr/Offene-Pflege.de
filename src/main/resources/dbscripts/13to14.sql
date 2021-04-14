@@ -626,7 +626,7 @@ WHERE t.BWINFTYP = 'FIXATION1';
 UPDATE resinfotype t
 SET t.XML = '<imagelabel image="/artwork/48x48/diabetes.png"/>
     <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 16."/>
-    <qdvs tooltip="Wird bei der Auswertung zur QDVS herangezogen."/>
+    <qdvs tooltip="qdvs.resinfo.standard.tooltip"/>
     <textfield name="description" label="Diabetes" length="30" hfill="false"/>
     <optiongroup name="application" label="Verabreichung per">
         <option label="nicht insulinpflichtig" name="none" default="true"/>
@@ -637,8 +637,7 @@ SET t.XML = '<imagelabel image="/artwork/48x48/diabetes.png"/>
 WHERE t.BWINFTYP = 'DIABETES1';
 --
 UPDATE resinfotype t
-SET t.XML = ' <qdvs
-                  tooltip="Zeile(n) 72 - 75 im DAS Dokumentationsbogen (Abschnitt &quot;Körpergewicht und Größe&quot;)"/>
+SET t.XML = ' <qdvs tooltip="qdvs.resinfo.standard.tooltip"/>
           <tabgroup size="18" fontstyle="bold"
                     label="Welche der aufgeführten Punkte trafen laut Pflegedokumentation für den Bewohner bzw. die Bewohnerin seit der letzten Ergebniserfassung zu?">
               <checkbox label="Gewichtsverlust durch medikamentöse Ausschwemmung" name="1"/>
@@ -1648,7 +1647,7 @@ VALUES ('fallprot02', 'Sturzprotokoll', '', '3', '30', '3',
 -- Interpretationsfehler bei der Schmerzauswertung. Schmerzfrei durch Medikamente erst bei einer NRS größer 0 nicht gleich 0.
 UPDATE resinfotype t
 SET t.XML = '  <label size="16" label="Allgemeine Einschätzung" color="blue"/>
-    <qdvs tooltip="Zeile(n) 82 - 86 im DAS Dokumentationsbogen (Abschnitt &quot;Schmerz&quot;)"/>
+    <qdvs tooltip="qdvs.resinfo.standard.tooltip"/>
     <combobox label="Schmerzintensität (Numerische Rating Skala)" name="schmerzint">
         <item label="0 - kein Schmerz" name="0"/>
         <item label="1 - kaum Schmerzen" name="1"/>
@@ -1706,8 +1705,7 @@ SET t.XML = '  <label size="16" label="Allgemeine Einschätzung" color="blue"/>
 WHERE t.BWINFTYP LIKE 'schmerze2';
 --
 SET @wundxml = '<tx tooltip="Wunden werden auf dem Überleitbogen auf Seite 2 Abschnitt 19 eingetragen. Ebenso wirken sich die Eintragunegn auf den Abschnitt 10 aus (Wundschmerz, Wunden)"/>
-    <qdvs
-            tooltip="Zeile(n) 64 - 71 im DAS Dokumentationsbogen (Abschnitt &quot;Dekubitus&quot;)"/>
+    <qdvs tooltip="qdvs.resinfo.standard.tooltip"/>
     <label
             label="Sie können mehr als eine Stelle markieren, aber beschreiben Sie unbedingt nur *eine* Wunde pro Formular."
             size="16" fontstyle="bold"/>
@@ -1917,6 +1915,13 @@ UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 100 WHERE t.ID = 8;
 UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 5000 WHERE t.ID = 11;
 -- Sauerstoffsättigung
 UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 100 WHERE t.ID = 12;
+--
+UPDATE resinfotype t SET t.XML = '<label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
+<qdvs tooltip="qdvs.resinfo.standard.tooltip"/>' WHERE t.BWINFTYP LIKE 'apoplex01';
+UPDATE resinfotype t SET t.XML = '<label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
+<qdvs tooltip="qdvs.resinfo.standard.tooltip"/>' WHERE t.BWINFTYP LIKE 'herzinf01';
+UPDATE resinfotype t SET t.XML = '<label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
+<qdvs tooltip="qdvs.resinfo.standard.tooltip"/>' WHERE t.BWINFTYP LIKE 'fraktur01';
 --
 alter table floors
   change floorid id bigint unsigned auto_increment;

@@ -1496,7 +1496,9 @@ public class PnlEditResInfo implements HasLogger {
                 outerpanel.add(jl);
             }
             if (tagName.equalsIgnoreCase("qdvs")) {
-                JLabel jl = new JLabel(SYSConst.findIcon(SYSConst.icon22qi));
+                // wenn true, dann ist das icon blau, sonst rot
+                boolean optionalQDVS = Optional.ofNullable(attributes.getValue("optional")).orElse("true").equalsIgnoreCase("true");
+                JLabel jl = new JLabel(optionalQDVS ? SYSConst.findIcon(SYSConst.icon22qi) : SYSConst.findIcon(SYSConst.icon22qiRed));
                 jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
@@ -1724,6 +1726,7 @@ public class PnlEditResInfo implements HasLogger {
                 pnl.add("left", btnbi);
             }
 
+            //todo: einbauen, dass rote notwendige QDVS markiert werden können.
             if (qdvs != null) { // indikator
                 final JButton btnqi = GUITools.getTinyButton(HTMLTools.toHTML(qdvs), SYSConst.findIcon(SYSConst.icon16qi));
 
