@@ -391,7 +391,7 @@ public class SYSConst {
     public static final String html_div_close = "</div>";
 
     public static final String html_color(Color color, String in) {
-        return "<font color=#" + GUITools.getHTMLColor(color) + ">" + in + "</font>";
+        return "<font color=#" + GUITools.getHTMLColor(color) + ">" + SYSTools.xx(in) + "</font>";
     }
 
 //    public static final String html_report_footer = "<hr/>" +
@@ -752,6 +752,7 @@ public class SYSConst {
     public static final Icon icon16warning = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/warning.png"));
     public static final Icon icon22work = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/work.png"));
     public static final Icon icon22chat = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/chat.png"));
+    public static final Icon icon48chat = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/chat.png"));
     public static final Icon icon22colorset = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset.png"));
     public static final Icon icon22colorsetPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset_pressed.png"));
     public static final Icon icon22allergy = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/allergy.png"));

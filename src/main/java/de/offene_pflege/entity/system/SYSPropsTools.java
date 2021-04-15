@@ -118,9 +118,11 @@ public class SYSPropsTools {
     public static final String KEY_QDVS_ERHEBUNG = "qdvs_erhebung";
     public static final String KEY_QDVS_TAGE_ERFASSUNGSPERIODE = "qdvs.tage.erfassungsperiode";
     public static final String KEY_QDVS_WORKPATH = "qdvs_path";
+    public static final String KEY_QDVS_COMMENT = "qdvs_kommentar";
 
     //should be useless in future
     public static final String LOCAL_KEY_CIPHER_NIC = "cipher.nic.id";
+
 
     public static void storeProp(EntityManager em, String key, String value, OPUsers user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
@@ -306,6 +308,8 @@ public class SYSPropsTools {
             btn.setSelected(false);
         }
     }
+
+
 
     public static void storeState(String name, JComboBox cmb) {
         storeProp(name, Integer.toString(cmb.getSelectedIndex()), OPDE.getLogin().getUser());

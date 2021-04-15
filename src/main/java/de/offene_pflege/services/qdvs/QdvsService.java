@@ -167,10 +167,11 @@ public class QdvsService implements HasLogger {
         runningNumber = 0;
     }
 
-    private void createQDVS() {
+    private void createQDVS(Optional<String> comment) {
         try {
             rootType.setHeader(createHeaderType());
-            rootType.setBody(createBodyType());
+            if (comment.isPresent()) rootType.setBody(createBodyType(comment.get()));
+            else rootType.setBody(createBodyType());
         } catch (Exception e) {
             getLogger().error(e);
 
@@ -230,6 +231,33 @@ public class QdvsService implements HasLogger {
         return body;
     }
 
+    /**
+     * Erzeugt eine XML Datei zur Ergebniskommentierung.
+     *
+     * @param comment
+     * @return
+     * @throws Exception
+     */
+    private BodyType createBodyType(String comment) throws Exception {
+        BodyType body = of.createBodyType();
+        body.setDataContainer(null);
+        body.setCommentationContainer(of.createDasCommentationType());
+        DasCommentationType.KOMMENTAR kommentar = new DasCommentationType.KOMMENTAR();
+        kommentar.setValue(comment);
+        body.getCommentationContainer().setKOMMENTAR(kommentar);
+        return body;
+    }
+
+    public void kommentierung(String kommentar) {
+        try {
+            createQDVS(Optional.of(kommentar));
+            marshal(of.createRoot(rootType));
+        } catch (Exception e) {
+            e.printStackTrace();
+            getLogger().fatal(e);
+            textListener.addLog(e.getMessage());
+        }
+    }
 
     public boolean ergebniserfassung() throws JAXBException, IOException {
 
@@ -259,7 +287,7 @@ public class QdvsService implements HasLogger {
     private void hauptpruefung() throws JAXBException, IOException {
         textListener.addLog(SYSConst.html_h2("qdvs.hauptprüfung.laeuft"));
         try {
-            createQDVS();
+            createQDVS(Optional.empty());
             marshal(of.createRoot(rootType));
         } catch (Exception e) {
             e.printStackTrace();

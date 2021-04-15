@@ -9,6 +9,7 @@ import com.jidesoft.combobox.FolderChooserComboBox;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
 import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.Resident;
@@ -120,13 +121,11 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         txtLog.setEditorKit(new HTMLEditorKit());
         txtLog.setEditable(false);
         txtLog.setEnabled(true);
-//        txtLog.setText(SYSTools.toHTML(SYSConst.html_h1("de.offene_pflege.gui.qdvs")));
         right.add(new JScrollPane(txtLog));
 
-        JPanel btnpnl = new JPanel();
-        btnpnl.setLayout(new BoxLayout(btnpnl, BoxLayout.LINE_AXIS));
-        JButton printButton = new JButton(SYSTools.xx("misc.commands.print"), SYSConst.icon22print2);
-        printButton.addActionListener(e -> {
+        Box b1 = Box.createHorizontalBox();
+
+        JideButton printButton = GUITools.createHyperlinkButton("misc.commands.print", SYSConst.icon22print2, e -> {
             if (target == null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.nodata", DisplayMessage.WARNING));
                 return;
@@ -134,10 +133,28 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             File ergebnis = new File(target.getParentFile(), "ergebnis.html");
             if (ergebnis.exists()) SYSFilesTools.handleFile(ergebnis, Desktop.Action.OPEN);
         });
-        printButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnpnl.add(printButton);
-        right.add(btnpnl);
 
+        printButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        b1.add(printButton);
+
+        JideButton openDirectory = GUITools.createHyperlinkButton("qdvs.workdir", SYSConst.findIcon("/artwork/22x22/folder_green.png"), e -> {
+            if (target == null) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.nodata", DisplayMessage.WARNING));
+                return;
+            }
+            try {
+                if (target.exists()) Desktop.getDesktop().open(target.getParentFile());
+                else addLog("Verzeichnis nicht gefunden...");
+            } catch (IOException ioException) {
+                addLog("Verzeichnis nicht gefunden...");
+            }
+        });
+
+        openDirectory.setAlignmentX(Component.LEFT_ALIGNMENT);
+        b1.add(openDirectory);
+
+        b1.add(Box.createHorizontalGlue());
+        right.add(b1);
 
         ERRORS = new MultiKeyMap<>();
         LOOKUP = new MultiKeyMap<>();
@@ -306,6 +323,9 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         }
 
         qdvsService.setParameters(STICHTAG, BEGINN_ERFASSUNGSZEITRAUM, home, liste_bewohner_zur_auswertung, target);
+        if (liste_bewohner_zur_auswertung.size() < liste_bewohner_zum_stichtag.size()) {
+            addLog(SYSConst.html_paragraph(SYSConst.html_color(Color.RED, "qdvs.warnung.bw.select")));
+        }
 
         ERRORS.clear();
         LOOKUP.clear();
@@ -351,6 +371,10 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                     html += SYSConst.html_h2(SYSTools.xx("qdvs.stichtag") + ": " + STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
                     html += SYSConst.html_h2(SYSTools.xx("qdvs.vorheriger.stichtag") + ": " + BEGINN_ERFASSUNGSZEITRAUM.minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
                     html += SYSConst.html_h2(SYSTools.xx("misc.msg.Date") + ": " + ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)));
+                    if (liste_bewohner_zur_auswertung.size() < liste_bewohner_zum_stichtag.size()) {
+                        html += "<hline/>";
+                        html += SYSConst.html_paragraph(SYSConst.html_color(Color.RED, "qdvs.warnung.bw.select"));
+                    }
                     html += "<hline/>";
                     html += toHTML(root);
                     html += SYSConst.html_bold(SYSTools.xx("qdvs.workdir") + ": " + target.getParent());
@@ -368,6 +392,64 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         worker.execute();
 
     }
+
+
+    void kommentierung(final String kommentar) {
+
+        OPDE.getMainframe().setBlockedTransparent(true);
+
+        txtLog.setText(null); // Inhalt löschen
+        txtLog.setText(SYSTools.toHTML(SYSConst.html_h1("de.offene_pflege.gui.qdvs")));
+        txtLog.setText(SYSTools.toHTML(SYSConst.html_h2("qdvs.ergebnis.kommentierung")));
+
+        // Die Auswertung kommt immer in ein eigenes Verzeichnis.
+        String dir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        File path = new File(workdir, home.getCareproviderid() + File.separator + dir + File.separator);
+        target = new File(path, "qs-data.xml");
+
+        liste_bewohner_zur_auswertung.clear();
+
+        qdvsService.setParameters(STICHTAG, BEGINN_ERFASSUNGSZEITRAUM, home, liste_bewohner_zur_auswertung, target);
+
+        ERRORS.clear();
+        LOOKUP.clear();
+
+        SwingWorker worker = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                qdvsService.kommentierung(kommentar);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+
+                try {
+                    String html = SYSConst.html_h1("qdvs.ergebnis.kommentierung");
+
+                    html += SYSConst.html_h2(SYSTools.xx("qdvs.stichtag") + ": " + STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
+                    html += SYSConst.html_h2(SYSTools.xx("qdvs.vorheriger.stichtag") + ": " + BEGINN_ERFASSUNGSZEITRAUM.minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
+                    html += SYSConst.html_h2(SYSTools.xx("misc.msg.Date") + ": " + ZonedDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)));
+                    html += "<hline/>";
+                    html += kommentar.isEmpty() ? SYSConst.html_paragraph("(leerer Kommentar führt zur Rückname eines evtl. vorher gesendeten Textes)") : SYSConst.html_paragraph(kommentar);
+                    html += "<hline/>";
+                    html += SYSConst.html_bold(SYSTools.xx("qdvs.workdir") + ": " + target.getParent());
+
+                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebnis.html"), SYSFilesTools.getHTML4Printout(html, true), Charset.defaultCharset());
+
+                    addLog(SYSConst.html_h2("misc.msg.endofreport"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlockedTransparent(false);
+            }
+        };
+        worker.execute();
+
+    }
+
 
     /**
      * bei jeder Änderung der Auswahlen für Zeitraum, Einrichtung usw. werden einmal die Parameter dem QDVS Service
@@ -429,13 +511,29 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         list.add(new JLabel(SYSTools.xx("qdvs.workdir")));
         list.add(fcWorkdir);
         list.add(new JSeparator());
-        list.add(GUITools.createHyperlinkButton(SYSTools.xx("qdvs.ergebniserfassung"), SYSConst.icon22exec, e -> {
+        list.add(GUITools.createHyperlinkButton(SYSTools.xx("qdvs.ergebniserfassung"), SYSConst.findIcon(SYSConst.icon16qi), e -> {
             if (workdir.exists()) {
                 ergebniserfasung();
             } else {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("qdvs.workdir.invalid", DisplayMessage.WARNING));
             }
         }));
+
+
+        // Kommentar
+        final JButton btnComment = GUITools.createHyperlinkButton("qdvs.ergebnis.kommentierung", SYSConst.icon22chat, null);
+        btnComment.addActionListener(actionEvent -> {
+            currentEditor = new DlgYesNo(SYSConst.icon48chat, o -> {
+                if (o != null) {
+                    SYSPropsTools.storeProp(SYSPropsTools.KEY_QDVS_COMMENT, o.toString().trim());
+                    kommentierung(o.toString().trim());
+                }
+                currentEditor = null;
+            }, "qdvs.ergebnis.kommentierung", OPDE.getProps().getProperty(SYSPropsTools.KEY_QDVS_COMMENT, ""), null);
+            currentEditor.setVisible(true);
+        });
+
+        list.add(btnComment);
 
         return list;
     }
@@ -542,7 +640,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             if (tnode.getType() <= TreeInfoNode.RESIDENT_RED) { // mieser Trick. :-D
                 Resident bw = (Resident) tnode.getUserObject();
                 String strResident = QdvsService.toString(bw);
-                if (!liste_bewohner_zur_auswertung.contains(bw)) strResident = "<strike>"+strResident+"</strike>";
+                if (!liste_bewohner_zur_auswertung.contains(bw)) strResident = "<strike>" + strResident + "</strike>";
                 Collections.list(tnode.children()).forEach(treeNode -> buffer.append(toHTML((DefaultMutableTreeNode) treeNode)));
                 if (buffer.length() > 0)
                     html = SYSConst.html_ul(SYSConst.html_li(strResident + SYSConst.html_ul(buffer.toString())));

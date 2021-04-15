@@ -111,8 +111,8 @@ public class DlgAnnotations extends MyJDialog {
         setModal(true);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "52dlu, $lcgap, default:grow",
-            "default:grow, 2*($lgap, default)"));
+                "52dlu, $lcgap, default:grow",
+                "default:grow, 2*($lgap, default)"));
 
         //======== scrollPane1 ========
         {
