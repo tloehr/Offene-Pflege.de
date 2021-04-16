@@ -1495,11 +1495,14 @@ public class PnlEditResInfo implements HasLogger {
                 jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
+            // <qdvs/>
             if (tagName.equalsIgnoreCase("qdvs")) {
                 // wenn true, dann ist das icon blau, sonst rot
                 boolean optionalQDVS = Optional.ofNullable(attributes.getValue("optional")).orElse("true").equalsIgnoreCase("true");
                 JLabel jl = new JLabel(optionalQDVS ? SYSConst.findIcon(SYSConst.icon22qi) : SYSConst.findIcon(SYSConst.icon22qiRed));
-                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                String tooltip_template = optionalQDVS ? "qdvs.resinfo.standard.tooltip" : "qdvs.resinfo.notwendig.tooltip";
+                String tooltip = SYSTools.catchNull(attributes.getValue("tooltip"), tooltip_template);
+                jl.setToolTipText(SYSTools.toHTML(("<p style=\"width:300px;\">" + tooltip).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
             if (tagName.equalsIgnoreCase("bi")) {
@@ -1689,7 +1692,7 @@ public class PnlEditResInfo implements HasLogger {
             String tooltip = attributes.getValue("tooltip");
             String tx = attributes.getValue("tx");
             String bi = attributes.getValue("bi");
-            String qdvs = attributes.getValue("qdvs");
+            String qdvs = attributes.getValue("qdvs"); // qdvs= attribute NOT Tag
 
             if (tooltip == null && tx == null && bi == null && qdvs == null) return;
 
@@ -1714,21 +1717,24 @@ public class PnlEditResInfo implements HasLogger {
                 pnl.add("left", btntx);
             }
 
-            if (bi != null) { // Begutachtungsinstrument
-                final JButton btnbi = GUITools.getTinyButton(HTMLTools.toHTML(bi), SYSConst.findIcon(SYSConst.icon22bi));
-                btnbi.addActionListener(e -> {
-                    if (popupInfo != null) popupInfo.hidePopupImmediately();
-                    popupInfo = createPopupInfo(HTMLTools.toHTML(prepareTooltip(bi)), btnbi);
-                    GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
-                });
+       // BI will ich nicht mehr
+//            if (bi != null) { // Begutachtungsinstrument
+//                final JButton btnbi = GUITools.getTinyButton(HTMLTools.toHTML(bi), SYSConst.findIcon(SYSConst.icon22bi));
+//                btnbi.addActionListener(e -> {
+//                    if (popupInfo != null) popupInfo.hidePopupImmediately();
+//                    popupInfo = createPopupInfo(HTMLTools.toHTML(prepareTooltip(bi)), btnbi);
+//                    GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+//                });
+//
+//
+//                pnl.add("left", btnbi);
+//            }
 
-
-                pnl.add("left", btnbi);
-            }
-
-            //todo: einbauen, dass rote notwendige QDVS markiert werden können.
             if (qdvs != null) { // indikator
-                final JButton btnqi = GUITools.getTinyButton(HTMLTools.toHTML(qdvs), SYSConst.findIcon(SYSConst.icon16qi));
+                boolean optionalQDVS = qdvs.equalsIgnoreCase("optional");
+                Icon icon = SYSConst.findIcon(optionalQDVS ? SYSConst.icon16qi : SYSConst.icon16qiRed);
+                String tooltip_template = optionalQDVS ? "qdvs.resinfo.standard.tooltip" : "qdvs.resinfo.notwendig.tooltip";
+                final JButton btnqi = GUITools.getTinyButton(HTMLTools.toHTML(tooltip_template), icon);
 
                 btnqi.addActionListener(e -> {
                     if (popupInfo != null) popupInfo.hidePopupImmediately();

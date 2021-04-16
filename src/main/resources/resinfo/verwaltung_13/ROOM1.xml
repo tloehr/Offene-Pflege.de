@@ -1,3 +1,4 @@
 <resinfotype>
+    <qdvs optional="false"/>
     <roomselect name="room" label="Zimmer"/>
 </resinfotype>

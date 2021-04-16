@@ -1,6 +1,8 @@
 <resinfotype bwinftyp="ninsur03" sinceversion="13" category="13" abstract_type="105" equivalent="15" intervalmode="0"
              infokurz="Pflegekasse" infolang="" tx="false" qpr="true">
 
+    <qdvs optional="false"/>
+
     <tabgroup size="18" fontstyle="bold" label="Anschrift" name="a2">
         <textfield label="Name" name="niname" innerlayout="tab"/>
         <textfield label="Strasse" name="nistreet" innerlayout="tab"/>
@@ -14,8 +16,7 @@
         <textfield label="Krankenkassen Nr." name="insuranceno" innerlayout="tab"/>
     </tabgroup>
 
-    <optiongroup name="grade" label="Einstufung" tx="Wird auf Seite 1 eingetragen."
-                 qdvs="Zeile(n) 8 im DAS Dokumentationsbogen.">
+    <optiongroup name="grade" label="Einstufung" tx="Wird auf Seite 1 eingetragen.">
         <option label="Kein Pflegegrad" name="0" layout="br"/>
         <option label="Pflegegrad 1" name="1"/>
         <option label="Pflegegrad 2" name="2"/>

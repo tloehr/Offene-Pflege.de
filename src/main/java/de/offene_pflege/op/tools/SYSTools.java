@@ -533,19 +533,16 @@ public class SYSTools {
      * dann wird der String neutral zurück gegeben.
      *
      * @param in
-     * @param neutral
+     * @param defaulttext
      * @return
      */
-    public static String catchNull(Object in, String neutral) {
-        String result = neutral;
+    public static String catchNull(Object in, String defaulttext) {
+        String result = "";
         if (in != null) {
             result = in.toString();
-            if (result.isEmpty()) {
-                result = neutral;
-            }
-            result = xx(result);
         }
-        return result;
+        if (result.isEmpty()) result = defaulttext;
+        return xx(result);
     }
 
     public static String catchNull(String in) {

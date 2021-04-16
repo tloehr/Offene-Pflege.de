@@ -1,6 +1,6 @@
 <resinfotype bwinftyp="respirat2" sinceversion="13" abstract_type="133" equivalent="22" intervalmode="0"
              infokurz="Atmung/Beatmung" infolang="" category="8" tx="true" qpr="true">
-
+    <qdvs optional="false"/>
     <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 12."/>
 
     <tabgroup size="18" fontstyle="bold" label="Atmung" name="atmung">
@@ -25,7 +25,6 @@
     </tabgroup>
 
     <optiongroup size="18" name="BEATMUNG" label="Wird der:die Bewohner:in beatmet ?"
-                 qdvs="Zeile(n) 22 im DAS Dokumentationsbogen."
                  tooltip="Die Antwortmöglichkeit „invasive Beatmung“ trifft zu, wenn die Beatmung durch eine Trachealkanüle erfolgt. Ansonsten ist „nicht invasiv“ anzukreuzen.">
         <option label="nein" default="true" name="0"/>
         <option label="ja, invasive Beatmung" name="1"/>

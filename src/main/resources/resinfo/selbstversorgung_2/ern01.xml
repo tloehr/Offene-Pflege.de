@@ -1,16 +1,16 @@
 <resinfotype bwinftyp="ern01" sinceversion="13" category="4" abstract_type="128" equivalent="18" intervalmode="0"
              infokurz="Essen und Trinken" infolang="" tx="true" qpr="true" bi="true">
 
-    <optiongroup name="SVESSEN" size="18" label="Essen" tooltip="bi4.essen.erklaerung"
-                 qdvs="Zeile(n) 53 im DAS Dokumentationsbogen.">
+    <qdvs optional="false"/>
+
+    <optiongroup name="SVESSEN" size="18" label="Essen" tooltip="bi4.essen.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.essen.selbst0"/>
         <option label="überwiegend selbständig" name="3" tooltip="bi4.essen.selbst3"/>
         <option label="überwiegend unselbständig" name="6" tooltip="bi4.essen.selbst6"/>
         <option label="unselbständig" name="9" tooltip="bi4.essen.selbst9"/>
     </optiongroup>
 
-    <optiongroup name="SVTRINKEN" size="18" label="Trinken" tooltip="bi4.trinken.erklaerung"
-                 qdvs="Zeile(n) 54 im DAS Dokumentationsbogen.">
+    <optiongroup name="SVTRINKEN" size="18" label="Trinken" tooltip="bi4.trinken.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.trinken.selbst0"/>
         <option label="überwiegend selbständig" name="2" tooltip="bi4.trinken.selbst2"/>
         <option label="überwiegend unselbständig" name="4" tooltip="bi4.trinken.selbst4"/>
@@ -18,7 +18,6 @@
     </optiongroup>
 
     <optiongroup name="SVNAHRUNGZUBEREITEN" size="18" tooltip="bi4.mundgerecht.erklaerung"
-                 qdvs="Zeile(n) 52 im DAS Dokumentationsbogen."
                  label="Mundgerechtes Zubereiten der Nahrung, Eingießen von Getränken">
 
         <option label="selbstständig" name="0" default="true" tooltip="bi4.mundgerecht.selbst0"/>

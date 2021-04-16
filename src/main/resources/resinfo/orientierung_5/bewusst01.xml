@@ -1,10 +1,10 @@
 <resinfotype bwinftyp="bewusst01" sinceversion="13" abstract_type="131" equivalent="21" intervalmode="0"
              infokurz="Bewusstseinszustand" infolang="" category="5" tx="true" qpr="true">
 
+    <qdvs optional="false"/>
 
     <optiongroup size="18" name="BEWUSSTSEINSZUSTAND"
                  label="Bewusstseinszustand"
-                 qdvs="Zeile(n) 23 im DAS Dokumentationsbogen." tooltip="bi6.beschaeftigen.erklaerung"
                  tx="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11.">
         <option label="wach" name="1" default="true"
                 tooltip="Die Person ist ansprechbar und kann an Aktivitäten teilnehmen." tx="setzt 'wach'"/>

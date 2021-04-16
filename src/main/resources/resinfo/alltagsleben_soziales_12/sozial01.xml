@@ -1,6 +1,8 @@
 <resinfotype bwinftyp="sozial01" sinceversion="13" category="12" abstract_type="160" equivalent="135"
              intervalmode="0" infokurz="Sozial" infolang="" tx="true" qpr="true">
 
+    <qdvs optional="false"/>
+
     <tabgroup size="18" fontstyle="bold" label="Hauptbezugsperson" name="hbp">
         <tx tooltip="Diese Angaben werden auf Seite 1, Abschnitt 1 eingetragen."/>
         <textfield label="Anrede" name="c1title" length="25" hfill="false" innerlayout="tab"/>
@@ -30,7 +32,7 @@
 
     <optiongroup size="18" name="GAINTERAKTION"
                  label="Interaktion mit Personen im direkten Kontakt"
-                 qdvs="63" bi="4.6.5" tooltip="bi6.interaktion.erklaerung" tx="Seite 1, Abschnitt 8">
+                 bi="4.6.5" tooltip="bi6.interaktion.erklaerung" tx="Seite 1, Abschnitt 8">
         <option label="selbstständig" name="0" default="true" tooltip="bi6.interaktion.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi6.interaktion.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi6.interaktion.selbst2" layout="br left"/>
@@ -39,7 +41,7 @@
 
     <optiongroup size="18" name="GAKONTAKTPFLEGE"
                  label="Kontaktpflege zu Personen außerhalb des direkten Umfelds"
-                 qdvs="64" bi="4.6.6" tooltip="bi6.kontaktpflege.erklaerung" tx="Seite 1, Abschnitt 8">
+                 bi="4.6.6" tooltip="bi6.kontaktpflege.erklaerung" tx="Seite 1, Abschnitt 8">
         <option label="selbstständig" name="0" default="true" tooltip="bi6.kontaktpflege.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi6.beschaeftigen.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi6.kontaktpflege.selbst2" layout="br left"/>
