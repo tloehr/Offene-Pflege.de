@@ -1,6 +1,5 @@
 <resinfotype bwinftyp="apoplex01" sinceversion="13" category="15" abstract_type="158" equivalent="0"
              intervalmode="3" infokurz="Schlaganfall" infolang="" tx="true" qpr="true">
-
-<!--    <datefield label="Datum" name="datum" qdvs="Zeilen 9 und 10"/>-->
-
+    <label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
+    <qdvs optional="true"/>
 </resinfotype>

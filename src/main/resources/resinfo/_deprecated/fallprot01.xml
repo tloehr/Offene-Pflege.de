@@ -1,5 +1,4 @@
 <resinfotype bwinftyp="fallprot01" sinceversion="7" lastversion="13" category="3" abstract_type="30" equivalent="0"
-             intervalmode="3"
              infokurz="Sturzprotokoll" infolang="" tx="false" qpr="true">
     <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
            label="1. Grundlegende Angaben"/>

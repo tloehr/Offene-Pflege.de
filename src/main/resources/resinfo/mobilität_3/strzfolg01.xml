@@ -1,8 +1,6 @@
 <resinfotype bwinftyp="strzfolg01" sinceversion="13" category="3" abstract_type="165" equivalent="0" intervalmode="3"
              infokurz="Auswirkungen Sturz" infolang="" tx="false" qpr="true">
-
-    <checkbox label="erhöhter Unterstützungsbedarf bei Alltagsverrichtungen" name="erhoehter_bedarf_alltag"
-              qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
-    <checkbox label="erhöhter Unterstützungsbedarf bei der Mobilität" name="erhoehter_bedarf_mobilitaet"
-                  qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
+    <qdvs optional="true"/>
+    <checkbox label="erhöhter Unterstützungsbedarf bei Alltagsverrichtungen" name="erhoehter_bedarf_alltag"/>
+    <checkbox label="erhöhter Unterstützungsbedarf bei der Mobilität" name="erhoehter_bedarf_mobilitaet"/>
 </resinfotype>

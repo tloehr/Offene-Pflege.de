@@ -2,8 +2,8 @@
              intervalmode="3" infokurz="Schmerzeinschätzung" infolang="Schmerzeinschätzung durch den Bewohner selbst"
              tx="true" qpr="true">
 
+    <qdvs optional="true"/>
     <label size="16" label="Allgemeine Einschätzung" color="blue"/>
-    <qdvs tooltip="Zeile(n) 82 - 86 im DAS Dokumentationsbogen (Abschnitt &quot;Schmerz&quot;)"/>
     <combobox label="Schmerzintensität (Numerische Rating Skala)" name="schmerzint">
         <item label="0 - kein Schmerz" name="0"/>
         <item label="1 - kaum Schmerzen" name="1"/>
@@ -18,8 +18,7 @@
         <item label="10 - unerträgliche Schmerzen" name="10"/>
     </combobox>
     <checkbox name="schmerzfrei" label="Schmerzfrei durch Medikamente" layout="br left" depends-on="schmerzint"
-              visible-when-dependency-neq="0" default-value-when-shown="false" size="14"
-              qdvs="Zeile(n) 83 im DAS Dokumentationsbogen."/>
+              visible-when-dependency-neq="0" default-value-when-shown="false" size="14"/>
     <label label="Akutschmerz i.d.R. weniger als 3 Monate, Chronischer Schmerz zwischen 6 Wochen und 3 Monaten, oder länger"
            depends-on="schmerzint" visible-when-dependency-neq="0" size="14" fontstyle="bold"/>
     <combobox label="Schmerztyp" name="schmerztyp"

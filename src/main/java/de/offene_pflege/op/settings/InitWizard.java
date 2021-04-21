@@ -451,6 +451,9 @@ public class InitWizard extends WizardDialog {
                 db_server_pingable = true;
 
                 // Credentials
+                //autoReconnect=true&useSSL=false&serverTimezone=Europe/Berlin
+//                Class.forName("com.mysql.cj.jdbc.Driver");
+//                Connection jdbcConnection = DriverManager.getConnection("jdbc:mysql://srv10:3320/opde?user=opdeuser&password=9rs1q01:a1Q&autoReconnect=true&useSSL=false&serverTimezone=Europe/Berlin");
                 Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(txtServer.getText().trim(), Integer.toString(port), null), txtUser.getText(), new String(txtPassword.getPassword()).trim());
                 logger.debug("jdbc.connection.ok");
                 db_dbms_reachable = true;
@@ -788,7 +791,7 @@ public class InitWizard extends WizardDialog {
                             progress++;
                             final int p = progress;
                             SwingUtilities.invokeLater(() -> pbProgress.setValue(p));
-                            logger.info(sql.toString());
+                            logger.info(sql);
                             try {
                                 PreparedStatement stmt = jdbcConnection.prepareStatement(sql);
                                 int result = stmt.executeUpdate();
@@ -1090,7 +1093,7 @@ public class InitWizard extends WizardDialog {
                         stmt.executeUpdate();
                         stmt.close();
                         summary.add(SYSTools.xx("opde.initwizard.summary.createdb.createschema", catalog));
-                        
+
                         String queryCreateUser1 = " CREATE USER '" + dbuser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
                         stmt = jdbcConnection.prepareStatement(queryCreateUser1);
                         stmt.executeUpdate();

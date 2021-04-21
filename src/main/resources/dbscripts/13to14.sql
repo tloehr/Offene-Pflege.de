@@ -665,21 +665,21 @@ SET t.XML = '<imagelabel image="/artwork/48x48/diabetes.png"/>
 WHERE t.BWINFTYP = 'DIABETES1';
 --
 UPDATE resinfotype t
-SET t.XML = '<qdvs/>
-          <tabgroup size="18" fontstyle="bold"
-                    label="Welche der aufgeführten Punkte trafen laut Pflegedokumentation für den Bewohner bzw. die Bewohnerin seit der letzten Ergebniserfassung zu?">
-              <checkbox label="Gewichtsverlust durch medikamentöse Ausschwemmung" name="1"/>
-              <checkbox label="Gewichtsverlust aufgrund ärztlich angeordneter oder ärztlich genehmigter Diät" name="2"
-                        layout="br left"/>
-              <checkbox label="Mindestens 10% Gewichtsverlust während eines Krankenhausaufenthalts" name="3"
-                        layout="br left"/>
-              <checkbox
-                      label="Aktuelles Gewicht bzw. Körpergröße liegt nicht vor. Wird aufgrund einer Entscheidung des Arztes oder der Angehörigen oder eines Betreuers nicht mehr ermittelt."
-                      name="4" layout="br left"/>
-              <checkbox
-                      label="Aktuelles Gewicht bzw. Körpergröße liegt nicht vor. BW möchte nicht gewogen werden." name="5" layout="br left"/>
-          </tabgroup>
-          '
+SET t.XML = ' <qdvs optional="true"/>
+    <tabgroup size="18" fontstyle="bold"
+              label="Welche der aufgeführten Punkte trafen laut Pflegedokumentation für den Bewohner bzw. die Bewohnerin seit der letzten Ergebniserfassung zu?">
+        <checkbox label="Gewichtsverlust durch medikamentöse Ausschwemmung" name="1"/>
+        <checkbox label="Gewichtsverlust aufgrund ärztlich angeordneter oder ärztlich genehmigter Diät" name="2"
+                  layout="br left"/>
+        <checkbox label="Mindestens 10% Gewichtsverlust während eines Krankenhausaufenthalts" name="3"
+                  layout="br left"/>
+        <checkbox
+                label="Aktuelles Gewicht bzw. Körpergröße liegt nicht vor. BW wird aufgrund einer Entscheidung des Arztes oder der Angehörigen oder eines Betreuers nicht mehr gewogen"
+                name="4" layout="br left"/>
+        <checkbox
+                label="Aktuelles Gewicht bzw. Körpergröße liegt nicht vor. BW möchte nicht gewogen werden" name="5"
+                layout="br left"/>
+    </tabgroup> '
 WHERE t.BWINFTYP = 'gewdoku1';
 --
 UPDATE resinfotype t
@@ -751,31 +751,31 @@ SET t.XML = ' <imagelabel image="/artwork/48x48/biohazard.png"/>
 WHERE t.BWINFTYP = 'INFECT2';
 --
 UPDATE resinfotype t
-SET t.XML = ' <optiongroup size="18" name="EINZUGGESPR"
-                       label="Integrationsgespräch"
-                       qdvs="Zeile 93"
-                       tooltip="Ist in den Wochen nach dem Einzug mit dem Bewohner bzw. der Bewohnerin und/oder einer seiner bzw. ihrer Angehörigen oder sonstigen Vertrauenspersonen ein Gespräch über sein bzw. ihr Einleben und die zukünftige Versorgung geführt worden?">
-              <option label="ja" name="1" default="true"/>
-              <option label="nicht möglich aufgrund fehlender Vertrauenspersonen des Bewohners bzw. der Bewohnerin"
-                      name="2" layout="br left"/>
-              <option label="nein, aus anderen Gründen" name="3" layout="br left"/>
-          </optiongroup>
+SET t.XML = '  <qdvs optional="true"/>
 
-          <tabgroup size="18" fontstyle="bold" label="Wer hat an dem Integrationsgespräch teilgenommen?" qdvs="Zeile 95"
-                    name="tab1">
-              <checkbox name="1" label="Bewohner/Bewohnerin" default="true" layout="br left"/>
-              <checkbox name="2" label="Angehörige"/>
-              <checkbox name="3" label="Betreuer/Betreuerin"/>
-              <checkbox name="4" label="andere Vertrauenspersonen, die nicht in der Einrichtung beschäftigt sind"
-                        layout="left"/>
-          </tabgroup>
+    <optiongroup size="18" name="EINZUGGESPR"
+                 label="Integrationsgespräch"
+                 tooltip="Ist in den Wochen nach dem Einzug mit dem Bewohner bzw. der Bewohnerin und/oder einer seiner bzw. ihrer Angehörigen oder sonstigen Vertrauenspersonen ein Gespräch über sein bzw. ihr Einleben und die zukünftige Versorgung geführt worden?">
+        <option label="ja" name="1" default="true"/>
+        <option label="nicht möglich aufgrund fehlender Vertrauenspersonen des Bewohners bzw. der Bewohnerin"
+                name="2" layout="br left"/>
+        <option label="nein, aus anderen Gründen" name="3" layout="br left"/>
+    </optiongroup>
 
-          <optiongroup size="18" name="EINZUGGESPRDOKU"
-                       label="Protokoll wurde erstellt und angehangen"
-                       qdvs="Zeile 96">
-              <option label="nein" name="0"/>
-              <option label="ja" name="1" default="true"/>
-          </optiongroup>',
+    <tabgroup size="18" fontstyle="bold" label="Wer hat an dem Integrationsgespräch teilgenommen?"
+              name="tab1">
+        <checkbox name="1" label="Bewohner/Bewohnerin" default="true" layout="br left"/>
+        <checkbox name="2" label="Angehörige"/>
+        <checkbox name="3" label="Betreuer/Betreuerin"/>
+        <checkbox name="4" label="andere Vertrauenspersonen, die nicht in der Einrichtung beschäftigt sind"
+                  layout="left"/>
+    </tabgroup>
+
+    <optiongroup size="18" name="EINZUGGESPRDOKU"
+                 label="Protokoll wurde erstellt und angehangen">
+        <option label="nein" name="0"/>
+        <option label="ja" name="1" default="true"/>
+    </optiongroup>',
 t.IntervalMode = 3,
 t.BWIKID = 12
 WHERE t.BWINFTYP = 'intgesp01';
@@ -801,44 +801,42 @@ SET t.XML = ' <qdvs optional="false"/>
 WHERE t.BWINFTYP = 'bewusst01';
 --
 UPDATE resinfotype t
-SET t.XML = ' <qpr tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Zeile: 42"/>
-          <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
-          <tx tooltip="Seite 2, Abschnitt 9."/>
+SET t.XML = '   <qdvs optional="true"/>
+    <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
+    <tx tooltip="Seite 2, Abschnitt 9."/>
 
-          <combobox label="Sondentyp" name="tubetype">
-              <item label="PEG (Perkutane endoskopische Gastrostomie)" name="peg"/>
-              <item label="PEG/J (PEG mit duodenalem Schenkel)" name="pej"/>
-              <item label="Transnasale Ernährungssonde" name="nose"/>
-          </combobox>
-          <textfield name="tubesince" label="Sonde gelegt am" length="12" type="date"/>
-          <textfield name="tubereason" label="Warum wurde die PEG gelegt ?" hfill="false" length="40" innerlayout="br"/>
+    <combobox label="Sondentyp" name="tubetype">
+        <item label="PEG (Perkutane endoskopische Gastrostomie)" name="peg"/>
+        <item label="PEG/J (PEG mit duodenalem Schenkel)" name="pej"/>
+        <item label="Transnasale Ernährungssonde" name="nose"/>
+    </combobox>
+    <textfield name="tubesince" label="Sonde gelegt am" length="12" type="date"/>
+    <textfield name="tubereason" label="Warum wurde die PEG gelegt ?" hfill="false" length="40" innerlayout="br"/>
 
-          <tabgroup size="12" label="Verabreichung" name="tab1">
-              <checkbox label="Ernährungspumpe" name="pump"/>
-              <checkbox label="Schwerkraft" name="gravity" layout="left"/>
-              <checkbox label="Spritze" name="syringe" layout="left"/>
-          </tabgroup>
+    <tabgroup size="12" label="Verabreichung" name="tab1">
+        <checkbox label="Ernährungspumpe" name="pump"/>
+        <checkbox label="Schwerkraft" name="gravity" layout="left"/>
+        <checkbox label="Spritze" name="syringe" layout="left"/>
+    </tabgroup>
 
-          <tabgroup size="12" label="Sonstiges" name="tab2">
-              <checkbox label="Orale Ernährung zusätzlich" name="oralnutrition"/>
-              <checkbox label="Parenterale Ernährung" name="parenteral" layout="left"/>
-          </tabgroup>
+    <tabgroup size="12" label="Sonstiges" name="tab2">
+        <checkbox label="Orale Ernährung zusätzlich" name="oralnutrition"/>
+        <checkbox label="Parenterale Ernährung" name="parenteral" layout="left"/>
+    </tabgroup>
 
-          <textfield name="calories" label="Kalorien (in 24h)" hfill="false" length="12"/>
+    <textfield name="calories" label="Kalorien (in 24h)" hfill="false" length="12"/>
 
-          <separator/>
-          <optiongroup name="SVERNAEHRUNGUMFANG" label="In welchem Umfang erfolgt eine künstliche Ernährung?"
-                       qi="43" bi="4.4.13">
-              <option label="nicht täglich oder nicht dauerhaft" name="0" default="true"/>
-              <option label="täglich, aber zusätzlich zur oralen Ernährung" name="6"/>
-              <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="3"/>
-          </optiongroup>
+    <separator/>
+    <optiongroup name="SVERNAEHRUNGUMFANG" label="In welchem Umfang erfolgt eine künstliche Ernährung?" bi="4.4.13">
+        <option label="nicht täglich oder nicht dauerhaft" name="0" default="true"/>
+        <option label="täglich, aber zusätzlich zur oralen Ernährung" name="6"/>
+        <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="3"/>
+    </optiongroup>
 
-          <optiongroup name="SVFREMDHILFE" label="Erfolgt die Bedienung selbständig oder mit Fremdhilfe?" qi="44"
-                       bi="4.4.13">
-              <option label="selbständig" name="0" default="true"/>
-              <option label="mit Fremdhilfe" name="1"/>
-          </optiongroup>'
+    <optiongroup name="SVFREMDHILFE" label="Erfolgt die Bedienung selbständig oder mit Fremdhilfe?" bi="4.4.13">
+        <option label="selbständig" name="0" default="true"/>
+        <option label="mit Fremdhilfe" name="1"/>
+    </optiongroup>'
 WHERE t.BWINFTYP = 'kern01';
 --
 UPDATE resinfotype t
@@ -1612,8 +1610,8 @@ WHERE t.BWINFTYP LIKE 'kern01';
 INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`)
 VALUES ('fallprot02', 'Sturzprotokoll', '', '3', '30', '3',
         '2',
-        '
-       <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+        ' <qdvs optional="true"/>
+    <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
            label="1. Grundlegende Angaben"/>
 
     <tabgroup size="16" label="Datum und Uhrzeit des Sturzes" name="date1">
@@ -1694,8 +1692,7 @@ VALUES ('fallprot02', 'Sturzprotokoll', '', '3', '30', '3',
         <checkbox label="Platzwunde" name="laceration" layout="br"/>
         <checkbox label="Schürfwunde" name="graze" layout="left"/>
         <checkbox label="Hämatome" name="bruise" layout="left"/>
-        <checkbox label="Fraktur" name="fracture" layout="left"
-                  qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
+        <checkbox label="Fraktur" name="fracture" layout="left"/>
         <checkbox label="Schmerzen" name="pain" layout="left"/>
     </tabgroup>
     <textfield name="othertext5" label="Andere" hfill="false"/>
@@ -1708,9 +1705,8 @@ VALUES ('fallprot02', 'Sturzprotokoll', '', '3', '30', '3',
         <checkbox label="Wundverband" name="wound"/>
         <checkbox label="Lagerung / Kühlung" name="wound"/>
         <checkbox label="pflegerische Unterstützung" name="pflegerisch"/>
-        <checkbox label="Arztkontakt" name="gp" qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
-        <checkbox label="Krankenhauseinweisung" name="hospital"
-                  qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
+        <checkbox label="Arztkontakt" name="gp"/>
+        <checkbox label="Krankenhauseinweisung" name="hospital"/>
     </tabgroup>
     <textfield name="othertext6" label="Anmerkungen zu den Massnahmen" hfill="false"/>
 
@@ -1720,8 +1716,8 @@ VALUES ('fallprot02', 'Sturzprotokoll', '', '3', '30', '3',
 --
 -- Interpretationsfehler bei der Schmerzauswertung. Schmerzfrei durch Medikamente erst bei einer NRS größer 0 nicht gleich 0.
 UPDATE resinfotype t
-SET t.XML = '  <label size="16" label="Allgemeine Einschätzung" color="blue"/>
-    <qdvs/>
+SET t.XML = '<qdvs optional="true"/>
+    <label size="16" label="Allgemeine Einschätzung" color="blue"/>
     <combobox label="Schmerzintensität (Numerische Rating Skala)" name="schmerzint">
         <item label="0 - kein Schmerz" name="0"/>
         <item label="1 - kaum Schmerzen" name="1"/>
@@ -1736,8 +1732,7 @@ SET t.XML = '  <label size="16" label="Allgemeine Einschätzung" color="blue"/>
         <item label="10 - unerträgliche Schmerzen" name="10"/>
     </combobox>
     <checkbox name="schmerzfrei" label="Schmerzfrei durch Medikamente" layout="br left" depends-on="schmerzint"
-              visible-when-dependency-neq="0" default-value-when-shown="false" size="14"
-              qdvs="Zeile(n) 83 im DAS Dokumentationsbogen."/>
+              visible-when-dependency-neq="0" default-value-when-shown="false" size="14"/>
     <label label="Akutschmerz i.d.R. weniger als 3 Monate, Chronischer Schmerz zwischen 6 Wochen und 3 Monaten, oder länger"
            depends-on="schmerzint" visible-when-dependency-neq="0" size="14" fontstyle="bold"/>
     <combobox label="Schmerztyp" name="schmerztyp"
@@ -1778,8 +1773,8 @@ SET t.XML = '  <label size="16" label="Allgemeine Einschätzung" color="blue"/>
     </combobox>'
 WHERE t.BWINFTYP LIKE 'schmerze2';
 --
-SET @wundxml = '<tx tooltip="Wunden werden auf dem Überleitbogen auf Seite 2 Abschnitt 19 eingetragen. Ebenso wirken sich die Eintragunegn auf den Abschnitt 10 aus (Wundschmerz, Wunden)"/>
-    <qdvs/>
+SET @wundxml = '  <tx tooltip="Wunden werden auf dem Überleitbogen auf Seite 2 Abschnitt 19 eingetragen. Ebenso wirken sich die Eintragunegn auf den Abschnitt 10 aus (Wundschmerz, Wunden)"/>
+    <qdvs optional="true"/>
     <label
             label="Sie können mehr als eine Stelle markieren, aber beschreiben Sie unbedingt nur *eine* Wunde pro Formular."
             size="16" fontstyle="bold"/>
@@ -1806,7 +1801,7 @@ SET @wundxml = '<tx tooltip="Wunden werden auf dem Überleitbogen auf Seite 2 Ab
     <combobox label="Wo ist der Dekubitus entstanden ?" name="dekubituslok"
               tooltip="Solange diese Wunde nicht abgeheilt ist, bleibt der Entstehungsort gleich."
               lockedforchanges="true" depends-on="dekubitus" visible-when-dependency-eq="true"
-              default-value-when-shown="1" qdvs="Verwendung im Abschnitt &quot;Dekubitus&quot;">
+              default-value-when-shown="1">
         <item label="bei uns" name="1"/>
         <item label="Im Krankenhaus" name="2"/>
         <item label="zu Hause (vor dem Einzug)" name="3"/>
@@ -1991,11 +1986,180 @@ UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 5000 WHERE t.ID = 11;
 UPDATE resvaluetypes t SET t.min1 = 0.1, t.max1 = 100 WHERE t.ID = 12;
 --
 UPDATE resinfotype t SET t.XML = '<label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
-<qdvs/>' WHERE t.BWINFTYP LIKE 'apoplex01';
+<qdvs optional="true"/>' WHERE t.BWINFTYP LIKE 'apoplex01';
 UPDATE resinfotype t SET t.XML = '<label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
-<qdvs/>' WHERE t.BWINFTYP LIKE 'herzinf01';
+<qdvs optional="true"/>' WHERE t.BWINFTYP LIKE 'herzinf01';
 UPDATE resinfotype t SET t.XML = '<label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
-<qdvs/>' WHERE t.BWINFTYP LIKE 'fraktur01';
+<qdvs optional="true"/>' WHERE t.BWINFTYP LIKE 'fraktur01';
+UPDATE resinfotype t SET t.XML = '<qdvs optional="true"/>
+<checkbox label="erhöhter Unterstützungsbedarf bei Alltagsverrichtungen" name="erhoehter_bedarf_alltag"/>
+<checkbox label="erhöhter Unterstützungsbedarf bei der Mobilität" name="erhoehter_bedarf_mobilitaet"/>' WHERE t.BWINFTYP LIKE 'strzfolg01';
+UPDATE resinfotype t SET t.XML = '<label size="16" fontstyle="bold"
+           label="Amputationsangaben (werden zur Berechnung der angepassten Köpergewichte herangezogen)"/>
+    <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 18."/>
+    <qdvs optional="true"/>
+
+    <optiongroup name="upperleft" label="linkes, oberes Viertel">
+        <option label="keine Amputation" name="none" default="true"/>
+        <option label="linke Hand" name="hand"/>
+        <option label="unterhalb des linken Ellenbogens" name="belowellbow"/>
+        <option label="oberhalb des linken Ellenbogens" name="aboveellbow" layout="br tab"/>
+        <option label="vollständige linke, obere Extremität" name="complete"/>
+    </optiongroup>
+
+    <datefield label="Datum der Operation" name="dateupperleft" depends-on="upperleft"
+               visible-when-dependency-neq="none" default-value-when-shown="now"/>
+    <separator/>
+
+    <optiongroup name="upperright" label="rechtes, oberes Viertel">
+        <option label="keine Amputation" name="none" default="true"/>
+        <option label="rechte Hand" name="hand"/>
+        <option label="unterhalb des rechten Ellenbogens" name="belowellbow"/>
+        <option label="oberhalb des rechten Ellenbogens" name="aboveellbow" layout="br tab"/>
+        <option label="vollständige rechte, obere Extremität" name="complete"/>
+    </optiongroup>
+
+    <datefield label="Datum der Operation" name="dateupperright" depends-on="upperright"
+               visible-when-dependency-neq="none" default-value-when-shown="now"/>
+    <separator/>
+
+    <optiongroup name="lowerleft" label="linkes, unteres Viertel">
+        <option label="keine Amputation" name="none" default="true"/>
+        <option label="linker Fuß" name="foot"/>
+        <option label="unterhalb des linken Knies" name="belowknee"/>
+        <option label="oberhalb des linken Knies" name="aboveknee" layout="br tab"/>
+        <option label="vollständige linke, untere Extremität" name="complete"/>
+    </optiongroup>
+
+    <datefield label="Datum der Operation" name="datelowerleft" depends-on="lowerleft"
+               visible-when-dependency-neq="none" default-value-when-shown="now"/>
+    <separator/>
+
+    <optiongroup name="lowerright" label="rechtes, unteres Viertel">
+        <option label="keine Amputation" name="none" default="true"/>
+        <option label="rechter Fuß" name="foot"/>
+        <option label="unterhalb des rechten Knies" name="belowknee"/>
+        <option label="oberhalb des rechten Knies" name="aboveknee" layout="br tab"/>
+        <option label="vollständige rechte, untere Extremität" name="complete"/>
+    </optiongroup>
+
+    <datefield label="Datum der Operation" name="datelowerright" depends-on="lowerright"
+               visible-when-dependency-neq="none" default-value-when-shown="now"/>' WHERE t.BWINFTYP LIKE 'amput01';
+UPDATE resinfotype t SET t.XML = '<label size="24" label="Einschätzung durch Pflegekraft" color="blue"/>
+    <qdvs optional="true"/>
+
+    <scale name="besd" label="BESD - BEurteilung von Schmerzen bei Demenz" resvaltype="14">
+        <scalegroup name="besd1" label="Atmung (unabhängig von Lautäußerungen)">
+            <option label="normal" name="s0-1" score="0" layout="left" default="true"/>
+            <option label="gelegentlich angestrengt atmen" name="s1-1" score="1" layout="left"/>
+            <option label="kurze Phasen von Hyperventilation" tooltip="schnelle und tiefe Atemzu?ge" name="s1-2"
+                    score="1" layout="br"/>
+            <option label="lautstark angestrengt atmen" name="s2-1" score="2" layout="left"/>
+            <option label="lange Phasen von Hyperventilation" tooltip="schnelle und tiefe Atemzu?ge" name="s2-2"
+                    score="2" layout="br"/>
+            <option label="Cheyne Stoke Atmung"
+                    tooltip="tiefer werdende und wieder abflachende Atemzu?ge mit Atempausen" name="s2-3" score="2"
+                    layout="left"/>
+        </scalegroup>
+        <scalegroup name="besd2" label="Negative Lautäußerungen">
+            <option label="keine" name="s0-1" score="0" layout="left" default="true"/>
+            <option label="gelegentlich stöhnen oder ächzen" name="s1-1" score="1" layout="left"/>
+            <option label="sich leise negativ oder missbilligend äußern" name="s1-2" score="1" layout="br"/>
+            <option label="wiederholt beunruhigt rufen" name="s2-1" score="2" layout="left"/>
+            <option label="laut stöhnen oder ächzen" name="s2-2" score="2" layout="br"/>
+            <option label="weinen" name="s2-3" score="2" layout="left"/>
+        </scalegroup>
+        <scalegroup name="besd3" label="Gesichtsausdruck">
+            <option label="lächelnd oder nichts sagend" name="s0-1" score="0" layout="left" default="true"/>
+            <option label="trauriger Gesichtsausdruck" name="s1-1" score="1" layout="left"/>
+            <option label="ängstlicher Gesichtsausdruck" name="s1-2" score="1" layout="br"/>
+            <option label="sorgenvoller Blick" name="s1-3" score="1" layout="left"/>
+            <option label="grimassieren" name="s2-1" score="2" layout="left"/>
+        </scalegroup>
+        <scalegroup name="besd4" label="Körpersprache">
+            <option label="entspannt" name="s0-1" score="0" layout="left" default="true"/>
+            <option label="angespannte Körperhaltung" name="s1-1" score="1" layout="left"/>
+            <option label="nervös hin und her gehen" name="s1-2" score="1" layout="br"/>
+            <option label="nesteln" name="s1-3" score="1" layout="left"/>
+            <option label="Körpersprache starr" name="s2-1" score="2" layout="left"/>
+            <option label="geballte Fäuste" name="s2-2" score="2" layout="left"/>
+            <option label="angezogene Knie" name="s2-3" score="2" layout="br"/>
+            <option label="sich entziehen oder wegstoßen" name="s2-4" score="2" layout="left"/>
+            <option label="schlagen" name="s2-5" score="2" layout="left"/>
+        </scalegroup>
+        <scalegroup name="besd5" label="Trost">
+            <option label="trösten nicht notwendig" name="s0-1" score="0" layout="left" default="true"/>
+            <option label="Ablenken durch Stimme oder Berührung ist möglich" name="s1-1" score="1" layout="left"/>
+            <option label="Ablenken durch Stimme oder Berührung ist nicht möglich" name="s2-1" score="2" layout="br"/>
+        </scalegroup>
+        <risk from="0" to="1" label="Wahrscheinlich keine Schmerzen" color="dark_green" rating="0"/>
+        <risk from="2" to="10" label="BW hat wahrscheinlich Schmerzen" color="dark_red" rating="1"/>
+    </scale>
+
+    <label size="24" label="Situationsbeurteilung" color="blue"/>
+
+    <checkbox name="schmerzfrei" label="Schmerzfrei durch Medikamente" layout="br left" depends-on="schmerzint"
+              size="14"/>
+    <label
+            label="Akutschmerz i.d.R. weniger als 3 Monate, Chronischer Schmerz zwischen 6 Wochen und 3 Monaten, oder länger"
+            size="14" fontstyle="bold"/>
+
+    <combobox label="Schmerztyp" name="schmerztyp" tooltip="[h1]Akuter Schmerz, „sinnvoller Schmerz“[/h1]
+              [p]
+              Der akute Schmerz gilt als Alarmzeichen des Körpers. Schon die alten Griechen nannten den Schmerz den „bellenden Wächter der Gesundheit“ (Hypokrates).
+              Der akute Schmerz macht uns aufmerksam, dass etwas nicht stimmt und ist zeitlich begrenzt. Ist die Ursache behoben verschwindet der Schmerz meistens wieder. Wenn wir wissen warum wir Schmerzen haben (z.B. den Fuss verstaucht), können wir den Schmerz auch eher akzeptieren. Hier spielt die individuelle Wahrnehmung und das Erlernte „umgehen mit dem Schmerz“ eine wichtige Rolle.
+              [/p]
+              [p]
+              Akuter Schmerz ist ein plötzlich auftretender und nur kurze Zeit andauern der Schmerz. Er wird als existentielle Erfahrung wahrgenommen, die eine lebenserhaltende Alarm- und Schutzfunktion einnimmt. Akuter Schmerz steht in einem offensichtlichen und direkten Zusammenhang mit einer Gewebe oder Organschädigung, also einer körperlichen Ursache. Nonverbale und verbale Signale, die wir im akuten Schmerz aussenden, verursachen unwillku?rlich Empathie und das Bedu?ürfnis fu?r Abhilfe zu sorgen. Akuter Schmerz geht mit physiologischen Begleiterscheinungen einher, wie einem Anstieg des Blutdrucks, des Pulses, Schweißausbru?chen und Anstieg der Atemfrequenz. Insbesondere diese Begleiterscheinungen, die in der akuten Versorgungssituation unmittelbar erkennbar sind, zeigt der Mensch mit ausschließlich chronischen Schmerzen nicht.
+              [/p]
+
+              [h1]Chronischer Schmerz, „sinnloser Schmerz“[/h1]
+              [p]
+              Der chronische Schmerz hat an sich keine Warnfunktion mehr. Seine Ursache ist nicht (mehr) ausschaltbar, er nimmt dem Menschen sinnlos die Kraft weg und zehrt allmählich seinen Lebensmut auf. Wenn die Tage zur Qual werden, erschöpft sich die Tragfähigkeit, der Leidende wünscht nur mehr ein Ende herbei, unter Umständen sogar um den Preis seines Lebens, denn es genügt nicht nur am Leben zu sein, man muss auch sein Leben haben.
+              Der chronische Schmerz kann zur eigenständigen Schmerzkrankheit werden, der alle Ebenen des Menschseins beeinflusst und beeinträchtigt. Man spricht dann von „total pain“. Dieser Schmerz ist oft losgelöst von der ursprünglichen Krankheit. Gerade wenn die Ursache unbekannt ist, kann die Chronifizierung schnell eintreten.
+              [/p]
+              [p]
+              Der Übergang zwischen akutem und chronischem Schmerz verläuft kontinuierlich. Gleichwohl werden verschiedene Zeiträume angenommen, ab wann ein Schmerz als chronischer, oder anhaltender Schmerz zu betrachten ist. Je nach Lokalisation des Schmerzes wird hierbei von mehr als 6 Wochen bis hin zu 3 Monaten ausgegangen. In erster Linie wird die Entstehung des chronischen Schmerzes durch drei grundlegende Elemente beschrieben:
+              [/p]
+              [ul]
+              [li]Es handelt sich um einen Entstehungsprozess, der durch ein Zusammenwirken von krankheitsbedingten und psychosozialen Prozessen gekennzeichnet ist.[/li]
+              [li]Chronischer Schmerz ist Schmerz, der u?ber einen Punkt, an dem die Heilung abgeschlossen sein sollte hinaus, anhält oder weiter auftritt. Chronischer Schmerz kann häufig nicht (mehr) mit einem Gewebeschaden oder einer Verletzung in Verbindung gebracht werden.[/li]
+              [li]Der Chronifizierung akuter Schmerzen kann durch angemessene Therapie des akuten Schmerzes entgegengewirkt werden. Eine fru?hzeitige Linderung von akutem Schmerz kann eine Entwicklung von chronischen Schmerzen verhindern. Bestimmte operative Verfahren, z. B. Amputationen, Mastektomien oder Thorakotomien bewirken häufig chronische Schmerzen.[/li]
+              [/ul]" depends-on="schmerzint" visible-when-dependency-neq="0" default-value-when-shown="0">
+        <item label="akute Schmerzen" name="0"/>
+        <item label="chronische Schmerzen" name="1"/>
+    </combobox>' WHERE t.BWINFTYP LIKE 'besd2';
+UPDATE resinfotype t SET t.XML = ' <qdvs optional="true"/>
+    <tabgroup size="18" label="Grund der Fixierung" name="tab1">
+        <checkbox name="eigen" label="Eigengefährung" />
+        <checkbox name="unfall" label="Sturz-/Unfallgefahr" layout="left"/>
+        <checkbox name="eigen" label="Auf eigenen Wunsch" layout="left"/>
+        <checkbox name="fremd" label="Fremdgefährdung"/>
+        <checkbox name="agg" label="Aggression" layout="left"/>
+        <checkbox name="path" label="pathologische Unruhe" layout="left"/>
+        <checkbox name="ngf" label="Nicht steh- und gehfähig"/>
+    </tabgroup>
+    <tabgroup size="18" label="Art der Fixierung" name="tab2">
+        <checkbox name="leibgurt" label="Leibgurt"
+                  tooltip="Bitte beachten Sie, dass alle Gurtanwendungen zu erfassen sind, gleichgültig, ob eine richterliche Genehmigung oder das Einverständnis des Bewohners bzw. der Bewohnerin vorliegt. Auch Gurte, die der Bewohner bzw. die Bewohnerin theoretisch selbst öffnen könnte, sind einzutragen. Auch wenn nur aufgrund der Befürchtung eines Sturzes fixiert wird, ist dies einzutragen."/>
+        <checkbox name="bettgitter" label="Bettseitenteile"
+                  tooltip="Außer Betracht bleiben unterbrochene Bettseitenteile, die das Verlassen des Bettes nicht behindern."
+                  layout="left"/>
+        <checkbox name="sitzgurt" label="Sitzgurt"/>
+        <checkbox name="geristuhl" label="Geriatriestuhl mit Vorsatztisch" layout="left"/>
+        <checkbox name="sonst" label="Sonstiges" tooltip="Bitte in der Bemerkung beschreiben."/>
+    </tabgroup>
+
+    <optiongroup size="18" name="dauer">
+        <option label="tagsüber" default="true" name="tag"/>
+        <option label="nachts" name="nacht"/>
+        <option label="halbe Stunde" name="05"/>
+        <option label="1 Stunde" name="1"  layout="br tab"/>
+        <option label="2 Stunden" name="2"/>
+        <option label="sonst (bitte aufschreiben)" name="sonst"/>
+    </optiongroup>
+
+    <textfield name="dauersonst" label="Sonstige Dauer" depends-on="dauer" visible-when-dependency-eq="sonst"/>' WHERE t.BWINFTYP LIKE 'fixprot2';
 --
 alter table floors
   change floorid id bigint unsigned auto_increment;

@@ -2,8 +2,7 @@
              infokurz="Wunde Nr.1" infolang="" category="9" tx="true" qpr="true">
 
     <tx tooltip="Wunden werden auf dem Überleitbogen auf Seite 2 Abschnitt 19 eingetragen. Ebenso wirken sich die Eintragunegn auf den Abschnitt 10 aus (Wundschmerz, Wunden)"/>
-    <qdvs
-            tooltip="Zeile(n) 64 - 71 im DAS Dokumentationsbogen (Abschnitt &quot;Dekubitus&quot;)"/>
+    <qdvs optional="true"/>
     <label
             label="Sie können mehr als eine Stelle markieren, aber beschreiben Sie unbedingt nur *eine* Wunde pro Formular."
             size="16" fontstyle="bold"/>
@@ -30,7 +29,7 @@
     <combobox label="Wo ist der Dekubitus entstanden ?" name="dekubituslok"
               tooltip="Solange diese Wunde nicht abgeheilt ist, bleibt der Entstehungsort gleich."
               lockedforchanges="true" depends-on="dekubitus" visible-when-dependency-eq="true"
-              default-value-when-shown="1" qdvs="Verwendung im Abschnitt &quot;Dekubitus&quot;">
+              default-value-when-shown="1">
         <item label="bei uns" name="1"/>
         <item label="Im Krankenhaus" name="2"/>
         <item label="zu Hause (vor dem Einzug)" name="3"/>

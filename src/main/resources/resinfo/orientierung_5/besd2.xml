@@ -1,7 +1,7 @@
 <resinfotype bwinftyp="besd2" sinceversion="13" abstract_type="131" equivalent="21" intervalmode="3"
              infokurz="Bewusstseinszustand" infolang="" category="15" tx="true" qpr="true">
     <label size="24" label="Einschätzung durch Pflegekraft" color="blue"/>
-    <qdvs tooltip="Zeile(n) 82 - 86 im DAS Dokumentationsbogen (Abschnitt &quot;Schmerz&quot;)"/>
+    <qdvs optional="true"/>
 
     <scale name="besd" label="BESD - BEurteilung von Schmerzen bei Demenz" resvaltype="14">
         <scalegroup name="besd1" label="Atmung (unabhängig von Lautäußerungen)">

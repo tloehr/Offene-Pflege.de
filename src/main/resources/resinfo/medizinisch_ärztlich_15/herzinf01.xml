@@ -1,5 +1,5 @@
 <resinfotype bwinftyp="herzinf01" sinceversion="13" category="15" abstract_type="163" equivalent="0"
              intervalmode="3" infokurz="Herzinfarkt" infolang="" tx="true" qpr="true">
-
-    <datefield label="Datum" name="datum" qdvs="Zeilen 13 und 14"/>
+    <label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
+    <qdvs optional="true"/>
 </resinfotype>

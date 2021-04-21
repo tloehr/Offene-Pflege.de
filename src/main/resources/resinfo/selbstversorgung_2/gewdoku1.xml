@@ -1,8 +1,7 @@
 <resinfotype bwinftyp="gewdoku1" sinceversion="13" abstract_type="164" equivalent="149" intervalmode="0"
              infokurz="Kommentierung Körpergewicht" infolang="" category="4" tx="false" qpr="true">
 
-    <qdvs
-            tooltip="Zeile(n) 72 - 75 im DAS Dokumentationsbogen (Abschnitt &quot;Körpergewicht und Größe&quot;)"/>
+    <qdvs optional="true"/>
     <tabgroup size="18" fontstyle="bold"
               label="Welche der aufgeführten Punkte trafen laut Pflegedokumentation für den Bewohner bzw. die Bewohnerin seit der letzten Ergebniserfassung zu?">
         <checkbox label="Gewichtsverlust durch medikamentöse Ausschwemmung" name="1"/>

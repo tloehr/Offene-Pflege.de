@@ -1,33 +1,41 @@
-<resinfotype bwinftyp="alltag01" sinceversion="13" category="12" abstract_type="160" equivalent="135"
-             intervalmode="0" infokurz="Alltagsleben" infolang="" tx="true" qpr="true">
+<info_elements>
+    <element_category name="Alltagsleben, Soziales">
+        <element id="alltag" name="Alltagsleben" validity="SEPARATE"> <!-- oder OVERLAP oder PIT -->
+            <version count="01" infolang="">
 
-    <qdvs optional="false"/>
+                <detailed_description>Some description</detailed_description>
 
-    <optiongroup size="18" name="GATAGESABLAUF"
-                 label="Tagesablauf gestalten und an Veränderungen anpassen"
-                 bi="4.6.1" tooltip="bi6.alltag.erklaerung" >
-        <option label="selbstständig" name="0" default="true" tooltip="bi6.alltag.selbst0"/>
-        <option label="überwiegend selbständig" name="1" tooltip="bi6.alltag.selbst1"/>
-        <option label="überwiegend unselbständig" name="2" tooltip="bi6.alltag.selbst2" layout="br left"/>
-        <option label="unselbständig" name="3" tooltip="bi6.alltag.selbst3"/>
-    </optiongroup>
+                <qdvs optional="false"/>
 
-    <optiongroup size="18" name="GABESCHAEFTIGEN"
-                 label="Sich beschäftigen"
-                 bi="4.6.3" tooltip="bi6.beschaeftigen.erklaerung" >
-        <option label="selbstständig" name="0" default="true" tooltip="bi6.beschaeftigen.selbst0"/>
-        <option label="überwiegend selbständig" name="1" tooltip="bi6.beschaeftigen.selbst1"/>
-        <option label="überwiegend unselbständig" name="2" tooltip="bi6.beschaeftigen.selbst2" layout="br left"/>
-        <option label="unselbständig" name="3" tooltip="bi6.beschaeftigen.selbst3"/>
-    </optiongroup>
+                <optiongroup size="18" name="GATAGESABLAUF"
+                             label="Tagesablauf gestalten und an Veränderungen anpassen"
+                             bi="4.6.1" tooltip="bi6.alltag.erklaerung">
+                    <option label="selbstständig" name="0" default="true" tooltip="bi6.alltag.selbst0"/>
+                    <option label="überwiegend selbständig" name="1" tooltip="bi6.alltag.selbst1"/>
+                    <option label="überwiegend unselbständig" name="2" tooltip="bi6.alltag.selbst2" layout="br left"/>
+                    <option label="unselbständig" name="3" tooltip="bi6.alltag.selbst3"/>
+                </optiongroup>
 
-    <optiongroup size="18" name="GAPLANUNGEN"
-                 label="Vornehmen von in die Zukunft gerichteten Planungen"
-                 bi="4.6.4" tooltip="bi6.zukunft.erklaerung" >
-        <option label="selbstständig" name="0" default="true" tooltip="bi6.zukunft.selbst0"/>
-        <option label="überwiegend selbständig" name="1" tooltip="bi6.zukunft.selbst1"/>
-        <option label="überwiegend unselbständig" name="2" tooltip="bi6.zukunft.selbst2" layout="br left"/>
-        <option label="unselbständig" name="3" tooltip="bi6.zukunft.selbst3"/>
-    </optiongroup>
+                <optiongroup size="18" name="GABESCHAEFTIGEN"
+                             label="Sich beschäftigen"
+                             bi="4.6.3" tooltip="bi6.beschaeftigen.erklaerung">
+                    <option label="selbstständig" name="0" default="true" tooltip="bi6.beschaeftigen.selbst0"/>
+                    <option label="überwiegend selbständig" name="1" tooltip="bi6.beschaeftigen.selbst1"/>
+                    <option label="überwiegend unselbständig" name="2" tooltip="bi6.beschaeftigen.selbst2"
+                            layout="br left"/>
+                    <option label="unselbständig" name="3" tooltip="bi6.beschaeftigen.selbst3"/>
+                </optiongroup>
 
-</resinfotype>
+                <optiongroup size="18" name="GAPLANUNGEN"
+                             label="Vornehmen von in die Zukunft gerichteten Planungen"
+                             bi="4.6.4" tooltip="bi6.zukunft.erklaerung">
+                    <option label="selbstständig" name="0" default="true" tooltip="bi6.zukunft.selbst0"/>
+                    <option label="überwiegend selbständig" name="1" tooltip="bi6.zukunft.selbst1"/>
+                    <option label="überwiegend unselbständig" name="2" tooltip="bi6.zukunft.selbst2" layout="br left"/>
+                    <option label="unselbständig" name="3" tooltip="bi6.zukunft.selbst3"/>
+                </optiongroup>
+
+            </version>
+        </element>
+    </element_category>
+</info_elements>

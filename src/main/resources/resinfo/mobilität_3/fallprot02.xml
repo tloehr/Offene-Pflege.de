@@ -1,5 +1,6 @@
 <resinfotype bwinftyp="fallprot02" sinceversion="14" category="3" abstract_type="30" equivalent="2" intervalmode="3"
              infokurz="Sturzprotokoll" infolang="" tx="false" qpr="true">
+    <qdvs optional="true"/>
     <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
            label="1. Grundlegende Angaben"/>
 
@@ -81,8 +82,7 @@
         <checkbox label="Platzwunde" name="laceration" layout="br"/>
         <checkbox label="Schürfwunde" name="graze" layout="left"/>
         <checkbox label="Hämatome" name="bruise" layout="left"/>
-        <checkbox label="Fraktur" name="fracture" layout="left"
-                  qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
+        <checkbox label="Fraktur" name="fracture" layout="left"/>
         <checkbox label="Schmerzen" name="pain" layout="left"/>
     </tabgroup>
     <textfield name="othertext5" label="Andere" hfill="false"/>
@@ -95,9 +95,8 @@
         <checkbox label="Wundverband" name="wound"/>
         <checkbox label="Lagerung / Kühlung" name="wound"/>
         <checkbox label="pflegerische Unterstützung" name="pflegerisch"/>
-        <checkbox label="Arztkontakt" name="gp" qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
-        <checkbox label="Krankenhauseinweisung" name="hospital"
-                  qdvs="Verwendung im Abschschnitt &quot;Sturzfolgen&quot;"/>
+        <checkbox label="Arztkontakt" name="gp"/>
+        <checkbox label="Krankenhauseinweisung" name="hospital"/>
     </tabgroup>
     <textfield name="othertext6" label="Anmerkungen zu den Massnahmen" hfill="false"/>
 

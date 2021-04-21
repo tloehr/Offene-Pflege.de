@@ -241,8 +241,8 @@ public class EntityTools {
     }
 
     public static String getJDBCUrl(String host, String port, String catalog) {
-        String addendum = "?autoReconnect=true&useSSL=false";
-        return "jdbc:mysql://" + SYSTools.catchNull(host) + ":" + SYSTools.catchNull(port) + (SYSTools.catchNull(catalog).isEmpty() ? "" : "/" + SYSTools.catchNull(catalog)) + addendum;
+        String params = "?autoReconnect=true&useSSL=false&serverTimezone=Europe/Berlin"; // Timezone wichtig ab Version 8 von Connector/J
+        return "jdbc:mysql://" + SYSTools.catchNull(host) + ":" + SYSTools.catchNull(port) + (SYSTools.catchNull(catalog).isEmpty() ? "" : "/" + SYSTools.catchNull(catalog)) + params;
     }
 
 
@@ -256,7 +256,8 @@ public class EntityTools {
      */
     public static void setServerLocked(Connection jdbcConnection, boolean locked) throws SQLException {
         String query = " UPDATE sysprops p SET p.V = ? WHERE p.K = ? ";
-        PreparedStatement stmt = jdbcConnection.prepareStatement(query);
+        PreparedStatement stmt = jdbcConnection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY);
         stmt.setString(1, Boolean.toString(locked).toLowerCase());
         stmt.setString(2, SYSPropsTools.KEY_MAINTENANCE_MODE);
         int result = stmt.executeUpdate();
@@ -265,7 +266,8 @@ public class EntityTools {
         // just in case the appropriate record does not yet exist.
         if (result == 0) {
             query = " INSERT INTO sysprops (K, V) VALUES (?, ?) ";
-            stmt = jdbcConnection.prepareStatement(query);
+            stmt = jdbcConnection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY);
             stmt.setString(1, SYSPropsTools.KEY_MAINTENANCE_MODE);
             stmt.setString(2, Boolean.toString(locked).toLowerCase());
             stmt.executeUpdate();
@@ -277,7 +279,8 @@ public class EntityTools {
     public static boolean isServerLocked(Connection jdbcConnection) throws SQLException {
         boolean isLocked = false;
         String query = " SELECT * FROM sysprops p WHERE p.K = ? AND p.v = 'true' ";
-        PreparedStatement stmt = jdbcConnection.prepareStatement(query);
+        PreparedStatement stmt = jdbcConnection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY);
         stmt.setString(1, SYSPropsTools.KEY_MAINTENANCE_MODE);
         ResultSet rs = stmt.executeQuery();
         isLocked = rs.first();

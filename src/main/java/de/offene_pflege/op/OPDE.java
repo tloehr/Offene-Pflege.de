@@ -58,10 +58,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /*! \mainpage My Personal Index Page
  *
@@ -384,6 +389,7 @@ public class OPDE {
 
 //        System.out.println("yoy");
 
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -394,7 +400,7 @@ public class OPDE {
         FileUtils.forceMkdir(new File(AppInfo.getOPCache()));
         FileUtils.forceMkdir(new File(AppInfo.getUserTemplatePath()));
         FileUtils.forceMkdir(new File(LocalMachine.getLogPath()));
-
+//        Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
         System.setProperty("logs", LocalMachine.getLogPath());
         logger = Logger.getRootLogger();
         uptime = SYSCalendar.now();
@@ -545,9 +551,6 @@ public class OPDE {
                 Logger.getRootLogger().setLevel(Level.DEBUG);
 //                logger.setLevel(Level.DEBUG);
             }
-
-
-
 
 
             Logger.getLogger("org.hibernate").setLevel(Level.OFF);

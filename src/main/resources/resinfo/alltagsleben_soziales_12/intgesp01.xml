@@ -1,9 +1,10 @@
 <resinfotype bwinftyp="intgesp01" sinceversion="13" category="13" abstract_type="168" equivalent="150"
              intervalmode="3" infokurz="Integrationsgespräch" infolang="" tx="false" qdvs="true">
 
+    <qdvs optional="true"/>
+
     <optiongroup size="18" name="EINZUGGESPR"
                  label="Integrationsgespräch"
-                 qdvs="Zeile 93"
                  tooltip="Ist in den Wochen nach dem Einzug mit dem Bewohner bzw. der Bewohnerin und/oder einer seiner bzw. ihrer Angehörigen oder sonstigen Vertrauenspersonen ein Gespräch über sein bzw. ihr Einleben und die zukünftige Versorgung geführt worden?">
         <option label="ja" name="1" default="true"/>
         <option label="nicht möglich aufgrund fehlender Vertrauenspersonen des Bewohners bzw. der Bewohnerin"
@@ -11,7 +12,7 @@
         <option label="nein, aus anderen Gründen" name="3" layout="br left"/>
     </optiongroup>
 
-    <tabgroup size="18" fontstyle="bold" label="Wer hat an dem Integrationsgespräch teilgenommen?" qdvs="Zeile 95"
+    <tabgroup size="18" fontstyle="bold" label="Wer hat an dem Integrationsgespräch teilgenommen?"
               name="tab1">
         <checkbox name="1" label="Bewohner/Bewohnerin" default="true" layout="br left"/>
         <checkbox name="2" label="Angehörige"/>
@@ -21,8 +22,7 @@
     </tabgroup>
 
     <optiongroup size="18" name="EINZUGGESPRDOKU"
-                 label="Protokoll wurde erstellt und angehangen"
-                 qdvs="Zeile 96">
+                 label="Protokoll wurde erstellt und angehangen">
         <option label="nein" name="0"/>
         <option label="ja" name="1" default="true"/>
     </optiongroup>

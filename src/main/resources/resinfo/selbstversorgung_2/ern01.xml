@@ -18,7 +18,7 @@
     </optiongroup>
 
     <optiongroup name="SVNAHRUNGZUBEREITEN" size="18" tooltip="bi4.mundgerecht.erklaerung"
-                 label="Mundgerechtes Zubereiten der Nahrung, Eingießen von Getränken">
+                 label="Mundgerechtes Zubereiten der Nahrung, Eingießen von Getränken">
 
         <option label="selbstständig" name="0" default="true" tooltip="bi4.mundgerecht.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.mundgerecht.selbst1"/>

@@ -72,7 +72,7 @@
     </optiongroup>
 
     <optiongroup size="18" name="SVHARNKONTINENZBEW"
-                 label="Bewältigen der Folgen einer Harninkontinenz und Umgang mit Dauerkatheter und Urostoma"
+                 label="Bewältigen der Folgen einer Harninkontinenz und Umgang mit Dauerkatheter und Urostoma"
                  tooltip="bi4.harnbewaeltigung.erklaerung" tx="Seite 1, Abschnitt 3">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.harnbewaeltigung.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.harnbewaeltigung.selbst1"/>

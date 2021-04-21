@@ -4,8 +4,7 @@
     <label size="16" fontstyle="bold"
            label="Amputationsangaben (werden zur Berechnung der angepassten Köpergewichte herangezogen)"/>
     <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 18."/>
-    <qdvs
-            tooltip="Wird für die Indiaktoren an die DAS-Pflege verwendet. Bitte besonders auf das Datum der Amputation achten."/>
+    <qdvs optional="true"/>
 
     <optiongroup name="upperleft" label="linkes, oberes Viertel">
         <option label="keine Amputation" name="none" default="true"/>
