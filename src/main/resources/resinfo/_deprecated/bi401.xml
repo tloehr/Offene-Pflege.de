@@ -28,7 +28,7 @@ Gliederung des Formulargutachtens des BI.
     <separator/>
     <!-- F4.4 -->
 
-    <tabgroup size="16" fontstyle="bold" label="Ernährung parenteral oder über Sonde">
+    <tabgroup size="16" fontstyle="bold" label="Ernährung parenteral oder über Sonde">
         <checkbox label="parenteral (z. B. Port)" name="parenteral" layout="br left"/>
         <checkbox label="perkutane endoskopische Gastrostomie (PEG)" name="peg" layout="left"/>
         <checkbox label="perkutane endoskopische Jejunostomie (PEJ)" name="pej" layout="br left"/>

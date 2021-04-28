@@ -28,7 +28,7 @@
 
     <separator/>
 
-    <optiongroup name="KKFERKENNEN" size="18" label="Erkennen von Personen aus dem näheren Umfeld"
+    <optiongroup name="KKFERKENNEN" size="18" label="Erkennen von Personen aus dem näheren Umfeld"
                  tooltip="bi2.personen.erklaerung"
                  tx="Verwendung bei Orientierung/Psyche: persönlich, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.personen.selbst0"/>
@@ -37,7 +37,7 @@
         <option label="nicht vorhanden" name="3" tooltip="bi2.personen.selbst3"/>
     </optiongroup>
 
-    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Ö̈rtliche Orientierung" tooltip="bi2.orte.erklaerung"
+    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"
                  tx="Verwendung bei Orientierung/Psyche: örtlich, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.orte.selbst0"/>
         <option label="größtenteils vorhanden" name="1" tooltip="bi2.orte.selbst1"/>
@@ -93,7 +93,7 @@
         <option label="nicht vorhanden" name="3" tooltip="bi2.risiken.selbst3"/>
     </optiongroup>
 
-    <optiongroup name="KKFMITTEILEN" size="18" label="Mitteilen von elementaren Bedürfnissen"
+    <optiongroup name="KKFMITTEILEN" size="18" label="Mitteilen von elementaren Bedürfnissen"
                    tooltip="bi2.beduerfnissen.erklaerung">
           <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.beduerfnissen.selbst0"/>
           <option label="größtenteils vorhanden" name="1" tooltip="bi2.beduerfnissen.selbst1"/>
@@ -109,7 +109,7 @@
           <option label="nicht vorhanden" name="3" tooltip="bi2.aufforderungen.selbst3"/>
       </optiongroup>
 
-      <optiongroup name="KKFBETEILIGUNG" size="18" label="Beteiligung an einem Gespräch"
+      <optiongroup name="KKFBETEILIGUNG" size="18" label="Beteiligung an einem Gespräch"
                    tooltip="bi2.gespraech.erklaerung">
           <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.gespraech.selbst0"/>
           <option label="größtenteils vorhanden" name="1" tooltip="bi2.gespraech.selbst1"/>

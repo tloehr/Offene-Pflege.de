@@ -186,32 +186,33 @@ WHERE t.BWINFTYP = 'sozial01';
 UPDATE resinfotype t
 SET t.XML = ' <qdvs optional="false"/>
 
-    <optiongroup size="18" name="GATAGESABLAUF"
-                 label="Tagesablauf gestalten und an Veränderungen anpassen"
-                 bi="4.6.1" tooltip="bi6.alltag.erklaerung" >
-        <option label="selbstständig" name="0" default="true" tooltip="bi6.alltag.selbst0"/>
-        <option label="überwiegend selbständig" name="1" tooltip="bi6.alltag.selbst1"/>
-        <option label="überwiegend unselbständig" name="2" tooltip="bi6.alltag.selbst2" layout="br left"/>
-        <option label="unselbständig" name="3" tooltip="bi6.alltag.selbst3"/>
-    </optiongroup>
+                <optiongroup size="18" name="GATAGESABLAUF"
+                             label="Tagesablauf gestalten und an Veränderungen anpassen"
+                             bi="4.6.1" tooltip="bi6.alltag.erklaerung">
+                    <option label="selbstständig" name="0" default="true" tooltip="bi6.alltag.selbst0"/>
+                    <option label="überwiegend selbständig" name="1" tooltip="bi6.alltag.selbst1"/>
+                    <option label="überwiegend unselbständig" name="2" tooltip="bi6.alltag.selbst2" layout="br left"/>
+                    <option label="unselbständig" name="3" tooltip="bi6.alltag.selbst3"/>
+                </optiongroup>
 
-    <optiongroup size="18" name="GABESCHAEFTIGEN"
-                 label="Sich beschäftigen"
-                 bi="4.6.3" tooltip="bi6.beschaeftigen.erklaerung" >
-        <option label="selbstständig" name="0" default="true" tooltip="bi6.beschaeftigen.selbst0"/>
-        <option label="überwiegend selbständig" name="1" tooltip="bi6.beschaeftigen.selbst1"/>
-        <option label="überwiegend unselbständig" name="2" tooltip="bi6.beschaeftigen.selbst2" layout="br left"/>
-        <option label="unselbständig" name="3" tooltip="bi6.beschaeftigen.selbst3"/>
-    </optiongroup>
+                <optiongroup size="18" name="GABESCHAEFTIGEN"
+                             label="Sich beschäftigen"
+                             bi="4.6.3" tooltip="bi6.beschaeftigen.erklaerung">
+                    <option label="selbstständig" name="0" default="true" tooltip="bi6.beschaeftigen.selbst0"/>
+                    <option label="überwiegend selbständig" name="1" tooltip="bi6.beschaeftigen.selbst1"/>
+                    <option label="überwiegend unselbständig" name="2" tooltip="bi6.beschaeftigen.selbst2"
+                            layout="br left"/>
+                    <option label="unselbständig" name="3" tooltip="bi6.beschaeftigen.selbst3"/>
+                </optiongroup>
 
-    <optiongroup size="18" name="GAPLANUNGEN"
-                 label="Vornehmen von in die Zukunft gerichteten Planungen"
-                 bi="4.6.4" tooltip="bi6.zukunft.erklaerung" >
-        <option label="selbstständig" name="0" default="true" tooltip="bi6.zukunft.selbst0"/>
-        <option label="überwiegend selbständig" name="1" tooltip="bi6.zukunft.selbst1"/>
-        <option label="überwiegend unselbständig" name="2" tooltip="bi6.zukunft.selbst2" layout="br left"/>
-        <option label="unselbständig" name="3" tooltip="bi6.zukunft.selbst3"/>
-    </optiongroup>
+                <optiongroup size="18" name="GAPLANUNGEN"
+                             label="Vornehmen von in die Zukunft gerichteten Planungen"
+                             bi="4.6.4" tooltip="bi6.zukunft.erklaerung">
+                    <option label="selbstständig" name="0" default="true" tooltip="bi6.zukunft.selbst0"/>
+                    <option label="überwiegend selbständig" name="1" tooltip="bi6.zukunft.selbst1"/>
+                    <option label="überwiegend unselbständig" name="2" tooltip="bi6.zukunft.selbst2" layout="br left"/>
+                    <option label="unselbständig" name="3" tooltip="bi6.zukunft.selbst3"/>
+                </optiongroup>
       '
 WHERE t.BWINFTYP = 'alltag01';
 --
@@ -331,7 +332,7 @@ SET t.XML = '    <optiongroup name="application" label="Anwendung"
 WHERE t.BWINFTYP = 'ANTIBIO1';
 --
 UPDATE resinfotype t
-SET t.XML = '    <qdvs optional="false"/>
+SET t.XML = '  <qdvs optional="false"/>
     <tx tooltip="Sobald das Inkontinenzprofil nicht mehr auf &quot;Kontinenz&quot; steht, wird im Überleitbogen die Markierung für &quot;Harninkontinenz&quot; gesetzt."/>
 
     <optiongroup size="18" name="SVTOILETTE"
@@ -402,7 +403,7 @@ SET t.XML = '    <qdvs optional="false"/>
     </optiongroup>
 
     <optiongroup size="18" name="SVHARNKONTINENZBEW"
-                 label="Bewältigen der Folgen einer Harninkontinenz und Umgang mit Dauerkatheter und Urostoma"
+                 label="Bewältigen der Folgen einer Harninkontinenz und Umgang mit Dauerkatheter und Urostoma"
                  tooltip="bi4.harnbewaeltigung.erklaerung" tx="Seite 1, Abschnitt 3">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.harnbewaeltigung.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.harnbewaeltigung.selbst1"/>
@@ -510,7 +511,7 @@ SET t.XML = ' <tx tooltip="Diese Eintragungen werden in den Überleitbogen über
 WHERE t.BWINFTYP = 'COMMS';
 --
 UPDATE resinfotype t
-SET t.XML = ' <qdvs optional="false"/>
+SET t.XML = '  <qdvs optional="false"/>
 
     <optiongroup name="SVESSEN" size="18" label="Essen" tooltip="bi4.essen.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.essen.selbst0"/>
@@ -527,7 +528,7 @@ SET t.XML = ' <qdvs optional="false"/>
     </optiongroup>
 
     <optiongroup name="SVNAHRUNGZUBEREITEN" size="18" tooltip="bi4.mundgerecht.erklaerung"
-                 label="Mundgerechtes Zubereiten der Nahrung, Eingießen von Getränken">
+                 label="Mundgerechtes Zubereiten der Nahrung, Eingießen von Getränken">
 
         <option label="selbstständig" name="0" default="true" tooltip="bi4.mundgerecht.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.mundgerecht.selbst1"/>
@@ -782,26 +783,27 @@ WHERE t.BWINFTYP = 'intgesp01';
 UPDATE resinfo r set r.Bis = r.Von WHERE r.BWINFTYP = 'intgesp01';
 --
 UPDATE resinfotype t
-SET t.XML = ' <qdvs optional="false"/>
+SET t.XML = '    <qdvs optional="false"/>
 
     <optiongroup size="18" name="BEWUSSTSEINSZUSTAND"
                  label="Bewusstseinszustand"
-                 tx="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11.">
+                 tx="Diese Eintragungen werden in den Überleitbogen übFernommen. Seite 2, Abschnitt 11.">
         <option label="wach" name="1" default="true"
-                tooltip="Die Person ist ansprechbar und kann an Aktivitäten teilnehmen." tx="setzt ''wach''"/>
+                tooltip="Die Person ist ansprechbar und kann an Aktivitäten teilnehmen." tx="setzt ''wach''"/>
         <option label="schläfrig" name="2"
-                tooltip="Die Person ist ansprechbar und gut erweckbar, wirkt jedoch müde und ist verlangsamt in seinen Handlungen." tx="setzt ''soporös''"/>
+                tooltip="Die Person ist ansprechbar und gut erweckbar, wirkt jedoch müde und ist verlangsamt in seinen Handlungen." tx="setzt ''soporös''"/>
         <option label="somnolent" name="3"
-                tooltip="Die Person ist sehr schläfrig und kann nur durch starke äußere Reize geweckt werden (z. B. kräftiges Rütteln an der Schulter oder mehrfaches, sehr lautes Ansprechen)."
+                tooltip="Die Person ist sehr schläfrig und kann nur durch starke äußere Reize geweckt werden (z. B. kräftiges Rütteln an der Schulter oder mehrfaches, sehr lautes Ansprechen)."
                 layout="br left"  tx="setzt ''somnolent''"/>
-        <option label="komatös" name="4" tooltip="Die Person kann durch äußere Reize nicht mehr geweckt werden."
+        <option label="komatös" name="4" tooltip="Die Person kann durch äußere Reize nicht mehr geweckt werden."
                 tx="setzt ''komatös''"/>
-        <option label="wachkoma" name="5" tooltip="Dies trifft nur dann zu, wenn eine ärztliche Diagnose vorliegt." tx="setzt ''komatös''"/>
+        <option label="wachkoma" name="5" tooltip="Dies trifft nur dann zu, wenn eine ärztliche Diagnose vorliegt."
+                tx="setzt ''komatös''"/>
     </optiongroup>'
 WHERE t.BWINFTYP = 'bewusst01';
 --
 UPDATE resinfotype t
-SET t.XML = '   <qdvs optional="true"/>
+SET t.XML = '  <qdvs optional="true"/>
     <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
     <tx tooltip="Seite 2, Abschnitt 9."/>
 
@@ -827,14 +829,14 @@ SET t.XML = '   <qdvs optional="true"/>
     <textfield name="calories" label="Kalorien (in 24h)" hfill="false" length="12"/>
 
     <separator/>
-    <optiongroup name="SVERNAEHRUNGUMFANG" label="In welchem Umfang erfolgt eine künstliche Ernährung?" bi="4.4.13">
-        <option label="nicht täglich oder nicht dauerhaft" name="0" default="true"/>
-        <option label="täglich, aber zusätzlich zur oralen Ernährung" name="6"/>
-        <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="3"/>
+    <optiongroup name="SVERNAEHRUNGUMFANG" label="In welchem Umfang erfolgt eine künstliche Ernährung?" bi="4.4.13">
+        <option label="nicht täglich oder nicht dauerhaft" name="0" default="true"/>
+        <option label="täglich, aber zusätzlich zur oralen Ernährung" name="6"/>
+        <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="3"/>
     </optiongroup>
 
-    <optiongroup name="SVFREMDHILFE" label="Erfolgt die Bedienung selbständig oder mit Fremdhilfe?" bi="4.4.13">
-        <option label="selbständig" name="0" default="true"/>
+    <optiongroup name="SVFREMDHILFE" label="Erfolgt die Bedienung selbständig oder mit Fremdhilfe?" bi="4.4.13">
+        <option label="selbständig" name="0" default="true"/>
         <option label="mit Fremdhilfe" name="1"/>
     </optiongroup>'
 WHERE t.BWINFTYP = 'kern01';
@@ -865,12 +867,12 @@ SET t.XML = '<tabgroup size="12" label="Kontrakturen an den oberen Extremitäten
 WHERE t.BWINFTYP = 'KONTRAKT';
 --
 UPDATE resinfotype t
-SET t.XML = '     <qdvs optional="false"/>
+SET t.XML = '  <qdvs optional="false"/>
     <tx tooltip="[b]Seite 1, Abschnitt 3. &quot;Grundpflege&quot;[/b]
             [br/]Die Markierungen im Abschnitt &quot;Grundpflege&quot; werden entsprechenden Ihren Einträgen in diesem Formular gesetzt.
             [br/]Der Bemerkungs-Text wird in die Bemerkungs-Zeile dieses Abschnitts im Überleitbogen übernommen."/>
 
-    <optiongroup size="18" name="SVOBERKOERPER" label="Waschen des vorderen Oberkörpers"
+    <optiongroup size="18" name="SVOBERKOERPER" label="Waschen des vorderen Oberkörpers"
                  tooltip="bi4.oberkoerper.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.oberkoerper.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.oberkoerper.selbst1"/>
@@ -878,7 +880,7 @@ SET t.XML = '     <qdvs optional="false"/>
         <option label="unselbständig" name="3" tooltip="bi4.oberkoerper.selbst3"/>
     </optiongroup>
 
-    <optiongroup size="18" name="SVKOPF" label="Körperpflege im Bereich des Kopfes"
+    <optiongroup size="18" name="SVKOPF" label="Körperpflege im Bereich des Kopfes"
                  tooltip="bi4.kopf.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.kopf.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.kopf.selbst1"/>
@@ -909,7 +911,7 @@ SET t.XML = '     <qdvs optional="false"/>
         <option label="unselbständig" name="3" tooltip="bi4.baden.selbst3"/>
     </optiongroup>
 
-    <optiongroup size="18" name="SVANAUSOBERKOERPER" label="An- und Auskleiden des Oberkörpers"
+    <optiongroup size="18" name="SVANAUSOBERKOERPER" label="An- und Auskleiden des Oberkörpers"
                  tooltip="bi4.okankleiden.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.okankleiden.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.okankleiden.selbst1"/>
@@ -917,7 +919,7 @@ SET t.XML = '     <qdvs optional="false"/>
         <option label="unselbständig" name="3" tooltip="bi4.okankleiden.selbst3"/>
     </optiongroup>
 
-    <optiongroup size="18" name="SVANAUSUNTERKOERPER" label="An- und Auskleiden des Unterkörpers"
+    <optiongroup size="18" name="SVANAUSUNTERKOERPER" label="An- und Auskleiden des Unterkörpers"
                 tooltip="bi4.ukankleiden.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.ukankleiden.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.ukankleiden.selbst1"/>
@@ -981,7 +983,7 @@ SET t.XML = '<tx tooltip="Diese Eintragungen werden in den Überleitbogen übern
 WHERE t.BWINFTYP = 'MEDS1';
 --
 UPDATE resinfotype t
-SET t.XML = '   <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
+SET t.XML = '  <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 11."/>
     <qdvs optional="false"/>
     <optiongroup name="type_of_dementia" label="Form der Demenz" size="18">
         <option label="Nicht dement" name="none" default="true"/>
@@ -1008,7 +1010,7 @@ SET t.XML = '   <tx tooltip="Diese Eintragungen werden in den Überleitbogen üb
 
     <separator/>
 
-    <optiongroup name="KKFERKENNEN" size="18" label="Erkennen von Personen aus dem näheren Umfeld"
+    <optiongroup name="KKFERKENNEN" size="18" label="Erkennen von Personen aus dem näheren Umfeld"
                  tooltip="bi2.personen.erklaerung"
                  tx="Verwendung bei Orientierung/Psyche: persönlich, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.personen.selbst0"/>
@@ -1017,7 +1019,7 @@ SET t.XML = '   <tx tooltip="Diese Eintragungen werden in den Überleitbogen üb
         <option label="nicht vorhanden" name="3" tooltip="bi2.personen.selbst3"/>
     </optiongroup>
 
-    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Ö̈rtliche Orientierung" tooltip="bi2.orte.erklaerung"
+    <optiongroup name="KKFORIENTOERTLICH" size="18" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"
                  tx="Verwendung bei Orientierung/Psyche: örtlich, Abbildung wie folgt: vorhanden ==> ja, nicht vorhanden ==> nein, ansonsten zeitweise">
         <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.orte.selbst0"/>
         <option label="größtenteils vorhanden" name="1" tooltip="bi2.orte.selbst1"/>
@@ -1073,7 +1075,7 @@ SET t.XML = '   <tx tooltip="Diese Eintragungen werden in den Überleitbogen üb
         <option label="nicht vorhanden" name="3" tooltip="bi2.risiken.selbst3"/>
     </optiongroup>
 
-    <optiongroup name="KKFMITTEILEN" size="18" label="Mitteilen von elementaren Bedürfnissen"
+    <optiongroup name="KKFMITTEILEN" size="18" label="Mitteilen von elementaren Bedürfnissen"
                    tooltip="bi2.beduerfnissen.erklaerung">
           <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.beduerfnissen.selbst0"/>
           <option label="größtenteils vorhanden" name="1" tooltip="bi2.beduerfnissen.selbst1"/>
@@ -1089,7 +1091,7 @@ SET t.XML = '   <tx tooltip="Diese Eintragungen werden in den Überleitbogen üb
           <option label="nicht vorhanden" name="3" tooltip="bi2.aufforderungen.selbst3"/>
       </optiongroup>
 
-      <optiongroup name="KKFBETEILIGUNG" size="18" label="Beteiligung an einem Gespräch"
+      <optiongroup name="KKFBETEILIGUNG" size="18" label="Beteiligung an einem Gespräch"
                    tooltip="bi2.gespraech.erklaerung">
           <option label="vorhanden/unbeeinträchtigt" name="0" default="true" tooltip="bi2.gespraech.selbst0"/>
           <option label="größtenteils vorhanden" name="1" tooltip="bi2.gespraech.selbst1"/>
@@ -1474,7 +1476,7 @@ SET t.XML = ' <qdvs optional="false"/>
     </optiongroup>'
 WHERE t.BWINFTYP = 'sozial01';
 UPDATE resinfotype t
-SET t.XML = '   <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
+SET t.XML = '  <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier als Bemerkung eintragen, steht hinterher in der Bemerkungs-Zeile dieses Abschnitts im Überleitbogen.[br/][b]Lagerungsarten[/b] werden anhand der Pflegeplanungen bestimmt."/>
     <qdvs optional="false"/>
     <checkbox name="bedridden" label="bettlägerig"/>
     <optiongroup size="18" name="MOBILPOSWECHSEL" label="Positionswechsel im Bett"
@@ -1524,7 +1526,7 @@ SET t.XML = '   <tx tooltip="[b]Seite 1, Abschnitt 4.[/b][br/]Alles was Sie hier
         <option label="unselbständig" name="3" tooltip="bi1.treppen.selbst3"/>
     </optiongroup>
 
-    <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
+    <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
               tooltip="bi1.unfaehig.arme.beine"/>'
 WHERE t.BWINFTYP LIKE 'mobil02';
 --
@@ -1534,7 +1536,7 @@ SET t.XML = ' <qdvs optional="false"/>
 WHERE t.BWINFTYP LIKE 'room1';
 --
 UPDATE resinfotype t
-SET t.XML = '  <qdvs optional="false"/>
+SET t.XML = '    <qdvs optional="false"/>
     <tx tooltip="Diese Eintragungen werden in den Überleitbogen übernommen. Seite 2, Abschnitt 12."/>
 
     <tabgroup size="18" fontstyle="bold" label="Atmung" name="atmung">
@@ -1559,53 +1561,12 @@ SET t.XML = '  <qdvs optional="false"/>
     </tabgroup>
 
     <optiongroup size="18" name="BEATMUNG" label="Wird der:die Bewohner:in beatmet ?"
-                 tooltip="Die Antwortmöglichkeit „invasive Beatmung“ trifft zu, wenn die Beatmung durch eine Trachealkanüle erfolgt. Ansonsten ist „nicht invasiv“ anzukreuzen.">
+                 tooltip="Die Antwortmöglichkeit „invasive Beatmung“ trifft zu, wenn die Beatmung durch eine Trachealkanüle erfolgt. Ansonsten ist „nicht invasiv“ anzukreuzen.">
         <option label="nein" default="true" name="0"/>
         <option label="ja, invasive Beatmung" name="1"/>
         <option label="ja, aber nicht invasiv" name="2"/>
     </optiongroup>'
 WHERE t.BWINFTYP LIKE 'respirat2';
---
-UPDATE resinfotype t
-SET t.XML = ' <qpr tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Zeile: 42"/>
-          <bi tooltip="Sobald diese Information eingetragen wurde, geht das System von einer künstlichen Ernährung aus. Formular: 4.4.13"/>
-          <tx tooltip="Seite 2, Abschnitt 9."/>
-
-          <combobox label="Sondentyp" name="tubetype">
-              <item label="PEG (Perkutane endoskopische Gastrostomie)" name="peg"/>
-              <item label="PEG/J (PEG mit duodenalem Schenkel)" name="pej"/>
-              <item label="Transnasale Ernährungssonde" name="nose"/>
-          </combobox>
-          <textfield name="tubesince" label="Sonde gelegt am" length="12" type="date"/>
-          <textfield name="tubereason" label="Warum wurde die PEG gelegt ?" hfill="false" length="40" innerlayout="br"/>
-
-          <tabgroup size="12" label="Verabreichung" name="tab1">
-              <checkbox label="Ernährungspumpe" name="pump"/>
-              <checkbox label="Schwerkraft" name="gravity" layout="left"/>
-              <checkbox label="Spritze" name="syringe" layout="left"/>
-          </tabgroup>
-
-          <tabgroup size="12" label="Sonstiges" name="tab2">
-              <checkbox label="Orale Ernährung zusätzlich" name="oralnutrition"/>
-              <checkbox label="Parenterale Ernährung" name="parenteral" layout="left"/>
-          </tabgroup>
-
-          <textfield name="calories" label="Kalorien (in 24h)" hfill="false" length="12"/>
-
-          <separator/>
-          <optiongroup name="SVERNAEHRUNGUMFANG" label="In welchem Umfang erfolgt eine künstliche Ernährung?"
-                       qdvs="43" bi="4.4.13">
-              <option label="nicht täglich oder nicht dauerhaft" name="0" default="true"/>
-              <option label="täglich, aber zusätzlich zur oralen Ernährung" name="6"/>
-              <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="3"/>
-          </optiongroup>
-
-          <optiongroup name="SVFREMDHILFE" label="Erfolgt die Bedienung selbständig oder mit Fremdhilfe?" qdvs="44"
-                       bi="4.4.13">
-              <option label="selbständig" name="0" default="true"/>
-              <option label="mit Fremdhilfe" name="1"/>
-          </optiongroup>'
-WHERE t.BWINFTYP LIKE 'kern01';
 --
 INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`)
 VALUES ('fallprot02', 'Sturzprotokoll', '', '3', '30', '3',

@@ -20,7 +20,8 @@ bi201 (heisst modul2 aber erste version. man weiss nie was sich verändert)
     <label parwidth="600px" label="bi2.intro"/>
     <separator/>
     <!--  QI26 F4.1.1 -->
-    <label fontstyle="bold" size="14" label="Erkennen von Personen aus dem näheren Umfeld" tooltip="bi2.personen.erklaerung"/>
+    <label fontstyle="bold" size="14" label="Erkennen von Personen aus dem näheren Umfeld"
+           tooltip="bi2.personen.erklaerung"/>
     <optiongroup name="personen">
         <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.personen.selbst0"/>
         <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.personen.selbst1"/>
@@ -29,7 +30,7 @@ bi201 (heisst modul2 aber erste version. man weiss nie was sich verändert)
     </optiongroup>
 
 
-    <label fontstyle="bold" size="14" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"/>
+    <label fontstyle="bold" size="14" label="Örtliche Orientierung" tooltip="bi2.orte.erklaerung"/>
     <optiongroup name="orte">
         <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.orte.selbst0"/>
         <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.orte.selbst1"/>
@@ -86,7 +87,8 @@ bi201 (heisst modul2 aber erste version. man weiss nie was sich verändert)
         <option label="unselbständig" name="selbst3" tooltip="bi2.risiken.selbst3"/>
     </optiongroup>
 
-    <label fontstyle="bold" size="14" label="Mitteilen von elementaren Bedürfnissen" tooltip="bi2.beduerfnissen.erklaerung"/>
+    <label fontstyle="bold" size="14" label="Mitteilen von elementaren Bedürfnissen"
+           tooltip="bi2.beduerfnissen.erklaerung"/>
     <optiongroup name="beduerfnissen">
         <option label="selbstständig" name="selbst0" default="true" tooltip="bi2.beduerfnissen.selbst0"/>
         <option label="überwiegend selbständig" name="selbst1" tooltip="bi2.beduerfnissen.selbst1"/>

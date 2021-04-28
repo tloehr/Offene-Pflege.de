@@ -27,9 +27,9 @@
     <textfield name="calories" label="Kalorien (in 24h)" hfill="false" length="12"/>
 
     <separator/>
-    <optiongroup name="SVERNAEHRUNGUMFANG" label="In welchem Umfang erfolgt eine künstliche Ernährung?" bi="4.4.13">
+    <optiongroup name="SVERNAEHRUNGUMFANG" label="In welchem Umfang erfolgt eine künstliche Ernährung?" bi="4.4.13">
         <option label="nicht täglich oder nicht dauerhaft" name="0" default="true"/>
-        <option label="täglich, aber zusätzlich zur oralen Ernährung" name="6"/>
+        <option label="täglich, aber zusätzlich zur oralen Ernährung" name="6"/>
         <option label="ausschließlich oder nahezu ausschließlich künstliche Ernährung" name="3"/>
     </optiongroup>
 

@@ -25,7 +25,7 @@
     </tabgroup>
 
     <optiongroup size="18" name="BEATMUNG" label="Wird der:die Bewohner:in beatmet ?"
-                 tooltip="Die Antwortmöglichkeit „invasive Beatmung“ trifft zu, wenn die Beatmung durch eine Trachealkanüle erfolgt. Ansonsten ist „nicht invasiv“ anzukreuzen.">
+                 tooltip="Die Antwortmöglichkeit „invasive Beatmung“ trifft zu, wenn die Beatmung durch eine Trachealkanüle erfolgt. Ansonsten ist „nicht invasiv“ anzukreuzen.">
         <option label="nein" default="true" name="0"/>
         <option label="ja, invasive Beatmung" name="1"/>
         <option label="ja, aber nicht invasiv" name="2"/>

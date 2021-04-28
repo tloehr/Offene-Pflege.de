@@ -50,7 +50,7 @@ INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`,            `B
     </optiongroup>
 
 
-    <label fontstyle="bold" size="14" label="Örtliche Orientierung" tooltip="bi4.orte.erklaerung"/>
+    <label fontstyle="bold" size="14" label="Örtliche Orientierung" tooltip="bi4.orte.erklaerung"/>
     <optiongroup name="orte">
         <option label="selbstständig" name="selbst0" default="true" tooltip="bi4.orte.selbst0"/>
         <option label="überwiegend selbständig" name="selbst1" tooltip="bi4.orte.selbst1"/>
@@ -107,7 +107,8 @@ INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`,            `B
         <option label="unselbständig" name="selbst3" tooltip="bi4.risiken.selbst3"/>
     </optiongroup>
 
-    <label fontstyle="bold" size="14" label="Mitteilen von elementaren Bedürfnissen" tooltip="bi4.beduerfnissen.erklaerung"/>
+    <label fontstyle="bold" size="14" label="Mitteilen von elementaren Bedürfnissen"
+           tooltip="bi4.beduerfnissen.erklaerung"/>
     <optiongroup name="beduerfnissen">
         <option label="selbstständig" name="selbst0" default="true" tooltip="bi4.beduerfnissen.selbst0"/>
         <option label="überwiegend selbständig" name="selbst1" tooltip="bi4.beduerfnissen.selbst1"/>

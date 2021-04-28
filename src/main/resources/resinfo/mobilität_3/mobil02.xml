@@ -51,7 +51,7 @@
         <option label="unselbständig" name="3" tooltip="bi1.treppen.selbst3"/>
     </optiongroup>
 
-    <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
+    <checkbox name="unfaegig-arme-beine" label="Gebrauchsunfähigkeit beider Arme und beider Beine"
               tooltip="bi1.unfaehig.arme.beine"/>
 
 </resinfotype>
