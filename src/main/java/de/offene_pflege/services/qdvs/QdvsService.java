@@ -17,10 +17,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.javatuples.Quintet;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+
+import jakarta.xml.bind.*;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;

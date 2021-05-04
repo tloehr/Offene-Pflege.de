@@ -2126,6 +2126,8 @@ alter table floors
   change floorid id bigint unsigned auto_increment;
 alter table rooms
   change RID id bigint unsigned auto_increment;
+-- für die Zukunft
+ALTER TABLE nreports ADD FULLTEXT(Text);
 --
 drop table training;
 drop table training2file;

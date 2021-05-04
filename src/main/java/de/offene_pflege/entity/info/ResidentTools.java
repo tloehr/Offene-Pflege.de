@@ -6,7 +6,6 @@ package de.offene_pflege.entity.info;
 
 import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.building.Homes;
-import de.offene_pflege.entity.building.Rooms;
 import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.entity.nursingprocess.NursingProcessTools;
 import de.offene_pflege.entity.prescription.MedInventoryTools;
@@ -17,7 +16,6 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
-import de.offene_pflege.services.RoomsService;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.joda.time.DateTime;
@@ -32,9 +30,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.DateFormat;
+import java.time.MonthDay;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author tloehr
@@ -179,9 +177,9 @@ public class ResidentTools {
 
         DateFormat df = DateFormat.getDateInstance();
 
-        String sterbephase = (resident.getSterbePhase() ? "//"+SYSTools.xx("misc.msg.dying")+"// " : "");
+        String sterbephase = (resident.getSterbePhase() ? "//" + SYSTools.xx("misc.msg.dying") + "// " : "");
 
-        String result = sterbephase+ ResidentTools.getName(resident) + ", " + ResidentTools.getFirstname(resident) + " (*" + df.format(getDob(resident)) + "), ";
+        String result = sterbephase + ResidentTools.getName(resident) + ", " + ResidentTools.getFirstname(resident) + " (*" + df.format(getDob(resident)) + "), ";
 
         result += getAge(resident).getYears() + " " + SYSTools.xx("misc.msg.Years") + " [" + SYSTools.anonymizeRID(resident.getId()) + "]";
 
@@ -460,9 +458,12 @@ public class ResidentTools {
                 dob1 = dob1.withYear(now.getYear() + 1); // Geburstag war schon, also liegt der nächste im nächsten Jahr
 
             long daysbetween = ChronoUnit.DAYS.between(now, dob1);
+            MonthDay birthMonthDay = MonthDay.from(dob);
+            MonthDay todayMonthDay = MonthDay.from(now);
+            Boolean isBirthdayToday = birthMonthDay.equals(todayMonthDay);
+            int birthday_is_coming = isBirthdayToday ? 0 : 1; // wenn der Geburtstag HEUTE ist, dann kein Jahr drauf rechnen.
             if (daysbetween <= days) {
-                // ursprünglicher Geburtstag
-                baldigeGeburtstage.add(new ImmutableTriple<>(resident, ChronoUnit.YEARS.between(dob, now) + 1, daysbetween));
+                baldigeGeburtstage.add(new ImmutableTriple<>(resident, ChronoUnit.YEARS.between(dob, now) + birthday_is_coming, daysbetween));
             }
         });
         listResident.clear();

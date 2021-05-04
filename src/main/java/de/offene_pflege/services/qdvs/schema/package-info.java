@@ -5,5 +5,5 @@
 // Generiert: 2019.10.30 um 10:38:41 AM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "https://www.das-pflege.de", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "https://www.das-pflege.de", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package de.offene_pflege.services.qdvs.schema;

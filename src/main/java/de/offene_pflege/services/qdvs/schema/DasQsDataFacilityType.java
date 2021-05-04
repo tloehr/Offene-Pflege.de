@@ -8,8 +8,8 @@
 
 package de.offene_pflege.services.qdvs.schema;
 
-import javax.xml.bind.annotation.*;
 
+import jakarta.xml.bind.annotation.*;
 
 /**
  * Erhebungsbogen zur Erfassung von administrativen Angaben zur

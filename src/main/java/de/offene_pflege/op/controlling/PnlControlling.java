@@ -842,51 +842,6 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
 
     private JPanel createContentPanel4Nursing() {
         JPanel pnlContent = new JPanel(new VerticalLayout());
-        /***
-         *       ___  ______     ______    ____  __ ____  _  __
-         *      / _ \|  _ \ \   / / ___|  / /  \/  |  _ \| |/ /
-         *     | | | | | | \ \ / /\___ \ / /| |\/| | | | | ' /
-         *     | |_| | |_| |\ V /  ___) / / | |  | | |_| | . \
-         *      \__\_\____/  \_/  |____/_/  |_|  |_|____/|_|\_\
-         *
-         */
-        JPanel pnlQDVS = new JPanel(new BorderLayout());
-        final JButton btnQDVS = GUITools.createHyperlinkButton("opde.controlling.qdvs", null, null);
-        LocalDateTime lastQDVSDate = null;
-        try {
-            lastQDVSDate = Instant.ofEpochMilli(Long.parseLong(OPDE.getProps().getProperty("opde.controlling::qdvslastdate"))).atZone(ZoneId.systemDefault()).toLocalDateTime();
-        } catch (NumberFormatException nfe) {
-            lastQDVSDate = LocalDateTime.of(2019, Month.JULY, 01, 0, 0);
-        }
-        final JTextField txtLastDate = new JTextField(lastQDVSDate.format(DateTimeFormatter.ISO_DATE_TIME));
-        txtLastDate.setToolTipText(SYSTools.xx("letzte Kontrolle"));
-
-
-        final LocalDateTime tmp = lastQDVSDate;
-
-        btnQDVS.addActionListener(e -> {
-            OPDE.getMainframe().setBlocked(true);
-            SwingWorker worker = new SwingWorker() {
-                @Override
-                protected Object doInBackground() throws Exception {
-//                    SYSPropsTools.storeProp("opde.controlling::qdvslastdate", txtWoundsMonthsBack.getText(), OPDE.getLogin().getUser());
-//                    SYSFilesTools.print("", false);
-                     getLogger().debug(getQDVS(tmp, null));
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
-                }
-            };
-            worker.execute();
-        });
-        pnlQDVS.add(btnQDVS, BorderLayout.WEST);
-        pnlQDVS.add(txtLastDate, BorderLayout.EAST);
-        pnlContent.add(pnlQDVS);
-
 
         /***
          *     __        __                    _

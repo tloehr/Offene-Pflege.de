@@ -8,8 +8,8 @@
 
 package de.offene_pflege.services.qdvs.schema;
 
-import javax.xml.bind.annotation.*;
 
+import jakarta.xml.bind.annotation.*;
 
 /**
  * <p>Java-Klasse für das_commentation_type complex type.
