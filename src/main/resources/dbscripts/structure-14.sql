@@ -53,7 +53,6 @@ CREATE TABLE `bhp` (
   `Status` smallint(6) DEFAULT NULL,
   `Text` mediumtext,
   `MDate` datetime NOT NULL,
-  `Dauer` smallint(5) unsigned DEFAULT NULL,
   `BWKennung` char(10) CHARACTER SET utf8 NOT NULL,
   `DafID` bigint(20) unsigned DEFAULT NULL,
   `VerID` bigint(20) unsigned NOT NULL,
@@ -98,7 +97,6 @@ CREATE TABLE `dfn` (
   `IZeit` smallint(6) DEFAULT NULL,
   `Status` smallint(6) DEFAULT NULL,
   `Erforderlich` tinyint(1) NOT NULL DEFAULT '0',
-  `Dauer` smallint(5) unsigned DEFAULT NULL,
   `MDate` datetime NOT NULL,
   `PlanID` bigint(20) DEFAULT NULL,
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -129,13 +127,13 @@ CREATE TABLE `dosageform` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `floors` (
-  `floorid` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `homeid` varchar(15) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `homeid` varchar(36) NOT NULL,
   `NAME` varchar(30) DEFAULT NULL,
   `LEVEL` smallint(6) DEFAULT NULL COMMENT '0 means ground floor. negative levels are below ground. positives above',
   `lift` smallint(6) DEFAULT NULL COMMENT 'number of lifts connecting to this floor',
   `version` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`floorid`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -159,17 +157,6 @@ CREATE TABLE `gp` (
   `skin` bit(1) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`ArztID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `groups` (
-  `GKENNUNG` char(20) NOT NULL,
-  `Beschreibung` mediumtext,
-  `System` tinyint(1) NOT NULL DEFAULT '0',
-  `Examen` tinyint(1) NOT NULL DEFAULT '0',
-  `version` bigint(20) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`GKENNUNG`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Diese Tabelle enthaelt die Liste aller OC Benutzergruppen.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -213,7 +200,7 @@ CREATE TABLE `hinsurance` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `homes` (
-  `EID` varchar(15) NOT NULL,
+  `id` varchar(36) NOT NULL,
   `Name` varchar(30) DEFAULT NULL,
   `Str` varchar(30) DEFAULT NULL,
   `ZIP` char(5) DEFAULT NULL,
@@ -224,10 +211,8 @@ CREATE TABLE `homes` (
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
   `active` tinyint(4) NOT NULL DEFAULT '1',
   `maxcap` int(11) DEFAULT '0' COMMENT 'Belegungskapazitaet',
-  `erhebungszeitraum` int(11) DEFAULT '1' COMMENT 'ERHEBUNGSZEITRAUM für die QDVS. Eindeutig durchnummertiert. Wird mit jeder Meldung um 1 erhöht.',
-  `auswertungszeitraum` int(11) DEFAULT '1' COMMENT 'Gilt innerhalb einer Erhebung. Kann 1 oder 2 sein. 0, wenn gerade keine Erhebung läuft. Für die QDVS',
   `careproviderid` int(11) DEFAULT '1' COMMENT 'Von DAS-PFLEGE eindeutig der Einrichtung zugewiesene 6 Stellige Kennung',
-  PRIMARY KEY (`EID`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -261,7 +246,6 @@ CREATE TABLE `icd` (
 CREATE TABLE `intervention` (
   `MassID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Bezeichnung` varchar(500) NOT NULL,
-  `Dauer` decimal(9,2) NOT NULL DEFAULT '0.00',
   `MassArt` int(11) NOT NULL,
   `BWIKID` bigint(20) unsigned NOT NULL,
   `Aktiv` tinyint(1) DEFAULT '1',
@@ -297,7 +281,6 @@ CREATE TABLE `ischedule` (
   `Son` tinyint(4) DEFAULT '0',
   `Erforderlich` tinyint(1) DEFAULT '0',
   `LDatum` datetime NOT NULL,
-  `Dauer` decimal(9,2) NOT NULL DEFAULT '0.00',
   `Bemerkung` mediumtext,
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`TermID`),
@@ -453,7 +436,6 @@ CREATE TABLE `nreports` (
   `PIT` datetime NOT NULL,
   `NewPIT` datetime NOT NULL,
   `Text` mediumtext,
-  `Dauer` int(11) NOT NULL,
   `NewBy` char(10) NOT NULL,
   `BWKennung` char(10) NOT NULL,
   `EditedBy` char(10) DEFAULT NULL,
@@ -465,7 +447,8 @@ CREATE TABLE `nreports` (
   `DeletedBy` char(10) DEFAULT NULL,
   PRIMARY KEY (`PBID`),
   KEY `Resident` (`BWKennung`),
-  KEY `PIT` (`PIT`)
+  KEY `PIT` (`PIT`),
+  FULLTEXT KEY `Text` (`Text`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -494,6 +477,34 @@ CREATE TABLE `nursingprocess` (
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`PlanID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `opgroups` (
+  `GKENNUNG` char(20) NOT NULL,
+  `Beschreibung` mediumtext,
+  `sysflag` tinyint(1) NOT NULL DEFAULT '0',
+  `Examen` tinyint(1) NOT NULL DEFAULT '0',
+  `version` bigint(20) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`GKENNUNG`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Diese Tabelle enthaelt die Liste aller OC Benutzergruppen.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `opusers` (
+  `UKennung` varchar(10) NOT NULL DEFAULT '',
+  `Vorname` varchar(100) NOT NULL DEFAULT '',
+  `Nachname` varchar(100) NOT NULL DEFAULT '',
+  `userstatus` tinyint(4) DEFAULT NULL,
+  `MD5PW` varchar(32) NOT NULL COMMENT 'Diese Spalte ist für den FTP Server notwendig.',
+  `EMail` varchar(100) DEFAULT NULL,
+  `mailconfirmed` smallint(6) NOT NULL DEFAULT '0',
+  `version` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `active_since` datetime DEFAULT NULL,
+  `cipherid` int(11) NOT NULL,
+  PRIMARY KEY (`UKennung`),
+  UNIQUE KEY `users_cipherid_uindex` (`cipherid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -693,7 +704,7 @@ CREATE TABLE `qprocess` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `resident` (
-  `BWKennung` varchar(10) NOT NULL DEFAULT '',
+  `id` char(10) NOT NULL,
   `Nachname` varchar(100) NOT NULL DEFAULT '',
   `Vorname` varchar(100) NOT NULL DEFAULT '',
   `Geschlecht` tinyint(1) NOT NULL DEFAULT '0',
@@ -709,7 +720,8 @@ CREATE TABLE `resident` (
   `controlling` mediumtext,
   `calcmedi` tinyint(1) DEFAULT '0',
   `idbewohner` int(11) NOT NULL DEFAULT '1' COMMENT 'QDVS: Bewohnerbezogene Nummer gema?ß Erhebungsbogen',
-  PRIMARY KEY (`BWKennung`)
+  `sterbephase` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -809,7 +821,7 @@ CREATE TABLE `resvalue` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Resvaluetypes` (
+CREATE TABLE `resvaluetypes` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Text` varchar(100) NOT NULL,
   `Label1` varchar(100) DEFAULT NULL,
@@ -825,6 +837,14 @@ CREATE TABLE `Resvaluetypes` (
   `format1` varchar(100) DEFAULT NULL,
   `format2` varchar(100) DEFAULT NULL,
   `format3` varchar(100) DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `version` bigint(20) NOT NULL,
+  `min1` decimal(9,2) DEFAULT NULL COMMENT 'minimum value for value1',
+  `min2` decimal(9,2) DEFAULT NULL COMMENT 'minimum value for value2',
+  `min3` decimal(9,2) DEFAULT NULL COMMENT 'minimum value for value3',
+  `max1` decimal(9,2) DEFAULT NULL COMMENT 'minimum value for value1',
+  `max2` decimal(9,2) DEFAULT NULL COMMENT 'minimum value for value2',
+  `max3` decimal(9,2) DEFAULT NULL COMMENT 'minimum value for value3',
   PRIMARY KEY (`ID`),
   KEY `idx1` (`ValType`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -832,14 +852,14 @@ CREATE TABLE `Resvaluetypes` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `rooms` (
-  `RID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `floorid` bigint(20) unsigned NOT NULL,
   `Text` varchar(30) DEFAULT NULL,
   `Single` tinyint(1) DEFAULT NULL,
   `Bath` tinyint(1) DEFAULT NULL,
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`RID`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -855,11 +875,11 @@ CREATE TABLE `situations` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `station` (
-  `StatID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `EID` varchar(15) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `eid` varchar(36) NOT NULL,
   `Name` varchar(30) DEFAULT NULL,
   `version` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`StatID`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1061,66 +1081,6 @@ CREATE TABLE `tradeform` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `trainatt2file` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `train2uid` bigint(20) unsigned NOT NULL,
-  `fid` bigint(20) unsigned NOT NULL,
-  `pit` datetime NOT NULL,
-  `editor` char(10) NOT NULL,
-  `version` bigint(20) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `idx1` (`train2uid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `training` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `startingon` datetime NOT NULL,
-  `title` varchar(200) NOT NULL,
-  `docent` varchar(200) NOT NULL,
-  `text` mediumtext,
-  `state` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `version` bigint(20) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `training2file` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `trainid` bigint(20) unsigned NOT NULL,
-  `fid` bigint(20) unsigned NOT NULL,
-  `pit` datetime NOT NULL,
-  `editor` char(10) NOT NULL,
-  `version` bigint(20) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `idx1` (`trainid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `training2tags` (
-  `trainid` bigint(20) unsigned NOT NULL,
-  `ctagid` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`trainid`,`ctagid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `training2users` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `uid` char(10) NOT NULL,
-  `trid` bigint(20) unsigned NOT NULL,
-  `pit` datetime NOT NULL,
-  `state` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `text` varchar(200) DEFAULT NULL,
-  `version` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `uniqueid` (
   `UNIQID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `UID` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -1140,23 +1100,6 @@ CREATE TABLE `user2file` (
   `editor` char(10) NOT NULL,
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `users` (
-  `UKennung` varchar(10) NOT NULL DEFAULT '',
-  `Vorname` varchar(100) NOT NULL DEFAULT '',
-  `Nachname` varchar(100) NOT NULL DEFAULT '',
-  `Status` tinyint(4) DEFAULT NULL,
-  `MD5PW` varchar(32) NOT NULL COMMENT 'Diese Spalte ist für den FTP Server notwendig.',
-  `EMail` varchar(100) DEFAULT NULL,
-  `mailconfirmed` smallint(6) NOT NULL DEFAULT '0',
-  `version` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `active_since` datetime DEFAULT NULL,
-  `cipherid` int(11) NOT NULL,
-  PRIMARY KEY (`UKennung`),
-  UNIQUE KEY `users_cipherid_uindex` (`cipherid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

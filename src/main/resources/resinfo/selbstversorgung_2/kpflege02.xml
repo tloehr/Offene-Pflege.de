@@ -15,6 +15,14 @@
         <option label="unselbständig" name="3" tooltip="bi4.oberkoerper.selbst3"/>
     </optiongroup>
 
+    <!-- Fehlt im Prüfkonzept und auch in der Begutachtungsrichtlinie - Haben wir wieder dabei geschrieben -->
+    <optiongroup size="18" name="SVUNTERKOERPER" label="Waschen des Unterkörpers">
+           <option label="selbstständig" name="0" default="true"/>
+           <option label="überwiegend selbständig" name="1"/>
+           <option label="überwiegend unselbständig" name="2"/>
+           <option label="unselbständig" name="3"/>
+    </optiongroup>
+
     <optiongroup size="18" name="SVKOPF" label="Körperpflege im Bereich des Kopfes"
                  tooltip="bi4.kopf.erklaerung">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.kopf.selbst0"/>

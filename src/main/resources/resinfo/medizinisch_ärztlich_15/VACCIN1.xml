@@ -1,6 +1,6 @@
 <resinfotype intervalmode="3">
     <combobox label="word.vaccine" name="vaccinetype">
-        <item label="Covid19" name="14"/>
+        <item label="COVID-19" name="14"/>
         <item label="Diphterie" name="0"/>
         <item label="HPV (Humane Papillomviren)" name="1"/>
         <item label="Hepatitis B" name="2"/>

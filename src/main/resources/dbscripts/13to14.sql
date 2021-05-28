@@ -1,4 +1,4 @@
--- Ab Version 1.15.2.x
+-- Ab Version 1.15.2.x mit x > 600
 UPDATE `sysprops`
 SET V = '14'
 WHERE K = 'dbstructure';
@@ -878,6 +878,14 @@ SET t.XML = '  <qdvs optional="false"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.oberkoerper.selbst1"/>
         <option label="überwiegend unselbständig" name="2" tooltip="bi4.oberkoerper.selbst2"/>
         <option label="unselbständig" name="3" tooltip="bi4.oberkoerper.selbst3"/>
+    </optiongroup>
+
+    <!-- Fehlt im Prüfkonzept und auch in der Begutachtungsrichtlinie - Haben wir wieder dabei geschrieben -->
+    <optiongroup size="18" name="SVUNTERKOERPER" label="Waschen des Unterkörpers">
+           <option label="selbstständig" name="0" default="true"/>
+           <option label="überwiegend selbständig" name="1"/>
+           <option label="überwiegend unselbständig" name="2"/>
+           <option label="unselbständig" name="3"/>
     </optiongroup>
 
     <optiongroup size="18" name="SVKOPF" label="Körperpflege im Bereich des Kopfes"
@@ -1853,12 +1861,12 @@ SET @wundxml = '  <tx tooltip="Wunden werden auf dem Überleitbogen auf Seite 2 
         <checkbox name="uebel6" label="übelriechend" layout="left"/>
         <checkbox name="suebel6" label="stark übelriechend" layout="left"/>
     </tabgroup>';
-UPDATE `resinfotype` SET `XML` = @wundxml WHERE resinfotype.BWINFTYP LIKE "WUNDE%c";
+UPDATE `resinfotype` SET `XML` = @wundxml WHERE resinfotype.BWINFTYP LIKE 'WUNDE%c';
 --
 -- Impfungen geändert
 UPDATE resinfotype t
 SET t.XML = '  <combobox label="word.vaccine" name="vaccinetype">
-        <item label="Covid19" name="14"/>
+        <item label="COVID-19" name="14"/>
         <item label="Diphterie" name="0"/>
         <item label="HPV (Humane Papillomviren)" name="1"/>
         <item label="Hepatitis B" name="2"/>
