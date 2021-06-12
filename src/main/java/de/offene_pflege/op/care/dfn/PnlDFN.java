@@ -321,7 +321,8 @@ public class PnlDFN extends NursingRecordsPanel {
                 pnlClock.setLayout(new VerticalLayout());
                 clock.setContentPane(pnlClock);
 
-                ArrayList<DFN> listDFN = null;
+                ArrayList<DFN> listDFN;
+                ArrayList<DFN> listClockDFN = new ArrayList<>();
                 synchronized (mapShift2DFN) {
                     listDFN = mapShift2DFN.get(shift);
                 }
@@ -336,9 +337,16 @@ public class PnlDFN extends NursingRecordsPanel {
                         } else if (dfn.getSollZeit() == SYSCalendar.BYTE_NOON) {
                             pnlNoon.add(mapDFN2Pane.get(dfn));
                         } else {
-                            pnlClock.add(mapDFN2Pane.get(dfn));
+                            listClockDFN.add(dfn);
                         }
                     }
+                }
+
+                // Uhrzeit DFNs, sollen auch so sortiert werden. Daher sammel ich die beim vorherigen Lauf erst ein.
+                if (!listClockDFN.isEmpty()) {
+                    listClockDFN.stream()
+                            .sorted(Comparator.comparing(DFN::getSoll))
+                            .forEach(dfn -> pnlClock.add(mapDFN2Pane.get(dfn)));
                 }
 
                 if (pnlClock.getComponentCount() > 0) {
@@ -380,6 +388,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 clock.setContentPane(pnlClock);
 
                 ArrayList<DFN> listDFN = null;
+                ArrayList<DFN> listClockDFN = new ArrayList<>();
                 synchronized (mapShift2DFN) {
                     listDFN = mapShift2DFN.get(shift);
                 }
@@ -394,9 +403,16 @@ public class PnlDFN extends NursingRecordsPanel {
                         } else if (dfn.getSollZeit() == SYSCalendar.BYTE_EVENING) {
                             pnlEvening.add(mapDFN2Pane.get(dfn));
                         } else {
-                            pnlClock.add(mapDFN2Pane.get(dfn));
+                            listClockDFN.add(dfn);
                         }
                     }
+                }
+
+                // Uhrzeit DFNs, sollen auch so sortiert werden. Daher sammel ich die beim vorherigen Lauf erst ein.
+                if (!listClockDFN.isEmpty()) {
+                    listClockDFN.stream()
+                            .sorted(Comparator.comparing(DFN::getSoll))
+                            .forEach(dfn -> pnlClock.add(mapDFN2Pane.get(dfn)));
                 }
 
                 if (pnlClock.getComponentCount() > 0) {
@@ -411,18 +427,30 @@ public class PnlDFN extends NursingRecordsPanel {
 
 
             } else {
-                ArrayList<DFN> listDFN = null;
+                ArrayList<DFN> listDFN;
+                ArrayList<DFN> listShiftDFN = new ArrayList<>();
+                ArrayList<DFN> listClockDFN = new ArrayList<>();
                 synchronized (mapShift2DFN) {
                     listDFN = mapShift2DFN.get(shift);
                 }
+
                 for (DFN dfn : listDFN) {
                     npPanel.setBackground(SYSCalendar.getBGItem(dfn.getShift()));
                     CollapsiblePane cp1 = createCP4(dfn);
                     synchronized (mapDFN2Pane) {
-                        mapDFN2Pane.put(dfn, cp1);
-                        npPanel.add(mapDFN2Pane.get(dfn));
+                        mapDFN2Pane.put(dfn, cp1); // Uhrzeiten nach Zeit sortieren.
+                        if (dfn.getSollZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
+                            listClockDFN.add(dfn);
+                        } else {
+                            listShiftDFN.add(dfn);
+                        }
                     }
                 }
+                // zur Sortierung und Trennung von Shifts und Clock DFNs
+                listClockDFN.stream()
+                        .sorted(Comparator.comparing(DFN::getSoll))
+                        .forEach(dfn -> npPanel.add(mapDFN2Pane.get(dfn)));
+                listShiftDFN.stream().forEach(dfn -> npPanel.add(mapDFN2Pane.get(dfn)));
             }
             mainPane.setContentPane(npPanel);
             mainPane.setCollapsible(true);
@@ -785,7 +813,6 @@ public class PnlDFN extends NursingRecordsPanel {
             cptitle.getRight().add(btnEmpty);
 
 
-         
         }
 
         /***

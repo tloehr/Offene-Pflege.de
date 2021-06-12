@@ -1751,6 +1751,8 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 Pair<Date, Date> period = (Pair<Date, Date>) o;
                                 ResInfoTools.setFrom(editinfo, period.getFirst());
                                 ResInfoTools.setTo(editinfo, period.getSecond());
+                                // since 1.15.2.x - UserOn wird ebenfalls gesetzt, wenn man die Perdiode ändert.
+                                editinfo.setUserON(OPDE.getLogin().getUser());
                                 editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
                                 em.getTransaction().commit();
 

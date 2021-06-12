@@ -20,6 +20,7 @@
         <!-- Damit die Tests nicht jedes mal vor dem Package ablaunfen -->
         <maven.test.skip>true</maven.test.skip>
         <!-- Library Versions -->
+        <!-- Vesions checked June 2021 -->
         <com.itextpdf.version>5.5.13.2</com.itextpdf.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.cli.version>1.4</commons.cli.version>
@@ -27,23 +28,22 @@
         <commons.csv.version>1.8</commons.csv.version>
         <commons.digester3.version>3.2</commons.digester3.version>
         <commons.exec.version>1.3</commons.exec.version>
-        <commons.io.version>2.8.0</commons.io.version>
-        <commons.lang3.version>3.11</commons.lang3.version>
+        <commons.io.version>2.9.0</commons.io.version>
+        <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.log4j.version>1.2.17</commons.log4j.version>
         <commons.text.version>1.9</commons.text.version>
-        <!--        <dom4j.version>2.1.3</dom4j.version>-->
-        <eclipselink.version>2.7.6</eclipselink.version>
+        <commons.net.version>3.8.0</commons.net.version>
+        <eclipselink.version>2.7.8</eclipselink.version>
         <hibernate.validator.version>6.1.7.Final</hibernate.validator.version>
-        <icu4j.version>68.1</icu4j.version>
-        <install4j.runtime.version>8.0.2</install4j.runtime.version>
+        <icu4j.version>69.1</icu4j.version>
         <javatuples.version>1.2</javatuples.version>
         <javax.activation.version>1.1.1</javax.activation.version>
         <javax.el-api.version>3.0.0</javax.el-api.version>
         <javax.el.version>3.0.0</javax.el.version>
         <javax.mail-api.version>1.6.2</javax.mail-api.version>
-        <javax.mail.version>1.6.2</javax.mail.version>
+        <javax.mail.version>1.4.7</javax.mail.version>
         <jaxb.api.version>2.3.3</jaxb.api.version>
-        <jaxb.core.version>3.0.0</jaxb.core.version>
+        <jaxb.core.version>3.0.1</jaxb.core.version>
         <jaxb.impl.version>2.1</jaxb.impl.version>
         <jcalendar.version>1.4</jcalendar.version>
         <jgoodies.binding.version>2.13.0</jgoodies.binding.version>
@@ -51,15 +51,16 @@
         <jgoodies.forms.version>1.9.0</jgoodies.forms.version>
         <jgoodies.looks.version>2.7.0</jgoodies.looks.version>
         <jgoodies.validation.version>2.5.1</jgoodies.validation.version>
-        <jide.version>3.7.7</jide.version>
-        <joda.time.version>2.10.8</joda.time.version>
-        <junit.version>4.13.1</junit.version>
-        <mysql.connector.version>8.0.22</mysql.connector.version>
+        <jide.version>3.7.11</jide.version>
+        <joda.time.version>2.10.10</joda.time.version>
+        <junit.version>4.13.2</junit.version>
+        <mysql.connector.version>8.0.25</mysql.connector.version>
         <poi.ooxml.version>4.1.2</poi.ooxml.version>
         <swingx.core.version>1.6.5-1</swingx.core.version>
         <timing.framework.version>7.3.1</timing.framework.version>
         <xerces.version>2.12-beta-r1667115</xerces.version>
-        <commons.net.version>3.8.0</commons.net.version>
+        <!-- not changed anymore -->
+        <install4j.runtime.version>8.0.2</install4j.runtime.version>
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>
         <opde.major>1</opde.major>
         <opde.minor>15</opde.minor>
@@ -148,17 +149,24 @@
             <artifactId>commons-exec</artifactId>
             <version>${commons.exec.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.mail/mail -->
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>${javax.mail.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>${javax.mail-api.version}</version>
-        </dependency>
+             <groupId>com.sun.mail</groupId>
+             <artifactId>javax.mail</artifactId>
+             <version>1.6.2</version>
+         </dependency>
+         <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
+         <dependency>
+             <groupId>javax.mail</groupId>
+             <artifactId>javax.mail-api</artifactId>
+             <version>1.6.2</version>
+         </dependency>
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/javax.mail/javax.mail-api &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>javax.mail</groupId>-->
+<!--            <artifactId>javax.mail-api</artifactId>-->
+<!--            <version>${javax.mail-api.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
