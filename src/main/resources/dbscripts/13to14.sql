@@ -1,4 +1,4 @@
--- Ab Version 1.15.2.x mit x > 600
+-- Ab Version 1.15.2.703
 UPDATE `sysprops`
 SET V = '14'
 WHERE K = 'dbstructure';

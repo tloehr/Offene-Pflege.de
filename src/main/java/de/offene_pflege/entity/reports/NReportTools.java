@@ -13,10 +13,7 @@ import de.offene_pflege.entity.system.Commontags;
 import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.tools.Pair;
-import de.offene_pflege.op.tools.SYSCalendar;
-import de.offene_pflege.op.tools.SYSConst;
-import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -28,10 +25,8 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -109,44 +104,6 @@ public class NReportTools {
     }
 
 
-    /**
-     * retrieves the PITs of the first and the last entry in the NReports table.
-     *
-     * @param resident
-     * @return
-     */
-    @Deprecated
-    public static MutableInterval getNativeMinMax(Resident resident) {
-        long time = System.currentTimeMillis();
-        MutableInterval result = null;
-
-        EntityManager em = OPDE.createEM();
-        Query queryMin = em.createNativeQuery(" SELECT PIT FROM nreports WHERE BWKennung = ? ORDER BY PIT ASC LIMIT 0,1 ");
-        queryMin.setParameter(1, resident.getId());
-        queryMin.setMaxResults(1);
-
-        Query queryMax = em.createNativeQuery(" SELECT PIT FROM nreports WHERE BWKennung = ? ORDER BY PIT DESC LIMIT 0,1 ");
-        queryMax.setParameter(1, resident.getId());
-        queryMax.setMaxResults(1);
-
-        try {
-            ArrayList<Date> min = new ArrayList<>(queryMin.getResultList());
-            ArrayList<Date> max = new ArrayList<>(queryMax.getResultList());
-            if (min.isEmpty()) {
-                result = null;
-            } else {
-                result = new MutableInterval(new DateTime(min.get(0)), new DateTime(max.get(0)));
-            }
-
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        }
-
-
-        em.close();
-        logger.debug((System.currentTimeMillis() - time) + " ms for native minmax");
-        return result;
-    }
 
 
     public static MutableInterval getNativeMinMax2(Resident resident) {
@@ -157,31 +114,25 @@ public class NReportTools {
         Query queryMin = em.createNativeQuery(" SELECT MIN(PIT) FROM nreports WHERE BWKennung = ?");
         queryMin.setParameter(1, resident.getId());
 
-
         Query queryMax = em.createNativeQuery(" SELECT MAX(PIT) FROM nreports WHERE BWKennung = ?");
         queryMax.setParameter(1, resident.getId());
 
-
         try {
-            // Changed this from the old concept with arraylists and get(0) afterwards.
-            // the list handling slows everything down
-            //
-            // getSingleResult() does not throw exceptions when there are no results.
-            // just returns a null.
-            Date min = (Date) queryMin.getSingleResult();
-            Date max = (Date) queryMax.getSingleResult();
+            // umgeschrieben weg. 1.15.2 scheinbar hat sich eine library geändert und wirft nun LocalDateTime statt Date aus
+            Optional<LocalDateTime> optMin = Optional.of((LocalDateTime) queryMin.getSingleResult());
+            Optional<LocalDateTime> optMax = Optional.of((LocalDateTime) queryMax.getSingleResult());
 
-            if (min == null) {
-                result = null;
-            } else {
-                result = new MutableInterval(new DateTime(min), new DateTime(max));
+            result = null;
+            if (optMin.isPresent()){
+                org.joda.time.LocalDateTime min = JavaTimeConverter.toJodaLocalDateTime(optMin.get());
+                org.joda.time.LocalDateTime max = JavaTimeConverter.toJodaLocalDateTime(optMax.get());
+                result = new MutableInterval(min.toDateTime(), max.toDateTime());
             }
 
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-
-
+        
         em.close();
         logger.debug((System.currentTimeMillis() - time) + " ms for native minmax2");
         return result;

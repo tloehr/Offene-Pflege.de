@@ -105,7 +105,6 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
     private JideTabbedPane tabMain;
     private JScrollPane scrollPane1;
     private CollapsiblePanes cpsControlling;
-    private JPanel panel2;
     // End of variables declaration//GEN-END:variables
 
 
@@ -1177,7 +1176,6 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
         tabMain = new JideTabbedPane();
         scrollPane1 = new JScrollPane();
         cpsControlling = new CollapsiblePanes();
-        panel2 = new JPanel();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -1201,12 +1199,6 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
                 scrollPane1.setViewportView(cpsControlling);
             }
             tabMain.addTab("controlling", scrollPane1);
-
-            //======== panel2 ========
-            {
-                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-            }
-            tabMain.addTab("text", panel2);
         }
         add(tabMain);
     }// </editor-fold>//GEN-END:initComponents

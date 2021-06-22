@@ -205,7 +205,6 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 }
                                 mapKey2CP.get(keyResInfoCat).setStyle(CollapsiblePane.TREE_STYLE);
 
-
                                 CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
                                     @Override
                                     public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {

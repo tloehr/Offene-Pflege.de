@@ -52,7 +52,7 @@ public class DlgReport extends MyJDialog {
         add(pnlPIT, CC.xyw(2, 2, 3));
 
         pnlCommonTags = new PnlCommonTags(nReport.getCommontags(), true, 5);
-        add(new JScrollPane(pnlCommonTags), CC.xyw(2, 6, 3));
+        add(new JScrollPane(pnlCommonTags), CC.xyw(2, 5, 3));
 
         txtBericht.setText(nReport.getText());
 
@@ -107,7 +107,7 @@ public class DlgReport extends MyJDialog {
                 thisWindowClosing(e);
             }
         });
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "13dlu, pref, $rgap, 336dlu, 13dlu",
             "13dlu, default, $nlgap, fill:143dlu, fill:46dlu, default, 13dlu"));

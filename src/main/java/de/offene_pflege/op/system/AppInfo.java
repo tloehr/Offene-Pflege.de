@@ -160,7 +160,7 @@ public class AppInfo {
         if (!OPDE.isAdmin()) {
             EntityManager em = OPDE.createEM();
             Query query = em.createQuery("SELECT DISTINCT i FROM SYSGROUPS2ACL i "
-                    + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.groups.members ");
+                    + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.opgroups.members ");
             query.setParameter("user", OPDE.getLogin().getUser());
             query.setParameter("internalClassID", internalClassID);
 

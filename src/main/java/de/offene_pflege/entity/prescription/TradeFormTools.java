@@ -151,20 +151,13 @@ public class TradeFormTools {
     }
 
 
-    public static MedInventory getInventory4Prescription(Prescription prescription) {
-        return getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
-
-    }
-
-
     /**
      * Die genaue Erläuterung zu dieser Methode befindet sich in der Methode <code>getSuitableInventoriesForThisTradeForm</code>.
      * Sie implementiert Punkt 1 der dort beschriebenen 2 Antworten.
      *
      * @param bewohner
      * @param tradeform
-     * @return Wenn die Darreichung zu einem früheren Zeitpunkt schonmal zugeordnet war, dann wird dieser Vorrat zurück gegeben. Ansonsten <code>null</code>.
-     * @see #getSuitableInventoriesForThisTradeForm(entity.info.Resident, TradeForm)
+     * @return Wenn die Darreichung zu einem früheren Zeitpunkt schonmal zugeordnet war, dann wird dieser Vorrat zurück gegeben. Ansonsten <code>null</code>
      */
     public static MedInventory getInventory4TradeForm(Resident bewohner, TradeForm tradeform) {
         MedInventory result = null;
@@ -233,7 +226,6 @@ public class TradeFormTools {
      * @param resident
      * @param tradeform
      * @return
-     * @see #getInventory4TradeForm(entity.info.Resident, TradeForm)
      */
     public static List<MedInventory> getSuitableInventoriesForThisTradeForm(Resident resident, TradeForm tradeform) {
         EntityManager em = OPDE.createEM();
@@ -262,7 +254,7 @@ public class TradeFormTools {
                         " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
         );
         queryVorraete.setParameter("resident", resident);
-        queryVorraete.setParameter("to", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        queryVorraete.setParameter("to", SYSConst.LD_UNTIL_FURTHER_NOTICE); // braucht seit 1.15.2 ein LocalDateTime statt Date()
 
         liste = queryVorraete.getResultList();
         em.close();
