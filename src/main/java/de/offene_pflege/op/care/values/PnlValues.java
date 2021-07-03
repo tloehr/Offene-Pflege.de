@@ -439,6 +439,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         pnlYear.setOpaque(false);
 
         for (final ResValue resValue : myValues) {
+            getLogger().debug(resValue.getId());
             String title = "<html><table border=\"0\">" +
                     "<tr>" +
                     "<td width=\"200\" align=\"left\">" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resValue.getPit()) + " [" + resValue.getID() + "]</td>" +

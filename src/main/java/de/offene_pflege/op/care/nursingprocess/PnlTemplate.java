@@ -14,7 +14,6 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.JXSearchField;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +26,7 @@ import java.awt.event.MouseEvent;
  */
 public class PnlTemplate extends MyJDialog {
     public static final String internalClassID = "nursingrecords.nursingprocess.pnltemplate";
-    private JToggleButton tbInactive;
+    private JToggleButton tbInactive, tbSearch4Residents2;
     private Closure actionBlock;
 
     public PnlTemplate(Closure actionBlock) {
@@ -39,11 +38,18 @@ public class PnlTemplate extends MyJDialog {
     }
 
     private void initPanel() {
-        txtSearch.setPrompt(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.searchtopic"));
+        txtSearch.setToolTipText(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.searchtopic"));
+        btnSearch.setText(SYSTools.xx("misc.msg.search"));
         tbInactive = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.inactive"));
         SYSPropsTools.restoreState("nursingrecords.nursingprocess.pnltemplate.tbInactive", tbInactive);
         tbInactive.addItemListener(e -> {
             SYSPropsTools.storeState("nursingrecords.nursingprocess.pnltemplate:tbInactive", tbInactive);
+            refreshDisplay();
+        });
+        tbSearch4Residents2 = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.search4residents"));
+        SYSPropsTools.restoreState("nursingrecords.nursingprocess.pnltemplate.tbSearch4Residents2", tbSearch4Residents2);
+        tbSearch4Residents2.addItemListener(e -> {
+            SYSPropsTools.storeState("nursingrecords.nursingprocess.pnltemplate:tbSearch4Residents2", tbSearch4Residents2);
             refreshDisplay();
         });
         lstTemplates.setCellRenderer(getListCellRenderer());
@@ -53,12 +59,19 @@ public class PnlTemplate extends MyJDialog {
             }
         });
 
-        add(tbInactive, CC.xy(3, 7, CC.LEFT, CC.DEFAULT));
-        refreshDisplay();
+        JPanel jPanel = new JPanel();
+        BoxLayout bl = new BoxLayout(jPanel, BoxLayout.LINE_AXIS);
+        jPanel.setLayout(bl);
+
+        jPanel.add(tbInactive);
+        jPanel.add(tbSearch4Residents2);
+        add(jPanel, CC.xy(3, 7, CC.LEFT, CC.DEFAULT));
+
     }
 
     private void refreshDisplay() {
-        java.util.List<NursingProcess> list = NursingProcessTools.getTemplates(txtSearch.getText(), tbInactive.isSelected());
+        if (txtSearch.getText().length() < 4) return;
+        java.util.List<NursingProcess> list = NursingProcessTools.getTemplates(txtSearch.getText(), tbInactive.isSelected(), tbSearch4Residents2.isSelected());
         lstTemplates.setModel(SYSTools.list2dlm(list));
     }
 
@@ -102,9 +115,16 @@ public class PnlTemplate extends MyJDialog {
         actionBlock.execute(null);
     }
 
+    private void btnSearchActionPerformed(ActionEvent e) {
+        refreshDisplay();
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        txtSearch = new JXSearchField();
+        panel2 = new JPanel();
+        txtSearch = new JTextField();
+        btnSearch = new JButton();
+        splitPane1 = new JSplitPane();
         scrollTemplates = new JScrollPane();
         lstTemplates = new JList();
         scrollPane1 = new JScrollPane();
@@ -114,42 +134,57 @@ public class PnlTemplate extends MyJDialog {
         btnApply = new JButton();
 
         //======== this ========
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, 150dlu, $rgap, [250dlu,min]:grow, $lcgap, default",
-            "2*(default, $lgap), [220dlu,min]:grow, 3*($lgap, default)"));
+                "default, $lcgap, 200dlu, $rgap, [250dlu,min]:grow, $lcgap, default",
+                "2*(default, $lgap), [220dlu,min]:grow, 3*($lgap, default)"));
 
-        //---- txtSearch ----
-        txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtSearch.setPromptFontStyle(null);
-        txtSearch.setInstantSearchDelay(1000);
-        txtSearch.addActionListener(e -> txtSearchActionPerformed(e));
-        contentPane.add(txtSearch, CC.xywh(3, 3, 3, 1));
-
-        //======== scrollTemplates ========
+        //======== panel2 ========
         {
+            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
 
-            //---- lstTemplates ----
-            lstTemplates.setFont(new Font("Arial", Font.PLAIN, 14));
-            lstTemplates.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            lstTemplates.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    lstTemplatesMouseClicked(e);
-                }
-            });
-            scrollTemplates.setViewportView(lstTemplates);
+            //---- txtSearch ----
+            txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtSearch.addActionListener(e -> txtSearchActionPerformed(e));
+            panel2.add(txtSearch);
+
+            //---- btnSearch ----
+            btnSearch.setText("Suchen");
+            btnSearch.addActionListener(e -> btnSearchActionPerformed(e));
+            panel2.add(btnSearch);
         }
-        contentPane.add(scrollTemplates, CC.xy(3, 5, CC.FILL, CC.FILL));
+        contentPane.add(panel2, CC.xywh(3, 3, 3, 1));
 
-        //======== scrollPane1 ========
+        //======== splitPane1 ========
         {
+            splitPane1.setDividerLocation(400);
 
-            //---- txtContent ----
-            txtContent.setContentType("text/html");
-            scrollPane1.setViewportView(txtContent);
+            //======== scrollTemplates ========
+            {
+
+                //---- lstTemplates ----
+                lstTemplates.setFont(new Font("Arial", Font.PLAIN, 14));
+                lstTemplates.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                lstTemplates.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        lstTemplatesMouseClicked(e);
+                    }
+                });
+                scrollTemplates.setViewportView(lstTemplates);
+            }
+            splitPane1.setLeftComponent(scrollTemplates);
+
+            //======== scrollPane1 ========
+            {
+
+                //---- txtContent ----
+                txtContent.setContentType("text/html");
+                scrollPane1.setViewportView(txtContent);
+            }
+            splitPane1.setRightComponent(scrollPane1);
         }
-        contentPane.add(scrollPane1, CC.xy(5, 5, CC.FILL, CC.FILL));
+        contentPane.add(splitPane1, CC.xywh(3, 5, 3, 1, CC.FILL, CC.FILL));
 
         //======== panel1 ========
         {
@@ -168,13 +203,16 @@ public class PnlTemplate extends MyJDialog {
             panel1.add(btnApply);
         }
         contentPane.add(panel1, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
-        setSize(830, 530);
+        setSize(1030, 660);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JXSearchField txtSearch;
+    private JPanel panel2;
+    private JTextField txtSearch;
+    private JButton btnSearch;
+    private JSplitPane splitPane1;
     private JScrollPane scrollTemplates;
     private JList lstTemplates;
     private JScrollPane scrollPane1;

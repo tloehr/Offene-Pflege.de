@@ -14,17 +14,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 19.07.12
- * Time: 15:50
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 19.07.12 Time: 15:50 To change this template use File | Settings | File
+ * Templates.
  */
 public class NursingProcessTools {
 
@@ -74,16 +69,33 @@ public class NursingProcessTools {
         return planungen;
     }
 
-    public static List<NursingProcess> getTemplates(String topic, boolean includeInactives) {
+    public static List<NursingProcess> getTemplates(String topic, boolean includeInactives, boolean searchResidents) {
         EntityManager em = OPDE.createEM();
+        // Suche nach Topics
         Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.topic like :topic " + (includeInactives ? "" : " AND p.to > :now ") + " ORDER BY p.topic, p.resident.id, p.from");
         query.setParameter("topic", EntityTools.getMySQLsearchPattern(topic));
         if (!includeInactives) {
             query.setParameter("now", new Date());
         }
-        List<NursingProcess> planungen = query.getResultList();
+        HashSet<NursingProcess> planungen = new HashSet<>(query.getResultList());
+
+        if (searchResidents) {
+            // Suche nach BW Namen
+            Query query1 = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident.name like :resname " + (includeInactives ? "" : " AND p.to > :now ") + " ORDER BY p.topic, p.resident.id, p.from");
+            query1.setParameter("resname", EntityTools.getMySQLsearchPattern(topic));
+            if (!includeInactives) {
+                query1.setParameter("now", new Date());
+            }
+            planungen.addAll(query1.getResultList());
+        }
         em.close();
-        return planungen;
+
+        // Nun noch sortieren
+        return planungen.stream()
+                .sorted(Comparator.comparing(NursingProcess::getTitle)
+                        .thenComparing(NursingProcess::getResident)
+                        .thenComparing(NursingProcess::getFrom))
+                .collect(Collectors.toList());
     }
 
     public static ArrayList<NursingProcess> getAll(Resident resident) {
