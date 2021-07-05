@@ -119,8 +119,8 @@ public class NReportTools {
 
         try {
             // umgeschrieben weg. 1.15.2 scheinbar hat sich eine library geändert und wirft nun LocalDateTime statt Date aus
-            Optional<LocalDateTime> optMin = Optional.of((LocalDateTime) queryMin.getSingleResult());
-            Optional<LocalDateTime> optMax = Optional.of((LocalDateTime) queryMax.getSingleResult());
+            Optional<LocalDateTime> optMin = Optional.ofNullable((LocalDateTime) queryMin.getSingleResult());
+            Optional<LocalDateTime> optMax = Optional.ofNullable((LocalDateTime) queryMax.getSingleResult());
 
             result = null;
             if (optMin.isPresent()){

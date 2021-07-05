@@ -105,6 +105,7 @@ public class AddBWWizard {
             String bwkennung = prefix + unique.getUid();
             resident.setId(bwkennung);
             resident.setIdbewohner(UniqueTools.getNewUID(em, "__idbewohner").getUid()); // jeder BW erhält eine eigene id für die QDVS Auswertung
+            resident.setSterbePhase(false);
             
             resident = em.merge(resident);
             resinfo_hauf = em.merge(resinfo_hauf);
