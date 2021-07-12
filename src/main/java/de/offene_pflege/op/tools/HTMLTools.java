@@ -37,6 +37,10 @@ public class HTMLTools {
         return dbl;
     }
 
+    public static String getTable(String content, String attribs) {
+            return "<table id=\"fonttext\" " + attribs + " \">" + SYSTools.xx(content) + "</table>\n";
+        }
+
     /**
      * Erzeugt Bruchdarstellung (für 0.5, 0.25, 0.75, 0.33) in HTML zu dem übergebenen Wert.
      */

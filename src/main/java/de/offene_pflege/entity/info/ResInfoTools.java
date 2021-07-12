@@ -3,6 +3,8 @@ package de.offene_pflege.entity.info;
 import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.building.Rooms;
 import de.offene_pflege.entity.building.Station;
+import de.offene_pflege.entity.files.SYSFilesTools;
+import de.offene_pflege.entity.files.SYSINF2FILE;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.reports.NReportTools;
@@ -33,6 +35,7 @@ import javax.persistence.Query;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -44,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.List;
 
 import static de.offene_pflege.services.qdvs.QdvsService.NF_IDBEWOHNER;
 
@@ -246,12 +250,13 @@ public class ResInfoTools implements HasLogger {
 
 
     /**
-     * Sucht für eine bestimmten Info Typ denjenigen raus, der an dem betreffenden Tag (dazu erweitern wir die PIT auf morgens bis nachts)
-     * gültig ist.
+     * Sucht für eine bestimmten Info Typ denjenigen raus, der an dem betreffenden Tag (dazu erweitern wir die PIT auf
+     * morgens bis nachts) gültig ist.
+     *
      * @param resident
      * @param resinfoid
      * @param pit
-     * @return  Gibt es mehrere, dann immer den neuesten. Gibts keinen, dann empty.
+     * @return Gibt es mehrere, dann immer den neuesten. Gibts keinen, dann empty.
      */
     public static Optional<ResInfo> getValidOnThatDayIfAny(Resident resident, String resinfoid, java.time.LocalDateTime pit) {
         List<ResInfo> list = getAll(resident, resinfoid, pit);
@@ -616,8 +621,6 @@ public class ResInfoTools implements HasLogger {
     }
 
 
-
-
     public static boolean isGone(Resident resident) {
         ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty(ResInfoTypeTools.STAY_KEY).equalsIgnoreCase(ResInfoTypeTools.STAY_VALUE_LEFT);
@@ -643,34 +646,34 @@ public class ResInfoTools implements HasLogger {
 
     /**
      * ermittelt zu einem heimaufenthalt , der nahtlos auf einen KZP aufenhtalt folgt eben diesen KZP aufenthalt.
+     *
      * @param hauf
      * @return
      */
-    public static Optional<ResInfo> getKZPvorDauerhaft(ResInfo hauf){
+    public static Optional<ResInfo> getKZPvorDauerhaft(ResInfo hauf) {
         Optional<ResInfo> result = Optional.empty();
 
         List<ResInfo> list = getAll(hauf.getConnectionid());
-        if (!list.isEmpty()) result = Optional.of(list.get(list.size()-1));
+        if (!list.isEmpty()) result = Optional.of(list.get(list.size() - 1));
         return result;
     }
 
 
-    public static org.javatuples.Pair<java.time.LocalDateTime, java.time.LocalDateTime> getMinMax(ArrayList<ResInfo> listInfos){
+    public static org.javatuples.Pair<java.time.LocalDateTime, java.time.LocalDateTime> getMinMax(ArrayList<ResInfo> listInfos) {
         Collections.sort(listInfos, Comparator.comparing(ResInfo::getFrom));
-        return org.javatuples.Pair.with(JavaTimeConverter.toJavaLocalDateTime(listInfos.get(0).getFrom()), JavaTimeConverter.toJavaLocalDateTime(listInfos.get(listInfos.size()-1).getTo()));
+        return org.javatuples.Pair.with(JavaTimeConverter.toJavaLocalDateTime(listInfos.get(0).getFrom()), JavaTimeConverter.toJavaLocalDateTime(listInfos.get(listInfos.size() - 1).getTo()));
     }
 
     /**
-     *
-     * Diese Methode erhält eine ResInfo und eine Liste aller anderen ResInfos vom selben Typ. Nun wird ermittelt, wie weit sich das Start- und Enddatum
-     * ausdehnen darf, damit es nicht zu einem Konflikt kommt.
+     * Diese Methode erhält eine ResInfo und eine Liste aller anderen ResInfos vom selben Typ. Nun wird ermittelt, wie
+     * weit sich das Start- und Enddatum ausdehnen darf, damit es nicht zu einem Konflikt kommt.
      *
      * @param info_to_be_checked
      * @param sortedInfoList
      * @return
      */
-     public static org.javatuples.Pair<java.time.LocalDateTime, java.time.LocalDateTime> getMinMaxExpansion(ResInfo info_to_be_checked, ArrayList<ResInfo> sortedInfoList, ResInfo firstHauf) {
-         java.time.LocalDateTime min = null, max = null;
+    public static org.javatuples.Pair<java.time.LocalDateTime, java.time.LocalDateTime> getMinMaxExpansion(ResInfo info_to_be_checked, ArrayList<ResInfo> sortedInfoList, ResInfo firstHauf) {
+        java.time.LocalDateTime min = null, max = null;
 
 //         if (info_to_be_checked.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
 //             min = SYSConst.LD_VERY_BEGINNING; //JavaTimeConverter.toJavaLocalDateTime(firstHauf.getFrom());
@@ -678,32 +681,32 @@ public class ResInfoTools implements HasLogger {
 //             return new org.javatuples.Pair<>(min, max);
 //         }
 
-         java.time.LocalDateTime as_early_as_possible = JavaTimeConverter.toJavaLocalDateTime(firstHauf.getFrom());
+        java.time.LocalDateTime as_early_as_possible = JavaTimeConverter.toJavaLocalDateTime(firstHauf.getFrom());
 
-         Collections.sort(sortedInfoList, Comparator.comparing(ResInfo::getFrom));
-         if (sortedInfoList.contains(info_to_be_checked)) {
-             int pos = sortedInfoList.indexOf(info_to_be_checked);
-             // vorhergehendes element
-             try {
-                 ResInfo precedingElemnt = sortedInfoList.get(pos - 1);
-                 java.time.LocalDateTime ldtTo = JavaTimeConverter.toJavaLocalDateTime(precedingElemnt.getTo());
-                 min = ldtTo.plusSeconds(1);
-             } catch (IndexOutOfBoundsException e) {
-                 min = as_early_as_possible;
-             }
+        Collections.sort(sortedInfoList, Comparator.comparing(ResInfo::getFrom));
+        if (sortedInfoList.contains(info_to_be_checked)) {
+            int pos = sortedInfoList.indexOf(info_to_be_checked);
+            // vorhergehendes element
+            try {
+                ResInfo precedingElemnt = sortedInfoList.get(pos - 1);
+                java.time.LocalDateTime ldtTo = JavaTimeConverter.toJavaLocalDateTime(precedingElemnt.getTo());
+                min = ldtTo.plusSeconds(1);
+            } catch (IndexOutOfBoundsException e) {
+                min = as_early_as_possible;
+            }
 
-             // nachfolgendes Element
-             try {
-                 ResInfo subsequentElement = sortedInfoList.get(pos + 1);
-                 java.time.LocalDateTime ldtFrom = JavaTimeConverter.toJavaLocalDateTime(subsequentElement.getFrom());
-                 max = ldtFrom.minusSeconds(1);
-             } catch (IndexOutOfBoundsException e) {
-                 max = SYSConst.LD_UNTIL_FURTHER_NOTICE;
-             }
-         }
+            // nachfolgendes Element
+            try {
+                ResInfo subsequentElement = sortedInfoList.get(pos + 1);
+                java.time.LocalDateTime ldtFrom = JavaTimeConverter.toJavaLocalDateTime(subsequentElement.getFrom());
+                max = ldtFrom.minusSeconds(1);
+            } catch (IndexOutOfBoundsException e) {
+                max = SYSConst.LD_UNTIL_FURTHER_NOTICE;
+            }
+        }
 
-         return new org.javatuples.Pair<>(min, max);
-     }
+        return new org.javatuples.Pair<>(min, max);
+    }
 
     /**
      * Erstellt eine Liste aller Resinfotypes, die zwischen from und to benutzt wurden und am to aktiv waren.
@@ -877,9 +880,9 @@ public class ResInfoTools implements HasLogger {
 
 
         String text = SYSTools.catchNull(resInfo.getText());
-        if (!text.isEmpty()){
-             html += SYSConst.html_h3("misc.msg.comment");
-             html += SYSConst.html_paragraph(text);
+        if (!text.isEmpty()) {
+            html += SYSConst.html_h3("misc.msg.comment");
+            html += SYSConst.html_paragraph(text);
         }
 
         return html;
@@ -995,7 +998,7 @@ public class ResInfoTools implements HasLogger {
 
         // MDK ID Bewohner
         result += SYSConst.html_table_tr(SYSConst.html_table_td("misc.msg.resident.qdvs.id", "left", "top") +
-                        SYSConst.html_table_td(SYSConst.html_bold(NF_IDBEWOHNER.format(resident.getIdbewohner())), "left", "top")
+                SYSConst.html_table_td(SYSConst.html_bold(NF_IDBEWOHNER.format(resident.getIdbewohner())), "left", "top")
         );
 
         for (ResInfo resInfo : ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ROOM), SYSCalendar.midOfDay().toDate(), SYSCalendar.midOfDay().toDate())) {
@@ -1229,6 +1232,51 @@ public class ResInfoTools implements HasLogger {
         List<ResInfo> bwinfos = query.getResultList();
         em.close();
         return bwinfos;
+    }
+
+    public static String getSchnellInfo(Resident resident) {
+
+        String diags = getDiags(resident);
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.resident = :resident AND b.to > :now ");
+        query.setParameter("resident", resident);
+        query.setParameter("now", new Date());
+        List listeVerordnungen = query.getResultList();
+        Collections.sort(listeVerordnungen);
+        String medis = PrescriptionTools.getPrescriptionsAsHTML(listeVerordnungen, true, false, false, false, false);
+        em.close();
+
+        String warning = "";
+        ResInfo infoWarning = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_WARNING));
+        if (infoWarning != null && infoWarning.isCurrentlyValid()) {
+            warning = SYSConst.html_h2("misc.msg.warning");
+            warning += getCompactHTML(infoWarning);
+        }
+
+        ResInfo infoWill = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_LIVINGWILL));
+        String will = "Es liegt uns keine Patientenverfügung vor";
+        if (infoWill != null && infoWill.isCurrentlyValid() && infoWill.getAttachedFilesConnections().size() > 0) {
+            will = SYSConst.html_h2("Patientenverfügung");
+            will += "Es liegt eine Patientenverfügung vor. Wird mit ausgedruckt.";
+            infoWill.getAttachedFilesConnections().forEach(sysinf2FILE -> SYSFilesTools.handleFile(sysinf2FILE.getSysfile(), Desktop.Action.OPEN));
+        }
+
+        ResInfo infoAllergy = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ALLERGY));
+        String allergy = "Es sind keine Allergien bekannt";
+        if (infoAllergy != null && infoAllergy.isCurrentlyValid()) {
+            allergy = SYSConst.html_h2("misc.msg.allergy");
+            allergy += getCompactHTML(infoAllergy);
+        }
+
+        String result = "<h1 id=\"fonth1\">Schnellinformation</h1>";
+        result += diags;
+        result += medis;
+        if (!warning.isEmpty()) result += HTMLTools.p(warning);
+        result += HTMLTools.p(allergy);
+        result += HTMLTools.p(will);
+
+        return result;
     }
 
 

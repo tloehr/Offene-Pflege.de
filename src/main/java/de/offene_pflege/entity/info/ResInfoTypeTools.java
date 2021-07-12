@@ -113,7 +113,6 @@ public class ResInfoTypeTools {
     public static final int TYPE_FALL_AUSWIRKUNG = 165;
     public static final int TYPE_FIXIERUNGPROTOKOLL = 166;
 
-
     public static final int TYPE_BESD = 167;
     public static final int TYPE_INTEGRATIONS_GESPRAECH = 168;
 

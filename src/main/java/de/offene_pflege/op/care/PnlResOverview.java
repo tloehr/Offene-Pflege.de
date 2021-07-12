@@ -59,8 +59,6 @@ public class PnlResOverview extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
     private JToggleButton tbMedi, tbBerichte;
-    private ItemListener itemListener;
-    private MouseAdapter mouseAdapter;
     private boolean initPhase = false;
 
     @Override
@@ -82,8 +80,8 @@ public class PnlResOverview extends NursingRecordsPanel {
 
     private void initPanel() {
         txtUebersicht.setContentType("text/html");
-        itemListener = itemEvent -> reloadDisplay();
-        mouseAdapter = GUITools.getHyperlinkStyleMouseAdapter();
+//        itemListener = itemEvent -> reloadDisplay();
+//        mouseAdapter = GUITools.getHyperlinkStyleMouseAdapter();
     }
 
     @Override
@@ -224,45 +222,18 @@ public class PnlResOverview extends NursingRecordsPanel {
         tbMedi = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.prescription"));
         tbMedi.addItemListener(e -> {
             if (initPhase) return;
-//                SYSPropsTools.storeState(internalClassID + ":tbMedi", tbMedi);
             reloadDisplay();
         });
         tbMedi.setHorizontalAlignment(SwingConstants.LEFT);
         labelPanel.add(tbMedi);
-//        SYSPropsTools.restoreState(internalClassID + ":tbMedi", tbMedi);
 
         tbBerichte = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.reports"));
         tbBerichte.addItemListener(e -> {
             if (initPhase) return;
-//                SYSPropsTools.storeState(internalClassID + ":tbBerichte", tbBerichte);
             reloadDisplay();
         });
         tbBerichte.setHorizontalAlignment(SwingConstants.LEFT);
         labelPanel.add(tbBerichte);
-//        SYSPropsTools.restoreState(internalClassID + ":tbBerichte", tbBerichte);
-
-//        tbBilanz = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.liquid.result"));
-//        tbBilanz.addItemListener(e -> {
-//            if (initPhase) return;
-////                SYSPropsTools.storeState(internalClassID + ":tbBilanz", tbBilanz);
-//            reloadDisplay();
-//        });
-//        tbBilanz.setHorizontalAlignment(SwingConstants.LEFT);
-//        labelPanel.add(tbBilanz);
-//        SYSPropsTools.restoreState(internalClassID + ":tbBilanz", tbBilanz);
-
-//        tbBWInfo = GUITools.getNiceToggleButton(SYSTools.xx(PnlInfo.internalClassID));
-//        tbBWInfo.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                if (initPhase) return;
-//                SYSPropsTools.storeState(internalClassID + ":tbBWInfo", tbBWInfo);
-//                reloadDisplay();
-//            }
-//        });
-//        tbBilanz.setHorizontalAlignment(SwingConstants.LEFT);
-//        labelPanel.add(tbBWInfo);
-//        SYSPropsTools.restoreState(internalClassID + ":tbBWInfo", tbBWInfo);
 
         panelFilter.setContentPane(labelPanel);
 
@@ -275,7 +246,6 @@ public class PnlResOverview extends NursingRecordsPanel {
         initPhase = true;
         searchPanes = new CollapsiblePanes();
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
-
 
         CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -291,8 +261,11 @@ public class PnlResOverview extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
+        JideButton quickInfo = GUITools.createHyperlinkButton("Schnellinfo", SYSConst.icon22info, actionEvent -> SYSFilesTools.print(ResInfoTools.getSchnellInfo(resident), false));
+        mypanel.add(quickInfo);
+
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, actionEvent -> SYSFilesTools.print(ResInfoTools.getTXReport(resident, true, false, tbMedi.isSelected(), tbBerichte.isSelected(), true, false, true, true), true));
-        mypanel.add(printButton);
+                mypanel.add(printButton);
 
 
         searchPane.setContentPane(mypanel);
