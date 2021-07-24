@@ -1269,7 +1269,7 @@ public class ResInfoTools implements HasLogger {
             allergy += getCompactHTML(infoAllergy);
         }
 
-        String result = "<h1 id=\"fonth1\">Schnellinformation</h1>";
+        String result = "<h1 id=\"fonth1\">Schnellinformation für "+ResidentTools.getLabelText(resident)+"</h1>";
         result += diags;
         result += medis;
         if (!warning.isEmpty()) result += HTMLTools.p(warning);

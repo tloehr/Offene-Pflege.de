@@ -56,7 +56,7 @@ public abstract class CleanablePanel extends JPanel {
     }
 
     public void reload() {
-        OPDE.getEMF().getCache().evictAll();
+        OPDE.clearCache();
     }
 
     public String getInternalClassID() {

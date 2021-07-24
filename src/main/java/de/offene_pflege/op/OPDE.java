@@ -58,15 +58,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /*! \mainpage My Personal Index Page
  *
@@ -98,6 +96,7 @@ public class OPDE {
     protected static LogicalPrinters printers;
     protected static Properties props;
     protected static SortedProperties localProps;
+    protected static Properties jpaProps = new Properties();
     private static Logger logger;
     public static HashMap[] anonymize = null;
     protected static EntityManagerFactory emf;
@@ -174,9 +173,23 @@ public class OPDE {
         return css;
     }
 
-    public static EntityManagerFactory getEMF() {
-        return emf;
+//    public static EntityManagerFactory getEMF() {
+//        return emf;
+//    }
+
+    public static void closeEMF() {
+        if (emf == null) return;
+        if (emf.isOpen()) emf.close();
+        emf = null;
+        return;
     }
+
+    public static void clearCache() {
+        if (emf == null || !emf.isOpen()) return;
+        emf.getCache().evictAll();
+        return;
+    }
+
 
     public static boolean isFTPworking() {
         return SYSTools.catchNull(props.getProperty(SYSPropsTools.KEY_FTP_IS_WORKING)).equalsIgnoreCase("true");
@@ -279,8 +292,12 @@ public class OPDE {
     }
 
     public static EntityManager createEM() {
+        if (emf == null || !emf.isOpen()) {
+            emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
+        }
         return emf.createEntityManager();
     }
+
 
     public static Properties getProps() {
         return props;
@@ -574,7 +591,7 @@ public class OPDE {
              *      \___/|_| /_/   \_\ |____/ \__,_|\__\__,_|_.__/ \__,_|___/\___|
              *
              */
-            Properties jpaProps = new Properties();
+
             jpaProps.putAll(localProps);
 
             customJDBCUrl = cl.hasOption("j");
@@ -596,12 +613,7 @@ public class OPDE {
             if (neededVersion != currentVersion)
                 throw new PersistenceException(SYSTools.xx("error.sql.schema.version.mismatch"));
 
-            emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
-
-            EntityManager em1 = emf.createEntityManager();
-            em1.close();
-
-            jpaProps.clear();
+//            createEM();
 
             /***
              *       ____                           _         ____  _____ _   _

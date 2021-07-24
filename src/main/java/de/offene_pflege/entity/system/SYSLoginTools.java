@@ -49,6 +49,7 @@ public class SYSLoginTools {
             OPDE.fatal(e);
         } finally {
             em.close();
+            OPDE.closeEMF();
         }
     }
 

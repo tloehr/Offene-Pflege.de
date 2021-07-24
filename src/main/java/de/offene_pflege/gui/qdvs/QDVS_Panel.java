@@ -164,13 +164,6 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         else
             STICHTAG = LocalDate.now();
 
-//        VORHERIGER_STICHTAG = STICHTAG.minusDays(SYSPropsTools.getInteger(SYSPropsTools.KEY_QDVS_TAGE_ERFASSUNGSPERIODE) + 1); // der vorh.stichtag liegt AUSSERHALB der 183 Tage... daher +1
-
-//        if (OPDE.getLocalProps().containsKey(SYSPropsTools.KEY_QDVS_ERHEBUNG))
-//            ERHEBUNG = JavaTimeConverter.from_iso8601(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_QDVS_ERHEBUNG)).toLocalDate();
-//        else
-//            ERHEBUNG = LocalDate.now();
-
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -379,7 +372,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
                     html += toHTML(root);
                     html += SYSConst.html_bold(SYSTools.xx("qdvs.workdir") + ": " + target.getParent());
 
-                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebnis.html"), SYSFilesTools.getHTML4Printout(html, true), Charset.defaultCharset());
+                    FileUtils.writeStringToFile(new File(target.getParentFile(), "ergebnis.html"), SYSFilesTools.getHTML4Printout(html, false), Charset.defaultCharset());
 
                     addLog(SYSConst.html_h2("qdvs.erfassung.abgeschlossen"));
                 } catch (IOException e) {
@@ -485,7 +478,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             GregorianCalendar gc = (GregorianCalendar) evt.getNewValue();
             OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_STICHTAG, JavaTimeConverter.to_iso8601(gc));
             STICHTAG = JavaTimeConverter.toJavaLocalDateTime(gc.getTime()).toLocalDate();
-            BEGINN_ERFASSUNGSZEITRAUM = STICHTAG.minusDays(SYSPropsTools.getInteger(SYSPropsTools.KEY_QDVS_TAGE_ERFASSUNGSPERIODE));
+            BEGINN_ERFASSUNGSZEITRAUM = STICHTAG.minusMonths(6l).plusDays(1);
             lblVorherigerStichtag.setText(BEGINN_ERFASSUNGSZEITRAUM.minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
             addLog(SYSConst.html_paragraph(SYSConst.html_bold("Zeitraum zur Ergebniserfassung: ") + String.format("%s bis einschließlich %s", BEGINN_ERFASSUNGSZEITRAUM.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)), STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))));
             prepareListOFResidents();
