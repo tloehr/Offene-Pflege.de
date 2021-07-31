@@ -1164,32 +1164,16 @@ public class SYSTools {
     // https://github.com/tloehr/Offene-Pflege.de/issues/17
     // https://github.com/tloehr/Offene-Pflege.de/issues/31
     public static BigDecimal parseDecimal(String test) {
-
         if (test == null) return null;
-
+        test = test.replace(".", ",");
         DecimalFormat fmt = new DecimalFormat();
         fmt.setParseBigDecimal(true);
-//        test = assimilateDecimalSeparators(test);
         BigDecimal num;
         try {
             num = (BigDecimal) fmt.parse(test);
         } catch (ParseException ex) {
             num = null;
         }
-
-//        BigDecimal wert = null;
-//        if (num != null) {
-//            if (num instanceof Long) {
-//                wert = new BigDecimal(num.longValue());
-//            } else if (num instanceof Double) {
-//                wert = new BigDecimal(num.doubleValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
-//            } else if (num instanceof BigDecimal) {
-//                wert = (BigDecimal) num;
-//            } else {
-//                wert = null;
-//            }
-//        }
-
 
         return num;
     }
@@ -1232,8 +1216,7 @@ public class SYSTools {
                 betrag = null;
             }
         }
-
-
+        
         return betrag;
     }
 
