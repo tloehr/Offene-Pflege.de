@@ -865,7 +865,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                 });
                 currentEditor.setVisible(true);
             });
-            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo)  && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
             cptitle.getRight().add(btnProcess);
         }
 
@@ -1664,8 +1664,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-
-            final JButton btnChangePeriod = GUITools.createHyperlinkButton(resInfo.isSingleIncident() ? "nursingrecords.info.change.pit" : "nursingrecords.info.change.pit", SYSConst.icon22changePeriod, null);
+            final JButton btnChangePeriod = GUITools.createHyperlinkButton(resInfo.isSingleIncident() ? "nursingrecords.info.change.pit" : "nursingrecords.info.change.period", SYSConst.icon22changePeriod, null);
             btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnChangePeriod.addActionListener(actionEvent -> {
                 if (resInfo.isSingleIncident()) {
@@ -1750,25 +1749,49 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 Pair<Date, Date> period = (Pair<Date, Date>) o;
                                 ResInfoTools.setFrom(editinfo, period.getFirst());
                                 ResInfoTools.setTo(editinfo, period.getSecond());
-                                // since 1.15.2.x - UserOn wird ebenfalls gesetzt, wenn man die Perdiode ändert.
+                                // since 1.15.2.767 - UserOn wird ebenfalls gesetzt, wenn man die Perdiode ändert.
                                 editinfo.setUserON(OPDE.getLogin().getUser());
+                                Optional<ResInfo> nextResInfo = Optional.empty();
+                                // since 1.15.2.772 - damit kann man einen "eingeschlossenen" resinfo
+                                // verschieben und der nachfolgende START wandert mit. Wenn
+                                // es einen Nachfolger gibt natürlich
+                                if (!period.getSecond().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && editinfo.getConnectionid() > 0) {
+                                    ArrayList<ResInfo> connectedResInfos = ResInfoTools.getAll(editinfo.getConnectionid());
+                                    // filter die Liste auf die mit einer größeren ID als diese hier
+                                    // und nur der erste Treffer interessiert mich.
+                                    nextResInfo = connectedResInfos.stream().filter(resInfo1 -> resInfo1.getID() > editinfo.getID()).findFirst();
+
+                                    // Wenn es eine nachfolgende ResInfo gibt, dann wird IHR Start direkt nach dem Ende dieser hier
+                                    // verschoben.
+                                    nextResInfo.ifPresent(resInfo1 -> {
+                                        resInfo1.setUserON(OPDE.getLogin().getUser());
+                                        ResInfoTools.setFrom(resInfo1, new DateTime(period.getSecond()).plusSeconds(1).toDate());
+                                        em.merge(resInfo1);
+                                    });
+                                }
+
                                 editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
                                 em.getTransaction().commit();
 
-                                synchronized (mapType2ResInfos) {
-                                    int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
-                                    mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
-                                    mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+                                if (nextResInfo.isPresent()){
+                                    reload(); // falls eine verschiebungsaktion mit nachfolgender verschiebung stattgefunden hat, dann ALLES neu laden
+                                } else { // sonst nur was nötig ist
+                                    synchronized (mapType2ResInfos) {
+                                        int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
+                                        mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
+                                        mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+                                    }
+                                    synchronized (listAllInfos) {
+                                        listAllInfos.remove(resInfo);
+                                        listAllInfos.add(editinfo);
+                                    }
+                                    synchronized (mapKey2CP) {
+                                        mapKey2CP.remove(keyResInfo);
+                                    }
+                                    sortData();
+                                    reloadDisplay();
                                 }
-                                synchronized (listAllInfos) {
-                                    listAllInfos.remove(resInfo);
-                                    listAllInfos.add(editinfo);
-                                }
-                                synchronized (mapKey2CP) {
-                                    mapKey2CP.remove(keyResInfo);
-                                }
-                                sortData();
-                                reloadDisplay();
+
                             } catch (OptimisticLockException ole) {
                                 OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {

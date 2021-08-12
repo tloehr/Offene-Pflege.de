@@ -139,6 +139,7 @@ public class ResInfo implements Serializable, QProcessElement, Comparable<ResInf
 
 
     public ResInfo() {
+        connectionid = 0l;
     }
 
 

@@ -78,11 +78,9 @@ public class ResInfoTools implements HasLogger {
         if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             resInfo.setFrom(now);
             resInfo.setTo(now);
-
         } else if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
             resInfo.setFrom(new LocalDate().toDateTimeAtStartOfDay().toDate());
             resInfo.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-
         } else {
             resInfo.setFrom(now);
             resInfo.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
@@ -345,7 +343,11 @@ public class ResInfoTools implements HasLogger {
         return resInfos;
     }
 
-
+    /**
+     * Gibt eine Liste aller verbundenen ResInfos zurück. Sortiert nach Start-Datum
+     * @param connectionID
+     * @return
+     */
     public static ArrayList<ResInfo> getAll(Long connectionID) {
         if (connectionID <= 0) return new ArrayList<>();
 
@@ -770,11 +772,11 @@ public class ResInfoTools implements HasLogger {
     }
 
     public static boolean isEditable(ResInfo resInfo) {
-        return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
+        return  resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
                 && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE
                 && !resInfo.getResInfoType().isDeprecated()
                 && ResidentTools.isActive(resInfo.getResident())
-                && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident())
+                && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident() || OPDE.isAdmin()) // Admin darf auch geschlossene verändern
                 && resInfo.getPrescription() == null;
     }
 

@@ -69,7 +69,18 @@ public class QdvsService implements HasLogger {
 
     private LocalDateTime STICHTAG; // ist das vorher festgelegte Zieldatum (2x im Jahr). Das bleibt auch bei den Nachkorrekturen gleich
     private LocalDateTime BEGINN_ERFASSUNGSZEITRAUM; // ist der letzt Stichtag.
-//    private LocalDateTime ERHEBUNGSDATUM; // Gibt an, zu welchem Datum die ResInfos ausgewertet werden sollen. Das kann durchaus nach dem Stichtag sein, wenn Fehler korrigiert werden mussten.
+
+
+    // Ich hatte immer wieder die Versuchung ein Erhebungsdatum statt einem Stichtag zu verwenden
+    // Das wäre elegant, wenn mann eine Korrektur eingeben muss. Dann ändert man die Fehler ab,
+    // setzt das Erhebungsdatum nach hinten und lässt die Auswertung erneut laufen.
+    // Der Haken aber ist, wenn bei anderen Informationen oder anderen BW seit dem Stichtag eine
+    // reele Änderung eingetreten ist, dann würde diese Änderung ebenfalls mit berücksichtigt,
+    // die gehört aber nicht in die Erhebung, weil sie eine Entwicklung des Zustands und keine
+    // Korrektur bedeutet.
+    // Somit bleibt mit im Moment nichts anderes übrig, als die Korrekturen in den
+    // Erhebungszeitraum zurückzuschieben.
+    // private LocalDateTime ERHEBUNGSDATUM;
 
     static final String SPECIFICATION = "V01"; // die Version der jeweilig eingereichten Datenstruktur, die zum Zeitpunkt der Verwendung gültig war.
     public static DecimalFormat NF_IDBEWOHNER = new DecimalFormat("000000");

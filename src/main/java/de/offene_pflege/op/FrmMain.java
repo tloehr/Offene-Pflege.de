@@ -468,7 +468,7 @@ public class FrmMain extends JFrame {
                 thisWindowClosing(e);
             }
         });
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
         //======== pnlMain ========
@@ -480,16 +480,16 @@ public class FrmMain extends JFrame {
                 }
             });
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -571,7 +571,10 @@ public class FrmMain extends JFrame {
                 btnReload.setToolTipText("Ansicht aktualisieren");
                 btnReload.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnReload.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload_pressed.png")));
-                btnReload.addActionListener(e -> btnReloadActionPerformed(e));
+                btnReload.addActionListener(e -> {
+			btnReloadActionPerformed(e);
+			btnReloadActionPerformed(e);
+		});
                 pnlMainMessage.add(btnReload, CC.xywh(7, 7, 1, 3));
             }
             pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1, CC.DEFAULT, CC.FILL));
