@@ -1654,6 +1654,26 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
             pnlMenu.add(btnToggleKZP);
         }
 
+
+        if (OPDE.isAdmin() && resInfo.getConnectionid() > 0) { // nur bei verbundenen ResInfos
+            final JButton btnFixPeriods = GUITools.createHyperlinkButton("resinfo.fix.connected.periods", SYSConst.icon22edit3, null);
+            btnFixPeriods.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnFixPeriods.addActionListener(actionEvent -> {
+                final JidePopup popup = new JidePopup();
+                PnlMoveResinfo pnlMoveResinfo = new PnlMoveResinfo(resInfo.getConnectionid(), closure -> {
+                });
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                popup.setOwner(pnlMenu);
+                popup.removeExcludedComponent(pnlMenu);
+                popup.getContentPane().add(pnlMoveResinfo);
+                popup.setDefaultFocusComponent(pnlMoveResinfo);
+                GUITools.showPopup(popup, SwingConstants.WEST);
+            });
+        }
+
+
         /**
          *
          *
@@ -1774,7 +1794,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
                                 em.getTransaction().commit();
 
-                                if (nextResInfo.isPresent()){
+                                if (nextResInfo.isPresent()) {
                                     reload(); // falls eine verschiebungsaktion mit nachfolgender verschiebung stattgefunden hat, dann ALLES neu laden
                                 } else { // sonst nur was nötig ist
                                     synchronized (mapType2ResInfos) {
