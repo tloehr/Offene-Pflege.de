@@ -4,7 +4,6 @@ import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.building.Rooms;
 import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.entity.files.SYSINF2FILE;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.reports.NReportTools;
@@ -46,8 +45,8 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static de.offene_pflege.services.qdvs.QdvsService.NF_IDBEWOHNER;
 
@@ -345,6 +344,7 @@ public class ResInfoTools implements HasLogger {
 
     /**
      * Gibt eine Liste aller verbundenen ResInfos zurück. Sortiert nach Start-Datum
+     *
      * @param connectionID
      * @return
      */
@@ -676,14 +676,11 @@ public class ResInfoTools implements HasLogger {
      */
     public static org.javatuples.Pair<java.time.LocalDateTime, java.time.LocalDateTime> getMinMaxExpansion(ResInfo info_to_be_checked, ArrayList<ResInfo> sortedInfoList, ResInfo firstHauf) {
         java.time.LocalDateTime min = null, max = null;
-
-//         if (info_to_be_checked.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
-//             min = SYSConst.LD_VERY_BEGINNING; //JavaTimeConverter.toJavaLocalDateTime(firstHauf.getFrom());
-//             max = SYSConst.LD_UNTIL_FURTHER_NOTICE;
-//             return new org.javatuples.Pair<>(min, max);
-//         }
-
         java.time.LocalDateTime as_early_as_possible = JavaTimeConverter.toJavaLocalDateTime(firstHauf.getFrom());
+
+        // Admins haben keine Beschränkungen
+        // Bis auf die Heimaufnahme, und NOW()
+        // since 1.15.2.772 - Als Korrekturhilfe für die QDVS
 
         Collections.sort(sortedInfoList, Comparator.comparing(ResInfo::getFrom));
         if (sortedInfoList.contains(info_to_be_checked)) {
@@ -706,7 +703,6 @@ public class ResInfoTools implements HasLogger {
                 max = SYSConst.LD_UNTIL_FURTHER_NOTICE;
             }
         }
-
         return new org.javatuples.Pair<>(min, max);
     }
 
@@ -772,7 +768,7 @@ public class ResInfoTools implements HasLogger {
     }
 
     public static boolean isEditable(ResInfo resInfo) {
-        return  resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
+        return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
                 && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE
                 && !resInfo.getResInfoType().isDeprecated()
                 && ResidentTools.isActive(resInfo.getResident())
@@ -903,7 +899,7 @@ public class ResInfoTools implements HasLogger {
 
     // Parsed die Struktur der Resinfo und gibt eine Zusammenstellung der Inhalte zurück
     private static ResInfoContentParser parseResInfo(ResInfo resInfo) {
-        OPDE.debug("parseResInfo: resinfo ID: " + resInfo.getID());
+        //OPDE.debug("parseResInfo: resinfo ID: " + resInfo.getID());
         Properties content = getContent(resInfo);
         ResInfoContentParser s = new ResInfoContentParser(content);
 
@@ -1271,7 +1267,7 @@ public class ResInfoTools implements HasLogger {
             allergy += getCompactHTML(infoAllergy);
         }
 
-        String result = "<h1 id=\"fonth1\">Schnellinformation für "+ResidentTools.getLabelText(resident)+"</h1>";
+        String result = "<h1 id=\"fonth1\">Schnellinformation für " + ResidentTools.getLabelText(resident) + "</h1>";
         result += diags;
         result += medis;
         if (!warning.isEmpty()) result += HTMLTools.p(warning);

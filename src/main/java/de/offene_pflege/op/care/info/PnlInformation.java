@@ -669,6 +669,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         } else {
             String kettennr = resInfo.getConnectionid() == 0 ? "" : " [" + resInfo.getConnectionid() + "]";
             title += DateFormat.getDateInstance().format(resInfo.getFrom()) + kettennr + " (" + (resInfo.getUserON() != null ? resInfo.getUserON().getFullname() : "--") + ") " + " >> ";
+            OPDE.debug(keyResInfo);
             title += resInfo.isClosed() ? DateFormat.getDateInstance().format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ") " : "";
             // früher gabs die Ketten nicht. Daher blenden wir das hier aus.
         }

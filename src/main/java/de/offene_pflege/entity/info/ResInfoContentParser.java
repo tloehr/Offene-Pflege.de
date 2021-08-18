@@ -56,7 +56,7 @@ public class ResInfoContentParser extends DefaultHandler implements HasLogger {
 
         if (name == null) name = UUID.randomUUID().toString(); // irgendeinen namen der eindeutig ist
         tagName = tagName.toLowerCase();
-        getLogger().debug(tagName);
+        //getLogger().debug(tagName);
 
         String label = SYSTools.xx(attributes.getValue("label"));
         // Tags, die es nicht mehr gibt müssen hier auch nicht berücksichtigt werden, weil
@@ -101,7 +101,7 @@ public class ResInfoContentParser extends DefaultHandler implements HasLogger {
         Enumeration en = wurzel.children();
         while (en.hasMoreElements())
             text += render((DefaultMutableTreeNode) en.nextElement(), resInfoRenderer);
-        getLogger().debug(text);
+        //getLogger().debug(text);
         return text;
     }
 

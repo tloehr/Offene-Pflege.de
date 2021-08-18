@@ -25,7 +25,8 @@
     </optiongroup>
 
     <optiongroup size="18" name="SVSTUHLKONTINENZBEW"
-                 label="Bewältigen der Folgen einer Stuhlinkontinenz und Umgang mit Stoma" tooltip="bi4.stuhlbewaeltigung.erklaerung"
+                 label="Bewältigen der Folgen einer Stuhlinkontinenz und Umgang mit Stoma"
+                 tooltip="bi4.stuhlbewaeltigung.erklaerung"
                  tx="Seite 1, Abschnitt 3">
         <option label="selbstständig" name="0" default="true" tooltip="bi4.stuhlbewaeltigung.selbst0"/>
         <option label="überwiegend selbständig" name="1" tooltip="bi4.stuhlbewaeltigung.selbst1"/>

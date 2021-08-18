@@ -26,7 +26,7 @@ import java.awt.event.MouseEvent;
  */
 public class PnlTemplate extends MyJDialog {
     public static final String internalClassID = "nursingrecords.nursingprocess.pnltemplate";
-    private JToggleButton tbInactive, tbSearch4Residents2;
+    private JToggleButton tbInactive;
     private Closure actionBlock;
 
     public PnlTemplate(Closure actionBlock) {
@@ -46,12 +46,12 @@ public class PnlTemplate extends MyJDialog {
             SYSPropsTools.storeState("nursingrecords.nursingprocess.pnltemplate:tbInactive", tbInactive);
             refreshDisplay();
         });
-        tbSearch4Residents2 = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.search4residents"));
-        SYSPropsTools.restoreState("nursingrecords.nursingprocess.pnltemplate.tbSearch4Residents2", tbSearch4Residents2);
-        tbSearch4Residents2.addItemListener(e -> {
-            SYSPropsTools.storeState("nursingrecords.nursingprocess.pnltemplate:tbSearch4Residents2", tbSearch4Residents2);
-            refreshDisplay();
-        });
+//        tbSearch4Residents2 = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.nursingprocess.pnltemplate.search4residents"));
+//        SYSPropsTools.restoreState("nursingrecords.nursingprocess.pnltemplate.tbSearch4Residents2", tbSearch4Residents2);
+//        tbSearch4Residents2.addItemListener(e -> {
+//            SYSPropsTools.storeState("nursingrecords.nursingprocess.pnltemplate:tbSearch4Residents2", tbSearch4Residents2);
+//            refreshDisplay();
+//        });
         lstTemplates.setCellRenderer(getListCellRenderer());
         lstTemplates.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && lstTemplates.getSelectedValue() != null) {
@@ -64,14 +64,14 @@ public class PnlTemplate extends MyJDialog {
         jPanel.setLayout(bl);
 
         jPanel.add(tbInactive);
-        jPanel.add(tbSearch4Residents2);
+//        jPanel.add(tbSearch4Residents2);
         add(jPanel, CC.xy(3, 7, CC.LEFT, CC.DEFAULT));
 
     }
 
     private void refreshDisplay() {
         if (txtSearch.getText().length() < 4) return;
-        java.util.List<NursingProcess> list = NursingProcessTools.getTemplates(txtSearch.getText(), tbInactive.isSelected(), tbSearch4Residents2.isSelected());
+        java.util.List<NursingProcess> list = NursingProcessTools.getTemplates(txtSearch.getText(), tbInactive.isSelected(), true);
         lstTemplates.setModel(SYSTools.list2dlm(list));
     }
 
@@ -136,8 +136,8 @@ public class PnlTemplate extends MyJDialog {
         //======== this ========
         var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, 200dlu, $rgap, [250dlu,min]:grow, $lcgap, default",
-                "2*(default, $lgap), [220dlu,min]:grow, 3*($lgap, default)"));
+            "default, $lcgap, 200dlu, $rgap, [250dlu,min]:grow, $lcgap, default",
+            "2*(default, $lgap), [220dlu,min]:grow, 3*($lgap, default)"));
 
         //======== panel2 ========
         {

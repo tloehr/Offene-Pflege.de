@@ -31,7 +31,10 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
-import de.offene_pflege.op.tools.*;
+import de.offene_pflege.op.tools.DlgYesNo;
+import de.offene_pflege.op.tools.NursingRecordsPanel;
+import de.offene_pflege.op.tools.SYSConst;
+import de.offene_pflege.op.tools.SYSTools;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
@@ -40,52 +43,50 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ItemEvent;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author tloehr
  */
 public class PnlProcess extends NursingRecordsPanel {
-
-
-
     private Resident resident;
-    private boolean initPhase = false;
-    private JToggleButton tbClosed, tbSystem;
+    private JToggleButton tbClosed, tbSystem, tbOnlyMyProcess;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
+    JComboBox cmbBW;
 
     private HashMap<Integer, CollapsiblePane> mapCP;
 
     private List<QProcess> processList;
     private int MAX_TEXT_LENGTH = 65;
 
+
     public PnlProcess(Resident resident, JScrollPane jspSearch) {
         super("nursingrecords.qprocesses");
-        initPhase = true;
+
         this.jspSearch = jspSearch;
         this.resident = resident;
         initComponents();
         initPanel();
         switchResident(resident);
-        initPhase = false;
+
     }
 
     public PnlProcess(JScrollPane jspSearch) {
         super("nursingrecords.qprocesses");
-        initPhase = true;
+
         this.jspSearch = jspSearch;
         this.resident = null;
         initComponents();
         initPanel();
         OPDE.getDisplayManager().setMainMessage(OPDE.getAppInfo().getInternalClasses().get(internalClassID).getShortDescription());
-        processList = QProcessTools.getProcesses4(OPDE.getLogin().getUser());
+        processList = QProcessTools.getAllActive();
         reloadDisplay();
-        initPhase = false;
+
     }
 
     private void initPanel() {
@@ -102,7 +103,22 @@ public class PnlProcess extends NursingRecordsPanel {
         if (resident != null) {
             switchResident(resident);
         } else {
-            processList = QProcessTools.getProcesses4(OPDE.getLogin().getUser());
+            if (cmbBW.getSelectedItem() != null) {
+                processList = QProcessTools.getActiveProcesses4((Resident) cmbBW.getSelectedItem());
+                if (tbClosed.isSelected()) {
+                    processList.addAll(QProcessTools.getAllClosedProcesses4((Resident) cmbBW.getSelectedItem()));
+                }
+            } else {
+                processList = QProcessTools.getAllActive();
+                if (tbClosed.isSelected()) {
+                    processList.addAll(QProcessTools.getAllClosedForActiveResidents());
+                }
+            }
+
+            if (tbOnlyMyProcess.isSelected()) {
+                processList = processList.stream().filter(qProcess -> qProcess.getOwner().equals(OPDE.getLogin().getUser())).collect(Collectors.toList());
+            }
+
             reloadDisplay();
         }
 
@@ -117,11 +133,8 @@ public class PnlProcess extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-        initPhase = true;
-
 
         mapCP.clear();
-
         for (QProcess qProcess : processList) {
             createCP4(qProcess);
         }
@@ -320,7 +333,8 @@ public class PnlProcess extends NursingRecordsPanel {
                         createCP4(myProcess);
 
                         buildPanel();
-                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -458,7 +472,8 @@ public class PnlProcess extends NursingRecordsPanel {
 
                         buildPanel();
 
-                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -512,10 +527,8 @@ public class PnlProcess extends NursingRecordsPanel {
     }
 
     /**
-     * This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the PrinterForm Editor.
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the PrinterForm Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -554,7 +567,10 @@ public class PnlProcess extends NursingRecordsPanel {
     public void switchResident(Resident res) {
         this.resident = EntityTools.find(Resident.class, res.getId());
         GUITools.setResidentDisplay(resident);
-        processList = QProcessTools.getProcesses4(resident);
+        processList = QProcessTools.getActiveProcesses4(resident);
+        if (tbClosed.isSelected()) {
+            processList.addAll(QProcessTools.getAllClosedProcesses4(resident));
+        }
         reloadDisplay();
     }
 
@@ -599,9 +615,9 @@ public class PnlProcess extends NursingRecordsPanel {
             OPDE.error(e);
         }
 
-        GUITools.addAllComponents(mypanel, addCommands());
+//        GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
-        GUITools.addAllComponents(mypanel, addKey());
+        //fGUITools.addAllComponents(mypanel, addKey());
 
         searchPane.setContentPane(mypanel);
 
@@ -614,143 +630,50 @@ public class PnlProcess extends NursingRecordsPanel {
         List<Component> list = new ArrayList<Component>();
 
         if (resident == null) {
-            final JComboBox cmbUser = new JComboBox();
-            final JComboBox cmbPCat = new JComboBox();
             DefaultComboBoxModel dcbm = SYSTools.list2cmb(ResidentTools.getAllActive());
             dcbm.insertElementAt(null, 0);
-            final JComboBox cmbBW = new JComboBox(dcbm);
+            cmbBW = new JComboBox(dcbm);
             cmbBW.setRenderer(ResidentTools.getRenderer());
             cmbBW.setFont(SYSConst.ARIAL14);
             cmbBW.setSelectedIndex(0);
             cmbBW.addItemListener(itemEvent -> {
-                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
-                initPhase = true;
-                if (cmbUser.getModel().getSize() > 0) {
-                    cmbUser.setSelectedIndex(0);
-                }
-                if (cmbPCat.getModel().getSize() > 0) {
-                    cmbPCat.setSelectedIndex(0);
-                }
-                processList = QProcessTools.getProcesses4((Resident) itemEvent.getItem());
-                initPhase = false;
-                reloadDisplay();
+                reload();
             });
             list.add(cmbBW);
 
-
-            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
-                DefaultComboBoxModel dcbm1 = SYSTools.list2cmb(UsersTools.getUsers(false));
-                cmbUser.setModel(dcbm1);
-                dcbm1.insertElementAt(null, 0);
-                cmbUser.setRenderer(UsersTools.getRenderer());
-                cmbUser.setFont(SYSConst.ARIAL14);
-                cmbUser.setSelectedIndex(0);
-                cmbUser.addItemListener(itemEvent -> {
-                    if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
-                    initPhase = true;
-                    cmbBW.setSelectedIndex(0);
-                    if (cmbPCat.getModel().getSize() > 0) {
-                        cmbPCat.setSelectedIndex(0);
-                    }
-                    initPhase = false;
-                    processList = QProcessTools.getProcesses4((OPUsers) itemEvent.getItem());
-                    reloadDisplay();
-                });
-                list.add(cmbUser);
-                DefaultComboBoxModel dcbm2 = SYSTools.list2cmb(PCatTools.getPCats());
-                dcbm2.insertElementAt(null, 0);
-                cmbPCat.setModel(dcbm2);
-                cmbPCat.setRenderer(PCatTools.getRenderer());
-                cmbPCat.setFont(SYSConst.ARIAL14);
-                cmbPCat.setSelectedIndex(0);
-                cmbPCat.addItemListener(itemEvent -> {
-                    if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
-                    initPhase = true;
-                    cmbBW.setSelectedIndex(0);
-                    if (cmbUser.getModel().getSize() > 0) {
-                        cmbUser.setSelectedIndex(0);
-                    }
-                    initPhase = false;
-                    processList = QProcessTools.getProcesses4((PCat) itemEvent.getItem());
-                    reloadDisplay();
-                });
-                list.add(cmbPCat);
-
-                final JideButton btnAll = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnallactive"), SYSConst.icon22link, e -> {
-                    processList = QProcessTools.getAllActive();
-                    initPhase = true;
-                    cmbBW.setSelectedIndex(0);
-                    if (cmbUser.getModel().getSize() > 0) {
-                        cmbUser.setSelectedIndex(0);
-                    }
-                    if (cmbPCat.getModel().getSize() > 0) {
-                        cmbPCat.setSelectedIndex(0);
-                    }
-                    initPhase = false;
-                    reloadDisplay();
-                });
-                list.add(btnAll);
-
-                final JideButton btnRunningOut = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnrunningout"), SYSConst.icon22clock, e -> {
-                    processList = QProcessTools.getProcessesRunningOutIn(5);
-                    initPhase = true;
-                    cmbBW.setSelectedIndex(0);
-                    if (cmbUser.getModel().getSize() > 0) {
-                        cmbUser.setSelectedIndex(0);
-                    }
-                    if (cmbPCat.getModel().getSize() > 0) {
-                        cmbPCat.setSelectedIndex(0);
-                    }
-                    initPhase = false;
-                    reloadDisplay();
-                });
-                list.add(btnRunningOut);
-            }
-
-            final JideButton btnMyProcesses = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnmyprocesses"), SYSConst.icon22myself, e -> {
-                initPhase = true;
-                cmbBW.setSelectedIndex(0);
-                if (cmbUser.getModel().getSize() > 0) {
-                    cmbUser.setSelectedIndex(0);
-                }
-                if (cmbPCat.getModel().getSize() > 0) {
-                    cmbPCat.setSelectedIndex(0);
-                }
-                initPhase = false;
-                processList = QProcessTools.getProcesses4(OPDE.getLogin().getUser());
-                reloadDisplay();
-            });
-            list.add(btnMyProcesses);
+//            final JideButton btnAll = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnallactive"), SYSConst.icon22link, e -> {
+//                cmbBW.setSelectedIndex(0);
+//            });
+//            list.add(btnAll);
         }
 
-        /***
-         *      _   _      ____ _                    _
-         *     | |_| |__  / ___| | ___  ___  ___  __| |
-         *     | __| '_ \| |   | |/ _ \/ __|/ _ \/ _` |
-         *     | |_| |_) | |___| | (_) \__ \  __/ (_| |
-         *      \__|_.__/ \____|_|\___/|___/\___|\__,_|
-         *
-         */
+        tbOnlyMyProcess = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.qprocesses.btnmyprocesses"));
+        tbOnlyMyProcess.addActionListener(e -> {
+            reload();
+        });
+        tbOnlyMyProcess.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbOnlyMyProcess);
+
+//        final JideButton btnMyProcesses = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnmyprocesses"), SYSConst.icon22myself, e -> {
+//            processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
+//            if (tbClosed.isSelected()){
+//                processList.addAll( QProcessTools.getClosedProcesses4(OPDE.getLogin().getUser()));
+//            }
+//            reloadDisplay();
+//
+//        });
+//        list.add(btnMyProcesses);
+
         tbClosed = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showclosed"));
-        tbClosed.addItemListener(itemEvent -> {
-            if (initPhase) return;
-            reloadDisplay();
+        tbClosed.addActionListener(e -> {
+            reload();
         });
         tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbClosed);
 
 
-        /***
-         *      _   _    ____            _
-         *     | |_| |__/ ___| _   _ ___| |_ ___ _ __ ___
-         *     | __| '_ \___ \| | | / __| __/ _ \ '_ ` _ \
-         *     | |_| |_) |__) | |_| \__ \ ||  __/ | | | | |
-         *      \__|_.__/____/ \__, |___/\__\___|_| |_| |_|
-         *                     |___/
-         */
         tbSystem = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.qprocesses.tbsystem.text"));
-        tbSystem.addItemListener(itemEvent -> {
-            if (initPhase) return;
+        tbSystem.addActionListener(e -> {
             reloadDisplay();
         });
         tbSystem.setHorizontalAlignment(SwingConstants.LEFT);
@@ -770,16 +693,16 @@ public class PnlProcess extends NursingRecordsPanel {
         Collections.sort(processList);
         boolean empty = true;
         for (QProcess process : processList) {
-            if (tbClosed.isSelected() || !process.isClosed()) {
-                empty = false;
-                CollapsiblePane cp = mapCP.get(process.hashCode());
-                cpProcess.add(cp);
+            //if (tbClosed.isSelected() || !process.isClosed()) {
+            empty = false;
+            CollapsiblePane cp = mapCP.get(process.hashCode());
+            cpProcess.add(cp);
 //                try {
 //                    cp.setCollapsed(collapseAll);
 //                } catch (PropertyVetoException e) {
 //
 //                }
-            }
+            //}
         }
         if (empty) {
             CollapsiblePane emptyPane = new CollapsiblePane(SYSTools.xx("misc.msg.nodata"));
@@ -876,7 +799,8 @@ public class PnlProcess extends NursingRecordsPanel {
                                 mapCP.remove(qProcess.hashCode());
                                 createCP4(myProcess);
                                 buildPanel();
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -934,7 +858,8 @@ public class PnlProcess extends NursingRecordsPanel {
                                 mapCP.remove(qProcess.hashCode());
                                 createCP4(myProcess);
                                 buildPanel();
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1008,7 +933,8 @@ public class PnlProcess extends NursingRecordsPanel {
                             processList.remove(qProcess);
                             mapCP.remove(qProcess.hashCode());
                             buildPanel();
-                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1079,7 +1005,8 @@ public class PnlProcess extends NursingRecordsPanel {
                         createCP4(myProcess);
 
                         buildPanel();
-                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1263,7 +1190,8 @@ public class PnlProcess extends NursingRecordsPanel {
 
                             createCP4(myProcess);
                             buildPanel();
-                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1335,7 +1263,8 @@ public class PnlProcess extends NursingRecordsPanel {
 
                                 createCP4(myProcess);
                                 buildPanel();
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1399,7 +1328,8 @@ public class PnlProcess extends NursingRecordsPanel {
             createCP4(myProcess);
 
             buildPanel();
-        } catch (OptimisticLockException ole) { OPDE.warn(ole);
+        } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
