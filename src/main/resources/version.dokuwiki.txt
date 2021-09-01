@@ -20,4 +20,7 @@
   * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Zukünftig können alle auf die Vorgangsverwaltung zugreifen. War vorher auf Pflegefachpersonal beschränkt. Das Verwaltungsmodul für Vorgänge wurde vereinfacht.
   * <label icon="glyphicon glyphicon-plus" type="success">New</label>
   * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Vital-Werte wurden falsch erkannt, wenn statt dem Komma ein Punkt bei Dezimal-Brüchen verwendet wurden.
+  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Berechnung Sturzrate hat keine Ereignisse berücksichtigt, wenn das zugehörige ResInfo Element sich verändert hat.
+  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Controlling Auswertung zu Gewicht und BMI findet keine Körpergrößen.
+  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> 
 

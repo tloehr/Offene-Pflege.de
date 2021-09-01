@@ -2,7 +2,6 @@ package de.offene_pflege.entity.values;
 
 
 import de.offene_pflege.entity.building.Station;
-import de.offene_pflege.services.StationService;
 import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
@@ -10,6 +9,7 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.*;
 import de.offene_pflege.services.ResvaluetypesService;
+import de.offene_pflege.services.StationService;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.javatuples.Quintet;
@@ -87,18 +87,18 @@ public class ResValueTools {
 //    }
 
     public static ArrayList<Integer> getYearsWithValues(Resident resident, Resvaluetypes type) {
-           EntityManager em = OPDE.createEM();
-           ArrayList<Integer> result = new ArrayList<Integer>();
-           Query query = em.createQuery(" SELECT rv.pit FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :type ORDER BY rv.pit DESC");
-           query.setParameter("resident", resident);
-           query.setParameter("type", type);
-           query.getResultList().forEach(o -> {
-               int year = JavaTimeConverter.toJavaLocalDateTime((Date) o).getYear();
-               if (!result.contains(year)) result.add(year);
-           });
-           em.close();
-           return result;
-       }
+        EntityManager em = OPDE.createEM();
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        Query query = em.createQuery(" SELECT rv.pit FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :type ORDER BY rv.pit DESC");
+        query.setParameter("resident", resident);
+        query.setParameter("type", type);
+        query.getResultList().forEach(o -> {
+            int year = JavaTimeConverter.toJavaLocalDateTime((Date) o).getYear();
+            if (!result.contains(year)) result.add(year);
+        });
+        em.close();
+        return result;
+    }
 
 //    public static ArrayList<Date> getDaysWithValues(Resident resident, Resvaluetypes type, int year) {
 //        DateTime from = new LocalDate(year, 1, 1).dayOfYear().withMinimumValue().toDateTimeAtStartOfDay();
@@ -617,8 +617,7 @@ public class ResValueTools {
 
             html.append(
                     SYSConst.html_div(
-                            heightType.getText() + ": " + (height.isPresent() ? SYSTools.xx("misc.msg.noentryyet") : SYSTools.formatBigDecimal(height.get().getVal1().setScale(2, RoundingMode.HALF_UP)) + " " + heightType.getUnit1())
-                    )
+                            heightType.getText() + ": " + (height.isPresent() ? SYSTools.formatBigDecimal(height.get().getVal1().setScale(2, RoundingMode.HALF_UP)) + " " + heightType.getUnit1() : SYSTools.xx("misc.msg.noentryyet")))
             );
 
 
@@ -638,7 +637,7 @@ public class ResValueTools {
 
             for (ResValue weight : listData.get(resident)) {
 
-                BigDecimal bmi = height.isPresent() ? null : weight.getVal1().divide(height.get().getVal1().pow(2), 2, RoundingMode.HALF_UP);
+                BigDecimal bmi = height.isPresent() ? weight.getVal1().divide(height.get().getVal1().pow(2), 2, RoundingMode.HALF_UP) : null;
 
                 BigDecimal divWeight = prevWeight == null ? null : weight.getVal1().subtract(prevWeight);
                 BigDecimal divBMI = prevBMI == null ? null : bmi.subtract(prevBMI);

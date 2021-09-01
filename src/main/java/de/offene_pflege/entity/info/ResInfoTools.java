@@ -1730,7 +1730,7 @@ public class ResInfoTools implements HasLogger {
         p = 0;
         for (LocalDate month = from; !month.isAfter(SYSCalendar.bom(new LocalDate())); month = month.plusMonths(1)) {
             p++;
-            progress.execute(new Pair<Integer, Integer>(p, new Long(interval.toDuration().getStandardDays() / 30l).intValue()));
+            progress.execute(new Pair<Integer, Integer>(p,Long.valueOf(interval.toDuration().getStandardDays() / 30l).intValue()));
             BigDecimal occupantDays = new BigDecimal(getOccupantDays(SYSCalendar.bom(month), SYSCalendar.min(SYSCalendar.eom(month), new LocalDate())));
             BigDecimal sumFalls = new BigDecimal(getFalls(SYSCalendar.bom(month), SYSCalendar.eom(month)).size());
             BigDecimal fallsIndicator = sumFalls.divide(occupantDays, 6, RoundingMode.HALF_UP).multiply(new BigDecimal(1000));
@@ -1953,13 +1953,12 @@ public class ResInfoTools implements HasLogger {
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
 
-        ResInfoType fallType = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALL);
+        //ResInfoType fallType = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FALL);
 
         String jpql = " " +
                 " SELECT ri " +
                 " FROM ResInfo ri " +
-                " WHERE ri.bwinfotyp = :infotyp " +
-                " AND ri.bwinfotyp.deprecated = false" +
+                " WHERE ri.bwinfotyp.type = :infotyp " +
                 " AND ri.resident.adminonly <> 2 " +
                 " AND ((ri.from <= :from AND ri.to >= :from) OR " +
                 " (ri.from <= :to AND ri.to >= :to) OR " +
@@ -1967,7 +1966,7 @@ public class ResInfoTools implements HasLogger {
                 " AND ri.from >= :from ";
 
         Query query = em.createQuery(jpql);
-        query.setParameter("infotyp", fallType);
+        query.setParameter("infotyp", ResInfoTypeTools.TYPE_FALL);
         query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
         ArrayList<ResInfo> listData = new ArrayList<ResInfo>(query.getResultList());
