@@ -3,6 +3,7 @@ package de.offene_pflege.op.system;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -88,7 +89,7 @@ public class PDF implements HasLogger {
         this.footer = footer;
         SIZE = basefontsize;
         if (output == null) {
-            this.output = File.createTempFile("opde", ".pdf");
+            this.output = SYSFilesTools.createTempFile("opde", ".pdf");
 
         } else {
             this.output = output;

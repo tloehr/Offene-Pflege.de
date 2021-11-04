@@ -31,6 +31,7 @@ import de.offene_pflege.entity.nursingprocess.NursingProcess;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
@@ -366,16 +367,6 @@ public class SYSFilesTools {
     }
 
 
-//    private static ArrayList<SYSFiles> getConnectedFiles(String md5) {
-//        ArrayList<SYSFiles> result = null;
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("SELECT s FROM SYSFiles s WHERE s.md5 = :md5");
-//        query.setParameter("md5", md5);
-//        result = new ArrayList<SYSFiles>(query.getResultList());
-//        em.close();
-//        return result;
-//    }
-
     /**
      * Diese Methode findet aus den properties eine lokal definierte Applikation heraus. Das braucht man nur dann, wenn
      * die Funktionen der Java eigenen Desktop API nicht funktionieren. z.B. linux-html=/usr/
@@ -465,57 +456,6 @@ public class SYSFilesTools {
         handleFile(getFile(sysfile), action);
     }
 
-//    public static FileTransferClient getFTPClient(Properties ftpProps) throws Exception {
-//        FileTransferClient ftp = new FileTransferClient();
-//
-//        ftp.setRemoteHost(ftpProps.getProperty(SYSPropsTools.KEY_FTP_HOST));
-//        ftp.setUserName(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER));
-//        ftp.setPassword(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
-//        ftp.setRemotePort(Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));
-//        ftp.connect();
-//        ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
-//        if (!ftpProps.getProperty(SYSPropsTools.KEY_FTP_WD).isEmpty()) {
-//            ftp.changeDirectory(ftpProps.getProperty(SYSPropsTools.KEY_FTP_WD));
-//        }
-//
-//
-//        return ftp;
-//    }
-//
-//
-//    public static FileTransferClient getFTPClient() {
-//        FileTransferClient ftp;
-//        try {
-//            ftp = getFTPClient(OPDE.getProps());
-//        } catch (Exception e) {
-//            OPDE.error(e);
-//            ftp = null;
-//
-//        }
-//        return ftp;
-//    }
-//
-//    public static boolean isFTPServerReady() {
-//        FileTransferClient ftp = getFTPClient();
-//        boolean ready = ftp != null;
-//        if (ready) {
-//            try {
-//                ftp.disconnect();
-//            } catch (Exception e) {
-//                OPDE.error(e);
-//                ready = false;
-//            }
-//        }
-//        return ready;
-//    }
-
-//    public static String getDatumUndUser(SYSFiles sysFiles) {
-//        String result = "";
-//        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-//        result = sdf.format(sysFiles.getPit()) + "; " + sysFiles.getUser().getFullname();
-//
-//        return SYSConst.html_fontface + result + "</font>";
-//    }
 
     public static File print(String html, boolean addPrintJScript) {
         return print(html, addPrintJScript, true);
@@ -532,7 +472,8 @@ public class SYSFilesTools {
         File temp = null;
         try {
             // Create temp file.
-            temp = File.createTempFile("opde", ".html");
+            temp = createTempFile("opde", ".html");
+            temp.deleteOnExit();
 
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
@@ -544,6 +485,10 @@ public class SYSFilesTools {
             OPDE.error(e);
         }
         return temp;
+    }
+
+    public static File createTempFile(String prefix, String suffix) throws IOException {
+        return File.createTempFile(prefix, suffix, new File(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_TMP_DIR)));
     }
 
     public static String getHTML4Printout(String html, boolean addPrintJScript) {
@@ -568,32 +513,5 @@ public class SYSFilesTools {
     }
 
 
-    public static File getHtmlFile(String html, String prefix, String ext) {
-        File temp = null;
-        try {
-            // Create temp file.
-            temp = File.createTempFile(prefix, ext);
-
-            String text = "<html><head>";
-
-            text += OPDE.getCSS();
-            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
-                    + "<hr/>" +
-                    "<div id=\"fonttext\">" +
-                    "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
-                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "</div></body></html>";
-
-
-            // Write to temp file
-            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            out.write(text);
-
-            out.close();
-        } catch (IOException e) {
-            OPDE.error(e);
-        }
-        return temp;
-    }
 
 }

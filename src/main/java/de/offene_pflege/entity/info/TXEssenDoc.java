@@ -167,7 +167,7 @@ public class TXEssenDoc implements HasLogger {
     }
 
     private File createDocPSYCH() throws Exception {
-        File outfilePSYCH = File.createTempFile("TXE", ".pdf"); //new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.PSYCH_" + resident.getId() + "_" + sdf.format(new Date()) + ".pdf");
+        File outfilePSYCH = SYSFilesTools.createTempFile("TXE", ".pdf");
         outfilePSYCH.deleteOnExit();
         PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEPSYCH).getAbsolutePath()), new FileOutputStream(outfilePSYCH));
         createContent4PSYCH();
@@ -182,7 +182,7 @@ public class TXEssenDoc implements HasLogger {
     }
 
     private File createDocMRE() throws Exception {
-        File outfileMRE = File.createTempFile("TXE", ".pdf"); //new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.MRE_" + resident.getId() + "_" + sdf.format(new Date()) + ".pdf");
+        File outfileMRE = SYSFilesTools.createTempFile("TXE", ".pdf");
         outfileMRE.deleteOnExit();
         PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEMRE).getAbsolutePath()), new FileOutputStream(outfileMRE));
         createContent4MRE();
@@ -197,7 +197,7 @@ public class TXEssenDoc implements HasLogger {
     }
 
     private File createDocWounds() throws Exception {
-        File outfileWOUND = File.createTempFile("TXE", ".pdf");
+        File outfileWOUND = SYSFilesTools.createTempFile("TXE", ".pdf");
         outfileWOUND.deleteOnExit();
         PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEWOUND).getAbsolutePath()), new FileOutputStream(outfileWOUND));
 
@@ -224,7 +224,7 @@ public class TXEssenDoc implements HasLogger {
      * @throws Exception
      */
     private File createDoc1() throws Exception {
-        File outfile1 = File.createTempFile("TXE", ".pdf");//new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX1_" + resident.getId() + "_" + sdf.format(new Date()) + ".pdf");
+        File outfile1 = SYSFilesTools.createTempFile("TXE", ".pdf");
         outfile1.deleteOnExit();
 
         PdfStamper stamper = new PdfStamper(new PdfReader(AppInfo.getTemplate(SOURCEDOC3).getAbsolutePath()), new FileOutputStream(outfile1));
@@ -345,7 +345,7 @@ public class TXEssenDoc implements HasLogger {
      * @throws Exception
      */
     private File concatPDFFiles(File file1, File filewounds, File filemre, File filepsych) throws Exception {
-        File outfileMain = File.createTempFile("TXE", ".pdf");
+        File outfileMain = SYSFilesTools.createTempFile("TXE", ".pdf");
         outfileMain.deleteOnExit();
 //        file1.deleteOnExit();
 

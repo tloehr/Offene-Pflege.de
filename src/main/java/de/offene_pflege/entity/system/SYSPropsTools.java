@@ -106,6 +106,8 @@ public class SYSPropsTools {
     public static final String KEY_DEBUG = "debug";
     public static final String KEY_EXPERIMENTAL = "experimental";
 
+    public static final String KEY_TMP_DIR = "tmp_dir";
+
     // login credentials for private computers
     public static final String KEY_USER = "defaultlogin";
     public static final String KEY_PASSWORD = "defaultpw";

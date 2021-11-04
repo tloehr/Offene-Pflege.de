@@ -5,12 +5,14 @@ import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.building.Floors;
 import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.building.Rooms;
+import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.system.Commontags;
 import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.Pair;
@@ -298,7 +300,7 @@ public class MREPrevalenceSheets implements HasLogger {
 
         progressClosure.execute(new Pair<Integer, Integer>(progress, max));
 
-        File temp = File.createTempFile("opde-mre", ".xlsx");
+        File temp = SYSFilesTools.createTempFile("opde-mre", ".xlsx");
         FileOutputStream fileOut = new FileOutputStream(temp);
         wb.write(fileOut);
         fileOut.close();

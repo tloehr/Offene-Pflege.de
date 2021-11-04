@@ -1,10 +1,12 @@
 package de.offene_pflege.op.settings.subpanels;
 
+import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.PnlBeanEditor;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.settings.databeans.FTPConfigBean;
+import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.FtpClient;
 import de.offene_pflege.op.tools.FtpUploadDownloadUtil;
@@ -68,7 +70,7 @@ public class PnlFTP extends DefaultPanel {
 
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.ftp.creating.testfile", 1));
                         // creating a testfile for the ftp test
-                        File file = File.createTempFile("opde", ".txt");
+                        File file = SYSFilesTools.createTempFile("opde", ".txt");
                         file.createNewFile();
                         FileWriter writer = new FileWriter(file);
 

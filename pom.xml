@@ -64,7 +64,7 @@
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>
         <opde.major>1</opde.major>
         <opde.minor>15</opde.minor>
-        <opde.release>3</opde.release>
+        <opde.release>2</opde.release>
         <opde.dbversion>14</opde.dbversion>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
     </properties>
