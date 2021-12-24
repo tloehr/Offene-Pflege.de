@@ -26,6 +26,8 @@ import de.offene_pflege.services.qdvs.DAS_REGELN;
 import de.offene_pflege.services.qdvs.MyErrorHandler;
 import de.offene_pflege.services.qdvs.QSData;
 import de.offene_pflege.services.qdvs.QdvsService;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.csv.CSVFormat;
@@ -75,7 +77,8 @@ import java.util.*;
 /**
  * @author Torsten Löhr
  */
-public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextListener {
+@Log4j2
+public class QDVS_Panel extends CleanablePanel implements AddTextListener {
     private static final String DAS_SPEZIFIKATION = "DAS_Pflege_Spezifikation_V01.4/02_XSD/interface_qs_data/das_interface.xsd";
     private static final String DAS_REGELN_CSV = "DAS_Pflege_Spezifikation_V01.4/03_Dokumentationsbogen/DAS_Plausibilitaetsregeln.csv";
 
@@ -279,7 +282,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -655,8 +658,8 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
     }
 
     @Override
-    public void addLog(String log) {
-        getLogger().debug(SYSTools.xx(log));
+    public void addLog(String logtext) {
+        log.debug(SYSTools.xx(logtext));
         SwingUtilities.invokeLater(() -> {
 //            HTMLDocument doc = (HTMLDocument) txtLog.getStyledDocument();
 //            HTMLEditorKit kit = (HTMLEditorKit) txtLog.getEditorKit();
@@ -667,7 +670,7 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
 //            String line = LocalTime.now().toString();
 
             try {
-                doc.insertBeforeEnd(elem, log);
+                doc.insertBeforeEnd(elem, logtext);
             } catch (BadLocationException | IOException ex) {
                 ex.printStackTrace();
             }
@@ -716,7 +719,6 @@ public class QDVS_Panel extends CleanablePanel implements HasLogger, AddTextList
             return ResidentTools.getTextCompact(resident);
         }
     }
-
 
     class DelegateDefaultCellRenderer extends DefaultTreeCellRenderer {
         TextAreaRenderer taRenderer = new TextAreaRenderer();

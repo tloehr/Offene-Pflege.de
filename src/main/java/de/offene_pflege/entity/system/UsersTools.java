@@ -8,6 +8,7 @@ import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 /**
  * @author tloehr
  */
+@Log4j2
 public class UsersTools {
     public static final short STATUS_INACTIVE = 0;
     public static final short STATUS_ACTIVE = 1;
@@ -150,7 +152,7 @@ public class UsersTools {
             query.setParameter("md5pw", SYSTools.hashword(password));
             user = (OPUsers) query.getSingleResult();
         } catch (Exception e) {
-            OPDE.info(e);
+            log.info(e);
         } finally {
             em.close();
         }

@@ -37,6 +37,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.DocumentSizeFilter;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -51,6 +52,7 @@ import java.math.BigDecimal;
 /**
  *
  */
+@Log4j2
 public class DlgTX extends MyJDialog {
     private BigDecimal amount, weight;
     private Closure actionBlock;
@@ -108,7 +110,7 @@ public class DlgTX extends MyJDialog {
         weight = SYSTools.checkBigDecimal(evt);
         // https://github.com/tloehr/Offene-Pflege.de/issues/30
         if (weight == null) weight = BigDecimal.ZERO;
-        OPDE.debug("weight = " + SYSTools.formatBigDecimal(weight));
+        log.debug("weight = " + SYSTools.formatBigDecimal(weight));
         btnBuchung.setEnabled(isAmountOk() && isWeightOk());
     }
 
@@ -118,7 +120,7 @@ public class DlgTX extends MyJDialog {
         if (amount == null) amount = BigDecimal.ZERO;
 
         btnBuchung.setEnabled(isAmountOk() && isWeightOk());
-        OPDE.debug("amount = " + SYSTools.formatBigDecimal(amount));
+        log.debug("amount = " + SYSTools.formatBigDecimal(amount));
     }
 
     private void thisWindowClosing(WindowEvent e) {

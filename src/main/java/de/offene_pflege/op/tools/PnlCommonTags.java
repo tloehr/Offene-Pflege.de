@@ -12,6 +12,7 @@ import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -24,6 +25,7 @@ import java.util.*;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class PnlCommonTags extends JPanel {
 
     private final boolean editmode;
@@ -183,7 +185,7 @@ public class PnlCommonTags extends JPanel {
                 popup.addPopupMenuListener(new PopupMenuListener() {
                     @Override
                     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                        OPDE.debug("popupMenuWillBecomeVisible");
+                        log.debug("popupMenuWillBecomeVisible");
                     }
 
                     @Override
@@ -214,7 +216,7 @@ public class PnlCommonTags extends JPanel {
 
                     @Override
                     public void popupMenuCanceled(PopupMenuEvent e) {
-                        OPDE.debug("popupMenuCanceled");
+                        log.debug("popupMenuCanceled");
                     }
                 });
 
@@ -273,7 +275,7 @@ public class PnlCommonTags extends JPanel {
     private JButton createButton(final Commontags commontag) {
 
         if (mapButtons.containsKey(commontag)) {
-            OPDE.debug("shortcut");
+            log.debug("shortcut");
             return mapButtons.get(commontag);
         }
 

@@ -39,6 +39,7 @@ import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.javatuples.Quartet;
@@ -63,7 +64,8 @@ import java.util.*;
 /**
  * @author Torsten Löhr
  */
-public class PnlInformation extends NursingRecordsPanel implements HasLogger {
+@Log4j2
+public class PnlInformation extends NursingRecordsPanel {
 
     private Resident resident;
     private JScrollPane jspSearch;
@@ -472,7 +474,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                                         reload();
 
                                                     } catch (OptimisticLockException ole) {
-                                                        OPDE.warn(ole);
+                                                        log.warn(ole);
                                                         if (em.getTransaction().isActive()) {
                                                             em.getTransaction().rollback();
                                                         }
@@ -571,7 +573,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                                         OPDE.getMainframe().addBesonderheit(newinfo.getResInfoType(), resident);
 
                                                     } catch (OptimisticLockException ole) {
-                                                        OPDE.warn(ole);
+                                                        log.warn(ole);
                                                         if (em.getTransaction().isActive()) {
                                                             em.getTransaction().rollback();
                                                         }
@@ -669,7 +671,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         } else {
             String kettennr = resInfo.getConnectionid() == 0 ? "" : " [" + resInfo.getConnectionid() + "]";
             title += DateFormat.getDateInstance().format(resInfo.getFrom()) + kettennr + " (" + (resInfo.getUserON() != null ? resInfo.getUserON().getFullname() : "--") + ") " + " >> ";
-            OPDE.debug(keyResInfo);
+            log.debug(keyResInfo);
             title += resInfo.isClosed() ? DateFormat.getDateInstance().format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ") " : "";
             // früher gabs die Ketten nicht. Daher blenden wir das hier aus.
         }
@@ -834,7 +836,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                         reloadDisplay();
 
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1017,7 +1019,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 }
                             }
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1149,7 +1151,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
 
 
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1344,7 +1346,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
 
@@ -1405,7 +1407,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
 
@@ -1495,7 +1497,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 OPDE.getMainframe().removeBesonderheit(editinfo.getResInfoType(), resident);
 
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1572,7 +1574,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                     }
                                     OPDE.getMainframe().removeBesonderheit(editinfo.getResInfoType(), resident);
                                 } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
+                                    log.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1632,7 +1634,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     else OPDE.getMainframe().removeBesonderheitKZP(resident);
 
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -1727,7 +1729,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                     }
                                 }
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1814,7 +1816,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                                 }
 
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1911,7 +1913,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     reloadDisplay();
 
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
@@ -2063,7 +2065,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                         reloadDisplay();
 
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -2208,7 +2210,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             }
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -2349,7 +2351,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             prepareSearchArea();
                             pnlCare.setJspSearch(jspSearch);
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -2404,7 +2406,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                         prepareSearchArea();
                         pnlCare.setJspSearch(jspSearch);
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -2457,7 +2459,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                         prepareSearchArea();
                         pnlCare.setJspSearch(jspSearch);
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -2508,7 +2510,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.info.msg.isawaynow")));
                             OPDE.getMainframe().addBesonderheit(newAbsence.getResInfoType(), resident);
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -2575,7 +2577,7 @@ public class PnlInformation extends NursingRecordsPanel implements HasLogger {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.info.msg.isbacknow")));
                     OPDE.getMainframe().removeBesonderheit(lastabsence.getResInfoType(), resident);
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();

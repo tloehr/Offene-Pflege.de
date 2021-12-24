@@ -26,6 +26,7 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.services.RoomsService;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -63,7 +64,8 @@ import java.util.*;
  * Created with IntelliJ IDEA. User: tloehr Date: 11.05.13 Time: 13:57 To change this template use File | Settings |
  * File Templates.
  */
-public class PnlEditResInfo implements HasLogger {
+@Log4j2
+public class PnlEditResInfo {
     public static final String internalClassID = "nursingrecords.info.dlg";
 
     // Zustand des gesamten Formulars
@@ -582,7 +584,7 @@ public class PnlEditResInfo implements HasLogger {
 //            for (String key : content.stringPropertyNames()) {
 //                if (components.containsKey(key) && components.get(key) instanceof Component && !((Component) components.get(key)).isVisible()) {
 //                    content.remove(key);
-//                    getLogger().debug("component is invisble => removing content for: " + key);
+//                    log.debug("component is invisble => removing content for: " + key);
 //                }
 //            }
 
@@ -1790,7 +1792,7 @@ public class PnlEditResInfo implements HasLogger {
             slavePanel.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentHidden(ComponentEvent e) {
-                    getLogger().debug(slave.getName() + " is hidden");
+                    log.debug(slave.getName() + " is hidden");
                     if (default_value_when_hidden.isPresent()) {
                         content.put(slave.getName(), default_value_when_hidden.get());
                         setContentForComponent(slave.getName());
@@ -1801,7 +1803,7 @@ public class PnlEditResInfo implements HasLogger {
 
                 @Override
                 public void componentShown(ComponentEvent e) {
-                    getLogger().debug(slave.getName() + " is shown");
+                    log.debug(slave.getName() + " is shown");
                     if (default_value_when_shown.isPresent()) {
                         content.put(slave.getName(), default_value_when_shown.get());
                         setContentForComponent(slave.getName());
@@ -1973,8 +1975,8 @@ public class PnlEditResInfo implements HasLogger {
         }
 
         public void setVisible(String value) {
-            getLogger().debug("component: " + me.getName());
-            getLogger().debug("submitted value: " + value);
+            log.debug("component: " + me.getName());
+            log.debug("submitted value: " + value);
 
             if (action == ACTION_ENABLE_EQ) {
                 panelContainingSlave.setVisible(condition.equals(value));
@@ -1987,7 +1989,7 @@ public class PnlEditResInfo implements HasLogger {
                 int int_value = Integer.valueOf(value);
                 panelContainingSlave.setVisible(int_value <= int_condition);
             }
-            getLogger().debug("JUST CHANGED MY VISIBILTY TO " + panelContainingSlave.isVisible());
+            log.debug("JUST CHANGED MY VISIBILTY TO " + panelContainingSlave.isVisible());
         }
     }
 

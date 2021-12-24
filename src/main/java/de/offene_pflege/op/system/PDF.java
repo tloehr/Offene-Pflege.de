@@ -4,8 +4,8 @@ package de.offene_pflege.op.system;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import de.offene_pflege.entity.files.SYSFilesTools;
-import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,7 +24,8 @@ import java.math.RoundingMode;
  * specifically into a PDF document with one or more pages. 3. Open the document. 4. Add content. 5. Close the
  * document.
  */
-public class PDF implements HasLogger {
+@Log4j2
+public class PDF  {
 
 //    Paragraph footer, endofreport;
 
@@ -148,8 +149,8 @@ public class PDF implements HasLogger {
             @Override
             public void onCloseDocument(PdfWriter writer, Document document) {
                 // 20200501 - der Footer zeigte die falsche maximale Seitenzahl an. Immer eine zu wenig.
-                getLogger().debug("mypagecounter: " + mypagecounter);
-                getLogger().debug("writer.getPageNumber(): " + writer.getPageNumber());
+                log.debug("mypagecounter: " + mypagecounter);
+                log.debug("writer.getPageNumber(): " + writer.getPageNumber());
                 ColumnText.showTextAligned(totalPages, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber()), plain(12)), 2, 8, 0);
             }
         });

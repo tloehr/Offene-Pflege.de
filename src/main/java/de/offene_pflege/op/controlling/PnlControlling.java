@@ -55,6 +55,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
@@ -90,7 +91,8 @@ import java.util.concurrent.ExecutionException;
  *
  * @author tloehr
  */
-public class PnlControlling extends CleanablePanel implements HasLogger {
+@Log4j2
+public class PnlControlling extends CleanablePanel {
 
     private JScrollPane jspSearch;
 
@@ -425,9 +427,9 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
                             }
                         } catch (IOException ioe) {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ioe.getMessage(), DisplayMessage.WARNING));
-                            getLogger().warn(ioe);
+                            log.warn(ioe);
                         } catch (Exception e) {
-                            getLogger().fatal(e);
+                            log.fatal(e);
                         }
 
                         OPDE.getDisplayManager().setProgressBarMessage(null);
@@ -995,7 +997,7 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
 //                    em.getTransaction().commit();
 //                    OPDE.getLogin().setUser(user);
 //                } catch (OptimisticLockException ole) {
-//                    OPDE.warn(ole);
+//                    log.warn(ole);
 //                    if (em.getTransaction().isActive()) {
 //                        em.getTransaction().rollback();
 //                    }
@@ -1300,7 +1302,7 @@ public class PnlControlling extends CleanablePanel implements HasLogger {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
 //

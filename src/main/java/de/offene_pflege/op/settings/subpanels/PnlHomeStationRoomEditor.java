@@ -29,8 +29,9 @@ import de.offene_pflege.services.FloorService;
 import de.offene_pflege.services.HomesService;
 import de.offene_pflege.services.RoomsService;
 import de.offene_pflege.services.StationService;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -46,11 +47,12 @@ import java.util.Map;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     private HashMap<String, DefaultCollapsiblePane> cpMap;
     private HashMap<String, DefaultCollapsiblePanes> parentCPS;
-    private Logger logger = Logger.getLogger(this.getClass());
+
     private JScrollPane scrollPane1;
     private DefaultCollapsiblePanes cpsHomes;
     private int i = 0;  // just for the progressbar
@@ -93,7 +95,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                         i++;
                         ((DefaultCollapsiblePane) o).reload();
                     } catch (Exception e) {
-                        OPDE.fatal(logger, e);
+                        OPDE.fatal(e);
                     }
                 });
                 return null;
@@ -140,7 +142,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                     try {
                         cpsHomes.add(createCP(home));
                     } catch (Exception e) {
-                        OPDE.fatal(logger, e);
+                        OPDE.fatal(e);
                     }
                 }
                 cpsHomes.addExpansion();
@@ -267,7 +269,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
             dcps.addExpansion();
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
 
         return dcps;
@@ -341,7 +343,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
             dcps.addExpansion();
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
 
         return dcps;
@@ -380,7 +382,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             }));
             result = pbe;
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
         return result;
     }
@@ -417,7 +419,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             }));
             result = pbe;
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
         return result;
     }
@@ -435,10 +437,10 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
                 em.getTransaction().commit();
             } catch (IllegalStateException ise) {
-                logger.error(ise);
+                log.error(ise);
             } catch (Exception ex) {
                 em.getTransaction().rollback();
-                OPDE.fatal(logger, ex);
+                OPDE.fatal( ex);
             } finally {
                 em.close();
             }
@@ -448,7 +450,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 cpsHomes.add(createCP(newHome));
                 cpsHomes.addExpansion();
             } catch (Exception e1) {
-                OPDE.fatal(logger, e1);
+                OPDE.fatal( e1);
             }
         });
 
@@ -470,7 +472,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 em.getTransaction().rollback();
-                OPDE.fatal(logger, ex);
+                OPDE.fatal( ex);
             } finally {
                 em.close();
             }
@@ -480,7 +482,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 parentCPS.get(getKey(home) + ":floors").add(createCP(newFloor));
                 parentCPS.get(getKey(home) + ":floors").addExpansion();
             } catch (Exception e1) {
-                OPDE.fatal(logger, e1);
+                OPDE.fatal( e1);
             }
         });
 
@@ -501,7 +503,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 em.getTransaction().rollback();
-                OPDE.fatal(logger, ex);
+                OPDE.fatal( ex);
             } finally {
                 em.close();
             }
@@ -514,7 +516,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 // #27
                 parentCPS.put(getKey(newRoom), parentCPS.get("rooms4:" + getKey(floor)));
             } catch (Exception e1) {
-                OPDE.fatal(logger, e1);
+                OPDE.fatal( e1);
             }
         });
 
@@ -535,7 +537,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 em.getTransaction().commit();
             } catch (Exception ex) {
                 em.getTransaction().rollback();
-                OPDE.fatal(logger, ex);
+                OPDE.fatal( ex);
             } finally {
                 em.close();
             }
@@ -545,7 +547,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
                 parentCPS.get(getKey(home) + ":station").add(createCP(newStation));
                 parentCPS.get(getKey(home) + ":station").addExpansion();
             } catch (Exception e1) {
-                OPDE.fatal(logger, e1);
+                OPDE.fatal( e1);
             }
         });
 

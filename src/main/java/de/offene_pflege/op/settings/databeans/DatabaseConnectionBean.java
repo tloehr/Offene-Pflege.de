@@ -3,7 +3,7 @@ package de.offene_pflege.op.settings.databeans;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
-import org.apache.log4j.Logger;
+
 import javax.validation.constraints.NotEmpty;
 
 import javax.crypto.BadPaddingException;
@@ -29,7 +29,7 @@ public class DatabaseConnectionBean {
 
     public DatabaseConnectionBean(Properties preset) {
 
-        Logger logger = Logger.getLogger(getClass());
+    
 
         host = SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_HOST));
         port = Integer.parseInt(SYSTools.catchNull(preset.getProperty(SYSPropsTools.KEY_JDBC_PORT), "3306"));
@@ -58,7 +58,7 @@ public class DatabaseConnectionBean {
 //        } catch (BadPaddingException e) {
 //            password = "";
 //        } catch (Exception e) {
-//            OPDE.fatal(logger, e);
+//            OPDE.fatal(e);
 //        }
 //
 //        // could still be encoded with the old algorithm. trying.
@@ -70,7 +70,7 @@ public class DatabaseConnectionBean {
 //            } catch (BadPaddingException e) {
 //                password = "";
 //            } catch (Exception e) {
-//                OPDE.fatal(logger, e);
+//                OPDE.fatal(e);
 //            }
 //        }
 

@@ -38,8 +38,9 @@ import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.log4j.Logger;
+
 import org.javatuples.Quintet;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
@@ -67,6 +68,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class PnlWelcome extends CleanablePanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
@@ -86,7 +88,6 @@ public class PnlWelcome extends CleanablePanel {
     private ArrayList<Object[]> noStoolList;
     private ArrayList<Object[]> violatingLiquidValues;
     private final int BIRTHDAY = 4;
-    private Logger logger = Logger.getLogger(getClass());
     private BigDecimal WEIGHT_PERCENT = new BigDecimal(5);
     private int WEIGHT_MONTHSBACK = 3;
 
@@ -126,7 +127,7 @@ public class PnlWelcome extends CleanablePanel {
 //        try {
 //            btnAbout.setText(SYSTools.isUpdateAvailable() ? SYSTools.xx("misc.msg.updateAvailable") : null);
 //        } catch (IOException e) {
-//            logger.warn(e);
+//            log.warn(e);
 //            btnAbout.setText(null);
 //        }
 
@@ -338,11 +339,11 @@ public class PnlWelcome extends CleanablePanel {
             @Override
             protected void done() {
                 try {
-                    OPDE.debug("Done");
+                    log.debug("Done");
                     get();
                 } catch (ExecutionException e) {
                     e.getCause().printStackTrace();
-                    OPDE.debug(e);
+                    log.debug(e);
                 } catch (InterruptedException e) {
                     // Process e here
                 } finally {
@@ -631,7 +632,7 @@ public class PnlWelcome extends CleanablePanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
 
@@ -651,9 +652,9 @@ public class PnlWelcome extends CleanablePanel {
         try {
             desktop.browse(new URI(SYSTools.xx("opde.general.website.url")));
         } catch (IOException ioe) {
-            logger.warn(ioe);
+            log.warn(ioe);
         } catch (URISyntaxException use) {
-            logger.warn(use);
+            log.warn(use);
         }
     }
 

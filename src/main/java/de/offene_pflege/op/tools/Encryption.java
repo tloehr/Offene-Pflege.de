@@ -2,7 +2,7 @@ package de.offene_pflege.op.tools;
 
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
-import org.apache.log4j.Logger;
+
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -20,14 +20,12 @@ public class Encryption {
 
     //    private final String keyphrase;
     private final Key aesKey;
-    private final Logger logger;
 
     public Encryption() throws NoSuchAlgorithmException {
         this(LocalMachine.getSerialNumber());
     }
 
     public Encryption(String keyphrase) throws NoSuchAlgorithmException {
-        logger = Logger.getLogger(getClass());
 
         byte[] k1 = keyphrase.getBytes();
         MessageDigest sha = MessageDigest.getInstance("SHA-1");
@@ -48,8 +46,8 @@ public class Encryption {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, aesKey);
             crypted = cipher.doFinal(secret.getBytes());
-//            logger.debug(secret);
-//            logger.debug(Base64.getEncoder().encodeToString(crypted));
+//            log.debug(secret);
+//            log.debug(Base64.getEncoder().encodeToString(crypted));
         } catch (Exception e) {
             // bugger!
             crypted = null;
@@ -71,8 +69,8 @@ public class Encryption {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, aesKey);
             decrypted = cipher.doFinal(Base64.getDecoder().decode(encrypted));
-//            logger.debug(encrypted);
-//            logger.debug(new String(decrypted));
+//            log.debug(encrypted);
+//            log.debug(new String(decrypted));
         } catch (Exception e) {
             // bugger!
             decrypted = null;
@@ -93,7 +91,7 @@ public class Encryption {
         try {
             jdbcpassword = SYSTools.catchNull(decrypt(SYSTools.catchNull(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_JDBC_PASSWORD))));
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
 
 

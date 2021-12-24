@@ -1,14 +1,14 @@
 package de.offene_pflege.entity;
 
 
-import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.Tools;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @MappedSuperclass
-public abstract class DefaultStringIDEntity implements HasLogger, Serializable {
+public abstract class DefaultStringIDEntity implements Serializable {
     private String id;
     private int version;
 //    Field field = Class.class.getDeclaredField("id");
@@ -57,7 +57,7 @@ public abstract class DefaultStringIDEntity implements HasLogger, Serializable {
             equal = id.equals(((DefaultStringIDEntity) other).id);
         }
 
-//        getLogger().debug("this: " + toString() + " other: " + Tools.catchNull(other, "null") + ": is equal ??: " + Boolean.toString(equal));
+//        log.debug("this: " + toString() + " other: " + Tools.catchNull(other, "null") + ": is equal ??: " + Boolean.toString(equal));
         return equal;
     }
 

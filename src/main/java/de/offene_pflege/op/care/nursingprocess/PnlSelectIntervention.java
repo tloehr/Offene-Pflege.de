@@ -16,6 +16,7 @@ import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXSearchField;
@@ -36,6 +37,7 @@ import java.util.Arrays;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class PnlSelectIntervention extends JPanel {
     private Intervention intervention2Edit = null;
     public static final String internalClassID = "nursingrecords.nursingprocess.pnlselectinterventions";
@@ -148,7 +150,7 @@ public class PnlSelectIntervention extends JPanel {
                     em.getTransaction().commit();
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.nursingprocess.pnlselectinterventions.interventionedited"));
                     actionBlock.execute(null);
-                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                } catch (OptimisticLockException ole) { log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }

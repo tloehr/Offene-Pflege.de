@@ -43,6 +43,7 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.DlgYesNo;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -59,6 +60,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * @author tloehr
  */
+@Log4j2
 public class PnlUser extends CleanablePanel {
 
 
@@ -238,7 +240,7 @@ public class PnlUser extends CleanablePanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -443,7 +445,7 @@ public class PnlUser extends CleanablePanel {
 
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.users.pwchanged")));
             } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
+                log.warn(ole);
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
@@ -499,7 +501,7 @@ public class PnlUser extends CleanablePanel {
                 cp12.setCollapsed(myUser.isActive() ? wasCollapsed : true);
                 buildPanel();
             } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
+                log.warn(ole);
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
@@ -553,7 +555,7 @@ public class PnlUser extends CleanablePanel {
                         cp1.setCollapsed(myUser.isActive() ? wasCollapsed : true);
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -679,7 +681,7 @@ public class PnlUser extends CleanablePanel {
                         cpMap.remove(key);
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }

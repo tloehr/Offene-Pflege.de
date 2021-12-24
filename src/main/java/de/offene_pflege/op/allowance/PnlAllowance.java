@@ -46,6 +46,7 @@ import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
@@ -72,6 +73,7 @@ import java.util.HashMap;
 /**
  * @author tloehr
  */
+@Log4j2
 public class PnlAllowance extends CleanablePanel {
 
     //    NumberFormat cf = NumberFormat.getCurrencyInstance();
@@ -622,7 +624,7 @@ public class PnlAllowance extends CleanablePanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -896,7 +898,7 @@ public class PnlAllowance extends CleanablePanel {
                                     buildPanel();
 
                                 } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
+                                    log.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -990,7 +992,7 @@ public class PnlAllowance extends CleanablePanel {
 
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
+                                    log.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1108,7 +1110,7 @@ public class PnlAllowance extends CleanablePanel {
                     GUITools.scroll2show(jspCash, cpMap.get(keyMonth), cpsCash, o1 -> GUITools.flashBackground(linemap.get(myAllowance), Color.YELLOW, 2));
 
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -1138,7 +1140,7 @@ public class PnlAllowance extends CleanablePanel {
 //
 //        // update carrysums
 //        for (LocalDate month = SYSCalendar.eom(new LocalDate(myAllowance.getPit())); month.compareTo(SYSCalendar.eoy(new LocalDate())) <= 0; month = SYSCalendar.eom(month.plusMonths(1))) {
-//            OPDE.debug(month.toString("yyyy-MM-dd"));
+//            log.debug(month.toString("yyyy-MM-dd"));
 //            final String key = getKey(myAllowance.getResident(), month);
 //
 //            if (!carrySums.containsKey(key)) {
@@ -1161,7 +1163,7 @@ public class PnlAllowance extends CleanablePanel {
 
         // update carrysums
         for (LocalDate month = SYSCalendar.eom(pit); month.compareTo(SYSCalendar.eoy(new LocalDate())) <= 0; month = SYSCalendar.eom(month.plusMonths(1))) {
-            OPDE.debug(month.toString("yyyy-MM-dd"));
+            log.debug(month.toString("yyyy-MM-dd"));
             final String key = getKey(resident, month);
 
             if (!carrySums.containsKey(key)) {

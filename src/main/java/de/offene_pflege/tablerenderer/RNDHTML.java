@@ -5,7 +5,7 @@
 package de.offene_pflege.tablerenderer;
 
 import de.offene_pflege.op.tools.SYSTools;
-import org.apache.log4j.Logger;
+
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -39,7 +39,6 @@ public class RNDHTML implements TableCellRenderer {
 
     protected JTextPane txt;
     protected JPanel panel;
-    private Logger logger = Logger.getLogger(getClass());
 
 //    public RNDHTML() {
 //        this(null);
@@ -92,7 +91,7 @@ public class RNDHTML implements TableCellRenderer {
     }
 
     private void addSize(JTable table, int row, int column, int height) {
-        //OpenCare.logger.debug("HTMLRenderer: addSize()");
+        //OpenCare.log.debug("HTMLRenderer: addSize()");
         Map rows = (Map) cellSizes.get(table);
         if (rows == null) {
             cellSizes.put(table, rows = new HashMap());
@@ -110,7 +109,7 @@ public class RNDHTML implements TableCellRenderer {
      * its hash table for this row.
      */
     private int findTotalMaximumRowSize(JTable table, int row) {
-        //OpenCare.logger.debug("HTMLRenderer: findTotalMaximumRowSize()");
+        //OpenCare.log.debug("HTMLRenderer: findTotalMaximumRowSize()");
         int maximum_height = 0;
         Enumeration columns = table.getColumnModel().getColumns();
         while (columns.hasMoreElements()) {
@@ -125,7 +124,7 @@ public class RNDHTML implements TableCellRenderer {
     }
 
     private int findMaximumRowSize(JTable table, int row) {
-        //OpenCare.logger.debug("HTMLRenderer: findMaximumRowSize()");
+        //OpenCare.log.debug("HTMLRenderer: findMaximumRowSize()");
         Map rows = (Map) cellSizes.get(table);
         if (rows == null) {
             return 0;

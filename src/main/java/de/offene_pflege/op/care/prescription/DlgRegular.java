@@ -42,6 +42,7 @@ import de.offene_pflege.op.residents.PnlEditHospital;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import de.offene_pflege.tablerenderer.RNDHTML;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.jdesktop.swingx.JXSearchField;
@@ -68,6 +69,7 @@ import java.util.List;
  *
  * @author tloehr
  */
+@Log4j2
 public class DlgRegular extends MyJDialog {
 
     public static final int MODE_EDIT = 0;
@@ -155,7 +157,7 @@ public class DlgRegular extends MyJDialog {
                     MedPackage medPackage = (MedPackage) pznQuery.getSingleResult();
                     cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{medPackage.getTradeForm()}));
                 } catch (NoResultException nre) {
-                    OPDE.debug("nothing found for this PZN");
+                    log.debug("nothing found for this PZN");
                 } catch (Exception ex) {
                     OPDE.fatal(ex);
                 }

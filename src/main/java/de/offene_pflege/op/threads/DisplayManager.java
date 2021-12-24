@@ -7,8 +7,9 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
-import org.apache.log4j.Logger;
+
 import org.joda.time.DateTime;
 
 import javax.persistence.OptimisticLockException;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
  * Created by IntelliJ IDEA. User: tloehr Date: 28.03.12 Time: 16:00 To change this template use File | Settings | File
  * Templates.
  */
+@Log4j2
 public class DisplayManager extends Thread {
     public static final String internalClassID = "opde.displaymanager";
     private final Closure timeoutAction;
@@ -42,7 +44,7 @@ public class DisplayManager extends Thread {
     private Icon[] reloading;
     private int currentAnimationFrameForReload = -1; // -1 means, no animation
     private int timeoutmins;
-    private final Logger logger = Logger.getLogger(getClass());
+
 
     public DisplayManager() {
         this.timeoutAction = null;
@@ -213,7 +215,7 @@ public class DisplayManager extends Thread {
             } else {
                 progressBarMessage.setFirst(pbMessage.getMessage() == null ? "" : pbMessage.getMessage());
                 progressBarMessage.setSecond(pbMessage.getPercentage());
-//                logger.debug("pbMessage.getPercentage(): "+pbMessage.getPercentage());
+//                log.debug("pbMessage.getPercentage(): "+pbMessage.getPercentage());
                 jp.setStringPainted(true);
             }
         }
@@ -323,7 +325,7 @@ public class DisplayManager extends Thread {
     }
 
     public static DisplayMessage getLockMessage(OptimisticLockException ole) {
-//        Logger.getLogger(ole.getClass()).debug("LOCKING FFS!!!!");
+//        log.getLogger(ole.getClass()).debug("LOCKING FFS!!!!");
         // ole.getEntity().getClass().getName()
         return new DisplayMessage(SYSTools.xx("misc.msg.lockingexception") + ": " + ole.getMessage() + "", DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
     }
@@ -395,9 +397,9 @@ public class DisplayManager extends Thread {
                 Thread.sleep(50);
             } catch (InterruptedException ie) {
                 interrupted = true;
-                logger.debug("DisplayManager interrupted!");
+                log.debug("DisplayManager interrupted!");
             } catch (Exception e) {
-                OPDE.fatal(logger, e);
+                OPDE.fatal(e);
             }
         }
     }

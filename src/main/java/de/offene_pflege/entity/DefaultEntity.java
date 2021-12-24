@@ -1,14 +1,13 @@
 package de.offene_pflege.entity;
 
 
-import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.Tools;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @MappedSuperclass
-public abstract class DefaultEntity implements HasLogger, Serializable {
+public abstract class DefaultEntity implements Serializable {
     private Long id;
     private int version;
 
@@ -56,7 +55,7 @@ public abstract class DefaultEntity implements HasLogger, Serializable {
             equal = id.equals(((DefaultEntity) other).id);
         }
 
-//        getLogger().debug("this: " + toString() + " other: " + Tools.catchNull(other, "null") + ": is equal ??: " + Boolean.toString(equal));
+//        log.debug("this: " + toString() + " other: " + Tools.catchNull(other, "null") + ": is equal ??: " + Boolean.toString(equal));
         return equal;
     }
 

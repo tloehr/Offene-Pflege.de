@@ -2,7 +2,7 @@ package de.offene_pflege.gui.events;
 
 import de.offene_pflege.gui.interfaces.GenericClosure;
 import de.offene_pflege.op.OPDE;
-import org.apache.log4j.Logger;
+
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -65,7 +65,7 @@ public class RelaxedDocumentListener implements DocumentListener {
             try {
                 handleAction.execute(e);
             } catch (Exception e1) {
-                OPDE.fatal(Logger.getLogger(getClass()), e1);
+                OPDE.fatal(e1);
             }
         } else {
             timer = new Timer();
@@ -75,7 +75,7 @@ public class RelaxedDocumentListener implements DocumentListener {
                     try {
                         handleAction.execute(e);
                     } catch (Exception e1) {
-                        OPDE.fatal(Logger.getLogger(getClass()), e1);
+                        OPDE.fatal(e1);
                     }
                 }
 

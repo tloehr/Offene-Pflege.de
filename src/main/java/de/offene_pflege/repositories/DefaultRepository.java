@@ -1,13 +1,14 @@
 package de.offene_pflege.repositories;
 
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.tools.HasLogger;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-public class DefaultRepository<T> implements HasLogger {
+@Log4j2
+public class DefaultRepository<T> {
     private Class<T> entityClass;
 
     public Optional<T> find(Class<T> entity, Object id) {
@@ -17,7 +18,7 @@ public class DefaultRepository<T> implements HasLogger {
         try {
             foundEntity = em.find(entity, id);
         } catch (Exception e) {
-            getLogger().fatal(e);
+            log.fatal(e);
         } finally {
             em.close();
         }

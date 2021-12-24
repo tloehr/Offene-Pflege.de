@@ -11,6 +11,7 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.PopupPanel;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
@@ -43,6 +44,7 @@ import java.util.concurrent.TimeUnit;
  * Created by IntelliJ IDEA. User: tloehr Date: 16.06.11 Time: 14:46 To change this template use File | Settings | File
  * Templates.
  */
+@Log4j2
 public class GUITools {
 
     public static void exportToPNG(JPanel pnl, File output) {
@@ -243,7 +245,7 @@ public class GUITools {
     public static void showPopup(JidePopup popup, int location, boolean keepOnScreen) {
         Point desiredPosition = getDesiredPosition(popup, location);
 
-//        OPDE.debug(Boolean.toString(isFullyVisibleOnScreen(popup, desiredPosition)));
+//        log.debug(Boolean.toString(isFullyVisibleOnScreen(popup, desiredPosition)));
 
 
         if (keepOnScreen && !isFullyVisibleOnScreen(popup, desiredPosition)) {
@@ -254,7 +256,7 @@ public class GUITools {
                 desiredPosition = getDesiredPosition(popup, pos);
                 if (isFullyVisibleOnScreen(popup, desiredPosition)) {
                     found = true;
-                    OPDE.debug("fits on screen");
+                    log.debug("fits on screen");
                     break;
                 }
             }
@@ -262,7 +264,7 @@ public class GUITools {
             if (!found) {
                 // desiredPosition = getDesiredPosition(popup, location);
                 desiredPosition = centerOnScreen(popup);
-                OPDE.debug("didnt find any position thats on the screen");
+                log.debug("didnt find any position thats on the screen");
             }
 
         }
@@ -364,8 +366,8 @@ public class GUITools {
         int spreadX = point.x + popup.getContentPane().getPreferredSize().width;
         int spreadY = point.y + popup.getContentPane().getPreferredSize().height;
 
-        OPDE.debug("PointX: " + point.x);
-        OPDE.debug("PointY: " + point.y);
+        log.debug("PointX: " + point.x);
+        log.debug("PointY: " + point.y);
 
         return point.x >= 0 && point.y >= 0 && width > spreadX && height > spreadY;
 
@@ -495,8 +497,8 @@ public class GUITools {
 
     public static void scroll2show(final JScrollPane jsp, int end, final Closure what2doAfterwards) {
         final int start = jsp.getVerticalScrollBar().getValue();
-        OPDE.debug("scroll2show: trying to move from " + start);
-        OPDE.debug("scroll2show: trying to move to " + end);
+        log.debug("scroll2show: trying to move from " + start);
+        log.debug("scroll2show: trying to move to " + end);
 
         end = Math.max(0, end);
         end = Math.min(jsp.getVerticalScrollBar().getMaximum(), end);
@@ -569,10 +571,10 @@ public class GUITools {
                         if (r.getSize().equals(component.getSize())) {
                             animator.stop();
                         } else if (r.isEmpty()) {
-                            OPDE.debug("not visible");
+                            log.debug("not visible");
                             jsp.getVerticalScrollBar().setValue(value.intValue());
                         } else {
-                            OPDE.debug("partly visible");
+                            log.debug("partly visible");
                             jsp.getVerticalScrollBar().setValue(value.intValue());
                         }
                     });
@@ -712,7 +714,7 @@ public class GUITools {
                             btn.setIcon(originalIcon);
                         }
 
-//                    Logger.getLogger(getClass()).debug(fraction);
+//                    log.getLogger(getClass()).debug(fraction);
 //                    btn.setIcon();
 //                    component.setBackground(interpolateColor(originalColor, flashcolor, fraction));
                         btn.revalidate();

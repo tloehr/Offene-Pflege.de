@@ -11,7 +11,8 @@ import de.offene_pflege.gui.events.DataChangeListener;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
  * Time: 11:57
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class DefaultCollapsiblePane<T> extends CollapsiblePane implements DataChangeListener<T> {
     //    private final Closure contentProvider;
     private final ContentRequestedEventListener headerUpdate, contentUpdate;
@@ -39,7 +41,6 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements DataCh
     ActionListener defaultActionListener;
 
     private final DefaultCollapsiblePane thisPane;
-    private Logger logger;
 
     public DefaultCollapsiblePane(ContentRequestedEventListener headerUpdate, ContentRequestedEventListener contentUpdate) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         this(headerUpdate, contentUpdate, null);
@@ -53,8 +54,8 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements DataCh
         setStyle(CollapsiblePane.TREE_STYLE);
 
         thisPane = this;
-        logger = Logger.getLogger(getClass() + ": id");
-//        logger.setLevel(Level.DEBUG);
+
+//        log.setLevel(Level.DEBUG);
 
         additionalIconPanel = new JPanel();
         additionalIconPanel.setLayout(new BoxLayout(additionalIconPanel, BoxLayout.LINE_AXIS));
@@ -92,7 +93,7 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements DataCh
 
 
         defaultActionListener = e -> {
-//            logger.debug(btnTitle.getName() + " " + btnTitle.getText());
+//            log.debug(btnTitle.getName() + " " + btnTitle.getText());
             setCollapsed(!isCollapsed());
         };
         btnTitle.addActionListener(defaultActionListener);
@@ -164,7 +165,7 @@ public class DefaultCollapsiblePane<T> extends CollapsiblePane implements DataCh
         try {
             super.setCollapsed(b);
         } catch (PropertyVetoException pve) {
-            OPDE.warn(pve);
+            log.warn(pve);
         }
     }
 

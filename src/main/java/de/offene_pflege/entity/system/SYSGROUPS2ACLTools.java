@@ -81,7 +81,7 @@ public class SYSGROUPS2ACLTools {
 //                            Acl[] acls = dbClasses.get(classname).getAclCollection().toArray(new Acl[]{});
 //                            for (int i = 0; i < acls.length; i++) {
 //                                if (currentacl.getACLcode() == acls[i].getACLcode()) {
-//                                    OPDE.debug("selected ACL found");
+//                                    log.debug("selected ACL found");
 //                                    currentacl.setAclEntity(acls[i]);
 //                                    selection.add(new TreePath(new Object[]{root, classnode, node}));
 //                                    break;
@@ -106,8 +106,8 @@ public class SYSGROUPS2ACLTools {
 //    public static void saveTree(DefaultMutableTreeNode node, CheckTreeSelectionModel selmodel) {
 //        if (node.getUserObject() instanceof Groups) { // Root
 //            boolean rootWasSelected = selmodel.isPathSelected(new TreePath(node.getPath()));
-//            OPDE.debug("saveTree: speichere Gruppe: " + ((Groups) node.getUserObject()).getGID());
-//            OPDE.debug("saveTree: Gruppe war " + (rootWasSelected ? "" : "NICHT") + " ausgewählt.");
+//            log.debug("saveTree: speichere Gruppe: " + ((Groups) node.getUserObject()).getGID());
+//            log.debug("saveTree: Gruppe war " + (rootWasSelected ? "" : "NICHT") + " ausgewählt.");
 //            Enumeration<DefaultMutableTreeNode> enumInternalClasses = node.children();
 //            while (enumInternalClasses.hasMoreElements()) {
 //                saveTree(enumInternalClasses.nextElement(), selmodel, rootWasSelected);
@@ -125,13 +125,13 @@ public class SYSGROUPS2ACLTools {
 //                SYSGROUPS2ACL intClasses = new SYSGROUPS2ACL(myInternalClass.getInternalClassID(), group);
 //                em.persist(intClasses);
 //                myInternalClass.setIntClass(intClasses);
-//                OPDE.debug("       saveTree: speichere EntityBean IntClass: " + myInternalClass.getInternalClassID());
+//                log.debug("       saveTree: speichere EntityBean IntClass: " + myInternalClass.getInternalClassID());
 //            } else {
-//                OPDE.debug("       saveTree: hat schon EntityBean: " + myInternalClass.getIntClass().getJavaclass());
-//                OPDE.debug("       saveTree: und zwar für die Gruppe: " + myInternalClass.getIntClass().getGroups().getGID());
+//                log.debug("       saveTree: hat schon EntityBean: " + myInternalClass.getIntClass().getJavaclass());
+//                log.debug("       saveTree: und zwar für die Gruppe: " + myInternalClass.getIntClass().getGroups().getGID());
 //
 //            }
-//            OPDE.debug("       saveTree: sie war " + (selmodel.isPathSelected(new TreePath(node.getPath())) ? "" : "NICHT") + " ausgewählt.");
+//            log.debug("       saveTree: sie war " + (selmodel.isPathSelected(new TreePath(node.getPath())) ? "" : "NICHT") + " ausgewählt.");
 //
 //            Enumeration<DefaultMutableTreeNode> enumInternalClasses = node.children();
 //            while (enumInternalClasses.hasMoreElements()) {
@@ -148,22 +148,22 @@ public class SYSGROUPS2ACLTools {
 //
 //
 //            if (shouldBeSelected) { // ACL gewähren
-//                OPDE.debug("              saveTree: SPEICHERE ACL " + InternalClassACL.strACLS[myACL.getACLcode()]);
-//                OPDE.debug("              saveTree: " + InternalClassACL.strACLS[myACL.getACLcode()] + " hat " + (myACL.hasAclEntity() ? "eine" : "keine") + " Entity Bean");
+//                log.debug("              saveTree: SPEICHERE ACL " + InternalClassACL.strACLS[myACL.getACLcode()]);
+//                log.debug("              saveTree: " + InternalClassACL.strACLS[myACL.getACLcode()] + " hat " + (myACL.hasAclEntity() ? "eine" : "keine") + " Entity Bean");
 //                if (!myACL.hasAclEntity()) { // Nur hinzufügen, wenn nötig.
-//                    OPDE.debug("              saveTree: erstelle neue EntityBean");
+//                    log.debug("              saveTree: erstelle neue EntityBean");
 //                    Acl acl = new Acl(myACL.getACLcode(), myClass.getIntClass());
 //                    em.persist(acl);
 //                } else {
-//                    OPDE.debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGID());
+//                    log.debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGID());
 //                }
 //            } else { // ACL entziehen
-//                OPDE.debug("              saveTree: LÖSCHE ACL " + InternalClassACL.strACLS[myACL.getACLcode()]);
-//                OPDE.debug("              saveTree: " + InternalClassACL.strACLS[myACL.getACLcode()] + " hat " + (myACL.hasAclEntity() ? "eine" : "keine") + " Entity Bean");
+//                log.debug("              saveTree: LÖSCHE ACL " + InternalClassACL.strACLS[myACL.getACLcode()]);
+//                log.debug("              saveTree: " + InternalClassACL.strACLS[myACL.getACLcode()] + " hat " + (myACL.hasAclEntity() ? "eine" : "keine") + " Entity Bean");
 //                if (myACL.hasAclEntity()) { // Nur löschen, wenn nötig.
-//                    OPDE.debug("              saveTree: lösche jetzt die EntityBean");
+//                    log.debug("              saveTree: lösche jetzt die EntityBean");
 //                    em.remove(myACL.getAclEntity());
-//                    OPDE.debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGID());
+//                    log.debug("              saveTree: für die Gruppe: " + myACL.getAclEntity().getIntclass().getGroups().getGID());
 //                }
 //            }
 //            myACL.setAclEntity(null);
@@ -274,14 +274,14 @@ public class SYSGROUPS2ACLTools {
 //            if (!found) { // Am Ende und war nicht dabei ?
 //                // Dann hinzufügen.
 //                dbclass.getAclCollection().add(new Acl(acl, dbclass));
-//                OPDE.debug("++ Gruppe " + dbclass.getGroups().getGID() + " erhält das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getJavaclass());
+//                log.debug("++ Gruppe " + dbclass.getGroups().getGID() + " erhält das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getJavaclass());
 //            }
 //        } else { // ACL soll entfernt werden
 //            while (!found && aclList.hasNext()) {
 //                Acl thisAcl = aclList.next();
 //                if (thisAcl.getACLcode() == acl) { // Eintrag gefunden
 //                    toBeDeleted.add(thisAcl);
-//                    OPDE.debug("-- Gruppe " + dbclass.getGroups().getGID() + " verliert das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getJavaclass());
+//                    log.debug("-- Gruppe " + dbclass.getGroups().getGID() + " verliert das Recht " + InternalClassACL.strACLS[acl] + " für die Klasse " + dbclass.getJavaclass());
 //                    found = true;
 //                }
 //            }

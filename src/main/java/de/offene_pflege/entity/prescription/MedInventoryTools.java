@@ -4,6 +4,7 @@ import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -23,6 +24,7 @@ import java.util.Date;
  * Time: 16:25
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class MedInventoryTools {
 
     public static ListCellRenderer getInventoryRenderer() {
@@ -70,7 +72,7 @@ public class MedInventoryTools {
 //            result = result.add(summe);
 //        }
 ////        long time2 = System.currentTimeMillis();
-////        OPDE.debug("MedInventoryTools.getSumme(): " + (time2 - timeStart) + " millis");
+////        log.debug("MedInventoryTools.getSumme(): " + (time2 - timeStart) + " millis");
 //        return result;
 //    }
 
@@ -100,13 +102,13 @@ public class MedInventoryTools {
      * @param bhp      BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      */
     public static void withdraw(EntityManager em, MedInventory inventory, BigDecimal quantity, BigDecimal weight, BHP bhp) throws Exception {
-        OPDE.debug("withdraw/5: inventory: " + inventory);
+        log.debug("withdraw/5: inventory: " + inventory);
         if (inventory == null) {
             throw new Exception("No MedStock is currently in use");
         }
         MedStock stock = MedStockTools.getStockInUse(inventory);
         if (stock.getTradeForm().getDosageForm().isDontCALC()) {
-            OPDE.debug("withdraw/5: no calculation necessary. is ointment or something like that");
+            log.debug("withdraw/5: no calculation necessary. is ointment or something like that");
             return;
         }
 
@@ -116,7 +118,7 @@ public class MedInventoryTools {
             quantity = quantity.divide(upr, 4, BigDecimal.ROUND_HALF_UP); // GitHub #16 Exception tritt hier auf. Weiter prüfen.
         }
 
-        OPDE.debug("withdraw/5: amount: " + quantity);
+        log.debug("withdraw/5: amount: " + quantity);
         withdraw(em, stock, quantity, weight, bhp);
     }
 
@@ -189,7 +191,7 @@ public class MedInventoryTools {
         MedStock stock = em.merge(activeStock);
         em.lock(stock, LockModeType.OPTIMISTIC);
 
-        OPDE.debug("withdraw/4: MedStock: " + stock);
+        log.debug("withdraw/4: MedStock: " + stock);
 
         BigDecimal stockSum = MedStockTools.getSum(stock); // wieviel der angebrochene Bestand noch hergibt.
 
@@ -203,7 +205,7 @@ public class MedInventoryTools {
         MedStockTransaction tx = em.merge(new MedStockTransaction(stock, withdrawal.negate(), weight, bhp));
         stock.getStockTransaction().add(tx);
         bhp.getStockTransaction().add(tx);
-        OPDE.debug("withdraw/4: tx: " + tx);
+        log.debug("withdraw/4: tx: " + tx);
 
         if (stockSum.compareTo(quantity) == 0) {
             if (stock.isToBeClosedSoon()) {
@@ -283,7 +285,7 @@ public class MedInventoryTools {
 
             EntityManager em = OPDE.createEM();
 
-//            OPDE.debug("MedInventoryTools.getPrinterForm: inventory: " + inventory.getID());
+//            log.debug("MedInventoryTools.getPrinterForm: inventory: " + inventory.getID());
 
             Query query = em.createQuery(" " +
                     " SELECT tf.dosageForm FROM MedInventory i " +

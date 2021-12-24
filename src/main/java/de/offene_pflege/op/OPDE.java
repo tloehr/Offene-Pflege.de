@@ -39,11 +39,10 @@ import de.offene_pflege.op.system.LogicalPrinters;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.PrintProcessor;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -78,6 +77,7 @@ import java.util.UUID;
  *
  * etc...
  */
+@Log4j2
 public class OPDE {
     public static final String internalClassID = "opde";
 
@@ -97,7 +97,6 @@ public class OPDE {
     protected static Properties props;
     protected static SortedProperties localProps;
     protected static Properties jpaProps = new Properties();
-    private static Logger logger;
     public static HashMap[] anonymize = null;
     protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
@@ -213,45 +212,43 @@ public class OPDE {
         OPDE.getProps().putAll(OPDE.getLocalProps());
     }
 
-    public static Logger getLogger() {
-        return logger;
-    }
-
-    public static void warn(Throwable message) {
-        warn(logger, message);
-    }
-
-    public static void warn(Logger classLogger, Throwable message) {
-        classLogger.warn(message);
-        if (emf != null)
-            SyslogTools.warn(ExceptionUtils.getMessage(message) + ": " + ExceptionUtils.getStackTrace(message));
-    }
-
-    public static void info(Object message) {
-        logger.info(message);
-    }
-
-    public static void important(Object message) {
-        logger.info(message);
-        SyslogTools.info(message.toString());
-    }
+//    public static Logger getLogger() {
+//        return logger;
+//    }
+//
+//    public static void warn(Throwable message) {
+//        warn(logger, message);
+//    }
+//
+//    public static void warn(Logger classLogger, Throwable message) {
+//        classlog.warn(message);
+//        if (emf != null)
+//            SyslogTools.warn(ExceptionUtils.getMessage(message) + ": " + ExceptionUtils.getStackTrace(message));
+//    }
+//
+//    public static void info(Object message) {
+//        log.info(message);
+//    }
+//
+//    public static void important(Object message) {
+//        log.info(message);
+//        SyslogTools.info(message.toString());
+//    }
 
     public static ValidatorFactory getValidatorFactory() {
         return validatorFactory;
     }
 
-    public static void important(EntityManager em, Object message) throws Exception {
-        logger.info(message);
-        SyslogTools.addLog(em, message.toString(), SyslogTools.INFO);
-    }
-
+//    public static void important(EntityManager em, Object message) throws Exception {
+//        log.info(message);
+//        SyslogTools.addLog(em, message.toString(), SyslogTools.INFO);
+//    }
+//
+//    public static void fatal(Throwable e) {
+//        fatal(logger, e);
+//    }
+//
     public static void fatal(Throwable e) {
-        fatal(logger, e);
-    }
-
-    public static void fatal(Logger classLogger, Throwable e) {
-        classLogger.fatal(e.getMessage(), e);
-
         if (emf != null && emf.isOpen()) {
             EntityManager em = OPDE.createEM();
             try {
@@ -275,20 +272,6 @@ public class OPDE {
         }
 
         System.exit(1);
-    }
-
-    public static void error(Object message) {
-        logger.error(message);
-        SyslogTools.error(message.toString());
-    }
-
-    public static void error(Logger classLogger, Object message) {
-        classLogger.error(message);
-        SyslogTools.error(message.toString());
-    }
-
-    public static void debug(Object message) {
-        logger.debug(message);
     }
 
     public static EntityManager createEM() {
@@ -419,7 +402,7 @@ public class OPDE {
         FileUtils.forceMkdir(new File(LocalMachine.getLogPath()));
 //        Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
         System.setProperty("logs", LocalMachine.getLogPath());
-        logger = Logger.getRootLogger();
+
         uptime = SYSCalendar.now();
 
         lang = ResourceBundle.getBundle("languageBundle", new CustomResourceBundleControl("UTF-8"));
@@ -559,18 +542,18 @@ public class OPDE {
 
             animation = SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_ANIMATION)).equals("true");
 
-            logger.info("######### START ###########  " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion());
-            logger.info(System.getProperty("os.name").toLowerCase());
+            log.info("######### START ###########  " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion());
+            log.info(System.getProperty("os.name").toLowerCase());
 
 
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_DEBUG)).equalsIgnoreCase("true")) {
                 debug = true;
-                Logger.getRootLogger().setLevel(Level.DEBUG);
-//                logger.setLevel(Level.DEBUG);
+                //log.getRootLogger().setLevel(Level.DEBUG);
+//                log.setLevel(Level.DEBUG);
             }
 
 
-            Logger.getLogger("org.hibernate").setLevel(Level.OFF);
+            //log.getLogger("org.hibernate").setLevel(Level.OFF);
 
             if (cl.hasOption("x") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_EXPERIMENTAL)).equalsIgnoreCase("true")) {
                 experimental = true;
@@ -596,7 +579,7 @@ public class OPDE {
 
             customJDBCUrl = cl.hasOption("j");
             url = customJDBCUrl ? cl.getOptionValue("j") : EntityTools.getJDBCUrl(localProps.getProperty(SYSPropsTools.KEY_JDBC_HOST), localProps.getProperty(SYSPropsTools.KEY_JDBC_PORT), localProps.getProperty(SYSPropsTools.KEY_JDBC_CATALOG));
-            logger.info(url);
+            log.info(url);
 
             jpaProps.put(SYSPropsTools.KEY_JDBC_URL, url);
             jpaProps.put(SYSPropsTools.KEY_JDBC_PASSWORD, encryption.decryptJDBCPasswort());  // this is a temporarily clear version of the password.
@@ -712,14 +695,14 @@ public class OPDE {
         } catch (Exception ioe) {
 
             if (cl.hasOption("d") || cl.hasOption("b")) {
-                logger.fatal(ioe);
+                log.fatal(ioe);
                 System.exit(0);
             }
 
             // trouble with the setup ?
             // start the init wizard
             if (ioe instanceof SQLException || ioe instanceof PersistenceException || ioe instanceof IOException) {
-                logger.warn(ioe);
+                log.warn(ioe);
                 InitWizard initWizard = new InitWizard();
                 SYSTools.center(initWizard);
                 initWizard.addWindowListener(new WindowAdapter() {
@@ -753,12 +736,12 @@ public class OPDE {
 
 
         File configFile = new File(LocalMachine.getAppDataPath() + sep + AppInfo.fileConfig);
-        info("configFile:" + configFile);
+        log.info("configFile:" + configFile);
 
         // make sure the file exists
         if (!configFile.exists()) { // path didnt exist yet.
 
-            info("configFile: missing");
+            log.info("configFile: missing");
 
             // is there an old opde.cfg ?
             // then we should copy it over
@@ -766,9 +749,9 @@ public class OPDE {
             File oldConfigFile = new File(oldopwd + sep + AppInfo.fileConfig);
 
             if (oldConfigFile.exists()) {
-                info("oldConfigFile found:" + oldConfigFile);
+                log.info("oldConfigFile found:" + oldConfigFile);
                 FileUtils.copyFile(oldConfigFile, configFile);
-                info("copying over and renaming the old one");
+                log.info("copying over and renaming the old one");
                 FileUtils.copyFile(oldConfigFile, new File(oldopwd + sep + AppInfo.fileConfig + ".old"));
                 FileUtils.deleteQuietly(oldConfigFile);
             }
@@ -838,9 +821,6 @@ public class OPDE {
 //        return true;
 //    }
 
-    public static Level getLogLevel() {
-        return Logger.getRootLogger().getLevel();
-    }
 
     public static boolean isAdmin() {
         return UsersTools.isAdmin(login.getUser());

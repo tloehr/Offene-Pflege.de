@@ -101,7 +101,7 @@ public class LogicalPrinters {
         public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
             String name = attributes.getValue("name");
             String label = attributes.getValue("label");
-            //Main.logger.debug("startElement: " + this.toString() + ": " + tagName + "    name: " + name);
+            //Main.log.debug("startElement: " + this.toString() + ": " + tagName + "    name: " + name);
             if (tagName.equalsIgnoreCase("printer")) {
                 printer = new LogicalPrinter(attributes.getValue("name"), attributes.getValue("label"), attributes.getValue("type"), attributes.getValue("encoding"), attributes.getValue("pageprinter"));
             } else if (tagName.equalsIgnoreCase("reset")) {
@@ -205,7 +205,7 @@ public class LogicalPrinters {
         PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
         aset.add(MediaSizeName.ISO_A4);
 
-//        OPDE.info(flavor);
+//        log.info(flavor);
 
         try {
             PrintService ps = getPrintService(printer);

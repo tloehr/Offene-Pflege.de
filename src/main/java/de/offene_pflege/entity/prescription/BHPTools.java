@@ -10,7 +10,8 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
-import org.apache.log4j.Logger;
+
+import lombok.extern.log4j.Log4j2;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 
@@ -29,13 +30,13 @@ import java.util.*;
  * Time: 15:49
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class BHPTools {
 
     public static final byte STATE_OPEN = 0;
     public static final byte STATE_DONE = 1;
     public static final byte STATE_REFUSED = 2;
     public static final byte STATE_REFUSED_DISCARDED = 3;
-    private static Logger logger = Logger.getLogger(BHPTools.class);
 
 //    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
 //    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.bhp.shift.veryearly", "nursingrecords.bhp.shift.early", "nursingrecords.bhp.shift.late", "nursingrecords.bhp.shift.verylate"};
@@ -161,7 +162,7 @@ public class BHPTools {
         }
 
         if (lastbhp.equals(new LocalDate())) {
-            OPDE.info("Today's BHPImport is already done. Stopping.");
+            log.info("Today's BHPImport is already done. Stopping.");
             System.exit(0);
         }
 
@@ -193,7 +194,7 @@ public class BHPTools {
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.info(SYSTools.xx("\"nursingrecords.bhpimport\"") + " " + SYSTools.xx("misc.msg.writingto") + ": " + OPDE.getUrl());
+            log.info(SYSTools.xx("\"nursingrecords.bhpimport\"") + " " + SYSTools.xx("misc.msg.writingto") + ": " + OPDE.getUrl());
 
             select.setParameter("andatum", new Date(SYSCalendar.startOfDay(targetdate.toDate())));
             select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(targetdate.toDate())));
@@ -203,7 +204,7 @@ public class BHPTools {
 
             numbhp += generate(em, list, targetdate, true);
 
-            OPDE.important(em, SYSTools.xx("\"nursingrecords.bhpimport\"") + " " + SYSTools.xx("nursingrecords.bhpimport.completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + SYSTools.xx("nursingrecords.bhpimport.numCreatedEntities") + ": " + numbhp);
+            log.info(SYSTools.xx("\"nursingrecords.bhpimport\"") + " " + SYSTools.xx("nursingrecords.bhpimport.completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + SYSTools.xx("nursingrecords.bhpimport.numCreatedEntities") + ": " + numbhp);
         }
 
         SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateTimeFormat.forPattern("yyyy-MM-dd").print(targetdate));
@@ -253,8 +254,8 @@ public class BHPTools {
 
         for (PrescriptionSchedule pSchedule : list) {
             int numbhpbefore = numbhp;
-            OPDE.debug("generation for schedule: " + pSchedule.toString());
-            OPDE.debug("targetdate: " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
+            log.debug("generation for schedule: " + pSchedule.toString());
+            log.debug("targetdate: " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
             row = row.add(BigDecimal.ONE);
             SYSTools.printProgBar(row.divide(maxrows, 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
 
@@ -271,7 +272,7 @@ public class BHPTools {
                 // Genaue Ermittlung der Treffer
                 // =============================
                 if (pSchedule.isDaily()) {
-//                    OPDE.debug("Eine tägliche pSchedule");
+//                    log.debug("Eine tägliche pSchedule");
                     // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
                     // der targetdate getroffen wurde oder überschritten ist.
                     while (Days.daysBetween(ldatum, targetdate).getDays() > 0) {
@@ -280,7 +281,7 @@ public class BHPTools {
                     // Mich interssiert nur der Treffer, also die Punktlandung auf dem targetdate
                     treffer = Days.daysBetween(ldatum, targetdate).getDays() == 0;
                 } else if (pSchedule.isWeekly()) {
-//                    OPDE.debug("Eine wöchentliche pSchedule");
+//                    log.debug("Eine wöchentliche pSchedule");
                     while (Weeks.weeksBetween(ldatum, targetdate).getWeeks() > 0) {
                         ldatum = ldatum.plusWeeks(pSchedule.getWoechentlich());
                     }
@@ -288,7 +289,7 @@ public class BHPTools {
                     // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
                     treffer = Weeks.weeksBetween(ldatum, targetdate).getWeeks() == 0;
                 } else if (pSchedule.isMonthly()) {
-//                    OPDE.debug("Eine monatliche pSchedule");
+//                    log.debug("Eine monatliche pSchedule");
                     while (Months.monthsBetween(ldatum, targetdate).getMonths() > 0) {
                         ldatum = ldatum.plusMonths(pSchedule.getMonatlich());
                     }
@@ -341,7 +342,7 @@ public class BHPTools {
                         if (dtz.isLocalDateTimeGap(localTargetDateTime)) {
                             //todo: find a better way to calculate this (getOffsetFromLocal)
                             localTargetDateTime = localTargetDateTime.plusHours(1);
-                            OPDE.info(SYSTools.xx("Correcting for DST. [BHPPID=" + pSchedule.getBhppid() + "] " + localTargetDateTime.toString()));
+                            log.info(SYSTools.xx("Correcting for DST. [BHPPID=" + pSchedule.getBhppid() + "] " + localTargetDateTime));
                         }
 
                         em.merge(new BHP(pSchedule, localTargetDateTime.toDate(), SYSConst.UZ, pSchedule.getUhrzeitDosis()));
@@ -353,15 +354,15 @@ public class BHPTools {
 
                 }
             }
-            OPDE.debug("number of bhps for this run: " + Integer.toString(numbhp - numbhpbefore));
+            log.debug("number of bhps for this run: " + Integer.toString(numbhp - numbhpbefore));
         }
 
         System.out.println();
         System.out.println(SYSTools.xx("nursingrecords.bhpimport.numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numbhp);
         System.out.println("------------------------------------------");
 
-        OPDE.debug("number of bhps overall: " + Integer.toString(numbhp));
-        OPDE.debug("------------------------------------------");
+        log.debug("number of bhps overall: " + Integer.toString(numbhp));
+        log.debug("------------------------------------------");
 
         return numbhp;
     }
@@ -872,7 +873,7 @@ public class BHPTools {
         // this can only happen, when the morning part of the night shift is still active, and the BHP in question
         // belongs to the same shift on the day before. (in the late evening)
 
-//        logger.debug(bhp.getShift());
+//        log.debug(bhp.getShift());
 
         if (bhp.getShift() == SYSCalendar.SHIFT_VERY_LATE && SYSCalendar.whatShiftIs(now.toDate()) == SYSCalendar.SHIFT_VERY_EARLY)
             return false;

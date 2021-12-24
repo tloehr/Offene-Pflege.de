@@ -5,6 +5,7 @@ import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.SYSConst;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -22,6 +23,7 @@ import java.util.HashMap;
  * Time: 14:37
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class PnlEditMemberships extends JPanel {
     private OPUsers user;
     private ArrayList<OPGroups> listGroups; // is only needed once during setup of the panel
@@ -69,7 +71,7 @@ public class PnlEditMemberships extends JPanel {
                     // so we won't get locking exceptions because of outdated version informations
                     user = myUser;
                     groupMap.put(gid, myGroup);
-                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                } catch (OptimisticLockException ole) { log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }

@@ -67,7 +67,8 @@ import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.op.users.PnlUser;
 import de.offene_pflege.op.welcome.PnlWelcome;
 import de.offene_pflege.services.StationService;
-import org.apache.log4j.Logger;
+
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -85,6 +86,7 @@ import java.util.*;
 /**
  * @author __USER__
  */
+@Log4j2
 public class FrmMain extends JFrame {
     public static final String internalClassID = "opde.mainframe";
     private boolean initPhase;
@@ -115,14 +117,14 @@ public class FrmMain extends JFrame {
     private CollapsiblePanes panesSearch, panesApps;
     //    private HashMap<Resident, JideButton> bwButtonMap;
     private JideButton homeButton;
-    private Logger logger;
+
 
     private final int TYPE_BESONDERHEIT_KURZZEITPFLEGE = 99999;
 
     public FrmMain() {
         initPhase = true;
 
-        logger = Logger.getLogger(getClass());
+
 
         initComponents();
 
@@ -358,7 +360,7 @@ public class FrmMain extends JFrame {
     }
 
     private void pnlMainComponentResized(ComponentEvent e) {
-//        logger.debug(e.getComponent().getSize().width + "x" + e.getComponent().getSize().height);
+//        log.debug(e.getComponent().getSize().width + "x" + e.getComponent().getSize().height);
 
         // Anpassung für kleine Bildschirme
         // https://github.com/tloehr/Offene-Pflege.de/issues/85

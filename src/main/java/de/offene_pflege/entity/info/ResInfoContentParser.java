@@ -1,6 +1,5 @@
 package de.offene_pflege.entity.info;
 
-import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.InfoTreeNodeBean;
 import de.offene_pflege.op.tools.RiskBean;
 import de.offene_pflege.op.tools.SYSTools;
@@ -13,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 // Dieser Struktur Handler ist nur für die Umwandlung eines ResInfos in eine HTML oder Text Datei
-public class ResInfoContentParser extends DefaultHandler implements HasLogger {
+public class ResInfoContentParser extends DefaultHandler  {
 
     // Die Multikey enthält alle Strukturen außer dem Scalerisk (gibts nur bei der BRADEN)
     // Diese Map liest man so: NAME_DER_COMPONENT,
@@ -56,7 +55,7 @@ public class ResInfoContentParser extends DefaultHandler implements HasLogger {
 
         if (name == null) name = UUID.randomUUID().toString(); // irgendeinen namen der eindeutig ist
         tagName = tagName.toLowerCase();
-        //getLogger().debug(tagName);
+        //log.debug(tagName);
 
         String label = SYSTools.xx(attributes.getValue("label"));
         // Tags, die es nicht mehr gibt müssen hier auch nicht berücksichtigt werden, weil
@@ -101,7 +100,7 @@ public class ResInfoContentParser extends DefaultHandler implements HasLogger {
         Enumeration en = wurzel.children();
         while (en.hasMoreElements())
             text += render((DefaultMutableTreeNode) en.nextElement(), resInfoRenderer);
-        //getLogger().debug(text);
+        //log.debug(text);
         return text;
     }
 

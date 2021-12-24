@@ -50,8 +50,8 @@ import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
-import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.*;
@@ -72,6 +72,7 @@ import java.util.*;
 /**
  * @author root
  */
+@Log4j2
 public class PnlReport extends NursingRecordsPanel {
 
 
@@ -91,8 +92,6 @@ public class PnlReport extends NursingRecordsPanel {
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private Logger logger = Logger.getLogger(getClass());
-
 
 //    private Pair<DateTime, DateTime> minmax = null;
 
@@ -150,7 +149,7 @@ public class PnlReport extends NursingRecordsPanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -348,7 +347,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 GUITools.scroll2show(jspReports, cpMap.get(keyDay), cpsReports, o -> GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2));
                             }
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -442,7 +441,7 @@ public class PnlReport extends NursingRecordsPanel {
                         i++;
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i, maxYears));
                         createCP4Year(year, start, end);
-                        logger.debug((System.currentTimeMillis() - time) + " ms for year " + year);
+                        log.debug((System.currentTimeMillis() - time) + " ms for year " + year);
                     }
 
                 }
@@ -456,10 +455,10 @@ public class PnlReport extends NursingRecordsPanel {
 
                 expandTheLast2Weeks();
 
-                logger.debug((System.currentTimeMillis() - time) + " ms for expanding 2 weeks");
+                log.debug((System.currentTimeMillis() - time) + " ms for expanding 2 weeks");
                 time = System.currentTimeMillis();
                 buildPanel();
-                logger.debug((System.currentTimeMillis() - time) + " ms for bulding the panel");
+                log.debug((System.currentTimeMillis() - time) + " ms for bulding the panel");
                 initPhase = false;
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);
@@ -1038,7 +1037,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     buildPanel();
                                     GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
                                 } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
+                                    log.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1275,7 +1274,7 @@ public class PnlReport extends NursingRecordsPanel {
                             buildPanel();
                             GUITools.scroll2show(jspReports, cpMap.get(keyNewDay), cpsReports, o1 -> GUITools.flashBackground(linemap.get(newReport), Color.YELLOW, 2));
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1347,7 +1346,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 GUITools.flashBackground(linemap.get(delReport), Color.YELLOW, 2);
                             }
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1441,7 +1440,7 @@ public class PnlReport extends NursingRecordsPanel {
                         buildPanel();
                         GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
@@ -1598,7 +1597,7 @@ public class PnlReport extends NursingRecordsPanel {
                         buildPanel();
                         GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }

@@ -2,6 +2,7 @@ package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -15,6 +16,7 @@ import java.util.Locale;
  * Time: 15:24
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class MedPackageTools {
     public static final String GROESSE[] = {"N1", "N2", "N3", "AP", "OP"};
 
@@ -173,7 +175,7 @@ public class MedPackageTools {
     private static boolean isPZNValid(String pzn, int calculatedChecksum) {
         int givenChecksum = Integer.parseInt(String.valueOf(pzn.charAt(pzn.length() - 1)));
         if (calculatedChecksum != givenChecksum) {
-            OPDE.debug("PZN is NOT valid");
+            log.debug("PZN is NOT valid");
         }
 
         return calculatedChecksum == givenChecksum;
@@ -188,7 +190,7 @@ public class MedPackageTools {
      */
     public static int getSwissmedicChecksum(String pzn) {
         if (pzn.isEmpty()) return -1;
-        OPDE.debug(pzn);
+        log.debug(pzn);
         int[] digits = new int[pzn.length()];
         int partsum = 0;
 
@@ -216,7 +218,7 @@ public class MedPackageTools {
 
     public static int getMOD11Checksum(String pzn) {
         if (pzn.isEmpty()) return -1;
-//        OPDE.debug(pzn);
+//        log.debug(pzn);
         int[] digits = new int[pzn.length() - 1];
 
         for (int c = 0; c < pzn.length() - 1; c++) {

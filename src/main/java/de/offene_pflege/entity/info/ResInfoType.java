@@ -191,7 +191,7 @@ public class ResInfoType implements Serializable {
         }
         ResInfoType other = (ResInfoType) object;
         if ((this.bwinftyp == null && other.bwinftyp != null) || (this.bwinftyp != null && !this.bwinftyp.equals(other.bwinftyp))) {
-//            OPDE.debug(this.bwinftyp + " != " + other.bwinftyp);
+//            log.debug(this.bwinftyp + " != " + other.bwinftyp);
             return false;
         }
         return true;

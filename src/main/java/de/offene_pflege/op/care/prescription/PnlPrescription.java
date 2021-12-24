@@ -54,8 +54,8 @@ import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
-import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -73,9 +73,9 @@ import java.util.*;
 /**
  * @author tloehr
  */
+@Log4j2
 public class PnlPrescription extends NursingRecordsPanel {
-
-    private Logger logger = Logger.getLogger(getClass());
+    
     private Resident resident;
 
     private ArrayList<Prescription> lstPrescriptions, lstVisiblePrescriptions; // <= the latter is only for the zebra pattern
@@ -207,7 +207,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
 
     private CollapsiblePane createCP4(final Prescription prescription) {
-        logger.debug(prescription.getID());
+        log.debug(prescription.getID());
         
         /***
          *                          _        ____ ____  _  _    ______                          _       _   _           __
@@ -381,7 +381,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                         GUITools.flashBackground(myCP, Color.YELLOW, 2);
 
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -543,7 +543,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -624,7 +624,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             buildPanel();
                             SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, o12 -> GUITools.flashBackground(myCP, Color.YELLOW, 2)));
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -676,7 +676,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, o1 -> GUITools.flashBackground(myCP, Color.YELLOW, 2)));
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -748,7 +748,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         int i = 0;
         // for the zebra coloring
         for (Prescription prescription : lstPrescriptions) {
-            logger.debug(prescription.getID() + ".xprescription");
+            log.debug(prescription.getID() + ".xprescription");
             cpMap.get(prescription.getID() + ".xprescription").setBackground(getColor(SYSConst.medium1, i % 2 == 1));
             cpsPrescription.add(cpMap.get(prescription.getID() + ".xprescription"));
             i++;
@@ -816,7 +816,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             buildPanel();
                             GUITools.flashBackground(myNewCP, Color.YELLOW, 2);
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -874,7 +874,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, o14 -> GUITools.flashBackground(myCP, Color.YELLOW, 2)));
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -947,7 +947,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, o13 -> GUITools.flashBackground(myCP, Color.YELLOW, 2)));
 
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1014,7 +1014,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, o12 -> GUITools.flashBackground(myCP, Color.YELLOW, 2)));
 
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1118,7 +1118,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                         SwingUtilities.invokeLater(() -> GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, o -> GUITools.flashBackground(myCP, Color.YELLOW, 2)));
 
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
@@ -1248,7 +1248,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             lstPrescriptions.remove(prescription);
                             buildPanel();
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1303,7 +1303,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                         createCP4(prescription);
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1546,7 +1546,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                         GUITools.flashBackground(myCP, Color.YELLOW, 2);
 
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }

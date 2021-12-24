@@ -21,8 +21,9 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
@@ -34,10 +35,10 @@ import java.util.Random;
 /**
  * Created by tloehr on 03.07.15.
  */
+@Log4j2
 public class PnlCommonTags extends DefaultPanel {
     private HashMap<Commontags, DefaultCollapsiblePane> cpMap;
-    private Logger logger = Logger.getLogger(this.getClass());
-    private JScrollPane scrollPane1;
+        private JScrollPane scrollPane1;
     private DefaultCollapsiblePanes cpsMain;
     private int i = 0;  // just for the progressbar
 
@@ -77,7 +78,7 @@ public class PnlCommonTags extends DefaultPanel {
                         i++;
                         ((DefaultCollapsiblePane) o).reload();
                     } catch (Exception e) {
-                        OPDE.fatal(logger, e);
+                        OPDE.fatal(e);
                     }
                 });
                 return null;
@@ -120,7 +121,7 @@ public class PnlCommonTags extends DefaultPanel {
                     try {
                         cpsMain.add(createCP(tag));
                     } catch (Exception e) {
-                        OPDE.fatal(logger, e);
+                        OPDE.fatal(e);
                     }
                 }
                 cpsMain.addExpansion();
@@ -165,7 +166,7 @@ public class PnlCommonTags extends DefaultPanel {
                 pnlBeanEditor.setEnabled(tag.getType() == CommontagsTools.TYPE_SYS_USER);
                 dcp.setContentPane(pnlBeanEditor);
             } catch (Exception e) {
-                OPDE.fatal(logger, e);
+                OPDE.fatal(e);
             }
         };
 
@@ -194,7 +195,7 @@ public class PnlCommonTags extends DefaultPanel {
 
                     GUITools.scroll2show(scrollPane1, cpMap.get(newTag), cpsMain, o -> GUITools.flashBackground(cpMap.get(newTag), Color.YELLOW, 2));
                 } catch (Exception exc) {
-                    OPDE.fatal(logger, exc);
+                    OPDE.fatal( exc);
                 }
             }
         });

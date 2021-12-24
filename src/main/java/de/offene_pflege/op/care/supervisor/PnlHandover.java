@@ -49,6 +49,7 @@ import de.offene_pflege.op.tools.NursingRecordsPanel;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -67,7 +68,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
-
+@Log4j2
 public class PnlHandover extends NursingRecordsPanel {
 
 
@@ -184,7 +185,7 @@ public class PnlHandover extends NursingRecordsPanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -517,7 +518,7 @@ public class PnlHandover extends NursingRecordsPanel {
                 createCP4Day(day);
                 buildPanel();
             } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
+                log.warn(ole);
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
@@ -632,7 +633,7 @@ public class PnlHandover extends NursingRecordsPanel {
                             buildPanel();
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -741,7 +742,7 @@ public class PnlHandover extends NursingRecordsPanel {
                             createCP4Day(day);
                             buildPanel();
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -900,7 +901,7 @@ public class PnlHandover extends NursingRecordsPanel {
 //                                            GUITools.flashBackground(linemapHO.get(myHO), Color.YELLOW, 2);
                             });
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }

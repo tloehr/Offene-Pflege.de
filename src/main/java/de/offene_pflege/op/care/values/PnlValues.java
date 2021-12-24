@@ -52,6 +52,7 @@ import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 
@@ -71,7 +72,8 @@ import java.util.*;
  * createCP4Day - creates the CP for the day (LIQUID BALANCE) createContent4Value - creates the JPanel with the actual
  * values in it.
  */
-public class PnlValues extends NursingRecordsPanel implements HasLogger {
+@Log4j2
+public class PnlValues extends NursingRecordsPanel {
 
 
     private Resident resident;
@@ -127,7 +129,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -165,7 +167,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
 
                         resident = myResident;
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -439,7 +441,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
         pnlYear.setOpaque(false);
 
         for (final ResValue resValue : myValues) {
-            getLogger().debug(resValue.getId());
+            log.debug(resValue.getId());
             String title = "<html><table border=\"0\">" +
                     "<tr>" +
                     "<td width=\"200\" align=\"left\">" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resValue.getPit()) + " [" + resValue.getID() + "]</td>" +
@@ -586,7 +588,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                             buildPanel();
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -765,7 +767,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                             buildPanel();
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -852,7 +854,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                             buildPanel();
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -981,7 +983,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                         //GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
 
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1053,7 +1055,7 @@ public class PnlValues extends NursingRecordsPanel implements HasLogger {
                     em.getTransaction().commit();
 
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }

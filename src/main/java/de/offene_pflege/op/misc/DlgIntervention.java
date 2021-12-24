@@ -17,6 +17,7 @@ import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.JXSearchField;
 
 import javax.persistence.EntityManager;
@@ -30,6 +31,7 @@ import java.awt.event.ActionEvent;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class DlgIntervention extends MyJDialog {
     Intervention intervention2Edit;
     private JToggleButton tbActive;
@@ -123,7 +125,8 @@ public class DlgIntervention extends MyJDialog {
                 myIntervention.setActive(tbActive.isSelected());
 
                 em.getTransaction().commit();
-            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+            } catch (OptimisticLockException ole) {
+                log.warn(ole);
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }

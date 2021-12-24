@@ -12,8 +12,9 @@ import de.offene_pflege.op.tools.FtpClient;
 import de.offene_pflege.op.tools.FtpUploadDownloadUtil;
 import de.offene_pflege.op.tools.LocalMachine;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+
 
 import javax.swing.*;
 import java.io.File;
@@ -24,10 +25,11 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by tloehr on 02.07.15.
  */
+@Log4j2
 public class PnlFTP extends DefaultPanel {
     boolean checkInProgress = false;
     boolean lastCheckOk = false;
-    Logger logger = Logger.getLogger(getClass());
+
 
     public PnlFTP() {
         super("opde.settings.ftp");
@@ -39,7 +41,7 @@ public class PnlFTP extends DefaultPanel {
             pbe.addDataChangeListener(evt -> SYSPropsTools.storeProps(evt.getData().toProperties(new Properties())));
             add(pbe);
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
     }
 
@@ -55,7 +57,7 @@ public class PnlFTP extends DefaultPanel {
             try {
                 pbe.broadcast();
             } catch (Exception e1) {
-                logger.warn(e1);
+                log.warn(e1);
                 return;
             }
 
@@ -111,7 +113,7 @@ public class PnlFTP extends DefaultPanel {
 
                     } catch (Exception ftpEx) {
 //                        OPDE.fatal(ftpEx);
-                        logger.error(ftpEx);
+                        log.error(ftpEx);
 //                        ftpEx.printStackTrace();
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ftpEx.getMessage(), DisplayMessage.WARNING));
                         SYSPropsTools.storeProp(SYSPropsTools.KEY_FTP_IS_WORKING, "false");
@@ -128,9 +130,9 @@ public class PnlFTP extends DefaultPanel {
                     try {
                         lastCheckOk = (Boolean) get();
                     } catch (InterruptedException e) {
-                        logger.debug(e);
+                        log.debug(e);
                     } catch (ExecutionException e) {
-                        OPDE.fatal(logger, e);
+                        OPDE.fatal(e);
                     }
                 }
             };

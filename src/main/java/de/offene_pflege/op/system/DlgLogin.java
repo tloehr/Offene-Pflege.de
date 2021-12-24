@@ -33,6 +33,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -47,6 +48,7 @@ import java.net.URISyntaxException;
 /**
  * @author __USER__
  */
+@Log4j2
 public class DlgLogin extends MyJDialog {
 
     public static final String internalClassID = "dlglogin";
@@ -222,10 +224,10 @@ public class DlgLogin extends MyJDialog {
             registerLogin();
             if (OPDE.getLogin() == null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.usernameOrPasswordWrong"));
-                OPDE.info(SYSTools.xx("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + SYSTools.xx("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
+                log.info(SYSTools.xx("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + SYSTools.xx("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
             } else {
                 OPDE.initProps();
-                OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
+                log.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
                 dispose();
             }
 

@@ -2,6 +2,7 @@ package de.offene_pflege.op.tools;
 
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
 /**
  * 
  */
-public class FtpClient implements HasLogger {
+@Log4j2
+public class FtpClient {
 
     private final String server;
     private final int port;
@@ -40,7 +42,7 @@ public class FtpClient implements HasLogger {
         ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 
         ftp.connect(server, port);
-        getLogger().debug(ftp.getReplyString());
+        log.debug(ftp.getReplyString());
         int reply = ftp.getReplyCode();
         if (!FTPReply.isPositiveCompletion(reply)) {
             ftp.disconnect();
@@ -48,7 +50,7 @@ public class FtpClient implements HasLogger {
         }
 
         ftp.login(user, password);
-        getLogger().debug(ftp.getReplyString());
+        log.debug(ftp.getReplyString());
 
         ftp.setFileType(FTP.BINARY_FILE_TYPE);
         ftp.enterLocalPassiveMode();
@@ -69,18 +71,18 @@ public class FtpClient implements HasLogger {
 
     public void putFile(File file, String remoteName) throws IOException {
         ftp.storeFile(path.isEmpty() ? "" : path + "/" + remoteName, new FileInputStream(file));
-        getLogger().debug(ftp.getReplyString());
+        log.debug(ftp.getReplyString());
     }
 
     public void getFile(String source, String destination) throws IOException {
         FileOutputStream out = new FileOutputStream(destination);
         ftp.retrieveFile(path.isEmpty() ? "" : path + "/" + source, out);
-        getLogger().debug(ftp.getReplyString());
+        log.debug(ftp.getReplyString());
         out.close();
     }
 
     public void delete(String source) throws IOException {
         ftp.deleteFile(path.isEmpty() ? "" : path + "/" + source);
-        getLogger().debug(ftp.getReplyString());
+        log.debug(ftp.getReplyString());
     }
 }

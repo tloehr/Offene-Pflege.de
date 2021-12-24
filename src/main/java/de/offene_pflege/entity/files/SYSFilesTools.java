@@ -39,6 +39,7 @@ import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.FtpClient;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 
 import javax.persistence.EntityManager;
@@ -58,6 +59,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
+@Log4j2
 public class SYSFilesTools {
 
     public static ListCellRenderer getSYSFilesRenderer() {
@@ -111,7 +113,7 @@ public class SYSFilesTools {
             ftpClient.open();
             ftpClient.putFile(file, sysfile.getRemoteFilename());
             ftpClient.close();
-            OPDE.info(SYSTools.xx("misc.msg.upload") + ": " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
+            log.info(SYSTools.xx("misc.msg.upload") + ": " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
         } else { // Ansonsten die bestehende Datei zurückgeben
             sysfile = alreadyExistingFiles.get(0);
         }
@@ -200,7 +202,7 @@ public class SYSFilesTools {
             }
             em.getTransaction().commit();
         } catch (OptimisticLockException ole) {
-            OPDE.warn(ole);
+            log.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -246,7 +248,7 @@ public class SYSFilesTools {
 //
 //                em.getTransaction().commit();
 //            } catch (OptimisticLockException ole) {
-//                OPDE.warn(ole);
+//                log.warn(ole);
 //                if (em.getTransaction().isActive()) {
 //                    em.getTransaction().rollback();
 //                }
@@ -265,7 +267,7 @@ public class SYSFilesTools {
 //                try {
 //                    ftp.disconnect();
 //                } catch (Exception e) {
-//                    OPDE.error(e);
+//                    log.error(e);
 //                }
 //            }
 //        }
@@ -299,7 +301,7 @@ public class SYSFilesTools {
             target = new File(AppInfo.getOPCache() + sep + sysfile.getFilename());
             // File present in cache directory ?
             if (!target.exists() || !SYSTools.getMD5Checksum(target).equals(sysfile.getMd5())) {
-                OPDE.info(SYSTools.xx("misc.msg.download") + ": " + OPDE.getProps().getProperty("FTPServer") + "://" + OPDE.getProps().getProperty("FTPWorkingDirectory") + "/" + sysfile.getFilename());
+                log.info(SYSTools.xx("misc.msg.download") + ": " + OPDE.getProps().getProperty("FTPServer") + "://" + OPDE.getProps().getProperty("FTPWorkingDirectory") + "/" + sysfile.getFilename());
                 FileUtils.deleteQuietly(target);
 
                 FtpClient ftpClient = new FtpClient();
@@ -312,7 +314,7 @@ public class SYSFilesTools {
 
             }
         } catch (Exception ex) {
-            OPDE.error(ex);
+            log.error(ex);
             target = null;
         }
         return target;
@@ -330,7 +332,7 @@ public class SYSFilesTools {
             em.getTransaction().commit();
             success = true;
         } catch (OptimisticLockException ole) {
-            OPDE.warn(ole);
+            log.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -356,9 +358,9 @@ public class SYSFilesTools {
                 ftpClient.open();
                 ftpClient.delete(sysfile.getRemoteFilename());
                 ftpClient.close();
-                OPDE.info("DELETING FILE FROM FTPSERVER: " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
+                log.info("DELETING FILE FROM FTPSERVER: " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
             } catch (Exception e) {
-                OPDE.error(e);
+                log.error(e);
                 success = false;
             }
         }
@@ -416,7 +418,7 @@ public class SYSFilesTools {
             try {
                 Runtime.getRuntime().exec(getLocalDefinedApp(file));
             } catch (IOException ex) {
-                OPDE.getLogger().error(ex);
+                log.error(ex);
             }
         } else {
             if (Desktop.isDesktopSupported()) {
@@ -482,7 +484,7 @@ public class SYSFilesTools {
             out.close();
             if (handleTheFile) SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
         } catch (IOException e) {
-            OPDE.error(e);
+            log.error(e);
         }
         return temp;
     }
@@ -511,7 +513,6 @@ public class SYSFilesTools {
 
         return text;
     }
-
 
 
 }

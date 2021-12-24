@@ -23,6 +23,7 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -42,6 +43,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * @author tloehr
  */
+@Log4j2
 public class PrescriptionTools {
 
     /**
@@ -809,7 +811,7 @@ public class PrescriptionTools {
         }
 
         for (Prescription p : result) {
-            OPDE.debug(toPrettyString(p));
+            log.debug(toPrettyString(p));
         }
 
         return result;

@@ -10,6 +10,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.*;
 import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.services.StationService;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.javatuples.Quintet;
@@ -31,6 +32,7 @@ import java.util.*;
  * Created by IntelliJ IDEA. User: tloehr Date: 28.10.11 Time: 16:41 To change this template use File | Settings | File
  * Templates.
  */
+@Log4j2
 public class ResValueTools {
 
     // weight adjustment percentages for amputation
@@ -745,7 +747,7 @@ public class ResValueTools {
                 Quintet<Resident, java.time.LocalDate, java.time.LocalDate, BigDecimal, BigDecimal> result = new Quintet<>(resident, startDate, endDate, divWeight, SYSTools.prozentualeVeraenderung(firstValue.getVal1(), lastValue.getVal1()));
                 if (result.getValue4().abs().compareTo(changeRateInPercent) >= 0) {
                     resultList.add(result);
-                    OPDE.debug(result);
+                    log.debug(result);
                 }
             }
         }

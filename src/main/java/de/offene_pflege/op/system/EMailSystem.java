@@ -6,6 +6,7 @@ import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -29,6 +30,7 @@ import java.util.Date;
  * Time: 14:38
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class EMailSystem {
 
     public static boolean isMailsystemActive() {
@@ -54,7 +56,7 @@ public class EMailSystem {
         try {
             localMachine = InetAddress.getLocalHost();
         } catch (java.net.UnknownHostException uhe) {
-            OPDE.error(uhe);
+            log.error(uhe);
         }
 
         String bodyText = SYSTools.xx("mail.errormail.line1") + "\n" +
@@ -87,7 +89,7 @@ public class EMailSystem {
 //                try {
 //                    sendMail(SYSTools.xx("mail.notification.subject") + ": " + new Date(), SYSTools.xx("hier ist die gewünschte email"), new Recipient(user), NotificationTools.notify(user));
 //                } catch (Exception e){
-//                    OPDE.error(e);
+//                    log.error(e);
 //                    error = true;
 //                }
 //            }
@@ -192,13 +194,13 @@ public class EMailSystem {
             success = true;
 //            OPDE.getDisplayManager().clearSubMessages();
         } catch (MessagingException e1) {
-            OPDE.info(e1);
+            log.info(e1);
             e1.printStackTrace();
-//            OPDE.info("Mail-System is not configured");
+//            log.info("Mail-System is not configured");
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage(), DisplayMessage.IMMEDIATELY));
             success = false;
         } catch (UnsupportedEncodingException e1) {
-            OPDE.info(e1);
+            log.info(e1);
             e1.printStackTrace();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage(), DisplayMessage.IMMEDIATELY));
             e1.printStackTrace();

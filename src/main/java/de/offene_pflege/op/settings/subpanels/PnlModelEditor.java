@@ -21,8 +21,8 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
@@ -33,10 +33,10 @@ import java.util.HashMap;
 /**
  * Created by tloehr on 30.06.15.
  */
+@Log4j2
 public class PnlModelEditor extends DefaultPanel {
 
     private HashMap<ResInfoCategory, DefaultCollapsiblePane> cpMap;
-    private Logger logger = Logger.getLogger(this.getClass());
     private JScrollPane scrollPane1;
     private DefaultCollapsiblePanes cpsMain;
     private int i = 0;  // just for the progressbar
@@ -77,7 +77,7 @@ public class PnlModelEditor extends DefaultPanel {
                         i++;
                         ((DefaultCollapsiblePane) o).reload();
                     } catch (Exception e) {
-                        OPDE.fatal(logger, e);
+                        OPDE.fatal(e);
                     }
                 });
                 return null;
@@ -120,7 +120,7 @@ public class PnlModelEditor extends DefaultPanel {
                     try {
                         cpsMain.add(createCP(cat));
                     } catch (Exception e) {
-                        OPDE.fatal(logger, e);
+                        OPDE.fatal(e);
                     }
                 }
                 cpsMain.addExpansion();
@@ -164,7 +164,7 @@ public class PnlModelEditor extends DefaultPanel {
 
                 dcp.setContentPane(pnlBeanEditor);
             } catch (Exception e) {
-                OPDE.fatal(logger, e);
+                OPDE.fatal(e);
             }
         };
 
@@ -185,7 +185,7 @@ public class PnlModelEditor extends DefaultPanel {
                     cpsMain.add(createCP(newCat));
                     cpsMain.addExpansion();
                 } catch (Exception exc) {
-                    OPDE.fatal(logger, exc);
+                    OPDE.fatal(exc);
                 }
             }
         });

@@ -12,6 +12,7 @@ import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -28,6 +29,7 @@ import java.util.*;
 /**
  * @author tloehr
  */
+@Log4j2
 public class AllowanceTools {
 
     public static String getAsHTML(List<Allowance> lstCash, BigDecimal carry, Resident resident) {
@@ -151,7 +153,7 @@ public class AllowanceTools {
         if (sum == null) {
             sum = BigDecimal.ZERO;
         }
-        OPDE.debug("getSUM(Resident " + resident.getId() + ", DateTime " + DateFormat.getDateTimeInstance().format(to.toDate()) + ") " + (System.currentTimeMillis() - time) + " ms");
+        log.debug("getSUM(Resident " + resident.getId() + ", DateTime " + DateFormat.getDateTimeInstance().format(to.toDate()) + ") " + (System.currentTimeMillis() - time) + " ms");
         return sum;
     }
 
@@ -171,7 +173,7 @@ public class AllowanceTools {
         if (sum == null) {
             sum = BigDecimal.ZERO;
         }
-        OPDE.debug("getSUM(Resident resident) " + (System.currentTimeMillis() - time) + " ms");
+        log.debug("getSUM(Resident resident) " + (System.currentTimeMillis() - time) + " ms");
         return sum;
     }
 
@@ -209,7 +211,7 @@ public class AllowanceTools {
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-        OPDE.debug("getYear(Resident " + resident.getId() + ", Date " + year + ") " + (System.currentTimeMillis() - time) + " ms");
+        log.debug("getYear(Resident " + resident.getId() + ", Date " + year + ") " + (System.currentTimeMillis() - time) + " ms");
         return result;
     }
 
@@ -231,7 +233,7 @@ public class AllowanceTools {
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-        OPDE.debug("getMonth(Resident resident, Date month) " + (System.currentTimeMillis() - time) + " ms");
+        log.debug("getMonth(Resident resident, Date month) " + (System.currentTimeMillis() - time) + " ms");
         return result;
     }
 
@@ -267,7 +269,7 @@ public class AllowanceTools {
             }
         }
         em.close();
-        OPDE.debug("getMinMax(Resident resident) " + (System.currentTimeMillis() - time) + " ms");
+        log.debug("getMinMax(Resident resident) " + (System.currentTimeMillis() - time) + " ms");
         return result;
     }
 

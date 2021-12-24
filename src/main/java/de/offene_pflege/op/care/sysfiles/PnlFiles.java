@@ -43,7 +43,7 @@ import de.offene_pflege.op.tools.NursingRecordsPanel;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.tablerenderer.RNDHTML;
-import org.apache.log4j.Logger;
+
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -74,8 +74,6 @@ public class PnlFiles extends NursingRecordsPanel {
     //    private RowFilter<TMSYSFiles, Integer> textFilter;
     private TableRowSorter<TMSYSFiles> sorter;
     private TMSYSFiles tmSYSFiles;
-
-    private Logger logger = Logger.getLogger(getClass());
 
     /**
      * Creates new form PnlFiles

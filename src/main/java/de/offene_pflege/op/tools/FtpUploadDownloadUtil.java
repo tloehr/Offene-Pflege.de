@@ -2,6 +2,7 @@ package de.offene_pflege.op.tools;
 
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.FileInputStream;
@@ -12,6 +13,7 @@ import java.util.Properties;
 /**
  * https://www.torsten-horn.de/techdocs/java-ftp.htm#FTP-Upload-Download
  */
+@Log4j2
 public class FtpUploadDownloadUtil {
     /**
      * FTP-Dateienliste.
@@ -47,14 +49,14 @@ public class FtpUploadDownloadUtil {
         try {
 
             ftpClient.connect(ftpProps.getProperty(SYSPropsTools.KEY_FTP_HOST), Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             resultOk &= ftpClient.login(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER), ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             fos = new FileOutputStream(localResultFile);
             resultOk &= ftpClient.retrieveFile(OPDE.getProps().getProperty("FTPWorkingDirectory")+"/"+remoteSourceFile, fos);
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             resultOk &= ftpClient.logout();
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
 
         } finally {
             try {
@@ -81,14 +83,14 @@ public class FtpUploadDownloadUtil {
 
         try {
             ftpClient.connect(ftpProps.getProperty(SYSPropsTools.KEY_FTP_HOST), Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             resultOk &= ftpClient.login(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER), ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             fis = new FileInputStream(localSourceFile);
             resultOk &= ftpClient.storeFile(OPDE.getProps().getProperty("FTPWorkingDirectory")+"/"+remoteResultFile, fis);
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             resultOk &= ftpClient.logout();
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
         } finally {
             try {
                 if (fis != null) {
@@ -114,13 +116,13 @@ public class FtpUploadDownloadUtil {
 
         try {
             ftpClient.connect(ftpProps.getProperty(SYSPropsTools.KEY_FTP_HOST), Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             resultOk &= ftpClient.login(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER), ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             resultOk &= ftpClient.deleteFile(OPDE.getProps().getProperty("FTPWorkingDirectory")+"/"+remoteResultFile);
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
             resultOk &= ftpClient.logout();
-            OPDE.debug(ftpClient.getReplyString());
+            log.debug(ftpClient.getReplyString());
         } finally {
             ftpClient.disconnect();
         }

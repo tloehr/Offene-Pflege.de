@@ -10,11 +10,12 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+
 import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
@@ -50,13 +51,13 @@ import java.util.HashSet;
  * with all the constraints we want to be obeyed during the edit phase. And this class handles it in no time.
  * All the constraints are taken care of by the javax.validation framework.
  */
+@Log4j2
 public class PnlBeanEditor<T> extends EditPanelDefault<T> {
     private final Class<T> clazz;
     private Closure cancelCallback;
     //    private JPanel customPanel;
     //    private final String[][] fields;
     private boolean ignoreListener = false;
-    private Logger logger = Logger.getLogger(this.getClass());
     private HashSet<Component> componentSet;
     public static final int SAVE_MODE_IMMEDIATE = 0;
     public static final int SAVE_MODE_OK_CANCEL = 1;
@@ -201,19 +202,19 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             // if there is a parser defined. it is loaded here
                             if (!editorComponent.parserClass().isEmpty()) {
                                 String p = editorComponent.parserClass();
-                                logger.debug(String.format("Parserclass for Field %s: %s", field.getName(), p));
+                                log.debug(String.format("Parserclass for Field %s: %s", field.getName(), p));
 
                                 // loads the specified parser class (needs to have a "parse" method)
                                 Class parserClazz = Class.forName(p);
 
 
                                 value = parserClazz.getMethod("parse", String.class).invoke(parserClazz.newInstance(), text);
-                                logger.debug(String.format("Parsed value: %s", value.toString()));
+                                log.debug(String.format("Parsed value: %s", value.toString()));
                             }
 
 
                             PropertyUtils.setProperty(data, field.getName(), ConvertUtils.convert(value, field.getType())); // ConverterUtils fixes #25
-//                            logger.debug(String.format("Content of the 'data' object: %s", ((Properties) data).getProperty(field.getName())));
+//                            log.debug(String.format("Content of the 'data' object: %s", ((Properties) data).getProperty(field.getName())));
 
                             if (saveMode == SAVE_MODE_IMMEDIATE) {
                                 broadcast(); // spread the news, that the data object was updated. in case of a constraint violation, an exception is thrown
@@ -224,34 +225,34 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                             lblOK.setToolTipText(null);
                             GUITools.flashBackground(txt, SYSConst.darkolivegreen1, Color.white, 2);
                         } catch (BadLocationException e1) {
-                            OPDE.error(logger, e1);
+                            log.error(e1);
                             lblOK.setIcon(SYSConst.icon16cancel);
                             lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_bold(e1.getMessage())));
                         } catch (IllegalAccessException e1) {
-                            OPDE.error(logger, e1);
+                            log.error( e1);
                             lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_bold(e1.getMessage())));
                         } catch (InvocationTargetException ite) {
                             if (ite.getTargetException() instanceof ParseException) {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ite.getTargetException().getMessage(), DisplayMessage.WARNING));
                             } else {
-                                OPDE.error(logger, ite);
+                                log.error( ite);
                             }
                             lblOK.setIcon(SYSConst.icon16cancel);
                             lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_bold(ite.getMessage())));
                         } catch (NoSuchMethodException e) {
-                            OPDE.error(logger, e);
+                            log.error( e);
                             lblOK.setIcon(SYSConst.icon16cancel);
                             lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_bold(e.getMessage())));
                         } catch (ConstraintViolationException cve) {
-                            logger.debug("Constraint violation!!");
+                            log.debug("Constraint violation!!");
                             if (saveMode == SAVE_MODE_IMMEDIATE) {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(cve));
                             }
 
                             String message = "";
                             for (ConstraintViolation cv : cve.getConstraintViolations()) {
-                                logger.debug(cv.getPropertyPath().toString());
-                                logger.debug(field.getName());
+                                log.debug(cv.getPropertyPath().toString());
+                                log.debug(field.getName());
                                 if (cv.getPropertyPath().toString().equals(field.getName())) {
                                     message = cv.getMessage();
                                     break;
@@ -271,15 +272,15 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
 
 
                         } catch (ClassNotFoundException e) {
-                            OPDE.error(logger, e);
+                            log.error( e);
                             lblOK.setIcon(SYSConst.icon16cancel);
                             lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_bold(e.getMessage())));
                         } catch (InstantiationException e) {
-                            OPDE.error(logger, e);
+                            log.error( e);
                             lblOK.setIcon(SYSConst.icon16cancel);
                             lblOK.setToolTipText(SYSTools.toHTMLForScreen(SYSConst.html_bold(e.getMessage())));
                         } catch (SQLIntegrityConstraintViolationException e) {
-                            OPDE.warn(logger, e);
+                            log.warn(e);
                             lblOK.setIcon(SYSConst.icon16cancel);
                             lblOK.setToolTipText(SYSTools.toHTMLForScreen("error.sql.integrity"));
                             GUITools.flashBackground(txt, SYSConst.orangered, Color.white, 2);
@@ -307,7 +308,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                                 if (saveMode == SAVE_MODE_IMMEDIATE)
                                     broadcast();
                             } catch (Exception e1) {
-                                logger.debug(e1);
+                                log.debug(e1);
                             }
                         }
                     };
@@ -337,7 +338,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                                         if (saveMode == SAVE_MODE_IMMEDIATE)
                                             broadcast();
                                     } catch (Exception e1) {
-                                        logger.debug(e1);
+                                        log.debug(e1);
                                     }
                                 }
                             };
@@ -386,7 +387,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                                 broadcast(dce);
                             }
                         } catch (Exception e1) {
-                            logger.debug(e1);
+                            log.debug(e1);
                         }
                     });
                 } else if (editorComponent.component()[0].equalsIgnoreCase("colorset")) {
@@ -405,7 +406,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                                 broadcast(dce);
                             }
                         } catch (Exception e1) {
-                            logger.debug(e1);
+                            log.debug(e1);
                         }
                     });
 
@@ -424,7 +425,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                     comp = cp;
                     comp.setName(field.getName());
                 } else {
-                    OPDE.fatal(logger, new IllegalStateException("invalid component name in EditorComponent Annotation"));
+                    OPDE.fatal( new IllegalStateException("invalid component name in EditorComponent Annotation"));
                 }
 
                 if (comp instanceof CollapsiblePane) {
@@ -466,7 +467,7 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
             } catch (IllegalAccessException e1) {
                 e1.printStackTrace();
             } catch (SQLIntegrityConstraintViolationException e1) {
-                OPDE.warn(logger, e1);
+                log.warn( e1);
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e1.getMessage()));
             }
             if (saveMode == SAVE_MODE_IMMEDIATE)
@@ -550,11 +551,11 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                         try {
                             ((JTextComponent) innerComp).setText(PropertyUtils.getProperty(data, innerComp.getName()).toString());
                         } catch (IllegalAccessException e) {
-                            OPDE.error(logger, e);
+                            log.error( e);
                         } catch (InvocationTargetException e) {
-                            OPDE.error(logger, e);
+                            log.error( e);
                         } catch (NoSuchMethodException e) {
-                            OPDE.error(logger, e);
+                            log.error( e);
                         }
                     }
                 }
@@ -562,11 +563,11 @@ public class PnlBeanEditor<T> extends EditPanelDefault<T> {
                 try {
                     ((YesNoToggleButton) comp).setSelected((boolean) PropertyUtils.getProperty(data, comp.getName()));
                 } catch (IllegalAccessException e) {
-                    OPDE.error(logger, e);
+                    log.error( e);
                 } catch (InvocationTargetException e) {
-                    OPDE.error(logger, e);
+                    log.error( e);
                 } catch (NoSuchMethodException e) {
-                    OPDE.error(logger, e);
+                    log.error( e);
                 }
             } else if (comp instanceof JComboBox) {
 

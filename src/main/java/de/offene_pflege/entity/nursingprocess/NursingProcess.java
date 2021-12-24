@@ -17,6 +17,7 @@ import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -32,6 +33,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "nursingprocess")
+@Log4j2
 public class NursingProcess implements Serializable, QProcessElement, Comparable<NursingProcess>, Cloneable, Attachable {
 
     private static final long serialVersionUID = 1L;
@@ -388,7 +390,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
                 result = from.compareTo(that.getFrom()) * -1;
             }
         } catch (NullPointerException n) {
-            OPDE.error(n);
+            log.error(n);
             result = 0;
         }
 

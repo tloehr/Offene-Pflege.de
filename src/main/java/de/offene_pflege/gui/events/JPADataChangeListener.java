@@ -3,7 +3,8 @@ package de.offene_pflege.gui.events;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -14,6 +15,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 /**
  * Created by tloehr on 09.06.15.
  */
+@Log4j2
 public class JPADataChangeListener<T> implements DataChangeListener<T> {
 
     private final DataChangeListener<T> postProcessing;
@@ -41,19 +43,19 @@ public class JPADataChangeListener<T> implements DataChangeListener<T> {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            OPDE.warn(Logger.getLogger(evt.getSource().getClass()), ole);
+            log.warn(ole);
             OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage(ole));
         } catch (Exception e) {
 
             for (Throwable t = e.getCause(); t != null; t = t.getCause()) {
                 if (t instanceof SQLIntegrityConstraintViolationException) {
-                    OPDE.warn(Logger.getLogger(evt.getSource().getClass()), t);
+                    log.warn( t);
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("error.sql.integrity"));
                     throw (new SQLIntegrityConstraintViolationException(t));
                 }
             }
 
-            OPDE.fatal(Logger.getLogger(evt.getSource().getClass()), e);
+            OPDE.fatal(e);
         } finally {
             em.close();
 

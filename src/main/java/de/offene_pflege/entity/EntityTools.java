@@ -6,8 +6,9 @@ import de.offene_pflege.gui.interfaces.NotRemovableUnlessEmpty;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.log4j.Logger;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -26,9 +27,8 @@ import java.util.List;
  * Created by IntelliJ IDEA. User: tloehr Date: 16.06.11 Time: 14:19 To change this template use File | Settings | File
  * Templates.
  */
+@Log4j2
 public class EntityTools {
-
-    static Logger logger = Logger.getLogger(EntityTools.class);
 
     public static boolean persist(Object entity) {
         boolean success = false;
@@ -75,7 +75,7 @@ public class EntityTools {
             em.lock(mergedEntity, LockModeType.OPTIMISTIC);
             em.getTransaction().commit();
         } catch (OptimisticLockException ole) {
-            OPDE.warn(logger, ole);
+            log.warn( ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -88,7 +88,7 @@ public class EntityTools {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         } finally {
             em.close();
         }
@@ -139,7 +139,7 @@ public class EntityTools {
             em.refresh(em.merge(entity));
 //            success = true;
         } catch (Exception e) {
-            Logger.getLogger(EntityTools.class).error(e);
+            log.error(e);
         } finally {
             em.close();
         }
@@ -193,7 +193,7 @@ public class EntityTools {
                 }
 
             } catch (Exception e) {
-                OPDE.fatal(Logger.getLogger(entity.getClass()), e);
+                OPDE.fatal(e);
             }
         }
 
@@ -209,7 +209,7 @@ public class EntityTools {
                         }
                     }
                 } catch (Exception e) {
-                    OPDE.fatal(Logger.getLogger(entity.getClass()), e);
+                    OPDE.fatal(e);
                 }
             }
         }
@@ -312,7 +312,7 @@ public class EntityTools {
 //
 //               jdbcConnection.close();
 //           } catch (SQLException e) {
-//               Main.logger.error(e);
+//               Main.log.error(e);
 //               ok = false;
 //           }
 //           return ok;

@@ -14,8 +14,9 @@ import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
-import org.apache.log4j.Logger;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.MutableInterval;
@@ -31,10 +32,10 @@ import java.util.*;
 /**
  * @author tloehr
  */
+@Log4j2
 public class NReportTools {
 
     public static int IGNORED_AMOUNT_SECONDS_TILL_THE_CLOCK_TURNS_UP = 120;
-    private static Logger logger = Logger.getLogger(NReport.class);
 
     //https://github.com/tloehr/Offene-Pflege.de/issues/66
     public static boolean isChangeable(NReport nReport) {
@@ -134,7 +135,7 @@ public class NReportTools {
         }
         
         em.close();
-        logger.debug((System.currentTimeMillis() - time) + " ms for native minmax2");
+        log.debug((System.currentTimeMillis() - time) + " ms for native minmax2");
         return result;
     }
 
@@ -174,7 +175,7 @@ public class NReportTools {
 
 
         em.close();
-        logger.debug((System.currentTimeMillis() - time) + " ms for minmax");
+        log.debug((System.currentTimeMillis() - time) + " ms for minmax");
         return result;
     }
 
@@ -425,7 +426,7 @@ public class NReportTools {
      */
     public static String getAsHTML(NReport nReport, String highlight) {
         String result = "<div id=\"fonttext\">";
-        logger.debug(nReport.getPbid());
+        log.debug(nReport.getPbid());
 //        result += getDateAndUser(nReport, false, true);
 
 //        result += SYSTools.catchNull(getTagsAsHTML(nReport), " [", "]") + " ";
@@ -634,7 +635,7 @@ public class NReportTools {
         DateTime from = ldfrom.toDateTimeAtStartOfDay();
         DateTime to = SYSCalendar.eod(ldto);
 
-        OPDE.debug(to);
+        log.debug(to);
         try {
 
             String jpql = " SELECT nr " +
@@ -665,7 +666,7 @@ public class NReportTools {
         DateTime from = SYSCalendar.bom(month).toDateTimeAtStartOfDay();
         DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
 
-        OPDE.debug(to);
+        log.debug(to);
         try {
 
             String jpql = " SELECT nr " +
@@ -696,7 +697,7 @@ public class NReportTools {
         DateTime from = SYSCalendar.bow(week).toDateTimeAtStartOfDay();
         DateTime to = SYSCalendar.eod(SYSCalendar.eow(week));
 
-        OPDE.debug(to);
+        log.debug(to);
         try {
 
             String jpql = " SELECT nr " +
@@ -725,7 +726,7 @@ public class NReportTools {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
 
-//        OPDE.debug(day.toString());
+//        log.debug(day.toString());
 
         try {
 
@@ -747,7 +748,7 @@ public class NReportTools {
 
 //            long b = System.currentTimeMillis();
 
-//            OPDE.debug((b - a) + " ms");
+//            log.debug((b - a) + " ms");
 
         } catch (Exception se) {
             OPDE.fatal(se);

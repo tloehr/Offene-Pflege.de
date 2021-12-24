@@ -431,8 +431,8 @@ public class BHP implements Serializable, Comparable<BHP> {
 //    @Override
 //    public boolean equals(Object o) {
 //        if (!(o instanceof BHP)){
-//            OPDE.info("not instance of BHP " + o.toString());
-//            OPDE.info("i am a bhp with id: " + bhpid);
+//            log.info("not instance of BHP " + o.toString());
+//            log.info("i am a bhp with id: " + bhpid);
 //            return false;
 //        }
 //        BHP other = (BHP) o;

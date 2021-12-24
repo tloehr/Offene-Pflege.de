@@ -26,6 +26,7 @@ import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import de.offene_pflege.tablerenderer.RNDHTML;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -53,6 +54,7 @@ import java.util.*;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class PnlLiquidBalance extends NursingRecordsPanel {
 
     private Resident resident;
@@ -444,7 +446,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                             tmRight.removeRow(row);
                             loadLeftTable();
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -494,7 +496,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -537,7 +539,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                         em.getTransaction().commit();
 
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -583,7 +585,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                         em.getTransaction().commit();
                         resident = myResident;
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }

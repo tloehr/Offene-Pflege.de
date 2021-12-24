@@ -10,6 +10,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
@@ -25,6 +26,7 @@ import java.awt.event.ActionEvent;
  * Time: 14:53
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class MedProductWizard {
 
     public static final String internalClassID = "opde.medication.medproduct.wizard";
@@ -214,9 +216,9 @@ public class MedProductWizard {
             setLeftPaneItems(LEFTPANE_STEPS);
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
-                    OPDE.debug(pageEvent.getSource());
+                    log.debug(pageEvent.getSource());
                 } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                    OPDE.debug("SubtextPage OPENDED");
+                    log.debug("SubtextPage OPENDED");
 //                        tradeform = null;
                     pnlTradeForm.setProduct(product);
                 }
@@ -238,7 +240,7 @@ public class MedProductWizard {
             pnlTradeForm = new PnlTradeForm(o -> {
                 tradeform = (TradeForm) o;
 
-                OPDE.debug(SYSTools.catchNull(tradeform.getID(), "null") + ": " + TradeFormTools.toPrettyString(tradeform));
+                log.debug(SYSTools.catchNull(tradeform.getID(), "null") + ": " + TradeFormTools.toPrettyString(tradeform));
                 setupWizardButtons();
             }, product);
             addComponent(pnlTradeForm, true);
@@ -258,9 +260,9 @@ public class MedProductWizard {
             setLeftPaneItems(LEFTPANE_STEPS);
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
-                    OPDE.debug(pageEvent.getSource());
+                    log.debug(pageEvent.getSource());
                 } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                    OPDE.debug("PackagePage OPENDED");
+                    log.debug("PackagePage OPENDED");
 //                        aPackage = null;
                     pnlPackage.setLabelEinheit(DosageFormTools.getPackageText(tradeform.getDosageForm()));
                     pnlPackage.setDarreichung(tradeform);
@@ -301,9 +303,9 @@ public class MedProductWizard {
             setLeftPaneItems(LEFTPANE_GRAPHIC);
             addPageListener(pageEvent -> {
                 if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
-                    OPDE.debug(pageEvent.getSource());
+                    log.debug(pageEvent.getSource());
                 } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                    OPDE.debug("ACMEPage OPENDED");
+                    log.debug("ACMEPage OPENDED");
 //                        acme = null;
                     pnlACME.setProdukt(product);
 //                        setupWizardButtons();

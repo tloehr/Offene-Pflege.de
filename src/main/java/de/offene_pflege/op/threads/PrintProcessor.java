@@ -8,6 +8,7 @@ import de.offene_pflege.op.system.LogicalPrinter;
 import de.offene_pflege.op.system.PrinterForm;
 import de.offene_pflege.op.tools.PrintListElement;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import javax.print.DocFlavor;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +22,7 @@ import java.util.List;
  * für die Etiketten nötig werden. Damit die Erstellung dieser Jobs das Programm nicht anhält
  * bedienen wir uns hier einer nebenläufigen Programierung.
  */
+@Log4j2
 public class PrintProcessor extends Thread {
 
     // TODO: change to synchronized version
@@ -118,7 +120,7 @@ public class PrintProcessor extends Thread {
 
 //                            pb.setValue(progressbar);
                             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.printing") + " " + SYSTools.xx("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
-//                            OPDE.debug("Drucke Nr. " + progressbar);
+//                            log.debug("Drucke Nr. " + progressbar);
                             progressbar++;
 
                         } else {
@@ -152,7 +154,7 @@ public class PrintProcessor extends Thread {
                                 if (printableObject != null) {
                                     printjob += getPrintableObject(printListElement);
                                 } else {
-                                    OPDE.error("invalid printer object. can't print a NULL value. please check printers.xml for typos");
+                                    log.error("invalid printer object. can't print a NULL value. please check printers.xml for typos");
                                 }
 
                                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.printing") + " " + SYSTools.xx("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
@@ -162,7 +164,7 @@ public class PrintProcessor extends Thread {
                             }
                             printjob += printerType.getFooter();
 
-                            OPDE.debug(printjob);
+                            log.debug(printjob);
 
                             try {
                                 encoded = printjob.getBytes(printerType.getEncoding());
@@ -184,7 +186,7 @@ public class PrintProcessor extends Thread {
                 Thread.sleep(2000); // Millisekunden
             } catch (InterruptedException ie) {
                 interrupted = true;
-                OPDE.debug("PrintProcessor interrupted!");
+                log.debug("PrintProcessor interrupted!");
             }
         }
     }
@@ -194,7 +196,7 @@ public class PrintProcessor extends Thread {
         Object printableObject = null;
         if (element.getObject() instanceof MedStock) {
             MedStock bestand = (MedStock) element.getObject();
-            OPDE.debug("PrintProcessor prints StockID: " + bestand.getID());
+            log.debug("PrintProcessor prints StockID: " + bestand.getID());
 
             printableObject = element.getPrinterForm().getFormtext(MedStockTools.getStock4Printing(bestand));
         }

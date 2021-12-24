@@ -35,6 +35,7 @@ import de.offene_pflege.op.tools.DlgYesNo;
 import de.offene_pflege.op.tools.NursingRecordsPanel;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
@@ -52,6 +53,7 @@ import java.util.stream.Collectors;
 /**
  * @author tloehr
  */
+@Log4j2
 public class PnlProcess extends NursingRecordsPanel {
     private Resident resident;
     private JToggleButton tbClosed, tbSystem, tbOnlyMyProcess;
@@ -334,7 +336,7 @@ public class PnlProcess extends NursingRecordsPanel {
 
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -473,7 +475,7 @@ public class PnlProcess extends NursingRecordsPanel {
                         buildPanel();
 
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -612,7 +614,7 @@ public class PnlProcess extends NursingRecordsPanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
 //        GUITools.addAllComponents(mypanel, addCommands());
@@ -800,7 +802,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                 createCP4(myProcess);
                                 buildPanel();
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -859,7 +861,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                 createCP4(myProcess);
                                 buildPanel();
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -934,7 +936,7 @@ public class PnlProcess extends NursingRecordsPanel {
                             mapCP.remove(qProcess.hashCode());
                             buildPanel();
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1006,7 +1008,7 @@ public class PnlProcess extends NursingRecordsPanel {
 
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1191,7 +1193,7 @@ public class PnlProcess extends NursingRecordsPanel {
                             createCP4(myProcess);
                             buildPanel();
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1264,7 +1266,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                 createCP4(myProcess);
                                 buildPanel();
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1329,7 +1331,7 @@ public class PnlProcess extends NursingRecordsPanel {
 
             buildPanel();
         } catch (OptimisticLockException ole) {
-            OPDE.warn(ole);
+            log.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }

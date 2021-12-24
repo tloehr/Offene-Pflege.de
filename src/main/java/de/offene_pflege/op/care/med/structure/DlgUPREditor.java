@@ -14,6 +14,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.*;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class DlgUPREditor extends MyJDialog {
     private static final String internalClassID = "upreditor";
 
@@ -216,7 +218,7 @@ public class DlgUPREditor extends MyJDialog {
                             em.getTransaction().commit();
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }

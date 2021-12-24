@@ -10,6 +10,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.LocalMachine;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.op.tools.SortedProperties;
+import lombok.extern.log4j.Log4j2;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -44,6 +45,7 @@ import java.util.*;
  *
  * @author tloehr
  */
+@Log4j2
 public class AppInfo {
 
     // Zur Unterscheidung in TXEssenDoc
@@ -230,7 +232,7 @@ public class AppInfo {
             } else if (environment.equalsIgnoreCase("classes")) { // oder wir sind schon in einer Umgebung.
                 if (tagName.equalsIgnoreCase("class")) {
                     thisClass = new InternalClass(attributes.getValue("name"), SYSTools.xx(attributes.getValue("short")), SYSTools.xx(attributes.getValue("long")), SYSTools.catchNull(attributes.getValue("main")).equalsIgnoreCase("true"), attributes.getValue("javaclass"), SYSTools.catchNull(attributes.getValue("icon"), "run.png"), attributes.getValue("helpurl"));
-//                    OPDE.debug(thisClass.getInternalClassID());
+//                    log.debug(thisClass.getInternalClassID());
                 } else if (tagName.equalsIgnoreCase("insert")) {
                     thisClass.getPossibleACLs().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.INSERT));
                 } else if (tagName.equalsIgnoreCase("select")) {
@@ -316,8 +318,8 @@ public class AppInfo {
         File user = new File(userTemplatePath);
         File sys = new File(systemTemplatePath);
 
-        OPDE.debug(user.getAbsoluteFile() + " " + user.exists());
-        OPDE.debug(sys.getAbsoluteFile() + " " + sys.exists());
+        log.debug(user.getAbsoluteFile() + " " + user.exists());
+        log.debug(sys.getAbsoluteFile() + " " + sys.exists());
 
         return user.exists() ? user : sys;
     }

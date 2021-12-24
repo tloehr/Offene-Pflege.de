@@ -43,6 +43,7 @@ import de.offene_pflege.op.care.med.prodassistant.MedProductWizard;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -61,6 +62,7 @@ import java.util.ArrayList;
 /**
  * @author tloehr
  */
+@Log4j2
 public class PnlMed extends CleanablePanel {
 
 
@@ -357,7 +359,7 @@ public class PnlMed extends CleanablePanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());

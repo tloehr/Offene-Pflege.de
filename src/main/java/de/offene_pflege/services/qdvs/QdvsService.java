@@ -11,6 +11,7 @@ import de.offene_pflege.op.tools.*;
 import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.services.RoomsService;
 import de.offene_pflege.services.qdvs.schema.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -39,7 +40,8 @@ import java.util.stream.Collectors;
  * vorgeschriebene  Erprobungsbetrieb startet am 01.Oktober 2019 und endet am 30. Juni 2020. Ab dem 01. Juli 2020
  * beginnt dann die stichtagsbezogene regelhafte Erhebung der Ergebnisindikatoren.
  */
-public class QdvsService implements HasLogger {
+@Log4j2
+public class QdvsService {
     private static final String HAUF = "hauf";
     private static final String ABWESENHEIT = "abwe1";
     private static final String BEWUSST = "bewusst01";
@@ -182,7 +184,7 @@ public class QdvsService implements HasLogger {
             if (comment.isPresent()) rootType.setBody(createBodyType(comment.get()));
             else rootType.setBody(createBodyType());
         } catch (Exception e) {
-            getLogger().error(e);
+            log.error(e);
 
         }
     }
@@ -263,7 +265,7 @@ public class QdvsService implements HasLogger {
             marshal(of.createRoot(rootType));
         } catch (Exception e) {
             e.printStackTrace();
-            getLogger().fatal(e);
+            log.fatal(e);
             textListener.addLog(e.getMessage());
         }
     }
@@ -300,7 +302,7 @@ public class QdvsService implements HasLogger {
             marshal(of.createRoot(rootType));
         } catch (Exception e) {
             e.printStackTrace();
-            getLogger().fatal(e);
+            log.fatal(e);
             textListener.addLog(e.getMessage());
         }
         textListener.addLog(SYSConst.html_h2("qdvs.hauptprüfung.abgeschlossen"));
@@ -340,7 +342,7 @@ public class QdvsService implements HasLogger {
         // ermitteln, welche BW ausgeschlossen werden. Und warum.
         residentInfoObjectMap.keySet().forEach(resident -> {
                     // gehen wir mal davon aus, das HAUF existiert
-                    getLogger().debug("Vorprüfung step1 - " + resident.toString());
+                    log.debug("Vorprüfung step1 - " + resident.toString());
 
                     Optional<ResInfo> hauf = ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, STICHTAG);
                     runningNumber++;
@@ -348,7 +350,7 @@ public class QdvsService implements HasLogger {
 
                     if (!hauf.isPresent()) { // das sollte NIE vorkommen, weil da bereits vorher ausgeschlossen wird. Ich konnte es aber nicht lassen.
                         residentInfoObjectMap.get(resident).addLog("Kein Heimaufenthalt HAUF.");
-                        getLogger().error("Bewohner " + resident + " kein HAUF. Das darf nicht sein. Hier läuft etwas schief. ");
+                        log.error("Bewohner " + resident + " kein HAUF. Das darf nicht sein. Hier läuft etwas schief. ");
                     } else {
                         // +1, weil abreise und ankunftstag mitgerechnet werden als abwesenheit
                         long aufenthaltszeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(hauf.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate()) + 1;
@@ -362,19 +364,19 @@ public class QdvsService implements HasLogger {
                         // Ausschlussgrund (4)
                         if (abwesenheitsZeitraumInTagen >= 21) {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
-                            getLogger().debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen);
+                            log.debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen);
                             textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit 21 Tage oder länger :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen + " Tage"));
                         } else if (aufenthaltszeitraumInTagen < 14) { // Ausschlussgrund (1)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_WENIGER_14_TAGE_DA);
-                            getLogger().debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
+                            log.debug("Bewohner " + resident.getId() + " Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen);
                             textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": Heimaufnahme weniger als 14 Tage :" + hauf.get().getFrom() + " // " + aufenthaltszeitraumInTagen + " Tage"));
                         } else if (ResInfoTools.isKZP(hauf.get())) { // Ausschlussgrund (2)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KURZZEIT);
-                            getLogger().debug("Bewohner " + resident.getId() + " in Kurzzeitpflege");
+                            log.debug("Bewohner " + resident.getId() + " in Kurzzeitpflege");
                             textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": Kurzzeitpflege"));
                         } else if (resident.getSterbePhase()) { // Ausschlussgrund (3)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_PALLIATIV);
-                            getLogger().debug("Bewohner " + resident.getId() + " befindet sich in der Sterbephase");
+                            log.debug("Bewohner " + resident.getId() + " befindet sich in der Sterbephase");
                             textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + " befindet sich in der Sterbephase"));
                         } else { // kein Ausschluss
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
@@ -476,62 +478,62 @@ public class QdvsService implements HasLogger {
      * @return
      */
     private ResidentType createResidentType(Resident resident) {
-        getLogger().debug("====================================================================");
-        getLogger().debug("====------------------------------------------------------------====");
-        getLogger().debug("====                                                            ====");
-        getLogger().debug("Indikatoren Ermittlung für Bewohner:in");
-        getLogger().debug(ResidentTools.getLabelText(resident) + " (" + NF_IDBEWOHNER.format(resident.getIdbewohner()) + ")");
+        log.debug("====================================================================");
+        log.debug("====------------------------------------------------------------====");
+        log.debug("====                                                            ====");
+        log.debug("Indikatoren Ermittlung für Bewohner:in");
+        log.debug(ResidentTools.getLabelText(resident) + " (" + NF_IDBEWOHNER.format(resident.getIdbewohner()) + ")");
         ResidentType residentType = of.createResidentType();
 
         try {
 
             final int WIDTH = 57;
             residentType.setQsData(of.createDasQsDataType());
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Allgemeine Angaben", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Allgemeine Angaben", WIDTH)));
             allgemeine_angaben(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", WIDTH)));
             krankenhaus(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Mobilität", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Mobilität", WIDTH)));
             mobilitaet(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", WIDTH)));
             kognitiv_kommunikativ(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Selbstversorgung", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Selbstversorgung", WIDTH)));
             selbstversorgung(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", WIDTH)));
             alltag_soziales(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Dekubitus", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Dekubitus", WIDTH)));
             dekubitus(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", WIDTH)));
             groesse_gewicht(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Sturz", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Sturz", WIDTH)));
             sturz(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Fixierung", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Fixierung", WIDTH)));
             fixierung(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Schmerzen", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Schmerzen", WIDTH)));
             schmerzen(residentType.getQsData(), resident);
-            getLogger().debug(String.format("===---%s---===", StringUtils.center("Informationen zum Einzug", WIDTH)));
+            log.debug(String.format("===---%s---===", StringUtils.center("Informationen zum Einzug", WIDTH)));
             einzug(residentType.getQsData(), resident);
 
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
         }
-        getLogger().debug("====                                                            ====");
-        getLogger().debug("====------------------------------------------------------------====");
-        getLogger().debug("====================================================================");
-        getLogger().debug("");
-        getLogger().debug("");
-        getLogger().debug("");
+        log.debug("====                                                            ====");
+        log.debug("====------------------------------------------------------------====");
+        log.debug("====================================================================");
+        log.debug("");
+        log.debug("");
+        log.debug("");
 
         return residentType;
     }
 
 
     private ResidentType createResidentAusschlussType(Resident resident) {
-        getLogger().debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-        getLogger().debug("XXXX------------------------------------------------------------XXXX");
-        getLogger().debug("XXXX                                                            XXXX");
-        getLogger().debug("AUSSCHLUSS: " + ResidentTools.getLabelText(resident) + " (" + NF_IDBEWOHNER.format(resident.getIdbewohner()) + ")");
+        log.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+        log.debug("XXXX------------------------------------------------------------XXXX");
+        log.debug("XXXX                                                            XXXX");
+        log.debug("AUSSCHLUSS: " + ResidentTools.getLabelText(resident) + " (" + NF_IDBEWOHNER.format(resident.getIdbewohner()) + ")");
         ResidentType residentType = of.createResidentType();
         DasQsDataMdsType qsMdsData = of.createDasQsDataMdsType();
         residentType.setQsDataMds(qsMdsData);
@@ -542,7 +544,7 @@ public class QdvsService implements HasLogger {
         Optional<Rooms> room = RoomsService.getRoom(resident, STICHTAG);
         /** 2 */qsMdsData.setWOHNBEREICH(of.createDasQsDataMdsTypeWOHNBEREICH());
         qsMdsData.getWOHNBEREICH().setValue(room.get().getFloor().getName());
-        getLogger().debug(room.get().toString());
+        log.debug(room.get().toString());
 
         // Datum der Erhebung
         /** 3 */qsMdsData.setERHEBUNGSDATUM(of.createDasQsDataMdsTypeERHEBUNGSDATUM());
@@ -565,9 +567,9 @@ public class QdvsService implements HasLogger {
             qsMdsData.getEINZUGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(ResInfoTools.getValidOnThatDayIfAny(resident, HAUF, STICHTAG).get().getFrom()));
         }
 
-        getLogger().debug("XXXX------------------------------------------------------------XXXX");
-        getLogger().debug("XXXX                                                            XXXX");
-        getLogger().debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+        log.debug("XXXX------------------------------------------------------------XXXX");
+        log.debug("XXXX                                                            XXXX");
+        log.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
 
         return residentType;
@@ -650,7 +652,7 @@ public class QdvsService implements HasLogger {
         }
 
 //        if (resident.getId().equalsIgnoreCase("SG3")) {
-//            getLogger().debug("hier ist sie");
+//            log.debug("hier ist sie");
 //        }
 
         //____ _  _ ___  _  _ ___ ____ ___ _ ____ _  _
@@ -693,8 +695,8 @@ public class QdvsService implements HasLogger {
                     laengsterAufenthalt = Optional.of(away);
                 }
 
-                getLogger().debug("KH Aufenthalt " + DateFormat.getDateInstance().format(away.getFrom()) + " " + DateFormat.getDateInstance().format(away.getTo()) + " Period " + diese_periode_in_tagen);
-                getLogger().debug("Länge der Abwesenheitsperiode: " + diese_periode_in_tagen);
+                log.debug("KH Aufenthalt " + DateFormat.getDateInstance().format(away.getFrom()) + " " + DateFormat.getDateInstance().format(away.getTo()) + " Period " + diese_periode_in_tagen);
+                log.debug("Länge der Abwesenheitsperiode: " + diese_periode_in_tagen);
             }
         }
 
@@ -713,7 +715,7 @@ public class QdvsService implements HasLogger {
             qsData.getKHENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(to));
         }
 
-        if (khbehandlung > 0) getLogger().debug("KHBEHANDLUNG " + khbehandlung + "  KHBANZAHLTAGE " + khbanzahltage);
+        if (khbehandlung > 0) log.debug("KHBEHANDLUNG " + khbehandlung + "  KHBANZAHLTAGE " + khbanzahltage);
         if (khbehandlung == 2) {
             qsData.getKHBANZAHLAUFENTHALTE().setValue(Math.min(khbanzahlaufenhalte, 10)); // mehrere
             qsData.getKHBANZAHLTAGE().setValue(Math.min(khbanzahltage, 200));
@@ -927,7 +929,7 @@ public class QdvsService implements HasLogger {
             connectionIDs.add(resInfo.getConnectionid());
             auswertung_dekubitus.put(resInfo.getConnectionid(), Quintet.with(resInfo.getConnectionid(), 1, 0, SYSConst.LD_UNTIL_FURTHER_NOTICE, SYSConst.LD_VERY_BEGINNING)); // Basisfall, 1 ist bei uns. Wird aber sowieso überschrieben.
         });
-//        getLogger().debug(String.format("%d Wunden gefunden", liste_wunden.size()));
+//        log.debug(String.format("%d Wunden gefunden", liste_wunden.size()));
 
         // Jetzt nehme ich mir jeden Wundverlauf einzeln vor und möchte wissen:
         // entstehungsort
@@ -1040,7 +1042,7 @@ public class QdvsService implements HasLogger {
             DasQsDataType.KOERPERGEWICHTDOKU kd = of.createDasQsDataTypeKOERPERGEWICHTDOKU();
             kd.setValue(0);
             qsData.getKOERPERGEWICHTDOKU().add(kd);
-            getLogger().debug("KEINE GewichtsDoku (oder zu alt)");
+            log.debug("KEINE GewichtsDoku (oder zu alt)");
         } else {
             Properties props = ResInfoTools.getContent(gewichtdoku.get());
             props.forEach((key, value) -> {
@@ -1055,7 +1057,7 @@ public class QdvsService implements HasLogger {
                 DasQsDataType.KOERPERGEWICHTDOKU kd = of.createDasQsDataTypeKOERPERGEWICHTDOKU();
                 kd.setValue(0);
                 qsData.getKOERPERGEWICHTDOKU().add(kd);
-                getLogger().debug("Eintrag vorhanden, aber nicht angekreuzt. Gilt als 0");
+                log.debug("Eintrag vorhanden, aber nicht angekreuzt. Gilt als 0");
             }
         }
     }

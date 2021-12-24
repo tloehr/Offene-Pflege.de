@@ -16,10 +16,10 @@ import de.offene_pflege.op.care.info.PnlBodyScheme;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.threads.DisplayMessage;
-import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
@@ -36,7 +36,8 @@ import java.util.*;
  * <p>
  * Nur die PDF Formulare, die als STATIC aus dem ES4 exportiert wurden liefern die Felder beim Stamper.
  */
-public class TXEssenDoc implements HasLogger {
+@Log4j2
+public class TXEssenDoc {
 
     public static final String SOURCEDOC3 = "ueberleitungsbogen_20170810.pdf";
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
@@ -325,10 +326,10 @@ public class TXEssenDoc implements HasLogger {
 
 
         AcroFields form = stamper.getAcroFields();
-//        form.getFields().keySet().forEach(s -> getLogger().debug(s));
+//        form.getFields().keySet().forEach(s -> log.debug(s));
         for (String key : content.keySet()) {
             if (!ArrayUtils.contains(PnlBodyScheme.PARTS, key)) { // this is a special case. The bodyparts and the pdfkeys have the same name.
-                getLogger().debug(key);
+                log.debug(key);
                 form.setField(key, content.get(key));
             }
         }
@@ -1461,16 +1462,16 @@ public class TXEssenDoc implements HasLogger {
                     if (key.startsWith("bs1.")) { // steht für "bodyscheme" und ist teil der resinfo formulars für die Wunden.
                         String bodykey = key.substring(4); // hiermit wird zwischen der Darstellung von PnlBodyScheme und dem PDF Dokument abgebildet.
                         // dabei ist die position innerhalb der Liste immer gleich.
-                        OPDE.debug(bodykey);
+                        log.debug(bodykey);
                         int listpos = bodyParts.indexOf(bodykey);
-                        OPDE.debug(Integer.toString(listpos));
+                        log.debug(Integer.toString(listpos));
                         // nur wenn dieses property ein körperteil ist und auch angeklickt wurde.
                         if (bodyParts.contains(bodykey)) {
-                            OPDE.debug("==================================================================");
-                            OPDE.debug(TXEAF.PDFPARTSWOUND_U[listpos]);
-                            OPDE.debug(form.getFieldPositions(TXEAF.PDFPARTSWOUND_U[listpos]));
-                            OPDE.debug(TXEAF.PDFPARTSWOUND_L[listpos]);
-                            OPDE.debug(form.getFieldPositions(TXEAF.PDFPARTSWOUND_L[listpos]));
+                            log.debug("==================================================================");
+                            log.debug(TXEAF.PDFPARTSWOUND_U[listpos]);
+                            log.debug(form.getFieldPositions(TXEAF.PDFPARTSWOUND_U[listpos]));
+                            log.debug(TXEAF.PDFPARTSWOUND_L[listpos]);
+                            log.debug(form.getFieldPositions(TXEAF.PDFPARTSWOUND_L[listpos]));
 
 
                             if (mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
@@ -1693,7 +1694,7 @@ public class TXEssenDoc implements HasLogger {
             document.close();
 
         } catch (DocumentException d) {
-            OPDE.error(d);
+            log.error(d);
         }
 
     }
@@ -1841,9 +1842,9 @@ public class TXEssenDoc implements HasLogger {
         for (String key : mapInfo2Properties.get(mapID2Info.get(ResInfoTypeTools.TYPE_INFECTION)).stringPropertyNames()) {
             if (key.startsWith("bs1.")) { // this is a key the resinfos NOT from the PDF
                 String bodykey = key.substring(4);
-                getLogger().debug(bodykey);
+                log.debug(bodykey);
                 int listpos = bodyParts.indexOf(bodykey);
-                getLogger().debug(Integer.toString(listpos));
+                log.debug(Integer.toString(listpos));
                 // does this property denote a body part AND is it clicked ?
                 content.put(TXEAF.PDFPARTSMRE[listpos], setCheckbox(bodyParts.contains(bodykey) && mapInfo2Properties.get(mapID2Info.get(ResInfoTypeTools.TYPE_INFECTION)).getProperty(key).equalsIgnoreCase("true")));
             }

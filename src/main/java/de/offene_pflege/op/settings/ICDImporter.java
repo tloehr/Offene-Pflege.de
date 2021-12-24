@@ -2,6 +2,7 @@ package de.offene_pflege.op.settings;
 
 import de.offene_pflege.entity.info.ICD;
 import de.offene_pflege.op.OPDE;
+import lombok.extern.log4j.Log4j2;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
  * Time: 17:24
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class ICDImporter extends DefaultHandler {
 
 //    private final EntityManager em;
@@ -43,7 +45,7 @@ public class ICDImporter extends DefaultHandler {
 
         if (tagName.equalsIgnoreCase("icd")) {
             code = attributes.getValue("code");
-            OPDE.debug(code);
+            log.debug(code);
             content = new StringBuilder();
         }
     }

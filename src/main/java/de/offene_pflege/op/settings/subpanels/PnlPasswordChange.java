@@ -7,7 +7,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.settings.databeans.PasswordBean;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSTools;
-import org.apache.log4j.Logger;
+
 
 import javax.swing.*;
 
@@ -16,7 +16,7 @@ import javax.swing.*;
  */
 public class PnlPasswordChange extends DefaultPanel {
 
-    Logger logger = Logger.getLogger(getClass());
+
 
     public PnlPasswordChange() {
         super("opde.settings.personal.password");
@@ -43,7 +43,7 @@ public class PnlPasswordChange extends DefaultPanel {
             });
             add(pbe);
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
 
     }

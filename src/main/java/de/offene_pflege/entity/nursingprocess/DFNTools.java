@@ -9,6 +9,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 
@@ -30,6 +31,7 @@ import java.util.List;
  * Time: 16:23
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class DFNTools {
     public static final byte STATE_OPEN = 0;
     public static final byte STATE_DONE = 1;
@@ -57,7 +59,7 @@ public class DFNTools {
         }
 
         if (lastdfn.equals(new LocalDate())) {
-            OPDE.info("Today's DFNImport is already done. Stopping.");
+            log.info("Today's DFNImport is already done. Stopping.");
             System.exit(0);
         }
 
@@ -85,14 +87,14 @@ public class DFNTools {
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.info("[DFNImport] " + SYSTools.xx("misc.msg.writingto") + ": " + OPDE.getUrl());
+            log.info("[DFNImport] " + SYSTools.xx("misc.msg.writingto") + ": " + OPDE.getUrl());
             select.setParameter("von", targetdate.toDateTimeAtStartOfDay().toDate());
             select.setParameter("bis", SYSCalendar.eod(targetdate).toDate());
             select.setParameter("ldatum", targetdate.toDate());
 
             List<InterventionSchedule> list = select.getResultList();
             numdfn += generate(em, list, targetdate, true);
-            OPDE.important(em, SYSTools.xx("nursingrecords.dfnimport") + " " + SYSTools.xx("nursingrecords.dfnimport.completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + SYSTools.xx("nursingrecords.dfnimport.numCreatedEntities") + ": " + numdfn);
+            log.info( SYSTools.xx("nursingrecords.dfnimport") + " " + SYSTools.xx("nursingrecords.dfnimport.completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + SYSTools.xx("nursingrecords.dfnimport.numCreatedEntities") + ": " + numdfn);
         }
 
         SYSPropsTools.storeProp(em, "LASTDFNIMPORT", DateTimeFormat.forPattern("yyyy-MM-dd").print(targetdate));
@@ -124,7 +126,7 @@ public class DFNTools {
             affectedOldDFNs++;
         }
 
-        OPDE.important(em, affectedOldDFNs + " " + SYSTools.xx("nursingrecords.dfnimport.floatingMoved"));
+        log.info(affectedOldDFNs + " " + SYSTools.xx("nursingrecords.dfnimport.floatingMoved"));
     }
 
     /**
@@ -184,28 +186,28 @@ public class DFNTools {
                 // Genaue Ermittlung der Treffer
                 // =============================
                 if (termin.isTaeglich()) {
-//                    OPDE.debug("Eine tägliche Planung");
+//                    log.debug("Eine tägliche Planung");
                     // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
                     // der stichtag getroffen wurde oder überschritten ist.
                     while (Days.daysBetween(ldatum, targetdate).getDays() > 0) {
-//                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere tage: " + termin.getTaeglich());
+//                        log.debug("ldatum liegt vor dem stichtag. Addiere tage: " + termin.getTaeglich());
                         ldatum = ldatum.plusDays(termin.getTaeglich());
                     }
                     // Mich interssiert nur der Treffer, also die Punktlandung auf dem Stichtag
                     treffer = Days.daysBetween(ldatum, targetdate).getDays() == 0;
                 } else if (termin.isWoechentlich()) {
-//                    OPDE.debug("Eine wöchentliche Planung");
+//                    log.debug("Eine wöchentliche Planung");
                     while (Weeks.weeksBetween(ldatum, targetdate).getWeeks() > 0) {
-//                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Wochen: " + termin.getWoechentlich());
+//                        log.debug("ldatum liegt vor dem stichtag. Addiere Wochen: " + termin.getWoechentlich());
                         ldatum = ldatum.plusWeeks(termin.getWoechentlich());
                     }
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest in der selben Kalenderwoche liegt.
                     // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
                     treffer = Weeks.weeksBetween(ldatum, targetdate).getWeeks() == 0;
                 } else if (termin.isMonatlich()) {
-//                    OPDE.debug("Eine monatliche Planung");
+//                    log.debug("Eine monatliche Planung");
                     while (Months.monthsBetween(ldatum, targetdate).getMonths() > 0) {
-//                        OPDE.debug("ldatum liegt vor dem stichtag. Addiere Monate: " + termin.getMonatlich());
+//                        log.debug("ldatum liegt vor dem stichtag. Addiere Monate: " + termin.getMonatlich());
                         ldatum = ldatum.plusMonths(termin.getMonatlich());
                     }
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem Stichtag ist ODER es zumindest im selben Monat desselben Jahres liegt.
@@ -227,42 +229,42 @@ public class DFNTools {
 
                 if (treffer) {
                     if (erstAbFM && termin.getNachtMo() > 0) {
-//                        OPDE.debug("SYSConst.FM, " + termin.getNachtMo());
+//                        log.debug("SYSConst.FM, " + termin.getNachtMo());
                         for (int dfncount = 1; dfncount <= termin.getNachtMo(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_EARLY_IN_THE_MORNING));
                             numdfn++;
                         }
                     }
                     if (erstAbMO && termin.getMorgens() > 0) {
-//                        OPDE.debug("SYSConst.MO, " + termin.getMorgens());
+//                        log.debug("SYSConst.MO, " + termin.getMorgens());
                         for (int dfncount = 1; dfncount <= termin.getMorgens(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_MORNING));
                             numdfn++;
                         }
                     }
                     if (erstAbMI && termin.getMittags() > 0) {
-//                        OPDE.debug("SYSConst.MI, " + termin.getMittags());
+//                        log.debug("SYSConst.MI, " + termin.getMittags());
                         for (int dfncount = 1; dfncount <= termin.getMittags(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_NOON));
                             numdfn++;
                         }
                     }
                     if (erstAbNM && termin.getNachmittags() > 0) {
-//                        OPDE.debug("SYSConst.NM, " + termin.getNachmittags());
+//                        log.debug("SYSConst.NM, " + termin.getNachmittags());
                         for (int dfncount = 1; dfncount <= termin.getNachmittags(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_AFTERNOON));
                             numdfn++;
                         }
                     }
                     if (erstAbAB && termin.getAbends() > 0) {
-//                        OPDE.debug("SYSConst.AB, " + termin.getAbends());
+//                        log.debug("SYSConst.AB, " + termin.getAbends());
                         for (int dfncount = 1; dfncount <= termin.getAbends(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_EVENING));
                             numdfn++;
                         }
                     }
                     if (erstAbNA && termin.getNachtAb() > 0) {
-//                        OPDE.debug("SYSConst.NA, " + termin.getNachtAb());
+//                        log.debug("SYSConst.NA, " + termin.getNachtAb());
                         for (int dfncount = 1; dfncount <= termin.getNachtAb(); dfncount++) {
                             em.merge(new DFN(termin, targetdate.toDate(), SYSCalendar.BYTE_LATE_AT_NIGHT));
                             numdfn++;
@@ -279,7 +281,7 @@ public class DFNTools {
                         if (dtz.isLocalDateTimeGap(localTargetDateTime)) {
                             //todo: find a better way to calculate this (getOffsetFromLocal)
                             localTargetDateTime = localTargetDateTime.plusHours(1);
-                            OPDE.info(SYSTools.xx("Correcting for DST. [TermID=" + termin.getTermID() + "] " + localTargetDateTime.toString()));
+                            log.info(SYSTools.xx("Correcting for DST. [TermID=" + termin.getTermID() + "] " + localTargetDateTime.toString()));
                         }
 
 //                        Date newTargetdate = localTargetDateTime.toDate();
@@ -293,8 +295,8 @@ public class DFNTools {
                     termin.setLDatum(targetdate.toDate());
                 }
             } else {
-//                OPDE.debug("///////////////////////////////////////////////////////////");
-//                OPDE.debug("Folgender MassTermin wurde nicht angenommen: " + termin);
+//                log.debug("///////////////////////////////////////////////////////////");
+//                log.debug("Folgender MassTermin wurde nicht angenommen: " + termin);
             }
         }
 

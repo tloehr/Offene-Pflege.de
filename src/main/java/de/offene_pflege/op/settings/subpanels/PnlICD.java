@@ -16,6 +16,7 @@ import de.offene_pflege.op.settings.ICDImporter;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 
 import javax.persistence.EntityManager;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class PnlICD extends DefaultPanel {
     private DefaultListModel<File> dlmICDFiles;
     private ArrayList<ICD> listICDs;
@@ -91,7 +93,7 @@ public class PnlICD extends DefaultPanel {
 
                         btnImportICD.setIcon(SYSConst.icon22ledGreenOn);
                     } catch (Exception e) {
-                        OPDE.debug(e.getMessage());
+                        log.debug(e.getMessage());
                         e.printStackTrace();
                         OPDE.getDisplayManager().addSubMessage("opde.settings.icd.noICDFile");
                         listICDs.clear();

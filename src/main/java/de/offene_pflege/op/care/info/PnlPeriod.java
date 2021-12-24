@@ -12,6 +12,7 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSConst;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -26,6 +27,7 @@ import java.util.Date;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class PnlPeriod extends JPanel {
     private boolean ignore;
     private Date min, max, fromTemplate, toTemplate;
@@ -86,10 +88,10 @@ public class PnlPeriod extends JPanel {
                 actionBlock.execute(new Pair<Date, Date>(from, to));
             }
 
-            OPDE.debug("accepted min: " + dtmin);
-            OPDE.debug("current fromTemplate: " + dtFrom);
-            OPDE.debug("current toTemplate: " + dtTo);
-            OPDE.debug("accepted max: " + dtmax);
+            log.debug("accepted min: " + dtmin);
+            log.debug("current fromTemplate: " + dtFrom);
+            log.debug("current toTemplate: " + dtTo);
+            log.debug("accepted max: " + dtmax);
 
         } else {
             actionBlock.execute(null);
@@ -258,8 +260,8 @@ public class PnlPeriod extends JPanel {
 
     private void initPanel() {
         ignore = true;
-//        OPDE.debug("min " + min + " max " + max);
-//        OPDE.debug("fromTemplate " + fromTemplate + " toTemplate " + toTemplate);
+//        log.debug("min " + min + " max " + max);
+//        log.debug("fromTemplate " + fromTemplate + " toTemplate " + toTemplate);
 
         final Date myMax = max.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? new Date() : max;
 

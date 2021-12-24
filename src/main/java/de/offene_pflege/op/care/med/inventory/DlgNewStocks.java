@@ -43,6 +43,7 @@ import de.offene_pflege.op.system.PrinterForm;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.JXSearchField;
 import org.joda.time.DateTime;
 
@@ -64,6 +65,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
+@Log4j2
 public class DlgNewStocks extends MyJDialog {
     private boolean ignoreEvent;
 
@@ -134,7 +136,7 @@ public class DlgNewStocks extends MyJDialog {
                     cmbMProdukt.getModel().setSelectedItem(tradeForm);
                 } catch (NoResultException nre) {
                     cmbMProdukt.setModel(new DefaultComboBoxModel());
-                    OPDE.debug(nre);
+                    log.debug(nre);
                 } catch (Exception e) {
                     OPDE.fatal(e);
                 } finally {
@@ -500,7 +502,7 @@ public class DlgNewStocks extends MyJDialog {
             return;
         }
         resident = (Resident) cmbBW.getSelectedItem();
-        OPDE.debug("cmbPackungItemStateChanged: " + cmbBW.getSelectedItem());
+        log.debug("cmbPackungItemStateChanged: " + cmbBW.getSelectedItem());
         initCmbVorrat();
         setApply();
     }//GEN-LAST:event_cmbBWItemStateChanged
@@ -597,7 +599,7 @@ public class DlgNewStocks extends MyJDialog {
             // if the label printer is not used, the new number is shown until the next message, so the user has time to write the number down manually.
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("newstocks.registration.success.1") + " <b>" + newStock.getID() + "</b> " + SYSTools.xx("newstocks.registration.success.2"), btnPrint.isSelected() ? 2 : 0));
         } catch (OptimisticLockException ole) {
-            OPDE.warn(ole);
+            log.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -641,7 +643,7 @@ public class DlgNewStocks extends MyJDialog {
         popup.setTransient(true);
         popup.setDefaultFocusComponent(wizard.getContentPane());
         popup.addPropertyChangeListener("visible", propertyChangeEvent -> {
-            OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
+            log.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
             popup.getContentPane().getComponentCount();
         });
 
@@ -747,7 +749,7 @@ public class DlgNewStocks extends MyJDialog {
             return;
         }
 
-        OPDE.debug("cmbPackungItemStateChanged: " + cmbPackung.getSelectedItem());
+        log.debug("cmbPackungItemStateChanged: " + cmbPackung.getSelectedItem());
         if (cmbPackung.getSelectedItem() instanceof MedPackage) {
             aPackage = (MedPackage) cmbPackung.getSelectedItem();
         } else {

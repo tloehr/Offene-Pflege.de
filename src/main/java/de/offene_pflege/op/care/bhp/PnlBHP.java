@@ -48,6 +48,7 @@ import de.offene_pflege.op.system.Validator;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
@@ -70,6 +71,7 @@ import java.util.*;
  * @author tloehr
  * @see <a href="https://offene-pflege.de/doku.php?id=en:dev:pnlbhp">Developer's website</a>
  */
+@Log4j2
 public class PnlBHP extends NursingRecordsPanel {
 
 
@@ -235,7 +237,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 try {
                                     mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift == SYSCalendar.SHIFT_OUTCOMES || shift != SYSCalendar.whatShiftIs(new Date()));
                                 } catch (PropertyVetoException e) {
-                                    OPDE.debug(e);
+                                    log.debug(e);
                                 }
                                 progress += 20;
                                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
@@ -295,7 +297,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 try {
                     mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift == SYSCalendar.SHIFT_OUTCOMES || shift != SYSCalendar.whatShiftIs(new Date()));
                 } catch (PropertyVetoException e) {
-                    OPDE.debug(e);
+                    log.debug(e);
                 }
             }
 
@@ -326,7 +328,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
 
                     } catch (PropertyVetoException e) {
-                        OPDE.debug(e);
+                        log.debug(e);
                     }
                 }
             }
@@ -724,7 +726,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         buildPanel(false);
                     }
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -784,7 +786,7 @@ public class PnlBHP extends NursingRecordsPanel {
         } else {
 
 //            if (bhp.getPrescription().getID() == 11014l){
-//                OPDE.debug(bhp.getPrescription());
+//                log.debug(bhp.getPrescription());
 //            }
             title = "<html><font size=+1>" +
                     SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
@@ -885,7 +887,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             reload();
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -962,7 +964,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1079,7 +1081,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1192,7 +1194,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 buildPanel(false);
                             }
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1280,7 +1282,7 @@ public class PnlBHP extends NursingRecordsPanel {
         try {
             bhpPane.setCollapsed(true);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         bhpPane.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
@@ -1337,7 +1339,7 @@ public class PnlBHP extends NursingRecordsPanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
 

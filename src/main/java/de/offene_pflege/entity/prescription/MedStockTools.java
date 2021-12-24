@@ -9,6 +9,7 @@ import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -31,6 +32,7 @@ import java.util.*;
  * Time: 14:28
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class MedStockTools {
 //    public static boolean apvNeuberechnung = true;
 
@@ -145,7 +147,7 @@ public class MedStockTools {
 //    }
 
     public static HashMap getStock4Printing(MedStock bestand) {
-        OPDE.debug("StockID: " + bestand.getID());
+        log.debug("StockID: " + bestand.getID());
 
         HashMap hm = new HashMap();
         hm.put("medstock.tradeform", TradeFormTools.toPrettyString(bestand.getTradeForm()));
@@ -212,7 +214,7 @@ public class MedStockTools {
      */
     public static BigDecimal getSum(EntityManager em, MedStock stock) throws Exception {
         BigDecimal result;
-//        OPDE.debug("BestID: " + stock.getID());
+//        log.debug("BestID: " + stock.getID());
         Query query = em.createQuery(" " +
                 " SELECT SUM(tx.amount) " +
                 " FROM MedStock st " +
@@ -263,18 +265,18 @@ public class MedStockTools {
                         // if the deviation was too high (usually more than 20%), then the new UPR is discarded
                         BigDecimal maxDeviation = SYSTools.parseDecimal(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR_CORRIDOR));
                         BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
-                        OPDE.debug("the deviation was: " + deviation + "%");
+                        log.debug("the deviation was: " + deviation + "%");
 
                         // if the deviation is below the limit, then the new UPR will be accepted.
                         // it must also be greater than 0
                         if (deviation.compareTo(maxDeviation) <= 0 && effectiveUPR.compareTo(BigDecimal.ZERO) > 0) {
-                            OPDE.debug("acceptable");
+                            log.debug("acceptable");
                             medStock.setUPR(effectiveUPR);
                         } else {
-                            OPDE.debug("discarded");
+                            log.debug("discarded");
                         }
                     } else {
-                        OPDE.debug("effective UPR is 0 or less. new UPR discarded");
+                        log.debug("effective UPR is 0 or less. new UPR discarded");
                     }
                 } else if (medStock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
                     medStock.setUPR(effectiveUPR);
@@ -296,7 +298,7 @@ public class MedStockTools {
         if (medStock.hasNext2Open()) {
             nextStock = medStock.getNextStock();
             nextStock.setOpened(now.plusSeconds(1).toDate());
-            OPDE.debug("NextStock: " + medStock.getNextStock().getID() + " will be opened now");
+            log.debug("NextStock: " + medStock.getNextStock().getID() + " will be opened now");
         } else {
             // Nothing to open next ?
             // Are there still stocks in this inventory ?
@@ -569,8 +571,8 @@ public class MedStockTools {
             return medstock.getTradeForm().getConstantUPRn();
         }
 
-        OPDE.debug("<--- recalculateUPR ");
-        OPDE.debug("MedStock ID: " + medstock.getID());
+        log.debug("<--- recalculateUPR ");
+        log.debug("MedStock ID: " + medstock.getID());
 
         // this is the amount of content, which was in that package before it was opened
         // package unit
@@ -609,20 +611,20 @@ public class MedStockTools {
      * For DosageForms with type STATE_UPR1, there is no calculation at all. Those values are constantly 1.
      */
     public static BigDecimal getEstimatedUPR(TradeForm tradeForm) {
-        OPDE.debug("<--- calcProspectiveUPR");
+        log.debug("<--- calcProspectiveUPR");
         BigDecimal upr = null;
         if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_DONT_CALC) {
-            OPDE.debug("STATE_DONT_CALC");
+            log.debug("STATE_DONT_CALC");
             // no calculation for gel or ointments. they wont work out anyways.
             upr = BigDecimal.ONE;// getEstimatedUPR_BY_RESIDENT(tradeForm, resident);
         } else if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
-            OPDE.debug("STATE_UPRn");
+            log.debug("STATE_UPRn");
 
             if (tradeForm.getConstantUPRn() != null) {
                 // there is a constant UPR defined for that tradeform
                 // so there is no estimation necessary
                 upr = tradeForm.getConstantUPRn();
-                OPDE.debug("constant UPRn");
+                log.debug("constant UPRn");
             } else {
                 EntityManager em = OPDE.createEM();
                 try {
@@ -633,7 +635,7 @@ public class MedStockTools {
 
                     if (result == null) {
                         upr = BigDecimal.ONE;
-                        OPDE.debug("calculated UPRn. first of its kind. UPR: 1");
+                        log.debug("calculated UPRn. first of its kind. UPR: 1");
                     } else if (result instanceof Double) {
                         upr = new BigDecimal((Double) result);
                     } else {
@@ -645,7 +647,7 @@ public class MedStockTools {
                     }
 
                     upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
-                    OPDE.debug("calculated UPRn. average so far: " + SYSTools.formatBigDecimal(upr));
+                    log.debug("calculated UPRn. average so far: " + SYSTools.formatBigDecimal(upr));
                 } catch (NoResultException nre) {
                     upr = BigDecimal.ONE;
                 } catch (Exception e) {
@@ -657,11 +659,11 @@ public class MedStockTools {
             }
 
         } else {
-            OPDE.debug("STATE_UPR1");
+            log.debug("STATE_UPR1");
             upr = BigDecimal.ONE;
         }
-        OPDE.debug("upr: " + upr);
-        OPDE.debug("calcProspectiveUPR --->");
+        log.debug("upr: " + upr);
+        log.debug("calcProspectiveUPR --->");
         return upr;
     }
 

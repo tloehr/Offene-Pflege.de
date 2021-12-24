@@ -13,6 +13,7 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.RiverLayout;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -29,6 +30,7 @@ import java.net.URI;
  * Time: 11:36
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class PnlEditACL extends JPanel {
     private SYSGROUPS2ACL sysgroups2ACL;
 
@@ -87,7 +89,7 @@ public class PnlEditACL extends JPanel {
                     sysgroups2ACL = mySYSGROUPS2ACL;
 
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }

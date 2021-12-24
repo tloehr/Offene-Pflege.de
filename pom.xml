@@ -30,7 +30,7 @@
         <commons.exec.version>1.3</commons.exec.version>
         <commons.io.version>2.9.0</commons.io.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>
-        <commons.log4j.version>1.2.17</commons.log4j.version>
+        <commons.log4j.version>2.17.0</commons.log4j.version>
         <commons.text.version>1.9</commons.text.version>
         <commons.net.version>3.8.0</commons.net.version>
         <eclipselink.version>2.7.8</eclipselink.version>
@@ -54,6 +54,7 @@
         <jide.version>3.7.11</jide.version>
         <joda.time.version>2.10.10</joda.time.version>
         <junit.version>4.13.2</junit.version>
+        <lombok.version>1.18.22</lombok.version>
         <mysql.connector.version>8.0.25</mysql.connector.version>
         <poi.ooxml.version>4.1.2</poi.ooxml.version>
         <swingx.core.version>1.6.5-1</swingx.core.version>
@@ -87,6 +88,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
@@ -111,11 +118,18 @@
             <artifactId>commons-io</artifactId>
             <version>${commons.io.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
             <version>${commons.log4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${commons.log4j.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itextpdf</artifactId>
@@ -151,22 +165,22 @@
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.mail/mail -->
         <dependency>
-             <groupId>com.sun.mail</groupId>
-             <artifactId>javax.mail</artifactId>
-             <version>1.6.2</version>
-         </dependency>
-         <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
-         <dependency>
-             <groupId>javax.mail</groupId>
-             <artifactId>javax.mail-api</artifactId>
-             <version>1.6.2</version>
-         </dependency>
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/javax.mail/javax.mail-api &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>javax.mail</groupId>-->
-<!--            <artifactId>javax.mail-api</artifactId>-->
-<!--            <version>${javax.mail-api.version}</version>-->
-<!--        </dependency>-->
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/javax.mail/javax.mail-api &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>javax.mail</groupId>-->
+        <!--            <artifactId>javax.mail-api</artifactId>-->
+        <!--            <version>${javax.mail-api.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>

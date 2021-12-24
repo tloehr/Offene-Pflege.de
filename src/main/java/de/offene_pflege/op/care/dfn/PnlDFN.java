@@ -53,6 +53,7 @@ import de.offene_pflege.op.tools.NursingRecordsPanel;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
@@ -76,6 +77,7 @@ import java.util.*;
 /**
  * @author root
  */
+@Log4j2
 public class PnlDFN extends NursingRecordsPanel {
 
 
@@ -215,7 +217,7 @@ public class PnlDFN extends NursingRecordsPanel {
                             try {
                                 mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
                             } catch (PropertyVetoException e) {
-                                OPDE.debug(e);
+                                log.debug(e);
                             }
                             progress += 20;
                             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
@@ -266,7 +268,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     try {
                         mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.SHIFT_ON_DEMAND && shift != SYSCalendar.whatShiftIs(new Date()));
                     } catch (PropertyVetoException e) {
-                        OPDE.debug(e);
+                        log.debug(e);
                     }
                 }
             }
@@ -576,7 +578,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     buildPanel(false);
 
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -697,7 +699,7 @@ public class PnlDFN extends NursingRecordsPanel {
                         }
                         buildPanel(false);
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -787,7 +789,7 @@ public class PnlDFN extends NursingRecordsPanel {
                         }
                         buildPanel(false);
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -855,7 +857,7 @@ public class PnlDFN extends NursingRecordsPanel {
         try {
             dfnPane.setCollapsed(true);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
         dfnPane.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
@@ -889,7 +891,7 @@ public class PnlDFN extends NursingRecordsPanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -1050,11 +1052,11 @@ public class PnlDFN extends NursingRecordsPanel {
                                     mapShift2Pane.get(SYSCalendar.SHIFT_ON_DEMAND).setCollapsed(false);
                                 }
                             } catch (PropertyVetoException e) {
-                                OPDE.debug(e);
+                                log.debug(e);
                             }
 
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }

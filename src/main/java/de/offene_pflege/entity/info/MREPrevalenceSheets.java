@@ -12,13 +12,12 @@ import de.offene_pflege.entity.system.Commontags;
 import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
-import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.services.RoomsService;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
@@ -34,7 +33,8 @@ import java.util.*;
 /**
  * Erzeugt eine Exceltabelle zur Prävalenzmessung im Rahmen des Hygienesiegels des mre-netz regio rhein-ahr.
  */
-public class MREPrevalenceSheets implements HasLogger {
+@Log4j2
+public class MREPrevalenceSheets {
 
     public static final int ROW_SHEET0_FIRST_LINE_FOR_HEADER = 0; // Deckblatt
 
@@ -422,7 +422,7 @@ public class MREPrevalenceSheets implements HasLogger {
     private ArrayList<Prescription> fillALineInSheet1(Resident resident) {
         String[] content = new String[MAXCOL_SHEET1];
 
-        getLogger().debug(resident);
+        log.debug(resident);
         content[FLOOR_INDEX] = stationIndex.get(mapRooms.get(resident).getFloor()).toString();
         content[RESIDENT_NAME_OR_RESID] = anonymous ? SYSTools.anonymizeRID(resident.getId()) : ResidentTools.getLabelText(resident);
         content[RUNNING_NO] = Integer.toString(runningNumber);

@@ -14,7 +14,7 @@ import de.offene_pflege.op.system.EMailSystem;
 import de.offene_pflege.op.system.Recipient;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSTools;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import javax.swing.*;
 import javax.validation.ConstraintViolation;
@@ -29,10 +29,10 @@ import java.util.concurrent.ExecutionException;
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class PnlGlobalMailSettings extends DefaultPanel {
     boolean checkInProgress = false;
     boolean lastCheckOk = false;
-    Logger logger = Logger.getLogger(getClass());
 
     public PnlGlobalMailSettings() {
         super("opde.settings.global.mail");
@@ -44,7 +44,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
             pbe.addDataChangeListener(evt -> SYSPropsTools.storeProps(evt.getData().toProperties(new Properties())));
             add(pbe);
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
 
     }
@@ -56,7 +56,7 @@ public class PnlGlobalMailSettings extends DefaultPanel {
         final YesNoToggleButton tbActive = new YesNoToggleButton("opde.settings.global.mail.active", "opde.settings.global.mail.inactive", SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE)).equalsIgnoreCase("true"));
         final JButton btnTestmail = new JButton(SYSTools.xx("opde.settings.global.mail.sendtest"));
         btnTestmail.addActionListener(e -> {
-            logger.debug("Testmail clicked");
+            log.debug("Testmail clicked");
             try {
                 if (checkInProgress) return;
 
@@ -87,9 +87,9 @@ public class PnlGlobalMailSettings extends DefaultPanel {
                             }
                             tbActive.setSelected(lastCheckOk);
                         } catch (InterruptedException e) {
-                            logger.debug(e);
+                            log.debug(e);
                         } catch (ExecutionException e) {
-                            OPDE.fatal(logger, e);
+                            OPDE.fatal(e);
                         }
                     }
                 };

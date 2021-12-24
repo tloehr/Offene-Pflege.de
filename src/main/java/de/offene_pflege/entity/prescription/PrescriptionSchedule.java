@@ -2,6 +2,7 @@ package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSCalendar;
+import lombok.extern.log4j.Log4j2;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
 
@@ -14,6 +15,7 @@ import java.util.GregorianCalendar;
 @Entity
 @Table(name = "pschedule")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
+@Log4j2
 public class PrescriptionSchedule implements Serializable, Cloneable, Comparable<PrescriptionSchedule> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -656,7 +658,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     @Override
     public int compareTo(PrescriptionSchedule that) {
 
-        OPDE.debug("sorting");
+        log.debug("sorting");
 
         if (this.isOnDemand()) return 0;
 

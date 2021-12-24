@@ -214,7 +214,7 @@ public class SYSPropsTools {
     public static boolean isBooleanTrue(String key, boolean defaultBoolean) {
         boolean bool = defaultBoolean;
 
-//        OPDE.debug("isBooleanTrue: " + key + ": " + SYSTools.catchNull(OPDE.getProps().getProperty(key), "no key/value pair"));
+//        log.debug("isBooleanTrue: " + key + ": " + SYSTools.catchNull(OPDE.getProps().getProperty(key), "no key/value pair"));
 
         if (OPDE.getProps().containsKey(key)) {
             bool = OPDE.getProps().getProperty(key).equalsIgnoreCase("true");
@@ -327,8 +327,8 @@ public class SYSPropsTools {
     }
 
 //    public static String getCountry() {
-//        OPDE.debug(Locale.getDefault().getCountry());
-//        OPDE.debug(Locale.getDefault().getDisplayCountry());
+//        log.debug(Locale.getDefault().getCountry());
+//        log.debug(Locale.getDefault().getDisplayCountry());
 //        String country = "germany";
 //        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_COUNTRY)) {
 //            country = OPDE.getProps().getProperty(SYSPropsTools.KEY_COUNTRY);

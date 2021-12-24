@@ -1,6 +1,7 @@
 package de.offene_pflege.op.threads;
 
 import de.offene_pflege.op.OPDE;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.List;
  * Time: 13:41
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class MessageQ {
     private List<DisplayMessage> messages;
 
@@ -78,10 +80,10 @@ public class MessageQ {
     public synchronized void debug() {
         synchronized (messages) {
             if (messages.isEmpty()) {
-                OPDE.debug("messageQ empty");
+                log.debug("messageQ empty");
             } else {
                 for (DisplayMessage msg : messages) {
-                    OPDE.debug(msg);
+                    log.debug(msg);
                 }
             }
         }

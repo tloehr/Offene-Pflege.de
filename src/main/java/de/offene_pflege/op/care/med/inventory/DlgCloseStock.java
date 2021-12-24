@@ -37,6 +37,7 @@ import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.MyJDialog;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
@@ -53,6 +54,7 @@ import java.math.BigDecimal;
 /**
  * @author tloehr
  */
+@Log4j2
 public class DlgCloseStock extends MyJDialog {
 
     private MedStock medStock;
@@ -313,13 +315,13 @@ public class DlgCloseStock extends MyJDialog {
             em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
 
-            OPDE.important("StockID: " + myStock.getID() + " " + SYSTools.xx("misc.msg.closed"));
-            OPDE.important("UID: " + OPDE.getLogin().getUser().getUID());
+            log.info("StockID: " + myStock.getID() + " " + SYSTools.xx("misc.msg.closed"));
+            log.info("UID: " + OPDE.getLogin().getUser().getUID());
 
             MedStock nextBest = null;
             if (cmbBestID.getSelectedIndex() > 0) {
                 nextBest = em.merge((MedStock) cmbBestID.getSelectedItem());
-                OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_SOON1") + ": " + nextBest.getID());
+                log.info(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_SOON1") + ": " + nextBest.getID());
                 em.lock(nextBest, LockModeType.OPTIMISTIC);
                 myStock.setNextStock(nextBest);
             }
@@ -328,17 +330,17 @@ public class DlgCloseStock extends MyJDialog {
                 BigDecimal inhalt =  SYSTools.parseDecimal(txtLetzte.getText());
                 MedStockTools.setStockTo(em, myStock, inhalt, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
                 myStock.setState(MedStockTools.STATE_WILL_BE_CLOSED_SOON);
-                OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
+                log.info(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
             } else {
                 if (rbGefallen.isSelected()) {
                     MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_BROKEN_OR_LOST"), MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
-                    OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_BROKEN_OR_LOST"));
+                    log.info(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_BROKEN_OR_LOST"));
                 } else if (rbAbgelaufen.isSelected()) {
                     MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_PAST_EXPIRY"), MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
-                    OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_PAST_EXPIRY"));
+                    log.info(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_PAST_EXPIRY"));
                 } else {
                     MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.prescription.dlgCloseStock.TX.STATE_EDIT_EMPTY_NOW"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
-                    OPDE.important(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_NOW"));
+                    log.info(SYSTools.xx("nursingrecords.prescription.dlgCloseStock.LOG.STATE_EDIT_EMPTY_NOW"));
                 }
             }
 

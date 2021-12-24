@@ -22,9 +22,9 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.info.PnlEditResInfo;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
-import de.offene_pflege.op.tools.HasLogger;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +52,8 @@ import java.util.*;
 /**
  * @author Torsten Löhr
  */
-public class PnlDev extends CleanablePanel implements HasLogger {
+@Log4j2
+public class PnlDev extends CleanablePanel {
     Resident resident = null;
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JTabbedPane tabbedPane1;
@@ -153,15 +154,15 @@ public class PnlDev extends CleanablePanel implements HasLogger {
 
     private void txtPZNCaretUpdate(CaretEvent e) {
         try {
-            OPDE.debug(MedPackageTools.parsePZN(txtPZN.getText().trim(), txtCountry.getText().trim()));
+            log.debug(MedPackageTools.parsePZN(txtPZN.getText().trim(), txtCountry.getText().trim()));
         } catch (NumberFormatException e1) {
-            OPDE.error(e1);
+            log.error(e1);
         }
 
     }
 
     private void btnMod11ActionPerformed(ActionEvent e) {
-        OPDE.debug(MedPackageTools.getMOD11Checksum(txtPZN.getText().trim() + "0"));
+        log.debug(MedPackageTools.getMOD11Checksum(txtPZN.getText().trim() + "0"));
     }
 
     private void btnImportMedDBActionPerformed(ActionEvent e) {
@@ -321,7 +322,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
 
                 } catch (Exception exc) {
                     // Structure error within the XLS file
-                    OPDE.warn(exc);
+                    log.warn(exc);
                     sheet.getRow(rowindex).createCell(IMPORT_STATE).setCellValue("error: " + exc.getMessage());
                 }
             }
@@ -355,7 +356,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
                 em.getTransaction().commit();
 
             } catch (OptimisticLockException ole) {
-                OPDE.warn(ole);
+                log.warn(ole);
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
@@ -378,7 +379,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             mapACME.clear();
 
         } catch (Exception ex) {
-            OPDE.error(ex);
+            log.error(ex);
         }
     }
 
@@ -446,7 +447,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
                     ResInfoTools.setContent(newInfo, content);
 //                    newInfo.setHtml(ResInfoTools.getContentAsHTML(newInfo));
 
-//                    OPDE.debug(newInfo.getResident().toString());
+//                    log.debug(newInfo.getResident().toString());
 
                 }
 
@@ -458,7 +459,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Nichts mehr zu tun. Keine offenen NINSURANCE gefunden."));
             }
         } catch (OptimisticLockException ole) {
-            OPDE.warn(ole);
+            log.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -494,7 +495,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
 
         // ResInfos
 
-        OPDE.debug("ResInfos");
+        log.debug("ResInfos");
         StringBuilder html = new StringBuilder(2000000);
 
         html.append(SYSConst.center("Pflegeverlauf " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(resident) +
@@ -524,7 +525,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             }
         }
 
-        OPDE.debug("nursingProcess");
+        log.debug("nursingProcess");
         // nursingProcess
         html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.nursingprocess") + "</h1>\n");
 
@@ -539,11 +540,11 @@ public class PnlDev extends CleanablePanel implements HasLogger {
             }
         }
 
-        OPDE.debug("prescriptions");
+        log.debug("prescriptions");
         html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.prescription") + "</h1>\n");
         html.append(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getAll(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate())), false, false, true, true, true));
 
-        OPDE.debug("reports");
+        log.debug("reports");
         html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.reports") + "</h1>\n");
         html.append(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate())), false, null, null));
 
@@ -552,7 +553,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
         try {
             FileUtils.copyFileToDirectory(f, new File(System.getProperty("user.home")));
         } catch (IOException e1) {
-            OPDE.error(e1);
+            log.error(e1);
         }
 
 
@@ -614,7 +615,7 @@ public class PnlDev extends CleanablePanel implements HasLogger {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Nichts mehr zu tun. Keine offenen NINSURANCE gefunden."));
             }
         } catch (OptimisticLockException ole) {
-            OPDE.warn(ole);
+            log.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }

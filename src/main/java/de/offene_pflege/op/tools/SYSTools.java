@@ -32,6 +32,7 @@ import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
+import lombok.extern.log4j.Log4j2;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -66,6 +67,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@Log4j2
 public class SYSTools {
 
     public static final int INDEX_LASTNAME = 0;
@@ -79,7 +81,7 @@ public class SYSTools {
     public static final int SPEED_NORMAL = 500;
     public static final int SPEED_SLOW = 700;
 
-//    private static final Logger logger = Logger.getLogger(this.getClass());
+//    private static final Logger logger = log.getLogger(this.getClass());
 
 
     public static ListCellRenderer getDefaultRenderer() {
@@ -128,7 +130,7 @@ public class SYSTools {
         if (!OPDE.isDebug()) return;
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 
-        OPDE.debug(ste[2].toString() + ": " + (System.currentTimeMillis() - begin) + " ms");
+        log.debug(ste[2].toString() + ": " + (System.currentTimeMillis() - begin) + " ms");
     }
 
     public static void handleIntegerFocusLost(FocusEvent evt, int min, int max, int def) {
@@ -330,15 +332,15 @@ public class SYSTools {
                         // It is possible that someone could create a listener
                         // that doesn't extend from EventListener.  If so,
                         // ignore it
-                        OPDE.debug("Listener " + params[0] + " does not extend EventListener");
+                        log.debug("Listener " + params[0] + " does not extend EventListener");
                         continue;
                     }
                     for (int j = 0; j < listeners.length; j++) {
                         try {
                             method.invoke(comp, new Object[]{listeners[j]});
-                            //OPDE.debug("removed Listener " + name + "for comp " + comp + "\n");
+                            //log.debug("removed Listener " + name + "for comp " + comp + "\n");
                         } catch (Exception e) {
-                            OPDE.debug("Cannot invoke removeListener method " + e);
+                            log.debug("Cannot invoke removeListener method " + e);
                             // Continue on.  The reason for removing all listeners is to
                             // make sure that we don't have a listener holding on to something
                             // which will keep it from being garbage collected. We want to
@@ -351,7 +353,7 @@ public class SYSTools {
                     // one argument is removePropertyChangeListener.  If it is
                     // something other than that, flag it and move on.
                     if (!name.equals("removePropertyChangeListener")) {
-                        OPDE.debug("    Wrong number of Args " + name);
+                        log.debug("    Wrong number of Args " + name);
                     }
                 }
             }
@@ -925,7 +927,7 @@ public class SYSTools {
     public static double showSide(final JSplitPane split, final double stop, int speedInMillis) {
 
         if (OPDE.isAnimation() && speedInMillis > 0) {
-            OPDE.debug("ShowSide double-version");
+            log.debug("ShowSide double-version");
             final double start = new Double(split.getDividerLocation()) / new Double(getDividerInAbsolutePosition(split, 1.0d));
 
             final TimingSource ts = new SwingTimerTimingSource();
@@ -980,9 +982,9 @@ public class SYSTools {
         } else {
             max = mysplit.getHeight();
         }
-        OPDE.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
-        OPDE.debug("DIVIDER MAX POSITION: " + max);
-        OPDE.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
+        log.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
+        log.debug("DIVIDER MAX POSITION: " + max);
+        log.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
         return new Double(pos) / new Double(max);
     }
 
@@ -996,9 +998,9 @@ public class SYSTools {
         } else {
             max = mysplit.getHeight();
         }
-        OPDE.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
-        OPDE.debug("DIVIDER MAX POSITION: " + max);
-        OPDE.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
+        log.debug("DIVIDER IN ABSOLUTE POSITION: " + pos);
+        log.debug("DIVIDER MAX POSITION: " + max);
+        log.debug("DIVIDER IN RELATIVE POSITION: " + new Double(pos) / new Double(max));
         return new Double(pos) / new Double(max);
     }
 
@@ -1129,7 +1131,7 @@ public class SYSTools {
             }
 
         } catch (ParseException ex) {
-            OPDE.debug(ex);
+            log.debug(ex);
             // Pech
         }
         return i;
@@ -1140,7 +1142,7 @@ public class SYSTools {
     }
 
     public static String left(String text, int size, String abrev) {
-        //        OPDE.debug("IN: " + text);
+        //        log.debug("IN: " + text);
         int originalLaenge = text.length();
         int max = Math.min(size, originalLaenge);
         text = text.substring(0, max);
@@ -1401,7 +1403,7 @@ public class SYSTools {
         // Set the width
         col.setPreferredWidth(width);
 
-        OPDE.debug("packColumn/3: col=" + vColIndex + "  width=" + width);
+        log.debug("packColumn/3: col=" + vColIndex + "  width=" + width);
     }
 
 //    public static boolean isUpdateAvailable() throws IOException {

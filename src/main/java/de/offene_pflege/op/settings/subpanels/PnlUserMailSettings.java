@@ -18,7 +18,8 @@ import de.offene_pflege.op.system.Recipient;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
+
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -35,11 +36,12 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by tloehr on 11.07.15.
  */
+@Log4j2
 public class PnlUserMailSettings extends DefaultPanel {
 
     boolean checkInProgress = false;
     boolean lastCheckOk = false;
-    Logger logger = Logger.getLogger(getClass());
+
     String mailaddress = "";
     boolean keyConfirmed = false;
     final JLabel lblLED = new JLabel();
@@ -60,7 +62,7 @@ public class PnlUserMailSettings extends DefaultPanel {
             pbe.addDataChangeListener(evt -> mailaddress = evt.getData().getMail());
             add(pbe);
         } catch (Exception e) {
-            OPDE.fatal(logger, e);
+            OPDE.fatal(e);
         }
 
         tbNotifications.addItemListener(ie -> {
@@ -119,10 +121,10 @@ public class PnlUserMailSettings extends DefaultPanel {
 
                         } catch (InterruptedException e1) {
                             lastCheckOk = false;
-                            OPDE.warn(logger, e1);
+                            log.warn( e1);
                         } catch (ExecutionException e1) {
                             lastCheckOk = false;
-                            OPDE.warn(logger, e1);
+                            log.warn( e1);
                         }
 
                     }

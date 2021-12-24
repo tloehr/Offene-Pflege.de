@@ -20,6 +20,7 @@ import de.offene_pflege.services.HomesService;
 import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.services.RoomsService;
 import de.offene_pflege.services.StationService;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -54,7 +55,8 @@ import static de.offene_pflege.services.qdvs.QdvsService.NF_IDBEWOHNER;
  * Created by IntelliJ IDEA. User: tloehr Date: 24.10.11 Time: 16:10 To change this template use File | Settings | File
  * Templates.
  */
-public class ResInfoTools implements HasLogger {
+@Log4j2
+public class ResInfoTools {
 
 
     public static ResInfo createStayResInfo(Resident resident, Date from, Boolean kzp) {
@@ -838,7 +840,7 @@ public class ResInfoTools implements HasLogger {
                     strHospital = SYSConst.html_bold(HospitalTools.getFullName(hospital));
                 }
 
-                OPDE.debug(resInfo.getID());
+                log.debug(resInfo.getID());
 
                 if (!strHospital.isEmpty()) {
                     html = "<br/>" + SYSConst.html_bold(SYSConst.html_ul("misc.msg.hospital")) +
@@ -899,7 +901,7 @@ public class ResInfoTools implements HasLogger {
 
     // Parsed die Struktur der Resinfo und gibt eine Zusammenstellung der Inhalte zurück
     private static ResInfoContentParser parseResInfo(ResInfo resInfo) {
-        //OPDE.debug("parseResInfo: resinfo ID: " + resInfo.getID());
+        //log.debug("parseResInfo: resinfo ID: " + resInfo.getID());
         Properties content = getContent(resInfo);
         ResInfoContentParser s = new ResInfoContentParser(content);
 
@@ -1912,7 +1914,7 @@ public class ResInfoTools implements HasLogger {
 
             if (overlap != null) {
                 daysPresent += overlap.toDuration().getStandardDays() + 1;
-//                OPDE.debug(daysPresent);
+//                log.debug(daysPresent);
             }
         }
 

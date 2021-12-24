@@ -4,6 +4,7 @@ package de.offene_pflege.op.tools;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -20,6 +21,7 @@ import java.util.Scanner;
  * this class handles everything that is needed to adapt to the local machine's structure and needs.
  * including os constraints like paths and serial number generation.
  */
+@Log4j2
 public class LocalMachine {
 
     /**
@@ -64,7 +66,7 @@ public class LocalMachine {
         // this is always a viable fallback, if everything else fails use the hostkey instead
         if (result == null) result = OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_HOSTKEY);
 
-        OPDE.debug("Serial Number: " + SYSTools.catchNull(result, "null"));
+        log.debug("Serial Number: " + SYSTools.catchNull(result, "null"));
 
         return result;
     }
@@ -94,19 +96,19 @@ public class LocalMachine {
             Scanner scanner = new Scanner(consoleOutput.toString());
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                OPDE.debug(line);
+                log.debug(line);
                 if (line.trim().startsWith(marker)) {
                     result = StringUtils.removeStart(line.trim(), marker).trim();
-                    OPDE.debug(line);
+                    log.debug(line);
                     break;
                 }
             }
             scanner.close();
         } catch (IOException e) {
-            OPDE.warn(e);
+            log.warn(e);
             result = null;
         } catch (Exception e) {
-            OPDE.error(e);
+            log.error(e);
             result = null;
         }
 

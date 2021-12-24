@@ -50,6 +50,7 @@ import de.offene_pflege.op.system.Validator;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -95,6 +96,7 @@ import java.util.*;
  *
  * @author tloehr
  */
+@Log4j2
 public class PnlInventory extends NursingRecordsPanel {
 
 
@@ -191,7 +193,7 @@ public class PnlInventory extends NursingRecordsPanel {
         try {
             searchPane.setCollapsed(false);
         } catch (PropertyVetoException e) {
-            OPDE.error(e);
+            log.error(e);
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
@@ -438,7 +440,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                 createCP4(myInventory);
                                 buildPanel();
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -520,7 +522,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                 createCP4(myInventory);
                                 buildPanel();
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -582,7 +584,7 @@ public class PnlInventory extends NursingRecordsPanel {
 //                                        lstInventories.remove(inventory);
                                 buildPanel();
                             } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
+                                log.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -901,7 +903,7 @@ public class PnlInventory extends NursingRecordsPanel {
                         createCP4(myStock.getInventory());
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -994,7 +996,7 @@ public class PnlInventory extends NursingRecordsPanel {
                         createCP4(myStock.getInventory());
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1069,7 +1071,7 @@ public class PnlInventory extends NursingRecordsPanel {
                         createCP4(myStock.getInventory());
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1152,7 +1154,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
                         buildPanel();
                     } catch (OptimisticLockException ole) {
-                        OPDE.warn(ole);
+                        log.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1279,7 +1281,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
-                                        OPDE.warn(ole);
+                                        log.warn(ole);
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
                                         }
@@ -1370,7 +1372,7 @@ public class PnlInventory extends NursingRecordsPanel {
 //                                                }
 //                                            });
                                 } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
+                                    log.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1435,7 +1437,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                         createCP4(myStock.getInventory());
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
-                                        OPDE.warn(ole);
+                                        log.warn(ole);
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
                                         }
@@ -1643,7 +1645,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             createCP4(myStock.getInventory());
                             buildPanel();
                         } catch (OptimisticLockException ole) {
-                            OPDE.warn(ole);
+                            log.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -1701,7 +1703,7 @@ public class PnlInventory extends NursingRecordsPanel {
                     createCP4(myStock.getInventory());
                     buildPanel();
                 } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
+                    log.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
