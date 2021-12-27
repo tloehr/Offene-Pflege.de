@@ -43,6 +43,9 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -390,17 +393,11 @@ public class OPDE {
 //        System.out.println("yoy");
 
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                System.out.println("Shutdown Hook");
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> System.out.println("Shutdown Hook")));
 
         FileUtils.forceMkdir(new File(AppInfo.getOPCache()));
         FileUtils.forceMkdir(new File(AppInfo.getUserTemplatePath()));
         FileUtils.forceMkdir(new File(LocalMachine.getLogPath()));
-//        Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
         System.setProperty("logs", LocalMachine.getLogPath());
 
         uptime = SYSCalendar.now();
@@ -548,9 +545,12 @@ public class OPDE {
 
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_DEBUG)).equalsIgnoreCase("true")) {
                 debug = true;
+                
                 //log.getRootLogger().setLevel(Level.DEBUG);
 //                log.setLevel(Level.DEBUG);
             }
+
+            //Configurator.setAllLevels(LogManager.getRootLogger().getName(), Level.OFF);
 
 
             //log.getLogger("org.hibernate").setLevel(Level.OFF);
