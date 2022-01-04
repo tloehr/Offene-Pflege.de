@@ -25,6 +25,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.*;
 import org.joda.time.LocalDate;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -574,10 +575,12 @@ public class MREPrevalenceSheets {
     private void prepareWorkbook() {
         wb = new XSSFWorkbook();
 
-        XSSFColor blue1 = new XSSFColor(GUITools.getColor("BFDAEF"));
-        XSSFColor blue2 = new XSSFColor(GUITools.getColor("E4DFEB"));
-        XSSFColor orange1 = new XSSFColor(GUITools.getColor("FFD3B7"));
-        XSSFColor gray1 = new XSSFColor(GUITools.getColor("F2F2F2"));
+        //todo: fix me later. came with poi 5.1.0
+
+        XSSFColor blue1 = new XSSFColor(GUITools.getColor("BFDAEF"), new DefaultIndexedColorMap());
+        XSSFColor blue2 = new XSSFColor(GUITools.getColor("E4DFEB"), new DefaultIndexedColorMap());
+        XSSFColor orange1 = new XSSFColor(GUITools.getColor("FFD3B7"), new DefaultIndexedColorMap());
+        XSSFColor gray1 = new XSSFColor(GUITools.getColor("F2F2F2"), new DefaultIndexedColorMap());
 
         Font titleFont = wb.createFont();
         titleFont.setFontHeightInPoints((short) 18);

@@ -1,0 +1,1156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" elementFormDefault="qualified" vc:minVersion="1.1">
+	<xs:simpleType name="enum_monat_type">
+		<xs:annotation>
+			<xs:documentation>Monatszahl</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Januar</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Februar</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>März</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>April</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="5">
+				<xs:annotation>
+					<xs:documentation>Mai</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="6">
+				<xs:annotation>
+					<xs:documentation>Juni</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="7">
+				<xs:annotation>
+					<xs:documentation>Juli</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="8">
+				<xs:annotation>
+					<xs:documentation>August</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="9">
+				<xs:annotation>
+					<xs:documentation>September</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="10">
+				<xs:annotation>
+					<xs:documentation>Oktober</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="11">
+				<xs:annotation>
+					<xs:documentation>November</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="12">
+				<xs:annotation>
+					<xs:documentation>Dezember</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_jn_type">
+		<xs:annotation>
+			<xs:documentation>ja/nein</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>nein</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>ja</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_jnAnzahl_type">
+		<xs:annotation>
+			<xs:documentation>ja/nein/Anzahl</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>nein</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>ja, einmal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>ja, mehrmals</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_jnNichtMoeglich_type">
+		<xs:annotation>
+			<xs:documentation>ja/nein/nicht möglich</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>ja</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>nicht möglich aufgrund fehlender Vertrauenspersonen des
+						Bewohners bzw. der Bewohnerin</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>nein, aus anderen Gründen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_bewusstseinszustand_type">
+		<xs:annotation>
+			<xs:documentation>Bewusstseinszustand</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>wach</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>schläfrig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>somnolent</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>komatös</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="5">
+				<xs:annotation>
+					<xs:documentation>Wachkoma</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_diagnose_type">
+		<xs:annotation>
+			<xs:documentation>Ärztliche Diagnosen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Keine der angegebenen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Bösartige Tumorerkrankung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Tetraplegie/Tetraparese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Chorea Huntington</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Apallisches Syndrom</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_selbststaendigkeitStandard_type">
+		<xs:annotation>
+			<xs:documentation>Selbstständigkeit (Punktwerte Standard)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>selbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>überwiegend selbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>überwiegend unselbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>unselbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_selbststaendigkeitTyp1_type">
+		<xs:annotation>
+			<xs:documentation>Selbstständigkeit (Punktwerte Typ 1)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>selbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>überwiegend selbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>überwiegend unselbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="6">
+				<xs:annotation>
+					<xs:documentation>unselbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_selbststaendigkeitTyp2_type">
+		<xs:annotation>
+			<xs:documentation>Selbstständigkeit (Punktwerte Typ 2)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>selbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>überwiegend selbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="6">
+				<xs:annotation>
+					<xs:documentation>überwiegend unselbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="9">
+				<xs:annotation>
+					<xs:documentation>unselbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_vorhandenseinStandard_type">
+		<xs:annotation>
+			<xs:documentation>Vorhandensein von Fähigkeiten (Punktwerte Standard)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>vorhanden/unbeeinträchtigt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>größtenteils vorhanden</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>in geringem Maße vorhanden</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>nicht vorhanden</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_fremdhilfe_type">
+		<xs:annotation>
+			<xs:documentation>Fremdhilfe</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>selbständig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>mit Fremdhilfe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_kuenstlicheErnaehrung_type">
+		<xs:annotation>
+			<xs:documentation>Künstliche Ernährung</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>nicht täglich oder nicht dauerhaft</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="6">
+				<xs:annotation>
+					<xs:documentation>täglich, aber zusätzlich zur oralen
+						Ernährung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>ausschließlich oder nahezu ausschließlich künstliche
+						Ernährung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_harnkontinenz_type">
+		<xs:annotation>
+			<xs:documentation>Blasenkontrolle/Harnkontinenz</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>ständig kontinent</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>überwiegend kontinent. Maximal 1x täglich inkontinent oder
+						Tröpfchen-/Stressinkontinenz</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>überwiegend (mehrmals täglich) inkontinent, gesteuerte
+						Blasenentleerung ist aber noch möglich</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>komplett inkontinent, gesteuerte Blasenentleerung ist nicht
+						möglich</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Bewohner bzw. Bewohnerin hat einen Dauerkatheter oder ein
+						Urostoma</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_stuhlkontinenz_type">
+		<xs:annotation>
+			<xs:documentation>Darmkontrolle/Stuhlkontinenz</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>ständig kontinent</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>überwiegend kontinent, gelegentlich
+						inkontinent</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>überwiegend inkontinent, selten gesteuerte
+						Darmentleerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>komplett inkontinent, gesteuerte Darmentleerung ist nicht
+						möglich</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Bewohner bzw. Bewohnerin hat ein Colo- oder
+						Ileostoma</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_dekubitusStadium_type">
+		<xs:annotation>
+			<xs:documentation>Dekubitusstadium</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Kategorie/Stadium 1</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Kategorie/Stadium 2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Kategorie/Stadium 3</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Kategorie/Stadium 4</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="9">
+				<xs:annotation>
+					<xs:documentation>unbekannt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_lokalisation_type">
+		<xs:annotation>
+			<xs:documentation>Lokalisation</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>in der Pflegeeinrichtung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>im Krankenhaus</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>zuhause (vor dem Einzug)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>woanders</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_gewichtsverlust_type">
+		<xs:annotation>
+			<xs:documentation>Gewichtsverlust aus Pflegedokumentation</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Keine der angegebenen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Gewichtsverlust durch medikamentöse
+						Ausschwemmung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Gewichtsverlust aufgrund ärztlich angeordneter oder ärztlich
+						genehmigter Diät</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Mindestens 10% Gewichtsverlust während eines
+						Krankenhausaufenthalts</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Aktuelles Gewicht liegt nicht vor. Bewohner bzw. Bewohnerin
+						wird aufgrund einer Entscheidung des Arztes bzw. der Ärztin oder eines
+						Betreuers bzw. einer Betreuerin bzw. des/der Bevollmächtigten nicht mehr
+						gewogen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="5">
+				<xs:annotation>
+					<xs:documentation>Aktuelles Gewicht liegt nicht vor. Bewohner bzw. Bewohnerin
+						möchte nicht gewogen werden</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_sturzfolgen_type">
+		<xs:annotation>
+			<xs:documentation>Sturzfolgen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>keine der genannten Folgen ist aufgetreten</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Frakturen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>ärztlich behandlungsbedürftige Wunde</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>erhöhter Unterstützungsbedarf bei
+						Alltagsverrichtungen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>erhöhter Unterstützungsbedarf bei der
+						Mobilität</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_schmerzeinschaetzung_type">
+		<xs:annotation>
+			<xs:documentation>Informationen zur Schmerzeischätzung</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Es liegen keine Informationen vor</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Schmerzintensität</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Schmerzqualität</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Schmerzlokalisation</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Folgen für Lebensalltag</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_teilnehmer_type">
+		<xs:annotation>
+			<xs:documentation>Gesprächsteilnehmer</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Keine der angegebenen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Bewohner/Bewohnerin</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Angehörige</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Betreuer/Betreuerin</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>andere Vertrauenspersonen, die nicht in der Einrichtung
+						beschäftigt sind</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_ausschlussgrund_type">
+		<xs:annotation>
+			<xs:documentation>Ausschlussgrund im Fall eines Minimaldatensatzes
+				(MDS)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Einzugsdatum liegt weniger als 14 Tage vor dem
+						Stichtag</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Bewohner bzw. Bewohnerin ist Kurzzeit- bzw.
+						Verhinderungspflegegast</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Bewohner bzw. Bewohnerin befindet sich in der
+						Sterbephase</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Bewohner bzw. Bewohnerin hält sich seit mindestens 21 Tagen
+						vor dem Stichtag nicht mehr in der Einrichtung auf (z. B. wegen einer
+						Krankenhausbehandlung oder eines längeren Urlaubs mit
+						Angehörigen)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_wohnbereich_type">
+		<xs:annotation>
+			<xs:documentation>Wohnbereichskode für die wohnbereichsbezogene
+				Auswertung</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="WB_1">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 1</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_2">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_3">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 3</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_4">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 4</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_5">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 5</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_6">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 6</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_7">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 7</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_8">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 8</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_9">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 9</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_10">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 10</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_11">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 11</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_12">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 12</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_13">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 13</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_14">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 14</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_15">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 15</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_16">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 16</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_17">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 17</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_18">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 18</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_19">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 19</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_20">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 20</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_21">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 21</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_22">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 22</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_23">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 23</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_24">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 24</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_25">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 25</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_26">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 26</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_27">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 27</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_28">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 28</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_29">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 29</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_30">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 30</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_31">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 31</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_32">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 32</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_33">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 33</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_34">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 34</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_35">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 35</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_36">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 36</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_37">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 37</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_38">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 38</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_39">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 39</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_40">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 40</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_41">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 41</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_42">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 42</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_43">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 43</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_44">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 44</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_45">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 45</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_46">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 46</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_47">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 47</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_48">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 48</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_49">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 49</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_50">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 50</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_51">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 51</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_52">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 52</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_53">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 53</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_54">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 54</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_55">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 55</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_56">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 56</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_57">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 57</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_58">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 58</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_59">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 59</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_60">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 60</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_61">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 61</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_62">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 62</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_63">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 63</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_64">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 64</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_65">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 65</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_66">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 66</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_67">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 67</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_68">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 68</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_69">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 69</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_70">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 70</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_71">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 71</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_72">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 72</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_73">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 73</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_74">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 74</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_75">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 75</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_76">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 76</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_77">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 77</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_78">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 78</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_79">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 79</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_80">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 80</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_81">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 81</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_82">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 82</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_83">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 83</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_84">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 84</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_85">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 85</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_86">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 86</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_87">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 87</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_88">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 88</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_89">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 89</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_90">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 90</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_91">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 91</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_92">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 92</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_93">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 93</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_94">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 94</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_95">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 95</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_96">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 96</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_97">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 97</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_98">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 98</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WB_99">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich 99</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

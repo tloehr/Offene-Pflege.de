@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" xmlns:das="https://www.das-pflege.de" elementFormDefault="qualified" vc:minVersion="1.1" xpathDefaultNamespace="##targetNamespace">
+	<xs:include schemaLocation="das_qs_datatypes.xsd"/>
+	<xs:complexType name="das_qs_data_mds_type">
+		<xs:annotation>
+			<xs:documentation>Erhebungsbogen zur Erfassung von Versorgungsergebnissen der
+				stationären Langzeitpflege sofern ein Ausschlussgrund vorliegt = Minimaldatensatz (MDS)</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="IDBEWOHNER">
+				<xs:annotation>
+					<xs:documentation>Bewohnerbezogene Nummer</xs:documentation>
+					<xs:appinfo>
+						<das:ref_number>1</das:ref_number>
+						<das:caption_id>1</das:caption_id>
+						<das:caption_header>Allgemeine Angaben</das:caption_header>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:pattern value="[0-9]{6}"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="WOHNBEREICH">
+				<xs:annotation>
+					<xs:documentation>Wohnbereich</xs:documentation>
+					<xs:appinfo>
+						<das:ref_number>2</das:ref_number>
+						<das:caption_id>1</das:caption_id>
+						<das:caption_header>Allgemeine Angaben</das:caption_header>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="enum_wohnbereich_type" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ERHEBUNGSDATUM">
+				<xs:annotation>
+					<xs:documentation>Datum der Ergebniserfassung</xs:documentation>
+					<xs:appinfo>
+						<das:ref_number>3</das:ref_number>
+						<das:caption_id>1</das:caption_id>
+						<das:caption_header>Allgemeine Angaben</das:caption_header>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="xs:date" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="EINZUGSDATUM">
+				<xs:annotation>
+					<xs:documentation>Datum des Einzugs (Beginn der vollstationären Langzeitpflege)</xs:documentation>
+					<xs:appinfo>
+						<das:ref_number>4</das:ref_number>
+						<das:caption_id>1</das:caption_id>
+						<das:caption_header>Allgemeine Angaben</das:caption_header>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="xs:date" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GEBURTSMONAT">
+				<xs:annotation>
+					<xs:documentation>Geburtsmonat</xs:documentation>
+					<xs:appinfo>
+						<das:ref_number>5</das:ref_number>
+						<das:caption_id>1</das:caption_id>
+						<das:caption_header>Allgemeine Angaben</das:caption_header>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="enum_monat_type" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GEBURTSJAHR">
+				<xs:annotation>
+					<xs:documentation>Geburtsjahr</xs:documentation>
+					<xs:appinfo>
+						<das:ref_number>6</das:ref_number>
+						<das:caption_id>1</das:caption_id>
+						<das:caption_header>Allgemeine Angaben</das:caption_header>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:gYear">
+								<xs:minInclusive value="1900"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AUSSCHLUSSGRUND">
+				<xs:annotation>
+					<xs:documentation>Ausschlussgrund</xs:documentation>
+					<xs:appinfo>
+						<das:ref_number>7</das:ref_number>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="enum_ausschlussgrund_type" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:assert test="if(not(exists(IDBEWOHNER/@value)) or string-length(xs:string(IDBEWOHNER/@value)) = 0 or xs:string(IDBEWOHNER/@value) = '') then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="10001"/>
+					<das:rule_text value="Im Pflichtfeld [1: 'Bewohnerbezogene Nummer'] ist kein Wert angegeben"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="IDBEWOHNER"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(not(exists(ERHEBUNGSDATUM/@value)) or string-length(xs:string(ERHEBUNGSDATUM/@value)) = 0 or xs:string(ERHEBUNGSDATUM/@value) = '') then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="10003"/>
+					<das:rule_text value="Im Pflichtfeld [3: 'Datum der Ergebniserfassung'] ist kein Wert angegeben"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="ERHEBUNGSDATUM"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(not(exists(GEBURTSMONAT/@value)) or string-length(xs:string(GEBURTSMONAT/@value)) = 0 or xs:string(GEBURTSMONAT/@value) = '') then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="10005"/>
+					<das:rule_text value="Im Pflichtfeld [5: 'Geburtsmonat'] ist kein Wert angegeben"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="GEBURTSMONAT"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(not(exists(GEBURTSJAHR/@value)) or string-length(xs:string(GEBURTSJAHR/@value)) = 0 or xs:string(GEBURTSJAHR/@value) = '') then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="10006"/>
+					<das:rule_text value="Im Pflichtfeld [6: 'Geburtsjahr'] ist kein Wert angegeben"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="GEBURTSJAHR"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(not(exists(AUSSCHLUSSGRUND/@value)) or string-length(xs:string(AUSSCHLUSSGRUND/@value)) = 0 or xs:string(AUSSCHLUSSGRUND/@value) = '') then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="10060"/>
+					<das:rule_text value="Im Pflichtfeld ['Ausschlussgrund'] ist kein Wert angegeben"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="AUSSCHLUSSGRUND"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(GEBURTSMONAT/@value) and not(xs:string(GEBURTSMONAT/@value) = ('1','2','3','4','5','6','7','8','9','10','11','12'))) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="20001"/>
+					<das:rule_text value="Der Wert des Datenfeldes [5: 'Geburtsmonat'] entspricht keinem der für dieses Datenfeld gültigen Schlüsselwerte = 1 bis 12"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="GEBURTSMONAT"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(AUSSCHLUSSGRUND/@value) and not(xs:string(AUSSCHLUSSGRUND/@value) = ('1','2','3','4'))) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="20072"/>
+					<das:rule_text value="Der Wert des Datenfeldes ['Ausschlussgrund'] entspricht keinem der für dieses Datenfeld gültigen Schlüsselwerte = 1, 2, 3 oder 4"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="AUSSCHLUSSGRUND"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(WOHNBEREICH/@value) and not(matches(WOHNBEREICH/@value, '^WB_([1-9]|[1-9][0-9])$'))) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="20073"/>
+					<das:rule_text value="Der Wert des Datenfeldes [2: 'Wohnbereich'] entspricht keinem der für dieses Datenfeld gültigen Schlüsselwerte: 'WB_' + [1 bis 99]"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="WOHNBEREICH"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(IDBEWOHNER/@value) and (not(IDBEWOHNER/@value castable as xs:int) or string-length(xs:string(IDBEWOHNER/@value)) &gt; 6)) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="30001"/>
+					<das:rule_text value="Der Datentyp des Datenfeldes [1: 'Bewohnerbezogene Nummer'] entspricht nicht dem vorgegebenen Datentyp: xs:int mit einer Feldlänge von 6"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="IDBEWOHNER"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(ERHEBUNGSDATUM/@value) and (not(ERHEBUNGSDATUM/@value castable as xs:date) or string-length(xs:string(ERHEBUNGSDATUM/@value)) != 10)) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="30002"/>
+					<das:rule_text value="Der Datentyp des Datenfeldes [3: 'Datum der Ergebniserfassung'] entspricht nicht dem vorgegebenen Datentyp: xs:date mit einer Feldlänge von 10"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="ERHEBUNGSDATUM"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(EINZUGSDATUM/@value) and (not(EINZUGSDATUM/@value castable as xs:date) or string-length(xs:string(EINZUGSDATUM/@value)) != 10)) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="30003"/>
+					<das:rule_text value="Der Datentyp des Datenfeldes [4: 'Datum des Einzugs (Beginn der vollstationären Langzeitpflege)'] entspricht nicht dem vorgegebenen Datentyp: xs:date mit einer Feldlänge von 10"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="EINZUGSDATUM"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(GEBURTSMONAT/@value) and (not(GEBURTSMONAT/@value castable as xs:int) or string-length(xs:string(GEBURTSMONAT/@value)) &gt; 2)) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="30004"/>
+					<das:rule_text value="Der Datentyp des Datenfeldes [5: 'Geburtsmonat'] entspricht nicht dem vorgegebenen Datentyp: xs:int mit einer Feldlänge von 2"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="GEBURTSMONAT"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(GEBURTSJAHR/@value) and (not(GEBURTSJAHR/@value castable as xs:gYear) or string-length(xs:string(GEBURTSJAHR/@value)) &gt; 4)) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="30005"/>
+					<das:rule_text value="Der Datentyp des Datenfeldes [6: 'Geburtsjahr'] entspricht nicht dem vorgegebenen Datentyp: xs:gYear mit einer Feldlänge von 4"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="GEBURTSJAHR"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(exists(AUSSCHLUSSGRUND/@value) and (not(AUSSCHLUSSGRUND/@value castable as xs:int) or string-length(xs:string(AUSSCHLUSSGRUND/@value)) &gt; 1)) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="30096"/>
+					<das:rule_text value="Der Datentyp des Datenfeldes ['Ausschlussgrund'] entspricht nicht dem vorgegebenen Datentyp: xs:int mit einer Feldlänge von 1"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="AUSSCHLUSSGRUND"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(xs:int(xs:string(GEBURTSJAHR/@value)) &lt; 1900 or xs:int(xs:string(GEBURTSJAHR/@value)) &gt; xs:int(xs:string(year-from-date(current-date())))) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="40001"/>
+					<das:rule_text value="Der Wert des Datenfeldes [6: 'Geburtsjahr'] liegt nicht im gültigen Wertebereich: &gt;= 1900 und &lt;= dem aktuellen Jahr"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="GEBURTSJAHR"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(ERHEBUNGSDATUM/@value &gt; current-date()) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="50001"/>
+					<das:rule_text value="Das Datum im Datenfeld [3: 'Datum der Ergebniserfassung'] liegt in der Zukunft"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="ERHEBUNGSDATUM"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(EINZUGSDATUM/@value &gt; current-date()) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="50002"/>
+					<das:rule_text value="Das Datum im Datenfeld [4: 'Datum des Einzugs (Beginn der vollstationären Langzeitpflege)'] liegt in der Zukunft"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="EINZUGSDATUM"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(ERHEBUNGSDATUM/@value &lt; EINZUGSDATUM/@value) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="50019"/>
+					<das:rule_text value="Das Datum im Datenfeld [3: 'Datum der Ergebniserfassung'] liegt vor dem Datum im Datenfeld [4: 'Datum des Einzugs (Beginn der vollstationären Langzeitpflege)']"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="EINZUGSDATUM"/>
+						<das:field value="ERHEBUNGSDATUM"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(AUSSCHLUSSGRUND/@value = (1,3,4) and not(exists(EINZUGSDATUM/@value))) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="60096"/>
+					<das:rule_text value="Im Datenfeld ['Ausschlussgrund'] ist [1 = Einzugsdatum liegt weniger als 14 Tage vor dem Stichtag], [3 = Bewohner bzw. Bewohnerin befindet sich in der Sterbephase] oder [4 = Bewohner bzw. Bewohnerin hält sich seit mindestens 21 Tagen vor dem Stichtag nicht  mehr in der Einrichtung auf (z. B. wegen einer Krankenhausbehandlung oder eines längeren Urlaubs mit Angehörigen)] angegeben, jedoch kein Wert im Datenfeld [4: 'Datum des Einzugs (Beginn der vollstationären Langzeitpflege)']. Das Datenfeld [4: 'Datum des Einzugs (Beginn der vollstationären Langzeitpflege)'] wird in diesem Fall zu einem Pflichtfeld"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="AUSSCHLUSSGRUND"/>
+						<das:field value="EINZUGSDATUM"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(not(AUSSCHLUSSGRUND/@value = (1,3,4)) and exists(EINZUGSDATUM/@value)) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="60097"/>
+					<das:rule_text value="Im Datenfeld ['Ausschlussgrund'] ist [2 = Bewohner bzw. Bewohnerin ist Kurzzeit- bzw. Verhinderungspflegegast] angegeben und gleichzeitig ein Wert im Datenfeld [4: 'Datum des Einzugs (Beginn der vollstationären Langzeitpflege)']. Im Datenfeld [4: 'Datum des Einzugs (Beginn der vollstationären Langzeitpflege)'] darf in diesem Fall kein Wert angegeben werden"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="AUSSCHLUSSGRUND"/>
+						<das:field value="EINZUGSDATUM"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+</xs:schema>

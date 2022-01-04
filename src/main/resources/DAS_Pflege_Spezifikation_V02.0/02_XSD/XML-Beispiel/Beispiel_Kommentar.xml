@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.das-pflege.de ../interface_qs_data/das_interface.xsd" xmlns="https://www.das-pflege.de">
+    <header>
+        <document>
+            <guid value="2d72c378-cf41-4647-a3ad-a30243412345"/>
+            <creation_date value="2021-12-30T09:00:00Z"/>
+            <specification value="V02"/>
+        </document>
+        <care_provider>
+            <registration value="100001"/>
+            <target_date value="2021-09-15"/>
+        </care_provider>
+        <software>
+            <provider value="Pflegesoftware Hersteller"/>
+            <name value="Pflegesoftware"/>
+            <version value="2"/>
+            <release value="1"/>
+        </software>
+    </header>
+    <body>
+        <commentation_container>
+            <KOMMENTAR value="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."/>
+        </commentation_container>
+    </body>
+</root>

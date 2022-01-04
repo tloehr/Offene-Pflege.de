@@ -49,7 +49,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.*;
 
-import static de.offene_pflege.services.qdvs.QdvsService.NF_IDBEWOHNER;
+import static de.offene_pflege.services.qdvs.spec14.QdvsService.NF_IDBEWOHNER;
 
 /**
  * Created by IntelliJ IDEA. User: tloehr Date: 24.10.11 Time: 16:10 To change this template use File | Settings | File
@@ -1685,7 +1685,7 @@ public class ResInfoTools {
                             SYSConst.html_table_th("misc.msg.details")
             ));
 
-            Collections.sort(dataMap.get(resident), (o1, o2) -> new Long(o1.getPITInMillis()).compareTo(new Long(o2.getPITInMillis())) * -1);
+            Collections.sort(dataMap.get(resident), (o1, o2) -> Long.valueOf(o1.getPITInMillis()).compareTo(Long.valueOf(o2.getPITInMillis())) * -1);
 
             for (QProcessElement element : dataMap.get(resident)) {
                 if (element instanceof ResInfo) {
