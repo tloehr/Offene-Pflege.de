@@ -459,34 +459,35 @@ public class SYSFilesTools {
     }
 
 
-    public static File print(String html, boolean addPrintJScript) {
-        return print(html, addPrintJScript, true);
+    public static void print(String html, boolean addPrintJScript) {
+        print(html, addPrintJScript, true);
+    }
+
+    public static void print(String html, boolean addPrintJScript, boolean handleTheFile) {
+        try {
+            File temp = createTempFile("opde", ".html");
+            temp.deleteOnExit();
+            print(html, temp, addPrintJScript, handleTheFile);
+        } catch (IOException e) {
+            log.error(e);
+        }
+
     }
 
     /**
      * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit. Erstellt
      * temporäre Dateien im temp Verzeichnis opde<irgendwas>.html
-     *
-     * @param html
-     * @param addPrintJScript Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
      */
-    public static File print(String html, boolean addPrintJScript, boolean handleTheFile) {
-        File temp = null;
-        try {
-            // Create temp file.
-            temp = createTempFile("opde", ".html");
-            temp.deleteOnExit();
+    public static void print(String html, File tempfile, boolean addPrintJScript, boolean handleTheFile) throws IOException {
 
-            // Write to temp file
-            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            out.write(getHTML4Printout(html, addPrintJScript));
+        // Write to temp file
+        BufferedWriter out = new BufferedWriter(new FileWriter(tempfile));
+        out.write(getHTML4Printout(html, addPrintJScript));
 
-            out.close();
-            if (handleTheFile) SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
-        } catch (IOException e) {
-            log.error(e);
-        }
-        return temp;
+        out.close();
+        if (handleTheFile) SYSFilesTools.handleFile(tempfile, Desktop.Action.OPEN);
+
+
     }
 
     public static File createTempFile(String prefix, String suffix) throws IOException {

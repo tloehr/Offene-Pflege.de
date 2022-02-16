@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "7.0.0.6.255" Java: "11.0.5" encoding: "UTF-8"
+JFDML JFormDesigner: "7.0.5.1.409" Java: "11.0.13" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -225,45 +225,19 @@ new FormModel {
 					"$rowSpecs": "fill:default, linegap, default:grow"
 				} ) {
 					name: "panel5"
-					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-						name: "scrollPane3"
-						add( new FormComponent( "javax.swing.JTree" ) {
-							name: "tree1"
-						} )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 1
-						"gridY": 3
-						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-					} )
-					add( new FormContainer( "javax.swing.JSplitPane", new FormLayoutManager( class javax.swing.JSplitPane ) ) {
-						name: "splitPane1"
-						"orientation": 0
-						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-							name: "scrollPane5"
-							add( new FormComponent( "javax.swing.JTable" ) {
-								name: "table1"
-							} )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "left"
-						} )
-						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-							name: "scrollPane4"
-							add( new FormComponent( "javax.swing.JTextArea" ) {
-								name: "textArea1"
-							} )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "right"
-						} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "button7"
+						"text": "text"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button7", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 3
 						"gridY": 3
-						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
 				}, new FormLayoutConstraints( null ) {
 					"title": "text"
 				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
-				"value": "Center"
+				"value": "North"
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )

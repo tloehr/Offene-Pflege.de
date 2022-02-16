@@ -113,8 +113,6 @@ public class InitWizard extends WizardDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         DriverManager.setLoginTimeout(2);
         createWizard();
-
-
     }
 
 
@@ -147,8 +145,14 @@ public class InitWizard extends WizardDialog {
             public void actionPerformed(ActionEvent e) {
                 OPDE.getLocalProps().putAll(jdbcProps);
                 OPDE.saveLocalProps();
-                if (!creationResultPage.isEmpty())
-                    SYSFilesTools.print(creationResultPage, true);
+                if (!creationResultPage.isEmpty()) {
+                    File results_file = new File(System.getProperty("user.home") + File.separator + "opde-installation.html");
+                    try {
+                        SYSFilesTools.print(creationResultPage, results_file, false, true);
+                    } catch (IOException ex) {
+                        log.error(ex);
+                    }
+                }
                 dispose();
             }
         });
@@ -1649,31 +1653,6 @@ public class InitWizard extends WizardDialog {
             txtLog.setWrapStyleWord(true);
             txtLog.setLineWrap(true);
 
-//            // keeps the log window under MAX_LOG_LINES lines to prevent out of memory exception
-//            txtLog.getDocument().addDocumentListener(new DocumentListener() {
-//                @Override
-//                public void insertUpdate(DocumentEvent e) {
-//                    SwingUtilities.invokeLater(() -> {
-//                        Element root = e.getDocument().getDefaultRootElement();
-//                        while (root.getElementCount() > 600) {
-//                            Element firstLine = root.getElement(0);
-//                            try {
-//                                e.getDocument().remove(0, firstLine.getEndOffset());
-//                            } catch (BadLocationException ble) {
-//                                log.error(ble);
-//                            }
-//                        }
-//                    });
-//                }
-//
-//                @Override
-//                public void removeUpdate(DocumentEvent e) {
-//                }
-//
-//                @Override
-//                public void changedUpdate(DocumentEvent e) {
-//                }
-//            });
         }
 
         public void addWarn(String text) {

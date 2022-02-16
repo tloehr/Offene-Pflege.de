@@ -39,13 +39,10 @@ import de.offene_pflege.op.system.LogicalPrinters;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.PrintProcessor;
 import de.offene_pflege.op.tools.*;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.config.Configurator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -242,7 +239,7 @@ public class OPDE {
         return validatorFactory;
     }
 
-//    public static void important(EntityManager em, Object message) throws Exception {
+    //    public static void important(EntityManager em, Object message) throws Exception {
 //        log.info(message);
 //        SyslogTools.addLog(em, message.toString(), SyslogTools.INFO);
 //    }
@@ -251,6 +248,7 @@ public class OPDE {
 //        fatal(logger, e);
 //    }
 //
+    @SneakyThrows
     public static void fatal(Throwable e) {
         if (emf != null && emf.isOpen()) {
             EntityManager em = OPDE.createEM();
@@ -268,7 +266,9 @@ public class OPDE {
         }
 
         String html = SYSTools.getThrowableAsHTML(e);
-        File temp = SYSFilesTools.print(html, false);
+        File temp = SYSFilesTools.createTempFile("opde", ".html");
+        temp.deleteOnExit();
+        SYSFilesTools.print(html, temp, false, true);
 
         if (!isDebug()) {
             EMailSystem.sendErrorMail(e.getMessage(), temp);
@@ -545,7 +545,7 @@ public class OPDE {
 
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_DEBUG)).equalsIgnoreCase("true")) {
                 debug = true;
-                
+
                 //log.getRootLogger().setLevel(Level.DEBUG);
 //                log.setLevel(Level.DEBUG);
             }
@@ -769,7 +769,8 @@ public class OPDE {
         // minimum requirement
         if (!localProps.containsKey(SYSPropsTools.KEY_STATION)) localProps.put(SYSPropsTools.KEY_STATION, "1");
         if (!localProps.containsKey(SYSPropsTools.KEY_ANIMATION)) localProps.put(SYSPropsTools.KEY_ANIMATION, "true");
-        if (!localProps.containsKey(SYSPropsTools.KEY_TMP_DIR)) localProps.put(SYSPropsTools.KEY_TMP_DIR, System.getProperty("java.io.tmpdir"));
+        if (!localProps.containsKey(SYSPropsTools.KEY_TMP_DIR))
+            localProps.put(SYSPropsTools.KEY_TMP_DIR, System.getProperty("java.io.tmpdir"));
         if (!localProps.containsKey(SYSPropsTools.KEY_HOSTKEY))
             localProps.put(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
 

@@ -25,7 +25,6 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -88,13 +87,10 @@ public class PnlDev extends CleanablePanel {
     private JButton btnVKontrole;
     private DateExComboBox dateExComboBox1;
     private JPanel panel5;
-    private JScrollPane scrollPane3;
-    private JTree tree1;
-    private JSplitPane splitPane1;
-    private JScrollPane scrollPane5;
-    private JTable table1;
-    private JScrollPane scrollPane4;
-    private JTextArea textArea1;
+    private JButton button7;
+    // JFormDesigner - End of variables declaration  //GEN-END:variables
+
+
     public PnlDev() {
         super("opde.dev");
         initComponents();
@@ -549,14 +545,6 @@ public class PnlDev extends CleanablePanel {
         html.append(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate())), false, null, null));
 
 
-        File f = SYSFilesTools.print(html.toString(), true, false);
-        try {
-            FileUtils.copyFileToDirectory(f, new File(System.getProperty("user.home")));
-        } catch (IOException e1) {
-            log.error(e1);
-        }
-
-
     }
 
     private void button4ActionPerformed(ActionEvent e) {
@@ -653,6 +641,15 @@ public class PnlDev extends CleanablePanel {
         });
     }
 
+    private void button7(ActionEvent e) {
+        File results_file = new File(System.getProperty("user.home") + File.separator + "somefile.html");
+        try {
+            SYSFilesTools.print("<html><h1>some text</h1></html>", results_file, false, true);
+        } catch (IOException ex) {
+            log.error(ex);
+        }
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabbedPane1 = new JTabbedPane();
@@ -687,13 +684,7 @@ public class PnlDev extends CleanablePanel {
         btnVKontrole = new JButton();
         dateExComboBox1 = new DateExComboBox();
         panel5 = new JPanel();
-        scrollPane3 = new JScrollPane();
-        tree1 = new JTree();
-        splitPane1 = new JSplitPane();
-        scrollPane5 = new JScrollPane();
-        table1 = new JTable();
-        scrollPane4 = new JScrollPane();
-        textArea1 = new JTextArea();
+        button7 = new JButton();
 
         //======== this ========
         setLayout(new BorderLayout());
@@ -851,38 +842,19 @@ public class PnlDev extends CleanablePanel {
                         "default, $rgap, default:grow",
                         "fill:default, $lgap, default:grow"));
 
-                //======== scrollPane3 ========
-                {
-                    scrollPane3.setViewportView(tree1);
-                }
-                panel5.add(scrollPane3, CC.xy(1, 3, CC.DEFAULT, CC.FILL));
-
-                //======== splitPane1 ========
-                {
-                    splitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
-
-                    //======== scrollPane5 ========
-                    {
-                        scrollPane5.setViewportView(table1);
-                    }
-                    splitPane1.setTopComponent(scrollPane5);
-
-                    //======== scrollPane4 ========
-                    {
-                        scrollPane4.setViewportView(textArea1);
-                    }
-                    splitPane1.setBottomComponent(scrollPane4);
-                }
-                panel5.add(splitPane1, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
+                //---- button7 ----
+                button7.setText("text");
+                button7.addActionListener(e -> button7(e));
+                panel5.add(button7, CC.xy(3, 3));
             }
             tabbedPane1.addTab("text", panel5);
         }
-        add(tabbedPane1, BorderLayout.CENTER);
+        add(tabbedPane1, BorderLayout.NORTH);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     private void button2ActionPerformed(ActionEvent e) {
 
     }
-    // JFormDesigner - End of variables declaration  //GEN-END:variables
+
 }
