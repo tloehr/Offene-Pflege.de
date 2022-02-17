@@ -1050,13 +1050,24 @@ public class InitWizard extends WizardDialog {
                         stmt.close();
                         summary.add(SYSTools.xx("opde.initwizard.summary.createdb.createschema", catalog));
 
-                        String queryCreateUser1 = " CREATE USER '" + dbuser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        // Modifikation damit bei einer missglückten instalation die vorhandene User nicht im weg stehen und wiederverwendet werden können.
+                        String queryCreateUser1 = " CREATE USER IF NOT EXISTS '" + dbuser + "'@'%'";
                         stmt = jdbcConnection.prepareStatement(queryCreateUser1);
                         stmt.executeUpdate();
                         stmt.close();
 
-                        String queryCreateUser2 = " CREATE USER '" + dbuser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        String queryCreateUser2 = " CREATE USER IF NOT EXISTS '" + dbuser + "'@'localhost'";
                         stmt = jdbcConnection.prepareStatement(queryCreateUser2);
+                        stmt.executeUpdate();
+                        stmt.close();
+
+                        String queryCreateUser3 = " ALTER USER '" + dbuser + "'@'%' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        stmt = jdbcConnection.prepareStatement(queryCreateUser3);
+                        stmt.executeUpdate();
+                        stmt.close();
+
+                        String queryCreateUser4 = " ALTER USER '" + dbuser + "'@'localhost' IDENTIFIED BY '" + generatedPassword4DBUser + "' ";
+                        stmt = jdbcConnection.prepareStatement(queryCreateUser4);
                         stmt.executeUpdate();
                         stmt.close();
 
