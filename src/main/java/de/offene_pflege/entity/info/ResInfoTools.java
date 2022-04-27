@@ -1756,6 +1756,9 @@ public class ResInfoTools {
 
         for (ResInfo info : bwinfos) {
             em.lock(info, LockModeType.OPTIMISTIC);
+            // just in case, somebody added an info AFTER the resident moved out / died. We fix that start date here
+            setFrom(info, SYSCalendar.min(info.getFrom(), enddate));
+
             setTo(info, enddate);
             info.setUserOFF(em.merge(OPDE.getLogin().getUser()));
 

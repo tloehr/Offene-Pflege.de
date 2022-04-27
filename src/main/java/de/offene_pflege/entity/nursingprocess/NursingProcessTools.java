@@ -204,6 +204,8 @@ public class NursingProcessTools {
         for (NursingProcess np : nursingProcesses) {
             NursingProcess mynp = em.merge(np);
             em.lock(mynp, LockModeType.OPTIMISTIC);
+            // just in case, somebody added an info AFTER the resident moved out / died. We fix that start date here
+            mynp.setFrom(SYSCalendar.min(mynp.getFrom(), enddate));
             mynp.setTo(enddate);
             mynp.setUserOFF(em.merge(OPDE.getLogin().getUser()));
         }

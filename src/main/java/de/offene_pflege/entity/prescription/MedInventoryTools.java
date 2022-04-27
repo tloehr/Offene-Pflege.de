@@ -2,6 +2,8 @@ package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.JavaTimeConverter;
+import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
@@ -351,6 +353,8 @@ public class MedInventoryTools {
                     MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.allinvetories.closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
                 }
             }
+            // just in case, somebody added an info AFTER the resident moved out / died. We fix that start date here
+            myInventory.setFrom(JavaTimeConverter.min(myInventory.getFrom(), enddate));
             // close inventory
             myInventory.setTo(enddate);
         }

@@ -73,7 +73,6 @@ public class QdvsService {
     private LocalDateTime STICHTAG; // ist das vorher festgelegte Zieldatum (2x im Jahr). Das bleibt auch bei den Nachkorrekturen gleich
     private LocalDateTime BEGINN_ERFASSUNGSZEITRAUM; // ist der letzt Stichtag.
 
-
     // Ich hatte immer wieder die Versuchung ein Erhebungsdatum statt einem Stichtag zu verwenden
     // Das wäre elegant, wenn mann eine Korrektur eingeben muss. Dann ändert man die Fehler ab,
     // setzt das Erhebungsdatum nach hinten und lässt die Auswertung erneut laufen.

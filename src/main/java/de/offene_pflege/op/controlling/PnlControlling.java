@@ -150,7 +150,7 @@ public class PnlControlling extends CleanablePanel {
 
 
     private CollapsiblePane createCP4Fall() {
-        final CollapsiblePane cpPain = new CollapsiblePane();
+        final CollapsiblePane cpFall = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
                 SYSTools.xx("opde.controlling.fall") +
@@ -158,29 +158,29 @@ public class PnlControlling extends CleanablePanel {
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
             try {
-                cpPain.setCollapsed(!cpPain.isCollapsed());
+                cpFall.setCollapsed(!cpFall.isCollapsed());
             } catch (PropertyVetoException pve) {
                 // BAH!
             }
         });
-        cpPain.setTitleLabelComponent(cptitle.getMain());
-        cpPain.setSlidingDirection(SwingConstants.SOUTH);
-        cpPain.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+        cpFall.setTitleLabelComponent(cptitle.getMain());
+        cpFall.setSlidingDirection(SwingConstants.SOUTH);
+        cpFall.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpPain.setContentPane(createContentPanel4Fall());
+                cpFall.setContentPane(createContentPanel4Fall());
             }
         });
 
-        if (!cpPain.isCollapsed()) {
-            cpPain.setContentPane(createContentPanel4Fall());
+        if (!cpFall.isCollapsed()) {
+            cpFall.setContentPane(createContentPanel4Fall());
         }
 
-        cpPain.setHorizontalAlignment(SwingConstants.LEADING);
+        cpFall.setHorizontalAlignment(SwingConstants.LEADING);
         //        cpOrga.setOpaque(false);
         //        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
 
-        return cpPain;
+        return cpFall;
     }
 
 

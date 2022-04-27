@@ -863,14 +863,14 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " JOIN nr.commontags ct " +
                     " WHERE nr.pit >= :from AND nr.pit <= :to AND (ct.type = :handover OR ct.type = :emergency) " +
-                    " AND nr.resident.station.home = :home " +
+                    //" AND nr.resident.station.home = :home " +
                     " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
 
             Query query = em.createQuery(jpql);
 
             query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
             query.setParameter("to", SYSCalendar.eod(to).toDate());
-            query.setParameter("home", home);
+            //query.setParameter("home", home);
             query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
             query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
 

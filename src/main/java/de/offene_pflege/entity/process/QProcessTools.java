@@ -15,6 +15,7 @@ import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.Pair;
+import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -299,6 +300,8 @@ public class QProcessTools {
             QProcess myProcess = em.merge(qp);
             em.lock(myProcess, LockModeType.OPTIMISTIC);
             PReport pReport = em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_CLOSE), PReportTools.PREPORT_TYPE_CLOSE, myProcess));
+            // just in case, somebody added an info AFTER the resident moved out / died. We fix that start date here
+            myProcess.setFrom(SYSCalendar.min(myProcess.getFrom(), enddate));
             myProcess.setTo(enddate);
             myProcess.getPReports().add(pReport);
         }

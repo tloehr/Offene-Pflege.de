@@ -101,6 +101,7 @@ public class JavaTimeConverter {
         return max(a.atStartOfDay(), b.atStartOfDay()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+
     public static LocalDateTime min(LocalDateTime a, LocalDateTime b) {
         long la = a.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         long lb = b.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();

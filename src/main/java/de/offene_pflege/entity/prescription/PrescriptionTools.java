@@ -218,7 +218,7 @@ public class PrescriptionTools {
                     table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_TOP);
 
                     if (gray) table.getDefaultCell().setBackgroundColor(BaseColor.LIGHT_GRAY);
-                    
+
                     Phrase col1 = getShortDescriptionAsPhrase(prescription);
                     if (bestid != null) {
                         MedStock stock = em.find(MedStock.class, bestid.longValue());
@@ -1045,13 +1045,6 @@ public class PrescriptionTools {
         return myPretty;
     }
 
-//    public static void absetzen(EntityManager em, Prescription verordnung) throws Exception {
-//        verordnung = em.merge(verordnung);
-//        em.lock(verordnung, LockModeType.OPTIMISTIC);
-//        verordnung.setTo(new Date());
-//        verordnung.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-//        BHPTools.cleanup(em, verordnung);
-//    }
 
     public static void closeAll(EntityManager em, Resident resident, Date enddate) throws Exception {
         Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.resident = :resident AND b.to >= :now");
@@ -1062,6 +1055,8 @@ public class PrescriptionTools {
         for (Prescription verordnung : verordnungen) {
             Prescription myp = em.merge(verordnung);
             em.lock(myp, LockModeType.OPTIMISTIC);
+            // just in case, somebody added an info AFTER the resident moved out / died. We fix that start date here
+            myp.setFrom(SYSCalendar.min(myp.getFrom(), enddate));
             myp.setTo(enddate);
             myp.setUserOFF(em.merge(OPDE.getLogin().getUser()));
 //            BHPTools.cleanup(em, myp);
