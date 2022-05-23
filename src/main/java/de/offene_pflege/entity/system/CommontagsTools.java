@@ -93,50 +93,6 @@ public class CommontagsTools {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    public static ArrayList<Commontags> getAllUsedInQMSPlans(boolean inactiveOnes2) {
-        EntityManager em = OPDE.createEM();
-        ArrayList<Commontags> list = null;
-
-        try {
-
-            String jpql = " SELECT DISTINCT c " +
-                    " FROM Commontags c " +
-                    " JOIN c.qmsplans qms " +
-                    " ORDER BY c.text ASC ";
-
-            Query query = em.createQuery(jpql);
-            list = new ArrayList<Commontags>(query.getResultList());
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return list;
-    }
-
-    public static ArrayList<Commontags> getAllUsedInTrainings() {
-        EntityManager em = OPDE.createEM();
-        ArrayList<Commontags> list = null;
-
-        try {
-
-            String jpql = " SELECT DISTINCT c " +
-                    " FROM Commontags c " +
-                    " JOIN c.trainings t " +
-                    " ORDER BY c.text ASC ";
-
-            Query query = em.createQuery(jpql);
-            list = new ArrayList<Commontags>(query.getResultList());
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return list;
-    }
-
     public static ArrayList<Commontags> getAllUsedInNReports(Resident resident) {
         EntityManager em = OPDE.createEM();
         ArrayList<Commontags> list = null;

@@ -6,7 +6,7 @@
 
     <groupId>de.offene-pflege</groupId>
     <artifactId>opde1</artifactId>
-    <version>1.15</version>
+    <version>1.15.3</version>
 
     <name>OPDE1</name>
     <url>https://www.offene-pflege.de</url>
@@ -17,11 +17,11 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <java.version>11</java.version>
-        <!-- Damit die Tests nicht jedes mal vor dem Package ablaunfen -->
+        <!-- Damit die Tests nicht jedes mal vor dem Package ablaufen -->
         <maven.test.skip>true</maven.test.skip>
         <!-- Library Versions -->
-        <!-- Vesions checked June 2021 -->
-        <com.itextpdf.version>5.5.13.2</com.itextpdf.version>
+        <!-- Versions checked June 2021 -->
+        <com.itextpdf.version>5.5.13.3</com.itextpdf.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.cli.version>1.5.0</commons.cli.version>
         <commons.collections4.version>4.4</commons.collections4.version>
@@ -30,21 +30,23 @@
         <commons.exec.version>1.3</commons.exec.version>
         <commons.io.version>2.11.0</commons.io.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>
-        <commons.log4j.version>2.17.1</commons.log4j.version>
+        <commons.log4j.version>2.17.2</commons.log4j.version>
         <commons.net.version>3.8.0</commons.net.version>
         <commons.text.version>1.9</commons.text.version>
-        <eclipselink.version>2.7.8</eclipselink.version>
-        <hibernate.validator.version>6.1.7.Final</hibernate.validator.version>
-        <icu4j.version>69.1</icu4j.version>
+        <eclipselink.version>2.7.10</eclipselink.version>
+        <hibernate.validator.version>6.2.3.Final</hibernate.validator.version>
+        <icu4j.version>71.1</icu4j.version> <!-- war 69.1 -->
         <javatuples.version>1.2</javatuples.version>
         <javax.activation.version>1.1.1</javax.activation.version>
         <javax.el-api.version>3.0.0</javax.el-api.version>
-        <javax.el.version>3.0.0</javax.el.version>
+        <javax.el.version>3.0.1-b12</javax.el.version>
         <javax.mail-api.version>1.6.2</javax.mail-api.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jaxb.api.version>2.3.3</jaxb.api.version>
         <jaxb.core.version>3.0.1</jaxb.core.version>
         <jaxb.impl.version>2.1</jaxb.impl.version>
+        <xml.bind.impl.version>3.0.2</xml.bind.impl.version>
+        <xml.bind.version>3.0.1</xml.bind.version>
         <jcalendar.version>1.4</jcalendar.version>
         <jgoodies.binding.version>2.13.0</jgoodies.binding.version>
         <jgoodies.common.version>1.8.1</jgoodies.common.version>
@@ -52,11 +54,11 @@
         <jgoodies.looks.version>2.7.0</jgoodies.looks.version>
         <jgoodies.validation.version>2.5.1</jgoodies.validation.version>
         <jide.version>3.7.12</jide.version>
-        <joda.time.version>2.10.13</joda.time.version>
+        <joda.time.version>2.10.14</joda.time.version>
         <junit.version>4.13.2</junit.version>
-        <lombok.version>1.18.22</lombok.version>
-        <mysql.connector.version>8.0.27</mysql.connector.version>
-        <poi.ooxml.version>5.1.0</poi.ooxml.version>
+        <lombok.version>1.18.24</lombok.version>
+        <mysql.connector.version>8.0.29</mysql.connector.version>
+        <poi.ooxml.version>5.2.2</poi.ooxml.version>
         <swingx.core.version>1.6.5-1</swingx.core.version>
         <timing.framework.version>7.3.1</timing.framework.version>
         <xerces.version>2.12-beta-r1667115</xerces.version>
@@ -285,12 +287,12 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>3.0.0</version>
+            <version>${xml.bind.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>3.0.0</version>
+            <version>${xml.bind.impl.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>

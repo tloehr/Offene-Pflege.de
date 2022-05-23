@@ -671,7 +671,7 @@ public class PnlInformation extends NursingRecordsPanel {
         } else {
             String kettennr = resInfo.getConnectionid() == 0 ? "" : " [" + resInfo.getConnectionid() + "]";
             title += DateFormat.getDateInstance().format(resInfo.getFrom()) + kettennr + " (" + (resInfo.getUserON() != null ? resInfo.getUserON().getFullname() : "--") + ") " + " >> ";
-            log.debug(keyResInfo);
+            log.trace(keyResInfo);
             title += resInfo.isClosed() ? DateFormat.getDateInstance().format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ") " : "";
             // früher gabs die Ketten nicht. Daher blenden wir das hier aus.
         }

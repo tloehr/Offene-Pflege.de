@@ -3,7 +3,6 @@ package de.offene_pflege.op.tools;
 
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
-
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -18,16 +17,16 @@ import java.io.OutputStream;
 import java.util.Scanner;
 
 /**
- * this class handles everything that is needed to adapt to the local machine's structure and needs.
- * including os constraints like paths and serial number generation.
+ * this class handles everything that is needed to adapt to the local machine's structure and needs. including os
+ * constraints like paths and serial number generation.
  */
 @Log4j2
 public class LocalMachine {
 
     /**
-     * computes a serial number out of local os tools. it knows how to handle mac, win and unix machines.
-     * if, for any reason, the generation fails it reverts to a randomly created UUID which is stored in
-     * opde.cfg by the key of SYSPropsTools.KEY_HOSTKEY
+     * computes a serial number out of local os tools. it knows how to handle mac, win and unix machines. if, for any
+     * reason, the generation fails it reverts to a randomly created UUID which is stored in opde.cfg by the key of
+     * SYSPropsTools.KEY_HOSTKEY
      *
      * @return a unique UUID which is used for password encryption as a key
      */
@@ -121,21 +120,23 @@ public class LocalMachine {
     }
 
     public static final String getAppDataPath() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
-        }
-        if (SystemUtils.IS_OS_LINUX) {
-            return System.getProperty("user.home") + File.separator + ".opde";
-        }
-        if (SystemUtils.IS_OS_MAC_OSX) {
-            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Application Support" + File.separator + "Offene-Pflege.de";
-        }
-        return null;
+        return System.getProperties().getProperty("workspace");
+//        if (SystemUtils.IS_OS_WINDOWS) {
+//            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
+//        }
+//        if (SystemUtils.IS_OS_LINUX) {
+//            return System.getProperty("user.home") + File.separator + ".opde";
+//        }
+//        if (SystemUtils.IS_OS_MAC_OSX) {
+//            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Application Support" + File.separator + "Offene-Pflege.de";
+//        }
+//        return null;
     }
 
 
     /**
-     * this is the path where OPDE can find all jar files and the directories artwork, dbscripts, licenses and the system templates
+     * this is the path where OPDE can find all jar files and the directories artwork, dbscripts, licenses and the
+     * system templates
      *
      * @return
      */

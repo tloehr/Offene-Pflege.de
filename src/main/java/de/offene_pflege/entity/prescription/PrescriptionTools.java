@@ -36,9 +36,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * @author tloehr
@@ -891,17 +893,23 @@ public class PrescriptionTools {
      * Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getOnDemandPrescriptions(Resident resident, Date date) {
-        EntityManager em = OPDE.createEM();
-
-        Query query = em.createQuery("SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.id");
-        query.setParameter("resident", resident);
-        query.setParameter("from", new LocalDate(date).toDateTimeAtStartOfDay().toDate());
-        query.setParameter("to", SYSCalendar.eod(new LocalDate(date)).toDate());
-
-        List<Prescription> list = query.getResultList();
-
-        em.close();
-        return list;
+        LocalDate d1 = new LocalDate(date);
+        return getAll(resident, d1, d1).stream().filter(prescription -> prescription.getSituation() != null)
+                .sorted(Comparator.comparing(p -> p.getSituation().getText()))
+                .collect(Collectors.toList());
+//
+//
+//        EntityManager em = OPDE.createEM();
+//
+//        Query query = em.createQuery("SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.id");
+//        query.setParameter("resident", resident);
+//        query.setParameter("from", new LocalDate(date).toDateTimeAtStartOfDay().toDate());
+//        query.setParameter("to", SYSCalendar.eod(new LocalDate(date)).toDate());
+//
+//        List<Prescription> list = query.getResultList();
+//
+//        em.close();
+//        return list;
     }
 
     public static String getPrescriptionAsHTML(Prescription prescription, boolean withheader, boolean withlongheader, boolean withmed, boolean withIcon) {

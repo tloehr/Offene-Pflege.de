@@ -392,6 +392,10 @@ public class OPDE {
 
 //        System.out.println("yoy");
 
+        if (!System.getProperties().containsKey("workspace")) {
+            log.fatal("workspace directory parameter needs to be set via -Dworkspace=/path/you/want");
+            Runtime.getRuntime().halt(0);
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> System.out.println("Shutdown Hook")));
 

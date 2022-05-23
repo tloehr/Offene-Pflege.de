@@ -833,13 +833,12 @@ public class DlgOnDemand extends MyJDialog {
         prescription.setUserON(OPDE.getLogin().getUser());
         prescription.setDocON((GP) cmbDocON.getSelectedItem());
 
-        prescription.setFrom(new LocalDate().toDate());
+        prescription.setFrom(new Date());
         if (rbDate.isSelected()) {
             prescription.setTo(SYSCalendar.eod(new LocalDate(SYSCalendar.parseDate(txtOFF.getText()))).toDate());
             prescription.setUserOFF(OPDE.getLogin().getUser());
             prescription.setHospitalOFF(prescription.getHospitalON());
             prescription.setDocOFF(prescription.getDocON());
-            prescription.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         } else {
             prescription.setHospitalOFF(null);
             prescription.setDocOFF(null);

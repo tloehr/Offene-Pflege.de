@@ -573,10 +573,7 @@ public class FrmMain extends JFrame {
                 btnReload.setToolTipText("Ansicht aktualisieren");
                 btnReload.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnReload.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload_pressed.png")));
-                btnReload.addActionListener(e -> {
-			btnReloadActionPerformed(e);
-			btnReloadActionPerformed(e);
-		});
+                btnReload.addActionListener(e -> btnReloadActionPerformed(e));
                 pnlMainMessage.add(btnReload, CC.xywh(7, 7, 1, 3));
             }
             pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1, CC.DEFAULT, CC.FILL));

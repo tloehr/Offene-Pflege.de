@@ -1204,20 +1204,13 @@ public class SYSCalendar {
         return null;
     }
 
-    public static DateTime eod(DateTime date) {
-        return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue().millisOfSecond().withMaximumValue();
-    }
-
-    public static DateTime eod(LocalDate date) {
-        return eod(date.toDateTimeAtStartOfDay());
-    }
 
     public static DateTime bom(DateTime d) {
-        return d.dayOfMonth().withMinimumValue().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue().millisOfSecond().withMinimumValue();
+        return d.dayOfMonth().withMinimumValue().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue();
     }
 
     public static DateTime eom(DateTime d) {
-        return d.dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue().millisOfSecond().withMaximumValue();
+        return d.dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
     }
 
 
@@ -1279,7 +1272,16 @@ public class SYSCalendar {
     public static LocalDate max(LocalDate a, LocalDate b) {
         return new LocalDate(Math.max(a.toDateTimeAtStartOfDay().getMillis(), b.toDateTimeAtStartOfDay().getMillis()));
     }
+//
+//    private static DateTime eod(DateTime date) {
+//        // fix for the rounding problem when the Database DATETIME column has no room left for the millis and nanos.
+//        // In this case the database rounded the end date to the next day. which is definitely not wanted.
+//        return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
+//    }
 
+    public static DateTime eod(LocalDate date) {
+        return date.toDateTimeAtStartOfDay().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
+    }
 
 
 }

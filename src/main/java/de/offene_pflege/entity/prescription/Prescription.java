@@ -39,8 +39,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * OPDE kann verschiedene Arten von wiederkehrenden Terminen für die Anwendung einer ärztlichen Verordnung
- * speichern. Dazu sind zwei Entity Classes nötig. Verordnungen und VerordnungPlanung.
+ * OPDE kann verschiedene Arten von wiederkehrenden Terminen für die Anwendung einer ärztlichen Verordnung speichern.
+ * Dazu sind zwei Entity Classes nötig. Verordnungen und VerordnungPlanung.
  * <ul>
  * <li><b>Verordnungen</b> enthält die Angaben über die Medikamente und Maßnahmen. Ärzte und Krankenhäuser, sowie Situations bei
  * Bedarfsmedikattion.</li>
@@ -598,8 +598,8 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
             result = mytitle.compareTo(thattitle);
         }
         if (result == 0) {
-                    result = from.compareTo(them.getFrom()) * -1;
-                }
+            result = from.compareTo(them.getFrom()) * -1;
+        }
 //        if (result == 0) {
 //            result = Long.valueOf(relation).compareTo(them.getRelation());
 //        }

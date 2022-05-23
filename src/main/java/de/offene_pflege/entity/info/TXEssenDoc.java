@@ -329,7 +329,7 @@ public class TXEssenDoc {
 //        form.getFields().keySet().forEach(s -> log.debug(s));
         for (String key : content.keySet()) {
             if (!ArrayUtils.contains(PnlBodyScheme.PARTS, key)) { // this is a special case. The bodyparts and the pdfkeys have the same name.
-                log.debug(key);
+                log.trace(key);
                 form.setField(key, content.get(key));
             }
         }
