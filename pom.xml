@@ -63,32 +63,35 @@
         <timing.framework.version>7.3.1</timing.framework.version>
         <xerces.version>2.12-beta-r1667115</xerces.version>
         <!-- not changed anymore -->
-        <install4j.runtime.version>8.0.2</install4j.runtime.version>
+        <install4j.runtime.version>9.0.7</install4j.runtime.version>
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>
         <opde.major>1</opde.major>
         <opde.minor>15</opde.minor>
         <opde.release>3</opde.release>
-        <opde.dbversion>14</opde.dbversion>
+        <opde.dbversion>15</opde.dbversion>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
     </properties>
 
     <repositories>
-        <!--        <repository>-->
-        <!--            <id>ej-technologies</id>-->
-        <!--            <url>http://maven.ej-technologies.com/repository</url>-->
-        <!--        </repository>-->
-        <!--        <repository>-->
-        <!--            <id>central</id>-->
-        <!--            <url>http://repo.maven.apache.org/maven2/</url>-->
-        <!--        </repository>-->
         <repository>
             <id>oss.sonatype.org</id>
             <name>OSS Sonatype Staging</name>
             <url>https://oss.sonatype.org/content/groups/staging</url>
         </repository>
+<!--        <repository>-->
+<!--                   <id>ej-technologies</id>-->
+<!--                   <url>https://maven.ej-technologies.com/repository</url>-->
+<!--                </repository>-->
     </repositories>
 
     <dependencies>
+<!--        <dependency>-->
+<!--           <groupId>com.install4j</groupId>-->
+<!--           <artifactId>install4j-runtime</artifactId>-->
+<!--           <version>${install4j.runtime.version}</version>-->
+<!--        </dependency>-->
+
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

@@ -49,7 +49,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.*;
 
-import static de.offene_pflege.services.qdvs.spec14.QdvsService.NF_IDBEWOHNER;
+import static de.offene_pflege.services.qdvs.spec14.QdvsService14.NF_IDBEWOHNER;
 
 /**
  * Created by IntelliJ IDEA. User: tloehr Date: 24.10.11 Time: 16:10 To change this template use File | Settings | File

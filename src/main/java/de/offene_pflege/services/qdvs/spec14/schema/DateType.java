@@ -9,8 +9,8 @@
 package de.offene_pflege.services.qdvs.spec14.schema;
 
 import jakarta.xml.bind.annotation.*;
-import javax.xml.datatype.XMLGregorianCalendar;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * <p>Java-Klasse für date_type complex type.
@@ -34,13 +34,6 @@ public class DateType {
     @XmlAttribute(name = "value", required = true)
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar value;
-
-
-    public DateType() {
-
-    }
-
-
 
     /**
      * Ruft den Wert der value-Eigenschaft ab.

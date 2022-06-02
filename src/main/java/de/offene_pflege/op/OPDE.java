@@ -393,7 +393,7 @@ public class OPDE {
 //        System.out.println("yoy");
 
         if (!System.getProperties().containsKey("workspace")) {
-            log.fatal("workspace directory parameter needs to be set via -Dworkspace=/path/you/want");
+            log.fatal("workspace directory parameter needs to be set via -Dworkspace=/path/you/want/without-app-dir/with-closing-separator/");
             Runtime.getRuntime().halt(0);
         }
 
@@ -442,21 +442,18 @@ public class OPDE {
         opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
         opts.addOption("p", "keyphrase", true, SYSTools.xx("cmdline.keyphrase.description"));
         opts.addOption("e", "encrypt-key", true, SYSTools.xx("cmdline.encrypt.key.description"));
-//        opts.addOption("q", "qdvs", false, SYSTools.xx("Erstellt QDVS - Testbetrieb"));
+        opts.addOption("j", "jdbc", true, SYSTools.xx("cmdline.jdbc.description"));
 
-        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(SYSTools.xx("cmdline.jdbc.description")).create("j"));
 
-        Option dfnimport = OptionBuilder //.withArgName("datum")
-                .withLongOpt("dfnimport").hasOptionalArg()
-                .withDescription(SYSTools.xx("cmdline.dfnimport.description")).create("d");
-        dfnimport.setArgName(SYSTools.xx("cmdline.dfnimport.arg1.description"));
+        Option dfnimport = Option.builder().longOpt("dfnimport").optionalArg(true)
+                .desc(SYSTools.xx("cmdline.dfnimport.description")).option("d").build();
         opts.addOption(dfnimport);
 
-        Option bhpimport = OptionBuilder.withLongOpt("bhpimport").hasOptionalArg().withDescription(SYSTools.xx("cmdline.bhpimport.description")).create("b");
-        bhpimport.setArgName(SYSTools.xx("cmdline.dfnimport.arg1.description"));
+        Option bhpimport = Option.builder().longOpt("bhpimport").optionalArg(true)
+                .desc(SYSTools.xx("cmdline.bhpimport.description")).option("b").build();
         opts.addOption(bhpimport);
 
-        BasicParser parser = new BasicParser();
+        DefaultParser parser = new DefaultParser();
         CommandLine cl = null;
         String footer = "https://www.Offene-Pflege.de" + " " + OPDE.getAppInfo().getBuildInformation();
 
@@ -549,15 +546,9 @@ public class OPDE {
 
             if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_DEBUG)).equalsIgnoreCase("true")) {
                 debug = true;
-
-                //log.getRootLogger().setLevel(Level.DEBUG);
-//                log.setLevel(Level.DEBUG);
+;
             }
 
-            //Configurator.setAllLevels(LogManager.getRootLogger().getName(), Level.OFF);
-
-
-            //log.getLogger("org.hibernate").setLevel(Level.OFF);
 
             if (cl.hasOption("x") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_EXPERIMENTAL)).equalsIgnoreCase("true")) {
                 experimental = true;
@@ -672,13 +663,6 @@ public class OPDE {
                 System.exit(0);
             }
 
-
-//            if (cl.hasOption("q")) {
-//                new QdvsService(LocalDate.of(2020, 01, 10), LocalDate.of(2020, 01, 10).minusMonths(6), LocalDate.now());
-//                System.exit(0);
-//            }
-
-
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             setStandardFont();
 
@@ -693,8 +677,6 @@ public class OPDE {
 
             mainframe = new FrmMain();
             mainframe.setVisible(true);
-
-//            new pnldebug();
 
         } catch (Exception ioe) {
 

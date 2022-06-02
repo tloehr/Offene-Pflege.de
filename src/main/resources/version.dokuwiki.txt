@@ -1,26 +1,13 @@
 {{tag>versions}}
-====== V1.15.2.x ======
-  * Datenbank Schema: **Version 14**
-  * Release: **??**
+====== V1.15.3.52 ======
+  * Datenbank Schema: **Version 15**
+  * Release: **24.05.2022**
 
-  * Version: [[de:info:versions:1.15.2.767|1.15.2.767]]
-  * Lizenz: [[http://www.gnu.org/licenses/gpl-2.0|GPLv2]]
-  * {{fa>windows?22}} [[http://www.offene-pflege.de/lib/exe/fetch.php?media=downloads:opde_win32_1_15_2_767.exe|Windows 32 Bit]]
-    * MD5: c83bf38265285b36f60038a2e674434f
-  * {{fa>windows?22}} [[http://www.offene-pflege.de/lib/exe/fetch.php?media=downloads:opde_win64_1_15_2_767.exe|Windows 64 Bit]]
-    * MD5: 1f8a806c7341dabbdddcf22bafbdb8f7
-  * {{fa>linux?22}} [[http://www.offene-pflege.de/lib/exe/fetch.php?media=downloads:opde_linux_1_15_2_767.deb|Ubuntu Linux]]
-    * MD5: b98d6ce6e6ca5ae212c30657584afc7a
-  * {{fa>apple?22}} [[http://www.offene-pflege.de/lib/exe/fetch.php?media=downloads:opde_macOS_amd64_1_15_2_767.dmg|Apple Macintosh Intel]]
-    * MD5: e043f234583c99e6bd74ac06be9e2821
-  * {{fa>apple?22}} [[http://www.offene-pflege.de/lib/exe/fetch.php?media=downloads:opde_macOS_aarch64_1_15_2_767|Apple Macintosh M1]]
-    * MD5: d85a927924b6a2921187c32369c26709
-
-  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Bei BW-Informationen kann der Admin nun vorherige Einträge nahtlos zurück schieben. Dabei wird das Start-Datum der nachfolgenden Informationen entsprechen angepasst. Wird nur im Rahmen der Indikatoren Erhebung benötigt, falls es Korrektur-Bedarf aufgrund von statistischen Auffälligkeiten gibt.
-  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Zukünftig können alle auf die Vorgangsverwaltung zugreifen. War vorher auf Pflegefachpersonal beschränkt. Das Verwaltungsmodul für Vorgänge wurde vereinfacht.
-  * <label icon="glyphicon glyphicon-plus" type="success">New</label>
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Vital-Werte wurden falsch erkannt, wenn statt dem Komma ein Punkt bei Dezimal-Brüchen verwendet wurden.
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Berechnung Sturzrate hat keine Ereignisse berücksichtigt, wenn das zugehörige ResInfo Element sich verändert hat.
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Controlling Auswertung zu Gewicht und BMI findet keine Körpergrößen.
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> 
-
+  * <label icon="glyphicon glyphicon-cog" type="info">Work in progress</label> Anpassungen für die neue [[https://www.das-pflege.de/spezifikationen#spezifikationen|Spezifikation 2.0]] der DAS-Pflege, gültig ab dem Erhebungszyklus 5((Beginn: 01.01.2023))
+  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Weitere Anpassungen wegen der Log4J Migration waren nötig. So müssen die Config Verzeichnisse nun einheitlich umbenannt werden. Sie heißen jetzt (je nach Plattform)
+    * win
+    * mac
+    * linux
+  * Wenn bei einer Verordnung schon vorab das End-Datum feststeht, setzte die Datenbank dieses Datum immer auf den Folgetag. Das geschah, weil die Nano-Sekunden von der Datenbank aufgerundet wurden. Behoben.
+  * Mehrere Deprecated Funktionen aktualisiert.
+  * Genesenen Status mit in die Impf-Angabe bei den BW-Infos aufgenommen.

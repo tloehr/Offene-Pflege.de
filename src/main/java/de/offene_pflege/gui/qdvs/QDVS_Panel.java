@@ -25,7 +25,9 @@ import de.offene_pflege.services.HomesService;
 import de.offene_pflege.services.qdvs.DAS_REGELN;
 import de.offene_pflege.services.qdvs.MyErrorHandler;
 import de.offene_pflege.services.qdvs.QSData;
-import de.offene_pflege.services.qdvs.spec14.QdvsService;
+import de.offene_pflege.services.qdvs.QdvsService;
+import de.offene_pflege.services.qdvs.spec14.QdvsService14;
+import de.offene_pflege.services.qdvs.spec21.QdvsService21;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -78,9 +80,6 @@ import java.util.*;
  */
 @Log4j2
 public class QDVS_Panel extends CleanablePanel implements AddTextListener {
-    private static final String DAS_SPEZIFIKATION = "DAS_Pflege_Spezifikation_V01.4/02_XSD/interface_qs_data/das_interface.xsd";
-    private static final String DAS_REGELN_CSV = "DAS_Pflege_Spezifikation_V01.4/03_Dokumentationsbogen/DAS_Plausibilitaetsregeln.csv";
-
     private final JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JTree tblResidents;
@@ -102,17 +101,16 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
 
     /**
      * Diese Klasse erzeugt das Panel für die QDVS Auswertung
+     * Bis zum 31.12.2022 verwendet wir die Spezifikation 1.4
+     * Ab dem 01.01.2023 die 2.0
      *
      * @param jspSearch
      */
     public QDVS_Panel(JScrollPane jspSearch) {
         super("de.offene_pflege.gui.qdvs");
         this.jspSearch = jspSearch;
-        qdvsService = new QdvsService(this);
-
         liste_bewohner_zum_stichtag = new ArrayList<>();
         liste_bewohner_zur_auswertung = new ArrayList<>();
-
         initPanel();
     }
 
@@ -166,6 +164,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         else
             STICHTAG = LocalDate.now();
 
+        select_specification();
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -185,10 +184,8 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_QDVS_WORKPATH, workdir.getAbsolutePath());
         prepareSearchArea();
 
-        File csv = new File(LocalMachine.getProgrammPath(), DAS_REGELN_CSV);
+        File csv = new File(LocalMachine.getProgrammPath(), qdvsService.get_DAS_REGELN_CSV());
         REGELN = lese_DAS_REGELN(csv);
-
-        //prepareListOFResidents(); // einmal am Anfang, damit die Liste der BW ausgefüllt ist
     }
 
 
@@ -285,8 +282,6 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
-//           GUITools.addAllComponents(mypanel, addFilters());
-
 
         searchPane.setContentPane(mypanel);
 
@@ -334,10 +329,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
                 if (vorpruefungOK) {
                     addLog(SYSConst.html_h2("qdvs.plausibilitaet.pruefen"));
 
-//                    File path = new File(workdir, home.getCareproviderid() + File.separator);
-//                    File xsd = new File(path, "interface_qs_data/das_interface.xsd");
-
-                    File xsd = new File(LocalMachine.getProgrammPath(), DAS_SPEZIFIKATION);
+                    File xsd = new File(LocalMachine.getProgrammPath(), qdvsService.get_DAS_SPEZIFIKATION());
 
                     ERRORS = validateFile(target, xsd); // welche Fehler
                     LOOKUP = getLookupTable(target); // welcher Bewohner
@@ -459,6 +451,14 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         tblResidents.setModel(new DefaultTreeModel(createTree()));
     }
 
+    void select_specification(){
+        if (STICHTAG.isBefore(LocalDate.of(2022, 1, 1))){
+            qdvsService = new QdvsService14(this);
+        } else {
+            qdvsService = new QdvsService21(this);
+        }
+    }
+
 
     private java.util.List<Component> addCommands() {
         FolderChooserComboBox fcWorkdir = new FolderChooserComboBox();
@@ -483,6 +483,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
             BEGINN_ERFASSUNGSZEITRAUM = STICHTAG.minusMonths(6l).plusDays(1);
             lblVorherigerStichtag.setText(BEGINN_ERFASSUNGSZEITRAUM.minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
             addLog(SYSConst.html_paragraph(SYSConst.html_bold("Zeitraum zur Ergebniserfassung: ") + String.format("%s bis einschließlich %s", BEGINN_ERFASSUNGSZEITRAUM.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)), STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))));
+            select_specification();
             prepareListOFResidents();
         });
 
@@ -634,7 +635,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
 
             if (tnode.getType() <= TreeInfoNode.RESIDENT_RED) { // mieser Trick. :-D
                 Resident bw = (Resident) tnode.getUserObject();
-                String strResident = QdvsService.toString(bw);
+                String strResident = QdvsService14.toString(bw);
                 if (!liste_bewohner_zur_auswertung.contains(bw)) strResident = "<strike>" + strResident + "</strike>";
                 Collections.list(tnode.children()).forEach(treeNode -> buffer.append(toHTML((DefaultMutableTreeNode) treeNode)));
                 if (buffer.length() > 0)
@@ -810,7 +811,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
                 Object userObject = node.getUserObject();
 
                 if (node.getType() <= TreeInfoNode.RESIDENT_RED) {
-                    setText(QdvsService.toString((Resident) userObject));
+                    setText(QdvsService14.toString((Resident) userObject));
                 }
                 if (node.getType() == TreeInfoNode.SELF_FOUND_ERROR) {
                     setText(userObject.toString());

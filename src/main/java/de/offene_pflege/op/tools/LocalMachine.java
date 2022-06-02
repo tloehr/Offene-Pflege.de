@@ -1,6 +1,5 @@
 package de.offene_pflege.op.tools;
 
-
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 import lombok.extern.log4j.Log4j2;
@@ -14,6 +13,7 @@ import org.apache.commons.lang3.SystemUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Scanner;
 
 /**
@@ -50,7 +50,7 @@ public class LocalMachine {
             }
 
             try {
-                result = FileUtils.readFileToString(machineid).trim();
+                result = FileUtils.readFileToString(machineid, Charset.defaultCharset()).trim();
             } catch (IOException e) {
                 result = null;
             }
@@ -121,16 +121,6 @@ public class LocalMachine {
 
     public static final String getAppDataPath() {
         return System.getProperties().getProperty("workspace");
-//        if (SystemUtils.IS_OS_WINDOWS) {
-//            return System.getenv("APPDATA") + File.separator + "Offene-Pflege.de";
-//        }
-//        if (SystemUtils.IS_OS_LINUX) {
-//            return System.getProperty("user.home") + File.separator + ".opde";
-//        }
-//        if (SystemUtils.IS_OS_MAC_OSX) {
-//            return System.getProperty("user.home") + File.separator + "Library" + File.separator + "Application Support" + File.separator + "Offene-Pflege.de";
-//        }
-//        return null;
     }
 
 
@@ -141,17 +131,14 @@ public class LocalMachine {
      * @return
      */
     public static final String getProgrammPath() {
-        // usually the installer saves this information in response.varfile, but not necessarily
-        String install4jDir = "";//SYSTools.catchNull(Variables.getInstallerVariable("sys.installationDir"));
-
         if (SystemUtils.IS_OS_WINDOWS) {
-            return install4jDir.isEmpty() ? System.getenv("ProgramFiles") + File.separator + "Offene-Pflege.de" : install4jDir;
+            return System.getenv("ProgramFiles") + File.separator + "Offene-Pflege.de";
         }
         if (SystemUtils.IS_OS_LINUX) {
-            return install4jDir.isEmpty() ? "/opt/opde" : install4jDir;
+            return "/opt/opde";
         }
         if (SystemUtils.IS_OS_MAC_OSX) {
-            return install4jDir.isEmpty() ? "/Applications/Offene-Pflege.de.app/Contents/java/app" : install4jDir + "/Offene-Pflege.de.app/Contents/java/app";
+            return "/Applications/Offene-Pflege.de.app/Contents/Resources/app";
         }
         return null;
     }

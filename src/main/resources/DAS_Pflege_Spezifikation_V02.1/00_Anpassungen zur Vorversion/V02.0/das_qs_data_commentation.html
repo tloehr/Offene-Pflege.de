@@ -1,0 +1,485 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style>
+.AlignLeft { text-align: left; }
+.AlignCenter { text-align: center; }
+.AlignRight { text-align: right; }
+.Wrap { white-space: nowrap; }
+body { font-family: sans-serif; font-size: 11pt; }
+img.AutoScale { max-width: 100%; max-height: 100%; }
+td { vertical-align: top; padding-left: 4px; padding-right: 4px; }
+
+tr.SectionGap td { font-size: 4px; border-left: none; border-top: none; border-bottom: 1px solid Black; border-right: 1px solid Black; }
+tr.SectionAll td { border-left: none; border-top: none; border-bottom: 1px solid Black; border-right: 1px solid Black; }
+tr.SectionBegin td { border-left: none; border-top: none; border-right: 1px solid Black; }
+tr.SectionEnd td { border-left: none; border-top: none; border-bottom: 1px solid Black; border-right: 1px solid Black; }
+tr.SectionMiddle td { border-left: none; border-top: none; border-right: 1px solid Black; }
+tr.SubsectionAll td { border-left: none; border-top: none; border-bottom: 1px solid Gray; border-right: 1px solid Black; }
+tr.SubsectionEnd td { border-left: none; border-top: none; border-bottom: 1px solid Gray; border-right: 1px solid Black; }
+table.fc { border-top: 1px solid Black; border-left: 1px solid Black; width: 100%; font-family: monospace; font-size: 10pt; }
+td.TextItemInsigMod { background-color: #F0F0F0; }
+td.TextItemInsigOrphan { background-color: #F0F0F0; }
+td.TextItemNum { }
+td.TextItemSame { }
+td.TextItemSigMod { background-color: #E5E5E5; }
+td.TextItemSigOrphan { background-color: #E5E5E5; }
+.TextSegInsigDiff { font-style: italic; }
+.TextSegReplacedDiff { font-style: italic; }
+.TextSegSigDiff { font-weight: bold; }
+td.TextItemInsigAdd { background-color: #F0F0F0; }
+td.TextItemInsigDel { background-color: #F0F0F0; text-decoration: line-through; }
+td.TextItemSigAdd { background-color: #E5E5E5; }
+td.TextItemSigDel { background-color: #E5E5E5; text-decoration: line-through; }
+.TextSegElementZeichenfolge { }
+.TextSegElementOperator { } 
+</style>
+<title>Delta: das_qs_data_commentation</title>
+</head>
+<body>
+Stand: 01.01.2022<br/>
+<br/>
+Linke Datei: V02.0
+<br/>
+Rechte Datei: V01.4
+<br/>
+<table class="fc" cellspacing="0" cellpadding="0">
+<tr class="SectionBegin">
+<td class="TextItemNum AlignRight Wrap">1</td>
+<td class="TextItemSame Wrap"><span class="TextSegElementOperator">&lt;</span>?xml version=<span class="TextSegElementZeichenfolge">&quot;1.0&quot;</span> encoding=<span class="TextSegElementZeichenfolge">&quot;UTF-8&quot;</span>?<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">=</td>
+<td class="TextItemNum AlignRight Wrap">1</td>
+<td class="TextItemSame Wrap"><span class="TextSegElementOperator">&lt;</span>?xml version=<span class="TextSegElementZeichenfolge">&quot;1.0&quot;</span> encoding=<span class="TextSegElementZeichenfolge">&quot;UTF-8&quot;</span>?<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">2</td>
+<td class="TextItemSame Wrap"><span class="TextSegElementOperator">&lt;</span>xs:schema xmlns:xs=<span class="TextSegElementZeichenfolge">&quot;http://www.w3.org/2001/XMLSchema&quot;</span> xmlns:vc=<span class="TextSegElementZeichenfolge">&quot;http://www.w3.org/2007/XMLSchema-versioning&quot;</span> xmlns:das=<span class="TextSegElementZeichenfolge">&quot;https://www.das-pflege.de&quot;</span> elementFormDefault=<span class="TextSegElementZeichenfolge">&quot;qualified&quot;</span> vc:minVersion=<span class="TextSegElementZeichenfolge">&quot;1.1&quot;</span> xpathDefaultNamespace=<span class="TextSegElementZeichenfolge">&quot;##targetNamespace&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">2</td>
+<td class="TextItemSame Wrap"><span class="TextSegElementOperator">&lt;</span>xs:schema xmlns:xs=<span class="TextSegElementZeichenfolge">&quot;http://www.w3.org/2001/XMLSchema&quot;</span> xmlns:vc=<span class="TextSegElementZeichenfolge">&quot;http://www.w3.org/2007/XMLSchema-versioning&quot;</span> xmlns:das=<span class="TextSegElementZeichenfolge">&quot;https://www.das-pflege.de&quot;</span> elementFormDefault=<span class="TextSegElementZeichenfolge">&quot;qualified&quot;</span> vc:minVersion=<span class="TextSegElementZeichenfolge">&quot;1.1&quot;</span> xpathDefaultNamespace=<span class="TextSegElementZeichenfolge">&quot;##targetNamespace&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">3</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:include schemaLocation=<span class="TextSegElementZeichenfolge">&quot;../das_datatypes.xsd&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">3</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:include schemaLocation=<span class="TextSegElementZeichenfolge">&quot;../das_datatypes.xsd&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">4</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:complexType name=<span class="TextSegElementZeichenfolge">&quot;das_commentation_type&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">4</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:complexType name=<span class="TextSegElementZeichenfolge">&quot;das_commentation_type&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">5</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:sequence<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">5</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:sequence<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">6</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:element name=<span class="TextSegElementZeichenfolge">&quot;KOMMENTAR&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">6</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:element name=<span class="TextSegElementZeichenfolge">&quot;KOMMENTAR&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">7</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">7</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">8</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:documentation<span class="TextSegElementOperator">&gt;</span>Kommentar<span class="TextSegElementOperator">&lt;</span>/xs:documentation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">8</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:documentation<span class="TextSegElementOperator">&gt;</span>Kommentar<span class="TextSegElementOperator">&lt;</span>/xs:documentation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionEnd">
+<td class="TextItemNum AlignRight Wrap">9</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">9</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionBegin">
+<td class="TextItemNum AlignRight Wrap">&nbsp;</td>
+<td class="TextItemSame Wrap">&nbsp;</td>
+<td class="AlignCenter Wrap">-+</td>
+<td class="TextItemNum AlignRight Wrap">10</td>
+<td class="TextItemSigMod Wrap"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&lt;</span><span class="TextSegSigDiff">das:caption_id</span><span class="TextSegSigDiff">&gt;</span><span class="TextSegSigDiff">17</span><span class="TextSegSigDiff">&lt;</span><span class="TextSegSigDiff">/das:caption_id</span><span class="TextSegSigDiff">&gt;</span></td>
+</tr>
+<tr class="SectionEnd">
+<td class="TextItemNum AlignRight Wrap">&nbsp;</td>
+<td class="TextItemSame Wrap">&nbsp;</td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">11</td>
+<td class="TextItemSigMod Wrap"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&lt;</span><span class="TextSegSigDiff">das:caption_header</span><span class="TextSegSigDiff">&gt;</span><span class="TextSegSigDiff">Kommentar</span><span class="TextSegSigDiff">&lt;</span><span class="TextSegSigDiff">/das:caption_header</span><span class="TextSegSigDiff">&gt;</span></td>
+</tr>
+<tr class="SectionBegin">
+<td class="TextItemNum AlignRight Wrap">10</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:guideline<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">=</td>
+<td class="TextItemNum AlignRight Wrap">12</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:guideline<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionEnd">
+<td class="TextItemNum AlignRight Wrap">11</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>div<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">13</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>div<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionBegin">
+<td class="TextItemNum AlignRight Wrap">12</td>
+<td class="TextItemSigMod Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;p&gt;<span class="TextSegSigDiff">S</span>ie <span class="TextSegSigDiff">hab</span><span class="TextSegInsigDiff">e</span>n<span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">hie</span>r<span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">die</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Mögli</span>ch<span class="TextSegSigDiff">k</span><span class="TextSegSigDiff">eit,</span> <span class="TextSegSigDiff">di</span><span class="TextSegSigDiff">e</span> <span class="TextSegInsigDiff">I</span>n<span class="TextSegSigDiff">dik</span><span class="TextSegSigDiff">at</span><span class="TextSegSigDiff">orener</span>ge<span class="TextSegSigDiff">bnisse</span> <span class="TextSegSigDiff">I</span><span class="TextSegSigDiff">hrer</span> <span class="TextSegSigDiff">P</span><span class="TextSegSigDiff">fl</span><span class="TextSegSigDiff">eg</span><span class="TextSegSigDiff">eeinrich</span>tung<span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">für</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">di</span>e<span class="TextSegInsigDiff"> </span>i<span class="TextSegSigDiff">nter</span>es<span class="TextSegSigDiff">s</span><span class="TextSegSigDiff">iert</span>e <span class="TextSegSigDiff">Öffent</span>lichkeit zu <span class="TextSegInsigDiff">k</span>ommentier<span class="TextSegSigDiff">en</span>. <span class="TextSegSigDiff">Be</span><span class="TextSegInsigDiff">s</span>ond<span class="TextSegInsigDiff">e</span><span class="TextSegSigDiff">r</span><span class="TextSegSigDiff">h</span><span class="TextSegSigDiff">eiten</span>, d<span class="TextSegSigDiff">ie</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">zu</span> de<span class="TextSegSigDiff">n</span> ent<span class="TextSegSigDiff">spreche</span>nde<span class="TextSegSigDiff">n</span> <span class="TextSegSigDiff">Ergebni</span><span class="TextSegSigDiff">s</span><span class="TextSegSigDiff">s</span><span class="TextSegSigDiff">e</span><span class="TextSegSigDiff">n</span> <span class="TextSegSigDiff">Ihr</span>er<span class="TextSegInsigDiff"> </span><span class="TextSegInsigDiff">E</span><span class="TextSegSigDiff">inr</span>icht<span class="TextSegSigDiff">ung</span> <span class="TextSegSigDiff">g</span><span class="TextSegSigDiff">eführ</span>t<span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">haben,</span> <span class="TextSegSigDiff">könnt</span>en <span class="TextSegSigDiff">b</span>ei<span class="TextSegSigDiff">spielsweise</span> <span class="TextSegSigDiff">spez</span><span class="TextSegSigDiff">ifis</span>che <span class="TextSegInsigDiff">V</span>er<span class="TextSegSigDiff">sorg</span>ung<span class="TextSegSigDiff">sschwerpunkte,</span> <span class="TextSegSigDiff">e</span><span class="TextSegInsigDiff">i</span>ne <span class="TextSegSigDiff">spezie</span><span class="TextSegSigDiff">lle</span> <span class="TextSegSigDiff">Klientel</span> <span class="TextSegSigDiff">oder</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">beso</span>nde<span class="TextSegSigDiff">re</span> Um<span class="TextSegSigDiff">stände</span> <span class="TextSegSigDiff">i</span>n <span class="TextSegSigDiff">der</span> <span class="TextSegSigDiff">betreff</span>en<span class="TextSegSigDiff">den</span> <span class="TextSegSigDiff">E</span><span class="TextSegSigDiff">r</span>he<span class="TextSegSigDiff">b</span><span class="TextSegSigDiff">ungsph</span>as<span class="TextSegSigDiff">e</span><span class="TextSegInsigDiff"> </span>se<span class="TextSegSigDiff">i</span>n.&lt;/p&gt;</td>
+<td class="AlignCenter Wrap">&lt;&gt;</td>
+<td class="TextItemNum AlignRight Wrap">14</td>
+<td class="TextItemSigMod Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;p&gt;<span class="TextSegSigDiff">D</span>ie <span class="TextSegInsigDiff">E</span><span class="TextSegSigDiff">i</span>nr<span class="TextSegSigDiff">i</span>ch<span class="TextSegSigDiff">tungen</span> <span class="TextSegSigDiff">haben</span> <span class="TextSegInsigDiff">i</span>n<span class="TextSegSigDiff">nerhalb</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">vo</span><span class="TextSegSigDiff">n</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">7</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Ta</span>ge<span class="TextSegSigDiff">n</span> <span class="TextSegSigDiff">nach</span> <span class="TextSegSigDiff">Ablauf</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">des</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Auswe</span><span class="TextSegSigDiff">r</span>tung<span class="TextSegSigDiff">sz</span>ei<span class="TextSegSigDiff">t</span><span class="TextSegSigDiff">raum</span>es<span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">di</span>e <span class="TextSegSigDiff">Mög</span>lichkeit zu<span class="TextSegSigDiff">r</span> <span class="TextSegInsigDiff">K</span>ommentier<span class="TextSegSigDiff">ung</span>. <span class="TextSegInsigDiff">S</span>o<span class="TextSegSigDiff">fer</span>n<span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">sich</span><span class="TextSegInsigDiff"> </span>d<span class="TextSegSigDiff">ie</span><span class="TextSegInsigDiff"> </span><span class="TextSegInsigDiff">E</span><span class="TextSegSigDiff">inrichtung</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">äußert</span>, <span class="TextSegSigDiff">wir</span>d de<span class="TextSegSigDiff">r</span> <span class="TextSegSigDiff">Komm</span>ent<span class="TextSegSigDiff">a</span><span class="TextSegSigDiff">r</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">i</span>n<span class="TextSegInsigDiff"> </span>de<span class="TextSegSigDiff">r</span> <span class="TextSegSigDiff">Qual</span><span class="TextSegSigDiff">itätsdarstellung</span> <span class="TextSegSigDiff">v</span>er<span class="TextSegSigDiff">öff</span><span class="TextSegInsigDiff">e</span><span class="TextSegSigDiff">ntl</span>icht<span class="TextSegSigDiff">.</span> <span class="TextSegSigDiff">Kommen</span>t<span class="TextSegSigDiff">are</span> <span class="TextSegSigDiff">dürf</span>en <span class="TextSegSigDiff">k</span>ei<span class="TextSegSigDiff">n</span><span class="TextSegSigDiff">e</span> <span class="TextSegSigDiff">unsachli</span>che<span class="TextSegSigDiff">n</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">und</span> <span class="TextSegInsigDiff">v</span>erung<span class="TextSegSigDiff">limpfe</span><span class="TextSegSigDiff">nd</span><span class="TextSegSigDiff">en</span> <span class="TextSegInsigDiff">I</span>n<span class="TextSegSigDiff">halt</span>e <span class="TextSegSigDiff">enthalten.</span> <span class="TextSegSigDiff">S</span><span class="TextSegSigDiff">i</span><span class="TextSegSigDiff">e</span> <span class="TextSegSigDiff">dürf</span><span class="TextSegSigDiff">e</span>n<span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">maximal</span><span class="TextSegInsigDiff"> </span>de<span class="TextSegSigDiff">n</span> Um<span class="TextSegSigDiff">fa</span><span class="TextSegSigDiff">ng</span> <span class="TextSegSigDiff">vo</span>n <span class="TextSegSigDiff">3.000</span> <span class="TextSegSigDiff">Zeich</span>en<span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">inkl.</span> <span class="TextSegSigDiff">Leerzeic</span>he<span class="TextSegSigDiff">n</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">umf</span>assen.&lt;/p&gt;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">13</td>
+<td class="TextItemSigMod Wrap"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&lt;</span><span class="TextSegSigDiff">p</span><span class="TextSegSigDiff">&gt;</span><span class="TextSegSigDiff">Kommentare</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">müssen</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">sachlich</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">formuliert</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">sein</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">und</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">dürfen</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">aus</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Datenschutzgründen</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">in</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">keinem</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Fall</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">personenbezogene</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Daten</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">(z.</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">B.</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Namen,</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Geburtsdatum</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">etc.)</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">enthalten!</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">&nbsp;</td>
+<td class="TextItemSame Wrap">&nbsp;</td>
+</tr>
+<tr class="SectionEnd">
+<td class="TextItemNum AlignRight Wrap">14</td>
+<td class="TextItemSigMod Wrap"><span class="TextSegSigDiff">Beachten</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Sie</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">zusätzlich,</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">dass</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">der</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Kommentar</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">weder</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">von</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">der</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">DAS</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Pflege</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">noch</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">von</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">den</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Landesverbänden</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">der</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Pflegekassen</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">vor</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">der</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">Veröffentlichung</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">geprüft</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">oder</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">redaktionell</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">bearbeitet</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">wird.</span><span class="TextSegSigDiff">&lt;</span><span class="TextSegSigDiff">/p</span><span class="TextSegSigDiff">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">&nbsp;</td>
+<td class="TextItemSame Wrap">&nbsp;</td>
+</tr>
+<tr class="SectionBegin">
+<td class="TextItemNum AlignRight Wrap">15</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/div<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">=</td>
+<td class="TextItemNum AlignRight Wrap">15</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/div<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">16</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/das:guideline<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">16</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/das:guideline<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">17</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">17</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">18</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">18</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">19</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:complexType<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">19</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:complexType<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">20</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:attribute name=<span class="TextSegElementZeichenfolge">&quot;value&quot;</span> use=<span class="TextSegElementZeichenfolge">&quot;required&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">20</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:attribute name=<span class="TextSegElementZeichenfolge">&quot;value&quot;</span> use=<span class="TextSegElementZeichenfolge">&quot;required&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">21</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:simpleType<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">21</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:simpleType<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">22</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:restriction base=<span class="TextSegElementZeichenfolge">&quot;xs:string&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">22</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:restriction base=<span class="TextSegElementZeichenfolge">&quot;xs:string&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">23</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:maxLength value=<span class="TextSegElementZeichenfolge">&quot;3000&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">23</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:maxLength value=<span class="TextSegElementZeichenfolge">&quot;3000&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">24</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:restriction<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">24</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:restriction<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">25</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:simpleType<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">25</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:simpleType<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">26</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:attribute<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">26</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:attribute<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">27</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:complexType<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">27</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:complexType<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">28</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:element<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">28</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:element<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">29</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:element name=<span class="TextSegElementZeichenfolge">&quot;validation_status&quot;</span> type=<span class="TextSegElementZeichenfolge">&quot;validation_status_type&quot;</span> minOccurs=<span class="TextSegElementZeichenfolge">&quot;0&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">29</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:element name=<span class="TextSegElementZeichenfolge">&quot;validation_status&quot;</span> type=<span class="TextSegElementZeichenfolge">&quot;validation_status_type&quot;</span> minOccurs=<span class="TextSegElementZeichenfolge">&quot;0&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">30</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">30</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">31</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:documentation<span class="TextSegElementOperator">&gt;</span>Umschlagselement für Informationen zur Plausibilitätsprüfung<span class="TextSegElementOperator">&lt;</span>/xs:documentation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">31</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:documentation<span class="TextSegElementOperator">&gt;</span>Umschlagselement für Informationen zur Plausibilitätsprüfung<span class="TextSegElementOperator">&lt;</span>/xs:documentation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">32</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">32</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">33</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:element<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">33</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:element<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">34</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:sequence<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">34</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:sequence<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">35</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:assert test=<span class="TextSegElementZeichenfolge">&quot;if(not(exists(KOMMENTAR/@value))) then false() else true()&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">35</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:assert test=<span class="TextSegElementZeichenfolge">&quot;if(not(exists(KOMMENTAR/@value))) then false() else true()&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">36</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">36</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">37</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">37</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionEnd">
+<td class="TextItemNum AlignRight Wrap">38</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_id value=<span class="TextSegElementZeichenfolge">&quot;10063&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">38</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_id value=<span class="TextSegElementZeichenfolge">&quot;10063&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+</tr>
+<tr class="SectionAll">
+<td class="TextItemNum AlignRight Wrap">39</td>
+<td class="TextItemSigMod Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;das:rule_text value=&quot;<span class="TextSegSigDiff">Im</span><span class="TextSegSigDiff"> Pflicht</span>feld <span class="TextSegSigDiff">[</span>'Kommentar'<span class="TextSegSigDiff">]</span><span class="TextSegSigDiff"> </span><span class="TextSegSigDiff">i</span><span class="TextSegSigDiff">s</span>t kein<span class="TextSegSigDiff"> W</span>er<span class="TextSegSigDiff">t a</span><span class="TextSegSigDiff">ngegeben</span>&quot;/&gt;</td>
+<td class="AlignCenter Wrap">&lt;&gt;</td>
+<td class="TextItemNum AlignRight Wrap">39</td>
+<td class="TextItemSigMod Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;das:rule_text value=&quot;<span class="TextSegSigDiff">Das Da</span><span class="TextSegSigDiff">ten</span>feld 'Kommentar'<span class="TextSegSigDiff"> ist nicht ausgefüll</span>t <span class="TextSegSigDiff">bzw. enthält </span>kein<span class="TextSegSigDiff">e le</span>er<span class="TextSegSigDiff">e Zeichenkett</span><span class="TextSegSigDiff">e</span>&quot;/&gt;</td>
+</tr>
+<tr class="SectionBegin">
+<td class="TextItemNum AlignRight Wrap">40</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_type value=<span class="TextSegElementZeichenfolge">&quot;ERROR&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+<td class="AlignCenter Wrap">=</td>
+<td class="TextItemNum AlignRight Wrap">40</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_type value=<span class="TextSegElementZeichenfolge">&quot;ERROR&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">41</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_fields<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">41</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_fields<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">42</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:field value=<span class="TextSegElementZeichenfolge">&quot;KOMMENTAR&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">42</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:field value=<span class="TextSegElementZeichenfolge">&quot;KOMMENTAR&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">43</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/das:rule_fields<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">43</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/das:rule_fields<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">44</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">44</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">45</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">45</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">46</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:assert<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">46</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:assert<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">47</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:assert test=<span class="TextSegElementZeichenfolge">&quot;if(string-length(KOMMENTAR/@value) &amp;gt; 3000) then false() else true()&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">47</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:assert test=<span class="TextSegElementZeichenfolge">&quot;if(string-length(KOMMENTAR/@value) &amp;gt; 3000) then false() else true()&quot;</span><span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">48</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">48</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">49</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">49</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionEnd">
+<td class="TextItemNum AlignRight Wrap">50</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_id value=<span class="TextSegElementZeichenfolge">&quot;40007&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">50</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_id value=<span class="TextSegElementZeichenfolge">&quot;40007&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+</tr>
+<tr class="SectionAll">
+<td class="TextItemNum AlignRight Wrap">51</td>
+<td class="TextItemSigMod Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;das:rule_text value=&quot;Der <span class="TextSegSigDiff">Tex</span>t <span class="TextSegSigDiff">im</span> Datenfeld <span class="TextSegSigDiff">[</span>'Kommentar'<span class="TextSegSigDiff">]</span><span class="TextSegSigDiff"> </span><span class="TextSegSigDiff">is</span><span class="TextSegSigDiff">t</span><span class="TextSegSigDiff"> </span><span class="TextSegSigDiff">lä</span><span class="TextSegSigDiff">ng</span>er<span class="TextSegSigDiff"> als</span> 3000 Zeichen&quot;/&gt;</td>
+<td class="AlignCenter Wrap">&lt;&gt;</td>
+<td class="TextItemNum AlignRight Wrap">51</td>
+<td class="TextItemSigMod Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;das:rule_text value=&quot;Der <span class="TextSegSigDiff">Wer</span>t <span class="TextSegSigDiff">des</span> Datenfeld<span class="TextSegSigDiff">es</span> 'Kommentar'<span class="TextSegSigDiff"> liegt nicht im gültigen Werteb</span>er<span class="TextSegSigDiff">eich: &amp;lt;=</span> 3000 Zeichen&quot;/&gt;</td>
+</tr>
+<tr class="SectionBegin">
+<td class="TextItemNum AlignRight Wrap">52</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_type value=<span class="TextSegElementZeichenfolge">&quot;ERROR&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+<td class="AlignCenter Wrap">=</td>
+<td class="TextItemNum AlignRight Wrap">52</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_type value=<span class="TextSegElementZeichenfolge">&quot;ERROR&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">53</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_fields<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">53</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:rule_fields<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">54</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:field value=<span class="TextSegElementZeichenfolge">&quot;KOMMENTAR&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">54</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>das:field value=<span class="TextSegElementZeichenfolge">&quot;KOMMENTAR&quot;</span><span class="TextSegElementOperator">/&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">55</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/das:rule_fields<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">55</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/das:rule_fields<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">56</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">56</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:appinfo<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">57</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">57</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:annotation<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">58</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:assert<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">58</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:assert<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemNum AlignRight Wrap">59</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:complexType<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">59</td>
+<td class="TextItemSame Wrap">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <span class="TextSegElementOperator">&lt;</span>/xs:complexType<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+<tr class="SectionEnd">
+<td class="TextItemNum AlignRight Wrap">60</td>
+<td class="TextItemSame Wrap"><span class="TextSegElementOperator">&lt;</span>/xs:schema<span class="TextSegElementOperator">&gt;</span></td>
+<td class="AlignCenter Wrap">&nbsp;</td>
+<td class="TextItemNum AlignRight Wrap">60</td>
+<td class="TextItemSame Wrap"><span class="TextSegElementOperator">&lt;</span>/xs:schema<span class="TextSegElementOperator">&gt;</span></td>
+</tr>
+</table>
+<br/>
+</body>
+</html>
