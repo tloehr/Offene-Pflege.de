@@ -127,9 +127,7 @@ public class SYSTools {
     } // center
 
     public static void showTimeDifference(long begin) {
-        if (!OPDE.isDebug()) return;
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-
         log.debug(ste[2].toString() + ": " + (System.currentTimeMillis() - begin) + " ms");
     }
 

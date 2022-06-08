@@ -103,7 +103,7 @@ public class OPDE {
     protected static SYSLogin login;
     protected static ValidatorFactory validatorFactory;
     protected static boolean animation = false;
-    protected static boolean debug;
+//    protected static boolean debug;
     protected static boolean experimental;
     protected static String css = SYSConst.fallbackCSS;
     private static int DEFAULT_TIMEOUT = 30;
@@ -125,10 +125,6 @@ public class OPDE {
 
     public static LogicalPrinters getLogicalPrinters() {
         return printers;
-    }
-
-    public static boolean isDebug() {
-        return debug;
     }
 
     public static int getErrorMessageTime() {
@@ -270,7 +266,7 @@ public class OPDE {
         temp.deleteOnExit();
         SYSFilesTools.print(html, temp, false, true);
 
-        if (!isDebug()) {
+        if (System.getProperties().getOrDefault("loglevel","INFO").equals("INFO")) {
             EMailSystem.sendErrorMail(e.getMessage(), temp);
         }
 
@@ -436,7 +432,7 @@ public class OPDE {
         opts.addOption("h", "help", false, SYSTools.xx("cmdline.help.description"));
         opts.addOption("v", "version", false, SYSTools.xx("cmdline.version.description"));
         opts.addOption("x", "experimental", false, SYSTools.xx("cmdline.experimental.description"));
-        opts.addOption("l", "debug", false, SYSTools.xx("cmdline.debug.description"));
+//        opts.addOption("l", "debug", false, SYSTools.xx("cmdline.debug.description"));
         opts.addOption("a", "anonymous", false, SYSTools.xx("cmdline.anonymous.description"));
         opts.addOption("t", "setup-database", false, SYSTools.xx("cmdline.setup-database.description"));
         opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
@@ -543,11 +539,11 @@ public class OPDE {
             log.info("######### START ###########  " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion());
             log.info(System.getProperty("os.name").toLowerCase());
 
-
-            if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_DEBUG)).equalsIgnoreCase("true")) {
-                debug = true;
-;
-            }
+//
+//            if (cl.hasOption("l") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_DEBUG)).equalsIgnoreCase("true")) {
+//                debug = true;
+//;
+//            }
 
 
             if (cl.hasOption("x") || SYSTools.catchNull(localProps.getProperty(SYSPropsTools.KEY_EXPERIMENTAL)).equalsIgnoreCase("true")) {

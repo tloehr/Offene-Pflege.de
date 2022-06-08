@@ -125,7 +125,6 @@ public class FrmMain extends JFrame {
         initPhase = true;
 
 
-
         initComponents();
 
 
@@ -151,11 +150,12 @@ public class FrmMain extends JFrame {
 
         iconPanels = Collections.synchronizedMap(new HashMap<Resident, JPanel>());
 
-        if (OPDE.isDebug()) {
+        if (System.getProperties().getOrDefault("loglevel", "INFO").equals("DEBUG")) {
             setSize(1280, 800); // Macbook White 13"
         } else {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
+
 
         setTitle(SYSTools.getWindowTitle(""));
 
@@ -482,16 +482,16 @@ public class FrmMain extends JFrame {
                 }
             });
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));

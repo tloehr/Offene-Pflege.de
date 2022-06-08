@@ -295,7 +295,7 @@ public class PnlEditResInfo {
         lowerButtonBanel.setOpaque(false);
 
         // export 2 png function for development
-        if (OPDE.isDebug()) {
+        if (System.getProperties().getOrDefault("loglevel", "INFO").equals("DEBUG")) {
             JButton png = new JButton(SYSConst.icon22magnify1);
             png.setBorder(null);
             png.setContentAreaFilled(false);
@@ -1025,7 +1025,8 @@ public class PnlEditResInfo {
 
             // set a title
             JLabel jl = new JLabel(resInfo.getResInfoType().getShortDescription());
-            if (OPDE.isDebug()) jl.setToolTipText(SYSTools.toHTMLForScreen(ResInfoTools.getContentAsHTML(resInfo)));
+            if (System.getProperties().getOrDefault("loglevel", "INFO").equals("DEBUG"))
+                jl.setToolTipText(SYSTools.toHTMLForScreen(ResInfoTools.getContentAsHTML(resInfo)));
             jl.setFont(SYSConst.ARIAL24BOLD);
             outerpanel.add(jl, RiverLayout.LEFT);
         }
@@ -1719,7 +1720,7 @@ public class PnlEditResInfo {
                 pnl.add("left", btntx);
             }
 
-       // BI will ich nicht mehr
+            // BI will ich nicht mehr
 //            if (bi != null) { // Begutachtungsinstrument
 //                final JButton btnbi = GUITools.getTinyButton(HTMLTools.toHTML(bi), SYSConst.findIcon(SYSConst.icon22bi));
 //                btnbi.addActionListener(e -> {
