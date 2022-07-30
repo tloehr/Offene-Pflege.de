@@ -20,9 +20,7 @@ import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.threads.DisplayMessage;
-import de.offene_pflege.op.tools.SYSCalendar;
-import de.offene_pflege.op.tools.SYSConst;
-import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -31,6 +29,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.text.html.HTML;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -346,10 +345,18 @@ public class PrescriptionTools {
                         (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText());
             }
         }
-
-        //result += "</font>";
-
         return result;
+    }
+
+    /**
+     * setzt das medikament aus dieser Verordnung auf die Bestellliste oder löscht sie davon, falls es schon drauf war.
+     *
+     * @param prescription
+     */
+    public static void toggle_order_status_for(Prescription prescription) {
+        if (!prescription.hasMed()) return;
+        // if (MedOrderTools.contains(prescription)) MedOrderTools.remove(prescription)
+        // else MedOrderTools.add(prescription);
     }
 
 
@@ -486,16 +493,12 @@ public class PrescriptionTools {
         return result;
     }
 
-//    public static String getPrescriptionAsShortText(Prescription verordnung) {
-//        String result = "";
-//        if (!verordnung.hasMed()) {
-//            result += verordnung.getIntervention().getBezeichnung();
-//        } else {
-//            result += verordnung.getTradeForm().getMedProduct().getText()
-//                    + (verordnung.getTradeForm().getSubtext().isEmpty() ? "" : " " + verordnung.getTradeForm().getSubtext());
-//        }
-//        return result;
-//    }
+    public static String getOrderInformation(Prescription prescription) {
+        if (!prescription.hasMed()) return "";
+        Optional<MedOrder> optionalMedOrder = MedOrderTools.find(prescription);
+        if (optionalMedOrder.isEmpty()) return "";
+        return HTMLTools.p(SYSConst.html_color(Color.green, "nursingrecords.prescription.ordered"));
+    }
 
     public static String getRemark(Prescription prescription) {
         String result = "<div id=\"fonttext\">";

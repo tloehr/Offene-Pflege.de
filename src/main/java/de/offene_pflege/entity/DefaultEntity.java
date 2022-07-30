@@ -2,34 +2,25 @@ package de.offene_pflege.entity;
 
 
 import de.offene_pflege.op.tools.Tools;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @MappedSuperclass
-public abstract class DefaultEntity implements Serializable {
-    private Long id;
-    private int version;
-
+@Getter
+@Setter
+@NoArgsConstructor
+public class DefaultEntity implements Serializable {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private Long id;
 
     @Version
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
+    private int version;
 
     @Override
     public int hashCode() {

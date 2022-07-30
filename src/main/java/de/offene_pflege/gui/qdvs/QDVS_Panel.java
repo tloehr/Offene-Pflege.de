@@ -95,6 +95,8 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
     private JEditorPane txtLog;
     private HashMap<String, DAS_REGELN> REGELN;
 
+    private JCheckBox cbx21 = new JCheckBox("Spezifikation 02.1");
+
     MultiKeyMap<MultiKey<Integer>, ArrayList<String>> ERRORS;
     MultiKeyMap<MultiKey<Integer>, Long> LOOKUP;
     boolean vorpruefungOK;
@@ -164,6 +166,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         else
             STICHTAG = LocalDate.now();
 
+        cbx21.addItemListener(e -> log.debug(e.getItem()));
         select_specification();
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -452,9 +455,10 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
     }
 
     void select_specification(){
-        if (STICHTAG.isBefore(LocalDate.of(2022, 1, 1))){
+        if (STICHTAG.isBefore(LocalDate.of(2023, 1, 1))){
             qdvsService = new QdvsService14(this);
         } else {
+            // todo: gibt struktur fehler bei der prüfung
             qdvsService = new QdvsService21(this);
         }
     }
@@ -503,6 +507,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         list.add(new JLabel(SYSTools.xx("qdvs.stichtag")));
         list.add(dcmbStichtag);
         list.add(new JLabel(SYSTools.xx("qdvs.vorheriger.stichtag")));
+        list.add(cbx21);
         list.add(lblVorherigerStichtag);
         list.add(new JLabel(SYSTools.xx("qdvs.workdir")));
         list.add(fcWorkdir);
@@ -514,6 +519,8 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("qdvs.workdir.invalid", DisplayMessage.WARNING));
             }
         }));
+
+
 
 
         // Kommentar

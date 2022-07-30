@@ -92,6 +92,10 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
     private Collection<NReport> korrigierteNReport;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSLogin> logins;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "")
+//    private Collection<MedOrders> medOrders;
+
+
 
     public Collection<User2File> getAttachedFilesConnections() {
         return attachedFilesConnections;

@@ -67,6 +67,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 
@@ -230,7 +231,6 @@ public class PnlPrescription extends NursingRecordsPanel {
         }
         final CollapsiblePane cpPres = cpMap.get(key);
 
-
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"280\" align=\"left\">" + prescription.getPITAsHTML() + "</td>" +
@@ -242,6 +242,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 "<td width=\"200\" align=\"left\">" +
                 PrescriptionTools.getOriginalPrescription(prescription) +
                 PrescriptionTools.getRemark(prescription) +
+                PrescriptionTools.getOrderInformation(prescription) +
                 "</td>";
 
         if (!prescription.getCommontags().isEmpty()) {
@@ -1401,6 +1402,47 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnOpenStock.setEnabled(inventory != null && stockInUse == null && !prescription.isClosed());
             pnlMenu.add(btnOpenStock);
 
+            /**
+             *  _____                 _         ___          _
+             * |_   _|__   __ _  __ _| | ___   / _ \ _ __ __| | ___ _ __
+             *   | |/ _ \ / _` |/ _` | |/ _ \ | | | | '__/ _` |/ _ \ '__|
+             *   | | (_) | (_| | (_| | |  __/ | |_| | | | (_| |  __/ |
+             *   |_|\___/ \__, |\__, |_|\___|  \___/|_|  \__,_|\___|_|
+             *            |___/ |___/
+             */
+            final JButton btnToggleOrderStatus = GUITools.createHyperlinkButton("nursingrecords.prescription.toggle_order", SYSConst.icon22ledOrangeOn, null);
+            btnToggleOrderStatus.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnToggleOrderStatus.addActionListener(actionEvent -> {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    final Prescription myPrescription = em.merge(prescription);
+                    MedOrders medOrders = em.merge(MedOrdersTools.get_or_create_active_med_orders(em));
+
+                    em.lock(medOrders, LockModeType.OPTIMISTIC);
+                    //em.merge();
+                    MedOrderTools.toggle(em, medOrders, prescription.getResident(), prescription.getTradeForm());
+
+                    em.getTransaction().commit();
+
+                    lstPrescriptions.remove(prescription);
+                    lstPrescriptions.add(myPrescription);
+                    Collections.sort(lstPrescriptions);
+                    createCP4(myPrescription); // recreate the CP
+                    buildPanel(); // rebuild the panel
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
+                }
+            });
+            // checked for acls
+            btnToggleOrderStatus.setEnabled(prescription.hasMed() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.medication"));
+            pnlMenu.add(btnToggleOrderStatus);
+
             /***
              *      ____  _     _      _____  __  __           _
              *     / ___|(_) __| | ___| ____|/ _|/ _| ___  ___| |_ ___
@@ -1444,8 +1486,6 @@ public class PnlPrescription extends NursingRecordsPanel {
             // checked for acls
             btnEditSideEffects.setEnabled(prescription.hasMed() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.medication"));
             pnlMenu.add(btnEditSideEffects);
-
-
             pnlMenu.add(new JSeparator());
 
             /***
@@ -1485,7 +1525,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                 });
                 currentEditor.setVisible(true);
             });
-
             pnlMenu.add(btnFiles);
 
             /***

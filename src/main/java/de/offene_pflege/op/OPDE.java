@@ -752,7 +752,7 @@ public class OPDE {
         if (!localProps.containsKey(SYSPropsTools.KEY_STATION)) localProps.put(SYSPropsTools.KEY_STATION, "1");
         if (!localProps.containsKey(SYSPropsTools.KEY_ANIMATION)) localProps.put(SYSPropsTools.KEY_ANIMATION, "true");
         if (!localProps.containsKey(SYSPropsTools.KEY_TMP_DIR))
-            localProps.put(SYSPropsTools.KEY_TMP_DIR, System.getProperty("java.io.tmpdir"));
+            localProps.put(SYSPropsTools.KEY_TMP_DIR, System.getProperty("user.home"));
         if (!localProps.containsKey(SYSPropsTools.KEY_HOSTKEY))
             localProps.put(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
 
