@@ -600,7 +600,7 @@ public class MedStockTools {
         //    effective UPR   =     --------------------------------------------
         //                          the startContent in the package unit
         //
-        BigDecimal effectiveUPR = theoreticalSum.divide(startContent, 4, BigDecimal.ROUND_UP);
+        BigDecimal effectiveUPR = theoreticalSum.divide(startContent, 4,  RoundingMode.HALF_UP);
 
         return effectiveUPR;
     }

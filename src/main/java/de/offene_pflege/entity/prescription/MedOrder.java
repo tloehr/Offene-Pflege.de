@@ -27,6 +27,14 @@ public class MedOrder extends DefaultEntity {
     @ManyToOne
     private TradeForm tradeForm;
 
+    @JoinColumn(name = "arztid", referencedColumnName = "ArztID")
+    @ManyToOne
+    private GP gp;
+
+    @JoinColumn(name = "khid", referencedColumnName = "KHID")
+    @ManyToOne
+    private Hospital hospital;
+
     @Basic
     @Column(nullable = false)
     private LocalDateTime opened_on;

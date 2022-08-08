@@ -40,16 +40,20 @@ import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.inventory.DlgNewStocks;
 import de.offene_pflege.op.care.med.prodassistant.MedProductWizard;
+import de.offene_pflege.op.care.nursingprocess.TMPlan;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.tablerenderer.RNDHTML;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.compress.utils.Lists;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -58,6 +62,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author tloehr
@@ -240,14 +245,23 @@ public class PnlMed extends CleanablePanel {
 
     private void createTree() {
         if (product == null) return;
-        JTree treeMed = new JTree();
-         //treeMed.setVisible(true);
-        tree = new DefaultTreeModel(getRoot());
-        treeMed.setModel(tree);
-        treeMed.setCellRenderer(new TreeRenderer());
-        scrlMain.removeAll();
-        scrlMain.add(treeMed);
-        SYSTools.expandAll(treeMed);
+        SwingUtilities.invokeLater(() -> {
+            JTree treeMed = new JTree();
+            treeMed.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    treeMedMousePressed(e);
+                }
+            });
+            //treeMed.setVisible(true);
+            tree = new DefaultTreeModel(getRoot());
+            treeMed.setModel(tree);
+            treeMed.setCellRenderer(new TreeRenderer());
+            scrlMain.setViewportView(treeMed);
+            SYSTools.expandAll(treeMed);
+            scrlMain.revalidate();
+            scrlMain.repaint();
+        });
     }
 
     private DefaultMutableTreeNode getRoot() {
@@ -389,14 +403,27 @@ public class PnlMed extends CleanablePanel {
 
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
-
-
-        final JideButton orderButton = GUITools.createHyperlinkButton(MedProductWizard.internalClassID, SYSConst.icon22shopping, null);
-
+        final JideButton orderButton = GUITools.createHyperlinkButton("nursingrecords.inventory.orders", SYSConst.icon22shopping, null);
         orderButton.addActionListener(actionEvent -> {
-            scrlMain.removeAll();
-            scrlMain.add(new JTable());
+            SwingUtilities.invokeLater(() -> {
+                txtSuche.setText(null);
+                JPanel pnl = new JPanel();
+                pnl.setLayout(new BoxLayout(pnl, BoxLayout.PAGE_AXIS));
+                MedOrders medOrders = MedOrdersTools.get_or_create_active_med_orders();
+                TMMedOrders tmMedOrders = new TMMedOrders(medOrders.getOrderList());
+                JTable tbl = new JTable(tmMedOrders);
+                JComboBox<GP> cmbGP = new JComboBox<>(GPTools.getAllActive().toArray(new GP[0]));
+                cmbGP.setRenderer(GPTools.getRenderer());
+                tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
+                tbl.getColumnModel().getColumn(TMMedOrders.COL_GP).setCellEditor(new DefaultCellEditor(cmbGP));
 
+                //tbl.getColumnModel().getColumn(TMMedOrders.COL_GP_HOSPITAL).setCellEditor(new DefaultCellEditor(cmbGP));
+                pnl.add(new JLabel("Bestellung #" + medOrders.getId() + "  Erstellt: " + medOrders.getOpened_on()));
+                pnl.add(tbl);
+                scrlMain.setViewportView(pnl);
+                scrlMain.revalidate();
+                scrlMain.repaint();
+            });
         });
 
         list.add(orderButton);

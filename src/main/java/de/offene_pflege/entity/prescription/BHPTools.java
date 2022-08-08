@@ -20,6 +20,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -257,7 +258,7 @@ public class BHPTools {
             log.debug("generation for schedule: " + pSchedule.toString());
             log.debug("targetdate: " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
             row = row.add(BigDecimal.ONE);
-            SYSTools.printProgBar(row.divide(maxrows, 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
+            SYSTools.printProgBar(row.divide(maxrows, 2,  RoundingMode.HALF_UP).multiply(new BigDecimal(100)).intValue());
 
             pSchedule = em.merge(pSchedule);
             em.lock(pSchedule, LockModeType.OPTIMISTIC_FORCE_INCREMENT);

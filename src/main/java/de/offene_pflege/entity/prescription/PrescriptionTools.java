@@ -33,6 +33,7 @@ import javax.swing.text.html.HTML;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -497,7 +498,7 @@ public class PrescriptionTools {
         if (!prescription.hasMed()) return "";
         Optional<MedOrder> optionalMedOrder = MedOrderTools.find(prescription);
         if (optionalMedOrder.isEmpty()) return "";
-        return HTMLTools.p(SYSConst.html_color(Color.green, "nursingrecords.prescription.ordered"));
+        return HTMLTools.p(SYSConst.html_color(Color.green.darker(), "nursingrecords.prescription.ordered"));
     }
 
     public static String getRemark(Prescription prescription) {
@@ -636,15 +637,15 @@ public class PrescriptionTools {
                     }
 
                     if (invSum != null && invSum.compareTo(BigDecimal.ZERO) > 0) {
-                        result += "<b><u>" + SYSTools.xx("misc.msg.inventory") + ":</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
+                        result += "<b><u>" + SYSTools.xx("misc.msg.inventory") + ":</u> <font color=\"green\">" + invSum.setScale(2, RoundingMode.HALF_UP) + " " +
                                 SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] +
                                 "</font></b>";
                         if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                             BigDecimal anwmenge = invSum.multiply(stockInUse.getUPR());
 
-                            result += " " + SYSTools.xx("misc.msg.equalTo") + " " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
+                            result += " " + SYSTools.xx("misc.msg.equalTo") + " " + anwmenge.setScale(2,  RoundingMode.HALF_UP) + " " +
                                     DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
-                            result += " (" + SYSTools.xx("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " " + SYSTools.xx("misc.msg.to1");
+                            result += " (" + SYSTools.xx("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2,  RoundingMode.HALF_UP) + " " + SYSTools.xx("misc.msg.to1");
                             if (stockInUse.getUPRDummyMode() == MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
                                 result += ", " + SYSTools.xx("misc.msg.preliminary");
                             }
@@ -654,12 +655,12 @@ public class PrescriptionTools {
                         result += "<br/>" + SYSTools.xx("misc.msg.stockInUse") + ": <b><font color=\"green\">" + stockInUse.getID() + "</font></b>";
 
                         if (invSum.compareTo(stockSum) != 0) {
-                            result += "<br/>" + SYSTools.xx("misc.msg.leftInStock") + ": <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
+                            result += "<br/>" + SYSTools.xx("misc.msg.leftInStock") + ": <b><font color=\"green\">" + stockSum.setScale(2,  RoundingMode.HALF_UP) + " " +
                                     SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] + "</font></b>";
                             if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                                 BigDecimal usage = stockSum.multiply(stockInUse.getUPR());
 
-                                result += " (" + SYSTools.xx("misc.msg.equalTo") + " " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +
+                                result += " (" + SYSTools.xx("misc.msg.equalTo") + " " + usage.setScale(2,  RoundingMode.HALF_UP) + " " +
                                         DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm()) + ")";
                             }
                         }

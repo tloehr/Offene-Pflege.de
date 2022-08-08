@@ -3,16 +3,18 @@ package de.offene_pflege.entity.prescription;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.op.OPDE;
 import lombok.extern.log4j.Log4j2;
+import org.apache.poi.sl.draw.geom.GuideIf;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Log4j2
 public class MedOrderTools {
-    public static Optional<MedOrder> toggle(EntityManager em, MedOrders medOrders, Resident resident, TradeForm tradeForm) {
-        Optional<MedOrder> optionalMedOrder = find(em, medOrders, resident, tradeForm);
+    public static Optional<MedOrder> toggle(EntityManager em, MedOrders medOrders, Prescription prescription) {
+        Optional<MedOrder> optionalMedOrder = find(em, medOrders, prescription.getResident(), prescription.getTradeForm());
         if (optionalMedOrder.isPresent()) {
             em.remove(optionalMedOrder.get());
             return Optional.empty();
@@ -21,8 +23,10 @@ public class MedOrderTools {
         medOrder.setMedOrders(medOrders);
         medOrder.setOpened_by(OPDE.getLogin().getUser());
         medOrder.setOpened_on(LocalDateTime.now());
-        medOrder.setResident(resident);
-        medOrder.setTradeForm(tradeForm);
+        medOrder.setResident(prescription.getResident());
+        medOrder.setTradeForm(prescription.getTradeForm());
+        medOrder.setGp(prescription.getDocON());
+        medOrder.setHospital(prescription.getHospitalON());
         em.merge(medOrder);
         return Optional.of(medOrder);
     }
@@ -37,10 +41,14 @@ public class MedOrderTools {
             query.setParameter("resident", resident);
             query.setParameter("tradeForm", tradeForm);
             return Optional.of((MedOrder) query.getSingleResult());
-        } catch (Exception e) {
+        } catch (NoResultException e) {
             log.trace(e);
             return Optional.empty();
+        } catch (Exception e) {
+            OPDE.fatal(e);
+
         }
+        return Optional.empty();
     }
 
 
@@ -54,9 +62,16 @@ public class MedOrderTools {
             query.setParameter("resident", prescription.getResident());
             query.setParameter("tradeForm", prescription.getTradeForm());
             return Optional.of((MedOrder) query.getSingleResult());
-        } catch (Exception e) {
+        } catch (NoResultException e) {
             log.trace(e);
             return Optional.empty();
+        } catch (Exception e) {
+            OPDE.fatal(e);
         }
+        return Optional.empty();
+    }
+
+    public static boolean is_closed(MedOrder medOrder) {
+        return medOrder.getClosed_by() != null;
     }
 }

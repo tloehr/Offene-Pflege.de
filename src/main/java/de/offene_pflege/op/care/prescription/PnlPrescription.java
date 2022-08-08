@@ -1421,7 +1421,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
                     em.lock(medOrders, LockModeType.OPTIMISTIC);
                     //em.merge();
-                    MedOrderTools.toggle(em, medOrders, prescription.getResident(), prescription.getTradeForm());
+                    MedOrderTools.toggle(em, medOrders, prescription);
 
                     em.getTransaction().commit();
 

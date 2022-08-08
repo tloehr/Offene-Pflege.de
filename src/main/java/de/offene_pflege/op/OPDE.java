@@ -263,7 +263,7 @@ public class OPDE {
 
         String html = SYSTools.getThrowableAsHTML(e);
         File temp = SYSFilesTools.createTempFile("opde", ".html");
-        temp.deleteOnExit();
+        //temp.deleteOnExit();
         SYSFilesTools.print(html, temp, false, true);
 
         if (System.getProperties().getOrDefault("loglevel","INFO").equals("INFO")) {
@@ -577,7 +577,7 @@ public class OPDE {
 
             // enable JPA cache
             jpaProps.put("eclipselink.cache.shared.default", cl.hasOption("c") ? "true" : "false");
-            jpaProps.put("eclipselink.session.customizer", "de.offene_pflege.entity.JPAEclipseLinkSessionCustomizer");
+            //jpaProps.put("eclipselink.session.customizer", "de.offene_pflege.entity.JPAEclipseLinkSessionCustomizer");
 
             Connection jdbcConnection = DriverManager.getConnection(url, jpaProps.getProperty(SYSPropsTools.KEY_JDBC_USER), jpaProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD));
             int neededVersion = OPDE.getAppInfo().getDbversion();

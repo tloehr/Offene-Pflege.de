@@ -18,6 +18,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -171,7 +172,7 @@ public class DFNTools {
         for (InterventionSchedule termin : list) {
 
             row = row.add(BigDecimal.ONE);
-            SYSTools.printProgBar(row.divide(maxrows, 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
+            SYSTools.printProgBar(row.divide(maxrows, 2,  RoundingMode.HALF_UP).multiply(new BigDecimal(100)).intValue());
 
             termin = em.merge(termin);
             em.lock(termin, LockModeType.OPTIMISTIC_FORCE_INCREMENT);

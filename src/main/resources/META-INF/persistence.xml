@@ -70,6 +70,10 @@
         <class>de.offene_pflege.entity.values.Resvaluetypes</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="eclipselink.logging.level" value="FINE"/>
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
+            <property name="eclipselink.session.customizer" value="de.offene_pflege.entity.JPAEclipseLinkSessionCustomizer"/>
 <!--            eclipselink.jpa.uppercase-column-names"="true"-->
 <!--            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>-->
         </properties>
