@@ -31,6 +31,7 @@
         <commons.io.version>2.11.0</commons.io.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.log4j.version>2.17.2</commons.log4j.version>
+        <guava.version>31.1-jre</guava.version>
         <commons.net.version>3.8.0</commons.net.version>
         <commons.text.version>1.9</commons.text.version>
         <eclipselink.version>2.7.10</eclipselink.version>
@@ -337,6 +338,12 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>${commons.net.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

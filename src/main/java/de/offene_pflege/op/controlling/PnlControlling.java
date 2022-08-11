@@ -822,6 +822,23 @@ public class PnlControlling extends CleanablePanel {
         pnlInsuranceGrade.add(btnIG, BorderLayout.WEST);
         pnlContent.add(pnlInsuranceGrade);
 
+        if (OPDE.isExperimental()) {
+            // Dokumentationsbogen zur besonderen Förderung der Pflegeheimversorgung
+            JPanel pnlKV = new JPanel(new BorderLayout());
+            final JButton btnKV = GUITools.createHyperlinkButton("opde.controlling.kv", null, null);
+
+            btnKV.addActionListener(e -> {
+                        try {
+                            KVExport.create();
+                        } catch (IOException exception) {
+                            log.error(exception);
+                        }
+                    }
+            );
+
+            pnlKV.add(btnKV, BorderLayout.WEST);
+            pnlContent.add(pnlKV);
+        }
 
         return pnlContent;
     }

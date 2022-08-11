@@ -494,6 +494,12 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static Set<TradeForm> getPrescribedTradeforms(Resident resident) {
+        Set<TradeForm> result = new HashSet<>();
+        getAllActive(resident).stream().filter(prescription -> prescription.hasMed()).forEach(prescription -> result.add(prescription.getTradeForm()));
+        return result;
+    }
+
     public static String getOrderInformation(Prescription prescription) {
         if (!prescription.hasMed()) return "";
         Optional<MedOrder> optionalMedOrder = MedOrderTools.find(prescription);
@@ -643,9 +649,9 @@ public class PrescriptionTools {
                         if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                             BigDecimal anwmenge = invSum.multiply(stockInUse.getUPR());
 
-                            result += " " + SYSTools.xx("misc.msg.equalTo") + " " + anwmenge.setScale(2,  RoundingMode.HALF_UP) + " " +
+                            result += " " + SYSTools.xx("misc.msg.equalTo") + " " + anwmenge.setScale(2, RoundingMode.HALF_UP) + " " +
                                     DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
-                            result += " (" + SYSTools.xx("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2,  RoundingMode.HALF_UP) + " " + SYSTools.xx("misc.msg.to1");
+                            result += " (" + SYSTools.xx("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2, RoundingMode.HALF_UP) + " " + SYSTools.xx("misc.msg.to1");
                             if (stockInUse.getUPRDummyMode() == MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
                                 result += ", " + SYSTools.xx("misc.msg.preliminary");
                             }
@@ -655,12 +661,12 @@ public class PrescriptionTools {
                         result += "<br/>" + SYSTools.xx("misc.msg.stockInUse") + ": <b><font color=\"green\">" + stockInUse.getID() + "</font></b>";
 
                         if (invSum.compareTo(stockSum) != 0) {
-                            result += "<br/>" + SYSTools.xx("misc.msg.leftInStock") + ": <b><font color=\"green\">" + stockSum.setScale(2,  RoundingMode.HALF_UP) + " " +
+                            result += "<br/>" + SYSTools.xx("misc.msg.leftInStock") + ": <b><font color=\"green\">" + stockSum.setScale(2, RoundingMode.HALF_UP) + " " +
                                     SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] + "</font></b>";
                             if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                                 BigDecimal usage = stockSum.multiply(stockInUse.getUPR());
 
-                                result += " (" + SYSTools.xx("misc.msg.equalTo") + " " + usage.setScale(2,  RoundingMode.HALF_UP) + " " +
+                                result += " (" + SYSTools.xx("misc.msg.equalTo") + " " + usage.setScale(2, RoundingMode.HALF_UP) + " " +
                                         DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm()) + ")";
                             }
                         }
