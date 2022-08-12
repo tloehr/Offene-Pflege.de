@@ -31,9 +31,14 @@ import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.OneToMany;
+import javax.persistence.OptimisticLockException;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import java.time.LocalDateTime;
@@ -43,6 +48,7 @@ import java.util.List;
 /**
  * @author tloehr
  */
+@Log4j2
 public class TMMedOrders extends AbstractTableModel {
     public static final int COL_TradeForm = 0;
     public static final int COL_Resident = 1;
@@ -69,7 +75,9 @@ public class TMMedOrders extends AbstractTableModel {
     public Class getColumnClass(int col) {
         switch (col) {
             case COL_TradeForm:
-            case COL_Resident:
+            case COL_Resident: {
+                return String.class;
+            }
             case COL_GP: {
                 return GP.class;
             }
@@ -92,18 +100,27 @@ public class TMMedOrders extends AbstractTableModel {
             Boolean complete = (Boolean) aValue;
             medOrder.setClosed_on(complete ? LocalDateTime.now() : null);
             medOrder.setClosed_by(complete ? OPDE.getLogin().getUser() : null);
-        }
-        if (column == COL_GP) {
+            medOrder = EntityTools.merge(medOrder);
+        } else if (column == COL_GP) {
             GP gp = (GP) aValue;
             medOrder.setGp(gp);
         }
-        medOrderList.set(row, EntityTools.merge(medOrder));
+        medOrderList.set(row, medOrder);
         fireTableCellUpdated(row, column);
     }
 
     @Override
     public boolean isCellEditable(int row, int column) {
         return column == COL_complete || column == COL_GP;
+    }
+
+    public MedOrder get(int row) {
+        return medOrderList.get(row);
+    }
+
+    public void delete(int row) {
+        medOrderList.remove(row);
+        fireTableRowsDeleted(row, row);
     }
 
     @Override

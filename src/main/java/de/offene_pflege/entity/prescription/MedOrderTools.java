@@ -23,10 +23,19 @@ public class MedOrderTools {
         medOrder.setMedOrders(medOrders);
         medOrder.setOpened_by(OPDE.getLogin().getUser());
         medOrder.setOpened_on(LocalDateTime.now());
-        medOrder.setResident(prescription.getResident());
-        medOrder.setTradeForm(prescription.getTradeForm());
-        medOrder.setGp(prescription.getDocON());
-        medOrder.setHospital(prescription.getHospitalON());
+        medOrder.setResident(em.merge(prescription.getResident()));
+        medOrder.setTradeForm(em.merge(prescription.getTradeForm()));
+
+        if (prescription.getDocON() != null)
+            medOrder.setGp(em.merge(prescription.getDocON()));
+        else
+            medOrder.setGp(null);
+
+        if (prescription.getHospitalON() != null)
+            medOrder.setHospital(em.merge(prescription.getHospitalON()));
+        else
+            medOrder.setHospital(null);
+        
         em.merge(medOrder);
         return Optional.of(medOrder);
     }
@@ -46,15 +55,14 @@ public class MedOrderTools {
             return Optional.empty();
         } catch (Exception e) {
             OPDE.fatal(e);
-
         }
         return Optional.empty();
     }
 
 
     public static Optional<MedOrder> find(Prescription prescription) {
+        EntityManager em = OPDE.createEM();
         try {
-            EntityManager em = OPDE.createEM();
             String jpql = " SELECT p " +
                     " FROM MedOrder p" +
                     " WHERE p.resident  = :resident AND p.tradeForm = :tradeForm AND p.closed_by = null ";
@@ -67,6 +75,8 @@ public class MedOrderTools {
             return Optional.empty();
         } catch (Exception e) {
             OPDE.fatal(e);
+        } finally {
+            em.close();
         }
         return Optional.empty();
     }

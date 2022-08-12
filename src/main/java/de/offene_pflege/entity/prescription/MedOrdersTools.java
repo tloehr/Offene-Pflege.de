@@ -6,8 +6,10 @@ import lombok.extern.log4j.Log4j2;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Log4j2
@@ -29,6 +31,31 @@ public class MedOrdersTools {
         return Optional.empty();
     }
 
+    public static Optional<MedOrders> next(MedOrders current, int skip_rows) {
+        EntityManager em = OPDE.createEM();
+        try {
+            String operator = skip_rows >= 0 ? ">=" : "<";
+            String asc = skip_rows >= 0 ? "DESC" : "ASC";
+            String jpql = " SELECT o " +
+                    " FROM MedOrders o" +
+                    " WHERE o.opened_on " + operator + " :current " +
+                    " ORDER BY o.opened_on " + asc;
+            Query query = em.createQuery(jpql);
+            query.setParameter("current", current.getOpened_on());
+            query.setMaxResults(Math.abs(skip_rows));
+            List<MedOrders> list = query.getResultList();
+            return list.size() != Math.abs(skip_rows) ? Optional.empty() : Optional.of(list.get(0));
+        } catch (NoResultException e) {
+            log.trace(e);
+            return Optional.empty();
+        } catch (Exception e) {
+            OPDE.fatal(e);
+            return Optional.empty();
+        } finally {
+            em.close();
+        }
+    }
+
     public static MedOrders get_or_create_active_med_orders() {
         EntityManager em = OPDE.createEM();
         em.getTransaction().begin();
@@ -40,6 +67,7 @@ public class MedOrdersTools {
 
     /**
      * returns the current active order list - creates one, if necessary
+     *
      * @param em
      * @return
      */

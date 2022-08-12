@@ -1,13 +1,14 @@
 {{tag>versions}}
-====== V1.15.3.52 ======
-  * Datenbank Schema: **Version 15**
-  * Release: **24.05.2022**
+====== V1.15.4.xx ======
+  * Datenbank Schema: **Version 16**
+  * Release: **24.09.2022**
 
   * <label icon="glyphicon glyphicon-cog" type="info">Work in progress</label> Anpassungen für die neue [[https://www.das-pflege.de/spezifikationen#spezifikationen|Spezifikation 2.0]] der DAS-Pflege, gültig ab dem Erhebungszyklus 5((Beginn: 01.01.2023))
   * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Weitere Anpassungen wegen der Log4J Migration waren nötig. So müssen die Config Verzeichnisse nun einheitlich umbenannt werden. Sie heißen jetzt (je nach Plattform)
-    * win
-    * mac
-    * linux
-  * Wenn bei einer Verordnung schon vorab das End-Datum feststeht, setzte die Datenbank dieses Datum immer auf den Folgetag. Das geschah, weil die Nano-Sekunden von der Datenbank aufgerundet wurden. Behoben.
-  * Mehrere Deprecated Funktionen aktualisiert.
-  * Genesenen Status mit in die Impf-Angabe bei den BW-Infos aufgenommen.
+    * win ''Roaming...''
+    * mac ''~/Library/Application Support/opde1''
+    * linux ''~/.local/share/opde1''
+  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label>  Wenn bei einer Verordnung schon vorab das End-Datum feststeht, setzte die Datenbank dieses Datum immer auf den Folgetag. Das geschah, weil die Nano-Sekunden von der Datenbank aufgerundet wurden. Behoben.
+  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label>  Deprecated Funktionen aktualisiert.
+  * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Status "genesen" mit in die Impf-Angabe bei den BW-Infos aufgenommen.
+  * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Bestellwesen für Medikamente. Zur Bestellung bei den Praxen und späteres Abhaken, wenn die Präparate von der Apotheke angekommen sind.

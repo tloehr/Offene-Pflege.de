@@ -52,5 +52,5 @@ public class MedOrder extends DefaultEntity {
     @ManyToOne
     @JoinColumn(name = "closed_by", referencedColumnName = "UKennung")
     private OPUsers closed_by;
-
+    
 }

@@ -34,14 +34,21 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
+import de.offene_pflege.entity.EntityTools;
+import de.offene_pflege.entity.files.SYSFiles;
+import de.offene_pflege.entity.files.SYSFilesTools;
+import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.inventory.DlgNewStocks;
+import de.offene_pflege.op.care.med.inventory.PnlMedOrders;
 import de.offene_pflege.op.care.med.prodassistant.MedProductWizard;
 import de.offene_pflege.op.care.nursingprocess.TMPlan;
+import de.offene_pflege.op.care.sysfiles.TMSYSFiles;
 import de.offene_pflege.op.system.InternalClassACL;
+import de.offene_pflege.op.tools.DlgYesNo;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.tablerenderer.RNDHTML;
@@ -53,6 +60,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -69,8 +77,6 @@ import java.util.Arrays;
  */
 @Log4j2
 public class PnlMed extends CleanablePanel {
-
-
     private DefaultTreeModel tree;
     private MedProducts product;
     private JPopupMenu menu;
@@ -113,6 +119,7 @@ public class PnlMed extends CleanablePanel {
     private void initDialog() {
         prepareSearchArea();
         product = null;
+        orderButtonPressed(); // wir starten immer mit der Bestellung
     }
 
     /**
@@ -121,24 +128,9 @@ public class PnlMed extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        scrlMain = new JScrollPane();
-        panel1 = new JPanel();
-        label1 = new JLabel();
 
         //======== this ========
         setLayout(new CardLayout());
-        add(scrlMain, "card1");
-
-        //======== panel1 ========
-        {
-            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-
-            //---- label1 ----
-            label1.setText("text");
-            label1.setIcon(null);
-            panel1.add(label1);
-        }
-        add(panel1, "card2");
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -257,10 +249,10 @@ public class PnlMed extends CleanablePanel {
             tree = new DefaultTreeModel(getRoot());
             treeMed.setModel(tree);
             treeMed.setCellRenderer(new TreeRenderer());
-            scrlMain.setViewportView(treeMed);
+//            scrlMain.setViewportView(treeMed);
             SYSTools.expandAll(treeMed);
-            scrlMain.revalidate();
-            scrlMain.repaint();
+//            scrlMain.revalidate();
+//            scrlMain.repaint();
         });
     }
 
@@ -297,17 +289,9 @@ public class PnlMed extends CleanablePanel {
         for (MedPackage aPackage : darreichung.getPackages()) {
             result.add(new DefaultMutableTreeNode(aPackage));
         }
-
-
         return result;
     }
 
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JScrollPane scrlMain;
-    private JPanel panel1;
-    private JLabel label1;
-    // End of variables declaration//GEN-END:variables
 
     private class TreeRenderer extends DefaultTreeCellRenderer {
         TreeRenderer() {
@@ -405,25 +389,7 @@ public class PnlMed extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
         final JideButton orderButton = GUITools.createHyperlinkButton("nursingrecords.inventory.orders", SYSConst.icon22shopping, null);
         orderButton.addActionListener(actionEvent -> {
-            SwingUtilities.invokeLater(() -> {
-                txtSuche.setText(null);
-                JPanel pnl = new JPanel();
-                pnl.setLayout(new BoxLayout(pnl, BoxLayout.PAGE_AXIS));
-                MedOrders medOrders = MedOrdersTools.get_or_create_active_med_orders();
-                TMMedOrders tmMedOrders = new TMMedOrders(medOrders.getOrderList());
-                JTable tbl = new JTable(tmMedOrders);
-                JComboBox<GP> cmbGP = new JComboBox<>(GPTools.getAllActive().toArray(new GP[0]));
-                cmbGP.setRenderer(GPTools.getRenderer());
-                tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
-                tbl.getColumnModel().getColumn(TMMedOrders.COL_GP).setCellEditor(new DefaultCellEditor(cmbGP));
-
-                //tbl.getColumnModel().getColumn(TMMedOrders.COL_GP_HOSPITAL).setCellEditor(new DefaultCellEditor(cmbGP));
-                pnl.add(new JLabel("Bestellung #" + medOrders.getId() + "  Erstellt: " + medOrders.getOpened_on()));
-                pnl.add(tbl);
-                scrlMain.setViewportView(pnl);
-                scrlMain.revalidate();
-                scrlMain.repaint();
-            });
+            orderButtonPressed();
         });
 
         list.add(orderButton);
@@ -475,4 +441,18 @@ public class PnlMed extends CleanablePanel {
 
         return list;
     }
+
+    private void orderButtonPressed() {
+        SwingUtilities.invokeLater(() -> {
+            txtSuche.setText(null);
+            removeAll();
+            add(new PnlMedOrders());
+            revalidate();
+            repaint();
+        });
+    }
+
+
+
+
 }

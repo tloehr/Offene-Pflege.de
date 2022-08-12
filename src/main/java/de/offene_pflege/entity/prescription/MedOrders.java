@@ -2,14 +2,12 @@ package de.offene_pflege.entity.prescription;
 
 
 import de.offene_pflege.entity.DefaultEntity;
-import de.offene_pflege.entity.info.ResInfo;
 import de.offene_pflege.entity.system.OPUsers;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -17,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 public class MedOrders extends DefaultEntity {
+
     @Basic
     @Column(nullable = false)
     private LocalDateTime opened_on;

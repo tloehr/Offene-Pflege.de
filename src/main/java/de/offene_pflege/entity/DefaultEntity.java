@@ -8,46 +8,41 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 @MappedSuperclass
 @Getter
 @Setter
 @NoArgsConstructor
 public class DefaultEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
     @Version
-    private int version;
+    protected int version;
 
     @Override
     public int hashCode() {
-        if (id == null) {
-            return super.hashCode();
-        }
-
-        return 31 + id.hashCode();
+        return (super.hashCode() * 907) + Objects.hashCode(getId());
     }
 
     @Override
-    public boolean equals(Object other) {
-        boolean equal;
-
-        if (id == null) {
-            // New entities are only equal if the instance if the same
-            equal = super.equals(other);
-        } else if (this == other) {
-            equal = true;
-        } else if (!(other instanceof DefaultEntity)) {
-            equal = false;
-        } else {
-            equal = id.equals(((DefaultEntity) other).id);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
-
-//        log.debug("this: " + toString() + " other: " + Tools.catchNull(other, "null") + ": is equal ??: " + Boolean.toString(equal));
-        return equal;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DefaultEntity entity = (DefaultEntity) obj;
+        if (entity.id == null || id == null) {
+            return false;
+        }
+        return Objects.equals(id, entity.id);
     }
 
     @Override

@@ -75,7 +75,7 @@ public class EntityTools {
             em.lock(mergedEntity, LockModeType.OPTIMISTIC);
             em.getTransaction().commit();
         } catch (OptimisticLockException ole) {
-            log.warn( ole);
+            log.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -123,9 +123,21 @@ public class EntityTools {
             em.remove(em.merge(entity));
             em.getTransaction().commit();
             success = true;
+        } catch (OptimisticLockException ole) {
+            log.warn(ole);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
         } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             OPDE.fatal(e);
-            em.getTransaction().rollback();
         } finally {
             em.close();
         }
@@ -267,7 +279,7 @@ public class EntityTools {
         if (result == 0) {
             query = " INSERT INTO sysprops (K, V) VALUES (?, ?) ";
             stmt = jdbcConnection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
-                            ResultSet.CONCUR_READ_ONLY);
+                    ResultSet.CONCUR_READ_ONLY);
             stmt.setString(1, SYSPropsTools.KEY_MAINTENANCE_MODE);
             stmt.setString(2, Boolean.toString(locked).toLowerCase());
             stmt.executeUpdate();
@@ -280,7 +292,7 @@ public class EntityTools {
         boolean isLocked = false;
         String query = " SELECT * FROM sysprops p WHERE p.K = ? AND p.v = 'true' ";
         PreparedStatement stmt = jdbcConnection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY);
+                ResultSet.CONCUR_READ_ONLY);
         stmt.setString(1, SYSPropsTools.KEY_MAINTENANCE_MODE);
         ResultSet rs = stmt.executeQuery();
         isLocked = rs.first();

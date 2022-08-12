@@ -1416,19 +1416,17 @@ public class PnlPrescription extends NursingRecordsPanel {
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
-                    final Prescription myPrescription = em.merge(prescription);
-                    MedOrders medOrders = em.merge(MedOrdersTools.get_or_create_active_med_orders(em));
+                    //final Prescription myPrescription = em.merge(prescription);
+                    MedOrders medOrders = MedOrdersTools.get_or_create_active_med_orders(em);
 
                     em.lock(medOrders, LockModeType.OPTIMISTIC);
-                    //em.merge();
                     MedOrderTools.toggle(em, medOrders, prescription);
-
                     em.getTransaction().commit();
 
-                    lstPrescriptions.remove(prescription);
-                    lstPrescriptions.add(myPrescription);
-                    Collections.sort(lstPrescriptions);
-                    createCP4(myPrescription); // recreate the CP
+//                    lstPrescriptions.remove(prescription);
+//                    lstPrescriptions.add(myPrescription);
+//                    Collections.sort(lstPrescriptions);
+                    createCP4(prescription); // recreate the CP
                     buildPanel(); // rebuild the panel
                 } catch (Exception e) {
                     if (em.getTransaction().isActive()) {
