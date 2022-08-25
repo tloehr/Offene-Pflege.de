@@ -22,6 +22,8 @@ import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.mutable.MutableDouble;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -1109,5 +1111,33 @@ public class PrescriptionTools {
         return list;
     }
 
+
+    public static BigDecimal get_consumption_per_day(Prescription prescription) {
+        if (prescription.getTradeForm().getDosageForm().isDontCALC()) return BigDecimal.ZERO;
+
+        MutableDouble dosage = new MutableDouble(0d);
+        prescription.getPrescriptionSchedule().forEach(prescriptionSchedule -> {
+
+            if (prescription.isOnDemand())
+                dosage.add(prescriptionSchedule.getMaxEDosis().multiply(prescriptionSchedule.getMaxEDosis()));
+            else {
+                BigDecimal divisor = BigDecimal.valueOf(NumberUtils.max(prescriptionSchedule.getTaeglich(),
+                        prescriptionSchedule.getWoechentlich() * 7,
+                        prescriptionSchedule.getMonatlich() * 30.42)
+                );
+                dosage.add(prescriptionSchedule.getOverAllDoseSum().divide(divisor, RoundingMode.HALF_UP));
+            }
+
+        });
+
+        TradeForm tradeForm = prescription.getTradeForm();
+
+        BigDecimal upr = BigDecimal.ONE;
+        if (tradeForm.getDosageForm().isUPRn()) {
+            upr = tradeForm.getConstantUPRn() != null ? tradeForm.getConstantUPRn() : MedStockTools.getEstimatedUPR(tradeForm);
+        }
+
+        return BigDecimal.valueOf(dosage.doubleValue()).divide(upr, 4, RoundingMode.HALF_UP);
+    }
 
 }

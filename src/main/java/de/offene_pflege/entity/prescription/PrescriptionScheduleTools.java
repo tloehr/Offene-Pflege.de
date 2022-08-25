@@ -470,39 +470,5 @@ public class PrescriptionScheduleTools {
     }
 
 
-    public static String getRemark(PrescriptionSchedule schedule) {
-        String result = "";
-
-        if (schedule.getPrescription().isOnDemand()) {
-            result += SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ";
-            result += schedule.getMaxAnzahl() + "x " + HTMLTools.printDouble(schedule.getMaxEDosis()) + " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
-            result += "<br/>";
-        }
-//        else if (schedule.usesTime()) {
-//            result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " Uhr</u></b> ";
-//            result += HTMLTools.printDouble(schedule.getUhrzeitDosis());
-//            result += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
-//            result += "<br/>";
-//        }
-
-        String wiederholung = getRepeatPattern(schedule, false);
-        result += wiederholung;
-
-        String substitution = PrescriptionTools.getOriginalPrescription(schedule.getPrescription());
-        if (!substitution.isEmpty()) {
-            result += substitution;
-        }
-
-        if (!SYSTools.catchNull(schedule.getPrescription().getText()).isEmpty()) {
-            if (!wiederholung.isEmpty()) {
-                result += "<br/>";
-            }
-            result += "<b><u>" + SYSTools.xx("misc.msg.comment") + ":</u></b> " + schedule.getPrescription().getText();
-
-        }
-
-        return result.equals("") ? "&nbsp;" : result;
-    }
-
 
 }

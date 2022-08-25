@@ -16,6 +16,7 @@ create table medorders
     closed_by char(10)
 );
 drop table if exists medorder;
+--
 create table medorder
 (
     id        bigint unsigned auto_increment primary key,
@@ -25,6 +26,7 @@ create table medorder
     dafid     bigint unsigned           not null,
     arztid    bigint unsigned,
     khid      bigint unsigned,
+    note      varchar(200),
     opened_on datetime                  not null,
     opened_by char(10)                  not null,
     closed_on datetime,

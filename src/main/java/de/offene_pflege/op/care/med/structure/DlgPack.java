@@ -72,6 +72,10 @@ public class DlgPack extends MyJDialog {
 //        setVisible(true);
     }
 
+    public MedPackage getPackage() {
+        return aPackage;
+    }
+
     /**
      * This method is called from within the constructor to
      * initialize the form.

@@ -54,7 +54,8 @@ public class TMMedOrders extends AbstractTableModel {
     public static final int COL_Resident = 1;
     public static final int COL_GP = 2;
     public static final int COL_HOSPITAL = 3;
-    public static final int COL_complete = 4;
+    public static final int COL_note = 4;
+    public static final int COL_complete = 5;
     private final List<MedOrder> medOrderList;
 
     public TMMedOrders(List<MedOrder> medOrderList) {
@@ -68,13 +69,14 @@ public class TMMedOrders extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 5;
+        return 6;
     }
 
     @Override
     public Class getColumnClass(int col) {
         switch (col) {
             case COL_TradeForm:
+            case COL_note:
             case COL_Resident: {
                 return String.class;
             }
@@ -104,6 +106,8 @@ public class TMMedOrders extends AbstractTableModel {
         } else if (column == COL_GP) {
             GP gp = (GP) aValue;
             medOrder.setGp(gp);
+        } else if (column == COL_note) {
+            medOrder.setNote(aValue.toString().trim());
         }
         medOrderList.set(row, medOrder);
         fireTableCellUpdated(row, column);
@@ -111,7 +115,7 @@ public class TMMedOrders extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return column == COL_complete || column == COL_GP;
+        return column == COL_complete || column == COL_note || column == COL_GP;
     }
 
     public MedOrder get(int row) {
@@ -138,6 +142,10 @@ public class TMMedOrders extends AbstractTableModel {
             }
             case COL_GP: {
                 result = medOrder.getGp() != null ? GPTools.getFullName(medOrder.getGp()) : "--";
+                break;
+            }
+            case COL_note: {
+                result = medOrder.getNote();
                 break;
             }
             case COL_HOSPITAL: {

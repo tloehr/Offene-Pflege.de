@@ -2,19 +2,26 @@ package de.offene_pflege.op.care.med.inventory;
 
 import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.structure.TMMedOrders;
+import de.offene_pflege.op.threads.DisplayManager;
+import de.offene_pflege.op.threads.DisplayMessage;
+import de.offene_pflege.op.tools.NumberVerifier;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.tablerenderer.RNDHTML;
 import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.HorizontalLayout;
-import org.jdesktop.swingx.VerticalLayout;
 
+import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.RollbackException;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Optional;
+import java.math.BigDecimal;
 
 @Log4j2
 public class PnlMedOrders extends JPanel {
@@ -23,10 +30,12 @@ public class PnlMedOrders extends JPanel {
     JTable tbl;
     JScrollPane scrl;
 
+
     public PnlMedOrders() {
         super();
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BorderLayout(5, 5));
         menu = null;
+
         selected_med_orders = MedOrdersTools.get_or_create_active_med_orders();
         initPanel();
     }
@@ -34,11 +43,11 @@ public class PnlMedOrders extends JPanel {
     private void initPanel() {
         JPanel pnl = getButtonPanel();
         pnl.add(getLabel());
-        add(pnl);
+        add(pnl, BorderLayout.SOUTH);
         scrl = new JScrollPane();
-        add(scrl);
-        TMMedOrders tmMedOrders = new TMMedOrders(selected_med_orders.getOrderList());
+        add(scrl, BorderLayout.CENTER);
         tbl = new JTable();
+        tbl.setAutoCreateRowSorter(true);
         load_table_model();
         tbl.addMouseListener(new MouseAdapter() {
             @Override
@@ -50,6 +59,8 @@ public class PnlMedOrders extends JPanel {
         cmbGP.setRenderer(GPTools.getRenderer());
         tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
         tbl.getColumnModel().getColumn(TMMedOrders.COL_GP).setCellEditor(new DefaultCellEditor(cmbGP));
+        tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellEditor(new DefaultCellEditor(new JTextField()));
+        tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellRenderer(new Tooltip_cell_renderer());
         scrl.setViewportView(tbl);
     }
 
@@ -64,10 +75,64 @@ public class PnlMedOrders extends JPanel {
     }
 
     private JPanel getButtonPanel() {
-        JPanel pnl = new JPanel(new HorizontalLayout(5));
+        JPanel pnl = new JPanel();
+        pnl.setLayout(new HorizontalLayout(5));
         JButton left = new JButton(SYSConst.icon22playerBack);
         JButton right = new JButton(SYSConst.icon22playerPlay);
+        JTextField days_range = new JTextField("14");
+        days_range.setInputVerifier(new NumberVerifier(BigDecimal.ONE, BigDecimal.valueOf(31), true));
 
+        JButton generate_orders = new JButton(SYSConst.icon22calc);
+        generate_orders.addActionListener(e -> {
+
+            OPDE.getMainframe().setBlocked(true);
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
+
+            SwingWorker worker = new SwingWorker() {
+
+                @Override
+                protected Object doInBackground() {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        MedOrders medOrders = em.merge(selected_med_orders);
+                        MedOrderTools.generate_orders(selected_med_orders, Double.parseDouble(days_range.getText())).forEach(medOrder -> {
+                            //medOrders.getOrderList().add(medOrder); <- produziert doppelte einträge
+                            em.merge(medOrder);
+                        });
+                        em.getTransaction().commit();
+                        em.refresh(medOrders);
+                        selected_med_orders = medOrders;
+                    } catch (OptimisticLockException | RollbackException ole) {
+                        log.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception exc) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(exc);
+                    } finally {
+                        em.close();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                }
+            };
+            worker.execute();
+
+        });
         left.addActionListener(e ->
                 MedOrdersTools.next(selected_med_orders, -1).ifPresent(medOrders -> {
                     selected_med_orders = medOrders;
@@ -82,6 +147,9 @@ public class PnlMedOrders extends JPanel {
         );
         pnl.add(left);
         pnl.add(right);
+        pnl.add(new JSeparator(SwingConstants.HORIZONTAL));
+        pnl.add(days_range);
+        pnl.add(generate_orders);
         return pnl;
     }
 
@@ -93,7 +161,6 @@ public class PnlMedOrders extends JPanel {
         ListSelectionModel lsm = tbl.getSelectionModel();
         Point p2 = evt.getPoint();
         SwingUtilities.convertPointToScreen(p2, tbl);
-        final Point screenposition = p2;
 
         boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
 
@@ -103,10 +170,6 @@ public class PnlMedOrders extends JPanel {
         if (singleRowSelected) {
             lsm.setSelectionInterval(row, row);
         }
-
-        //        final TMSYSFiles tm = (TMSYSFiles) tblFiles.getModel();
-        //        final SYSFiles sysfile = tm.getRow(tblFiles.convertRowIndexToModel(row));
-
 
         SYSTools.unregisterListeners(menu);
         menu = new JPopupMenu();
@@ -124,5 +187,15 @@ public class PnlMedOrders extends JPanel {
 
 
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+    }
+
+    class Tooltip_cell_renderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//            c.setToolTipText(value.toString());
+            c.setToolTipText(c.getText());
+            return c;
+        }
     }
 }

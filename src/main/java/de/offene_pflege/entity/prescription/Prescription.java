@@ -620,4 +620,6 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     public boolean isActive() {
         return ResidentTools.isActive(resident) && !isClosed();
     }
+
+
 }

@@ -27,6 +27,10 @@ public class MedOrder extends DefaultEntity {
     @ManyToOne
     private TradeForm tradeForm;
 
+    @Lob
+    @Column(name = "note")
+    private String note;
+
     @JoinColumn(name = "arztid", referencedColumnName = "ArztID")
     @ManyToOne
     private GP gp;

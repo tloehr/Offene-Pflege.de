@@ -611,20 +611,20 @@ public class MedStockTools {
      * For DosageForms with type STATE_UPR1, there is no calculation at all. Those values are constantly 1.
      */
     public static BigDecimal getEstimatedUPR(TradeForm tradeForm) {
-        log.debug("<--- calcProspectiveUPR");
+        log.trace("<--- calcProspectiveUPR");
         BigDecimal upr = null;
         if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_DONT_CALC) {
-            log.debug("STATE_DONT_CALC");
+            log.trace("STATE_DONT_CALC");
             // no calculation for gel or ointments. they wont work out anyways.
             upr = BigDecimal.ONE;// getEstimatedUPR_BY_RESIDENT(tradeForm, resident);
         } else if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
-            log.debug("STATE_UPRn");
+            log.trace("STATE_UPRn");
 
             if (tradeForm.getConstantUPRn() != null) {
                 // there is a constant UPR defined for that tradeform
                 // so there is no estimation necessary
                 upr = tradeForm.getConstantUPRn();
-                log.debug("constant UPRn");
+                log.trace("constant UPRn");
             } else {
                 EntityManager em = OPDE.createEM();
                 try {
@@ -635,7 +635,7 @@ public class MedStockTools {
 
                     if (result == null) {
                         upr = BigDecimal.ONE;
-                        log.debug("calculated UPRn. first of its kind. UPR: 1");
+                        log.trace("calculated UPRn. first of its kind. UPR: 1");
                     } else if (result instanceof Double) {
                         upr = new BigDecimal((Double) result);
                     } else {
@@ -647,7 +647,7 @@ public class MedStockTools {
                     }
 
                     upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
-                    log.debug("calculated UPRn. average so far: " + SYSTools.formatBigDecimal(upr));
+                    log.trace("calculated UPRn. average so far: " + SYSTools.formatBigDecimal(upr));
                 } catch (NoResultException nre) {
                     upr = BigDecimal.ONE;
                 } catch (Exception e) {
@@ -659,11 +659,11 @@ public class MedStockTools {
             }
 
         } else {
-            log.debug("STATE_UPR1");
+            log.trace("STATE_UPR1");
             upr = BigDecimal.ONE;
         }
-        log.debug("upr: " + upr);
-        log.debug("calcProspectiveUPR --->");
+        log.trace("upr: " + upr);
+        log.trace("calcProspectiveUPR --->");
         return upr;
     }
 

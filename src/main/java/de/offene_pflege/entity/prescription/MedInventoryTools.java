@@ -14,6 +14,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,41 +45,7 @@ public class MedInventoryTools {
         };
     }
 
-//    public static String getInventoryAsHTML(MedInventory inventory) {
-//        String result = "";
-//
-//        String htmlcolor = inventory.isClosed() ? "gray" : "blue";
-//
-//        result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
-//        result += "<font color=\"" + htmlcolor + "\"><b><u>" + inventory.getID() + "</u></b></font>&nbsp; ";
-//        result += inventory.getText();
-//
-//
-//        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
-//
-//        result += "<br/><font color=\"blue\">Eingang: " + df.format(inventory.getFrom()) + "</font>";
-//        if (inventory.isClosed()) {
-//            result += "<br/><font color=\"green\">Abschluss: " + df.format(inventory.getTo()) + "</font>";
-//        }
-//
-//        result += "</font>";
-//        return result;
-//
-//    }
-
-//    public static BigDecimal getSum(MedInventory inventory) {
-////        long timeStart = System.currentTimeMillis();
-//        BigDecimal result = BigDecimal.ZERO;
-//        for (MedStock bestand : inventory.getMedStocks()) {
-//            BigDecimal summe = MedStockTools.getSum(bestand);
-//            result = result.add(summe);
-//        }
-////        long time2 = System.currentTimeMillis();
-////        log.debug("MedInventoryTools.getSumme(): " + (time2 - timeStart) + " millis");
-//        return result;
-//    }
-
-    public static BigDecimal getSum(MedInventory inventory) throws Exception {
+    public static BigDecimal getSum(MedInventory inventory){
         BigDecimal result = BigDecimal.ZERO;
         for (MedStock stock : inventory.getMedStocks()) {
             if (!stock.isClosed()) {
@@ -117,7 +84,7 @@ public class MedInventoryTools {
         if (stock.getTradeForm().getDosageForm().isUPRn()) {
             BigDecimal upr = stock.getTradeForm().getConstantUPRn() != null ? stock.getTradeForm().getConstantUPRn() : stock.getUPR();
             // #16
-            quantity = quantity.divide(upr, 4, BigDecimal.ROUND_HALF_UP); // GitHub #16 Exception tritt hier auf. Weiter prüfen.
+            quantity = quantity.divide(upr, 4, RoundingMode.HALF_UP); // GitHub #16 Exception tritt hier auf. Weiter prüfen.
         }
 
         log.debug("withdraw/5: amount: " + quantity);
@@ -222,31 +189,6 @@ public class MedInventoryTools {
             }
         }
     }
-
-//    /**
-//     * Diese Methode bucht ein Medikament in einen Vorrat ein.
-//     * Dabei wird ein passendes APV ermittelt, eine Buchung angelegt und der neue MedBestand zurück gegeben.
-//     * Der muss dann nur noch persistiert werden.
-//     *
-//     * @param inventory
-//     * @param aPackage
-//     * @param tradeForm
-//     * @param text
-//     * @param menge
-//     * @return
-//     * @throws Exception
-//     */
-//    public static MedStock addTo(MedInventory inventory, MedPackage aPackage, TradeForm tradeForm, String text, BigDecimal menge) {
-//        MedStock stock = null;
-//        if (menge.compareTo(BigDecimal.ZERO) > 0) {
-//            BigDecimal estimatedUPR = MedStockTools.getEstimatedUPR(tradeForm, inventory.getResident());
-//            stock = new MedStock(inventory, tradeForm, aPackage, text, estimatedUPR);
-//            MedStockTransaction buchung = new MedStockTransaction(stock, menge);
-//            stock.getStockTransaction().add(buchung);
-//        }
-//        return stock;
-//    }
-
 
     public static MedStock getNextToOpen(MedInventory inventory) {
         MedStock bestand = null;
