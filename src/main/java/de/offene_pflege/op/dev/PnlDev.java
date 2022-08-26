@@ -654,9 +654,9 @@ public class PnlDev extends CleanablePanel {
 
     private void button8(ActionEvent e) {
         MedOrders medOrders = new MedOrders();
-        medOrders.setOpened_by(OPDE.getLogin().getUser());
+        medOrders.setCreated_by(OPDE.getLogin().getUser());
         medOrders.setClosed_by(OPDE.getLogin().getUser());
-        medOrders.setOpened_on(LocalDateTime.now());
+        medOrders.setClosed_on(LocalDateTime.now());
         medOrders.setClosed_on(LocalDateTime.now());
         EntityTools.persist(medOrders);
     }

@@ -596,6 +596,8 @@ public class SYSConst {
     public static final Icon icon22playerPlay = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_play.png"));
     public static final Icon icon22playerBack = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/back.png"));
     public static final Icon icon22playerPlayPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_play_invert.png"));
+    public static final Icon icon22REV = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/2leftarrow.png"));
+    public static final Icon icon22FWD = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/2rightarrow.png"));
     //    public static final Icon icon22playerStart = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_start.png"));
 //    public static final Icon icon22playerStartPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_start_pressed.png"));
     public static final Icon icon22playerStop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));

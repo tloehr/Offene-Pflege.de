@@ -102,14 +102,13 @@ public class TMMedOrders extends AbstractTableModel {
             Boolean complete = (Boolean) aValue;
             medOrder.setClosed_on(complete ? LocalDateTime.now() : null);
             medOrder.setClosed_by(complete ? OPDE.getLogin().getUser() : null);
-            medOrder = EntityTools.merge(medOrder);
         } else if (column == COL_GP) {
             GP gp = (GP) aValue;
             medOrder.setGp(gp);
         } else if (column == COL_note) {
             medOrder.setNote(aValue.toString().trim());
         }
-        medOrderList.set(row, medOrder);
+        medOrderList.set(row, EntityTools.merge(medOrder));
         fireTableCellUpdated(row, column);
     }
 

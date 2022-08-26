@@ -1,35 +1,25 @@
 package de.offene_pflege.entity.prescription;
 
-import com.google.common.collect.ArrayTable;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Table;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.javatuples.Quintet;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 public class MedOrderTools {
@@ -79,6 +69,20 @@ public class MedOrderTools {
         return Optional.empty();
     }
 
+    public static List<MedOrder> get_open_orders(EntityManager em, Resident resident) {
+        ArrayList<MedOrder> list = new ArrayList<>();
+        try {
+            String jpql = " SELECT p " +
+                    " FROM MedOrder p" +
+                    " WHERE p.resident  = :resident AND p.closed_by = NULL";
+            Query query = em.createQuery(jpql);
+            query.setParameter("resident", resident);
+            list.addAll(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return list;
+    }
 
     public static Optional<MedOrder> find(Prescription prescription) {
         EntityManager em = OPDE.createEM();
@@ -108,7 +112,7 @@ public class MedOrderTools {
         MutableInt i = new MutableInt(0);
 
         residents.forEach(resident -> {
-                    SwingUtilities.invokeLater(() -> OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i.intValue(), residents.size())));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(ResidentTools.getNameAndFirstname(resident), i.intValue(), residents.size()));
                     i.increment();
                     // suche alle medikamente die im moment verordnet sind und schreibe den aktuellen Bedarf und den aktuellen bestand in eine Map
                     PrescriptionTools.getAllActive(resident)
@@ -125,7 +129,7 @@ public class MedOrderTools {
                     // wie weit kommen wir mit unserm vorrat bei dieser Verordnung ?
                 }
         );
-        SwingUtilities.invokeLater(() -> OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 0, 0)));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 0, 0));
         map.entrySet().forEach(multiKeyTupleEntry -> {
             final Resident resident = (Resident) multiKeyTupleEntry.getKey().getKey(0);
             final TradeForm tradeForm = (TradeForm) multiKeyTupleEntry.getKey().getKey(1);

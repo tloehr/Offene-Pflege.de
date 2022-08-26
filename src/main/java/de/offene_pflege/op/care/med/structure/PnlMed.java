@@ -74,6 +74,7 @@ public class PnlMed extends CleanablePanel {
     private JToggleButton tbIDs;
 
     private Optional<PnlMedStructure> optPnlMedStructure;
+    private Optional<PnlMedOrders> optPnlMedOrders;
 
     /**
      * Creates new form FrmMed
@@ -98,6 +99,7 @@ public class PnlMed extends CleanablePanel {
     @Override
     public void reload() {
         optPnlMedStructure.ifPresent(pnlMedStructure -> pnlMedStructure.reload());
+        optPnlMedOrders.ifPresent(pnlMedOrders -> pnlMedOrders.reload());
     }
 
     private void initPanel() {
@@ -111,6 +113,7 @@ public class PnlMed extends CleanablePanel {
         if (!evt.getValueIsAdjusting() && lstPraep.getSelectedValue() != null) {
             SwingUtilities.invokeLater(() -> {
                 if (optPnlMedStructure.isEmpty()) {
+                    optPnlMedOrders = Optional.empty();
                     removeAll();
                     optPnlMedStructure = Optional.of(new PnlMedStructure(tbIDs.isSelected(), (MedProducts) lstPraep.getSelectedValue()));
                     add(optPnlMedStructure.get());
@@ -267,7 +270,8 @@ public class PnlMed extends CleanablePanel {
             optPnlMedStructure.ifPresent(pnlMedStructure -> pnlMedStructure.cleanup());
             optPnlMedStructure = Optional.empty();
             removeAll();
-            add(new PnlMedOrders());
+            optPnlMedOrders = Optional.of(new PnlMedOrders());
+            add(optPnlMedOrders.get());
             revalidate();
             repaint();
         });

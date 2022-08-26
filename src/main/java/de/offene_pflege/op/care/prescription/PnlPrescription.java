@@ -1413,19 +1413,18 @@ public class PnlPrescription extends NursingRecordsPanel {
             final JButton btnToggleOrderStatus = GUITools.createHyperlinkButton("nursingrecords.prescription.toggle_order", SYSConst.icon22ledOrangeOn, null);
             btnToggleOrderStatus.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnToggleOrderStatus.addActionListener(actionEvent -> {
+
+                final List<MedOrders> medOrdersList = MedOrdersTools.getMedOrders(1);
+                if (medOrdersList.isEmpty()) medOrdersList.add(MedOrdersTools.create(java.time.LocalDate.now()));
+                final MedOrders medOrders = medOrdersList.get(0);
+
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
-                    //final Prescription myPrescription = em.merge(prescription);
-                    MedOrders medOrders = MedOrdersTools.get_or_create_active_med_orders(em);
-
                     em.lock(medOrders, LockModeType.OPTIMISTIC);
                     MedOrderTools.toggle(em, medOrders, prescription);
                     em.getTransaction().commit();
 
-//                    lstPrescriptions.remove(prescription);
-//                    lstPrescriptions.add(myPrescription);
-//                    Collections.sort(lstPrescriptions);
                     createCP4(prescription); // recreate the CP
                     buildPanel(); // rebuild the panel
                 } catch (Exception e) {

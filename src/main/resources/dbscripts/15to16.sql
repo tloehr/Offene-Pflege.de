@@ -8,12 +8,13 @@ WHERE K = 'dbstructure';
 drop table if exists medorders;
 create table medorders
 (
-    id        bigint unsigned auto_increment primary key,
-    version   bigint unsigned default 0 not null,
-    opened_on datetime                  not null,
-    opened_by char(10)                  not null,
-    closed_on datetime,
-    closed_by char(10)
+    id         bigint unsigned auto_increment primary key,
+    version    bigint unsigned default 0 not null,
+    created_on datetime                  not null,
+    created_by char(10)                  not null,
+    order_week date,
+    closed_on  datetime,
+    closed_by  char(10)
 );
 drop table if exists medorder;
 --

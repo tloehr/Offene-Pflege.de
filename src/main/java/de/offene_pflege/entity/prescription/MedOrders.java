@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,11 +19,15 @@ public class MedOrders extends DefaultEntity {
 
     @Basic
     @Column(nullable = false)
-    private LocalDateTime opened_on;
+    private LocalDateTime created_on;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "opened_by", referencedColumnName = "UKennung")
-    private OPUsers opened_by;
+    @JoinColumn(name = "created_by", referencedColumnName = "UKennung")
+    private OPUsers created_by;
+
+    @Basic
+    @Column(nullable = false)
+    private LocalDate order_week;
 
     @Basic
     @Column(nullable = false)

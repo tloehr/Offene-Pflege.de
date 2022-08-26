@@ -19,16 +19,20 @@ import javax.persistence.RollbackException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 @Log4j2
 public class PnlMedOrders extends JPanel {
-    private MedOrders selected_med_orders;
+    private final java.util.List<MedOrders> list_med_orders;
     private JPopupMenu menu;
     JTable tbl;
     JScrollPane scrl;
+    private String internalClassID = "opde.medication";
+    private final JComboBox<MedOrders> cmb_orders;
 
 
     public PnlMedOrders() {
@@ -36,49 +40,97 @@ public class PnlMedOrders extends JPanel {
         setLayout(new BorderLayout(5, 5));
         menu = null;
 
-        selected_med_orders = MedOrdersTools.get_or_create_active_med_orders();
+        list_med_orders = new ArrayList<>();
+        cmb_orders = new JComboBox<>();
+        cmb_orders.addItemListener(e -> {
+            if (e.getStateChange() != ItemEvent.SELECTED) return;
+            reload();
+        });
+        cmb_orders.setFont(new Font("Arial", Font.PLAIN, 18));
+        cmb_orders.setRenderer((list, value, index, isSelected, cellHasFocus) ->
+                new DefaultListCellRenderer().getListCellRendererComponent(list, value.getOrder_week().format(DateTimeFormatter.ISO_WEEK_DATE), index, isSelected, cellHasFocus));
+
+        reload_combo_box();
         initPanel();
     }
 
     private void initPanel() {
         JPanel pnl = getButtonPanel();
-        pnl.add(getLabel());
         add(pnl, BorderLayout.SOUTH);
         scrl = new JScrollPane();
         add(scrl, BorderLayout.CENTER);
         tbl = new JTable();
         tbl.setAutoCreateRowSorter(true);
-        load_table_model();
         tbl.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 tableMousePressed(e);
             }
         });
-        JComboBox<GP> cmbGP = new JComboBox<>(GPTools.getAllActive().toArray(new GP[0]));
-        cmbGP.setRenderer(GPTools.getRenderer());
-        tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
-        tbl.getColumnModel().getColumn(TMMedOrders.COL_GP).setCellEditor(new DefaultCellEditor(cmbGP));
-        tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellEditor(new DefaultCellEditor(new JTextField()));
-        tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellRenderer(new Tooltip_cell_renderer());
+        reload();
         scrl.setViewportView(tbl);
     }
 
-    private void load_table_model() {
-        tbl.setModel(new TMMedOrders(selected_med_orders.getOrderList()));
+    public void reload() {
+        MedOrders selected = list_med_orders.get(cmb_orders.getSelectedIndex());
+        tbl.setModel(new TMMedOrders(selected.getOrderList()));
+        OPDE.getDisplayManager().setMainMessage(get_label_text());
+
+        SwingUtilities.invokeLater(() -> {
+            JComboBox<GP> cmbGP = new JComboBox<>(SYSTools.list2cmb(GPTools.getAllActive()));
+            cmbGP.setRenderer(GPTools.getRenderer());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_GP).setCellEditor(new DefaultCellEditor(cmbGP));
+            JTextField txt = new JTextField();
+            txt.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txt.selectAll();
+                }
+            });
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellEditor(new DefaultCellEditor(txt));
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellRenderer(new RNDHTML());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_complete).setMaxWidth(30);
+            tbl.revalidate();
+            tbl.repaint();
+        });
     }
 
-    private JLabel getLabel() {
-        JLabel lbl = new JLabel("Bestellung #" + selected_med_orders.getId() + "  Erstellt: " + selected_med_orders.getOpened_on());
-        lbl.setFont(new Font("Arial", Font.PLAIN, 18));
-        return lbl;
+    private void reload_combo_box() {
+        list_med_orders.clear();
+        list_med_orders.addAll(MedOrdersTools.getMedOrders(1));
+        if (list_med_orders.isEmpty()) list_med_orders.add(MedOrdersTools.create(java.time.LocalDate.now()));
+        cmb_orders.setModel(SYSTools.list2cmb(list_med_orders));
+    }
+
+
+//    private JLabel createLabel() {
+//        JLabel lbl = new JLabel(get_label_text());
+//        lbl.setFont(new Font("Arial", Font.PLAIN, 28));
+//        return lbl;
+//    }
+
+    private String get_label_text() {
+        MedOrders selected = ((MedOrders) cmb_orders.getSelectedItem());
+        return String.format("Bestellung #%s - Für die Woche %s => %s %s",
+                selected.getId(),
+                selected.getOrder_week().format(DateTimeFormatter.ofPattern("dd.MM.YY")),
+                selected.getOrder_week().with(DayOfWeek.SUNDAY).format(DateTimeFormatter.ofPattern("dd.MM.YY")),
+                (selected.getClosed_by() != null ? "-abgeschlossen-" : "")
+        );
     }
 
     private JPanel getButtonPanel() {
         JPanel pnl = new JPanel();
         pnl.setLayout(new HorizontalLayout(5));
-        JButton left = new JButton(SYSConst.icon22playerBack);
-        JButton right = new JButton(SYSConst.icon22playerPlay);
+
+
+//        JButton left = new JButton(SYSConst.icon22REV);
+//        JButton right = new JButton(SYSConst.icon22FWD);
+        // MANAGER ONLY
+        JButton close = new JButton(SYSConst.icon22playerStop);
+        JButton reopen = new JButton(SYSConst.icon22playerPlay);
+
         JTextField days_range = new JTextField("14");
         days_range.setInputVerifier(new NumberVerifier(BigDecimal.ONE, BigDecimal.valueOf(31), true));
 
@@ -94,15 +146,13 @@ public class PnlMedOrders extends JPanel {
                 protected Object doInBackground() {
                     EntityManager em = OPDE.createEM();
                     try {
+                        MedOrders selected = list_med_orders.get(cmb_orders.getSelectedIndex());
                         em.getTransaction().begin();
-                        MedOrders medOrders = em.merge(selected_med_orders);
-                        MedOrderTools.generate_orders(selected_med_orders, Double.parseDouble(days_range.getText())).forEach(medOrder -> {
-                            //medOrders.getOrderList().add(medOrder); <- produziert doppelte einträge
-                            em.merge(medOrder);
-                        });
+                        MedOrders medOrders = em.merge(selected);
+                        MedOrderTools.generate_orders(medOrders, Double.parseDouble(days_range.getText())).forEach(medOrder -> em.merge(medOrder));
                         em.getTransaction().commit();
-                        em.refresh(medOrders);
-                        selected_med_orders = medOrders;
+                        list_med_orders.set(cmb_orders.getSelectedIndex(), medOrders);
+                        reload();
                     } catch (OptimisticLockException | RollbackException ole) {
                         log.warn(ole);
                         if (em.getTransaction().isActive()) {
@@ -133,23 +183,31 @@ public class PnlMedOrders extends JPanel {
             worker.execute();
 
         });
-        left.addActionListener(e ->
-                MedOrdersTools.next(selected_med_orders, -1).ifPresent(medOrders -> {
-                    selected_med_orders = medOrders;
-                    tbl.setModel(new TMMedOrders(selected_med_orders.getOrderList()));
-                })
-        );
-        right.addActionListener(e ->
-                MedOrdersTools.next(selected_med_orders, -1).ifPresent(medOrders -> {
-                    selected_med_orders = medOrders;
-                    tbl.setModel(new TMMedOrders(selected_med_orders.getOrderList()));
-                })
-        );
-        pnl.add(left);
-        pnl.add(right);
-        pnl.add(new JSeparator(SwingConstants.HORIZONTAL));
+//        left.addActionListener(e -> MedOrdersTools.next(selected_med_orders, -1).ifPresent(medOrders -> {
+//            selected_med_orders = medOrders;
+//            tbl.setModel(new TMMedOrders(selected_med_orders.getOrderList()));
+//        }));
+//        right.addActionListener(e -> MedOrdersTools.next(selected_med_orders, -1).ifPresent(medOrders -> {
+//            selected_med_orders = medOrders;
+//            tbl.setModel(new TMMedOrders(selected_med_orders.getOrderList()));
+//        }));
+        reopen.addActionListener(e -> {
+            MedOrders selected = list_med_orders.get(cmb_orders.getSelectedIndex());
+            MedOrdersTools.open(selected).ifPresent(medOrders -> list_med_orders.set(cmb_orders.getSelectedIndex(), medOrders));
+            OPDE.getDisplayManager().setMainMessage(get_label_text());
+        });
+        close.addActionListener(e -> {
+            MedOrders selected = list_med_orders.get(cmb_orders.getSelectedIndex());
+            MedOrdersTools.close(selected).ifPresent(medOrders -> list_med_orders.set(cmb_orders.getSelectedIndex(), medOrders));
+            OPDE.getDisplayManager().setMainMessage(get_label_text());
+        });
+        pnl.add(cmb_orders);
+        pnl.add(new JSeparator(SwingConstants.VERTICAL));
         pnl.add(days_range);
         pnl.add(generate_orders);
+        pnl.add(new JSeparator(SwingConstants.VERTICAL));
+        pnl.add(close);
+        pnl.add(reopen);
         return pnl;
     }
 
