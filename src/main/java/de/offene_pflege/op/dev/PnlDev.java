@@ -63,7 +63,6 @@ public class PnlDev extends CleanablePanel {
     private JScrollPane scrollPane2;
     private JTextArea txtException;
     private JButton button1;
-    private JButton button8;
     private JPanel panel3;
     private JTextField txtResInfoID;
     private JScrollPane scrollPane6;
@@ -652,15 +651,6 @@ public class PnlDev extends CleanablePanel {
         }
     }
 
-    private void button8(ActionEvent e) {
-        MedOrders medOrders = new MedOrders();
-        medOrders.setCreated_by(OPDE.getLogin().getUser());
-        medOrders.setClosed_by(OPDE.getLogin().getUser());
-        medOrders.setClosed_on(LocalDateTime.now());
-        medOrders.setClosed_on(LocalDateTime.now());
-        EntityTools.persist(medOrders);
-    }
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabbedPane1 = new JTabbedPane();
@@ -670,7 +660,6 @@ public class PnlDev extends CleanablePanel {
         scrollPane2 = new JScrollPane();
         txtException = new JTextArea();
         button1 = new JButton();
-        button8 = new JButton();
         panel3 = new JPanel();
         txtResInfoID = new JTextField();
         scrollPane6 = new JScrollPane();
@@ -739,11 +728,6 @@ public class PnlDev extends CleanablePanel {
                 button1.setText("ResInfoType Form Test");
                 button1.addActionListener(e -> button1ActionPerformed(e));
                 panel1.add(button1, CC.xywh(3, 5, 3, 1));
-
-                //---- button8 ----
-                button8.setText("text");
-                button8.addActionListener(e -> button8(e));
-                panel1.add(button8, CC.xy(3, 9));
             }
             tabbedPane1.addTab("text", panel1);
 

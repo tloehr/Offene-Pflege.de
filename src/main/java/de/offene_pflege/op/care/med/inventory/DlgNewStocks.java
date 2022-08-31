@@ -585,17 +585,18 @@ public class DlgNewStocks extends MyJDialog {
             tx.setWeight(weight);
 
             // wenn es offene Bestellungen zu diesem Medikament gibt, dann schließen wir sie jetzt.
-            List<MedOrder> open_orders = MedOrderTools.get_open_orders(em, resident);
+            List<MedOrder> open_orders = MedOrderTools.get_open_orders(em);
             if (!open_orders.isEmpty()) {
                 // alle passenden tradeforms finden, anhand vergangenener Zurordnungen
                 final List<TradeForm> equivalent_tfs = TradeFormTools.get_tradeforms_in_this_inventory(em, inventory);
-                
+
                 // alle passenden bestellungen suchen und abschließen.
                 open_orders.stream()
-                        .filter(medOrder -> medOrder.getTradeForm().equals(tradeForm) || equivalent_tfs.contains(medOrder.getTradeForm()))
+                        .filter(medOrder -> medOrder.getResident().equals(resident) && (medOrder.getTradeForm().equals(tradeForm) || equivalent_tfs.contains(medOrder.getTradeForm())))
                         .forEach(medOrder -> {
                             medOrder.setClosed_on(LocalDateTime.now());
                             medOrder.setClosed_by(OPDE.getLogin().getUser());
+                            medOrder.setClosing_med_stock(newStock);
                             medOrder.setNote(String.format("Bestand Nr. %s eingebucht.", newStock.getID()));
                         });
             }

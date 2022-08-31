@@ -3,14 +3,14 @@ package de.offene_pflege.entity.prescription;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
+import java.util.ArrayList;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 14.12.11
- * Time: 13:30
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 14.12.11 Time: 13:30 To change this template use File | Settings | File
+ * Templates.
  */
 public class HospitalTools {
 
@@ -26,6 +26,16 @@ public class HospitalTools {
             }
             return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
         };
+    }
+
+    public static ArrayList<Hospital> getAll() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT a FROM Hospital a  ORDER BY a.name");
+        ArrayList<Hospital> liste = new ArrayList<Hospital>(query.getResultList());
+        em.close();
+
+        return liste;
+
     }
 
 

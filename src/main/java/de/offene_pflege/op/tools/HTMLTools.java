@@ -38,8 +38,8 @@ public class HTMLTools {
     }
 
     public static String getTable(String content, String attribs) {
-            return "<table id=\"fonttext\" " + attribs + " \">" + SYSTools.xx(content) + "</table>\n";
-        }
+        return "<table id=\"fonttext\" " + attribs + " \">" + SYSTools.xx(content) + "</table>\n";
+    }
 
     /**
      * Erzeugt Bruchdarstellung (für 0.5, 0.25, 0.75, 0.33) in HTML zu dem übergebenen Wert.
@@ -106,5 +106,10 @@ public class HTMLTools {
             out = "<p>" + SYSTools.xx(in) + "</p>";
         }
         return out;
+    }
+
+    public static String strike(String result) {
+        return "<s>" + result + "</s>";
+
     }
 }

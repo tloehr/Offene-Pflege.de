@@ -6,7 +6,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "hospital")
 
-public class Hospital implements Serializable {
+public class Hospital implements Serializable, HasName {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +49,7 @@ public class Hospital implements Serializable {
         this.khid = khid;
     }
 
+    @Override
     public String getName() {
         return name;
     }

@@ -67,7 +67,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 
@@ -242,7 +241,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                 "<td width=\"200\" align=\"left\">" +
                 PrescriptionTools.getOriginalPrescription(prescription) +
                 PrescriptionTools.getRemark(prescription) +
-                PrescriptionTools.getOrderInformation(prescription) +
                 "</td>";
 
         if (!prescription.getCommontags().isEmpty()) {
@@ -260,9 +258,14 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         title += "</table>" + "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
+        final DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
         cpPres.setCollapsible(false);
         cptitle.getButton().setIcon(getIcon(prescription));
+        get_order_toggle(prescription).ifPresent(jButton -> {
+            cptitle.get_buttons_under_title().add(jButton);
+            jButton.setHorizontalAlignment(SwingConstants.RIGHT);
+        });
+
 
         cpPres.setTitleLabelComponent(cptitle.getMain());
         cpPres.setSlidingDirection(SwingConstants.SOUTH);
@@ -454,6 +457,50 @@ public class PnlPrescription extends NursingRecordsPanel {
 
 
         return cpPres;
+    }
+
+    private Optional<JButton> get_order_toggle(final Prescription prescription) {
+        if (!prescription.hasMed() || !OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.medication"))
+            return Optional.empty();
+        /**
+         *  _____                 _         ___          _
+         * |_   _|__   __ _  __ _| | ___   / _ \ _ __ __| | ___ _ __
+         *   | |/ _ \ / _` |/ _` | |/ _ \ | | | | '__/ _` |/ _ \ '__|
+         *   | | (_) | (_| | (_| | |  __/ | |_| | | | (_| |  __/ |
+         *   |_|\___/ \__, |\__, |_|\___|  \___/|_|  \__,_|\___|_|
+         *            |___/ |___/
+         */
+        Optional<MedOrder> optMedOrder = MedOrderTools.find(prescription);
+        String button_label = "Medikament (nach)bestellen";
+        Icon icon = SYSConst.icon22shopping;
+        if (optMedOrder.isPresent()) {
+            button_label = "Medikament bestellt (Bestellung löschen ?)";
+            icon = SYSConst.icon22apply;
+        }
+
+        JButton btnToggleOrderStatus = GUITools.createHyperlinkButton(button_label, icon, null);
+        btnToggleOrderStatus.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnToggleOrderStatus.addActionListener(actionEvent -> {
+
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                Prescription myPrescription = em.merge(prescription);
+                MedOrderTools.toggle_order_status(em, myPrescription);
+                em.getTransaction().commit();
+
+                createCP4(myPrescription); // recreate the CP
+                buildPanel(); // rebuild the panel
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(e);
+            } finally {
+                em.close();
+            }
+        });
+        return Optional.of(btnToggleOrderStatus);
     }
 
     private Icon getIcon(Prescription mypres) {
@@ -1401,44 +1448,6 @@ public class PnlPrescription extends NursingRecordsPanel {
             });
             btnOpenStock.setEnabled(inventory != null && stockInUse == null && !prescription.isClosed());
             pnlMenu.add(btnOpenStock);
-
-            /**
-             *  _____                 _         ___          _
-             * |_   _|__   __ _  __ _| | ___   / _ \ _ __ __| | ___ _ __
-             *   | |/ _ \ / _` |/ _` | |/ _ \ | | | | '__/ _` |/ _ \ '__|
-             *   | | (_) | (_| | (_| | |  __/ | |_| | | | (_| |  __/ |
-             *   |_|\___/ \__, |\__, |_|\___|  \___/|_|  \__,_|\___|_|
-             *            |___/ |___/
-             */
-            final JButton btnToggleOrderStatus = GUITools.createHyperlinkButton("nursingrecords.prescription.toggle_order", SYSConst.icon22ledOrangeOn, null);
-            btnToggleOrderStatus.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnToggleOrderStatus.addActionListener(actionEvent -> {
-
-                final List<MedOrders> medOrdersList = MedOrdersTools.getMedOrders(1);
-                if (medOrdersList.isEmpty()) medOrdersList.add(MedOrdersTools.create(java.time.LocalDate.now()));
-                final MedOrders medOrders = medOrdersList.get(0);
-
-                EntityManager em = OPDE.createEM();
-                try {
-                    em.getTransaction().begin();
-                    em.lock(medOrders, LockModeType.OPTIMISTIC);
-                    MedOrderTools.toggle(em, medOrders, prescription);
-                    em.getTransaction().commit();
-
-                    createCP4(prescription); // recreate the CP
-                    buildPanel(); // rebuild the panel
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.fatal(e);
-                } finally {
-                    em.close();
-                }
-            });
-            // checked for acls
-            btnToggleOrderStatus.setEnabled(prescription.hasMed() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.medication"));
-            pnlMenu.add(btnToggleOrderStatus);
 
             /***
              *      ____  _     _      _____  __  __           _

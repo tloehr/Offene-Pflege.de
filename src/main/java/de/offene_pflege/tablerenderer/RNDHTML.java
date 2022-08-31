@@ -35,20 +35,9 @@ public class RNDHTML implements TableCellRenderer {
      * map from table to map of rows to map of column heights
      */
     private final Map cellSizes = new HashMap();
-//    private Closure fileDropActivity = null;
 
     protected JTextPane txt;
     protected JPanel panel;
-
-//    public RNDHTML() {
-//        this(null);
-//
-//    }
-//
-//    public RNDHTML(FileDrop.Listener fileDropListener) {
-//        this();
-//        new FileDrop(txt, fileDropListener);
-//    }
 
     public RNDHTML() {
 
@@ -59,10 +48,6 @@ public class RNDHTML implements TableCellRenderer {
         txt.setContentType("text/html");
         txt.setOpaque(false);
         txt.setBackground(new Color(0, 0, 0, 0));
-
-//        if (kit != null) {
-//            txt.setEditorKit(kit);
-//        }
 
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));

@@ -3,7 +3,7 @@
     <!-- Logging Properties -->
     <Properties>
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%t] %p %m%n</Property>
-        <Property name="APP_LOG_ROOT">${sys:workspace}/logs</Property>
+        <Property name="APP_LOG_ROOT">${sys:workspace}${sys:file.separator}logs</Property>
     </Properties>
 
     <Appenders>

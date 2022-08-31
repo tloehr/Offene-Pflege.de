@@ -23,18 +23,19 @@ import java.util.Optional;
 
 @Log4j2
 public class MedOrderTools {
-    public static Optional<MedOrder> toggle(EntityManager em, MedOrders medOrders, Prescription prescription) {
-        Optional<MedOrder> optionalMedOrder = find(em, medOrders, prescription.getResident(), prescription.getTradeForm());
+    public static Optional<MedOrder> toggle_order_status(EntityManager em, Prescription prescription) {
+        Optional<MedOrder> optionalMedOrder = find(em, prescription.getResident(), prescription.getTradeForm());
         if (optionalMedOrder.isPresent()) {
             em.remove(optionalMedOrder.get());
             return Optional.empty();
         }
         MedOrder medOrder = new MedOrder();
-        medOrder.setMedOrders(medOrders);
-        medOrder.setOpened_by(OPDE.getLogin().getUser());
-        medOrder.setOpened_on(LocalDateTime.now());
+        medOrder.setCreated_by(OPDE.getLogin().getUser());
+        medOrder.setCreated_on(LocalDateTime.now());
+        medOrder.setAuto_created(false);
         medOrder.setResident(em.merge(prescription.getResident()));
         medOrder.setTradeForm(em.merge(prescription.getTradeForm()));
+        medOrder.setClosing_med_stock(null);
 
         if (prescription.getDocON() != null)
             medOrder.setGp(em.merge(prescription.getDocON()));
@@ -50,13 +51,13 @@ public class MedOrderTools {
         return Optional.of(medOrder);
     }
 
-    public static Optional<MedOrder> find(EntityManager em, MedOrders medOrders, Resident resident, TradeForm tradeForm) {
+    public static Optional<MedOrder> find(EntityManager em, Resident resident, TradeForm tradeForm) {
         try {
             String jpql = " SELECT p " +
                     " FROM MedOrder p" +
-                    " WHERE p.medOrders = :medOrders AND p.resident  = :resident AND p.tradeForm = :tradeForm ";
+                    " WHERE  p.resident  = :resident AND p.tradeForm = :tradeForm AND p.closed_by = null ";
             Query query = em.createQuery(jpql);
-            query.setParameter("medOrders", medOrders);
+
             query.setParameter("resident", resident);
             query.setParameter("tradeForm", tradeForm);
             return Optional.of((MedOrder) query.getSingleResult());
@@ -69,31 +70,11 @@ public class MedOrderTools {
         return Optional.empty();
     }
 
-    public static List<MedOrder> get_open_orders(EntityManager em, Resident resident) {
-        ArrayList<MedOrder> list = new ArrayList<>();
-        try {
-            String jpql = " SELECT p " +
-                    " FROM MedOrder p" +
-                    " WHERE p.resident  = :resident AND p.closed_by = NULL";
-            Query query = em.createQuery(jpql);
-            query.setParameter("resident", resident);
-            list.addAll(query.getResultList());
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        }
-        return list;
-    }
 
     public static Optional<MedOrder> find(Prescription prescription) {
         EntityManager em = OPDE.createEM();
         try {
-            String jpql = " SELECT p " +
-                    " FROM MedOrder p" +
-                    " WHERE p.resident  = :resident AND p.tradeForm = :tradeForm AND p.closed_by = null ";
-            Query query = em.createQuery(jpql);
-            query.setParameter("resident", prescription.getResident());
-            query.setParameter("tradeForm", prescription.getTradeForm());
-            return Optional.of((MedOrder) query.getSingleResult());
+            return find(em, prescription.getResident(), prescription.getTradeForm());
         } catch (NoResultException e) {
             log.trace(e);
             return Optional.empty();
@@ -105,15 +86,60 @@ public class MedOrderTools {
         return Optional.empty();
     }
 
-    public static List<MedOrder> generate_orders(MedOrders medOrders, final double cover_days) {
+//    public static List<MedOrder> get_open_orders(EntityManager em, Resident resident) {
+//        ArrayList<MedOrder> list = new ArrayList<>();
+//        try {
+//            String jpql = " SELECT p " +
+//                    " FROM MedOrder p" +
+//                    " WHERE p.resident  = :resident AND p.closed_by = NULL";
+//            Query query = em.createQuery(jpql);
+//            query.setParameter("resident", resident);
+//            list.addAll(query.getResultList());
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//        }
+//        return list;
+//    }
+
+    public static List<MedOrder> get_open_orders(EntityManager em) {
+        ArrayList<MedOrder> list = new ArrayList<>();
+        try {
+            String jpql = " SELECT p " +
+                    " FROM MedOrder p" +
+                    " WHERE p.closed_by = NULL";
+            Query query = em.createQuery(jpql);
+            list.addAll(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return list;
+    }
+
+
+    public static List<MedOrder> get_open_orders() {
+        List<MedOrder> list = new ArrayList<>();
+
+        EntityManager em = OPDE.createEM();
+        try {
+            list = get_open_orders(em);
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+
+    public static List<MedOrder> generate_orders(final double cover_days, List<MedOrder> open_orders) {
         List<MedOrder> result = new ArrayList<>();
         final MultiKeyMap<Object, Quintet<BigDecimal, BigDecimal, BigDecimal, GP, Hospital>> map = new MultiKeyMap();
         List<Resident> residents = ResidentTools.getAllActive();
-        MutableInt i = new MutableInt(0);
 
+        MutableInt running_integer = new MutableInt(0);
         residents.forEach(resident -> {
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(ResidentTools.getNameAndFirstname(resident), i.intValue(), residents.size()));
-                    i.increment();
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(ResidentTools.getNameAndFirstname(resident), running_integer.intValue(), residents.size()));
+                    running_integer.increment();
                     // suche alle medikamente die im moment verordnet sind und schreibe den aktuellen Bedarf und den aktuellen bestand in eine Map
                     PrescriptionTools.getAllActive(resident)
                             .stream().filter(prescription -> prescription.hasMed() && !prescription.getTradeForm().getDosageForm().isDontCALC())
@@ -134,20 +160,24 @@ public class MedOrderTools {
             final Resident resident = (Resident) multiKeyTupleEntry.getKey().getKey(0);
             final TradeForm tradeForm = (TradeForm) multiKeyTupleEntry.getKey().getKey(1);
 
+
             // wir haben so eine bestellung schon
-            if (medOrders.getOrderList().stream().anyMatch(medOrder -> medOrder.getResident().equals(resident) && medOrder.getTradeForm().equals(tradeForm)))
+            if (open_orders.stream().anyMatch(medOrder -> medOrder.getResident().equals(resident) && medOrder.getTradeForm().equals(tradeForm)))
                 return;
 
             DecimalFormat df = new DecimalFormat("#0.##");
 
+            //todo: order week loswerden
+
             MedOrder medOrder = new MedOrder();
-            medOrder.setMedOrders(medOrders);
             medOrder.setTradeForm(tradeForm);
             medOrder.setResident(resident);
-            medOrder.setOpened_on(LocalDateTime.now());
-            medOrder.setOpened_by(OPDE.getLogin().getUser());
+            medOrder.setCreated_on(LocalDateTime.now());
+            medOrder.setCreated_by(OPDE.getLogin().getUser());
+            medOrder.setAuto_created(true);
             medOrder.setGp(multiKeyTupleEntry.getValue().getValue3());
             medOrder.setHospital(multiKeyTupleEntry.getValue().getValue4());
+            medOrder.setClosing_med_stock(null);
             medOrder.setNote(String.format("Bedarf %s pro Tag, %s sind noch da, hält noch %s Tage",
                             df.format(multiKeyTupleEntry.getValue().getValue0()),
                             df.format(multiKeyTupleEntry.getValue().getValue1()),

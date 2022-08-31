@@ -47,14 +47,6 @@ new FormModel {
 						"gridY": 5
 						"gridWidth": 3
 					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "button8"
-						"text": "text"
-						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button8", true ) )
-					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridX": 3
-						"gridY": 9
-					} )
 				}, new FormLayoutConstraints( null ) {
 					"title": "text"
 				} )

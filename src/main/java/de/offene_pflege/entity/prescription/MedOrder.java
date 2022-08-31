@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,10 +15,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class MedOrder extends DefaultEntity {
-
-    @JoinColumn(name = "mosid", referencedColumnName = "id")
-    @ManyToOne
-    private MedOrders medOrders;
 
     @JoinColumn(name = "resid", referencedColumnName = "id")
     @ManyToOne
@@ -41,20 +38,27 @@ public class MedOrder extends DefaultEntity {
 
     @Basic
     @Column(nullable = false)
-    private LocalDateTime opened_on;
-
+    private LocalDateTime created_on;
 
     @ManyToOne
-    @JoinColumn(name = "opened_by", referencedColumnName = "UKennung")
-    private OPUsers opened_by;
+    @JoinColumn(name = "created_by", referencedColumnName = "UKennung")
+    private OPUsers created_by;
+
+    @Basic
+    @Column(nullable = false)
+    private Boolean auto_created;
 
     @Basic
     @Column(nullable = false)
     private LocalDateTime closed_on;
 
-
     @ManyToOne
     @JoinColumn(name = "closed_by", referencedColumnName = "UKennung")
     private OPUsers closed_by;
-    
+
+    @ManyToOne
+    @JoinColumn(name = "closing_stockid", referencedColumnName = "BestID")
+    private MedStock closing_med_stock;
+
+
 }

@@ -506,7 +506,7 @@ public class PrescriptionTools {
         if (!prescription.hasMed()) return "";
         Optional<MedOrder> optionalMedOrder = MedOrderTools.find(prescription);
         if (optionalMedOrder.isEmpty()) return "";
-        return HTMLTools.p(SYSConst.html_color(Color.green.darker(), "nursingrecords.prescription.ordered"));
+        return HTMLTools.p(SYSConst.html_color(Color.green.darker().darker(), "Medikament nachbestellt"));
     }
 
     public static String getRemark(Prescription prescription) {

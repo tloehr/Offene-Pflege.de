@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "gp")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-public class GP implements Serializable {
+public class GP implements Serializable, HasName {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -129,6 +129,7 @@ public class GP implements Serializable {
         this.titel = title;
     }
 
+    @Override
     public String getName() {
         return name;
     }

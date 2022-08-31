@@ -32,8 +32,11 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayManager;
+import de.offene_pflege.op.tools.HTMLTools;
+import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -41,7 +44,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OptimisticLockException;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.html.HTML;
+import java.text.DateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -52,11 +58,12 @@ import java.util.List;
 public class TMMedOrders extends AbstractTableModel {
     public static final int COL_TradeForm = 0;
     public static final int COL_Resident = 1;
-    public static final int COL_GP = 2;
-    public static final int COL_HOSPITAL = 3;
+    public static final int COL_ORDER_DATE = 2;
+    public static final int COL_WHERE_TO_ORDER = 3;
     public static final int COL_note = 4;
     public static final int COL_complete = 5;
     private final List<MedOrder> medOrderList;
+    private final String[] header = new String[]{"Medikament","Bewohner:in","Datum","Arzt/KH","Text","ok"};
 
     public TMMedOrders(List<MedOrder> medOrderList) {
         this.medOrderList = medOrderList;
@@ -77,14 +84,12 @@ public class TMMedOrders extends AbstractTableModel {
         switch (col) {
             case COL_TradeForm:
             case COL_note:
+            case COL_ORDER_DATE:
             case COL_Resident: {
                 return String.class;
             }
-            case COL_GP: {
-                return GP.class;
-            }
-            case COL_HOSPITAL: {
-                return Hospital.class;
+            case COL_WHERE_TO_ORDER: {
+                return Object.class;
             }
             case COL_complete: {
                 return Boolean.class;
@@ -96,25 +101,37 @@ public class TMMedOrders extends AbstractTableModel {
     }
 
     @Override
+    public String getColumnName(int column) {
+        return header[column];
+    }
+
+    @Override
     public void setValueAt(Object aValue, int row, int column) {
         MedOrder medOrder = medOrderList.get(row);
         if (column == COL_complete) {
             Boolean complete = (Boolean) aValue;
             medOrder.setClosed_on(complete ? LocalDateTime.now() : null);
             medOrder.setClosed_by(complete ? OPDE.getLogin().getUser() : null);
-        } else if (column == COL_GP) {
-            GP gp = (GP) aValue;
-            medOrder.setGp(gp);
+        } else if (column == COL_WHERE_TO_ORDER) {
+            if (aValue instanceof GP) {
+                medOrder.setGp((GP) aValue);
+                medOrder.setHospital(null);
+            } else {
+                medOrder.setGp(null);
+                medOrder.setHospital((Hospital) aValue);
+            }
         } else if (column == COL_note) {
             medOrder.setNote(aValue.toString().trim());
         }
         medOrderList.set(row, EntityTools.merge(medOrder));
-        fireTableCellUpdated(row, column);
+        fireTableRowsUpdated(row, row);
     }
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return column == COL_complete || column == COL_note || column == COL_GP;
+        if (column == COL_complete) return true;
+        if (medOrderList.get(row).getClosed_by() != null) return false;
+        return column == COL_note || column == COL_WHERE_TO_ORDER;
     }
 
     public MedOrder get(int row) {
@@ -133,22 +150,23 @@ public class TMMedOrders extends AbstractTableModel {
         switch (col) {
             case COL_TradeForm: {
                 result = TradeFormTools.toPrettyHTML(medOrder.getTradeForm());
+                if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
             case COL_Resident: {
                 result = ResidentTools.getNameAndFirstname(medOrder.getResident()) + String.format(" [%s]", medOrder.getResident().getId());
                 break;
             }
-            case COL_GP: {
-                result = medOrder.getGp() != null ? GPTools.getFullName(medOrder.getGp()) : "--";
+            case COL_WHERE_TO_ORDER: {
+                result = medOrder.getGp() != null ? GPTools.getFullName(medOrder.getGp()) : HospitalTools.getFullName(medOrder.getHospital());
                 break;
             }
             case COL_note: {
                 result = medOrder.getNote();
                 break;
             }
-            case COL_HOSPITAL: {
-                result = medOrder.getHospital() != null ? HospitalTools.getFullName(medOrder.getHospital()) : "--";
+            case COL_ORDER_DATE: {
+                result = DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getCreated_on()));
                 break;
             }
             case COL_complete: {

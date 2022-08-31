@@ -2,6 +2,8 @@ package de.offene_pflege.gui.interfaces;
 
 import com.jidesoft.swing.JideButton;
 import de.offene_pflege.gui.GUITools;
+import org.jdesktop.swingx.HorizontalLayout;
+import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +19,7 @@ import java.awt.event.ActionListener;
 public class DefaultCPTitle  {
     JPanel titlePanelleft, titlePanelright, titlePanel, additionalIconPanel;
     JideButton btnTitle;
+    JPanel buttons_under_title            ;
 
 
     public DefaultCPTitle(String title, ActionListener actionListener) {
@@ -33,7 +36,11 @@ public class DefaultCPTitle  {
         btnTitle.addActionListener(actionListener);
 
         titlePanelleft.add(additionalIconPanel);
-        titlePanelleft.add(btnTitle);
+
+        buttons_under_title = new JPanel(new VerticalLayout());
+        buttons_under_title.setOpaque(false);
+        buttons_under_title.add(btnTitle);
+        titlePanelleft.add(buttons_under_title);
 
         titlePanelright = new JPanel();
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
@@ -56,6 +63,10 @@ public class DefaultCPTitle  {
                 GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                 new Insets(0, 0, 0, 0), 0, 0));
 
+    }
+
+    public JPanel get_buttons_under_title(){
+        return buttons_under_title;
     }
 
     public JPanel getAdditionalIconPanel() {
