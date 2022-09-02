@@ -5,6 +5,7 @@
 package de.offene_pflege.op.tools;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -55,8 +56,13 @@ public class HTMLTools {
      * @param objects
      * @return
      */
-    public static String getTableRow(Object... objects) {
-        return "<tr>" + getTableData(objects) + "</tr>";
+    public static String getTableRow(List<String> entries) {
+        return getTableRow("", entries);
+    }
+
+    public static String getTableRow(String cssid, List<String> entries) {
+        String tr = cssid.isEmpty() ? "<tr>" : String.format("<tr id=\"%s\">", cssid);
+        return tr + getTableData(entries) + "</tr>\n";
     }
 
     /**
@@ -66,8 +72,13 @@ public class HTMLTools {
      * @param objects
      * @return
      */
-    public static String getTableHead(Object... objects) {
-        return "<th>" + getTableData(objects) + "</th>";
+    public static String getTableHead(List<String> entries) {
+        return getTableHead("", entries);
+    }
+
+    public static String getTableHead(String cssid, List<String> entries) {
+        String th = cssid.isEmpty() ? "<th>" : String.format("<th id=\"%s\">", cssid);
+        return th + getTableData(entries) + "</th>";
     }
 
     /**
@@ -76,10 +87,10 @@ public class HTMLTools {
      * @param objects
      * @return
      */
-    public static String getTableData(Object... objects) {
+    public static String getTableData(List<String> entries) {
         String result = "";
-        for (Object o : objects) {
-            result += "<td>" + o.toString() + "</td>";
+        for (String o : entries) {
+            result += "<td>" + o + "</td>";
         }
         return result;
     }

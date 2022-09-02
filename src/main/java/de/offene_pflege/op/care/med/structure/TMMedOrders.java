@@ -63,7 +63,11 @@ public class TMMedOrders extends AbstractTableModel {
     public static final int COL_note = 4;
     public static final int COL_complete = 5;
     private final List<MedOrder> medOrderList;
-    private final String[] header = new String[]{"Medikament","Bewohner:in","Datum","Arzt/KH","Text","ok"};
+    private final String[] header = new String[]{"Medikament", "Bewohner:in", "Datum", "Arzt/KH", "Text", "ok"};
+
+    public String[] getHeader() {
+        return header;
+    }
 
     public TMMedOrders(List<MedOrder> medOrderList) {
         this.medOrderList = medOrderList;
@@ -112,6 +116,7 @@ public class TMMedOrders extends AbstractTableModel {
             Boolean complete = (Boolean) aValue;
             medOrder.setClosed_on(complete ? LocalDateTime.now() : null);
             medOrder.setClosed_by(complete ? OPDE.getLogin().getUser() : null);
+            if (!complete) medOrder.setCreated_by(OPDE.getLogin().getUser());
         } else if (column == COL_WHERE_TO_ORDER) {
             if (aValue instanceof GP) {
                 medOrder.setGp((GP) aValue);
@@ -120,8 +125,10 @@ public class TMMedOrders extends AbstractTableModel {
                 medOrder.setGp(null);
                 medOrder.setHospital((Hospital) aValue);
             }
+            medOrder.setCreated_by(OPDE.getLogin().getUser());
         } else if (column == COL_note) {
             medOrder.setNote(aValue.toString().trim());
+            medOrder.setCreated_by(OPDE.getLogin().getUser());
         }
         medOrderList.set(row, EntityTools.merge(medOrder));
         fireTableRowsUpdated(row, row);
@@ -143,6 +150,10 @@ public class TMMedOrders extends AbstractTableModel {
         fireTableRowsDeleted(row, row);
     }
 
+    public List<MedOrder> getMedOrderList() {
+        return medOrderList;
+    }
+
     @Override
     public Object getValueAt(int row, int col) {
         Object result;
@@ -158,7 +169,8 @@ public class TMMedOrders extends AbstractTableModel {
                 break;
             }
             case COL_WHERE_TO_ORDER: {
-                result = medOrder.getGp() != null ? GPTools.getFullName(medOrder.getGp()) : HospitalTools.getFullName(medOrder.getHospital());
+                result = medOrder.getGp() != null ? GPTools.getFullName(medOrder.getGp()) + SYSTools.catchNull(medOrder.getGp().getFax(), "\n", "") :
+                        HospitalTools.getFullName(medOrder.getHospital()) + SYSTools.catchNull(medOrder.getHospital().getFax(), "\n", "");
                 break;
             }
             case COL_note: {

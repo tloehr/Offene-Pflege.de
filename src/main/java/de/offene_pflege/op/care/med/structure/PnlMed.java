@@ -35,6 +35,7 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.op.OPDE;
@@ -42,6 +43,9 @@ import de.offene_pflege.op.care.med.inventory.DlgNewStocks;
 import de.offene_pflege.op.care.med.inventory.PnlMedOrders;
 import de.offene_pflege.op.care.med.prodassistant.MedProductWizard;
 import de.offene_pflege.op.system.InternalClassACL;
+import de.offene_pflege.op.threads.DisplayManager;
+import de.offene_pflege.op.threads.DisplayMessage;
+import de.offene_pflege.op.tools.NumberVerifier;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
@@ -49,15 +53,17 @@ import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
+import javax.persistence.RollbackException;
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -71,7 +77,8 @@ public class PnlMed extends CleanablePanel {
     private JScrollPane jspSearch;
     private JXSearchField txtSuche;
     private JList lstPraep;
-    private JToggleButton tbIDs;
+    private JToggleButton tbIDs, tbShowClosed;
+    JTextField days_range;
 
     private Optional<PnlMedStructure> optPnlMedStructure;
     private Optional<PnlMedOrders> optPnlMedOrders;
@@ -83,23 +90,26 @@ public class PnlMed extends CleanablePanel {
         super("opde.medication");
         this.jspSearch = jspSearch;
         optPnlMedStructure = Optional.empty();
+        optPnlMedOrders = Optional.empty();
         initPanel();
     }
 
     @Override
     public void cleanup() {
         super.cleanup();
-        //  https://github.com/tloehr/Offene-Pflege.de/issues/62
-        // closes an open modal dialog, if necessary.
-        // when the timeout occurs
-
         SYSTools.unregisterListeners(this);
     }
 
     @Override
     public void reload() {
         optPnlMedStructure.ifPresent(pnlMedStructure -> pnlMedStructure.reload());
-        optPnlMedOrders.ifPresent(pnlMedOrders -> pnlMedOrders.reload());
+        optPnlMedOrders.ifPresent(pnlMedOrders -> {
+            if (tbShowClosed.isSelected()) {
+                pnlMedOrders.reload(MedOrderTools.get_medorders(Integer.parseInt(days_range.getText())));
+            } else {
+                pnlMedOrders.reload(MedOrderTools.get_medorders(0));
+            }
+        });
     }
 
     private void initPanel() {
@@ -166,8 +176,11 @@ public class PnlMed extends CleanablePanel {
             log.error(e);
         }
 
-        GUITools.addAllComponents(mypanel, addCommands());
-        GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addOrders());
+        mypanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        GUITools.addAllComponents(mypanel, addStocks());
+        mypanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        GUITools.addAllComponents(mypanel, addStructure());
 
 
         searchPane.setContentPane(mypanel);
@@ -177,11 +190,60 @@ public class PnlMed extends CleanablePanel {
 
     }
 
-    private java.util.List<Component> addFilters() {
-        java.util.List<Component> list = new ArrayList<Component>();
+    private List<Component> addStocks() {
+        java.util.List<Component> list = new ArrayList<>();
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
+            final JideButton addButton = GUITools.createHyperlinkButton(MedProductWizard.internalClassID, SYSConst.icon22wizard, null);
+
+            addButton.addActionListener(actionEvent -> {
+
+                JidePopup currentPopup = new JidePopup();
+
+                WizardDialog wizard = new MedProductWizard(o -> {
+                    currentPopup.hidePopup();
+                    // keine Maßnahme nötig
+                }).getWizard();
+
+                currentPopup.setMovable(false);
+                currentPopup.setPreferredSize((new Dimension(800, 450)));
+                currentPopup.setResizable(false);
+                currentPopup.getContentPane().setLayout(new BoxLayout(currentPopup.getContentPane(), BoxLayout.LINE_AXIS));
+                currentPopup.getContentPane().add(wizard.getContentPane());
+                currentPopup.setOwner(addButton);
+                currentPopup.removeExcludedComponent(addButton);
+                currentPopup.setTransient(false);
+                currentPopup.setDefaultFocusComponent(wizard.getContentPane());
+                //                currentPopup.addPropertyChangeListener("visible", propertyChangeEvent -> currentPopup.getContentPane().getComponentCount());
+
+                GUITools.showPopup(currentPopup, SwingConstants.NORTH_EAST);
+            });
+
+            list.add(addButton);
+        }
+
+        if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
+            JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.inventory.newstocks", SYSConst.icon22addrow, actionEvent -> {
+                currentEditor = new DlgNewStocks(null);
+                currentEditor.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        super.windowClosing(e);
+                        currentEditor = null;
+                        reload();
+                    }
+                });
+                currentEditor.setVisible(true);
+            });
+            list.add(buchenButton);
+        }
+        return list;
+    }
+
+    private java.util.List<Component> addStructure() {
+        java.util.List<Component> list = new ArrayList<>();
 
         tbIDs = GUITools.getNiceToggleButton("misc.msg.showIDs");
-        tbIDs.addItemListener(e -> reload());
+        tbIDs.addItemListener(e -> optPnlMedStructure.ifPresent(pnlMedStructure -> pnlMedStructure.reload()));
         tbIDs.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbIDs);
 
@@ -207,64 +269,97 @@ public class PnlMed extends CleanablePanel {
         return list;
     }
 
-    private java.util.List<Component> addCommands() {
-        java.util.List<Component> list = new ArrayList<Component>();
+    private java.util.List<Component> addOrders() {
+        java.util.List<Component> list = new ArrayList<>();
         final JideButton orderButton = GUITools.createHyperlinkButton("nursingrecords.inventory.orders", SYSConst.icon22shopping, null);
         orderButton.addActionListener(actionEvent -> {
             orderButtonPressed();
         });
-
         list.add(orderButton);
 
+        days_range = new JTextField(10);
+        days_range.setText(OPDE.getProps().getProperty("opde.medorder:auto_order_day_range", "7"));
+        days_range.setInputVerifier(new NumberVerifier(BigDecimal.ONE, BigDecimal.valueOf(31), true));
+        days_range.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                SYSPropsTools.storeProp("opde.medorder:auto_order_day_range", ((JTextComponent) e.getSource()).getText().trim(), OPDE.getLogin().getUser());
+                reload();
+            }
+        });
+        list.add(days_range);
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            final JideButton addButton = GUITools.createHyperlinkButton(MedProductWizard.internalClassID, SYSConst.icon22wizard, null);
+        tbShowClosed = GUITools.getNiceToggleButton("Abgeschlossene Bestellungen anzeigen");
+        tbShowClosed.addItemListener(e -> optPnlMedOrders.ifPresent(pnlMedOrders -> {
+            reload();
+        }));
+        tbShowClosed.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbShowClosed);
 
-            addButton.addActionListener(actionEvent -> {
 
-                JidePopup currentPopup = new JidePopup();
+        JButton generate_orders = GUITools.createHyperlinkButton("Bedarf prüfen", SYSConst.icon22calc, null);
+        generate_orders.addActionListener(e -> {
+            orderButtonPressed(); // just in case
 
-                WizardDialog wizard = new MedProductWizard(o -> {
-                    currentPopup.hidePopup();
-                    // keine Maßnahme nötig
-                }).getWizard();
+            optPnlMedOrders.ifPresent(pnlMedOrders -> {
+                OPDE.getMainframe().setBlocked(true);
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
-                currentPopup.setMovable(false);
-                currentPopup.setPreferredSize((new Dimension(800, 450)));
-                currentPopup.setResizable(false);
-                currentPopup.getContentPane().setLayout(new BoxLayout(currentPopup.getContentPane(), BoxLayout.LINE_AXIS));
-                currentPopup.getContentPane().add(wizard.getContentPane());
-                currentPopup.setOwner(addButton);
-                currentPopup.removeExcludedComponent(addButton);
-                currentPopup.setTransient(false);
-                currentPopup.setDefaultFocusComponent(wizard.getContentPane());
-//                currentPopup.addPropertyChangeListener("visible", propertyChangeEvent -> currentPopup.getContentPane().getComponentCount());
+                SwingWorker worker = new SwingWorker() {
 
-                GUITools.showPopup(currentPopup, SwingConstants.NORTH_EAST);
-            });
-
-            list.add(addButton);
-        }
-
-        if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.inventory.newstocks", SYSConst.icon22addrow, actionEvent -> {
-                currentEditor = new DlgNewStocks(null);
-                currentEditor.addWindowListener(new WindowAdapter() {
                     @Override
-                    public void windowClosing(WindowEvent e) {
-                        super.windowClosing(e);
-                        currentEditor = null;
+                    protected Object doInBackground() {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            MedOrderTools.generate_orders(Integer.parseInt(days_range.getText()), MedOrderTools.get_open_orders(em)).forEach(medOrder -> em.merge(medOrder));
+                            em.getTransaction().commit();
+                        } catch (OptimisticLockException | RollbackException ole) {
+                            log.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception exc) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(exc);
+                        } finally {
+                            em.close();
+                        }
+                        return null;
                     }
-                });
-                currentEditor.setVisible(true);
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                        reload();
+                    }
+                };
+                worker.execute();
             });
-            list.add(buchenButton);
-        }
+        });
+        list.add(generate_orders);
+
+
+        final JideButton printButton = GUITools.createHyperlinkButton("Bestell-Liste drucken", SYSConst.icon22print2, null);
+        printButton.addActionListener(actionEvent -> {
+            optPnlMedOrders.ifPresent(pnlMedOrders -> pnlMedOrders.print());
+        });
+        list.add(printButton);
+
 
         return list;
     }
 
     private void orderButtonPressed() {
+        if (optPnlMedOrders.isPresent()) return;
         SwingUtilities.invokeLater(() -> {
             txtSuche.setText(null);
             optPnlMedStructure.ifPresent(pnlMedStructure -> pnlMedStructure.cleanup());
@@ -272,6 +367,7 @@ public class PnlMed extends CleanablePanel {
             removeAll();
             optPnlMedOrders = Optional.of(new PnlMedOrders());
             add(optPnlMedOrders.get());
+            reload();
             revalidate();
             repaint();
         });

@@ -2,8 +2,13 @@ package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
+import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
+import de.offene_pflege.op.tools.HTMLTools;
+import de.offene_pflege.op.tools.JavaTimeConverter;
+import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -15,7 +20,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,13 +122,30 @@ public class MedOrderTools {
         return list;
     }
 
+    public static List<MedOrder> get_closed_medorders(EntityManager em, int within_last_days) {
+        ArrayList<MedOrder> list = new ArrayList<>();
+        try {
+            String jpql = " SELECT p " +
+                    " FROM MedOrder p" +
+                    " WHERE p.closed_by IS NOT NULL" +
+                    " AND p.created_on >= :target_date";
+            Query query = em.createQuery(jpql);
+            query.setParameter("target_date", LocalDateTime.now().minusDays(within_last_days));
+            list.addAll(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return list;
+    }
 
-    public static List<MedOrder> get_open_orders() {
+    public static List<MedOrder> get_medorders(int within_last_days) {
         List<MedOrder> list = new ArrayList<>();
-
         EntityManager em = OPDE.createEM();
         try {
             list = get_open_orders(em);
+            if (within_last_days > 0) {
+                list.addAll(get_closed_medorders(em, within_last_days));
+            }
         } catch (Exception e) {
             OPDE.fatal(e);
         } finally {
@@ -131,7 +155,16 @@ public class MedOrderTools {
     }
 
 
-    public static List<MedOrder> generate_orders(final double cover_days, List<MedOrder> open_orders) {
+    public static String toPrettyHTML(MedOrder medOrder) {
+        String text = TradeFormTools.toPrettyHTML(medOrder.getTradeForm());
+        text += "<br/>";
+        text += DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getCreated_on()));
+        text += "&nbsp;" + medOrder.getCreated_by().getFullname();
+        return text;
+    }
+
+
+    public static List<MedOrder> generate_orders(final int cover_days, List<MedOrder> open_orders) {
         List<MedOrder> result = new ArrayList<>();
         final MultiKeyMap<Object, Quintet<BigDecimal, BigDecimal, BigDecimal, GP, Hospital>> map = new MultiKeyMap();
         List<Resident> residents = ResidentTools.getAllActive();

@@ -1,12 +1,17 @@
 package de.offene_pflege.op.care.med.inventory;
 
 import de.offene_pflege.entity.EntityTools;
+import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.entity.reports.NReportTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
+import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.care.med.MedOrderHTMLRenderer;
 import de.offene_pflege.op.care.med.structure.TMMedOrders;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
+import de.offene_pflege.op.tools.HTMLTools;
 import de.offene_pflege.op.tools.NumberVerifier;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
@@ -22,13 +27,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.JTextComponent;
 
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -36,6 +40,7 @@ public class PnlMedOrders extends JPanel {
     private JPopupMenu menu;
     JTable tbl;
     JScrollPane scrl;
+
     private String internalClassID = "opde.medication";
 
     public PnlMedOrders() {
@@ -58,12 +63,16 @@ public class PnlMedOrders extends JPanel {
                 tableMousePressed(e);
             }
         });
-        reload();
         scrl.setViewportView(tbl);
     }
 
-    public void reload() {
-        tbl.setModel(new TMMedOrders(MedOrderTools.get_open_orders()));
+    public void reload(List<MedOrder> list) {
+
+
+//    public void reload() {
+
+        tbl.setModel(new TMMedOrders(list));
+
         OPDE.getDisplayManager().setMainMessage("Medikamenten Bestellungen");
 
         SwingUtilities.invokeLater(() -> {
@@ -84,7 +93,7 @@ public class PnlMedOrders extends JPanel {
                             index, isSelected, cellHasFocus);
                 }
             });
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new MedOrderHTMLRenderer());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellEditor(new DefaultCellEditor(cmb));
 
             JTextField txt = new JTextField();
@@ -98,6 +107,7 @@ public class PnlMedOrders extends JPanel {
             tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_complete).setMaxWidth(30);
             tbl.getColumnModel().getColumn(TMMedOrders.COL_ORDER_DATE).setMaxWidth(80);
+
             tbl.revalidate();
             tbl.repaint();
         });
@@ -107,67 +117,6 @@ public class PnlMedOrders extends JPanel {
         JPanel pnl = new JPanel();
         pnl.setLayout(new HorizontalLayout(5));
 
-        JTextField days_range = new JTextField(10);
-        days_range.setText(OPDE.getProps().getProperty("opde.medorder:auto_order_day_range","7"));
-        days_range.setInputVerifier(new NumberVerifier(BigDecimal.ONE, BigDecimal.valueOf(31), true));
-        days_range.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                SYSPropsTools.storeProp("opde.medorder:auto_order_day_range", ((JTextComponent) e.getSource()).getText().trim(), OPDE.getLogin().getUser());
-            }
-        });
-
-        JButton generate_orders = new JButton(SYSConst.icon22calc);
-        generate_orders.addActionListener(e -> {
-
-            OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
-
-            SwingWorker worker = new SwingWorker() {
-
-                @Override
-                protected Object doInBackground() {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        MedOrderTools.generate_orders(Double.parseDouble(days_range.getText()), MedOrderTools.get_open_orders(em)).forEach(medOrder -> em.merge(medOrder));
-                        em.getTransaction().commit();
-                        reload();
-                    } catch (OptimisticLockException | RollbackException ole) {
-                        log.warn(ole);
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception exc) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(exc);
-                    } finally {
-                        em.close();
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
-                }
-            };
-            worker.execute();
-
-        });
-        pnl.add(days_range);
-        pnl.add(generate_orders);
-        //todo: abgeschlossene der letzten x tage einblenden
-        // mit checkbox und startdatum (immer 7 Tage zurück)
-        pnl.add(new JSeparator(SwingConstants.VERTICAL));
         return pnl;
     }
 
@@ -193,11 +142,14 @@ public class PnlMedOrders extends JPanel {
         menu = new JPopupMenu();
 
         JMenuItem itemPopupShow = new JMenuItem(SYSTools.xx("misc.commands.show"), SYSConst.icon22magnify1);
+        itemPopupShow.addActionListener(e -> {
+            MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.getSelectionModel().getLeadSelectionIndex());
+            GUITools.showPopup(GUITools.getHTMLPopup(tbl, MedOrderTools.toPrettyHTML(medOrder)), SwingConstants.NORTH);
+        });
         menu.add(itemPopupShow);
 
         JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
         itemPopupDelete.addActionListener(evt1 -> {
-
             for (int sel : tbl.getSelectionModel().getSelectedIndices()) {
                 MedOrder medOrder = ((TMMedOrders) tbl.getModel()).get(sel);
                 EntityTools.delete(medOrder);
@@ -212,14 +164,30 @@ public class PnlMedOrders extends JPanel {
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }
 
-    class Tooltip_cell_renderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            log.debug(value);
-//            c.setToolTipText(value.toString());
-            c.setToolTipText(c.getText());
-            return c;
+    public void print() {
+        TMMedOrders model = (TMMedOrders) tbl.getModel();
+        String table_content = "";
+
+        int cols = model.getColumnCount();
+        ArrayList<String> row_content = new ArrayList<>();
+
+        for (int row = 0; row < model.getRowCount(); row++) {
+            row_content.clear();
+            for (int col = 0; col < cols - 1; col++) {
+                row_content.add(SYSTools.catchNull(model.getValueAt(row, col)));
+            }
+            table_content += HTMLTools.getTableRow("", row_content);
         }
+
+        //todo: druck klappt nicht richtig. Sieht noch komisch aus
+        // todo: sortierung auf dem bildschirm passt nicht zum druck
+
+        SYSFilesTools.print(
+                HTMLTools.getTable(
+                        HTMLTools.getTableHead("fonttextgray", Arrays.asList(Arrays.copyOfRange(model.getHeader(), 0, cols - 1))) +
+                                table_content, "border=1"
+                ), false
+        );
     }
+
 }
