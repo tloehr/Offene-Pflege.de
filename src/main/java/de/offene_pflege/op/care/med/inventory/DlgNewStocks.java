@@ -67,7 +67,7 @@ import java.util.List;
  * @author tloehr
  */
 @Log4j2
-public class DlgNewStocks extends MyJDialog {
+public class DlgNewStocks extends JDialog {
     private boolean ignoreEvent;
 
     private BigDecimal amount, weight;
@@ -94,7 +94,7 @@ public class DlgNewStocks extends MyJDialog {
 //    private CaretListener weightListener;
 
     public DlgNewStocks(Resident resident) {
-        super(false);
+        super();
         this.resident = resident;
         initComponents();
         initDialog();

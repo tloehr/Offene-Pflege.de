@@ -49,6 +49,8 @@ import de.offene_pflege.op.tools.NumberVerifier;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
+import org.apache.poi.ss.formula.functions.T;
+import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -78,7 +80,7 @@ public class PnlMed extends CleanablePanel {
     private JXSearchField txtSuche;
     private JList lstPraep;
     private JToggleButton tbIDs, tbShowClosed;
-    JTextField days_range;
+    private JTextField days_range, filter_gp_hospital;
 
     private Optional<PnlMedStructure> optPnlMedStructure;
     private Optional<PnlMedOrders> optPnlMedOrders;
@@ -228,7 +230,14 @@ public class PnlMed extends CleanablePanel {
                     @Override
                     public void windowClosing(WindowEvent e) {
                         super.windowClosing(e);
+                        log.debug("CLOSING");
                         currentEditor = null;
+                    }
+
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        log.debug("CLOSED");
                         reload();
                     }
                 });
@@ -277,7 +286,7 @@ public class PnlMed extends CleanablePanel {
         });
         list.add(orderButton);
 
-        days_range = new JTextField(10);
+        days_range = new JTextField(5);
         days_range.setText(OPDE.getProps().getProperty("opde.medorder:auto_order_day_range", "7"));
         days_range.setInputVerifier(new NumberVerifier(BigDecimal.ONE, BigDecimal.valueOf(31), true));
         days_range.addFocusListener(new FocusAdapter() {
@@ -287,15 +296,25 @@ public class PnlMed extends CleanablePanel {
                 reload();
             }
         });
-        list.add(days_range);
 
-        tbShowClosed = GUITools.getNiceToggleButton("Abgeschlossene Bestellungen anzeigen");
+        JPanel pnl = new JPanel(new HorizontalLayout(5));
+        pnl.add(new JLabel("Zeitraum:"));
+        pnl.add(days_range);
+        pnl.add(new JLabel("Tage"));
+        list.add(pnl);
+
+        tbShowClosed = GUITools.getNiceToggleButton("Zeige erledigte");
         tbShowClosed.addItemListener(e -> optPnlMedOrders.ifPresent(pnlMedOrders -> {
             reload();
         }));
         tbShowClosed.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbShowClosed);
 
+//        list.add(new JLabel("Filter Arzt / KH"));
+//        filter_gp_hospital = new JTextField(10);
+//        filter_gp_hospital.addActionListener(e -> {
+//
+//        });
 
         JButton generate_orders = GUITools.createHyperlinkButton("Bedarf prüfen", SYSConst.icon22calc, null);
         generate_orders.addActionListener(e -> {
@@ -348,7 +367,7 @@ public class PnlMed extends CleanablePanel {
         list.add(generate_orders);
 
 
-        final JideButton printButton = GUITools.createHyperlinkButton("Bestell-Liste drucken", SYSConst.icon22print2, null);
+        final JideButton printButton = GUITools.createHyperlinkButton("Bestellung drucken", SYSConst.icon22print2, null);
         printButton.addActionListener(actionEvent -> {
             optPnlMedOrders.ifPresent(pnlMedOrders -> pnlMedOrders.print());
         });

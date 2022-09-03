@@ -169,8 +169,8 @@ public class TMMedOrders extends AbstractTableModel {
                 break;
             }
             case COL_WHERE_TO_ORDER: {
-                result = medOrder.getGp() != null ? GPTools.getFullName(medOrder.getGp()) + SYSTools.catchNull(medOrder.getGp().getFax(), "\n", "") :
-                        HospitalTools.getFullName(medOrder.getHospital()) + SYSTools.catchNull(medOrder.getHospital().getFax(), "\n", "");
+                result = medOrder.getGp() != null ? GPTools.get_for_order_list(medOrder.getGp()):
+                        HospitalTools.get_for_order_list(medOrder.getHospital());
                 break;
             }
             case COL_note: {

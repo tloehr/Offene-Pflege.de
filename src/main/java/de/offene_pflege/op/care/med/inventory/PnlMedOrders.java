@@ -15,6 +15,7 @@ import de.offene_pflege.op.tools.HTMLTools;
 import de.offene_pflege.op.tools.NumberVerifier;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.HomesService;
 import de.offene_pflege.tablerenderer.RNDHTML;
 import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -93,7 +94,8 @@ public class PnlMedOrders extends JPanel {
                             index, isSelected, cellHasFocus);
                 }
             });
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new MedOrderHTMLRenderer());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellEditor(new DefaultCellEditor(cmb));
 
             JTextField txt = new JTextField();
@@ -155,8 +157,6 @@ public class PnlMedOrders extends JPanel {
                 EntityTools.delete(medOrder);
                 ((TMMedOrders) tbl.getModel()).delete(row);
             }
-//            EntityTools.delete(medOrder);
-//            ((TMMedOrders) tbl.getModel()).delete(row);
         });
         menu.add(itemPopupDelete);
 
@@ -166,25 +166,23 @@ public class PnlMedOrders extends JPanel {
 
     public void print() {
         TMMedOrders model = (TMMedOrders) tbl.getModel();
-        String table_content = "";
+        String table_content = SYSConst.html_h1("Medikamenten Bestellungen");
+        table_content += SYSConst.html_paragraph(HomesService.getAsTextForTX(HomesService.getByPK("wiedenhof")));
 
         int cols = model.getColumnCount();
         ArrayList<String> row_content = new ArrayList<>();
 
         for (int row = 0; row < model.getRowCount(); row++) {
             row_content.clear();
-            for (int col = 0; col < cols - 1; col++) {
-                row_content.add(SYSTools.catchNull(model.getValueAt(row, col)));
+            for (int col = 0; col < cols - 2; col++) {
+                row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
             }
-            table_content += HTMLTools.getTableRow("", row_content);
+            table_content += HTMLTools.getTableRow("td", "", row_content);
         }
-
-        //todo: druck klappt nicht richtig. Sieht noch komisch aus
-        // todo: sortierung auf dem bildschirm passt nicht zum druck
 
         SYSFilesTools.print(
                 HTMLTools.getTable(
-                        HTMLTools.getTableHead("fonttextgray", Arrays.asList(Arrays.copyOfRange(model.getHeader(), 0, cols - 1))) +
+                        HTMLTools.getTableRow("th", "fonttextgray", Arrays.asList(Arrays.copyOfRange(model.getHeader(), 0, cols - 2))) +
                                 table_content, "border=1"
                 ), false
         );

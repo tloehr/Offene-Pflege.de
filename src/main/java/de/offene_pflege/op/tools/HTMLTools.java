@@ -49,50 +49,24 @@ public class HTMLTools {
         return printDouble(bd.doubleValue());
     }
 
-    /**
-     * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die der Methode übergeben wurden. Nur die
-     * Zeile inkl. der "tr" Tags.
-     *
-     * @param objects
-     * @return
-     */
-    public static String getTableRow(List<String> entries) {
-        return getTableRow("", entries);
-    }
+    public static String getTableRow(String tag, List<String> entries) {
 
-    public static String getTableRow(String cssid, List<String> entries) {
-        String tr = cssid.isEmpty() ? "<tr>" : String.format("<tr id=\"%s\">", cssid);
-        return tr + getTableData(entries) + "</tr>\n";
-    }
-
-    /**
-     * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die der Methode übergeben wurden. Nur die
-     * Zeile inkl. der "th" Tags.
-     *
-     * @param objects
-     * @return
-     */
-    public static String getTableHead(List<String> entries) {
-        return getTableHead("", entries);
-    }
-
-    public static String getTableHead(String cssid, List<String> entries) {
-        String th = cssid.isEmpty() ? "<th>" : String.format("<th id=\"%s\">", cssid);
-        return th + getTableData(entries) + "</th>";
+        return getTableRow(tag, "", entries);
     }
 
     /**
      * Erzeugt eine HTML Tabellen Zeile aus den verschiedenen Parametern, die der Methode übergeben wurden.
      *
-     * @param objects
+     * @param entries
      * @return
      */
-    public static String getTableData(List<String> entries) {
+    public static String getTableRow(String tag, String cssid, List<String> entries) {
         String result = "";
+        tag = cssid.isEmpty() ? tag : String.format(tag + " id=\"%s\"", cssid);
         for (String o : entries) {
-            result += "<td>" + o + "</td>";
+            result += "<" + tag + ">" + o + "</" + tag + ">";
         }
-        return result;
+        return "<tr>" + result + "</tr>";
     }
 
     /**

@@ -68,7 +68,6 @@ public class MyJDialog extends JDialog {
     @Override
     public void dispose() {
         setVisible(false);
-
     }
 
     @Override

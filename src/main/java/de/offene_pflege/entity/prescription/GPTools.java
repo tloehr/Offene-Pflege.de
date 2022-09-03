@@ -9,11 +9,8 @@ import javax.swing.*;
 import java.util.ArrayList;
 
 /**
- * Created by IntelliJ IDEA.
- * User: tloehr
- * Date: 14.12.11
- * Time: 13:27
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: tloehr Date: 14.12.11 Time: 13:27 To change this template use File | Settings | File
+ * Templates.
  */
 public class GPTools {
 
@@ -41,6 +38,13 @@ public class GPTools {
         } else {
             return SYSTools.xx("misc.msg.noentryyet");
         }
+    }
+
+    public static String get_for_order_list(GP doc) {
+        if (OPDE.isAnonym()) {
+            return "[" + SYSTools.xx("misc.msg.anon") + "]";
+        }
+        return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + "<br/>" + doc.getFax();
     }
 
     public static String getCompleteAddress(GP doc) {

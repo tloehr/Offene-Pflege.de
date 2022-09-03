@@ -50,6 +50,13 @@ public class HospitalTools {
         }
     }
 
+    public static String get_for_order_list(Hospital h) {
+        if (OPDE.isAnonym()) {
+            return "[" + SYSTools.xx("misc.msg.anon") + "]";
+        }
+        return h.getName() + "<br/>" + h.getFax();
+    }
+
     public static String getFullName(Hospital kh) {
         if (kh == null)
             return "--";
