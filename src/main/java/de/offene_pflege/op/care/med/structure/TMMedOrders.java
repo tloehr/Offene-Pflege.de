@@ -38,10 +38,7 @@ import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.OneToMany;
-import javax.persistence.OptimisticLockException;
+import javax.persistence.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.html.HTML;
@@ -146,6 +143,8 @@ public class TMMedOrders extends AbstractTableModel {
     }
 
     public void delete(int row) {
+        MedOrder medOrder = medOrderList.get(row);
+        EntityTools.delete(medOrder);
         medOrderList.remove(row);
         fireTableRowsDeleted(row, row);
     }

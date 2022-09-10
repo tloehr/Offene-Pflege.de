@@ -30,9 +30,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -150,21 +148,19 @@ public class PnlMedOrders extends JPanel {
         });
         menu.add(itemPopupShow);
 
-        JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
-        itemPopupDelete.addActionListener(evt1 -> {
-            for (int sel : tbl.getSelectionModel().getSelectedIndices()) {
-                MedOrder medOrder = ((TMMedOrders) tbl.getModel()).get(sel);
-                EntityTools.delete(medOrder);
-                ((TMMedOrders) tbl.getModel()).delete(row);
-            }
-        });
-        menu.add(itemPopupDelete);
-
-
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }
 
-    public void print() {
+    public List<MedOrder> getSelected() {
+        ArrayList<MedOrder> list = new ArrayList<>();
+        for (int sel : tbl.getSelectionModel().getSelectedIndices()) {
+            MedOrder medOrder = ((TMMedOrders) tbl.getModel()).get(tbl.convertRowIndexToModel(sel));
+            list.add(medOrder);
+        }
+        return list;
+    }
+
+    public void print(Optional<HasName> filter) {
         TMMedOrders model = (TMMedOrders) tbl.getModel();
         String table_content = SYSConst.html_h1("Medikamenten Bestellungen");
         table_content += SYSConst.html_paragraph(HomesService.getAsTextForTX(HomesService.getByPK("wiedenhof")));
@@ -173,11 +169,14 @@ public class PnlMedOrders extends JPanel {
         ArrayList<String> row_content = new ArrayList<>();
 
         for (int row = 0; row < model.getRowCount(); row++) {
-            row_content.clear();
-            for (int col = 0; col < cols - 2; col++) {
-                row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
+            // todo: das hier aufröumen
+            if (filter.isEmpty() || model.get(tbl.convertRowIndexToModel(row), TMMedOrders.COL_WHERE_TO_ORDER).toString().equals(filter.get().getName())) {
+                row_content.clear();
+                for (int col = 0; col < cols - 2; col++) {
+                    row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
+                }
+                table_content += HTMLTools.getTableRow("td", "", row_content);
             }
-            table_content += HTMLTools.getTableRow("td", "", row_content);
         }
 
         SYSFilesTools.print(

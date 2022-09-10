@@ -1135,9 +1135,7 @@ public class PnlReport extends NursingRecordsPanel {
                 LocalDate start = SYSCalendar.bom(minmax.getStart()).toLocalDate();
                 LocalDate end = ResidentTools.isActive(resident) ? new LocalDate() : SYSCalendar.eom(minmax.getEnd()).toLocalDate();
                 for (int year = end.getYear(); year >= start.getYear(); year--) {
-                    final String keyYear = Integer.toString(year) + ".year";
-
-
+                    final String keyYear = year + ".year";
                     // todo: to track down the NPEs.
                     if (cpMap.get(keyYear) == null) {
                         reload();
