@@ -24,11 +24,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.RollbackException;
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.JTextComponent;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
@@ -62,17 +65,22 @@ public class PnlMedOrders extends JPanel {
                 tableMousePressed(e);
             }
         });
+
         scrl.setViewportView(tbl);
     }
 
+    public List<MedOrder> get_list() {
+        return ((TMMedOrders) tbl.getModel()).getMedOrderList();
+    }
+
     public void reload(List<MedOrder> list) {
-
-
-//    public void reload() {
-
         tbl.setModel(new TMMedOrders(list));
+        tbl.getModel().addTableModelListener(e -> {
+            if (e.getColumn() == TMMedOrders.COL_WHERE_TO_ORDER)
+                firePropertyChange("table_where_to_order_changed", -1, e.getFirstRow());
+        });
 
-        OPDE.getDisplayManager().setMainMessage("Medikamenten Bestellungen");
+        //OPDE.getDisplayManager().setMainMessage("Medikamenten Bestellungen");
 
         SwingUtilities.invokeLater(() -> {
             java.util.List<HasName> liste = new ArrayList();
@@ -160,6 +168,11 @@ public class PnlMedOrders extends JPanel {
         return list;
     }
 
+    private String filter_text(MedOrder medOrder) {
+        return medOrder.getGp() != null ? medOrder.getGp().getName() :
+                medOrder.getHospital().getName();
+    }
+
     public void print(Optional<HasName> filter) {
         TMMedOrders model = (TMMedOrders) tbl.getModel();
         String table_content = SYSConst.html_h1("Medikamenten Bestellungen");
@@ -169,8 +182,8 @@ public class PnlMedOrders extends JPanel {
         ArrayList<String> row_content = new ArrayList<>();
 
         for (int row = 0; row < model.getRowCount(); row++) {
-            // todo: das hier aufröumen
-            if (filter.isEmpty() || model.get(tbl.convertRowIndexToModel(row), TMMedOrders.COL_WHERE_TO_ORDER).toString().equals(filter.get().getName())) {
+
+            if (filter.isEmpty() || filter_text(model.get(tbl.convertRowIndexToModel(row))).equalsIgnoreCase(filter.get().getName())) {
                 row_content.clear();
                 for (int col = 0; col < cols - 2; col++) {
                     row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));

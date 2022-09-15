@@ -31,6 +31,7 @@ package de.offene_pflege.op.care.med.structure;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
+import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
@@ -52,6 +53,7 @@ import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.apache.poi.ss.formula.functions.T;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXSearchField;
@@ -65,12 +67,12 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -120,15 +122,27 @@ public class PnlMed extends CleanablePanel {
             } else {
                 list = MedOrderTools.get_medorders(0);
             }
-            final DefaultComboBoxModel<HasName> dcbm = new DefaultComboBoxModel<>();
-            dcbm.addElement(null);
-            list.stream().map(medOrder -> medOrder.getGp() != null ? medOrder.getGp() : medOrder.getHospital())
-                    .distinct()
-                    .sorted(Comparator.comparing(o -> o.getName()))
-                    .forEach(serializable -> dcbm.addElement(serializable));
-            cmb_where_to_order_filter.setModel(dcbm);
+
+            ComparatorChain chain = new ComparatorChain();
+            chain.addComparator(Comparator.comparing((MedOrder mo) -> mo.getResident().getName()));
+            chain.addComparator(Comparator.comparing((MedOrder mo) -> mo.getTradeForm().getMedProduct().getText()));
+
+            Collections.sort(list, chain);
+
+            fill_where_to_order_filter(list);
             pnlMedOrders.reload(list);
         });
+    }
+
+    private void fill_where_to_order_filter(List<MedOrder> list) {
+        final DefaultComboBoxModel<HasName> dcbm = new DefaultComboBoxModel<>();
+        dcbm.addElement(null);
+
+        list.stream().map(medOrder -> medOrder.getGp() != null ? medOrder.getGp() : medOrder.getHospital())
+                .distinct()
+                .sorted(Comparator.comparing((HasName hasName) -> hasName.getName()))
+                .forEach(serializable -> dcbm.addElement(serializable));
+        cmb_where_to_order_filter.setModel(dcbm);
     }
 
     private void initPanel() {
@@ -186,32 +200,49 @@ public class PnlMed extends CleanablePanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
-//        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
-//        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
-//        searchPane.setCollapsible(false);
-//
-//        try {
-//            searchPane.setCollapsed(false);
-//        } catch (PropertyVetoException e) {
-//            log.error(e);
-//        }
 
+        final JPanel orderPanel = new JPanel(new VerticalLayout());
+        final JPanel structPanel = new JPanel(new VerticalLayout());
+        final JPanel stockPanel = new JPanel(new VerticalLayout());
+        final CollapsiblePane stocks = new CollapsiblePane("Bestände");
+        final CollapsiblePane structure = new CollapsiblePane("Liste der Medikamente");
+        final CollapsiblePane orders = new CollapsiblePane("Bestellungen");
 
-        JPanel orderPanel = new JPanel(new VerticalLayout());
-        CollapsiblePane orders = new CollapsiblePane("orders");
         addOrders().forEach(component -> orderPanel.add(component));
         orders.setContentPane(orderPanel);
         orders.setCollapsed(false);
+        orders.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @SneakyThrows
+            @Override
+            public void paneExpanding(CollapsiblePaneEvent event) {
+                super.paneExpanding(event);
+                structure.setCollapsed(true);
+            }
 
-        JPanel stockPanel = new JPanel(new VerticalLayout());
-        CollapsiblePane stocks = new CollapsiblePane("stocks");
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent event) {
+                super.paneExpanded(event);
+                orderButtonPressed();
+            }
+        });
+
+
         addStocks().forEach(component -> stockPanel.add(component));
         stocks.setContentPane(stockPanel);
+        stocks.setCollapsed(true);
 
-        JPanel structPanel = new JPanel(new VerticalLayout());
-        CollapsiblePane structure = new CollapsiblePane("structure");
+
         addStructure().forEach(component -> structPanel.add(component));
         structure.setContentPane(structPanel);
+        structure.setCollapsed(true);
+        structure.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @SneakyThrows
+            @Override
+            public void paneExpanding(CollapsiblePaneEvent event) {
+                super.paneExpanding(event);
+                orders.setCollapsed(true);
+            }
+        });
 
 
         searchPanes.add(orders);
@@ -310,11 +341,11 @@ public class PnlMed extends CleanablePanel {
 
     private java.util.List<Component> addOrders() {
         java.util.List<Component> list = new ArrayList<>();
-        final JideButton orderButton = GUITools.createHyperlinkButton("nursingrecords.inventory.orders", SYSConst.icon22shopping, null);
-        orderButton.addActionListener(actionEvent -> {
-            orderButtonPressed();
-        });
-        list.add(orderButton);
+//        final JideButton orderButton = GUITools.createHyperlinkButton("nursingrecords.inventory.orders", SYSConst.icon22shopping, null);
+//        orderButton.addActionListener(actionEvent -> {
+//            orderButtonPressed();
+//        });
+//        list.add(orderButton);
 
         days_range = new JTextField(5);
         days_range.setText(OPDE.getProps().getProperty("opde.medorder:auto_order_day_range", "7"));
@@ -341,7 +372,7 @@ public class PnlMed extends CleanablePanel {
         list.add(tbShowClosed);
 
 
-        JButton generate_orders = GUITools.createHyperlinkButton("Bedarf prüfen", SYSConst.icon22calc, null);
+        JButton generate_orders = GUITools.createHyperlinkButton("Bedarf ermitteln", SYSConst.icon22calc, null);
         generate_orders.addActionListener(e -> {
             orderButtonPressed(); // just in case
 
@@ -428,7 +459,13 @@ public class PnlMed extends CleanablePanel {
             optPnlMedStructure.ifPresent(pnlMedStructure -> pnlMedStructure.cleanup());
             optPnlMedStructure = Optional.empty();
             removeAll();
-            optPnlMedOrders = Optional.of(new PnlMedOrders());
+            PnlMedOrders pnlMedOrders = new PnlMedOrders();
+            pnlMedOrders.addPropertyChangeListener(evt -> {
+                if (evt.getPropertyName().equals("table_where_to_order_changed"))
+                    fill_where_to_order_filter(pnlMedOrders.get_list());
+            });
+            optPnlMedOrders = Optional.of(pnlMedOrders);
+
             add(optPnlMedOrders.get());
             reload();
             revalidate();

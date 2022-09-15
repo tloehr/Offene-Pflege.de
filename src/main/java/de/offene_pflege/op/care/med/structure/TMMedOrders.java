@@ -126,9 +126,10 @@ public class TMMedOrders extends AbstractTableModel {
         } else if (column == COL_note) {
             medOrder.setNote(aValue.toString().trim());
             medOrder.setCreated_by(OPDE.getLogin().getUser());
+
         }
         medOrderList.set(row, EntityTools.merge(medOrder));
-        fireTableRowsUpdated(row, row);
+        fireTableCellUpdated(row, column);
     }
 
     @Override
@@ -168,8 +169,7 @@ public class TMMedOrders extends AbstractTableModel {
                 break;
             }
             case COL_WHERE_TO_ORDER: {
-                result = medOrder.getGp() != null ? GPTools.get_for_order_list(medOrder.getGp()):
-                        HospitalTools.get_for_order_list(medOrder.getHospital());
+                result = MedOrderTools.get_where_to_order(medOrder);
                 break;
             }
             case COL_note: {
