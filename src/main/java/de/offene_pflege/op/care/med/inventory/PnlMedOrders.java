@@ -94,7 +94,7 @@ public class PnlMedOrders extends JPanel {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     return super.getListCellRendererComponent(list, (value instanceof GP ?
-                                    ((GP) value).getName() + ", " + ((GP) value).getFirstname() :
+                                    SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getFirstname(), SYSTools.INDEX_FIRSTNAME_MALE) :
                                     ((Hospital) value).getName() + ", " + ((Hospital) value).getCity()
                             ),
                             index, isSelected, cellHasFocus);

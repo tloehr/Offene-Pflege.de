@@ -33,6 +33,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.*;
 import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.entity.info.Resident;
+import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
@@ -222,6 +223,13 @@ public class DlgNewStocks extends JDialog {
         cmbBW = new OverlayComboBox();
         cmbBW.addItemListener(itemEvent -> cmbBWItemStateChanged(itemEvent));
         cmbBW.setFont(SYSConst.ARIAL14);
+        cmbBW.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+
+                return super.getListCellRendererComponent(list, ResidentTools.getTextCompact(((Resident) value)), index, isSelected, cellHasFocus);
+            }
+        });
         ovrBW = new DefaultOverlayable(cmbBW);
         mainPane.add(ovrBW, CC.xywh(7, 17, 2, 1));
 
@@ -319,14 +327,14 @@ public class DlgNewStocks extends JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Medikamente einbuchen");
         setMinimumSize(new Dimension(640, 300));
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default:grow, $lcgap, 14dlu",
-                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 39dlu:grow, $lcgap, default:grow, $lcgap, 14dlu",
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- lblPZN ----
             lblPZN.setText("PZN oder Suchbegriff");
@@ -361,7 +369,7 @@ public class DlgNewStocks extends JDialog {
             mainPane.add(lblProd, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[]{
+            cmbMProdukt.setModel(new DefaultComboBoxModel<>(new String[] {
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -394,7 +402,7 @@ public class DlgNewStocks extends JDialog {
             mainPane.add(lblPack, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[]{
+            cmbPackung.setModel(new DefaultComboBoxModel<>(new String[] {
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -413,7 +421,6 @@ public class DlgNewStocks extends JDialog {
                 public void focusGained(FocusEvent e) {
                     txtExpiresFocusGained(e);
                 }
-
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtExpiresFocusLost(e);
@@ -425,8 +432,8 @@ public class DlgNewStocks extends JDialog {
             //======== panel3 ========
             {
                 panel3.setLayout(new FormLayout(
-                        "pref, $lcgap, default:grow",
-                        "fill:17dlu"));
+                    "pref, $lcgap, default:grow",
+                    "fill:17dlu"));
 
                 //---- lblWeightControl ----
                 lblWeightControl.setText("weightcontrol");

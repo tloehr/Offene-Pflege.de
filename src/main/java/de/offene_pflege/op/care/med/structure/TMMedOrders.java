@@ -129,6 +129,7 @@ public class TMMedOrders extends AbstractTableModel {
 
         }
         medOrderList.set(row, EntityTools.merge(medOrder));
+        if (column == COL_complete) fireTableCellUpdated(row, COL_TradeForm);
         fireTableCellUpdated(row, column);
     }
 

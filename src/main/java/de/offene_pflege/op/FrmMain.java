@@ -69,6 +69,7 @@ import de.offene_pflege.op.welcome.PnlWelcome;
 import de.offene_pflege.services.StationService;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -170,7 +171,7 @@ public class FrmMain extends JFrame {
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
-        label.setText(OPDE.getUrl() + " " + OPDE.getAppInfo().getBuildInformation());
+        label.setText(StringUtils.abbreviate(OPDE.getUrl(), 15) + " " + OPDE.getAppInfo().getBuildInformation());
         if (OPDE.isCustomJDBCUrl()) {
             label.setForeground(Color.RED);
         }
@@ -183,7 +184,6 @@ public class FrmMain extends JFrame {
         statusBar.add(labelUSER, JideBoxLayout.FLEXIBLE);
         final TimeStatusBarItem time = new TimeStatusBarItem();
         time.setFont(new Font("Arial", Font.PLAIN, 14));
-        time.setUpdateInterval(10000);
         time.setTextFormat(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT));
         time.setAlignment(JLabel.CENTER);
         statusBar.add(time, JideBoxLayout.FLEXIBLE);

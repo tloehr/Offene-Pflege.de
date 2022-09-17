@@ -128,6 +128,7 @@ public class ResidentTools {
 //    }
 
     public static String getTextCompact(Resident resident) {
+        if (resident == null) return "";
         return ResidentTools.getName(resident) + ", " + ResidentTools.getFirstname(resident) + " [" + SYSTools.anonymizeRID(resident.getId()) + "]";
     }
 

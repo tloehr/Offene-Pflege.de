@@ -175,9 +175,6 @@ public class PnlMed extends CleanablePanel {
     }
 
     private void txtSucheActionPerformed(ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
-//        treeMed.setCellRenderer(new DefaultTreeCellRenderer());
-        //treeMed.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
-//        treeMed.setVisible(false);
         if (txtSuche.getText().isEmpty()) {
             lstPraep.setModel(new DefaultListModel());
         } else {
@@ -276,7 +273,6 @@ public class PnlMed extends CleanablePanel {
                 currentPopup.removeExcludedComponent(addButton);
                 currentPopup.setTransient(false);
                 currentPopup.setDefaultFocusComponent(wizard.getContentPane());
-                //                currentPopup.addPropertyChangeListener("visible", propertyChangeEvent -> currentPopup.getContentPane().getComponentCount());
 
                 GUITools.showPopup(currentPopup, SwingConstants.NORTH_EAST);
             });
@@ -341,11 +337,6 @@ public class PnlMed extends CleanablePanel {
 
     private java.util.List<Component> addOrders() {
         java.util.List<Component> list = new ArrayList<>();
-//        final JideButton orderButton = GUITools.createHyperlinkButton("nursingrecords.inventory.orders", SYSConst.icon22shopping, null);
-//        orderButton.addActionListener(actionEvent -> {
-//            orderButtonPressed();
-//        });
-//        list.add(orderButton);
 
         days_range = new JTextField(5);
         days_range.setText(OPDE.getProps().getProperty("opde.medorder:auto_order_day_range", "7"));
@@ -439,7 +430,7 @@ public class PnlMed extends CleanablePanel {
         cmb_where_to_order_filter.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return super.getListCellRendererComponent(list, value == null ? "für Alle" : ((HasName) value).getName(), index, isSelected, cellHasFocus);
+                return super.getListCellRendererComponent(list, value == null ? "für Alle" : SYSTools.anonymizeName(((HasName) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
             }
         });
         final JideButton printButton = GUITools.createHyperlinkButton(null, SYSConst.icon22print2, null);
@@ -460,10 +451,8 @@ public class PnlMed extends CleanablePanel {
             optPnlMedStructure = Optional.empty();
             removeAll();
             PnlMedOrders pnlMedOrders = new PnlMedOrders();
-            pnlMedOrders.addPropertyChangeListener(evt -> {
-                if (evt.getPropertyName().equals("table_where_to_order_changed"))
-                    fill_where_to_order_filter(pnlMedOrders.get_list());
-            });
+
+            pnlMedOrders.addPropertyChangeListener("table_where_to_order_changed", evt -> fill_where_to_order_filter(pnlMedOrders.get_list()));
             optPnlMedOrders = Optional.of(pnlMedOrders);
 
             add(optPnlMedOrders.get());

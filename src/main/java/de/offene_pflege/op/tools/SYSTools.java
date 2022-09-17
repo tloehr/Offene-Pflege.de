@@ -359,6 +359,7 @@ public class SYSTools {
     }
 
     public static String anonymizeName(String in, int arrayindex) {
+        if (in == null || in.isEmpty()) return "";
         String name = in;
         if (OPDE.isAnonym()) {
             String ersterBuchstabe = in.toLowerCase().substring(0, 1);

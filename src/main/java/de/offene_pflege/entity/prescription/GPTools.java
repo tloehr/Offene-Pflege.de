@@ -41,10 +41,7 @@ public class GPTools {
     }
 
     public static String get_for_order_list(GP doc) {
-        if (OPDE.isAnonym()) {
-            return "[" + SYSTools.xx("misc.msg.anon") + "]";
-        }
-        return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + "<br/>" + doc.getFax();
+        return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + SYSTools.anonymizeName(doc.getName(), SYSTools.INDEX_LASTNAME) + "<br/>" + SYSTools.anonymizeString(doc.getFax());
     }
 
     public static String getCompleteAddress(GP doc) {
