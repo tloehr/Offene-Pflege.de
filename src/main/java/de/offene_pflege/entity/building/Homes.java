@@ -39,9 +39,9 @@ public class Homes extends DefaultStringIDEntity implements Serializable {
     private int maxcap;
     @EditorComponent(label = "misc.msg.careproviderid", parserClass = "de.offene_pflege.gui.parser.IntegerParser", component = {"textfield"}, tooltip="misc.tooltip.careproviderid")
     private int careproviderid;
-    @EditorComponent(label = "misc.msg.colorset", component = {"colorset"}, triggersReload = "true")
+//    @EditorComponent(label = "misc.msg.colorset", component = {"colorset"}, triggersReload = "true")
     private String color;
-    @EditorComponent(label = "misc.msg.active", component = {"onoffswitch", "misc.msg.active", "misc.msg.inactive"})
+//    @EditorComponent(label = "misc.msg.active", component = {"onoffswitch", "misc.msg.active", "misc.msg.inactive"})
     private Boolean active;
     @NotRemovableUnlessEmpty(message = "msg.cantberemoved.stations.assigned")
     private List<Station> station;

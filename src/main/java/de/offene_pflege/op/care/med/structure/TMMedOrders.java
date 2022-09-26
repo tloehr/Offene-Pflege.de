@@ -60,14 +60,16 @@ public class TMMedOrders extends AbstractTableModel {
     public static final int COL_note = 4;
     public static final int COL_complete = 5;
     private final List<MedOrder> medOrderList;
-    private final String[] header = new String[]{"Medikament", "Bewohner:in", "Datum", "Arzt/KH", "Text", "ok"};
+    private final boolean is_allowed_to_update;
+    private final String[] header = new String[]{"Medikament/Text", "Bewohner:in", "Datum", "Arzt/KH", "Text", "ok"};
 
     public String[] getHeader() {
         return header;
     }
 
-    public TMMedOrders(List<MedOrder> medOrderList) {
+    public TMMedOrders(List<MedOrder> medOrderList, boolean is_allowed_to_update) {
         this.medOrderList = medOrderList;
+        this.is_allowed_to_update = is_allowed_to_update;
     }
 
     @Override
@@ -124,9 +126,8 @@ public class TMMedOrders extends AbstractTableModel {
             }
             medOrder.setCreated_by(OPDE.getLogin().getUser());
         } else if (column == COL_note) {
-            medOrder.setNote(aValue.toString().trim());
+            medOrder.setNote(StringUtils.abbreviate(aValue.toString().trim(), 200));
             medOrder.setCreated_by(OPDE.getLogin().getUser());
-
         }
         medOrderList.set(row, EntityTools.merge(medOrder));
         if (column == COL_complete) fireTableCellUpdated(row, COL_TradeForm);
@@ -135,6 +136,7 @@ public class TMMedOrders extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int column) {
+        if (!is_allowed_to_update) return false;
         if (column == COL_complete) return true;
         if (medOrderList.get(row).getClosed_by() != null) return false;
         return column == COL_note || column == COL_WHERE_TO_ORDER;
@@ -161,7 +163,7 @@ public class TMMedOrders extends AbstractTableModel {
         MedOrder medOrder = medOrderList.get(row);
         switch (col) {
             case COL_TradeForm: {
-                result = TradeFormTools.toPrettyHTML(medOrder.getTradeForm());
+                result = medOrder.getTradeForm() != null ? TradeFormTools.toPrettyHTML(medOrder.getTradeForm()) : "--";
                 if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }

@@ -231,6 +231,7 @@ public class SYSPropsTools {
     }
 
 
+
     /**
      * Lädt Properties aus der Tabelle OCProps ein. Passend zu einer IP bzw. IP='*', wenn die Properties für alle
      * gedacht sind.

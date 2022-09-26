@@ -171,7 +171,7 @@ public class FrmMain extends JFrame {
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
-        label.setText(StringUtils.abbreviate(OPDE.getUrl(), 15) + " " + OPDE.getAppInfo().getBuildInformation());
+        label.setText(StringUtils.abbreviate(OPDE.getUrl(),  "....", 35) + " " + OPDE.getAppInfo().getBuildInformation());
         if (OPDE.isCustomJDBCUrl()) {
             label.setForeground(Color.RED);
         }

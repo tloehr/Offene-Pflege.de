@@ -9,6 +9,7 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.MedOrderHTMLRenderer;
 import de.offene_pflege.op.care.med.structure.TMMedOrders;
+import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.HTMLTools;
@@ -74,13 +75,11 @@ public class PnlMedOrders extends JPanel {
     }
 
     public void reload(List<MedOrder> list) {
-        tbl.setModel(new TMMedOrders(list));
+        tbl.setModel(new TMMedOrders(list, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)));
         tbl.getModel().addTableModelListener(e -> {
             if (e.getColumn() == TMMedOrders.COL_WHERE_TO_ORDER)
                 firePropertyChange("table_where_to_order_changed", -1, e.getFirstRow());
         });
-
-        //OPDE.getDisplayManager().setMainMessage("Medikamenten Bestellungen");
 
         SwingUtilities.invokeLater(() -> {
             java.util.List<HasName> liste = new ArrayList();
@@ -89,7 +88,7 @@ public class PnlMedOrders extends JPanel {
             Collections.sort(liste, (o1, o2) -> {
                 return o1.getName().compareTo(o2.getName());
             });
-            JComboBox cmb = new JComboBox<>(SYSTools.list2cmb(liste));
+            JComboBox<HasName> cmb = new JComboBox<>(SYSTools.list2cmb(liste));
             cmb.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -129,34 +128,34 @@ public class PnlMedOrders extends JPanel {
     }
 
     private void tableMousePressed(MouseEvent evt) {
-        if (!SwingUtilities.isRightMouseButton(evt)) return;
-
-        Point p = evt.getPoint();
-        JTable tbl = (JTable) evt.getSource();
-        ListSelectionModel lsm = tbl.getSelectionModel();
-        Point p2 = evt.getPoint();
-        SwingUtilities.convertPointToScreen(p2, tbl);
-
-        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-
-        final int row = tbl.rowAtPoint(p);
-        final int col = tbl.columnAtPoint(p);
-
-        if (singleRowSelected) {
-            lsm.setSelectionInterval(row, row);
-        }
-
-        SYSTools.unregisterListeners(menu);
-        menu = new JPopupMenu();
-
-        JMenuItem itemPopupShow = new JMenuItem(SYSTools.xx("misc.commands.show"), SYSConst.icon22magnify1);
-        itemPopupShow.addActionListener(e -> {
-            MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.getSelectionModel().getLeadSelectionIndex());
-            GUITools.showPopup(GUITools.getHTMLPopup(tbl, MedOrderTools.toPrettyHTML(medOrder)), SwingConstants.NORTH);
-        });
-        menu.add(itemPopupShow);
-
-        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+//        if (!SwingUtilities.isRightMouseButton(evt)) return;
+//
+//        Point p = evt.getPoint();
+//        JTable tbl = (JTable) evt.getSource();
+//        ListSelectionModel lsm = tbl.getSelectionModel();
+//        Point p2 = evt.getPoint();
+//        SwingUtilities.convertPointToScreen(p2, tbl);
+//
+//        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
+//
+//        final int row = tbl.rowAtPoint(p);
+//        final int col = tbl.columnAtPoint(p);
+//
+//        if (singleRowSelected) {
+//            lsm.setSelectionInterval(row, row);
+//        }
+//
+//        SYSTools.unregisterListeners(menu);
+//        menu = new JPopupMenu();
+//
+//        JMenuItem itemPopupShow = new JMenuItem(SYSTools.xx("misc.commands.show"), SYSConst.icon22magnify1);
+//        itemPopupShow.addActionListener(e -> {
+//            MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.getSelectionModel().getLeadSelectionIndex());
+//            GUITools.showPopup(GUITools.getHTMLPopup(tbl, MedOrderTools.toPrettyHTML(medOrder)), SwingConstants.NORTH);
+//        });
+//        menu.add(itemPopupShow);
+//
+//        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }
 
     public List<MedOrder> getSelected() {
@@ -176,19 +175,29 @@ public class PnlMedOrders extends JPanel {
     public void print(Optional<HasName> filter) {
         TMMedOrders model = (TMMedOrders) tbl.getModel();
         String table_content = SYSConst.html_h1("Medikamenten Bestellungen");
+        //todo: fixme - not releasable
         table_content += SYSConst.html_paragraph(HomesService.getAsTextForTX(HomesService.getByPK("wiedenhof")));
 
         int cols = model.getColumnCount();
+
         ArrayList<String> row_content = new ArrayList<>();
-
+        //ArrayList<MedOrder> list_of_free_text = new ArrayList<>();
         for (int row = 0; row < model.getRowCount(); row++) {
-
-            if (filter.isEmpty() || filter_text(model.get(tbl.convertRowIndexToModel(row))).equalsIgnoreCase(filter.get().getName())) {
-                row_content.clear();
-                for (int col = 0; col < cols - 2; col++) {
+            row_content.clear();
+            if (model.get(row).getTradeForm() != null) {
+                if (filter.isEmpty() || filter_text(model.get(tbl.convertRowIndexToModel(row))).equalsIgnoreCase(filter.get().getName())) {
+                    for (int col = 0; col < cols - 2; col++) {
+                        row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
+                    }
+                    table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
+                }
+            } else {
+                MedOrder free_text = model.get(tbl.convertRowIndexToModel(row));
+                row_content.add(SYSTools.catchNull(free_text.getNote(), "--"));
+                for (int col = 1; col < cols - 2; col++) {
                     row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
                 }
-                table_content += HTMLTools.getTableRow("td", "", row_content);
+                table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
             }
         }
 

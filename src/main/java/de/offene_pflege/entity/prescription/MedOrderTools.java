@@ -88,21 +88,6 @@ public class MedOrderTools {
         return Optional.empty();
     }
 
-//    public static List<MedOrder> get_open_orders(EntityManager em, Resident resident) {
-//        ArrayList<MedOrder> list = new ArrayList<>();
-//        try {
-//            String jpql = " SELECT p " +
-//                    " FROM MedOrder p" +
-//                    " WHERE p.resident  = :resident AND p.closed_by = NULL";
-//            Query query = em.createQuery(jpql);
-//            query.setParameter("resident", resident);
-//            list.addAll(query.getResultList());
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        }
-//        return list;
-//    }
-
     public static List<MedOrder> get_open_orders(EntityManager em) {
         ArrayList<MedOrder> list = new ArrayList<>();
         try {

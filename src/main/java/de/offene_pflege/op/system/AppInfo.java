@@ -195,7 +195,7 @@ public class AppInfo {
 //    }
 
     public String getVersion() {
-        return context.getProperty("opde.major") + "." + context.getProperty("opde.minor") + "." + context.getProperty("opde.release") + "." + context.getProperty("buildNumber");
+        return "v" + context.getProperty("opde.major") + "." + context.getProperty("opde.minor") + "." + context.getProperty("opde.release") + " b" + context.getProperty("buildNumber");
     }
 
 

@@ -11,7 +11,7 @@ create table medorder
     id              bigint unsigned auto_increment primary key,
     version         bigint unsigned default 0 not null,
     resid           CHAR(10)                  not null,
-    dafid           bigint unsigned           not null,
+    dafid           bigint unsigned,
     arztid          bigint unsigned,
     khid            bigint unsigned,
     note            varchar(200),

@@ -63,6 +63,7 @@ public class TradeFormTools {
     }
 
     public static String toPrettyHTML(TradeForm tradeForm) {
+        if (tradeForm == null) return "";
         String preparation = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
         String usageText = SYSTools.catchNull(tradeForm.getDosageForm().getUsageText());
         String subtext = SYSTools.catchNull(tradeForm.getSubtext());

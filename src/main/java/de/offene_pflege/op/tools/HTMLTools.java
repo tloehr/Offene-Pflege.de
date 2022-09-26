@@ -69,6 +69,7 @@ public class HTMLTools {
         return "<tr>" + result + "</tr>";
     }
 
+    
     /**
      * Fügt html Tags vor und hinter den Eingangsstring ein.
      *

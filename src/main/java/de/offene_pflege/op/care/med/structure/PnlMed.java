@@ -42,6 +42,7 @@ import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.care.med.inventory.DlgNewOrder;
 import de.offene_pflege.op.care.med.inventory.DlgNewStocks;
 import de.offene_pflege.op.care.med.inventory.PnlMedOrders;
 import de.offene_pflege.op.care.med.prodassistant.MedProductWizard;
@@ -125,7 +126,7 @@ public class PnlMed extends CleanablePanel {
 
             ComparatorChain chain = new ComparatorChain();
             chain.addComparator(Comparator.comparing((MedOrder mo) -> mo.getResident().getName()));
-            chain.addComparator(Comparator.comparing((MedOrder mo) -> mo.getTradeForm().getMedProduct().getText()));
+            chain.addComparator(Comparator.comparing((MedOrder mo) -> mo.getTradeForm() != null ? mo.getTradeForm().getMedProduct().getText() : ""));
 
             Collections.sort(list, chain);
 
@@ -412,6 +413,20 @@ public class PnlMed extends CleanablePanel {
             });
         });
         list.add(generate_orders);
+        generate_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
+
+
+        JPanel pnl_add_del = new JPanel(new HorizontalLayout(5));
+
+        JButton add_order = GUITools.createHyperlinkButton("freier Text", SYSConst.icon22add, null);
+        add_order.addActionListener(evt1 -> {
+            optPnlMedOrders.ifPresent(pnlMedOrders -> {
+                new DlgNewOrder(OPDE.getMainframe()).setVisible(true);
+                reload();
+            });
+        });
+        pnl_add_del.add(add_order);
+        add_order.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
 
         JButton delete_orders = GUITools.createHyperlinkButton("misc.commands.delete", SYSConst.icon22delete, null);
         delete_orders.addActionListener(evt1 -> {
@@ -422,7 +437,10 @@ public class PnlMed extends CleanablePanel {
                 reload();
             });
         });
-        list.add(delete_orders);
+        pnl_add_del.add(delete_orders);
+        delete_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
+        list.add(pnl_add_del);
+
 
         JPanel pnl2 = new JPanel(new HorizontalLayout(5));
         cmb_where_to_order_filter = new JComboBox<>();

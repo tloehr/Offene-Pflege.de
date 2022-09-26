@@ -127,7 +127,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     private void loadAllData() {
         cpsHomes.removeAll();
-        cpsHomes.add(createAddHomeButton());
+        //cpsHomes.add(createAddHomeButton());
 
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 0, -1));
@@ -185,7 +185,7 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
             dcp.setContentPane(createContent(myHome, (DefaultCollapsiblePane<Homes>) cre.getSource()));
         };
 
-        DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, getMenu(home));
+        DefaultCollapsiblePane<Homes> cp = new DefaultCollapsiblePane(headerUpdate, contentUpdate, null);
         cp.setName(getKey(home));
         cpMap.put(cp.getName(), cp);
         return cp;
@@ -425,37 +425,37 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
     }
 
 
-    private JideButton createAddHomeButton() {
-        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.home.btnAddHome", SYSConst.icon22add, null);
-        btnAddHome.addActionListener(e -> {
-
-            Homes newHome = null;
-            EntityManager em = OPDE.createEM();
-            try {
-                em.getTransaction().begin();
-                newHome = em.merge(HomesService.createHome());
-
-                em.getTransaction().commit();
-            } catch (IllegalStateException ise) {
-                log.error(ise);
-            } catch (Exception ex) {
-                em.getTransaction().rollback();
-                OPDE.fatal( ex);
-            } finally {
-                em.close();
-            }
-
-            try {
-                cpsHomes.removeExpansion();
-                cpsHomes.add(createCP(newHome));
-                cpsHomes.addExpansion();
-            } catch (Exception e1) {
-                OPDE.fatal( e1);
-            }
-        });
-
-        return btnAddHome;
-    }
+//    private JideButton createAddHomeButton() {
+//        final JideButton btnAddHome = GUITools.createHyperlinkButton("opde.settings.home.btnAddHome", SYSConst.icon22add, null);
+//        btnAddHome.addActionListener(e -> {
+//
+//            Homes newHome = null;
+//            EntityManager em = OPDE.createEM();
+//            try {
+//                em.getTransaction().begin();
+//                newHome = em.merge(HomesService.createHome());
+//
+//                em.getTransaction().commit();
+//            } catch (IllegalStateException ise) {
+//                log.error(ise);
+//            } catch (Exception ex) {
+//                em.getTransaction().rollback();
+//                OPDE.fatal( ex);
+//            } finally {
+//                em.close();
+//            }
+//
+//            try {
+//                cpsHomes.removeExpansion();
+//                cpsHomes.add(createCP(newHome));
+//                cpsHomes.addExpansion();
+//            } catch (Exception e1) {
+//                OPDE.fatal( e1);
+//            }
+//        });
+//
+//        return btnAddHome;
+//    }
 
 
     private JideButton createAddFloorButton(final Homes home) {
@@ -555,34 +555,34 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
     }
 
-    private JPanel getMenu(final Homes home) {
-        final JPanel pnlMenu = new JPanel(new VerticalLayout());
-
-        final JButton btnDelete = GUITools.createHyperlinkButton("opde.settings.home.btnDelHome", SYSConst.icon22delete, null);
-        pnlMenu.add(btnDelete);
-
-        btnDelete.addActionListener(e -> {
-            Container c = pnlMenu.getParent();
-            ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
-//            if (!OPDE.isAdmin()) return;
-            String message = EntityTools.mayBeDeleted(EntityTools.find(Homes.class, home.getId()));
-            if (message != null) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
-                return;
-            }
-            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + home.getName() + " (" + home.getId() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelHome", SYSConst.icon48delete, o -> {
-
-                if (o.equals(JOptionPane.YES_OPTION)) {
-                    EntityTools.delete(EntityTools.find(Homes.class, home.getId()));
-                    cpsHomes.remove(cpMap.get(getKey(home)));
-                    cpMap.remove(getKey(home));
-                }
-                mainView();
-            }));
-        });
-
-        return pnlMenu;
-    }
+//    private JPanel getMenu(final Homes home) {
+//        final JPanel pnlMenu = new JPanel(new VerticalLayout());
+//
+//        final JButton btnDelete = GUITools.createHyperlinkButton("opde.settings.home.btnDelHome", SYSConst.icon22delete, null);
+//        pnlMenu.add(btnDelete);
+//
+//        btnDelete.addActionListener(e -> {
+//            Container c = pnlMenu.getParent();
+//            ((JidePopup) c.getParent().getParent().getParent()).hidePopup();
+////            if (!OPDE.isAdmin()) return;
+//            String message = EntityTools.mayBeDeleted(EntityTools.find(Homes.class, home.getId()));
+//            if (message != null) {
+//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, DisplayMessage.WARNING));
+//                return;
+//            }
+//            ask(new PnlYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><br/>&raquo;" + home.getName() + " (" + home.getId() + ")" + "&laquo;<br/>" + "<br/>" + SYSTools.xx("misc.questions.delete2"), "opde.settings.home.btnDelHome", SYSConst.icon48delete, o -> {
+//
+//                if (o.equals(JOptionPane.YES_OPTION)) {
+//                    EntityTools.delete(EntityTools.find(Homes.class, home.getId()));
+//                    cpsHomes.remove(cpMap.get(getKey(home)));
+//                    cpMap.remove(getKey(home));
+//                }
+//                mainView();
+//            }));
+//        });
+//
+//        return pnlMenu;
+//    }
 
     private JPanel getMenu(final Floors floor) {
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
