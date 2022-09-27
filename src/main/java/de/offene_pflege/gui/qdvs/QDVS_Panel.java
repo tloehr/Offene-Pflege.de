@@ -95,16 +95,15 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
     private JEditorPane txtLog;
     private HashMap<String, DAS_REGELN> REGELN;
 
-    private JCheckBox cbx21 = new JCheckBox("Spezifikation 02.1");
+//    private JCheckBox cbx21 = new JCheckBox("Spezifikation 02.1");
 
     MultiKeyMap<MultiKey<Integer>, ArrayList<String>> ERRORS;
     MultiKeyMap<MultiKey<Integer>, Long> LOOKUP;
     boolean vorpruefungOK;
 
     /**
-     * Diese Klasse erzeugt das Panel für die QDVS Auswertung
-     * Bis zum 31.12.2022 verwendet wir die Spezifikation 1.4
-     * Ab dem 01.01.2023 die 2.0
+     * Diese Klasse erzeugt das Panel für die QDVS Auswertung Bis zum 31.12.2022 verwendet wir die Spezifikation 1.4 Ab
+     * dem 01.01.2023 die 2.0
      *
      * @param jspSearch
      */
@@ -166,7 +165,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         else
             STICHTAG = LocalDate.now();
 
-        cbx21.addItemListener(e -> log.debug(e.getItem()));
+//        cbx21.addItemListener(e -> log.debug(e.getItem()));
         select_specification();
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -454,13 +453,14 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         tblResidents.setModel(new DefaultTreeModel(createTree()));
     }
 
-    void select_specification(){
-        if (STICHTAG.isBefore(LocalDate.of(2023, 1, 1))){
-            qdvsService = new QdvsService14(this);
-        } else {
-            // todo: gibt struktur fehler bei der prüfung
-            qdvsService = new QdvsService21(this);
-        }
+    void select_specification() {
+        // todo: wieder rein vor release
+//        if (STICHTAG.isBefore(LocalDate.of(2023, 1, 1))) {
+//            qdvsService = new QdvsService14(this);
+//        } else {
+//            qdvsService = new QdvsService21(this);
+//        }
+        qdvsService = new QdvsService21(this);
     }
 
 
@@ -493,21 +493,14 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
 
         dcmbStichtag.setSelectedItem(JavaTimeConverter.toDate(STICHTAG));
 
-        JComboBox<Homes> cmbHome = new JComboBox<>();
-        HomesService.setComboBox(cmbHome);
-        home = (Homes) cmbHome.getSelectedItem();
-        cmbHome.addItemListener(e -> {
-            home = (Homes) e.getItem();
-            prepareListOFResidents();
-        });
-
+        home = HomesService.get();
 
         java.util.List<Component> list = new ArrayList();
-        list.add(cmbHome);
+
         list.add(new JLabel(SYSTools.xx("qdvs.stichtag")));
         list.add(dcmbStichtag);
         list.add(new JLabel(SYSTools.xx("qdvs.vorheriger.stichtag")));
-        list.add(cbx21);
+//        list.add(cbx21);
         list.add(lblVorherigerStichtag);
         list.add(new JLabel(SYSTools.xx("qdvs.workdir")));
         list.add(fcWorkdir);
@@ -519,8 +512,6 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("qdvs.workdir.invalid", DisplayMessage.WARNING));
             }
         }));
-
-
 
 
         // Kommentar

@@ -3,12 +3,15 @@
   * Datenbank Schema: **Version 16**
   * Release: **24.09.2022**
 
-  * <label icon="glyphicon glyphicon-cog" type="info">Work in progress</label> Anpassungen für die neue [[https://www.das-pflege.de/spezifikationen#spezifikationen|Spezifikation 2.0]] der DAS-Pflege, gültig ab dem Erhebungszyklus 5((Beginn: 01.01.2023))
+  * <label icon="glyphicon glyphicon-cog" type="info">Work in progress</label> Anpassungen für die neue [[https://www.das-pflege.de/spezifikationen#spezifikationen|Spezifikation v2.01]] der DAS-Pflege, gültig ab dem Erhebungszyklus 5((Beginn: 01.01.2023))
+    * Diese Spezifikation wird nur für Stichtage ab dem 01.01.2023 benutzt, andernfalls wird die v01.4 verwendet.
   * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Weitere Anpassungen wegen der Log4J Migration waren nötig. So müssen die Config Verzeichnisse nun einheitlich umbenannt werden. Sie heißen jetzt (je nach Plattform)
     * win ''%HOMEDRIVE%%HOMEPATH%\AppData\Roaming\opde1''
     * mac ''~/Library/Application Support/opde1''
     * linux ''~/.local/share/opde1''
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label>  Wenn bei einer Verordnung schon vorab das End-Datum feststeht, setzte die Datenbank dieses Datum immer auf den Folgetag. Das geschah, weil die Nano-Sekunden von der Datenbank aufgerundet wurden. Behoben.
+  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Wenn bei einer Verordnung schon vorab das End-Datum feststeht, setzte die Datenbank dieses Datum immer auf den Folgetag. Das geschah, weil die Nano-Sekunden von der Datenbank aufgerundet wurden. Behoben.
   * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Deprecated(([[https://en.wikipedia.org/wiki/Deprecation|veraltet]])) Funktionen aktualisiert.
   * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Status "genesen" mit in die Impf-Angabe bei den BW-Infos aufgenommen.
-  * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Bestellwesen für Medikamente. Zur Bestellung bei den Praxen und späteres Abhaken, wenn die Präparate von der Apotheke angekommen sind.
+  * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Bestellwesen für Medikamente. Zur Bestellung bei den Praxen und späteres Abhaken, wenn die Präparate von der Apotheke angekommen sind. Siehe auch folgendes Video auf YouTube.
+  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Die Anzahl der zu verwaltenden Pflegeeinrichtung ist auf 1 reduziert. Falls Sie bishere mehrere Einrichtungen mit **einer einzigen** Installation betreiben, dann nehmen Sie bitte vor einem Update Kontakt mit mir auf.
+  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Dateien können nun auch an Elemente angehangen werden, die bereits abgeschlossen sind.

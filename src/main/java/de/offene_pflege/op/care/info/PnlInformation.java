@@ -1964,7 +1964,7 @@ public class PnlInformation extends NursingRecordsPanel {
              *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
              *
              */
-            final JButton btnFiles = GUITools.createHyperlinkButton(resInfo.isClosed() ? "misc.btnfiles.tooltip.closed" : "misc.btnfiles.tooltip", SYSConst.icon22attach, null);
+            final JButton btnFiles = GUITools.createHyperlinkButton("misc.btnfiles.tooltip", SYSConst.icon22attach, null);
             btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnFiles.addActionListener(actionEvent -> {
                 // If the closure is null, only attached files can be viewed but no new ones can be attached.

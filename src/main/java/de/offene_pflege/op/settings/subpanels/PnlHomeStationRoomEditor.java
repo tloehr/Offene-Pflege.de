@@ -136,17 +136,8 @@ public class PnlHomeStationRoomEditor extends DefaultPanel {
 
             @Override
             protected Object doInBackground() throws Exception {
-                i = 0;
-
-                for (final Homes home : HomesService.getAll()) {
-                    try {
-                        cpsHomes.add(createCP(home));
-                    } catch (Exception e) {
-                        OPDE.fatal(e);
-                    }
-                }
+                cpsHomes.add(createCP(HomesService.get()));
                 cpsHomes.addExpansion();
-
                 return null;
             }
 

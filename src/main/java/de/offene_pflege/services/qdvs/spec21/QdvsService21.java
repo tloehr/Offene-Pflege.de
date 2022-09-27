@@ -86,7 +86,7 @@ public class QdvsService21 implements QdvsService {
     // Erhebungszeitraum zurückzuschieben.
     // private LocalDateTime ERHEBUNGSDATUM;
 
-    static final String SPECIFICATION = "V01"; // die Version der jeweilig eingereichten Datenstruktur, die zum Zeitpunkt der Verwendung gültig war.
+    static final String SPECIFICATION = "V02"; // die Version der jeweilig eingereichten Datenstruktur, die zum Zeitpunkt der Verwendung gültig war.
     public static DecimalFormat NF_IDBEWOHNER = new DecimalFormat("000000");
     private File target;
     int runningNumber = 0;

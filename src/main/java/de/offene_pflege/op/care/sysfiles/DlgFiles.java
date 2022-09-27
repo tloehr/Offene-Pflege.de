@@ -59,12 +59,12 @@ public class DlgFiles extends MyJDialog {
     }
 
     private void initDialog() {
-        if (!attachable.isActive()) {
-            contentPanel.add(getFileListPanel(), CC.xywh(1, 1, 3, 1));
-        } else {
+//        if (!attachable.isActive()) {
+//            contentPanel.add(getFileListPanel(), CC.xywh(1, 1, 3, 1));
+//        } else {
             contentPanel.add(getFileDropPanel(), CC.xy(1, 1));
             contentPanel.add(getFileListPanel(), CC.xy(3, 1));
-        }
+//        }
     }
 
     private JPanel getFileDropPanel() {

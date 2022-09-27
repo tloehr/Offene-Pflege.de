@@ -175,8 +175,8 @@ public class PnlMedOrders extends JPanel {
     public void print(Optional<HasName> filter) {
         TMMedOrders model = (TMMedOrders) tbl.getModel();
         String table_content = SYSConst.html_h1("Medikamenten Bestellungen");
-        //todo: fixme - not releasable
-        table_content += SYSConst.html_paragraph(HomesService.getAsTextForTX(HomesService.getByPK("wiedenhof")));
+
+        table_content += SYSConst.html_paragraph(HomesService.getAsTextForTX(HomesService.get()));
 
         int cols = model.getColumnCount();
 

@@ -57,25 +57,26 @@ public class HomesService {
         em.close();
         cmb.setSelectedItem(station.getHome());
     }
+//
+//    public static Homes getByPK(String eid) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT e FROM Homes e WHERE e.id = :id");
+//        query.setParameter("id", eid);
+//        Homes home = (Homes) query.getSingleResult();
+//        em.close();
+//        return home;
+//    }
+//
 
-    public static Homes getByPK(String eid) {
+    public static Homes get() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT e FROM Homes e WHERE e.id = :id");
-        query.setParameter("id", eid);
-        Homes home = (Homes) query.getSingleResult();
-        em.close();
-        return home;
-    }
+        Query query = em.createQuery("SELECT e FROM Homes e WHERE e.active = TRUE ORDER BY e.id");
+        query.setMaxResults(1);
+        Homes homes = (Homes) query.getSingleResult();
 
-
-    public static ArrayList<Homes> getAll() {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT e FROM Homes e  ORDER BY e.id");
-
-        ArrayList<Homes> list = new ArrayList<Homes>(query.getResultList());
         em.close();
 
-        return list;
+        return homes;
     }
 
     public static Homes createHome() {

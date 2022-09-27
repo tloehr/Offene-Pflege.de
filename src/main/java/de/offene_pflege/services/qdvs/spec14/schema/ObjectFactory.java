@@ -138,7 +138,6 @@ public class ObjectFactory {
         TextType textType = new TextType();
         textType.setValue(text);
         return textType;
-
     }
 
     /**

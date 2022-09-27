@@ -72,6 +72,8 @@ public class SoftwareType {
         this.provider = value;
     }
 
+
+
     /**
      * Ruft den Wert der name-Eigenschaft ab.
      *

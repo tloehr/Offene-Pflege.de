@@ -363,9 +363,6 @@ public class PnlControlling extends CleanablePanel {
         final JButton btnPrevalence = GUITools.createHyperlinkButton("opde.controlling.hygiene.prevalence", null, null);
         final JDateChooser jdc = new JDateChooser(new Date());
         final JCheckBox cbAnonymous = new JCheckBox(SYSTools.xx("misc.msg.anon"));
-        final JComboBox<Homes> cmbHomes = new JComboBox<>();
-        HomesService.setComboBox(cmbHomes);
-
 
         SYSPropsTools.restoreState("opde.controlling:prevalence::cbAnonymous", cbAnonymous);
         cbAnonymous.addItemListener(e -> SYSPropsTools.storeState("opde.controlling:prevalence::cbAnonymous", cbAnonymous));
@@ -379,7 +376,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        MREPrevalenceSheets mre = new MREPrevalenceSheets(new LocalDate(jdc.getDate()), (Homes) cmbHomes.getSelectedItem(), cbAnonymous.isSelected(), progressClosure);
+                        MREPrevalenceSheets mre = new MREPrevalenceSheets(new LocalDate(jdc.getDate()), HomesService.get(), cbAnonymous.isSelected(), progressClosure);
                         return mre.createSheet();
                     }
 
@@ -445,7 +442,6 @@ public class PnlControlling extends CleanablePanel {
         optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.LINE_AXIS));
 
         optionPanel.add(cbAnonymous);
-        optionPanel.add(cmbHomes);
         optionPanel.add(jdc);
 
         pnlPrevalence.add(optionPanel, BorderLayout.EAST);
