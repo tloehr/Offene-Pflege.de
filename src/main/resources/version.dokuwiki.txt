@@ -1,5 +1,5 @@
 {{tag>versions}}
-====== V1.15.4.xx ======
+====== V1.16.1.xx ======
   * Datenbank Schema: **Version 16**
   * Release: **24.09.2022**
 
@@ -15,3 +15,4 @@
   * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Bestellwesen für Medikamente. Zur Bestellung bei den Praxen und späteres Abhaken, wenn die Präparate von der Apotheke angekommen sind. Siehe auch folgendes Video auf YouTube.
   * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Die Anzahl der zu verwaltenden Pflegeeinrichtung ist auf 1 reduziert. Falls Sie bishere mehrere Einrichtungen mit **einer einzigen** Installation betreiben, dann nehmen Sie bitte vor einem Update Kontakt mit mir auf.
   * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Dateien können nun auch an Elemente angehangen werden, die bereits abgeschlossen sind.
+  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> In der Medikamenten Verwaltung können Produkte nun auch anhand der Bestandsnummer gesucht werden.

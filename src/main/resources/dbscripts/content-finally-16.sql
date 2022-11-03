@@ -12,7 +12,7 @@ INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('NM','13:15',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('AB','17:30',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('NA','21:00',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('apv_korridor','20',NULL);
-INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('dbstructure','15',NULL);
+INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('dbstructure','16',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('calc.medi.upr1','false',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('calc.medi.other','false',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('bhp_max_minutes_to_withdraw','30',NULL);

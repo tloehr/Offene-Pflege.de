@@ -3,6 +3,7 @@ package de.offene_pflege.entity.prescription;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.care.med.structure.PnlMed;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSTools;
@@ -149,7 +150,7 @@ public class MedOrderTools {
     }
 
 
-    public static List<MedOrder> generate_orders(final int cover_days, List<MedOrder> open_orders) {
+    public static List<MedOrder> generate_orders(final int cover_days, final int type, List<MedOrder> open_orders) {
         List<MedOrder> result = new ArrayList<>();
         final MultiKeyMap<Object, Quintet<BigDecimal, BigDecimal, BigDecimal, GP, Hospital>> map = new MultiKeyMap();
         List<Resident> residents = ResidentTools.getAllActive();
@@ -162,6 +163,8 @@ public class MedOrderTools {
                     PrescriptionTools.getAllActive(resident)
                             .stream().filter(prescription -> prescription.hasMed() && !prescription.getTradeForm().getDosageForm().isDontCALC())
                             .forEach(prescription -> {
+                                if (type == PnlMed.TYPE_REGULAR && prescription.isOnDemand()) return;
+                                if (type == PnlMed.TYPE_ON_DEMAND && !prescription.isOnDemand()) return;
                                 BigDecimal consumption_per_day = PrescriptionTools.get_consumption_per_day(prescription);
                                 BigDecimal sum_for_inventory = MedInventoryTools.getSum(TradeFormTools.getInventory4TradeForm(resident, prescription.getTradeForm()));
                                 BigDecimal range = sum_for_inventory.divide(consumption_per_day, RoundingMode.HALF_UP);
@@ -194,7 +197,7 @@ public class MedOrderTools {
             medOrder.setGp(multiKeyTupleEntry.getValue().getValue3());
             medOrder.setHospital(multiKeyTupleEntry.getValue().getValue4());
             medOrder.setClosing_med_stock(null);
-            medOrder.setNote(String.format("Bedarf %s pro Tag, %s sind noch da, hält noch %s Tage",
+            medOrder.setNote(String.format("Wir brauchen %s pro Tag, es sind noch %s da, reicht noch für %s Tage",
                             df.format(multiKeyTupleEntry.getValue().getValue0()),
                             df.format(multiKeyTupleEntry.getValue().getValue1()),
                             df.format(multiKeyTupleEntry.getValue().getValue2())

@@ -36,12 +36,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Bis 2019 wurden unter Begleitung des Qualitätsausschuss Pflege vom Institut für Pflegewissenschaft an der Universität
- * Bielefeld (IPW) und vom aQua-Institut unter Federführung von Dr. Wingenfeld indikatorengestützte Instrumente und
- * Verfahren für die Qualitätsprüfungen gem. § 113b SGB XI entwickelt. Sie lösen die bisherigen
- * Qualitäts-Prüfungsrichtlinien und die Pflege-Transparenzvereinbarungen gem. § 113 SGB XI ab. Der gesetzlich
- * vorgeschriebene  Erprobungsbetrieb startet am 01.Oktober 2019 und endet am 30. Juni 2020. Ab dem 01. Juli 2020
- * beginnt dann die stichtagsbezogene regelhafte Erhebung der Ergebnisindikatoren.
+ * Mit der Vesion 02.1 der Spezifikation wurden einige Änderungen vorgenommen.
+ * <ul>
+ *     <li>Wohnbereiche werden nur noch durchnummeriert, nicht mehr als Text</li>
+ *     <li>Pflegegrade nur noch ja/nein</lI>
+ *     <li>Geschlechtsangabe wurde entfernt</li>
+ *     <li>Die Anggaben zum zweiten KH Aufenthalt entfallen</li>
+ *     <li>Beatmung wird nicht mehr abgefragt.</li>
+ *     <li>Körpergröße entfällt</li>
+ *     <li>Diagnosen entfallen:  5 = Diabetes Mellitus, 6 = Demenz , 7 = Morbus Parkinson, 8 = Osteoporose, 9 = Multiple Sklerose</li>
+ *     <li>Gurthäufigkeit, Bettseitenteile entfallen. Neue Frage ob in den letzten 4 Wochen Gurte angewendet wurden.</li>
+ *     <li>Dekubitus Erhebung ist anders. Folgefragen nach anderen Kriterien.</li>
+ *     <li>Bei mehreren KH Aufenthalten kümmert uns nur noch der längste</li>
+ * </ul>
  */
 @Log4j2
 public class QdvsService21 implements QdvsService {
@@ -75,16 +82,7 @@ public class QdvsService21 implements QdvsService {
     private LocalDateTime STICHTAG; // ist das vorher festgelegte Zieldatum (2x im Jahr). Das bleibt auch bei den Nachkorrekturen gleich
     private LocalDateTime BEGINN_ERFASSUNGSZEITRAUM; // ist der letzt Stichtag.
 
-    // Ich hatte immer wieder die Versuchung ein Erhebungsdatum statt einem Stichtag zu verwenden
-    // Das wäre elegant, wenn mann eine Korrektur eingeben muss. Dann ändert man die Fehler ab,
-    // setzt das Erhebungsdatum nach hinten und lässt die Auswertung erneut laufen.
-    // Der Haken aber ist, wenn bei anderen Informationen oder anderen BW seit dem Stichtag eine
-    // reele Änderung eingetreten ist, dann würde diese Änderung ebenfalls mit berücksichtigt,
-    // die gehört aber nicht in die Erhebung, weil sie eine Entwicklung des Zustands und keine
-    // Korrektur bedeutet.
-    // Somit bleibt mit im Moment nichts anderes übrig, als die Korrekturen in den
-    // Erhebungszeitraum zurückzuschieben.
-    // private LocalDateTime ERHEBUNGSDATUM;
+
 
     static final String SPECIFICATION = "V02"; // die Version der jeweilig eingereichten Datenstruktur, die zum Zeitpunkt der Verwendung gültig war.
     public static DecimalFormat NF_IDBEWOHNER = new DecimalFormat("000000");
@@ -119,8 +117,8 @@ public class QdvsService21 implements QdvsService {
 
     // eine Liste aller gültigen Resinfos zum Thema Diagnosen
     ResInfoType typeDiagnosen = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIAGNOSIS);
-    ResInfoType typeDiabetes = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIABETES);
-    ResInfoType typeDemenz = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ORIENTATION);
+//    ResInfoType typeDiabetes = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIABETES);
+//    ResInfoType typeDemenz = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ORIENTATION);
     private Homes home;
 
 
@@ -563,7 +561,7 @@ public class QdvsService21 implements QdvsService {
         Optional<Rooms> room = RoomsService.getRoom(resident, STICHTAG);
         /** 2 */qsMdsData.setWOHNBEREICH(of.createDasQsDataMdsTypeWOHNBEREICH());
         qsMdsData.getWOHNBEREICH().setValue(EnumWohnbereichType.fromValue(resident.getStation()));
-        log.debug(room.get().toString());
+        log.trace(room.get().toString());
 
         // Datum der Erhebung
         /** 3 */qsMdsData.setERHEBUNGSDATUM(of.createDasQsDataMdsTypeERHEBUNGSDATUM());
@@ -938,7 +936,6 @@ public class QdvsService21 implements QdvsService {
             connectionIDs.add(resInfo.getConnectionid());
             auswertung_dekubitus.put(resInfo.getConnectionid(), Quintet.with(resInfo.getConnectionid(), 1, 0, SYSConst.LD_UNTIL_FURTHER_NOTICE, SYSConst.LD_VERY_BEGINNING)); // Basisfall, 1 ist bei uns. Wird aber sowieso überschrieben.
         });
-//        log.debug(String.format("%d Wunden gefunden", liste_wunden.size()));
 
         // Jetzt nehme ich mir jeden Wundverlauf einzeln vor und möchte wissen:
         // entstehungsort

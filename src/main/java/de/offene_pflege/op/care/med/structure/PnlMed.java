@@ -55,6 +55,7 @@ import de.offene_pflege.op.tools.SYSTools;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.comparators.ComparatorChain;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXSearchField;
@@ -82,10 +83,12 @@ import java.util.stream.Collectors;
 @Log4j2
 public class PnlMed extends CleanablePanel {
 
-    private JPopupMenu menu;
+    public static int TYPE_REGULAR = 0;
+    public static int TYPE_ON_DEMAND = 1;
+    //    private JPopupMenu menu;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
-    private JXSearchField txtSuche;
+    private JTextField txtSuche;
     private JList lstPraep;
     private JToggleButton tbIDs, tbShowClosed;
     private JTextField days_range;
@@ -179,11 +182,21 @@ public class PnlMed extends CleanablePanel {
         if (txtSuche.getText().isEmpty()) {
             lstPraep.setModel(new DefaultListModel());
         } else {
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.text LIKE :bezeichnung ORDER BY m.text");
-            query.setParameter("bezeichnung", "%" + txtSuche.getText() + "%");
-            lstPraep.setModel(SYSTools.list2dlm(query.getResultList()));
-            em.close();
+            long id = NumberUtils.toLong(txtSuche.getText(), -1L);
+            MedStock stock = id > -1L ? EntityTools.find(MedStock.class, id) : null;
+            if (stock != null) {
+                lstPraep.setModel(SYSTools.list2dlm(List.of(stock.getTradeForm().getMedProduct())));
+            } else {
+                EntityManager em = OPDE.createEM();
+                Query query = em.createQuery("SELECT m FROM MedProducts m" +
+                        " WHERE m.text LIKE :bezeichnung" +
+                        " ORDER BY m.text");
+                query.setParameter("bezeichnung", "%" + txtSuche.getText() + "%");
+                //query.setParameter("stockid", NumberUtils.toLong(txtSuche.getText(), -1L));
+                lstPraep.setModel(SYSTools.list2dlm(query.getResultList()));
+                em.close();
+            }
+
         }
     }
 
@@ -364,71 +377,33 @@ public class PnlMed extends CleanablePanel {
         list.add(tbShowClosed);
 
 
-        JButton generate_orders = GUITools.createHyperlinkButton("Bedarf ermitteln", SYSConst.icon22calc, null);
-        generate_orders.addActionListener(e -> {
-            orderButtonPressed(); // just in case
-
-            optPnlMedOrders.ifPresent(pnlMedOrders -> {
-                OPDE.getMainframe().setBlocked(true);
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
-
-                SwingWorker worker = new SwingWorker() {
-
-                    @Override
-                    protected Object doInBackground() {
-                        EntityManager em = OPDE.createEM();
-                        try {
-                            em.getTransaction().begin();
-                            MedOrderTools.generate_orders(Integer.parseInt(days_range.getText()), MedOrderTools.get_open_orders(em)).forEach(medOrder -> em.merge(medOrder));
-                            em.getTransaction().commit();
-                        } catch (OptimisticLockException | RollbackException ole) {
-                            log.warn(ole);
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                OPDE.getMainframe().emptyFrame();
-                                OPDE.getMainframe().afterLogin();
-                            }
-                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                        } catch (Exception exc) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            OPDE.fatal(exc);
-                        } finally {
-                            em.close();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
-                        OPDE.getDisplayManager().setProgressBarMessage(null);
-                        OPDE.getMainframe().setBlocked(false);
-                        reload();
-                    }
-                };
-                worker.execute();
-            });
+        JButton btn_regular = GUITools.createHyperlinkButton("Bestellung Regel-Verordnungen", null, null);
+        btn_regular.addActionListener(e -> {
+//            orderButtonPressed(); // just in case
+            generate_orders(TYPE_REGULAR);
         });
-        list.add(generate_orders);
-        generate_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
+        list.add(btn_regular);
+        btn_regular.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
 
+        JButton btn_demand = GUITools.createHyperlinkButton("Bestellung Bedarfs-Verordnungen", null, null);
+        btn_demand.addActionListener(e -> {
+            //            orderButtonPressed(); // just in case
+            generate_orders(TYPE_ON_DEMAND);
+        });
+        list.add(btn_demand);
+        btn_demand.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
 
-        JPanel pnl_add_del = new JPanel(new HorizontalLayout(5));
-
-        JButton add_order = GUITools.createHyperlinkButton("freier Text", SYSConst.icon22add, null);
-        add_order.addActionListener(evt1 -> {
+        JButton add_free_text = GUITools.createHyperlinkButton("freien Text eintragen", SYSConst.icon22add, null);
+        add_free_text.addActionListener(evt1 -> {
             optPnlMedOrders.ifPresent(pnlMedOrders -> {
                 new DlgNewOrder(OPDE.getMainframe()).setVisible(true);
                 reload();
             });
         });
-        pnl_add_del.add(add_order);
-        add_order.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
+        list.add(add_free_text);
+        add_free_text.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
 
-        JButton delete_orders = GUITools.createHyperlinkButton("misc.commands.delete", SYSConst.icon22delete, null);
+        JButton delete_orders = GUITools.createHyperlinkButton("markierte Bestellungen löschen", SYSConst.icon22delete, null);
         delete_orders.addActionListener(evt1 -> {
             optPnlMedOrders.ifPresent(pnlMedOrders -> {
                 pnlMedOrders.getSelected().forEach(medOrder -> {
@@ -437,9 +412,8 @@ public class PnlMed extends CleanablePanel {
                 reload();
             });
         });
-        pnl_add_del.add(delete_orders);
+        list.add(delete_orders);
         delete_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
-        list.add(pnl_add_del);
 
 
         JPanel pnl2 = new JPanel(new HorizontalLayout(5));
@@ -451,7 +425,7 @@ public class PnlMed extends CleanablePanel {
                 return super.getListCellRendererComponent(list, value == null ? "für Alle" : SYSTools.anonymizeName(((HasName) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
             }
         });
-        final JideButton printButton = GUITools.createHyperlinkButton(null, SYSConst.icon22print2, null);
+        final JideButton printButton = GUITools.createHyperlinkButton("Bestellung drucken", SYSConst.icon22print2, null);
         printButton.addActionListener(actionEvent -> {
             optPnlMedOrders.ifPresent(pnlMedOrders -> pnlMedOrders.print(Optional.ofNullable((HasName) cmb_where_to_order_filter.getSelectedItem())));
         });
@@ -459,6 +433,53 @@ public class PnlMed extends CleanablePanel {
         list.add(pnl2);
 
         return list;
+    }
+
+
+    private void generate_orders(final int type) {
+        optPnlMedOrders.ifPresent(pnlMedOrders -> {
+            OPDE.getMainframe().setBlocked(true);
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
+
+            SwingWorker worker = new SwingWorker() {
+
+                @Override
+                protected Object doInBackground() {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        MedOrderTools.generate_orders(Integer.parseInt(days_range.getText()), type, MedOrderTools.get_open_orders(em)).forEach(medOrder -> em.merge(medOrder));
+                        em.getTransaction().commit();
+                    } catch (OptimisticLockException | RollbackException ole) {
+                        log.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception exc) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(exc);
+                    } finally {
+                        em.close();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                    reload();
+                }
+            };
+            worker.execute();
+        });
     }
 
     private void orderButtonPressed() {

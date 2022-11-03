@@ -95,7 +95,7 @@ public class PnlBHP extends NursingRecordsPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspBHP;
     private CollapsiblePanes cpBHP;
-
+    // End of variables declaration//GEN-END:variables
     /**
      * @param resident
      * @param jspSearch
@@ -1476,5 +1476,5 @@ public class PnlBHP extends NursingRecordsPanel {
 
         return list;
     }
-    // End of variables declaration//GEN-END:variables
+
 }

@@ -40,7 +40,7 @@ public class DlgUPREditor extends MyJDialog {
 
     private TradeForm tradeForm;
     private ArrayList<MedStock> listStocks;
-    private HashMap<MedStock, Pair<BigDecimal, BigDecimal>> mapEffectiveUPRs;
+    //private HashMap<MedStock, Pair<BigDecimal, BigDecimal>> mapEffectiveUPRs;
     private Closure afterAction;
     private JDialog currentEditor;
 
@@ -68,15 +68,8 @@ public class DlgUPREditor extends MyJDialog {
 
                 lblProduct.setText(tradeForm.getMedProduct().getText() + " " + TradeFormTools.toPrettyStringMedium(tradeForm));
 
-                mapEffectiveUPRs = new HashMap<MedStock, Pair<BigDecimal, BigDecimal>>();
-
                 rbUPRConst.setText(SYSTools.xx("upreditor.constant.upr"));
                 rbUPRAuto.setText(SYSTools.xx("upreditor.calculated.upr"));
-
-
-                //        Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
-                //        cmbDosageForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
-                //        cmbDosageForm.setRenderer(DosageFormTools.getRenderer(0));
 
                 if (tradeForm.getConstantUPRn() != null) {
                     txtUPR.setText(SYSTools.formatBigDecimal(tradeForm.getConstantUPRn().setScale(2, RoundingMode.HALF_UP)));
@@ -92,20 +85,12 @@ public class DlgUPREditor extends MyJDialog {
                 listStocks = new ArrayList<MedStock>(query.getResultList());
                 em.close();
 
-                // calculate effective UPRs for every closed stock for that tradeform
-                for (MedStock stock : listStocks) {
-                    progress++;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listStocks.size()));
-                    if (stock.isClosed()) {
-                        mapEffectiveUPRs.put(stock, new Pair<BigDecimal, BigDecimal>(MedStockTools.getSumOfDosesInBHP(stock), MedStockTools.getEffectiveUPR(stock)));
-                    }
-                }
                 return null;
             }
 
             @Override
             protected void done() {
-                tblStock.setModel(new MDLStock());
+                tblStock.setModel(new TMStocks(listStocks));
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);
                 setVisible(true);
@@ -271,7 +256,7 @@ public class DlgUPREditor extends MyJDialog {
         btnSave = new JButton();
 
         //======== this ========
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "default, $lcgap, pref, $lcgap, default:grow, $lcgap, default",
             "6*(default, $lgap), default:grow, 2*($lgap, default)"));
@@ -359,81 +344,13 @@ public class DlgUPREditor extends MyJDialog {
         setLocationRelativeTo(getOwner());
 
         //---- buttonGroup1 ----
-        ButtonGroup buttonGroup1 = new ButtonGroup();
+        var buttonGroup1 = new ButtonGroup();
         buttonGroup1.add(rbUPRAuto);
         buttonGroup1.add(rbUPRConst);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
-    private class MDLStock extends AbstractTableModel {
 
-        String[] columnNames;
-
-        private MDLStock() {
-            columnNames = new String[]{SYSTools.xx("upreditor.col1"), SYSTools.xx("upreditor.col2"), SYSTools.xx("upreditor.col3"), SYSTools.xx("upreditor.col4"), SYSTools.xx("upreditor.col5"), SYSTools.xx("upreditor.col6"), SYSTools.xx("upreditor.col7")};
-        }
-
-        @Override
-        public int getRowCount() {
-            return listStocks.size();  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public int getColumnCount() {
-            return 7;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            return columnNames[column];
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            Object result = null;
-
-            switch (columnIndex) {
-                case 0: {
-                    result = listStocks.get(rowIndex).getID();
-                    break;
-                }
-                case 1: {
-                    result = listStocks.get(rowIndex).getInventory().getResident().getId();
-                    break;
-                }
-                case 2: {
-                    result = SYSTools.formatBigDecimal(listStocks.get(rowIndex).getUPR().setScale(2, RoundingMode.HALF_UP));
-                    break;
-                }
-                case 3: {
-                    result = DateFormat.getDateInstance().format(listStocks.get(rowIndex).getIN());
-                    break;
-                }
-                case 4: {
-                    result = SYSTools.formatBigDecimal(MedStockTools.getStartTX(listStocks.get(rowIndex)).getAmount().setScale(2, RoundingMode.HALF_UP));
-                    break;
-                }
-                case 5: {
-                    result = "OPEN";
-                    if (mapEffectiveUPRs.containsKey(listStocks.get(rowIndex))) {
-                        result = SYSTools.formatBigDecimal(mapEffectiveUPRs.get(listStocks.get(rowIndex)).getFirst().setScale(2, RoundingMode.HALF_UP));
-                    }
-                    break;
-                }
-                case 6: {
-                    result = "OPEN";
-                    if (mapEffectiveUPRs.containsKey(listStocks.get(rowIndex))) {
-                        result = SYSTools.formatBigDecimal(mapEffectiveUPRs.get(listStocks.get(rowIndex)).getSecond().setScale(2, RoundingMode.HALF_UP));
-                    }
-                    break;
-                }
-                default: {
-                    result = "Fuck it!";
-                }
-            }
-            return result;
-        }
-    }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JLabel lblProduct;

@@ -264,7 +264,7 @@ public class MedStockTools {
                     if (effectiveUPR.compareTo(BigDecimal.ZERO) > 0) { // if this stock was never used the effective UPR must be 0. we must handle this case separately
                         // if the deviation was too high (usually more than 20%), then the new UPR is discarded
                         BigDecimal maxDeviation = SYSTools.parseDecimal(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR_CORRIDOR));
-                        BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
+                        BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, RoundingMode.HALF_UP).subtract(new BigDecimal(100)).abs();
                         log.debug("the deviation was: " + deviation + "%");
 
                         // if the deviation is below the limit, then the new UPR will be accepted.
@@ -628,7 +628,8 @@ public class MedStockTools {
             } else {
                 EntityManager em = OPDE.createEM();
                 try {
-                    Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
+                    // fix 221031: fälschlicherweise mit s.upr gerechnet. Daher waren die Schätzungen alle falsch.
+                    Query query = em.createQuery(" SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
                     query.setParameter("dummymode", ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
                     query.setParameter("tradeform", tradeForm);
                     Object result = query.getSingleResult();
@@ -646,7 +647,7 @@ public class MedStockTools {
                         upr = BigDecimal.ONE;
                     }
 
-                    upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
+                    upr = upr.setScale(2, RoundingMode.HALF_UP);
                     log.trace("calculated UPRn. average so far: " + SYSTools.formatBigDecimal(upr));
                 } catch (NoResultException nre) {
                     upr = BigDecimal.ONE;

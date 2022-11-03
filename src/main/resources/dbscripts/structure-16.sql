@@ -323,6 +323,28 @@ CREATE TABLE `medinventory` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `medorder` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `version` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `resid` char(10) NOT NULL,
+  `dafid` bigint(20) unsigned DEFAULT NULL,
+  `arztid` bigint(20) unsigned DEFAULT NULL,
+  `khid` bigint(20) unsigned DEFAULT NULL,
+  `note` varchar(200) DEFAULT NULL,
+  `created_on` datetime NOT NULL,
+  `created_by` char(10) NOT NULL,
+  `auto_created` tinyint(1) NOT NULL,
+  `closed_on` datetime DEFAULT NULL,
+  `closed_by` char(10) DEFAULT NULL,
+  `closing_stockid` bigint(20) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx1` (`closed_by`),
+  KEY `idx2` (`resid`),
+  KEY `idx3` (`dafid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `medpackage` (
   `MPID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `DafID` bigint(20) unsigned NOT NULL,
