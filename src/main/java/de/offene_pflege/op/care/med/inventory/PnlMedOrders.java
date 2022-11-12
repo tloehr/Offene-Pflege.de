@@ -1,19 +1,11 @@
 package de.offene_pflege.op.care.med.inventory;
 
-import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.prescription.*;
-import de.offene_pflege.entity.reports.NReportTools;
-import de.offene_pflege.entity.system.SYSPropsTools;
-import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.care.med.MedOrderHTMLRenderer;
-import de.offene_pflege.op.care.med.structure.TMMedOrders;
 import de.offene_pflege.op.system.InternalClassACL;
-import de.offene_pflege.op.threads.DisplayManager;
-import de.offene_pflege.op.threads.DisplayMessage;
+import de.offene_pflege.gui.ButtonColumn;
 import de.offene_pflege.op.tools.HTMLTools;
-import de.offene_pflege.op.tools.NumberVerifier;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.services.HomesService;
@@ -21,22 +13,14 @@ import de.offene_pflege.tablerenderer.RNDHTML;
 import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.HorizontalLayout;
 
-import javax.persistence.EntityManager;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.RollbackException;
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.text.JTextComponent;
+import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Log4j2
 public class PnlMedOrders extends JPanel {
@@ -75,7 +59,7 @@ public class PnlMedOrders extends JPanel {
     }
 
     public void reload(List<MedOrder> list) {
-        tbl.setModel(new TMMedOrders(list, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)));
+        tbl.setModel(new TMMedOrders(list, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID), OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)));
         tbl.getModel().addTableModelListener(e -> {
             if (e.getColumn() == TMMedOrders.COL_WHERE_TO_ORDER)
                 firePropertyChange("table_where_to_order_changed", -1, e.getFirstRow());
@@ -101,6 +85,7 @@ public class PnlMedOrders extends JPanel {
             });
             tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellRenderer(new RNDHTML());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_ORDER_INFO).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellEditor(new DefaultCellEditor(cmb));
 
             JTextField txt = new JTextField();
@@ -110,10 +95,35 @@ public class PnlMedOrders extends JPanel {
                     txt.selectAll();
                 }
             });
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellEditor(new DefaultCellEditor(txt));
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_note).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_complete).setMaxWidth(30);
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_ORDER_DATE).setMaxWidth(80);
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_DELETE).setMaxWidth(30);
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_CONFIRMED).setMaxWidth(60);
+            //tbl.getColumnModel().getColumn(TMMedOrders.COL_ORDER_INFO).setMaxWidth(80);
+
+            ButtonColumn confirm_button = new ButtonColumn(tbl, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JTable table = (JTable) e.getSource();
+                    int row_of_button = Integer.valueOf(e.getActionCommand());
+                    ((TMMedOrders) table.getModel()).confirm(tbl.convertRowIndexToModel(row_of_button));
+                }
+            }, TMMedOrders.COL_CONFIRMED);
+            ButtonColumn complete_button = new ButtonColumn(tbl, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JTable table = (JTable) e.getSource();
+                    int row_of_button = Integer.valueOf(e.getActionCommand());
+                    ((TMMedOrders) table.getModel()).complete(tbl.convertRowIndexToModel(row_of_button));
+                }
+            }, TMMedOrders.COL_complete);
+            ButtonColumn delete_button = new ButtonColumn(tbl, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JTable table = (JTable) e.getSource();
+                    int row_of_button = Integer.valueOf(e.getActionCommand());
+                    ((TMMedOrders) table.getModel()).delete(tbl.convertRowIndexToModel(row_of_button));
+                }
+            }, TMMedOrders.COL_DELETE);
 
             tbl.revalidate();
             tbl.repaint();

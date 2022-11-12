@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<java version="1.8.0_112-release" class="java.beans.XMLDecoder">
+<java version="11.0.14.1" class="java.beans.XMLDecoder">
  <object class="com.jformdesigner.model.FormModel">
   <void property="contentType">
    <string>form/swing</string>
@@ -17,7 +17,7 @@
        </void>
        <void method="setProperty">
         <string>$rowSpecs</string>
-        <string>unrelgap, linegap, 34dlu, linegap, fill:default, linegap, default, linegap, fill:default, unrelgap</string>
+        <string>unrelgap, linegap, 34dlu, linegap, fill:default, linegap, default, 3dlu:grow, fill:default, unrelgap</string>
        </void>
       </object>
       <void method="setProperty">
@@ -452,7 +452,7 @@
        <string>size</string>
        <object class="java.awt.Dimension">
         <int>600</int>
-        <int>195</int>
+        <int>235</int>
        </object>
       </void>
       <void method="setProperty">

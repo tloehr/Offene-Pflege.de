@@ -2,6 +2,7 @@ package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
+import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.structure.PnlMed;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -10,16 +11,21 @@ import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.math3.util.OpenIntToDoubleHashMap;
 import org.javatuples.Quintet;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -89,6 +95,69 @@ public class MedOrderTools {
         return Optional.empty();
     }
 
+    public static List<MedOrder> get_open_medorders(EntityManager em, LocalDate week) {
+        ArrayList<MedOrder> list = new ArrayList<>();
+        try {
+            String jpql = " SELECT p " +
+                    " FROM MedOrder p" +
+                    " WHERE p.created_on between :from AND :to" +
+                    " AND p.closed_by IS NULL ";
+            Query query = em.createQuery(jpql);
+            query.setParameter("from", week.with(DayOfWeek.MONDAY).atStartOfDay());
+            query.setParameter("to", week.with(DayOfWeek.SUNDAY).atTime(LocalTime.MAX));
+            list.addAll(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return list;
+    }
+
+    public static List<MedOrder> get_closed_medorders(EntityManager em, LocalDate week) {
+        ArrayList<MedOrder> list = new ArrayList<>();
+        try {
+            String jpql = " SELECT p " +
+                    " FROM MedOrder p" +
+                    " WHERE p.created_on between :from AND :to" +
+                    " AND p.closed_by IS NOT NULL ";
+            Query query = em.createQuery(jpql);
+            query.setParameter("from", week.with(DayOfWeek.MONDAY).atStartOfDay());
+            query.setParameter("to", week.with(DayOfWeek.SUNDAY).atTime(LocalTime.MAX));
+            list.addAll(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return list;
+    }
+
+    public static List<MedOrder> get_open_medorders(EntityManager em) {
+        ArrayList<MedOrder> list = new ArrayList<>();
+        try {
+            String jpql = " SELECT p " +
+                    " FROM MedOrder p" +
+                    " WHERE p.closed_by IS NULL ";
+            Query query = em.createQuery(jpql);
+            list.addAll(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return list;
+    }
+
+    public static List<MedOrder> get_closed_medorders(EntityManager em) {
+        ArrayList<MedOrder> list = new ArrayList<>();
+        try {
+            String jpql = " SELECT p " +
+                    " FROM MedOrder p" +
+                    " WHERE p.closed_by IS NULL ";
+            Query query = em.createQuery(jpql);
+            list.addAll(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return list;
+    }
+
+
     public static List<MedOrder> get_open_orders(EntityManager em) {
         ArrayList<MedOrder> list = new ArrayList<>();
         try {
@@ -135,6 +204,26 @@ public class MedOrderTools {
         return list;
     }
 
+    public static List<MedOrder> get_medorders(Optional<LocalDate> week, boolean with_closed) {
+        List<MedOrder> list = new ArrayList<>();
+        EntityManager em = OPDE.createEM();
+        try {
+            if (week.isPresent()) {
+                list = get_open_medorders(em, week.get());
+                if (with_closed) list.addAll(get_closed_medorders(em, week.get()));
+            } else {
+                list = get_open_medorders(em);
+                if (with_closed) list.addAll(get_closed_medorders(em));
+            }
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
     public static String get_where_to_order(MedOrder medOrder) {
         return medOrder.getGp() != null ? GPTools.get_for_order_list(medOrder.getGp()) :
                 HospitalTools.get_for_order_list(medOrder.getHospital());
@@ -161,7 +250,7 @@ public class MedOrderTools {
                     running_integer.increment();
                     // suche alle medikamente die im moment verordnet sind und schreibe den aktuellen Bedarf und den aktuellen bestand in eine Map
                     PrescriptionTools.getAllActive(resident)
-                            .stream().filter(prescription -> prescription.hasMed() && !prescription.getTradeForm().getDosageForm().isDontCALC())
+                            .stream().filter(prescription -> prescription.hasMed() && !prescription.getTradeForm().getDosageForm().isDontCALC() && !prescription.isUntilEndOfPackage())
                             .forEach(prescription -> {
                                 if (type == PnlMed.TYPE_REGULAR && prescription.isOnDemand()) return;
                                 if (type == PnlMed.TYPE_ON_DEMAND && !prescription.isOnDemand()) return;
@@ -210,5 +299,9 @@ public class MedOrderTools {
 
     public static boolean is_closed(MedOrder medOrder) {
         return medOrder.getClosed_by() != null;
+    }
+
+    public static Optional<OPUsers> get_confirmed_by(MedOrder medOrder) {
+        return Optional.ofNullable(medOrder.getConfirmed_by());
     }
 }

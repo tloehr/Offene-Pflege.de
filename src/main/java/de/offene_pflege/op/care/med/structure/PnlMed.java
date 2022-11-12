@@ -73,6 +73,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,6 +95,11 @@ public class PnlMed extends CleanablePanel {
     private JTextField days_range;
     //    private List<HasName> where_to_order_list;
     private JComboBox<HasName> cmb_where_to_order_filter;
+
+    private JRadioButton rb_this_week;
+    private JRadioButton rb_all;
+    private JRadioButton rb_last_week;
+    private JRadioButton rb_before_last_week;
 
     private Optional<PnlMedStructure> optPnlMedStructure;
     private Optional<PnlMedOrders> optPnlMedOrders;
@@ -121,11 +127,13 @@ public class PnlMed extends CleanablePanel {
         optPnlMedStructure.ifPresent(pnlMedStructure -> pnlMedStructure.reload());
         optPnlMedOrders.ifPresent(pnlMedOrders -> {
             List<MedOrder> list;
-            if (tbShowClosed.isSelected()) {
-                list = MedOrderTools.get_medorders(Integer.parseInt(days_range.getText()));
-            } else {
-                list = MedOrderTools.get_medorders(0);
-            }
+
+            Optional<LocalDate> week = Optional.empty();
+            if (rb_this_week.isSelected()) week = Optional.of(LocalDate.now());
+            if (rb_last_week.isSelected()) week = Optional.of(LocalDate.now().minusWeeks(1));
+            if (rb_before_last_week.isSelected()) week = Optional.of(LocalDate.now().minusWeeks(2));
+
+            list = MedOrderTools.get_medorders(week, tbShowClosed.isSelected());
 
             ComparatorChain chain = new ComparatorChain();
             chain.addComparator(Comparator.comparing((MedOrder mo) -> mo.getResident().getName()));
@@ -369,14 +377,6 @@ public class PnlMed extends CleanablePanel {
         pnl.add(new JLabel("Tage"));
         list.add(pnl);
 
-        tbShowClosed = GUITools.getNiceToggleButton("Zeige erledigte");
-        tbShowClosed.addItemListener(e -> optPnlMedOrders.ifPresent(pnlMedOrders -> {
-            reload();
-        }));
-        tbShowClosed.setHorizontalAlignment(SwingConstants.LEFT);
-        list.add(tbShowClosed);
-
-
         JButton btn_regular = GUITools.createHyperlinkButton("Bestellung Regel-Verordnungen", null, null);
         btn_regular.addActionListener(e -> {
 //            orderButtonPressed(); // just in case
@@ -384,14 +384,14 @@ public class PnlMed extends CleanablePanel {
         });
         list.add(btn_regular);
         btn_regular.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
-
-        JButton btn_demand = GUITools.createHyperlinkButton("Bestellung Bedarfs-Verordnungen", null, null);
-        btn_demand.addActionListener(e -> {
-            //            orderButtonPressed(); // just in case
-            generate_orders(TYPE_ON_DEMAND);
-        });
-        list.add(btn_demand);
-        btn_demand.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
+//
+//        JButton btn_demand = GUITools.createHyperlinkButton("Bestellung Bedarfs-Verordnungen", null, null);
+//        btn_demand.addActionListener(e -> {
+//            //            orderButtonPressed(); // just in case
+//            generate_orders(TYPE_ON_DEMAND);
+//        });
+//        list.add(btn_demand);
+//        btn_demand.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
 
         JButton add_free_text = GUITools.createHyperlinkButton("freien Text eintragen", SYSConst.icon22add, null);
         add_free_text.addActionListener(evt1 -> {
@@ -402,23 +402,56 @@ public class PnlMed extends CleanablePanel {
         });
         list.add(add_free_text);
         add_free_text.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
+//
+//        JButton delete_orders = GUITools.createHyperlinkButton("markierte Bestellungen löschen", SYSConst.icon22delete, null);
+//        delete_orders.addActionListener(evt1 -> {
+//            optPnlMedOrders.ifPresent(pnlMedOrders -> {
+//                pnlMedOrders.getSelected().forEach(medOrder -> {
+//                    EntityTools.delete(medOrder);
+//                });
+//                reload();
+//            });
+//        });
+//        list.add(delete_orders);
+//        delete_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
 
-        JButton delete_orders = GUITools.createHyperlinkButton("markierte Bestellungen löschen", SYSConst.icon22delete, null);
-        delete_orders.addActionListener(evt1 -> {
-            optPnlMedOrders.ifPresent(pnlMedOrders -> {
-                pnlMedOrders.getSelected().forEach(medOrder -> {
-                    EntityTools.delete(medOrder);
-                });
-                reload();
-            });
-        });
-        list.add(delete_orders);
-        delete_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
+
+        tbShowClosed = GUITools.getNiceToggleButton("mit Erledigten");
+        tbShowClosed.addItemListener(e -> optPnlMedOrders.ifPresent(pnlMedOrders -> {
+            reload();
+        }));
+        tbShowClosed.setHorizontalAlignment(SwingConstants.LEFT);
+
+        rb_this_week = new JRadioButton("diese Woche");
+        rb_last_week = new JRadioButton("letzte Woche");
+        rb_before_last_week = new JRadioButton("vor 2 Wochen");
+        rb_all = new JRadioButton("alles");
 
 
-        JPanel pnl2 = new JPanel(new HorizontalLayout(5));
+        list.add(rb_this_week);
+        list.add(rb_last_week);
+        list.add(rb_before_last_week);
+        list.add(rb_all);
+        list.add(tbShowClosed);
+
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(rb_this_week);
+        bg.add(rb_last_week);
+        bg.add(rb_before_last_week);
+        bg.add(rb_all);
+
+        rb_this_week.setSelected(true);
+
+        ActionListener actionListener = e -> reload();
+
+        rb_this_week.addActionListener(actionListener);
+        rb_last_week.addActionListener(actionListener);
+        rb_before_last_week.addActionListener(actionListener);
+        rb_all.addActionListener(actionListener);
+
+
         cmb_where_to_order_filter = new JComboBox<>();
-        pnl2.add(cmb_where_to_order_filter);
+        list.add(cmb_where_to_order_filter);
         cmb_where_to_order_filter.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -429,8 +462,7 @@ public class PnlMed extends CleanablePanel {
         printButton.addActionListener(actionEvent -> {
             optPnlMedOrders.ifPresent(pnlMedOrders -> pnlMedOrders.print(Optional.ofNullable((HasName) cmb_where_to_order_filter.getSelectedItem())));
         });
-        pnl2.add(printButton);
-        list.add(pnl2);
+        list.add(printButton);
 
         return list;
     }

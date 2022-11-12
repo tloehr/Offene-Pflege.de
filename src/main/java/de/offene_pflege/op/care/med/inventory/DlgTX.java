@@ -217,10 +217,10 @@ public class DlgTX extends MyJDialog {
                 thisWindowClosing(e);
             }
         });
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "$ugap, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, $ugap",
-            "$ugap, $lgap, 34dlu, $lgap, fill:default, $lgap, default, $lgap, fill:default, $ugap"));
+            "$ugap, $lgap, 34dlu, $lgap, fill:default, $lgap, default, 3dlu:grow, fill:default, $ugap"));
 
         //======== panel2 ========
         {
@@ -311,7 +311,7 @@ public class DlgTX extends MyJDialog {
             panel1.add(btnBuchung);
         }
         contentPane.add(panel1, CC.xywh(5, 9, 3, 1, CC.RIGHT, CC.DEFAULT));
-        setSize(600, 195);
+        setSize(600, 235);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 

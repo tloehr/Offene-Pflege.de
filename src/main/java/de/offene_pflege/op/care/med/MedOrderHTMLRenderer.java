@@ -2,7 +2,7 @@ package de.offene_pflege.op.care.med;
 
 import de.offene_pflege.entity.prescription.MedOrder;
 import de.offene_pflege.entity.prescription.MedOrderTools;
-import de.offene_pflege.op.care.med.structure.TMMedOrders;
+import de.offene_pflege.op.care.med.inventory.TMMedOrders;
 import de.offene_pflege.tablerenderer.RNDHTML;
 import lombok.extern.log4j.Log4j2;
 

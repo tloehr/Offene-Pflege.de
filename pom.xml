@@ -69,7 +69,7 @@
         <opde.major>1</opde.major>
         <opde.minor>16</opde.minor>
         <opde.release>1</opde.release>
-        <opde.dbversion>16</opde.dbversion>
+        <opde.dbversion>17</opde.dbversion>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
     </properties>
 

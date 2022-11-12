@@ -44,6 +44,10 @@ public class MedOrder extends DefaultEntity {
     @JoinColumn(name = "created_by", referencedColumnName = "UKennung")
     private OPUsers created_by;
 
+    @ManyToOne
+    @JoinColumn(name = "confirmed_by", referencedColumnName = "UKennung")
+    private OPUsers confirmed_by;
+
     @Basic
     @Column(nullable = false)
     private Boolean auto_created;

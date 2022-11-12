@@ -47,7 +47,7 @@ public class RNDHTML implements TableCellRenderer {
         txt.setEditable(false);
         txt.setContentType("text/html");
         txt.setOpaque(false);
-        txt.setBackground(new Color(0, 0, 0, 0));
+        txt.setBackground(Color.YELLOW);
 
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));

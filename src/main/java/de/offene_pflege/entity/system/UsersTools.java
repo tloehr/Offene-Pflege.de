@@ -160,4 +160,14 @@ public class UsersTools {
         return user;
     }
 
+    public static String getFullname(OPUsers opUsers) {
+        String fullname = "";
+        if (OPDE.isUserCipher()) {
+            fullname = "#" + opUsers.getCipherid();
+        } else {
+            fullname = opUsers.getName() + ", " + opUsers.getVorname();
+        }
+        return fullname;
+    }
+
 }
