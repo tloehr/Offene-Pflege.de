@@ -91,7 +91,7 @@ public class PnlMed extends CleanablePanel {
     private JScrollPane jspSearch;
     private JTextField txtSuche;
     private JList lstPraep;
-    private JToggleButton tbIDs, tbShowClosed;
+    private JToggleButton tbIDs, tbShowClosed, tbWithNotes;
     private JTextField days_range;
     //    private List<HasName> where_to_order_list;
     private JComboBox<HasName> cmb_where_to_order_filter;
@@ -142,7 +142,7 @@ public class PnlMed extends CleanablePanel {
             Collections.sort(list, chain);
 
             fill_where_to_order_filter(list);
-            pnlMedOrders.reload(list);
+            pnlMedOrders.reload(list, tbWithNotes.isSelected());
         });
     }
 
@@ -422,6 +422,12 @@ public class PnlMed extends CleanablePanel {
         }));
         tbShowClosed.setHorizontalAlignment(SwingConstants.LEFT);
 
+        tbWithNotes = GUITools.getNiceToggleButton("mit Notizen");
+        tbWithNotes.addItemListener(e -> optPnlMedOrders.ifPresent(pnlMedOrders -> {
+            reload();
+        }));
+        tbWithNotes.setHorizontalAlignment(SwingConstants.LEFT);
+
         rb_this_week = new JRadioButton("diese Woche");
         rb_last_week = new JRadioButton("letzte Woche");
         rb_before_last_week = new JRadioButton("vor 2 Wochen");
@@ -433,6 +439,7 @@ public class PnlMed extends CleanablePanel {
         list.add(rb_before_last_week);
         list.add(rb_all);
         list.add(tbShowClosed);
+        list.add(tbWithNotes);
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(rb_this_week);

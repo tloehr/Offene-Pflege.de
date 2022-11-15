@@ -2,6 +2,7 @@ package de.offene_pflege.op.care.med.inventory;
 
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.gui.ButtonColumn;
@@ -14,8 +15,6 @@ import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -58,14 +57,15 @@ public class PnlMedOrders extends JPanel {
         return ((TMMedOrders) tbl.getModel()).getMedOrderList();
     }
 
-    public void reload(List<MedOrder> list) {
-        tbl.setModel(new TMMedOrders(list, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID), OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)));
+    public void reload(List<MedOrder> list, boolean show_notes) {
+        tbl.setModel(new TMMedOrders(list, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID), OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID), show_notes));
         tbl.getModel().addTableModelListener(e -> {
             if (e.getColumn() == TMMedOrders.COL_WHERE_TO_ORDER)
                 firePropertyChange("table_where_to_order_changed", -1, e.getFirstRow());
         });
 
         SwingUtilities.invokeLater(() -> {
+
             java.util.List<HasName> liste = new ArrayList();
             liste.addAll(GPTools.getAllActive());
             liste.addAll(HospitalTools.getAll());
@@ -83,10 +83,14 @@ public class PnlMedOrders extends JPanel {
                             index, isSelected, cellHasFocus);
                 }
             });
+
             tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_Resident).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_ORDER_INFO).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellEditor(new DefaultCellEditor(cmb));
+            ((DefaultCellEditor) tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).getCellEditor()).setClickCountToStart(2);
+
 
             JTextField txt = new JTextField();
             txt.addFocusListener(new FocusAdapter() {
@@ -95,9 +99,9 @@ public class PnlMedOrders extends JPanel {
                     txt.selectAll();
                 }
             });
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_complete).setMaxWidth(30);
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_DELETE).setMaxWidth(30);
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_CONFIRMED).setMaxWidth(60);
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_complete).setMaxWidth(45);
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_DELETE).setMaxWidth(45);
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_CONFIRMED).setMaxWidth(45);
             //tbl.getColumnModel().getColumn(TMMedOrders.COL_ORDER_INFO).setMaxWidth(80);
 
             ButtonColumn confirm_button = new ButtonColumn(tbl, new AbstractAction() {
@@ -138,34 +142,65 @@ public class PnlMedOrders extends JPanel {
     }
 
     private void tableMousePressed(MouseEvent evt) {
-//        if (!SwingUtilities.isRightMouseButton(evt)) return;
+        if (!SwingUtilities.isRightMouseButton(evt)) return;
+
+        Point p = evt.getPoint();
+        JTable tbl = (JTable) evt.getSource();
+        ListSelectionModel lsm = tbl.getSelectionModel();
+        Point p2 = evt.getPoint();
+        SwingUtilities.convertPointToScreen(p2, tbl);
+
+        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
+
+        final int row = tbl.rowAtPoint(p);
+        final int col = tbl.columnAtPoint(p);
+
+        if (singleRowSelected) {
+            lsm.setSelectionInterval(row, row);
+        }
+
+        SYSTools.unregisterListeners(menu);
+        menu = new JPopupMenu();
+
+        JMenuItem itemPopupInfo = new JMenuItem(SYSTools.xx("misc.filters.showDetails"), SYSConst.icon22info);
+        itemPopupInfo.addActionListener(e -> {
+            MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.convertRowIndexToModel(tbl.getSelectionModel().getLeadSelectionIndex()));
+            GUITools.showPopup(GUITools.getHTMLPopup(tbl, MedOrderTools.toPrettyHTMLOrderInfos(medOrder, true)), SwingConstants.NORTH);
+        });
+        menu.add(itemPopupInfo);
+
+//        JMenuItem itemPopupChangeGP = new JMenuItem(SYSTools.xx("misc.msg.change.gp"), SYSConst.icon22edit);
+//        itemPopupChangeGP.addActionListener(e -> {
+//            MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.convertRowIndexToModel(tbl.getSelectionModel().getLeadSelectionIndex()));
+//            java.util.List<HasName> liste = new ArrayList();
+//            liste.addAll(GPTools.getAllActive());
+//            liste.addAll(HospitalTools.getAll());
+//            Collections.sort(liste, (o1, o2) -> {
+//                return o1.getName().compareTo(o2.getName());
+//            });
+//            JComboBox<HasName> cmb = new JComboBox<>(SYSTools.list2cmb(liste));
+//            cmb.setRenderer(new DefaultListCellRenderer() {
+//                @Override
+//                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+//                    return super.getListCellRendererComponent(list, (value instanceof GP ?
+//                                    SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getFirstname(), SYSTools.INDEX_FIRSTNAME_MALE) :
+//                                    ((Hospital) value).getName() + ", " + ((Hospital) value).getCity()
+//                            ),
+//                            index, isSelected, cellHasFocus);
+//                }
+//            });
+//            ,
 //
-//        Point p = evt.getPoint();
-//        JTable tbl = (JTable) evt.getSource();
-//        ListSelectionModel lsm = tbl.getSelectionModel();
-//        Point p2 = evt.getPoint();
-//        SwingUtilities.convertPointToScreen(p2, tbl);
+//            if (medOrder.getGp() != null) cmb.setSelectedItem(medOrder.getGp());
+//            else cmb.setSelectedItem(medOrder.getHospital());
+//            JPanel pnl = new JPanel(new BorderLayout());
+//            pnl.add(cmb, BorderLayout.CENTER);
 //
-//        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-//
-//        final int row = tbl.rowAtPoint(p);
-//        final int col = tbl.columnAtPoint(p);
-//
-//        if (singleRowSelected) {
-//            lsm.setSelectionInterval(row, row);
-//        }
-//
-//        SYSTools.unregisterListeners(menu);
-//        menu = new JPopupMenu();
-//
-//        JMenuItem itemPopupShow = new JMenuItem(SYSTools.xx("misc.commands.show"), SYSConst.icon22magnify1);
-//        itemPopupShow.addActionListener(e -> {
-//            MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.getSelectionModel().getLeadSelectionIndex());
-//            GUITools.showPopup(GUITools.getHTMLPopup(tbl, MedOrderTools.toPrettyHTML(medOrder)), SwingConstants.NORTH);
 //        });
-//        menu.add(itemPopupShow);
-//
-//        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+
+//        menu.add(itemPopupChangeGP);
+
+        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }
 
     public List<MedOrder> getSelected() {
@@ -194,26 +229,35 @@ public class PnlMedOrders extends JPanel {
         //ArrayList<MedOrder> list_of_free_text = new ArrayList<>();
         for (int row = 0; row < model.getRowCount(); row++) {
             row_content.clear();
-            if (model.get(row).getTradeForm() != null) {
-                if (filter.isEmpty() || filter_text(model.get(tbl.convertRowIndexToModel(row))).equalsIgnoreCase(filter.get().getName())) {
-                    for (int col = 0; col < cols - 2; col++) {
-                        row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
-                    }
-                    table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
-                }
-            } else {
-                MedOrder free_text = model.get(tbl.convertRowIndexToModel(row));
-                row_content.add(SYSTools.catchNull(free_text.getNote(), "--"));
-                for (int col = 1; col < cols - 2; col++) {
+
+            if (filter.isEmpty() || filter_text(model.get(tbl.convertRowIndexToModel(row))).equalsIgnoreCase(filter.get().getName())) {
+                for (int col = 0; col < cols - 3; col++) {
                     row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
                 }
                 table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
             }
+
+
+//            if (model.get(row).getTradeForm() != null) {
+//                if (filter.isEmpty() || filter_text(model.get(tbl.convertRowIndexToModel(row))).equalsIgnoreCase(filter.get().getName())) {
+//                    for (int col = 0; col < cols - 3; col++) {
+//                        row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
+//                    }
+//                    table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
+//                }
+//            } else {
+//                MedOrder free_text = model.get(tbl.convertRowIndexToModel(row));
+//                row_content.add(SYSTools.catchNull(free_text.getNote(), "--"));
+//                for (int col = 0; col < cols - 3; col++) {
+//                    row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
+//                }
+//                table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
+//            }
         }
 
         SYSFilesTools.print(
                 HTMLTools.getTable(
-                        HTMLTools.getTableRow("th", "fonttextgray", Arrays.asList(Arrays.copyOfRange(model.getHeader(), 0, cols - 2))) +
+                        HTMLTools.getTableRow("th", "fonttextgray", Arrays.asList(Arrays.copyOfRange(model.getHeader(), 0, cols - 3))) +
                                 table_content, "border=1"
                 ), false
         );

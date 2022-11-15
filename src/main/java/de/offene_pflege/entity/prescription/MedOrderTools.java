@@ -6,18 +6,18 @@ import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.structure.PnlMed;
 import de.offene_pflege.op.threads.DisplayMessage;
+import de.offene_pflege.op.tools.HTMLTools;
 import de.offene_pflege.op.tools.JavaTimeConverter;
+import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.math3.util.OpenIntToDoubleHashMap;
 import org.javatuples.Quintet;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
@@ -229,13 +229,24 @@ public class MedOrderTools {
                 HospitalTools.get_for_order_list(medOrder.getHospital());
     }
 
-
-    public static String toPrettyHTML(MedOrder medOrder) {
-        String text = TradeFormTools.toPrettyHTML(medOrder.getTradeForm());
-        text += "<br/>";
-        text += DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getCreated_on()));
-        text += "&nbsp;" + medOrder.getCreated_by().getFullname();
-        return text;
+    public static String toPrettyHTMLOrderInfos(MedOrder medOrder, boolean with_note) {
+        final StringBuffer text = new StringBuffer();
+        text.append("Erstellt: ");
+        text.append(DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getCreated_on())));
+        text.append("&nbsp;" + medOrder.getCreated_by().getFullname());
+        if (get_confirmed_by(medOrder).isPresent()) {
+            text.append("<br/>Geprüft: " + medOrder.getConfirmed_by().getFullname());
+        } else {
+            text.append("<br/>"+SYSConst.html_italic("bisher ungeprüft"));
+        }
+        if (is_closed(medOrder)) {
+            text.append("<br/>Geschlossen: ");
+            text.append(DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getClosed_on())));
+            text.append("&nbsp;" + medOrder.getClosed_by().getFullname());
+        }
+        text.append(medOrder.getAuto_created() ? SYSConst.html_italic("<br/>automatisch erstellt") :  SYSConst.html_italic("<br/>manuell erstellt"));
+        if (with_note && !medOrder.getNote().isEmpty()) text.append(HTMLTools.p(medOrder.getNote()));
+        return text.toString();
     }
 
 

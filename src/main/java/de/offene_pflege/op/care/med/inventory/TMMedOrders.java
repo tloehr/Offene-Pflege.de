@@ -31,19 +31,15 @@ import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.system.OPUsers;
-import de.offene_pflege.entity.system.SYSLogin;
 import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.ButtonAppearance;
 import de.offene_pflege.op.tools.HTMLTools;
-import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSConst;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -54,8 +50,8 @@ import java.util.Optional;
  */
 @Log4j2
 public class TMMedOrders extends AbstractTableModel {
-    public static final int COL_TradeForm = 0;
-    public static final int COL_Resident = 1;
+    public static final int COL_TradeForm = 1;
+    public static final int COL_Resident = 0;
     public static final int COL_ORDER_INFO = 2;
     public static final int COL_WHERE_TO_ORDER = 3;
     public static final int COL_CONFIRMED = 4;
@@ -65,16 +61,18 @@ public class TMMedOrders extends AbstractTableModel {
     private final List<MedOrder> medOrderList;
     private final boolean is_allowed_to_update;
     private final boolean is_allowed_to_delete;
-    private final String[] header = new String[]{"Medikament/Text", "Bewohner:in", "Datum", "Arzt/KH", "?", "X", "√"};
+    private final boolean show_notes;
+    private final String[] header = new String[]{"Bewohner:in", "Medikament/Text", "Datum", "Arzt/KH", "Check", "Lösch.", "Erl."};
 
     public String[] getHeader() {
         return header;
     }
 
-    public TMMedOrders(List<MedOrder> medOrderList, boolean is_allowed_to_update, boolean is_allowed_to_delete) {
+    public TMMedOrders(List<MedOrder> medOrderList, boolean is_allowed_to_update, boolean is_allowed_to_delete, boolean show_notes) {
         this.medOrderList = medOrderList;
         this.is_allowed_to_update = is_allowed_to_update;
         this.is_allowed_to_delete = is_allowed_to_delete;
+        this.show_notes = show_notes;
     }
 
     @Override
@@ -161,25 +159,39 @@ public class TMMedOrders extends AbstractTableModel {
         MedOrder medOrder = medOrderList.get(row);
         switch (col) {
             case COL_TradeForm: {
-                result = medOrder.getTradeForm() != null ? TradeFormTools.toPrettyHTML(medOrder.getTradeForm()) : "--";
+                result = medOrder.getTradeForm() != null ? TradeFormTools.toPrettyHTML(medOrder.getTradeForm()) : medOrder.getNote();
                 if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
             case COL_Resident: {
                 result = ResidentTools.getNameAndFirstname(medOrder.getResident()) + String.format(" [%s]", medOrder.getResident().getId());
+                if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
             case COL_WHERE_TO_ORDER: {
                 result = MedOrderTools.get_where_to_order(medOrder);
+                if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
             case COL_ORDER_INFO: {
-                result = DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getCreated_on())) + "\n";
-                result += medOrder.getCreated_by().toString();
 
-                if (MedOrderTools.get_confirmed_by(medOrder).isPresent()) {
-                    result += "\ngeprüft: " + MedOrderTools.get_confirmed_by(medOrder).get().toString();
-                }
+                result = MedOrderTools.toPrettyHTMLOrderInfos(medOrder, show_notes);
+//
+//                result = "erstellt: "+ DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getCreated_on())) + "<br/>";
+//                result += medOrder.getCreated_by().getFullname();
+//
+//                if (MedOrderTools.get_confirmed_by(medOrder).isPresent()) {
+//                    result += "<br/>geprüft: " + MedOrderTools.get_confirmed_by(medOrder).get().getFullname();
+//                }
+//
+//                if (MedOrderTools.is_closed(medOrder)) {
+//                    result +="<br/>erledigt: " + DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getClosed_on())) + "<br/>";
+//                    result += medOrder.getClosed_by().getFullname();
+//                }
+//
+//
+//
+//                if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
             case COL_DELETE: {
@@ -268,5 +280,6 @@ public class TMMedOrders extends AbstractTableModel {
         }
         medOrderList.set(row, EntityTools.merge(medOrder));
         fireTableCellUpdated(row, COL_CONFIRMED);
+        fireTableCellUpdated(row, COL_ORDER_INFO);
     }
 }

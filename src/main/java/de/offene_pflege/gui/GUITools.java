@@ -838,6 +838,38 @@ public class GUITools {
         return popup;
     }
 
+    public static JidePopup createPanelPopup(final JPanel myPnl, final Closure saveAction, Component owner) {
+        final JidePopup popup = new JidePopup();
+        popup.setMovable(false);
+        JPanel pnl = new JPanel(new BorderLayout(10, 10));
+        pnl.setBorder(new EmptyBorder(5, 5, 5, 5));
+        pnl.add(myPnl, BorderLayout.CENTER);
+
+        JPanel btnPanel = new JPanel();
+        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
+
+        JButton saveButton = new JButton(SYSConst.icon22apply);
+        saveButton.addActionListener(e -> {
+            popup.hidePopup();
+            saveAction.execute(null);
+        });
+        saveButton.setContentAreaFilled(false);
+        saveButton.setBorder(null);
+        saveButton.setBorderPainted(false);
+        btnPanel.add(Box.createHorizontalGlue());
+        btnPanel.add(saveButton);
+        pnl.add(btnPanel, BorderLayout.SOUTH);
+
+        popup.setContentPane(pnl);
+        popup.setPreferredSize(pnl.getPreferredSize());
+        pnl.revalidate();
+        popup.setOwner(owner);
+        popup.removeExcludedComponent(owner);
+        //        popup.removeExcludedComponent(pnl);
+        popup.setDefaultFocusComponent(pnl);
+        return popup;
+    }
+
     public static JidePopup createPanelPopup(final PopupPanel myPnl, final Closure saveAction, Component owner) {
         final JidePopup popup = new JidePopup();
         popup.setMovable(false);
@@ -1040,7 +1072,8 @@ public class GUITools {
     }
 
     /**
-     * creates a blend between two colors. The float specifies where the balance is. the more towards 1.0 emphasizes the
+     * creates a blend between two colors. The float specifies where the balance is. the more towards 1.0 emphasizes
+     * the
      * <b>first</b> color. the more towards 0.0 emphasizes the <b>second</b> color.
      *
      * @param clOne
