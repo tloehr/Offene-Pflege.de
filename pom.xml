@@ -6,7 +6,7 @@
 
     <groupId>de.offene-pflege</groupId>
     <artifactId>opde1</artifactId>
-    <version>1.16.1</version>
+    <version>1.16.2</version>
 
     <name>OPDE1</name>
     <url>https://www.offene-pflege.de</url>

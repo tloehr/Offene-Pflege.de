@@ -102,7 +102,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
     boolean vorpruefungOK;
 
     /**
-     * Diese Klasse erzeugt das Panel für die QDVS Auswertung Bis zum 31.12.2022 verwendet wir die Spezifikation 1.4 Ab
+     * Diese Klasse erzeugt das Panel für die QDVS Auswertung. Bis zum 31.12.2022 verwenden wir die Spezifikation 1.4 Ab
      * dem 01.01.2023 die 2.0
      *
      * @param jspSearch
@@ -454,12 +454,14 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
     }
 
     void select_specification() {
-        // todo: wieder rein vor release
+
 //        if (STICHTAG.isBefore(LocalDate.of(2023, 1, 1))) {
 //            qdvsService = new QdvsService14(this);
 //        } else {
 //            qdvsService = new QdvsService21(this);
 //        }
+        
+        // todo: wieder rein vor release
         qdvsService = new QdvsService21(this);
     }
 

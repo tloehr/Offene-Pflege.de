@@ -13,6 +13,7 @@ import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.services.RoomsService;
+import de.offene_pflege.services.StationService;
 import de.offene_pflege.services.qdvs.QdvsResidentInfoObject;
 import de.offene_pflege.services.qdvs.QdvsService;
 import de.offene_pflege.services.qdvs.spec21.schema.*;
@@ -83,7 +84,6 @@ public class QdvsService21 implements QdvsService {
     private LocalDateTime BEGINN_ERFASSUNGSZEITRAUM; // ist der letzt Stichtag.
 
 
-
     static final String SPECIFICATION = "V02"; // die Version der jeweilig eingereichten Datenstruktur, die zum Zeitpunkt der Verwendung gültig war.
     public static DecimalFormat NF_IDBEWOHNER = new DecimalFormat("000000");
     private File target;
@@ -117,7 +117,7 @@ public class QdvsService21 implements QdvsService {
 
     // eine Liste aller gültigen Resinfos zum Thema Diagnosen
     ResInfoType typeDiagnosen = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIAGNOSIS);
-//    ResInfoType typeDiabetes = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIABETES);
+    //    ResInfoType typeDiabetes = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIABETES);
 //    ResInfoType typeDemenz = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ORIENTATION);
     private Homes home;
 
@@ -603,11 +603,11 @@ public class QdvsService21 implements QdvsService {
         qsData.setIDBEWOHNER(of.createDasQsDataTypeIDBEWOHNER());
         qsData.getIDBEWOHNER().setValue(NF_IDBEWOHNER.format(resident.getIdbewohner()));
 
-        Optional<Rooms> room = RoomsService.getRoom(resident, STICHTAG);
+        //Optional<Rooms> room = RoomsService.getRoom(resident, STICHTAG);
+
         qsData.setWOHNBEREICH(of.createDasQsDataTypeWOHNBEREICH());
         qsData.getWOHNBEREICH().setValue(EnumWohnbereichType.fromValue(resident.getStation()));
-        //todo: installation klappt nicht / verzeichnis wird gelöscht /
-        // Datum der Erhebung
+
         qsData.setERHEBUNGSDATUM(of.createDasQsDataTypeERHEBUNGSDATUM());
         qsData.getERHEBUNGSDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(STICHTAG.toLocalDate())); // Das Erhebungsdatum ist immer das Datum an dem die Eingabe erfolgte. Ich nehme hier STICHTAG.
 
@@ -1001,19 +1001,29 @@ public class QdvsService21 implements QdvsService {
         }
         qsData.getDEKUBITUS().setValue(dekubitus_schluessel);
 
+        final int fin_dekubitus_schlussel = dekubitus_schluessel;
         optWunde1.ifPresent(wunde1 -> {
-            if (wunde1.getValue2() > 1 && wunde1.getValue1() == 1) { // Grad > 1 und Wunde bei uns entstanden.
-                qsData.getDEKUBITUS1BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde1.getValue3()));
-                // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
-                qsData.getDEKUBITUS1ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde1.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
+            // wenn [Feld 60 = 1,2] UND [Feld 61 = 2,3,4,9] UND [Feld 64 <> LEER] UND [Feld 64 = 1]
+            if (wunde1.getValue2() > 1) { // Grad > 1
+                /** SPEC20-62 */
+                if (wunde1.getValue1() == 1) // Wunde bei uns entstanden.
+                    qsData.getDEKUBITUS1BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde1.getValue3()));
+
+                // wenn Bedingung 1: [Feld 60 = 1] UND [Feld 61 = 2,3,4,9] oder Bedingung 2: [Feld 60 = 2] UND ( [Feld 62 <> LEER] ODER [Feld 64 <> LEER] )
+                /** SPEC20-63 */
+                if (fin_dekubitus_schlussel == 2)
+                    qsData.getDEKUBITUS1ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde1.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
             }
             qsData.getDEKUBITUS1LOK().setValue(wunde1.getValue1());
         });
 
         optWunde2.ifPresent(wunde2 -> {
-            if (wunde2.getValue2() > 1 && wunde2.getValue1() == 1) { // Grad > 1 und Wunde bei uns entstanden.
-                qsData.getDEKUBITUS2BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde2.getValue3()));
-                // Falls der Dekubitus zum Stichtag noch besteht, bitte den Stichtag angeben.
+            if (wunde2.getValue2() > 1) { // Grad > 1
+                /** SPEC20-65 */
+                if (wunde2.getValue1() == 1) // Wunde bei uns entstanden.
+                    qsData.getDEKUBITUS2BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde2.getValue3()));
+
+                /** SPEC20-66 */
                 qsData.getDEKUBITUS2ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde2.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
             }
             qsData.getDEKUBITUS2LOK().setValue(wunde2.getValue1());

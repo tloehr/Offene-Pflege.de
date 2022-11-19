@@ -73,6 +73,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -133,7 +134,12 @@ public class PnlMed extends CleanablePanel {
             if (rb_last_week.isSelected()) week = Optional.of(LocalDate.now().minusWeeks(1));
             if (rb_before_last_week.isSelected()) week = Optional.of(LocalDate.now().minusWeeks(2));
 
-            list = MedOrderTools.get_medorders(week, tbShowClosed.isSelected());
+
+            list = MedOrderTools.get_medorders(
+                    week,
+                    tbShowClosed.isSelected(),
+                    DayOfWeek.of(SYSPropsTools.getInteger(SYSPropsTools.KEY_CALC_MEDI_START_ORDER_WEEK, DayOfWeek.MONDAY.getValue()))
+            );
 
             ComparatorChain chain = new ComparatorChain();
             chain.addComparator(Comparator.comparing((MedOrder mo) -> mo.getResident().getName()));

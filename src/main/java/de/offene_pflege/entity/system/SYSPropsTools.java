@@ -75,6 +75,7 @@ public class SYSPropsTools {
     public static final String KEY_CALC_MEDI_OTHER = "calc.medi.other"; // yet unused
     public static final String KEY_MAINTENANCE_MODE = "system.maintenance.mode";
     public static final String KEY_CALC_MEDI_UPR_CORRIDOR = "apv_korridor";
+    public static final String KEY_CALC_MEDI_START_ORDER_WEEK = "calc.medi.start.order.week";
 
     public static final String KEY_USERS_CIPHERED = "users.ciphered";
     public static final String KEY_RESIDENTS_ANONYMIZED = "residents.anonymized";
@@ -222,8 +223,17 @@ public class SYSPropsTools {
         return bool;
     }
 
-    public static int getInteger(String key) {
-        int i = 0;
+    public static void storeInteger(String key, int value) {
+          storeProp(key, Integer.toString(value), null);
+      }
+
+
+    public static int getInteger(String key){
+        return getInteger(key, 0);
+    }
+
+    public static int getInteger(String key, int default_value) {
+        int i = default_value;
         if (OPDE.getProps().containsKey(key)) {
             i = Integer.parseInt(OPDE.getProps().getProperty(key));
         }

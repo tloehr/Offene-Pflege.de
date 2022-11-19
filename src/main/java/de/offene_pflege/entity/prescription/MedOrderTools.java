@@ -112,7 +112,8 @@ public class MedOrderTools {
         return list;
     }
 
-    public static List<MedOrder> get_closed_medorders(EntityManager em, LocalDate week) {
+    public static List<MedOrder> get_closed_medorders(EntityManager em, LocalDate week, DayOfWeek start_day) {
+        DayOfWeek end_day = start_day.plus(6);
         ArrayList<MedOrder> list = new ArrayList<>();
         try {
             String jpql = " SELECT p " +
@@ -120,8 +121,8 @@ public class MedOrderTools {
                     " WHERE p.created_on between :from AND :to" +
                     " AND p.closed_by IS NOT NULL ";
             Query query = em.createQuery(jpql);
-            query.setParameter("from", week.with(DayOfWeek.MONDAY).atStartOfDay());
-            query.setParameter("to", week.with(DayOfWeek.SUNDAY).atTime(LocalTime.MAX));
+            query.setParameter("from", week.with(start_day).atStartOfDay());
+            query.setParameter("to", week.with(end_day).atTime(LocalTime.MAX));
             list.addAll(query.getResultList());
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -204,13 +205,13 @@ public class MedOrderTools {
         return list;
     }
 
-    public static List<MedOrder> get_medorders(Optional<LocalDate> week, boolean with_closed) {
+    public static List<MedOrder> get_medorders(Optional<LocalDate> week, boolean with_closed, DayOfWeek start_day) {
         List<MedOrder> list = new ArrayList<>();
         EntityManager em = OPDE.createEM();
         try {
             if (week.isPresent()) {
                 list = get_open_medorders(em, week.get());
-                if (with_closed) list.addAll(get_closed_medorders(em, week.get()));
+                if (with_closed) list.addAll(get_closed_medorders(em, week.get(), start_day));
             } else {
                 list = get_open_medorders(em);
                 if (with_closed) list.addAll(get_closed_medorders(em));

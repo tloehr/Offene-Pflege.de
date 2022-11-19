@@ -632,6 +632,7 @@ public enum EnumWohnbereichType {
     }
 
     public static EnumWohnbereichType fromValue(Station station) {
+        if (station == null) return WB_99;
         return valueOf("WB_" + station.getId());
     }
 
