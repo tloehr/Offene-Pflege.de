@@ -150,6 +150,10 @@ public class TradeFormTools {
         return list;
     }
 
+    public static MedInventory getInventory4TradeForm(MedOrder medOrder) {
+        return getInventory4TradeForm(medOrder.getResident(), medOrder.getTradeForm());
+    }
+
 
     /**
      * Die genaue Erläuterung zu dieser Methode befindet sich in der Methode

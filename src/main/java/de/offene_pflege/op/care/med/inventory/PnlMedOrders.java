@@ -2,6 +2,7 @@ package de.offene_pflege.op.care.med.inventory;
 
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
@@ -18,6 +19,11 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.List;
 
@@ -26,6 +32,7 @@ public class PnlMedOrders extends JPanel {
     private JPopupMenu menu;
     JTable tbl;
     JScrollPane scrl;
+    JLabel lbl_week;
 
     private String internalClassID = "opde.medication";
 
@@ -35,8 +42,13 @@ public class PnlMedOrders extends JPanel {
     }
 
     private void initPanel() {
+        lbl_week = new JLabel("--");
+        lbl_week.setFont(SYSConst.ARIAL28);
+
         setLayout(new BorderLayout(5, 5));
         menu = null;
+
+        add(lbl_week, BorderLayout.NORTH);
         JPanel pnl = getButtonPanel();
         add(pnl, BorderLayout.SOUTH);
         scrl = new JScrollPane();
@@ -57,7 +69,16 @@ public class PnlMedOrders extends JPanel {
         return ((TMMedOrders) tbl.getModel()).getMedOrderList();
     }
 
-    public void reload(List<MedOrder> list, boolean show_notes) {
+    public void reload(List<MedOrder> list, boolean show_notes, Optional<LocalDate> week) {
+
+        lbl_week.setText("alles");
+        week.ifPresent(localDate -> {
+            LocalDate start_day = localDate.with(DayOfWeek.of(SYSPropsTools.getInteger(SYSPropsTools.KEY_CALC_MEDI_START_ORDER_WEEK, DayOfWeek.MONDAY.getValue())));
+            LocalDate end_day = start_day.plusDays(6);
+            lbl_week.setText(start_day.atStartOfDay().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)) + " => " + end_day.atTime(LocalTime.MAX).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)));
+        });
+
+
         tbl.setModel(new TMMedOrders(list, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID), OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID), show_notes));
         tbl.getModel().addTableModelListener(e -> {
             if (e.getColumn() == TMMedOrders.COL_WHERE_TO_ORDER)
@@ -169,36 +190,6 @@ public class PnlMedOrders extends JPanel {
         });
         menu.add(itemPopupInfo);
 
-//        JMenuItem itemPopupChangeGP = new JMenuItem(SYSTools.xx("misc.msg.change.gp"), SYSConst.icon22edit);
-//        itemPopupChangeGP.addActionListener(e -> {
-//            MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.convertRowIndexToModel(tbl.getSelectionModel().getLeadSelectionIndex()));
-//            java.util.List<HasName> liste = new ArrayList();
-//            liste.addAll(GPTools.getAllActive());
-//            liste.addAll(HospitalTools.getAll());
-//            Collections.sort(liste, (o1, o2) -> {
-//                return o1.getName().compareTo(o2.getName());
-//            });
-//            JComboBox<HasName> cmb = new JComboBox<>(SYSTools.list2cmb(liste));
-//            cmb.setRenderer(new DefaultListCellRenderer() {
-//                @Override
-//                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-//                    return super.getListCellRendererComponent(list, (value instanceof GP ?
-//                                    SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getFirstname(), SYSTools.INDEX_FIRSTNAME_MALE) :
-//                                    ((Hospital) value).getName() + ", " + ((Hospital) value).getCity()
-//                            ),
-//                            index, isSelected, cellHasFocus);
-//                }
-//            });
-//            ,
-//
-//            if (medOrder.getGp() != null) cmb.setSelectedItem(medOrder.getGp());
-//            else cmb.setSelectedItem(medOrder.getHospital());
-//            JPanel pnl = new JPanel(new BorderLayout());
-//            pnl.add(cmb, BorderLayout.CENTER);
-//
-//        });
-
-//        menu.add(itemPopupChangeGP);
 
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }
@@ -236,23 +227,6 @@ public class PnlMedOrders extends JPanel {
                 }
                 table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
             }
-
-
-//            if (model.get(row).getTradeForm() != null) {
-//                if (filter.isEmpty() || filter_text(model.get(tbl.convertRowIndexToModel(row))).equalsIgnoreCase(filter.get().getName())) {
-//                    for (int col = 0; col < cols - 3; col++) {
-//                        row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
-//                    }
-//                    table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
-//                }
-//            } else {
-//                MedOrder free_text = model.get(tbl.convertRowIndexToModel(row));
-//                row_content.add(SYSTools.catchNull(free_text.getNote(), "--"));
-//                for (int col = 0; col < cols - 3; col++) {
-//                    row_content.add(SYSTools.catchNull(model.getValueAt(tbl.convertRowIndexToModel(row), col)));
-//                }
-//                table_content += HTMLTools.getTableRow("td style=\"vertical-align:top\"", "", row_content);
-//            }
         }
 
         SYSFilesTools.print(

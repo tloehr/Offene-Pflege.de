@@ -3,6 +3,7 @@ package de.offene_pflege.entity.prescription;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.OPUsers;
+import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.structure.PnlMed;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -95,7 +96,8 @@ public class MedOrderTools {
         return Optional.empty();
     }
 
-    public static List<MedOrder> get_open_medorders(EntityManager em, LocalDate week) {
+    public static List<MedOrder> get_open_medorders(EntityManager em, LocalDate start) {
+        LocalDate end = start.plusDays(6);
         ArrayList<MedOrder> list = new ArrayList<>();
         try {
             String jpql = " SELECT p " +
@@ -103,8 +105,8 @@ public class MedOrderTools {
                     " WHERE p.created_on between :from AND :to" +
                     " AND p.closed_by IS NULL ";
             Query query = em.createQuery(jpql);
-            query.setParameter("from", week.with(DayOfWeek.MONDAY).atStartOfDay());
-            query.setParameter("to", week.with(DayOfWeek.SUNDAY).atTime(LocalTime.MAX));
+            query.setParameter("from", start.atStartOfDay());
+            query.setParameter("to", end.atTime(LocalTime.MAX));
             list.addAll(query.getResultList());
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -112,8 +114,8 @@ public class MedOrderTools {
         return list;
     }
 
-    public static List<MedOrder> get_closed_medorders(EntityManager em, LocalDate week, DayOfWeek start_day) {
-        DayOfWeek end_day = start_day.plus(6);
+    public static List<MedOrder> get_closed_medorders(EntityManager em, LocalDate start) {
+        LocalDate end = start.plusDays(6);
         ArrayList<MedOrder> list = new ArrayList<>();
         try {
             String jpql = " SELECT p " +
@@ -121,8 +123,8 @@ public class MedOrderTools {
                     " WHERE p.created_on between :from AND :to" +
                     " AND p.closed_by IS NOT NULL ";
             Query query = em.createQuery(jpql);
-            query.setParameter("from", week.with(start_day).atStartOfDay());
-            query.setParameter("to", week.with(end_day).atTime(LocalTime.MAX));
+            query.setParameter("from", start.atStartOfDay());
+            query.setParameter("to", end.atTime(LocalTime.MAX));
             list.addAll(query.getResultList());
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -205,13 +207,13 @@ public class MedOrderTools {
         return list;
     }
 
-    public static List<MedOrder> get_medorders(Optional<LocalDate> week, boolean with_closed, DayOfWeek start_day) {
+    public static List<MedOrder> get_medorders(Optional<LocalDate> week, boolean with_closed) {
         List<MedOrder> list = new ArrayList<>();
         EntityManager em = OPDE.createEM();
         try {
             if (week.isPresent()) {
                 list = get_open_medorders(em, week.get());
-                if (with_closed) list.addAll(get_closed_medorders(em, week.get(), start_day));
+                if (with_closed) list.addAll(get_closed_medorders(em, week.get()));
             } else {
                 list = get_open_medorders(em);
                 if (with_closed) list.addAll(get_closed_medorders(em));
@@ -238,15 +240,16 @@ public class MedOrderTools {
         if (get_confirmed_by(medOrder).isPresent()) {
             text.append("<br/>Geprüft: " + medOrder.getConfirmed_by().getFullname());
         } else {
-            text.append("<br/>"+SYSConst.html_italic("bisher ungeprüft"));
+            text.append("<br/>" + SYSConst.html_italic("bisher ungeprüft"));
         }
         if (is_closed(medOrder)) {
             text.append("<br/>Geschlossen: ");
             text.append(DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getClosed_on())));
             text.append("&nbsp;" + medOrder.getClosed_by().getFullname());
         }
-        text.append(medOrder.getAuto_created() ? SYSConst.html_italic("<br/>automatisch erstellt") :  SYSConst.html_italic("<br/>manuell erstellt"));
-        if (with_note && !medOrder.getNote().isEmpty()) text.append(HTMLTools.p(medOrder.getNote()));
+        text.append(medOrder.getAuto_created() ? SYSConst.html_italic("<br/>automatisch erstellt") : SYSConst.html_italic("<br/>manuell erstellt"));
+        if (with_note && !Optional.ofNullable(medOrder.getNote()).orElse("").isEmpty())
+            text.append(HTMLTools.p(medOrder.getNote()));
         return text.toString();
     }
 
@@ -284,8 +287,10 @@ public class MedOrderTools {
 
 
             // wir haben so eine bestellung schon
-            if (open_orders.stream().anyMatch(medOrder -> medOrder.getResident().equals(resident) && medOrder.getTradeForm().equals(tradeForm)))
+            if (open_orders.stream().anyMatch(medOrder -> medOrder.getResident().equals(resident) && medOrder.getTradeForm().equals(tradeForm))) {
+                log.debug("Bestellung schon vorhanden. skip");
                 return;
+            }
 
             DecimalFormat df = new DecimalFormat("#0.##");
 

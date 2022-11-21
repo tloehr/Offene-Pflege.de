@@ -125,7 +125,6 @@ public class FrmMain extends JFrame {
     public FrmMain() {
         initPhase = true;
 
-
         initComponents();
 
 

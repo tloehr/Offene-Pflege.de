@@ -129,16 +129,19 @@ public class PnlMed extends CleanablePanel {
         optPnlMedOrders.ifPresent(pnlMedOrders -> {
             List<MedOrder> list;
 
-            Optional<LocalDate> week = Optional.empty();
-            if (rb_this_week.isSelected()) week = Optional.of(LocalDate.now());
-            if (rb_last_week.isSelected()) week = Optional.of(LocalDate.now().minusWeeks(1));
-            if (rb_before_last_week.isSelected()) week = Optional.of(LocalDate.now().minusWeeks(2));
+            DayOfWeek start_day = DayOfWeek.of(SYSPropsTools.getInteger(SYSPropsTools.KEY_CALC_MEDI_START_ORDER_WEEK, DayOfWeek.MONDAY.getValue()));
 
+            LocalDate now = LocalDate.now().with(start_day);
+            if (now.compareTo(LocalDate.now()) > 0) now = now.minusWeeks(1);
+
+            Optional<LocalDate> week = Optional.empty();
+            if (rb_this_week.isSelected()) week = Optional.of(now);
+            if (rb_last_week.isSelected()) week = Optional.of(now.minusWeeks(1));
+            if (rb_before_last_week.isSelected()) week = Optional.of(now.minusWeeks(2));
 
             list = MedOrderTools.get_medorders(
                     week,
-                    tbShowClosed.isSelected(),
-                    DayOfWeek.of(SYSPropsTools.getInteger(SYSPropsTools.KEY_CALC_MEDI_START_ORDER_WEEK, DayOfWeek.MONDAY.getValue()))
+                    tbShowClosed.isSelected()
             );
 
             ComparatorChain chain = new ComparatorChain();
@@ -148,7 +151,7 @@ public class PnlMed extends CleanablePanel {
             Collections.sort(list, chain);
 
             fill_where_to_order_filter(list);
-            pnlMedOrders.reload(list, tbWithNotes.isSelected());
+            pnlMedOrders.reload(list, tbWithNotes.isSelected(), week);
         });
     }
 

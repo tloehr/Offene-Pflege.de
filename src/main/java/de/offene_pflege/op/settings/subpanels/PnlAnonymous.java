@@ -5,6 +5,7 @@ import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.interfaces.DefaultPanel;
 import de.offene_pflege.gui.interfaces.YesNoToggleButton;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.RiverLayout;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 
@@ -40,17 +41,12 @@ public class PnlAnonymous extends DefaultPanel {
         });
         btn2.setFont(SYSConst.ARIAL20);
 
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+        mainPanel.setLayout(new RiverLayout());
 
-
-        JPanel innerLayout = new JPanel(new GridLayout(3, 2, 5, 5));
-        innerLayout.add(lbl1);
-        innerLayout.add(btn1);
-        innerLayout.add(lbl2);
-        innerLayout.add(btn2);
-        innerLayout.add(lbl3);
-
-        mainPanel.add(innerLayout);
-
+        mainPanel.add("p left", lbl1);
+        mainPanel.add("tab", btn1);
+        mainPanel.add("p left", lbl2);
+        mainPanel.add("tab", btn2);
+        mainPanel.add("p left", lbl3);
     }
 }

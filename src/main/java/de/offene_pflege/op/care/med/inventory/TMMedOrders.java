@@ -159,7 +159,21 @@ public class TMMedOrders extends AbstractTableModel {
         MedOrder medOrder = medOrderList.get(row);
         switch (col) {
             case COL_TradeForm: {
-                result = medOrder.getTradeForm() != null ? TradeFormTools.toPrettyHTML(medOrder.getTradeForm()) : medOrder.getNote();
+
+                if (medOrder.getTradeForm() == null) {
+                    result = medOrder.getNote();
+                } else {
+                    Optional<MedStock> stockInUse = Optional.ofNullable(MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(medOrder)));
+                    if (stockInUse.isPresent()) {
+                        if (!stockInUse.get().getTradeForm().equals(medOrder.getTradeForm())) {
+                            result = TradeFormTools.toPrettyHTML(stockInUse.get().getTradeForm()) + " " + TradeFormTools.toPrettyHTMLalternative(medOrder.getTradeForm());
+                        } else {
+                            result = TradeFormTools.toPrettyHTML(medOrder.getTradeForm());
+                        }
+                    } else {
+                        result = TradeFormTools.toPrettyHTML(medOrder.getTradeForm());
+                    }
+                }
                 if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
@@ -174,24 +188,7 @@ public class TMMedOrders extends AbstractTableModel {
                 break;
             }
             case COL_ORDER_INFO: {
-
                 result = MedOrderTools.toPrettyHTMLOrderInfos(medOrder, show_notes);
-//
-//                result = "erstellt: "+ DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getCreated_on())) + "<br/>";
-//                result += medOrder.getCreated_by().getFullname();
-//
-//                if (MedOrderTools.get_confirmed_by(medOrder).isPresent()) {
-//                    result += "<br/>geprüft: " + MedOrderTools.get_confirmed_by(medOrder).get().getFullname();
-//                }
-//
-//                if (MedOrderTools.is_closed(medOrder)) {
-//                    result +="<br/>erledigt: " + DateFormat.getDateInstance(DateFormat.SHORT).format(JavaTimeConverter.toDate(medOrder.getClosed_on())) + "<br/>";
-//                    result += medOrder.getClosed_by().getFullname();
-//                }
-//
-//
-//
-//                if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
             case COL_DELETE: {
