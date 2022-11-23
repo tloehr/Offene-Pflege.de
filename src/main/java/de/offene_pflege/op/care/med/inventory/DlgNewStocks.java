@@ -599,7 +599,7 @@ public class DlgNewStocks extends JDialog {
 
                 // alle passenden bestellungen suchen und abschließen.
                 open_orders.stream()
-                        .filter(medOrder -> medOrder.getResident().equals(resident) && (medOrder.getTradeForm().equals(tradeForm) || equivalent_tfs.contains(medOrder.getTradeForm())))
+                        .filter(medOrder -> medOrder.getResident().equals(resident) && medOrder.getTradeForm() != null && (medOrder.getTradeForm().equals(tradeForm) || equivalent_tfs.contains(medOrder.getTradeForm())))
                         .forEach(medOrder -> {
                             medOrder.setClosed_on(LocalDateTime.now());
                             medOrder.setClosed_by(OPDE.getLogin().getUser());
