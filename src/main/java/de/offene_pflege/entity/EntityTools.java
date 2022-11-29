@@ -253,7 +253,10 @@ public class EntityTools {
     }
 
     public static String getJDBCUrl(String host, String port, String catalog) {
-        String params = "?autoReconnect=true&useSSL=false&serverTimezone=Europe/Berlin"; // Timezone wichtig ab Version 8 von Connector/J
+        // Timezone wichtig ab Version 8 von Connector/J
+        // bei Neuinstallationen auf MySQL8 muss man allowPublicKeyRetrieval=true verwenden, sonst kann es passieren, dass man sich nicht anmelden kann
+        // SQLNonTransientConnectionException
+        String params = "?autoReconnect=true&useSSL=false&serverTimezone=Europe/Berlin&allowPublicKeyRetrieval=true";
         return "jdbc:mysql://" + SYSTools.catchNull(host) + ":" + SYSTools.catchNull(port) + (SYSTools.catchNull(catalog).isEmpty() ? "" : "/" + SYSTools.catchNull(catalog)) + params;
     }
 

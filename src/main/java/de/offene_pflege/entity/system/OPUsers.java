@@ -233,7 +233,6 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
         OPUsers OPUsers = (OPUsers) o;
 
         if (eMail != null ? !eMail.equals(OPUsers.eMail) : OPUsers.eMail != null) return false;
-        if (logins != null ? !logins.equals(OPUsers.logins) : OPUsers.logins != null) return false;
         if (md5pw != null ? !md5pw.equals(OPUsers.md5pw) : OPUsers.md5pw != null) return false;
         if (nachname != null ? !nachname.equals(OPUsers.nachname) : OPUsers.nachname != null) return false;
         if (userstatus != null ? !userstatus.equals(OPUsers.userstatus) : OPUsers.userstatus != null) return false;

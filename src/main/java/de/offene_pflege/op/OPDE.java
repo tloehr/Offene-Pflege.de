@@ -579,6 +579,7 @@ public class OPDE {
             jpaProps.put("eclipselink.cache.shared.default", cl.hasOption("c") ? "true" : "false");
             //jpaProps.put("eclipselink.session.customizer", "de.offene_pflege.entity.JPAEclipseLinkSessionCustomizer");
 
+            
             Connection jdbcConnection = DriverManager.getConnection(url, jpaProps.getProperty(SYSPropsTools.KEY_JDBC_USER), jpaProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD));
             int neededVersion = OPDE.getAppInfo().getDbversion();
             int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
