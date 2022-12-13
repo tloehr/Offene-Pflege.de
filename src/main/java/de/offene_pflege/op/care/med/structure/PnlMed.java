@@ -56,7 +56,6 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -69,15 +68,11 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -95,7 +90,7 @@ public class PnlMed extends CleanablePanel {
     private JToggleButton tbIDs, tbShowClosed, tbWithNotes;
     private JTextField days_range;
     //    private List<HasName> where_to_order_list;
-    private JComboBox<HasName> cmb_where_to_order_filter;
+    private JComboBox<HasName> cmb_where_to_order_filter, cmb_filter_for_generate;
 
     private JRadioButton rb_this_week;
     private JRadioButton rb_all;
@@ -151,8 +146,16 @@ public class PnlMed extends CleanablePanel {
             Collections.sort(list, chain);
 
             fill_where_to_order_filter(list);
+            fill_filter_for_generate();
             pnlMedOrders.reload(list, tbWithNotes.isSelected(), week);
         });
+    }
+
+    private void fill_filter_for_generate() {
+        final DefaultComboBoxModel<HasName> dcbm = new DefaultComboBoxModel<>();
+        dcbm.addElement(null);
+        PrescriptionTools.get_active_order_sources().forEach(o -> dcbm.addElement((HasName) o));
+        cmb_filter_for_generate.setModel(dcbm);
     }
 
     private void fill_where_to_order_filter(List<MedOrder> list) {
@@ -386,21 +389,21 @@ public class PnlMed extends CleanablePanel {
         pnl.add(new JLabel("Tage"));
         list.add(pnl);
 
+        cmb_filter_for_generate = new JComboBox<>();
+        cmb_filter_for_generate.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                return super.getListCellRendererComponent(list, value == null ? "für Alle" : SYSTools.anonymizeName(((HasName) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
+            }
+        });
+        list.add(cmb_filter_for_generate);
+
         JButton btn_regular = GUITools.createHyperlinkButton("Bestellung Regel-Verordnungen", null, null);
         btn_regular.addActionListener(e -> {
-//            orderButtonPressed(); // just in case
             generate_orders(TYPE_REGULAR);
         });
         list.add(btn_regular);
         btn_regular.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
-//
-//        JButton btn_demand = GUITools.createHyperlinkButton("Bestellung Bedarfs-Verordnungen", null, null);
-//        btn_demand.addActionListener(e -> {
-//            //            orderButtonPressed(); // just in case
-//            generate_orders(TYPE_ON_DEMAND);
-//        });
-//        list.add(btn_demand);
-//        btn_demand.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
 
         JButton add_free_text = GUITools.createHyperlinkButton("freien Text eintragen", SYSConst.icon22add, null);
         add_free_text.addActionListener(evt1 -> {
@@ -465,7 +468,6 @@ public class PnlMed extends CleanablePanel {
         rb_before_last_week.addActionListener(actionListener);
         rb_all.addActionListener(actionListener);
 
-
         cmb_where_to_order_filter = new JComboBox<>();
         list.add(cmb_where_to_order_filter);
         cmb_where_to_order_filter.setRenderer(new DefaultListCellRenderer() {
@@ -496,7 +498,7 @@ public class PnlMed extends CleanablePanel {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        MedOrderTools.generate_orders(Integer.parseInt(days_range.getText()), type, MedOrderTools.get_open_orders(em)).forEach(medOrder -> em.merge(medOrder));
+                        MedOrderTools.generate_orders(Integer.parseInt(days_range.getText()), type, Optional.ofNullable((HasName) cmb_filter_for_generate.getSelectedItem()), MedOrderTools.get_open_orders(em)).forEach(medOrder -> em.merge(medOrder));
                         em.getTransaction().commit();
                     } catch (OptimisticLockException | RollbackException ole) {
                         log.warn(ole);

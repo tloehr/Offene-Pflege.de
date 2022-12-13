@@ -421,7 +421,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         ButtonColumn bc = new ButtonColumn(tblRight, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                final int row = Integer.parseInt(ae.getActionCommand());
+                final int row = tblRight.convertRowIndexToModel(Integer.parseInt(ae.getActionCommand()));
                 final ResValue val2Delete = listValues.get(row);
                 currentEditor = new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + "<br/><i>" + df.format(val2Delete.getPit()) + "<br/>" + nf.format(val2Delete.getVal1()) + " ml<br/>" + val2Delete.getUser().toString() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, answer -> {
                     if (answer.equals(JOptionPane.YES_OPTION)) {

@@ -32,10 +32,10 @@
         <commons.io.version>2.11.0</commons.io.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.log4j.version>2.17.2</commons.log4j.version>
-        <guava.version>31.1-jre</guava.version>
-        <commons.net.version>3.8.0</commons.net.version>
+        <commons.net.version>3.9.0</commons.net.version>
         <commons.text.version>1.10.0</commons.text.version>
         <eclipselink.version>2.7.10</eclipselink.version>
+        <guava.version>31.1-jre</guava.version>
         <hibernate.validator.version>6.2.3.Final</hibernate.validator.version>
         <icu4j.version>71.1</icu4j.version> <!-- war 69.1 -->
         <javatuples.version>1.2</javatuples.version>
@@ -47,8 +47,6 @@
         <jaxb.api.version>2.3.3</jaxb.api.version>
         <jaxb.core.version>3.0.1</jaxb.core.version>
         <jaxb.impl.version>2.1</jaxb.impl.version>
-        <xml.bind.impl.version>3.0.2</xml.bind.impl.version>
-        <xml.bind.version>3.0.1</xml.bind.version>
         <jcalendar.version>1.4</jcalendar.version>
         <jgoodies.binding.version>2.13.0</jgoodies.binding.version>
         <jgoodies.common.version>1.8.1</jgoodies.common.version>
@@ -64,6 +62,8 @@
         <swingx.core.version>1.6.5-1</swingx.core.version>
         <timing.framework.version>7.3.1</timing.framework.version>
         <xerces.version>2.12-beta-r1667115</xerces.version>
+        <xml.bind.impl.version>3.0.2</xml.bind.impl.version>
+        <xml.bind.version>3.0.1</xml.bind.version>
         <!-- not changed anymore -->
         <install4j.runtime.version>9.0.7</install4j.runtime.version>
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>

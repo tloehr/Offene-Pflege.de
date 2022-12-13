@@ -2,7 +2,6 @@ package de.offene_pflege.op.care.med.structure;
 
 import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.prescription.MedStock;
-import de.offene_pflege.entity.prescription.MedStockTools;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -12,21 +11,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @Log4j2
 public class TMStocks extends AbstractTableModel {
     public static final int COL_UPR = 6;
     private final ArrayList<MedStock> listStocks;
     private final String[] columnNames;
-//    private final ArrayList<BigDecimal> bhp_doses_cache;
 
     public TMStocks(ArrayList<MedStock> listStocks) {
         this.listStocks = listStocks;
-//        bhp_doses_cache = new ArrayList<>();
-//        for (int i = 0; i < listStocks.size(); i++){
-//            bhp_doses_cache.add(MedStockTools.getSumOfDosesInBHP(listStocks.get(i)));
-//        }
         columnNames = new String[]{SYSTools.xx("upreditor.col1"), SYSTools.xx("upreditor.col2"), SYSTools.xx("upreditor.col3"), SYSTools.xx("upreditor.col4"), SYSTools.xx("upreditor.col5"), SYSTools.xx("upreditor.col6"), SYSTools.xx("upreditor.col7")};
     }
 

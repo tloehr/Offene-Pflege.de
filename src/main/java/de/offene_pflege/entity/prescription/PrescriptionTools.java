@@ -744,6 +744,29 @@ public class PrescriptionTools {
         return prescriptions;
     }
 
+    public static List get_active_order_sources() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT p FROM Prescription p " +
+                " WHERE p.to >= :now ");
+        query.setParameter("now", new Date());
+        List list = (List) query.getResultList().stream().map(o -> {
+            Prescription p = (Prescription) o;
+            return p.getDocON() != null ? p.getDocON() : p.getHospitalON();
+        })
+                .distinct()
+                .sorted(Comparator.comparing(HasName::getName))
+                .collect(Collectors.toList());
+        em.close();
+
+        return list;
+    }
+
+    public static HasName get_order_source(Prescription p){
+        return p.getDocON() != null ? p.getDocON() : p.getHospitalON();
+    }
+
+
     public static ArrayList<Prescription> getAll(Resident resident, LocalDate from, LocalDate to) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
@@ -823,7 +846,6 @@ public class PrescriptionTools {
         Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.to >= :now");
         query.setParameter("resident", resident);
         query.setParameter("now", new Date());
-//        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         result = new ArrayList<Prescription>(query.getResultList());
 
         em.close();

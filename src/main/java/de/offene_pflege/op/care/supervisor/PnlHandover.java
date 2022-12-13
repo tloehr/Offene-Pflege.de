@@ -32,8 +32,6 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import de.offene_pflege.entity.building.Homes;
-import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
@@ -49,6 +47,7 @@ import de.offene_pflege.op.tools.NursingRecordsPanel;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.services.HomesService;
 import lombok.extern.log4j.Log4j2;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXSearchField;
@@ -61,7 +60,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
@@ -75,7 +73,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
     private JXSearchField txtSearch;
     private JComboBox yearCombo;
-    private JScrollPane jspSearch;
+    private final JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
     private Map<String, CollapsiblePane> cpMap;
@@ -87,9 +85,6 @@ public class PnlHandover extends NursingRecordsPanel {
 
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     Format dayFormat = new SimpleDateFormat("EEEE, dd.MM.yyyy");
-
-    int checkWeeksbackForNewReports = 4;
-
 
     /**
      * Creates new form PnlHandover
@@ -131,9 +126,9 @@ public class PnlHandover extends NursingRecordsPanel {
             }
         };
 
-        cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
-        cacheHO = Collections.synchronizedMap(new HashMap<String, ArrayList<Handovers>>());
-        cacheNR = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
+        cpMap = Collections.synchronizedMap(new HashMap<>());
+        cacheHO = Collections.synchronizedMap(new HashMap<>());
+        cacheNR = Collections.synchronizedMap(new HashMap<>());
         OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
         prepareSearchArea();
     }
@@ -258,7 +253,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
 
     private void expandDay(LocalDate day) {
-        final String keyYear = Integer.toString(day.getYear()) + ".year";
+        final String keyYear = day.getYear() + ".year";
         if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
             try {
                 cpMap.get(keyYear).setCollapsed(false);
@@ -297,7 +292,7 @@ public class PnlHandover extends NursingRecordsPanel {
         final LocalDate start = new LocalDate(year, 1, 1).isBefore(min.dayOfMonth().withMinimumValue()) ? min.dayOfMonth().withMinimumValue() : new LocalDate(year, 1, 1);
         final LocalDate end = new LocalDate(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new LocalDate(year, 12, 31);
 
-        final String keyYear = Integer.toString(year) + ".year";
+        final String keyYear = year + ".year";
         synchronized (cpMap) {
             if (!cpMap.containsKey(keyYear)) {
                 cpMap.put(keyYear, new CollapsiblePane());
@@ -314,7 +309,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
 
         String title = "<html><font size=+1>" +
-                "<b>" + Integer.toString(year) + "</b>" +
+                "<b>" + year + "</b>" +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, e -> {
@@ -856,7 +851,7 @@ public class PnlHandover extends NursingRecordsPanel {
             LocalDate end = new LocalDate();
 
             for (int year = end.getYear(); year >= start.getYear(); year--) {
-                final String keyYear = Integer.toString(year) + ".year";
+                final String keyYear = year + ".year";
                 cpsHandover.add(cpMap.get(keyYear));
             }
         }

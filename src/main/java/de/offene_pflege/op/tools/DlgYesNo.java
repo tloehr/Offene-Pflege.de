@@ -35,7 +35,6 @@ public class DlgYesNo extends MyJDialog {
         txtMessage.setText(SYSTools.toHTML("<div id=\"fonttext\">" + message + "</div>"));
         lblTitle.setText(null);
         lblIcon.setIcon(icon);
-        pack();
     }
 
     /**
@@ -58,7 +57,6 @@ public class DlgYesNo extends MyJDialog {
         txtMessage.setContentType("text/plain");
         txtMessage.setText(SYSTools.catchNull(preset));
         lblIcon.setIcon(icon);
-        pack();
     }
 
     private void cancelButtonActionPerformed(ActionEvent e) {
@@ -96,7 +94,7 @@ public class DlgYesNo extends MyJDialog {
         okButton = new JButton();
 
         //======== this ========
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
         //======== dialogPane ========
@@ -147,7 +145,7 @@ public class DlgYesNo extends MyJDialog {
             dialogPane.add(contentPanel, BorderLayout.CENTER);
         }
         contentPane.add(dialogPane, BorderLayout.CENTER);
-        pack();
+        setSize(675, 470);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

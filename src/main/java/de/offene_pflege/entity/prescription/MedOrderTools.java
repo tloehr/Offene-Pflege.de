@@ -3,7 +3,6 @@ package de.offene_pflege.entity.prescription;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.OPUsers;
-import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.structure.PnlMed;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -23,7 +22,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -254,7 +252,7 @@ public class MedOrderTools {
     }
 
 
-    public static List<MedOrder> generate_orders(final int cover_days, final int type, List<MedOrder> open_orders) {
+    public static List<MedOrder> generate_orders(final int cover_days, final int type, Optional<HasName> order_source, List<MedOrder> open_orders) {
         List<MedOrder> result = new ArrayList<>();
         final MultiKeyMap<Object, Quintet<BigDecimal, BigDecimal, BigDecimal, GP, Hospital>> map = new MultiKeyMap();
         List<Resident> residents = ResidentTools.getAllActive();
@@ -265,7 +263,13 @@ public class MedOrderTools {
                     running_integer.increment();
                     // suche alle medikamente die im moment verordnet sind und schreibe den aktuellen Bedarf und den aktuellen bestand in eine Map
                     PrescriptionTools.getAllActive(resident)
-                            .stream().filter(prescription -> prescription.hasMed() && !prescription.getTradeForm().getDosageForm().isDontCALC() && !prescription.isUntilEndOfPackage())
+                            .stream()
+                            .filter(
+                                    prescription -> prescription.hasMed() &&
+                                            !prescription.getTradeForm().getDosageForm().isDontCALC() &&
+                                            !prescription.isUntilEndOfPackage() &&
+                                            (order_source.isEmpty() || order_source.get().equals(PrescriptionTools.get_order_source(prescription)))
+                            )
                             .forEach(prescription -> {
                                 if (type == PnlMed.TYPE_REGULAR && prescription.isOnDemand()) return;
                                 if (type == PnlMed.TYPE_ON_DEMAND && !prescription.isOnDemand()) return;

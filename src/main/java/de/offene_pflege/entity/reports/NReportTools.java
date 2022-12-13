@@ -864,7 +864,7 @@ public class NReportTools {
                     " JOIN nr.commontags ct " +
                     " WHERE nr.pit >= :from AND nr.pit <= :to AND (ct.type = :handover OR ct.type = :emergency) " +
                     //" AND nr.resident.station.home = :home " +
-                    " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
+                    " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL AND nr.deletedBy IS NULL";
 
             Query query = em.createQuery(jpql);
 

@@ -164,15 +164,14 @@ public class ButtonColumn extends AbstractCellEditor
      *	The button has been pressed. Stop editing and invoke the custom Action
      */
     public void actionPerformed(ActionEvent e) {
-        int row = table.convertRowIndexToModel(table.getEditingRow());
+        int row = table.getEditingRow();
         fireEditingStopped();
 
         //  Invoke the Action
-
         ActionEvent event = new ActionEvent(
                 table,
                 ActionEvent.ACTION_PERFORMED,
-                "" + row);
+                Integer.toString(row));
         action.actionPerformed(event);
     }
 

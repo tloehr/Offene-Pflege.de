@@ -13,6 +13,8 @@ import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.services.HomesService;
 import de.offene_pflege.tablerenderer.RNDHTML;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
@@ -48,7 +50,14 @@ public class PnlMedOrders extends JPanel {
         setLayout(new BorderLayout(5, 5));
         menu = null;
 
-        add(lbl_week, BorderLayout.NORTH);
+        JPanel centered = new JPanel();
+        centered.setLayout(new BoxLayout(centered, BoxLayout.X_AXIS));
+        centered.add(Box.createHorizontalGlue());
+        centered.add(lbl_week);
+        centered.add(Box.createHorizontalGlue());
+
+        add(centered, BorderLayout.NORTH);
+
         JPanel pnl = getButtonPanel();
         add(pnl, BorderLayout.SOUTH);
         scrl = new JScrollPane();
@@ -112,6 +121,13 @@ public class PnlMedOrders extends JPanel {
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellEditor(new DefaultCellEditor(cmb));
             ((DefaultCellEditor) tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).getCellEditor()).setClickCountToStart(2);
 
+            tbl.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+                        tbl.getCellEditor().cancelCellEditing();
+                }
+            });
 
             JTextField txt = new JTextField();
             txt.addFocusListener(new FocusAdapter() {
@@ -166,7 +182,7 @@ public class PnlMedOrders extends JPanel {
         if (!SwingUtilities.isRightMouseButton(evt)) return;
 
         Point p = evt.getPoint();
-        JTable tbl = (JTable) evt.getSource();
+        final JTable tbl = (JTable) evt.getSource();
         ListSelectionModel lsm = tbl.getSelectionModel();
         Point p2 = evt.getPoint();
         SwingUtilities.convertPointToScreen(p2, tbl);
@@ -188,6 +204,26 @@ public class PnlMedOrders extends JPanel {
             MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.convertRowIndexToModel(tbl.getSelectionModel().getLeadSelectionIndex()));
             GUITools.showPopup(GUITools.getHTMLPopup(tbl, MedOrderTools.toPrettyHTMLOrderInfos(medOrder, true)), SwingConstants.NORTH);
         });
+
+        JMenuItem itemDelete = new JMenuItem(SYSTools.xx("misc.delete"), SYSConst.icon22delete);
+        itemDelete.addActionListener(e -> {
+            for (int row_num : tbl.getSelectedRows()) {
+                ((TMMedOrders) tbl.getModel()).delete(tbl.convertRowIndexToModel(row_num));
+            }
+        });
+
+        //        JButton delete_orders = GUITools.createHyperlinkButton("markierte Bestellungen löschen", SYSConst.icon22delete, null);
+        //        delete_orders.addActionListener(evt1 -> {
+        //            optPnlMedOrders.ifPresent(pnlMedOrders -> {
+        //                pnlMedOrders.getSelected().forEach(medOrder -> {
+        //                    EntityTools.delete(medOrder);
+        //                });
+        //                reload();
+        //            });
+        //        });
+        //        list.add(delete_orders);
+        //        delete_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
+
         menu.add(itemPopupInfo);
 
 
