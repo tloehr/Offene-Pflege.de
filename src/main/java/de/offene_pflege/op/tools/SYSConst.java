@@ -605,6 +605,8 @@ public class SYSConst {
     //    public static final Icon icon16date = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/date.png"));
     //    public static final Icon icon22printPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1_pressed.png"));
     public static final Icon icon22print2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2.png"));
+    public static final Icon icon32printer = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/printer.png"));
+    public static final Icon icon22printer = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer.png"));
     public static final Icon icon22print2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2_pressed.png"));
     public static final Icon icon22redo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo.png"));
     public static final Icon icon22calc = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/kcalc.png"));
@@ -637,6 +639,8 @@ public class SYSConst {
     public static final Icon icon22todo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo.png"));
     public static final Icon icon22todoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo_pressed.png"));
     public static final Icon icon22checkbox = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/checkbox.png"));
+    public static final Icon icon22checked= new ImageIcon(SYSConst.class.getResource("/artwork/22x22/checked.png"));
+
     public static final Icon icon22checkboxPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/checkbox_pressed.png"));
     public static final Icon icon22undo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/undo.png"));
     public static final Icon icon22unlink = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/unlink.png"));
@@ -691,6 +695,8 @@ public class SYSConst {
     public static final Icon icon22ledBlueOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledlightblue.png"));
     public static final Icon icon22ledBlueOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkblue.png"));
     public static final Icon icon22shopping = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/shopping-trolley-22.png"));
+    public static final Icon icon32shopping = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/shopping-trolley-32.png"));
+    public static final Icon icon48shopping = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/shopping-trolley-48.png"));
     public static final Icon icon22nothing = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/nothing.png"));
     public static final Icon icon22stopSignGray = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/stop-gray.png"));
     public static final Icon icon22stopSign = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/stop.png"));

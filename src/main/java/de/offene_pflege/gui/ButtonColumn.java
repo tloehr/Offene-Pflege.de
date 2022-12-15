@@ -49,6 +49,10 @@ public class ButtonColumn extends AbstractCellEditor
         editButton.setContentAreaFilled(false);
         editButton.setFocusPainted(false);
         editButton.addActionListener(this);
+
+        editButton.setOpaque(false);
+        renderButton.setOpaque(false);
+
         originalBorder = editButton.getBorder();
         setFocusBorder(new LineBorder(Color.BLUE));
 
@@ -120,9 +124,6 @@ public class ButtonColumn extends AbstractCellEditor
         return editorValue;
     }
 
-    //
-//  Implement TableCellRenderer interface
-//
     public Component getTableCellRendererComponent(
             JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (isSelected) {

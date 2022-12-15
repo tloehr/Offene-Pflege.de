@@ -52,3 +52,4 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- tasks-solid-35.png Another Color, resized. Creative Commons Attribution 4.0 International license https://fontawesome.com/license
 -- shopping-trolley.png <a href="https://iconscout.com/icons/shopping-trolley" target="_blank">Shopping Trolley Icon</a> by <a href="https://iconscout.com/contributors/delesign">Delesign Graphics</a> on <a href="https://iconscout.com">IconScout</a>
 -- checkbox checked and unchecked <a href="http://clipart-library.com/clipart/1922650.htm>clipart library</a>
+-- printer.pnr https://iconscout.com/icon/printer-1769152 <a href="https://iconscout.com/icons/printer" target="_blank">Printer Icon</a> by <a href="https://iconscout.com/contributors/guicon" target="_blank">Gunaldi Yunus</a>

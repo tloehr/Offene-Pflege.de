@@ -393,12 +393,12 @@ public class PnlMed extends CleanablePanel {
         cmb_filter_for_generate.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return super.getListCellRendererComponent(list, value == null ? "für Alle" : SYSTools.anonymizeName(((HasName) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
+                return super.getListCellRendererComponent(list, value == null ? "für alle" : SYSTools.anonymizeName(((HasName) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
             }
         });
         list.add(cmb_filter_for_generate);
 
-        JButton btn_regular = GUITools.createHyperlinkButton("Bestellung Regel-Verordnungen", null, null);
+        JButton btn_regular = GUITools.createHyperlinkButton("automatisch Bestellen", SYSConst.icon22shopping, null);
         btn_regular.addActionListener(e -> {
             generate_orders(TYPE_REGULAR);
         });
@@ -414,19 +414,6 @@ public class PnlMed extends CleanablePanel {
         });
         list.add(add_free_text);
         add_free_text.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID));
-//
-//        JButton delete_orders = GUITools.createHyperlinkButton("markierte Bestellungen löschen", SYSConst.icon22delete, null);
-//        delete_orders.addActionListener(evt1 -> {
-//            optPnlMedOrders.ifPresent(pnlMedOrders -> {
-//                pnlMedOrders.getSelected().forEach(medOrder -> {
-//                    EntityTools.delete(medOrder);
-//                });
-//                reload();
-//            });
-//        });
-//        list.add(delete_orders);
-//        delete_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
-
 
         tbShowClosed = GUITools.getNiceToggleButton("mit Erledigten");
         tbShowClosed.addItemListener(e -> optPnlMedOrders.ifPresent(pnlMedOrders -> {
@@ -473,10 +460,10 @@ public class PnlMed extends CleanablePanel {
         cmb_where_to_order_filter.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return super.getListCellRendererComponent(list, value == null ? "für Alle" : SYSTools.anonymizeName(((HasName) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
+                return super.getListCellRendererComponent(list, value == null ? "für alle" : SYSTools.anonymizeName(((HasName) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
             }
         });
-        final JideButton printButton = GUITools.createHyperlinkButton("Bestellung drucken", SYSConst.icon22print2, null);
+        final JideButton printButton = GUITools.createHyperlinkButton("Bestellung drucken", SYSConst.icon22printer, null);
         printButton.addActionListener(actionEvent -> {
             optPnlMedOrders.ifPresent(pnlMedOrders -> pnlMedOrders.print(Optional.ofNullable((HasName) cmb_where_to_order_filter.getSelectedItem())));
         });

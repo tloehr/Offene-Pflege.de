@@ -178,7 +178,8 @@ public class TMMedOrders extends AbstractTableModel {
                 break;
             }
             case COL_Resident: {
-                result = ResidentTools.getNameAndFirstname(medOrder.getResident()) + String.format(" [%s]", medOrder.getResident().getId());
+                String order_id = OPDE.isExperimental() ? "#_"+medOrder.getId()+" " : "";
+                result = order_id+  ResidentTools.getNameAndFirstname(medOrder.getResident()) + String.format(" [%s]", medOrder.getResident().getId());
                 if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }

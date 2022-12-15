@@ -1,5 +1,6 @@
 package de.offene_pflege.op.care.med.inventory;
 
+import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.system.SYSPropsTools;
@@ -7,6 +8,7 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.gui.ButtonColumn;
+import de.offene_pflege.op.tools.DlgYesNo;
 import de.offene_pflege.op.tools.HTMLTools;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
@@ -204,13 +206,36 @@ public class PnlMedOrders extends JPanel {
             MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.convertRowIndexToModel(tbl.getSelectionModel().getLeadSelectionIndex()));
             GUITools.showPopup(GUITools.getHTMLPopup(tbl, MedOrderTools.toPrettyHTMLOrderInfos(medOrder, true)), SwingConstants.NORTH);
         });
+        menu.add(itemPopupInfo);
 
         JMenuItem itemDelete = new JMenuItem(SYSTools.xx("misc.delete"), SYSConst.icon22delete);
         itemDelete.addActionListener(e -> {
+            new DlgYesNo(SYSTools.xx("misc.questions.delete3"), SYSConst.icon48delete, answer -> {
+                if (answer.equals(JOptionPane.YES_OPTION)) {
+                    ArrayList<MedOrder> to_delete = new ArrayList<>();
+                    for (int row_num : tbl.getSelectedRows()) {
+                        MedOrder medOrder = ((TMMedOrders) tbl.getModel()).getMedOrderList().get(tbl.convertRowIndexToModel(row_num));
+                        log.debug(medOrder.getId());
+                        to_delete.add(medOrder);
+                    }
+                    to_delete.forEach(medOrder -> {
+                        EntityTools.delete(medOrder);
+                        ((TMMedOrders) tbl.getModel()).getMedOrderList().remove(medOrder);
+                    });
+                    ((TMMedOrders) tbl.getModel()).fireTableDataChanged();
+                }
+            }).setVisible(true);
+        });
+        menu.add(itemDelete);
+
+
+        JMenuItem itemClose = new JMenuItem(SYSTools.xx("misc.close"), SYSConst.icon22checked);
+        itemClose.addActionListener(e -> {
             for (int row_num : tbl.getSelectedRows()) {
-                ((TMMedOrders) tbl.getModel()).delete(tbl.convertRowIndexToModel(row_num));
+                ((TMMedOrders) tbl.getModel()).complete(tbl.convertRowIndexToModel(row_num));
             }
         });
+        menu.add(itemClose);
 
         //        JButton delete_orders = GUITools.createHyperlinkButton("markierte Bestellungen löschen", SYSConst.icon22delete, null);
         //        delete_orders.addActionListener(evt1 -> {
@@ -223,8 +248,6 @@ public class PnlMedOrders extends JPanel {
         //        });
         //        list.add(delete_orders);
         //        delete_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
-
-        menu.add(itemPopupInfo);
 
 
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
