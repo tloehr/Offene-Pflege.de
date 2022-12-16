@@ -210,7 +210,7 @@ public class PnlMedOrders extends JPanel {
 
         JMenuItem itemDelete = new JMenuItem(SYSTools.xx("misc.delete"), SYSConst.icon22delete);
         itemDelete.addActionListener(e -> {
-            new DlgYesNo(SYSTools.xx("misc.questions.delete3"), SYSConst.icon48delete, answer -> {
+            DlgYesNo dlgYesNo = new DlgYesNo(SYSTools.xx("misc.questions.delete3"), SYSConst.icon48delete, answer -> {
                 if (answer.equals(JOptionPane.YES_OPTION)) {
                     ArrayList<MedOrder> to_delete = new ArrayList<>();
                     for (int row_num : tbl.getSelectedRows()) {
@@ -224,7 +224,9 @@ public class PnlMedOrders extends JPanel {
                     });
                     ((TMMedOrders) tbl.getModel()).fireTableDataChanged();
                 }
-            }).setVisible(true);
+            });
+            dlgYesNo.setModal(true);
+            dlgYesNo.setVisible(true);
         });
         menu.add(itemDelete);
 
