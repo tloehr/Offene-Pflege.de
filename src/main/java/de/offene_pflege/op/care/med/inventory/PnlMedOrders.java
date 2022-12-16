@@ -208,7 +208,7 @@ public class PnlMedOrders extends JPanel {
         });
         menu.add(itemPopupInfo);
 
-        JMenuItem itemDelete = new JMenuItem(SYSTools.xx("misc.delete"), SYSConst.icon22delete);
+        JMenuItem itemDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
         itemDelete.addActionListener(e -> {
             DlgYesNo dlgYesNo = new DlgYesNo(SYSTools.xx("misc.questions.delete3"), SYSConst.icon48delete, answer -> {
                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -231,7 +231,7 @@ public class PnlMedOrders extends JPanel {
         menu.add(itemDelete);
 
 
-        JMenuItem itemClose = new JMenuItem(SYSTools.xx("misc.close"), SYSConst.icon22checked);
+        JMenuItem itemClose = new JMenuItem(SYSTools.xx("misc.commands.close"), SYSConst.icon22checked);
         itemClose.addActionListener(e -> {
             for (int row_num : tbl.getSelectedRows()) {
                 ((TMMedOrders) tbl.getModel()).complete(tbl.convertRowIndexToModel(row_num));
