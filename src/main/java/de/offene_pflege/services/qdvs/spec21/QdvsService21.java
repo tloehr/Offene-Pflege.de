@@ -436,30 +436,24 @@ public class QdvsService21 implements QdvsService {
                     listeBWFehlerfrei.remove(resident);
                 }
 
-                /**
-                 * Aus der FAQ:
-                 * Körpergröße und Gewicht
-                 * Was gibt man an, wenn der Bewohner, bzw. die Bewohnerin die Messung der Körpergröße ablehnt?
-                 * In diesem Fall kann die Angabe „0“ erfolgen.
-                 */
                 Optional<ResInfo> gewichtdoku = ResInfoTools.getValidOnThatDayIfAny(resident, KOERPERGEWICHTDOKU, STICHTAG);
-                boolean groesse_gewicht_noetig = true;
-                if (gewichtdoku.isPresent()) {
-                    Properties content = ResInfoTools.getContent(gewichtdoku.get());
-                    // wenn eine gewichtsdoku vorhanden ist und die Felder 4 und/oder 5 ausgefüllt wurden, dann ist es egal ob gewicht oder größe vorhanden sind
-                    // also beides ist nötig, WENN 4 UND 5 nicht ausgefüllt sind.
-                    groesse_gewicht_noetig = content.getProperty("4", "false").equalsIgnoreCase("false") && content.getProperty("5", "false").equalsIgnoreCase("false");
-                }
 
-                if (groesse_gewicht_noetig) {
-                    if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG).isPresent()) {
-                        residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
-                        textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.weight.missing")));
-                        listeBWFehlerfrei.remove(resident);
-                    }
-                    if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.HEIGHT, STICHTAG).isPresent()) {
-                        textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.height.missing")));
-                        listeBWFehlerfrei.remove(resident);
+                if (!gewichtdoku.isPresent() || JavaTimeConverter.toJavaLocalDateTime(gewichtdoku.get().getFrom()).isBefore(BEGINN_ERFASSUNGSZEITRAUM)) {
+                    // fehlt oder zu alt
+                    residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.doc.missing");
+                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.weight.doc.missing")));
+                    listeBWFehlerfrei.remove(resident);
+                } else {
+                    Properties content = ResInfoTools.getContent(gewichtdoku.get());
+                    // wenn eine gewichtsdoku Feld 70 vorhanden ist und die Punkte 4 und/oder 5 ausgefüllt wurden, dann ist es egal ob gewicht oder größe vorhanden sind
+                    // also beides ist nötig, WENN 4 UND 5 nicht ausgefüllt sind.
+                    boolean gewicht_noetig = content.getProperty("4", "false").equalsIgnoreCase("false") && content.getProperty("5", "false").equalsIgnoreCase("false");
+                    if (gewicht_noetig) {
+                        if (!ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG).isPresent()) {
+                            residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.missing");
+                            textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.weight.missing")));
+                            listeBWFehlerfrei.remove(resident);
+                        }
                     }
                 }
 
@@ -988,45 +982,56 @@ public class QdvsService21 implements QdvsService {
         /** SPEC20-66 */qsData.setDEKUBITUS2ENDEDATUM(of.createDasQsDataTypeDEKUBITUS2ENDEDATUM());
         /** SPEC20-67 */qsData.setDEKUBITUS2LOK(of.createDasQsDataTypeDEKUBITUS2LOK());
 
-        // Die Analyse der XML Auswertungen hat ergeben, dass wenn der maximale Wert für DEKUBITUS >1, dann werden alle Beginn- und Enddaten erwartet. Auch wenn eine von den beiden Wunden nicht über 1 hinausgekommen ist.
+        // Die Analyse der XML Auswertungen hat ergeben, dass wenn der maximale Wert für DEKUBITUS >1, dann werden alle Beginn- und Enddaten erwartet.
+        // Auch wenn eine von den beiden Wunden nicht über 1 hinausgekommen ist.
         int maximales_dekubitus_stadium = optWunde1.isPresent() ? optWunde1.get().getValue2() : 0;
         maximales_dekubitus_stadium = Math.max(maximales_dekubitus_stadium, optWunde2.isPresent() ? optWunde2.get().getValue2() : 0);
 
+        /** SPEC20-60 */
         int dekubitus_schluessel = 0; // wenn kein dekubitus vorhanden
         if (listDekubitus.size() == 1) dekubitus_schluessel = 1; // genau einer
         if (listDekubitus.size() > 1) dekubitus_schluessel = 2; // mehr als einer
+        qsData.getDEKUBITUS().setValue(dekubitus_schluessel);
 
+        /** SPEC20-61 */
         if (dekubitus_schluessel > 0) {
             qsData.getDEKUBITUSSTADIUM().setValue(maximales_dekubitus_stadium);
         }
-        qsData.getDEKUBITUS().setValue(dekubitus_schluessel);
 
-        final int fin_dekubitus_schlussel = dekubitus_schluessel;
-        optWunde1.ifPresent(wunde1 -> {
+//        final int fin_dekubitus_schlussel = dekubitus_schluessel;
+        optWunde1.ifPresent(wunde1 -> { // [Feld 60 = 1,2]
             // wenn [Feld 60 = 1,2] UND [Feld 61 = 2,3,4,9] UND [Feld 64 <> LEER] UND [Feld 64 = 1]
-            if (wunde1.getValue2() > 1) { // Grad > 1
+            if (qsData.getDEKUBITUSSTADIUM().getValue() > 1) { // Grad > 1  -> [Feld 61 = 2,3,4,9]
+
+                /** SPEC20-64 */
+                qsData.getDEKUBITUS1LOK().setValue(wunde1.getValue1());
+
                 /** SPEC20-62 */
-                if (wunde1.getValue1() == 1) // Wunde bei uns entstanden.
+                if (qsData.getDEKUBITUS1LOK().getValue() == 1) // value1 enthält den entstehungs ort. 1 heisst "BEI UNS". [Feld 64 = 1]
                     qsData.getDEKUBITUS1BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde1.getValue3()));
 
                 // wenn Bedingung 1: [Feld 60 = 1] UND [Feld 61 = 2,3,4,9] oder Bedingung 2: [Feld 60 = 2] UND ( [Feld 62 <> LEER] ODER [Feld 64 <> LEER] )
                 /** SPEC20-63 */
-                if (fin_dekubitus_schlussel == 2)
+                // Bedingung 1: [Feld 60 = 1] UND [Feld 61 = 2,3,4,9]
+                boolean bedingung1 = qsData.getDEKUBITUS().getValue() == 1 && qsData.getDEKUBITUSSTADIUM().getValue() > 1;
+                // Bedingung 2: [Feld 60 = 2] UND ( [Feld 62 <> LEER] ODER [Feld 64 <> LEER] )
+                boolean bedingung2 = qsData.getDEKUBITUS().getValue() == 2 && (qsData.getDEKUBITUS1BEGINNDATUM().getValue() != null || qsData.getDEKUBITUS1LOK().getValue() != null);
+                if (bedingung1 || bedingung2)
                     qsData.getDEKUBITUS1ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde1.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
             }
-            qsData.getDEKUBITUS1LOK().setValue(wunde1.getValue1());
         });
 
-        optWunde2.ifPresent(wunde2 -> {
-            if (wunde2.getValue2() > 1) { // Grad > 1
+        optWunde2.ifPresent(wunde2 -> { // Feld 60 = 2
+            if (qsData.getDEKUBITUSSTADIUM().getValue() > 1) { // [Feld 61 = 2,3,4,9]
+                /** SPEC20-67 */
+                qsData.getDEKUBITUS2LOK().setValue(wunde2.getValue1()); // [Feld 67 <> LEER]
                 /** SPEC20-65 */
-                if (wunde2.getValue1() == 1) // Wunde bei uns entstanden.
+                if (qsData.getDEKUBITUS2LOK().getValue() == 1) // [Feld 67 = 1]   Wunde bei uns entstanden.
                     qsData.getDEKUBITUS2BEGINNDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(wunde2.getValue3()));
-
                 /** SPEC20-66 */
+                // Feld 67 ist nie leer wenn wir bis hierher schon gekommen sind
                 qsData.getDEKUBITUS2ENDEDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(JavaTimeConverter.min(wunde2.getValue4().toLocalDate(), STICHTAG.toLocalDate())));
             }
-            qsData.getDEKUBITUS2LOK().setValue(wunde2.getValue1());
         });
     }
 
