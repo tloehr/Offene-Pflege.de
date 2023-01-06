@@ -46,7 +46,6 @@ public class JavaTimeConverter {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
-
     public static java.time.LocalDate toJavaLocalDate(org.joda.time.LocalDate jodaLD) {
         return java.time.LocalDate.of(jodaLD.getYear(), jodaLD.getMonthOfYear(), jodaLD.getDayOfMonth());
     }
@@ -67,6 +66,7 @@ public class JavaTimeConverter {
     public static LocalDateTime noon(LocalDateTime jt_ldt) {
         return jt_ldt.withHour(12).withMinute(0).withSecond(0).withNano(0);
     }
+
 
     public static XMLGregorianCalendar toXMLGregorianCalendar(LocalDateTime ldt) {
         XMLGregorianCalendar x = toXMLGregorianCalendar(GregorianCalendar.from(ldt.atZone(ZoneId.systemDefault())));

@@ -33,7 +33,6 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
-import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.services.StationService;
@@ -57,8 +56,10 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.JodaTimePermission;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -75,11 +76,8 @@ import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -1224,16 +1222,36 @@ public class PnlControlling extends CleanablePanel {
     }
 
 
-    public static String getWounds(int monthsback, Closure progress) {
+    /**
+     * Erstellt eine HTML Darstellung aller Pflegeberichte mit dem Common Tag "Wunde".
+     *
+     * @param monthsback
+     * @param progress
+     * @return
+     */
+    static String getWounds(int monthsback, Closure progress) {
         StringBuilder html = new StringBuilder(1000);
 
         int p = -1;
-        progress.execute(new Pair<Integer, Integer>(p, 100));
+        progress.execute(new Pair<>(p, 100));
 
-        LocalDate from = new LocalDate().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        java.time.LocalDate from = java.time.LocalDate.now().minusMonths(monthsback).withDayOfMonth(1);
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
 
+        final MultiKeyMap<String, QProcessElement> wounds = new MultiKeyMap();
+        // diese Liste bezieht sich nur auf BW die noch da sind.
+        ResidentTools.getAllActive().forEach(resident -> {
+                    ResInfoTools.getAll(resident, ResInfoTypeTools.TYPE_ALL_WOUNDS,
+                            from.atStartOfDay(),
+                            java.time.LocalDate.now().atTime(LocalTime.MAX)
+                    ).forEach(resInfo -> wounds.put(resident.getId(), resInfo.getConnectionid().toString(), resInfo));
+                    NReportTools.getNReports4Tags(CommontagsTools.getType(CommontagsTools.TYPE_SYS_WOUNDS), from, java.time.LocalDate.now());
+                }
+        );
+
+       /**
+        // todo: Der ganze Verlauf muss drin sein, wenn sie innerhalb des Zeitraums noch aktiv war.
         String jpql1 = " SELECT b FROM ResInfo b WHERE b.from > :from AND b.resident.adminonly <> 2 AND b.bwinfotyp.type = :type ORDER BY b.resident.id, b.from DESC ";
         Query query1 = em.createQuery(jpql1);
         query1.setParameter("type", ResInfoTypeTools.TYPE_WOUNDS);
@@ -1252,13 +1270,12 @@ public class PnlControlling extends CleanablePanel {
         query2.setParameter("type", CommontagsTools.TYPE_SYS_WOUNDS);
         query2.setParameter("from", from.toDate());
         listVal.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
-
         em.close();
 
         HashMap<Resident, ArrayList<QProcessElement>> listData = new HashMap<Resident, ArrayList<QProcessElement>>();
         for (QProcessElement element : listVal) {
             if (!listData.containsKey(element.getResident())) {
-                listData.put(element.getResident(), new ArrayList<QProcessElement>());
+                listData.put(element.getResident(), new ArrayList<>());
             }
             listData.get(element.getResident()).add(element);
         }
@@ -1295,6 +1312,8 @@ public class PnlControlling extends CleanablePanel {
 
             html.append(SYSConst.html_table(table.toString(), "1"));
         }
+
+        */
         return html.toString();
     }
 

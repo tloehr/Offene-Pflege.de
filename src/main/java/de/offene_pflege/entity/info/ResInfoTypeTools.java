@@ -115,6 +115,7 @@ public class ResInfoTypeTools {
 
     public static final int TYPE_BESD = 167;
     public static final int TYPE_INTEGRATIONS_GESPRAECH = 168;
+    public static final int TYPE_SCALE_OHAT = 169;
 
     // find new max type via sql: SELECT 'next to use',MAX(equiv)+1, MAX(TYPE)+1 FROM resinfotype;
 

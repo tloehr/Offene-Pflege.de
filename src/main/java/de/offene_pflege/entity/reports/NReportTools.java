@@ -1,7 +1,7 @@
 /*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
-*/
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package de.offene_pflege.entity.reports;
 
 import de.offene_pflege.entity.EntityTools;
@@ -27,6 +27,7 @@ import javax.persistence.Query;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -43,11 +44,10 @@ public class NReportTools {
     }
 
     /**
-     * retrieves the PITs of the first and the last entries in the NReports and Handovers table.
-     * The values are combined, so that the maximum span is calculated.
-     *
-     * https://github.com/tloehr/Offene-Pflege.de/issues/83
-     * https://github.com/tloehr/Offene-Pflege.de/issues/88
+     * retrieves the PITs of the first and the last entries in the NReports and Handovers table. The values are
+     * combined, so that the maximum span is calculated.
+     * <p>
+     * https://github.com/tloehr/Offene-Pflege.de/issues/83 https://github.com/tloehr/Offene-Pflege.de/issues/88
      *
      * @return
      */
@@ -66,7 +66,7 @@ public class NReportTools {
         queryMax2.setMaxResults(1);
 
         DateTime dmin1 = null, dmax1 = null, dmin2 = null, dmax2 = null;
-        
+
         try {
             NReport min1 = (NReport) queryMin1.getSingleResult();
             NReport max1 = (NReport) queryMax1.getSingleResult();
@@ -94,7 +94,7 @@ public class NReportTools {
         DateTime min = SYSCalendar.min(dmin1, dmin2);
         DateTime max = SYSCalendar.max(dmax1, dmax2);
 
-        if (min != null && max != null){
+        if (min != null && max != null) {
             result = new MutableInterval(min, max);
         } else {
             result = null;
@@ -103,8 +103,6 @@ public class NReportTools {
         em.close();
         return result;
     }
-
-
 
 
     public static MutableInterval getNativeMinMax2(Resident resident) {
@@ -124,7 +122,7 @@ public class NReportTools {
             Optional<LocalDateTime> optMax = Optional.ofNullable((LocalDateTime) queryMax.getSingleResult());
 
             result = null;
-            if (optMin.isPresent()){
+            if (optMin.isPresent()) {
                 org.joda.time.LocalDateTime min = JavaTimeConverter.toJodaLocalDateTime(optMin.get());
                 org.joda.time.LocalDateTime max = JavaTimeConverter.toJodaLocalDateTime(optMax.get());
                 result = new MutableInterval(min.toDateTime(), max.toDateTime());
@@ -133,7 +131,7 @@ public class NReportTools {
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-        
+
         em.close();
         log.debug((System.currentTimeMillis() - time) + " ms for native minmax2");
         return result;
@@ -843,7 +841,8 @@ public class NReportTools {
     }
 
     /**
-     * retrieves all NReports for a certain day which have been assigned with the Tags Nr. 1 (Handover) and Nr. 2 (Emergency)
+     * retrieves all NReports for a certain day which have been assigned with the Tags Nr. 1 (Handover) and Nr. 2
+     * (Emergency)
      *
      * @param day
      * @return
@@ -945,6 +944,10 @@ public class NReportTools {
         return report;
     }
 
+    public static ArrayList<NReport> getNReports4Tags(Commontags tag, java.time.LocalDate start, java.time.LocalDate end) {
+        return getNReports4Tags(tag, JavaTimeConverter.toJodaLocalDateTime(start.atStartOfDay()).toLocalDate(), JavaTimeConverter.toJodaLocalDateTime(end.atTime(LocalTime.MAX)).toLocalDate());
+    }
+
     public static ArrayList<NReport> getNReports4Tags(Commontags tag, LocalDate start, LocalDate end) {
 
         EntityManager em = OPDE.createEM();
@@ -953,16 +956,6 @@ public class NReportTools {
         try {
 
             long begin = System.currentTimeMillis();
-
-
-//            String jpql = " SELECT nr " +
-//                    " FROM NReport nr " +
-//                    " JOIN nr.commontags t " +
-//                    " WHERE nr.pit >= :from AND nr.pit <= :to  " +
-//                    " ORDER BY nr.pit DESC ";
-//                    " WHERE nr.resident.adminonly <> 2 " +
-//                    " AND t = :tag " +
-
 
             // native sql. the generated one is awfully slow
             String nativeSQL = "SELECT nr.* FROM nreports nr " +

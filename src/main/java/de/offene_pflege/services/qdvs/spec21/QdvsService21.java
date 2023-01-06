@@ -13,7 +13,6 @@ import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.services.RoomsService;
-import de.offene_pflege.services.StationService;
 import de.offene_pflege.services.qdvs.QdvsResidentInfoObject;
 import de.offene_pflege.services.qdvs.QdvsService;
 import de.offene_pflege.services.qdvs.spec21.schema.*;
@@ -437,13 +436,7 @@ public class QdvsService21 implements QdvsService {
                 }
 
                 Optional<ResInfo> gewichtdoku = ResInfoTools.getValidOnThatDayIfAny(resident, KOERPERGEWICHTDOKU, STICHTAG);
-
-                if (!gewichtdoku.isPresent() || JavaTimeConverter.toJavaLocalDateTime(gewichtdoku.get().getFrom()).isBefore(BEGINN_ERFASSUNGSZEITRAUM)) {
-                    // fehlt oder zu alt
-                    residentInfoObjectMap.get(resident).addLog("qdvs.error.weight.doc.missing");
-                    textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": " + SYSTools.xx("qdvs.error.weight.doc.missing")));
-                    listeBWFehlerfrei.remove(resident);
-                } else {
+                if (gewichtdoku.isPresent()) {
                     Properties content = ResInfoTools.getContent(gewichtdoku.get());
                     // wenn eine gewichtsdoku Feld 70 vorhanden ist und die Punkte 4 und/oder 5 ausgefüllt wurden, dann ist es egal ob gewicht oder größe vorhanden sind
                     // also beides ist nötig, WENN 4 UND 5 nicht ausgefüllt sind.
@@ -515,7 +508,7 @@ public class QdvsService21 implements QdvsService {
             log.debug(String.format("===---%s---===", StringUtils.center("Dekubitus", WIDTH)));
             dekubitus(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", WIDTH)));
-            groesse_gewicht(residentType.getQsData(), resident);
+            gewicht(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Sturz", WIDTH)));
             sturz(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Fixierung", WIDTH)));
@@ -1035,7 +1028,7 @@ public class QdvsService21 implements QdvsService {
         });
     }
 
-    private void groesse_gewicht(DasQsDataType qsData, Resident resident) {
+    private void gewicht(DasQsDataType qsData, Resident resident) {
         Optional<ResValue> weight = ResValueTools.getMostRecentBefore(resident, ResvaluetypesService.WEIGHT, STICHTAG);
 
         // seit SPEC20 keine Körpergröße mehr
@@ -1057,7 +1050,7 @@ public class QdvsService21 implements QdvsService {
             DasQsDataType.KOERPERGEWICHTDOKU kd = of.createDasQsDataTypeKOERPERGEWICHTDOKU();
             kd.setValue(0);
             qsData.getKOERPERGEWICHTDOKU().add(kd);
-            log.debug("KEINE GewichtsDoku (oder zu alt)");
+            log.debug("KEINE GewichtsDoku (oder zu alt) - daher erzeuge ich eine und setze die Antwort auf 0");
         } else {
             Properties props = ResInfoTools.getContent(gewichtdoku.get());
             props.forEach((key, value) -> {

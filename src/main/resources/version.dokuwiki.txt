@@ -16,3 +16,4 @@
   * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Die Anzahl der zu verwaltenden Pflegeeinrichtung ist auf 1 reduziert. Falls Sie bishere mehrere Einrichtungen mit **einer einzigen** Installation betreiben, dann nehmen Sie bitte vor einem Update Kontakt mit mir auf.
   * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Dateien können nun auch an Elemente angehangen werden, die bereits abgeschlossen sind.
   * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> In der Medikamenten Verwaltung können Produkte nun auch anhand der Bestandsnummer gesucht werden.
+  * OHAT((Oral Health Assessment Tool - OHAT nach Murray und Schölten 2018)) Werkzeug zur Umsetzung des Expertenstandards "FÖRDERUNG DER MUNDGESUNDHEIT IN DER PFLEGE"
