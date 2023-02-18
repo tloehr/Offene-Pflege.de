@@ -291,8 +291,10 @@ public class MedOrderTools {
 
 
             // wir haben so eine bestellung schon
-            if (open_orders.stream().anyMatch(medOrder -> medOrder.getResident().equals(resident) && medOrder.getTradeForm().equals(tradeForm))) {
-                log.debug("Bestellung schon vorhanden. skip");
+            // 23-02-18: wir interessieren uns aber nur für die mit einer Tradeform. Keine freien texte !!
+            if (open_orders.stream().filter(medOrder -> medOrder.getTradeForm() != null)
+                    .anyMatch(medOrder -> medOrder.getResident().equals(resident) && medOrder.getTradeForm().equals(tradeForm))) {
+                log.debug("Bestellung schon vorhanden für {} => {}", resident, tradeForm);
                 return;
             }
 

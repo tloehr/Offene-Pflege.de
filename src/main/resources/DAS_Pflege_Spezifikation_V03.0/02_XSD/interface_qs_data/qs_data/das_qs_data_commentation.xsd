@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" xmlns:das="https://www.das-pflege.de" elementFormDefault="qualified" vc:minVersion="1.1" xpathDefaultNamespace="##targetNamespace">
+	<xs:include schemaLocation="../das_datatypes.xsd"/>
+	<xs:complexType name="das_commentation_type">
+		<xs:sequence>
+			<xs:element name="KOMMENTAR">
+				<xs:annotation>
+					<xs:documentation>Kommentar</xs:documentation>
+					<xs:appinfo>
+						<das:guideline>
+							<div>
+								<p>Sie haben hier die Möglichkeit, die Indikatorenergebnisse Ihrer Pflegeeinrichtung für die interessierte Öffentlichkeit zu kommentieren. Besonderheiten, die zu den entsprechenden Ergebnissen Ihrer Einrichtung geführt haben, könnten beispielsweise spezifische Versorgungsschwerpunkte, eine spezielle Klientel oder besondere Umstände in der betreffenden Erhebungsphase sein.</p>
+								<p>Kommentare müssen sachlich formuliert sein und dürfen aus Datenschutzgründen in keinem Fall personenbezogene Daten (z. B. Namen, Geburtsdatum etc.) enthalten!
+Beachten Sie zusätzlich, dass der Kommentar weder von der DAS Pflege noch von den Landesverbänden der Pflegekassen vor der Veröffentlichung geprüft oder redaktionell bearbeitet wird.</p>
+							</div>
+						</das:guideline>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="3000"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="validation_status" type="validation_status_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für Informationen zur Plausibilitätsprüfung</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:assert test="if(not(exists(KOMMENTAR/@value))) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="10063"/>
+					<das:rule_text value="Im Pflichtfeld ['Kommentar'] ist kein Wert angegeben"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="KOMMENTAR"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+		<xs:assert test="if(string-length(KOMMENTAR/@value) &gt; 3000) then false() else true()">
+			<xs:annotation>
+				<xs:appinfo>
+					<das:rule_id value="40007"/>
+					<das:rule_text value="Der Text im Datenfeld ['Kommentar'] ist länger als 3000 Zeichen"/>
+					<das:rule_type value="ERROR"/>
+					<das:rule_fields>
+						<das:field value="KOMMENTAR"/>
+					</das:rule_fields>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:assert>
+	</xs:complexType>
+</xs:schema>

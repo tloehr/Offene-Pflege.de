@@ -1202,7 +1202,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 GUITools.showPopup(popup, SwingConstants.WEST);
 
             });
-            btnTAGs.setEnabled(prescription.isMine() && !prescription.isClosed());
+            btnTAGs.setEnabled((prescription.isMine() || OPDE.isAdmin()) && !prescription.isClosed());
             pnlMenu.add(btnTAGs);
 
 

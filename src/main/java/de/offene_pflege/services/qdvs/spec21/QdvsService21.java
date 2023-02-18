@@ -1,6 +1,7 @@
 package de.offene_pflege.services.qdvs.spec21;
 
 
+import com.google.common.io.Resources;
 import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.building.Rooms;
 import de.offene_pflege.entity.info.*;
@@ -20,13 +21,17 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.javatuples.Quintet;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -52,6 +57,7 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 public class QdvsService21 implements QdvsService {
+    // todo: change this to JSON
     private static final String HAUF = "hauf";
     private static final String ABWESENHEIT = "abwe1";
     private static final String BEWUSST = "bewusst01";
@@ -71,6 +77,8 @@ public class QdvsService21 implements QdvsService {
     private static final String KOERPERGEWICHTDOKU = "gewdoku1";
     private static final String BESD = "besd2";
     private static final String SCHMERZ = "schmerze2";
+
+    private JSONObject MANDANTORY_RESINFOTYPES;
 
     private final ResInfoType FALLTYPE;
     private final ResInfoType FALLAUSWIRKUNG;
@@ -127,7 +135,14 @@ public class QdvsService21 implements QdvsService {
      *
      * @param textListener meldet alle Protokoll Einträge an den Textlistener. Der kann das dann hinterher anzeigen.
      */
+    @SneakyThrows
     public QdvsService21(AddTextListener textListener) {
+        log.info("\n ____    _    ____     ____  _____ _     _____ ____ _____          ___ ____    _\n" +
+                "|  _ \\  / \\  / ___|   |  _ \\|  ___| |   | ____/ ___| ____| __   __/ _ \\___ \\  / |\n" +
+                "| | | |/ _ \\ \\___ \\   | |_) | |_  | |   |  _|| |  _|  _|   \\ \\ / / | | |__) | | |\n" +
+                "| |_| / ___ \\ ___) |  |  __/|  _| | |___| |__| |_| | |___   \\ V /| |_| / __/ _| |\n" +
+                "|____/_/   \\_\\____/___|_|   |_|   |_____|_____\\____|_____|___\\_/  \\___/_____(_)_|\n" +
+                "                 |_____|                                |_____|");
         this.textListener = textListener;
         // ein paar Hilfs-Variablen.
 
@@ -151,6 +166,9 @@ public class QdvsService21 implements QdvsService {
         for (String pk : new String[]{"confidants", "respirat1", "mobility", "orient1", "artnutrit", "hinko", "hinkon", "excrem1", "finco1", "care", "mouthcare", "food", "sleep1", "ninsur02", "amputation"}) {
             forbiddenTypes.add(ResInfoTypeTools.getByID(pk));
         }
+
+        // todo: change this mechanism to JSON.
+        MANDANTORY_RESINFOTYPES = new JSONObject(Resources.toString(Resources.getResource("mandantory_resinfotypes_regular_qdvs_v2.json"), StandardCharsets.UTF_8));
 
         /**
          * Diese Resinfotypes müssen gesetzt sein, wenn der BW mit in der Stichprobe drin ist. Sonst muss der Lauf abgebrochen werden.

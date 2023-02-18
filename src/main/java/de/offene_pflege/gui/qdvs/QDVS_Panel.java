@@ -454,15 +454,13 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
     }
 
     void select_specification() {
-
-//        if (STICHTAG.isBefore(LocalDate.of(2023, 1, 1))) {
-//            qdvsService = new QdvsService14(this);
-//        } else {
-//            qdvsService = new QdvsService21(this);
-//        }
-        
-        // todo: wieder rein vor release
-        qdvsService = new QdvsService21(this);
+        if (STICHTAG.isBefore(LocalDate.of(2023, 1, 1))) {
+            qdvsService = new QdvsService14(this);
+        } else if (STICHTAG.isBefore(LocalDate.of(2024, 1, 1))) {
+            qdvsService = new QdvsService21(this);
+        } else {
+            qdvsService = null;
+        }
     }
 
 

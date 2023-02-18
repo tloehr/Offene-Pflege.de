@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" elementFormDefault="qualified" vc:minVersion="1.1">
+	<xs:complexType name="text_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="255"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="long_text_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="5000"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="number_type">
+		<xs:attribute name="value" type="xs:integer" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="dateTime_type">
+		<xs:attribute name="value" type="xs:dateTime" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="date_type">
+		<xs:attribute name="value" type="xs:date" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="guid_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="registration_type">
+		<xs:attribute name="value" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:int">
+					<xs:pattern value="[0-9]{6}"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="specification_type">
+		<xs:attribute name="value" use="required" fixed="V03"/>
+	</xs:complexType>
+	<xs:complexType name="delivery_status_type">
+		<xs:sequence>
+			<xs:element name="http_status" type="number_type">
+				<xs:annotation>
+					<xs:documentation>http-Status der Datenlieferung</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="error" type="error_type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für regelspezifische Informationen</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="value" type="enum_status_type" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="validation_status_type">
+		<xs:sequence>
+			<xs:element name="error" type="error_type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Umschlagselement für regelspezifische Informationen</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="value" type="enum_rule_type" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="error_type">
+		<xs:annotation>
+			<xs:documentation>Komplexer Datentyp zur Aufnahme von Fehlermeldungen</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="rule_id" type="number_type" minOccurs="0"/>
+			<xs:element name="rule_text" type="long_text_type"/>
+			<xs:element name="rule_type" type="val_rule_type"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="val_rule_type">
+		<xs:attribute name="value" type="enum_rule_type" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="enum_rule_type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="WARNING"/>
+			<xs:enumeration value="ERROR"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enum_status_type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OK"/>
+			<xs:enumeration value="WARNING"/>
+			<xs:enumeration value="ERROR"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

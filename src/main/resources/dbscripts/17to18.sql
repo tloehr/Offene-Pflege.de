@@ -1,9 +1,11 @@
--- Ab Version 1.15.3
+-- Ab Version 1.16.3
 UPDATE `sysprops`
 SET V = '18'
 WHERE K = 'dbstructure';
 --
-UPDATE `resinfotype` SET `deprecated` = '1' WHERE `BWINFTYP` = 'kpflege02';
+UPDATE `resinfotype`
+SET `deprecated` = '1'
+WHERE `BWINFTYP` = 'kpflege02';
 --
 INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`)
 VALUES ('kpflege03', 'Körperpflege', '', '2', '108', '0',
@@ -78,10 +80,11 @@ VALUES ('kpflege03', 'Körperpflege', '', '2', '108', '0',
 ');
 --
 INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`)
-VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murray und Schölten 2018', '17', '169', '3','0','
-  <scale name="ohat" label="OHAT Wert">
+VALUES ('ohat01', 'Mund Assessment OHAT', 'Oral Health Assessment Tool nach Murray und Schölten 2018', '2', '169', '3',
+        '0', '
+ <scale name="ohat" label="OHAT Wert">
         <scalegroup name="lippen" label="Lippen">
-            <option label="gesund" tooltip="weich, rosa, befeuchtet" name="0" score="0" layout="left"/>
+            <option label="gesund" tooltip="weich, rosa, befeuchtet" name="0" score="0" layout="left" default="true" />
             <option label="verändert" tooltip="trocken, rissig, an den Mundwinkeln gerötet" name="1" score="1"
                     layout="left"/>
             <option label="ungesund/erkrankt"
@@ -90,7 +93,7 @@ VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murra
         </scalegroup>
 
         <scalegroup name="zunge" label="Zunge">
-            <option label="gesund" tooltip="unauffällig, durchfeuchtet, rosa" name="0" score="0" layout="left"/>
+            <option label="gesund" tooltip="unauffällig, durchfeuchtet, rosa" name="0" score="0" layout="left" default="true" />
             <option label="verändert" tooltip="fleckig, gefurcht, rot, belegt" name="1" score="1" layout="left"/>
             <option label="ungesund/erkrankt"
                     tooltip="rote und/oder weiße Flecken ulzeriert, geschwollen"
@@ -98,7 +101,7 @@ VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murra
         </scalegroup>
 
         <scalegroup name="zahnfleisch" label="Zahnfleisch und Schleimhaut">
-            <option label="gesund" tooltip="rosa, befeuchtet, glatt, keine Blutungen" name="0" score="0" layout="left"/>
+            <option label="gesund" tooltip="rosa, befeuchtet, glatt, keine Blutungen" name="0" score="0" layout="left" default="true" />
             <option label="verändert"
                     tooltip="trocken, glänzend, rau, gerötet, geschwollen, Geschwür/wunde Stelle unter Zahnprothese"
                     name="1" score="1" layout="left"/>
@@ -109,7 +112,7 @@ VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murra
 
         <scalegroup name="speichel" label="Speichel">
             <option label="gesund" tooltip="feuchte Schleimhäute, wässrig flüssiger Speichel" name="0" score="0"
-                    layout="left"/>
+                    layout="left" default="true" />
             <option label="verändert"
                     tooltip="trockene, klebrige Schleimhäute, wenig Speichel vorhanden, Bewohner klagt über trockenen Mund"
                     name="1" score="1" layout="left"/>
@@ -120,7 +123,7 @@ VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murra
 
         <scalegroup name="zaehne" label="Natürliche Zähne">
             <option label="gesund" tooltip="keine kariösen oder zerstörten Zähne/Wurzeln" name="0" score="0"
-                    layout="left"/>
+                    layout="left" default="true" />
             <option label="verändert"
                     tooltip="ein bis drei kariöse oder zerstörte Zähne/Wurzeln oder extrem abgenutzte Zähne"
                     name="1" score="1" layout="left"/>
@@ -132,7 +135,7 @@ VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murra
         <scalegroup name="prothesen" label="Prothesen">
             <option label="gesund"
                     tooltip="keine beschädigten Prothesenflächen oder Zähne, Prothese wird regelmäßig getragen" name="0"
-                    score="0" layout="left"/>
+                    score="0" layout="left" default="true" />
             <option
                     label="verändert"
                     tooltip="eine beschädigte Prothesenfläche oder Zahn oder Prothese wird nur ein bis zwei Stunden täglich getragen oder Prothese sitzt locker"
@@ -145,7 +148,7 @@ VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murra
         <scalegroup name="hygiene" label="Mund-/Prothesenhygiene">
             <option label="gesund" tooltip="sauber, keine Speisereste/Beläge/Zahnstein mi Mund oder an Prothese"
                     name="0" score="0"
-                    layout="left"/>
+                    layout="left" default="true" />
             <option label="verändert"
                     tooltip="Speisereste/Zahnstein/ Belag an ein bis zwei Stellen des Mundes bzw. an kleinem Bereich der Prothese oder Halitosis (Mundgeruch)"
                     name="1" score="1" layout="left"/>
@@ -157,7 +160,7 @@ VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murra
         <scalegroup name="schmerzen" label="Zahnschmerzen">
             <option label="gesund"
                     tooltip="keine verbalen, körperlichen Zeichen oder Verhaltensindikatoren deuten auf Zahnschmerz hin"
-                    name="0" score="0" layout="left"/>
+                    name="0" score="0" layout="left" default="true" />
             <option
                     label="verändert"
                     tooltip="Verbale Zeichen und/oder Verhaltensindikatoren für Schmerz, z.B. das Gesicht verziehen, Lippen kauen, Essen verweigern, aggresives Verhalten."
@@ -167,15 +170,32 @@ VALUES ('ohat01', 'OHAT Mundgesundheit', 'Oral Health Assessment Tool nach Murra
                     name="2" score="2" layout="left"/>
         </scalegroup>
 
-
         <risk from="0" to="2" label="sehr gut" color="dark_green" rating="0"/>
         <risk from="3" to="6" label="gut" color="blue" rating="1"/>
         <risk from="7" to="9" label="mittelmäßig" color="dark_orange" rating="2"/>
         <risk from="10" to="16" label="schlecht" color="dark_red" rating="3"/>
     </scale>
-
-    <separator/>
-
     <label name="hinweis" color="blue" size="14"
-           label="Oral Health Assessment Tool nach Murray und Schölten 2018 - Gemäß Expertenstandard FÖRDERUNG DER MUNDGESUNDHEIT IN DER PFLEGE 2021"/>
+           label="Oral Health Assessment Tool nach Murray und Schölten 2018"/>
+');
+--
+INSERT INTO `resinfotype` (`BWINFTYP`, `BWInfoKurz`, `BWInfoLang`, `BWIKID`, `type`, `IntervalMode`, `equiv`, `XML`)
+VALUES ('mouthscrn', 'Mund Kurzscreening', 'Screening zur Beurteilung, ob ein volles OHAT Assessment nötig ist',
+        '2', '169', '3', '0', '
+    <label name="hinweis1" color="red" size="14"
+           label="Wenn jeglicher Verdacht auf Probleme bei der Mundgesundheit ausgeschlossen werden kann, benötigen wir kein Assessment. Ansonsten bitte den OHAT ausfüllen."/>
+
+    <label name="hinweis2" color="black" size="12"
+           label="Ein Screening soll ohne Inspektion des Mundes erfolgen."/>
+
+    <checkbox name="schmerz" label="Schmerzen, Schwellungen oder Verletzunge" layout="br left"/>
+    <checkbox name="kauen" label="Probleme beim Essen/Kauen (auch Nahrungskarenzen)" layout="br left"/>
+    <checkbox name="ersatz" label="Probleme mit herausnehmbarem Zahnersatz" layout="br left"/>
+    <checkbox name="mundpflege" label="Probleme bei der Mundpflege" layout="br left"/>
+    <checkbox name="lippen" label="Trockene/rissige Lippen, Rhagaden" layout="br left"/>
+    <checkbox name="trocken" label="Mundtrockenheit" layout="br left"/>
+    <checkbox name="geruch" label="Mundgeruch" layout="br left"/>
+
+    <label name="hinweis3" color="blue" size="14"
+           label="Erläuterungen übernommen aus Expertenstandaerd ''Förderung der Mundgesund, 2021''"/>
 ');

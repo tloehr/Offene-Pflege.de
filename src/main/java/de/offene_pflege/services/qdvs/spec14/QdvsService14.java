@@ -131,6 +131,12 @@ public class QdvsService14 implements QdvsService {
      * @param textListener meldet alle Protokoll Einträge an den Textlistener. Der kann das dann hinterher anzeigen.
      */
     public QdvsService14(AddTextListener textListener) {
+        log.info("\n ____    _    ____     ____  _____ _     _____ ____ _____          ___  _  _  _\n" +
+                "|  _ \\  / \\  / ___|   |  _ \\|  ___| |   | ____/ ___| ____| __   __/ _ \\/ || || |\n" +
+                "| | | |/ _ \\ \\___ \\   | |_) | |_  | |   |  _|| |  _|  _|   \\ \\ / / | | | || || |_\n" +
+                "| |_| / ___ \\ ___) |  |  __/|  _| | |___| |__| |_| | |___   \\ V /| |_| | ||__   _|\n" +
+                "|____/_/   \\_\\____/___|_|   |_|   |_____|_____\\____|_____|___\\_/  \\___/|_(_) |_|\n" +
+                "                 |_____|                                |_____|");
         this.textListener = textListener;
         // ein paar Hilfs-Variablen.
 

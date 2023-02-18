@@ -1,0 +1,24 @@
+<resinfotype bwinftyp="mouthscrn" sinceversion="18" category="2" abstract_type="169" equivalent="0"
+             intervalmode="3"
+             infokurz="Mund Kurzscreening"
+             infolang="Screening zur Beurteilung, ob ein volles OHAT Assessment nötig ist"
+             tx="false" qpr="false">
+
+    <label name="hinweis1" color="red" size="14"
+           label="Wenn jeglicher Verdacht auf Probleme bei der Mundgesundheit ausgeschlossen werden kann, benötigen wir kein Assessment. Ansonsten bitte den OHAT ausfüllen."/>
+
+    <label name="hinweis2" color="black" size="12"
+           label="Ein Screening soll ohne Inspektion des Mundes erfolgen."/>
+
+    <checkbox name="schmerz" label="Schmerzen, Schwellungen oder Verletzunge" layout="br left"/>
+    <checkbox name="kauen" label="Probleme beim Essen/Kauen (auch Nahrungskarenzen)" layout="br left"/>
+    <checkbox name="ersatz" label="Probleme mit herausnehmbarem Zahnersatz" layout="br left"/>
+    <checkbox name="mundpflege" label="Probleme bei der Mundpflege" layout="br left"/>
+    <checkbox name="lippen" label="Trockene/rissige Lippen, Rhagaden" layout="br left"/>
+    <checkbox name="trocken" label="Mundtrockenheit" layout="br left"/>
+    <checkbox name="geruch" label="Mundgeruch" layout="br left"/>
+
+    <label name="hinweis3" color="blue" size="14"
+           label="Erläuterungen übernommen aus Expertenstandaerd 'Förderung der Mundgesund, 2021'"/>
+
+</resinfotype>

@@ -688,7 +688,7 @@ public class PnlDev extends CleanablePanel {
         button7 = new JButton();
 
         //======== this ========
-        setLayout(new BorderLayout());
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         //======== tabbedPane1 ========
         {
@@ -850,7 +850,7 @@ public class PnlDev extends CleanablePanel {
             }
             tabbedPane1.addTab("text", panel5);
         }
-        add(tabbedPane1, BorderLayout.NORTH);
+        add(tabbedPane1);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 

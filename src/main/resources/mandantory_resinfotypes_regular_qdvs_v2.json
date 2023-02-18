@@ -1,0 +1,29 @@
+{
+  "regular": {
+    "HAUF": "hauf",
+    "ABWESENHEIT": "abwe1",
+    "BEWUSST": "bewusst01",
+    "ORIENT": "orient02",
+    "MOBIL": "mobil02",
+    "AUSSCHEID": "aussch01",
+    "KPFLEGE": [
+      "kpflege02",
+      "kpflege03"
+    ],
+    "ERN": "ern01",
+    "ALLTAG": "alltag01",
+    "SCHLAF": "schlaf02",
+    "SOZIAL": "sozial01",
+    "NINSUR": "ninsur03",
+    "ROOM": "room1",
+    "RESPIRAT": "respirat2",
+    "KERN": "kern01",
+    "INTEGRATION": "intgesp01",
+    "KOERPERGEWICHTDOKU": "gewdoku1",
+    "BESD": "besd2",
+    "SCHMERZ": "schmerze2"
+  },
+  "minimal": {
+    "ROOM": "room1"
+  }
+}
