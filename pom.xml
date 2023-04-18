@@ -53,18 +53,18 @@
         <jgoodies.forms.version>1.9.0</jgoodies.forms.version>
         <jgoodies.looks.version>2.7.0</jgoodies.looks.version>
         <jgoodies.validation.version>2.5.1</jgoodies.validation.version>
-        <jide.version>3.7.12</jide.version>
+        <jide.version>3.7.13</jide.version>
         <joda.time.version>2.10.14</joda.time.version>
         <junit.version>4.13.2</junit.version>
         <lombok.version>1.18.24</lombok.version>
-        <mysql.connector.version>8.0.29</mysql.connector.version>
+        <mysql.connector.version>8.0.32</mysql.connector.version>
         <poi.ooxml.version>5.2.2</poi.ooxml.version>
         <swingx.core.version>1.6.5-1</swingx.core.version>
         <timing.framework.version>7.3.1</timing.framework.version>
         <xerces.version>2.12-beta-r1667115</xerces.version>
         <xml.bind.impl.version>3.0.2</xml.bind.impl.version>
         <xml.bind.version>3.0.1</xml.bind.version>
-        <json.version>20220924</json.version>
+        <json.version>20230227</json.version>
         <!-- not changed anymore -->
         <install4j.runtime.version>9.0.7</install4j.runtime.version>
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>
@@ -230,37 +230,27 @@
             <artifactId>jgoodies-validation</artifactId>
             <version>${jgoodies.validation.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.bidib.com.jidesoft/jide-common -->
         <dependency>
             <groupId>org.bidib.com.jidesoft</groupId>
             <artifactId>jide-common</artifactId>
             <version>${jide.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.bidib.com.jidesoft/jide-dialogs -->
         <dependency>
             <groupId>org.bidib.com.jidesoft</groupId>
             <artifactId>jide-components</artifactId>
             <version>${jide.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.bidib.com.jidesoft/jide-dialogs -->
         <dependency>
             <groupId>org.bidib.com.jidesoft</groupId>
             <artifactId>jide-dialogs</artifactId>
             <version>${jide.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.bidib.com.jidesoft/jide-grids -->
         <dependency>
             <groupId>org.bidib.com.jidesoft</groupId>
             <artifactId>jide-grids</artifactId>
             <version>${jide.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.bidib.com.jidesoft/jide-parent -->
-        <dependency>
-            <groupId>org.bidib.com.jidesoft</groupId>
-            <artifactId>jide-parent</artifactId>
-            <version>${jide.version}</version>
-            <type>pom</type>
-        </dependency>
+
         <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
         <dependency>
             <groupId>joda-time</groupId>

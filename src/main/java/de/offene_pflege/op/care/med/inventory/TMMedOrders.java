@@ -36,11 +36,14 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.ButtonAppearance;
 import de.offene_pflege.op.tools.HTMLTools;
 import de.offene_pflege.op.tools.SYSConst;
+import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.text.DateFormat;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,11 +71,16 @@ public class TMMedOrders extends AbstractTableModel {
         return header;
     }
 
+    HashMap<MedInventory, String> cache;
+
     public TMMedOrders(List<MedOrder> medOrderList, boolean is_allowed_to_update, boolean is_allowed_to_delete, boolean show_notes) {
         this.medOrderList = medOrderList;
+        this.cache = new HashMap<>();
         this.is_allowed_to_update = is_allowed_to_update;
         this.is_allowed_to_delete = is_allowed_to_delete;
         this.show_notes = show_notes;
+        // preset cache
+        medOrderList.forEach(medOrder -> get_presciption_dose_for_inventory(TradeFormTools.getInventory4TradeForm(medOrder)));
     }
 
     @Override
@@ -125,10 +133,6 @@ public class TMMedOrders extends AbstractTableModel {
             }
             medOrder.setCreated_by(OPDE.getLogin().getUser());
         }
-//        else if (column == COL_note) {
-//            medOrder.setNote(StringUtils.abbreviate(aValue.toString().trim(), 200));
-//            medOrder.setCreated_by(OPDE.getLogin().getUser());
-//        }
         medOrderList.set(row, EntityTools.merge(medOrder));
         if (column == COL_complete) fireTableCellUpdated(row, COL_TradeForm);
         fireTableCellUpdated(row, column);
@@ -148,6 +152,23 @@ public class TMMedOrders extends AbstractTableModel {
         return medOrderList.get(row);
     }
 
+    private String get_presciption_dose_for_inventory(MedInventory medInventory) {
+        if (medInventory == null) return "";
+        return cache.computeIfAbsent(medInventory, inventory -> {
+            List<Prescription> prescriptions = PrescriptionTools.getPrescriptionsByInventory(medInventory);
+            StringBuffer result = new StringBuffer();
+            prescriptions.forEach(prescription -> {
+                if (prescription.isOnDemand()) {
+                    result.append("<br/>" + SYSTools.xx("misc.msg.ondemand") + ": " + prescription.getSituation().getText() + "&nbsp;" +
+                            PrescriptionTools.getDoseAsCompactText(prescription));
+                } else {
+                    result.append("<br/>" +PrescriptionTools.getDoseAsCompactText(prescription));
+                }
+            });
+            return result.toString();
+        });
+    }
+
 
     public List<MedOrder> getMedOrderList() {
         return medOrderList;
@@ -163,7 +184,9 @@ public class TMMedOrders extends AbstractTableModel {
                 if (medOrder.getTradeForm() == null) {
                     result = medOrder.getNote();
                 } else {
-                    Optional<MedStock> stockInUse = Optional.ofNullable(MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(medOrder)));
+                    MedInventory medInventory = TradeFormTools.getInventory4TradeForm(medOrder);
+                    Optional<MedStock> stockInUse = Optional.ofNullable(MedStockTools.getStockInUse(medInventory));
+
                     if (stockInUse.isPresent()) {
                         if (!stockInUse.get().getTradeForm().equals(medOrder.getTradeForm())) {
                             result = TradeFormTools.toPrettyHTML(stockInUse.get().getTradeForm()) + " " + TradeFormTools.toPrettyHTMLalternative(medOrder.getTradeForm());
@@ -173,13 +196,20 @@ public class TMMedOrders extends AbstractTableModel {
                     } else {
                         result = TradeFormTools.toPrettyHTML(medOrder.getTradeForm());
                     }
+
+                    result += get_presciption_dose_for_inventory(medInventory);
                 }
                 if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
             case COL_Resident: {
-                String order_id = OPDE.isExperimental() ? "#_"+medOrder.getId()+" " : "";
-                result = order_id+  ResidentTools.getNameAndFirstname(medOrder.getResident()) + String.format(" [%s]", medOrder.getResident().getId());
+                String order_id = OPDE.isExperimental() ? "#_" + medOrder.getId() + " " : "";
+                result = order_id + String.format("%s (*%s) [%s]",
+                        ResidentTools.getNameAndFirstname(medOrder.getResident()),
+                        DateFormat.getDateInstance().format(ResidentTools.getDob(medOrder.getResident())),
+                        medOrder.getResident().getId()
+                );
+
                 if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }

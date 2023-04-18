@@ -67,9 +67,7 @@ public class DlgPack extends MyJDialog {
             cmbGroesse.setSelectedIndex(aPackage.getSize());
         }
         lblPackEinheit.setText(TradeFormTools.getPackUnit(aPackage.getTradeForm()));
-//        SYSTools.centerOnParent(parent, this);
         pack();
-//        setVisible(true);
     }
 
     public MedPackage getPackage() {

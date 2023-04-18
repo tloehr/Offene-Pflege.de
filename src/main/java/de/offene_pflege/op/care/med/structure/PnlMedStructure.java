@@ -106,9 +106,9 @@ public class PnlMedStructure extends CleanablePanel {
                     itemedit.addActionListener(evt14 -> {
                         if (currentEditor != null) return;
                         currentEditor = new DlgTradeForm(tradeForm);
-                        currentEditor.addWindowListener(new WindowAdapter() {
+                        currentEditor.addComponentListener(new ComponentAdapter() {
                             @Override
-                            public void windowClosing(WindowEvent e) {
+                            public void componentHidden(ComponentEvent e) {
                                 createTree(((DlgTradeForm) currentEditor).getTradeForm().getMedProduct());
                                 currentEditor = null;
                             }
@@ -124,15 +124,17 @@ public class PnlMedStructure extends CleanablePanel {
                     itemedit.addActionListener(evt12 -> {
                         if (currentEditor != null) return;
                         currentEditor = new DlgPack(SYSTools.xx("misc.msg.edit"), packung);
-                        currentEditor.addWindowListener(new WindowAdapter() {
+
+                        // only component hidden is reported on all cases when dialog is closing
+                        currentEditor.addComponentListener(new ComponentAdapter() {
                             @Override
-                            public void windowClosing(WindowEvent e) {
+                            public void componentHidden(ComponentEvent e) {
                                 createTree(((DlgPack) currentEditor).getPackage().getTradeForm().getMedProduct());
                                 currentEditor = null;
                             }
                         });
-                        currentEditor.setVisible(true);
 
+                        currentEditor.setVisible(true);
                     });
                 } else if (dmtn.getUserObject() instanceof MedProducts) {
                     final MedProducts medProducts = (MedProducts) dmtn.getUserObject();
@@ -140,9 +142,9 @@ public class PnlMedStructure extends CleanablePanel {
                     itemedit.addActionListener(evt1 -> {
                         if (currentEditor != null) return;
                         currentEditor = new DlgProduct(SYSTools.xx("misc.msg.edit"), medProducts);
-                        currentEditor.addWindowListener(new WindowAdapter() {
+                        currentEditor.addComponentListener(new ComponentAdapter() {
                             @Override
-                            public void windowClosed(WindowEvent e) {
+                            public void componentHidden(ComponentEvent e) {
                                 createTree(((DlgProduct) currentEditor).getProduct());
                                 currentEditor = null;
                             }
