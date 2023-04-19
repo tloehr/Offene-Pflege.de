@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 /**
@@ -303,7 +304,6 @@ public class PrescriptionScheduleTools {
         }
 
 
-
         return phrase;
     }
 
@@ -388,6 +388,53 @@ public class PrescriptionScheduleTools {
         return result + "</div>";
     }
 
+    public static String getDoseAsEvenCompacterText(PrescriptionSchedule schedule) {
+        String result = "";
+        if (getTerminStatus(schedule) == ROUGHLY) {
+
+            result = String.format("%s-%s-%s-%s-%s-%s",
+                    SYSTools.formatBigDecimal(schedule.getNachtMo()),
+                    SYSTools.formatBigDecimal(schedule.getMorgens()),
+                    SYSTools.formatBigDecimal(schedule.getMittags()),
+                    SYSTools.formatBigDecimal(schedule.getNachmittags()),
+                    SYSTools.formatBigDecimal(schedule.getAbends()),
+                    SYSTools.formatBigDecimal(schedule.getNachtAb())
+            );
+
+            //result = result.substring(0, result.length() - 2);
+
+            String repeat = getRepeatPatternAsCompactText(schedule);
+            if (!repeat.isEmpty()) {
+                result = "(" + result + " => " + repeat + ")";
+            }
+        } else if (getTerminStatus(schedule) == MAXDOSE) {
+            result += SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ";
+            result += schedule.getMaxAnzahl() + "x " + SYSTools.formatBigDecimal(schedule.getMaxEDosis());
+            if (schedule.getCheckAfterHours() != null) {
+                result += "\n";
+                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
+                result += schedule.getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)");
+            }
+        } else if (getTerminStatus(schedule) == EXACTTIME) {
+
+            DateTime dt = new DateTime(schedule.getUhrzeit());
+
+            if (dt.getMinuteOfHour() == 0) {
+                result += dt.getHourOfDay();
+            } else {
+                result += DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit());
+            }
+
+            result += SYSTools.xx("misc.msg.Time.short") + " " + SYSTools.formatBigDecimal(schedule.getUhrzeitDosis()) + "x";
+            String repeat = getRepeatPatternAsCompactText(schedule);
+            if (!repeat.isEmpty()) {
+                result = "(" + result + " => " + repeat + ")";
+            }
+        } else {
+            result = "!!" + SYSTools.xx("misc.msg.error") + "!!";
+        }
+        return result;
+    }
 
     public static String getDoseAsCompactText(PrescriptionSchedule schedule) {
         String result = "";
@@ -468,7 +515,6 @@ public class PrescriptionScheduleTools {
 
         return phrase;
     }
-
 
 
 }

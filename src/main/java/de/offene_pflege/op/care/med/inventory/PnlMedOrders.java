@@ -294,8 +294,20 @@ public class PnlMedOrders extends JPanel {
                 HTMLTools.getTable(
                         HTMLTools.getTableRow("th", "fonttextgray", Arrays.asList(Arrays.copyOfRange(model.getHeader(), 0, cols - 3))) +
                                 table_content, "border=1"
-                ), false
+                )+getDosisAnmerkung(), false
         );
+    }
+
+    private String getDosisAnmerkung(){
+        return "<p><b>Regel</b>dosierungen werden in der Form <b><em>fm - mo - mi - nm - ab - sa</em></b> angegeben. Mit folgender Bedeutung</p>" +
+                "<ul>" +
+                "<li><b>fm</b> - früh morgens</li>\n" +
+                "<li><b>mo</b> - morgens</li>\n" +
+                "<li><b>mi</b> - mittags</li>\n" +
+                "<li><b>nm</b> - nachmittags</li>\n" +
+                "<li><b>ab</b> - abends</li>\n" +
+                "<li><b>na</b> - nachts</li>\n" +
+                "</ul>";
     }
 
 }

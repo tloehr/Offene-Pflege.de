@@ -573,6 +573,26 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static String getDoseAsEvenCompacterText(Prescription prescription) {
+        String result = "";
+
+        ArrayList<PrescriptionSchedule> listSchedules = new ArrayList<>(prescription.getPrescriptionSchedule());
+        Collections.sort(listSchedules);
+
+        if (listSchedules.isEmpty()) {
+            result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
+        } else {
+            for (PrescriptionSchedule schedule : listSchedules) {
+                result += PrescriptionScheduleTools.getDoseAsEvenCompacterText(schedule) + "; ";
+            }
+            result = result.substring(0, result.length() - 2);
+        }
+
+
+        return result;
+    }
+
+
     public static String getDoseAsHTML(Prescription prescription, boolean showInventory) {
         String result = "";
         ArrayList<PrescriptionSchedule> listSchedules = new ArrayList<>(prescription.getPrescriptionSchedule());

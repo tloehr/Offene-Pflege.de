@@ -160,9 +160,9 @@ public class TMMedOrders extends AbstractTableModel {
             prescriptions.forEach(prescription -> {
                 if (prescription.isOnDemand()) {
                     result.append("<br/>" + SYSTools.xx("misc.msg.ondemand") + ": " + prescription.getSituation().getText() + "&nbsp;" +
-                            PrescriptionTools.getDoseAsCompactText(prescription));
+                            PrescriptionTools.getDoseAsEvenCompacterText(prescription));
                 } else {
-                    result.append("<br/>" +PrescriptionTools.getDoseAsCompactText(prescription));
+                    result.append("<br/>" +PrescriptionTools.getDoseAsEvenCompacterText(prescription));
                 }
             });
             return result.toString();
