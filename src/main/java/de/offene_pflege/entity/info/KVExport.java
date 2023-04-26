@@ -128,7 +128,7 @@ public class KVExport {
         export_table.put(resident, "wirkstoffe", Integer.toString(PrescriptionTools.getPrescribedTradeforms(resident).size()));
 
         String hm = "";
-
+        log.debug("exporting resident: {}", resident);
         for (String hms : new String[]{"kruecke", "gehstock", "rollstuhl", "rollator"}) {
             if (import_map.get(resident, ResInfoTypeTools.TYPE_MOBILITY, hms).toString().equalsIgnoreCase("true")) {
                 hms = StringUtils.replace(hms, "kruecke", "Unterarm-Stütze");
