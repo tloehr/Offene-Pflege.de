@@ -5,16 +5,14 @@ import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Phrase;
 import de.offene_pflege.op.system.PDF;
-import de.offene_pflege.op.tools.HTMLTools;
-import de.offene_pflege.op.tools.SYSCalendar;
-import de.offene_pflege.op.tools.SYSConst;
-import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.op.tools.*;
 import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -128,6 +126,9 @@ public class PrescriptionScheduleTools {
             if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
                 result += "<br/>" + SYSTools.xx("nursingrecords.prescription.mostRecentApplication") + ": ";
                 result += df.format(schedule.getLDatum());
+                if (schedule.getTaeglich() > 1) { // für so was wie alle 4 Tage...
+                    result += "<br/>Nächstes mal am: " + JavaTimeConverter.toJavaLocalDateTime(schedule.getLDatum()).plusDays(schedule.getTaeglich()).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                }
             }
         }
 
@@ -213,7 +214,10 @@ public class PrescriptionScheduleTools {
             result += " !" + SYSTools.xx("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum());
         } else {
             if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
-                result += " " + SYSTools.xx("misc.msg.mostRecent") + " " + df.format(schedule.getLDatum());
+                result += ", " + SYSTools.xx("misc.msg.mostRecent") + ": " + df.format(schedule.getLDatum());
+                if (schedule.getTaeglich() > 1) { // für so was wie alle 4 Tage...
+                    result += ", nächstes mal: " + JavaTimeConverter.toJavaLocalDateTime(schedule.getLDatum()).plusDays(schedule.getTaeglich()).format(DateTimeFormatter.ofPattern("dd.MM.yy"));
+                }
             }
         }
 
@@ -300,6 +304,10 @@ public class PrescriptionScheduleTools {
             if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
                 phrase.add(Chunk.NEWLINE);
                 phrase.add(PDF.chunk(SYSTools.xx("nursingrecords.prescription.mostRecentApplication") + ": " + df.format(schedule.getLDatum())));
+                if (schedule.getTaeglich() > 1) { // für so was wie alle 4 Tage...
+                    phrase.add(Chunk.NEWLINE);
+                    phrase.add(PDF.chunk(SYSTools.xx("Nächstes mal am: " + JavaTimeConverter.toJavaLocalDateTime(schedule.getLDatum()).plusDays(schedule.getTaeglich()).format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))));
+                }
             }
         }
 

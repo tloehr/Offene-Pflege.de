@@ -174,7 +174,7 @@ public class BHPTools {
         LocalDate targetdate = null;
 
         // If (for technical reasons) the lastdfn lies in the past (more than the usual 1 day),
-        // then the generation is interated until the current day.
+        // then the generation is repeated until the current day.
         for (int days = 1; days <= Days.daysBetween(lastbhp.plusDays(1), new LocalDate()).getDays() + 1; days++) {
 
             targetdate = lastbhp.plusDays(days);
@@ -279,7 +279,7 @@ public class BHPTools {
                     while (Days.daysBetween(ldatum, targetdate).getDays() > 0) {
                         ldatum = ldatum.plusDays(pSchedule.getTaeglich());
                     }
-                    // Mich interssiert nur der Treffer, also die Punktlandung auf dem targetdate
+                    // Mich interessiert nur der Treffer, also die Punktlandung auf dem targetdate
                     treffer = Days.daysBetween(ldatum, targetdate).getDays() == 0;
                 } else if (pSchedule.isWeekly()) {
 //                    log.debug("Eine wöchentliche pSchedule");
