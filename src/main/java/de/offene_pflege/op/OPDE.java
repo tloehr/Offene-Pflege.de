@@ -103,7 +103,7 @@ public class OPDE {
     protected static SYSLogin login;
     protected static ValidatorFactory validatorFactory;
     protected static boolean animation = false;
-//    protected static boolean debug;
+    //    protected static boolean debug;
     protected static boolean experimental;
     protected static String css = SYSConst.fallbackCSS;
     private static int DEFAULT_TIMEOUT = 30;
@@ -168,10 +168,6 @@ public class OPDE {
         return css;
     }
 
-//    public static EntityManagerFactory getEMF() {
-//        return emf;
-//    }
-
     public static void closeEMF() {
         if (emf == null) return;
         if (emf.isOpen()) emf.close();
@@ -208,42 +204,10 @@ public class OPDE {
         OPDE.getProps().putAll(OPDE.getLocalProps());
     }
 
-//    public static Logger getLogger() {
-//        return logger;
-//    }
-//
-//    public static void warn(Throwable message) {
-//        warn(logger, message);
-//    }
-//
-//    public static void warn(Logger classLogger, Throwable message) {
-//        classlog.warn(message);
-//        if (emf != null)
-//            SyslogTools.warn(ExceptionUtils.getMessage(message) + ": " + ExceptionUtils.getStackTrace(message));
-//    }
-//
-//    public static void info(Object message) {
-//        log.info(message);
-//    }
-//
-//    public static void important(Object message) {
-//        log.info(message);
-//        SyslogTools.info(message.toString());
-//    }
-
     public static ValidatorFactory getValidatorFactory() {
         return validatorFactory;
     }
 
-    //    public static void important(EntityManager em, Object message) throws Exception {
-//        log.info(message);
-//        SyslogTools.addLog(em, message.toString(), SyslogTools.INFO);
-//    }
-//
-//    public static void fatal(Throwable e) {
-//        fatal(logger, e);
-//    }
-//
     @SneakyThrows
     public static void fatal(Throwable e) {
         if (emf != null && emf.isOpen()) {
@@ -266,7 +230,7 @@ public class OPDE {
         //temp.deleteOnExit();
         SYSFilesTools.print(html, temp, false, true);
 
-        if (System.getProperties().getOrDefault("loglevel","INFO").equals("INFO")) {
+        if (System.getProperties().getOrDefault("loglevel", "INFO").equals("INFO")) {
             EMailSystem.sendErrorMail(e.getMessage(), temp);
         }
 
@@ -579,7 +543,7 @@ public class OPDE {
             jpaProps.put("eclipselink.cache.shared.default", cl.hasOption("c") ? "true" : "false");
             //jpaProps.put("eclipselink.session.customizer", "de.offene_pflege.entity.JPAEclipseLinkSessionCustomizer");
 
-            
+
             Connection jdbcConnection = DriverManager.getConnection(url, jpaProps.getProperty(SYSPropsTools.KEY_JDBC_USER), jpaProps.getProperty(SYSPropsTools.KEY_JDBC_PASSWORD));
             int neededVersion = OPDE.getAppInfo().getDbversion();
             int currentVersion = EntityTools.getDatabaseSchemaVersion(jdbcConnection);
@@ -750,61 +714,12 @@ public class OPDE {
         in.close();
 
         // minimum requirement
-        if (!localProps.containsKey(SYSPropsTools.KEY_STATION)) localProps.put(SYSPropsTools.KEY_STATION, "1");
-        if (!localProps.containsKey(SYSPropsTools.KEY_ANIMATION)) localProps.put(SYSPropsTools.KEY_ANIMATION, "true");
-        if (!localProps.containsKey(SYSPropsTools.KEY_TMP_DIR))
-            localProps.put(SYSPropsTools.KEY_TMP_DIR, System.getProperty("user.home"));
-        if (!localProps.containsKey(SYSPropsTools.KEY_HOSTKEY))
-            localProps.put(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
-
+        localProps.putIfAbsent("test", "1");
+        localProps.putIfAbsent(SYSPropsTools.KEY_STATION, "1");
+        localProps.putIfAbsent(SYSPropsTools.KEY_ANIMATION, "true");
+        localProps.putIfAbsent(SYSPropsTools.KEY_TMP_DIR, System.getProperty("user.home"));
+        localProps.putIfAbsent(SYSPropsTools.KEY_HOSTKEY, UUID.randomUUID().toString());
     }
-
-
-//    // http://stackoverflow.com/questions/19082265/how-to-ensure-only-one-instance-of-a-java-program-can-be-executed
-//    private static boolean getMonitoredVMs(int processPid) {
-//        MonitoredHost host;
-//        Set vms;
-//        try {
-//            host = MonitoredHost.getMonitoredHost(new HostIdentifier((String) null));
-//            vms = host.activeVms();
-//        } catch (java.net.URISyntaxException sx) {
-//            throw new InternalError(sx.getMessage());
-//        } catch (MonitorException mx) {
-//            throw new InternalError(mx.getMessage());
-//        }
-//        MonitoredVm mvm = null;
-//        String processName = null;
-//        try {
-//            mvm = host.getMonitoredVm(new VmIdentifier(String.valueOf(processPid)));
-//            processName = MonitoredVmUtil.commandLine(mvm);
-//            processName = processName.substring(processName.lastIndexOf("\\") + 1, processName.length());
-//            mvm.detach();
-//        } catch (Exception ex) {
-//
-//        }
-//        // This line is just to verify the process name. It can be removed.
-//        JOptionPane.showMessageDialog(null, processName);
-//        for (Object vmid : vms) {
-//            if (vmid instanceof Integer) {
-//                int pid = ((Integer) vmid).intValue();
-//                String name = vmid.toString(); // default to pid if name not available
-//                try {
-//                    mvm = host.getMonitoredVm(new VmIdentifier(name));
-//                    // use the command line as the display name
-//                    name = MonitoredVmUtil.commandLine(mvm);
-//                    name = name.substring(name.lastIndexOf("\\") + 1, name.length());
-//                    mvm.detach();
-//                    if ((name.equalsIgnoreCase(processName)) && (processPid != pid))
-//                        return false;
-//                } catch (Exception x) {
-//                    // ignore
-//                }
-//            }
-//        }
-//
-//        return true;
-//    }
-
 
     public static boolean isAdmin() {
         return UsersTools.isAdmin(login.getUser());

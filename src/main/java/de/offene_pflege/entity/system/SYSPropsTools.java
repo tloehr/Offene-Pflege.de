@@ -112,20 +112,11 @@ public class SYSPropsTools {
     // login credentials for private computers
     public static final String KEY_USER = "defaultlogin";
     public static final String KEY_PASSWORD = "defaultpw";
-
-    // not used
-//    public static final String KEY_OUTCOME_FGITEM = "OUTCOME_FGITEM";
-//    public static final String KEY_OUTCOME_BGITEM = "OUTCOME_BGITEM";
-
     public static final String KEY_QDVS_STICHTAG = "qdvs_stichtag";
     public static final String KEY_QDVS_ERHEBUNG = "qdvs_erhebung";
     public static final String KEY_QDVS_TAGE_ERFASSUNGSPERIODE = "qdvs.tage.erfassungsperiode";
     public static final String KEY_QDVS_WORKPATH = "qdvs_path";
     public static final String KEY_QDVS_COMMENT = "qdvs_kommentar";
-
-    //should be useless in future
-    public static final String LOCAL_KEY_CIPHER_NIC = "cipher.nic.id";
-
 
     public static void storeProp(EntityManager em, String key, String value, OPUsers user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";

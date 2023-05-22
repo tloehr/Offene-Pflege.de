@@ -1,5 +1,5 @@
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `acl` (
   `ACLID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `ICID` bigint(20) unsigned NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE `acl` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `acme` (
   `MPHID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Firma` varchar(100) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE `acme` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `allowance` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `resid` char(10) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE `allowance` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bhp` (
   `BHPID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BHPPID` bigint(20) unsigned NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE `bhp` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `commontags` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `text` varchar(15) NOT NULL,
@@ -83,7 +83,7 @@ CREATE TABLE `commontags` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dfn` (
   `DFNID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BWKennung` char(10) NOT NULL,
@@ -109,7 +109,7 @@ CREATE TABLE `dfn` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dosageform` (
   `FormID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Zubereitung` varchar(100) CHARACTER SET utf8 NOT NULL,
@@ -125,7 +125,7 @@ CREATE TABLE `dosageform` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `floors` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `homeid` varchar(36) NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE `floors` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `gp` (
   `ArztID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Anrede` varchar(20) NOT NULL,
@@ -159,7 +159,7 @@ CREATE TABLE `gp` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `handover2user` (
   `PKID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `HID` bigint(20) unsigned NOT NULL,
@@ -170,7 +170,7 @@ CREATE TABLE `handover2user` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `handovers` (
   `HID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `PIT` datetime NOT NULL,
@@ -183,7 +183,7 @@ CREATE TABLE `handovers` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `hinsurance` (
   `KassID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Name` varchar(100) NOT NULL,
@@ -198,7 +198,7 @@ CREATE TABLE `hinsurance` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `homes` (
   `id` varchar(36) NOT NULL,
   `Name` varchar(30) DEFAULT NULL,
@@ -216,7 +216,7 @@ CREATE TABLE `homes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `hospital` (
   `KHID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Name` varchar(100) NOT NULL,
@@ -231,7 +231,7 @@ CREATE TABLE `hospital` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `icd` (
   `icdid` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `icd10` varchar(20) NOT NULL,
@@ -242,7 +242,7 @@ CREATE TABLE `icd` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `intervention` (
   `MassID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Bezeichnung` varchar(500) NOT NULL,
@@ -255,7 +255,7 @@ CREATE TABLE `intervention` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ischedule` (
   `TermID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `MassID` bigint(20) unsigned NOT NULL,
@@ -288,7 +288,7 @@ CREATE TABLE `ischedule` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `lcustodian` (
   `BetrID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Anrede` varchar(20) NOT NULL,
@@ -307,7 +307,7 @@ CREATE TABLE `lcustodian` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `medinventory` (
   `VorID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Text` varchar(500) NOT NULL,
@@ -322,7 +322,7 @@ CREATE TABLE `medinventory` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `medorder` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -345,7 +345,7 @@ CREATE TABLE `medorder` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `medpackage` (
   `MPID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `DafID` bigint(20) unsigned NOT NULL,
@@ -358,7 +358,7 @@ CREATE TABLE `medpackage` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `medproducts` (
   `medpid` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `acmeid` bigint(20) unsigned NOT NULL,
@@ -369,7 +369,7 @@ CREATE TABLE `medproducts` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `medstock` (
   `BestID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `DafID` bigint(20) unsigned NOT NULL,
@@ -393,7 +393,7 @@ CREATE TABLE `medstock` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `medstocktx` (
   `BuchID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BestID` bigint(20) unsigned NOT NULL,
@@ -411,7 +411,7 @@ CREATE TABLE `medstocktx` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `member` (
   `OCMID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `UKennung` char(10) NOT NULL,
@@ -421,7 +421,7 @@ CREATE TABLE `member` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Diese Tabelle enthaelt die Liste aller Gruppenzugehörigkeite';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `np2tags` (
   `npid` bigint(20) unsigned NOT NULL,
   `ctagid` bigint(20) unsigned NOT NULL,
@@ -429,7 +429,7 @@ CREATE TABLE `np2tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `npcontrol` (
   `PKonID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `PlanID` bigint(20) unsigned NOT NULL,
@@ -442,7 +442,7 @@ CREATE TABLE `npcontrol` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `nr2user` (
   `PKID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `PBID` bigint(20) unsigned NOT NULL,
@@ -453,7 +453,7 @@ CREATE TABLE `nr2user` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `nreports` (
   `PBID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `PIT` datetime NOT NULL,
@@ -475,7 +475,7 @@ CREATE TABLE `nreports` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `nreports2tags` (
   `pbid` bigint(20) unsigned NOT NULL,
   `ctagid` bigint(20) unsigned NOT NULL,
@@ -483,7 +483,7 @@ CREATE TABLE `nreports2tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `nursingprocess` (
   `PlanID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BWKennung` char(10) NOT NULL,
@@ -502,7 +502,7 @@ CREATE TABLE `nursingprocess` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `opgroups` (
   `GKENNUNG` char(20) NOT NULL,
   `Beschreibung` mediumtext,
@@ -513,13 +513,13 @@ CREATE TABLE `opgroups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Diese Tabelle enthaelt die Liste aller OC Benutzergruppen.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `opusers` (
   `UKennung` varchar(10) NOT NULL DEFAULT '',
   `Vorname` varchar(100) NOT NULL DEFAULT '',
   `Nachname` varchar(100) NOT NULL DEFAULT '',
   `userstatus` tinyint(4) DEFAULT NULL,
-  `MD5PW` varchar(32) NOT NULL COMMENT 'Diese Spalte ist für den FTP Server notwendig.',
+  `hashed_pw` varchar(256) NOT NULL,
   `EMail` varchar(100) DEFAULT NULL,
   `mailconfirmed` smallint(6) NOT NULL DEFAULT '0',
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -530,7 +530,7 @@ CREATE TABLE `opusers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pcat` (
   `VKatID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Text` varchar(100) NOT NULL,
@@ -539,7 +539,7 @@ CREATE TABLE `pcat` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `preport` (
   `VBID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `VorgangID` bigint(20) unsigned NOT NULL,
@@ -551,7 +551,7 @@ CREATE TABLE `preport` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `prescription` (
   `VerID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BWKennung` char(10) NOT NULL,
@@ -579,7 +579,7 @@ CREATE TABLE `prescription` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `prescription2tags` (
   `prescid` bigint(20) unsigned NOT NULL,
   `ctagid` bigint(20) unsigned NOT NULL,
@@ -587,7 +587,7 @@ CREATE TABLE `prescription2tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pschedule` (
   `BHPPID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `VerID` bigint(20) unsigned DEFAULT NULL,
@@ -620,7 +620,7 @@ CREATE TABLE `pschedule` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `qms` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `qmssid` bigint(20) unsigned DEFAULT NULL,
@@ -636,7 +636,7 @@ CREATE TABLE `qms` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `qms2file` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `qmsid` bigint(20) unsigned NOT NULL,
@@ -649,7 +649,7 @@ CREATE TABLE `qms2file` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `qmsp2tags` (
   `qmspid` bigint(20) unsigned NOT NULL,
   `ctagid` bigint(20) unsigned NOT NULL,
@@ -657,7 +657,7 @@ CREATE TABLE `qmsp2tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `qmsplan` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(200) NOT NULL,
@@ -670,7 +670,7 @@ CREATE TABLE `qmsplan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `qmsplan2file` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `qmsplanid` bigint(20) unsigned NOT NULL,
@@ -683,7 +683,7 @@ CREATE TABLE `qmsplan2file` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `qmssched` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `qmspid` bigint(20) unsigned DEFAULT NULL,
@@ -708,7 +708,7 @@ CREATE TABLE `qmssched` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `qprocess` (
   `VorgangID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Titel` varchar(100) NOT NULL,
@@ -725,7 +725,7 @@ CREATE TABLE `qprocess` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resident` (
   `id` char(10) NOT NULL,
   `Nachname` varchar(100) NOT NULL DEFAULT '',
@@ -748,7 +748,7 @@ CREATE TABLE `resident` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resident2file` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `rid` char(10) NOT NULL,
@@ -761,7 +761,7 @@ CREATE TABLE `resident2file` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resinfo` (
   `BWINFOID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `AnUKennung` char(10) NOT NULL,
@@ -784,7 +784,7 @@ CREATE TABLE `resinfo` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resinfo2tags` (
   `resinfoid` bigint(20) unsigned NOT NULL,
   `ctagid` bigint(20) unsigned NOT NULL,
@@ -792,7 +792,7 @@ CREATE TABLE `resinfo2tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resinfocategory` (
   `BWIKID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Bezeichnung` varchar(100) DEFAULT NULL,
@@ -804,7 +804,7 @@ CREATE TABLE `resinfocategory` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resinfotype` (
   `BWINFTYP` char(10) NOT NULL,
   `XML` mediumtext NOT NULL,
@@ -821,7 +821,7 @@ CREATE TABLE `resinfotype` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resvalue` (
   `BWID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `UKennung` varchar(10) CHARACTER SET utf8 NOT NULL DEFAULT '',
@@ -843,7 +843,7 @@ CREATE TABLE `resvalue` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resvaluetypes` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Text` varchar(100) NOT NULL,
@@ -873,7 +873,7 @@ CREATE TABLE `resvaluetypes` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `rooms` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `floorid` bigint(20) unsigned NOT NULL,
@@ -886,7 +886,7 @@ CREATE TABLE `rooms` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `situations` (
   `SitID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Kategorie` tinyint(4) DEFAULT NULL,
@@ -896,7 +896,7 @@ CREATE TABLE `situations` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `station` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `eid` varchar(36) NOT NULL,
@@ -906,7 +906,7 @@ CREATE TABLE `station` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysfiles` (
   `OCFID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Type` smallint(6) DEFAULT NULL,
@@ -922,7 +922,7 @@ CREATE TABLE `sysfiles` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysgroups2acl` (
   `ICID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `GID` char(20) NOT NULL,
@@ -932,7 +932,7 @@ CREATE TABLE `sysgroups2acl` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysinf2file` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BWInfoID` bigint(20) unsigned NOT NULL,
@@ -945,7 +945,7 @@ CREATE TABLE `sysinf2file` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysinf2process` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BWInfoID` bigint(20) unsigned NOT NULL,
@@ -956,7 +956,7 @@ CREATE TABLE `sysinf2process` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `syslog` (
   `LOGID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `LoginID` bigint(20) unsigned DEFAULT NULL,
@@ -970,7 +970,7 @@ CREATE TABLE `syslog` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `syslogin` (
   `LoginID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `UKennung` char(10) NOT NULL,
@@ -981,7 +981,7 @@ CREATE TABLE `syslogin` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysnp2file` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `ForeignID` bigint(20) unsigned NOT NULL,
@@ -994,7 +994,7 @@ CREATE TABLE `sysnp2file` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysnp2process` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `PlanID` bigint(20) unsigned NOT NULL,
@@ -1005,7 +1005,7 @@ CREATE TABLE `sysnp2process` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysnr2file` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `PBID` bigint(20) unsigned NOT NULL,
@@ -1018,7 +1018,7 @@ CREATE TABLE `sysnr2file` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysnr2process` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `PBID` bigint(20) unsigned NOT NULL,
@@ -1029,7 +1029,7 @@ CREATE TABLE `sysnr2process` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `syspre2file` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `VERID` bigint(20) unsigned NOT NULL,
@@ -1042,7 +1042,7 @@ CREATE TABLE `syspre2file` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `syspre2process` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `VerID` bigint(20) unsigned NOT NULL,
@@ -1053,7 +1053,7 @@ CREATE TABLE `syspre2process` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysprops` (
   `SYSPID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `K` varchar(200) NOT NULL,
@@ -1065,7 +1065,7 @@ CREATE TABLE `sysprops` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysval2file` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `ForeignID` bigint(20) unsigned NOT NULL,
@@ -1078,7 +1078,7 @@ CREATE TABLE `sysval2file` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sysval2process` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BWID` bigint(20) unsigned NOT NULL,
@@ -1089,7 +1089,7 @@ CREATE TABLE `sysval2process` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tradeform` (
   `DafID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Zusatz` varchar(100) DEFAULT NULL,
@@ -1103,7 +1103,7 @@ CREATE TABLE `tradeform` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `uniqueid` (
   `UNIQID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `UID` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -1114,7 +1114,7 @@ CREATE TABLE `uniqueid` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Dies ist eine Hilfstabelle zur Generierung von eindeutigen S';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user2file` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `uid` char(10) NOT NULL,
@@ -1126,7 +1126,7 @@ CREATE TABLE `user2file` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `vorgangassign` (
   `VAID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `VorgangID` bigint(20) unsigned NOT NULL,

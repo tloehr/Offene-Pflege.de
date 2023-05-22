@@ -2,7 +2,7 @@ INSERT INTO `homes` (`id`, `name`, `str`, `zip`, `city`, `tel`, `fax`,`color`,`a
 INSERT INTO `floors` (`id`,`homeid`, `name`, `level`, `lift`, `version`) VALUES ('1','home1', 'Erdgeschoss', '0', '1', '1');
 INSERT INTO `rooms` (`id`, `floorid`, `Text`, `Single`, `Bath`, `active`, `version`) values('1','1','1','1','1','1','0');
 INSERT INTO `station` (`id`,`eid`, `name`, `version`) VALUES ('1','home1', 'Station 1','0');
-INSERT INTO opusers (Vorname, Nachname, UKennung, userstatus, MD5PW, version, cipherid) VALUES ('OPDE','Admin','admin',2,'notyet','0',ROUND((RAND() * (10000))+1));
+INSERT INTO opusers (Vorname, Nachname, UKennung, userstatus, hashed_pw, version, cipherid) VALUES ('OPDE','Admin','admin',2,'notyet','0',ROUND((RAND() * (10000))+1));
 INSERT INTO `member` (`UKennung`, `GKennung`) VALUES ('admin', 'admin');
 INSERT INTO `member` (`UKennung`, `GKennung`) VALUES ('admin', 'everyone');
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('FM','00:00',NULL);
@@ -12,7 +12,7 @@ INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('NM','13:15',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('AB','17:30',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('NA','21:00',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('apv_korridor','20',NULL);
-INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('dbstructure','18',NULL);
+INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('dbstructure','19',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('calc.medi.upr1','false',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('calc.medi.other','false',NULL);
 INSERT INTO `sysprops` (`K`, `V`, `UKennung`) VALUES('bhp_max_minutes_to_withdraw','30',NULL);

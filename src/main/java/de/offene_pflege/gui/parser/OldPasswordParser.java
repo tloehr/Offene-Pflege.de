@@ -13,7 +13,7 @@ public class OldPasswordParser implements TextParser<String> {
     @Override
     public String parse(String in) throws ParseException {
         if (in.trim().isEmpty()) return "";
-        boolean passwordCorrect = OPDE.getLogin().getUser().getMd5pw().equals(SYSTools.hashword(in.trim()));
+        boolean passwordCorrect = OPDE.getLogin().getUser().getHashed_pw().equals(SYSTools.hashword(in.trim(), "SHA-256"));
         if (!passwordCorrect) {
             throw new ParseException(SYSTools.xx("opde.settings.personal.oldpw.wrong"), in.length() - 1);
         }

@@ -33,6 +33,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.threads.DisplayMessage;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -442,18 +443,18 @@ public class SYSTools {
     }
 
 
-    public static String hashword(String password) {
+    public static String hashword(String password, String algorithm) {
         String hashword = null;
         try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            md5.update(password.getBytes());
-            BigInteger hash = new BigInteger(1, md5.digest());
-            hashword = hash.toString(16);
-            if (hashword.length() == 31) {
-                hashword = "0" + hashword;
+            if (algorithm.equalsIgnoreCase("md5")){
+                hashword = DigestUtils.md5Hex(password);
+            } else if (algorithm.equalsIgnoreCase("sha-256")){
+                hashword = DigestUtils.sha256Hex(password);
+            } else {
+                throw new NoSuchAlgorithmException(algorithm + " not supported. only md5 and sha-256");
             }
         } catch (NoSuchAlgorithmException nsae) {
-            // ignore
+            OPDE.fatal(nsae);
         }
         return hashword;
     }

@@ -1108,7 +1108,7 @@ public class InitWizard extends WizardDialog {
                         }
 
                         // Set the password for the OPDE admin user
-                        String queryAdminPW = " UPDATE opusers SET md5pw = MD5(?) WHERE ukennung = 'admin'";
+                        String queryAdminPW = " UPDATE opusers SET hashed_pw = SHA2(?, 256) WHERE ukennung = 'admin'";
                         stmt = jdbcConnection.prepareStatement(queryAdminPW);
                         stmt.setString(1, generatedPassword4AdminUser);
                         stmt.executeUpdate();

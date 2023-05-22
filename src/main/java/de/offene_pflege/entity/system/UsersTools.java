@@ -15,6 +15,7 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -48,11 +49,6 @@ public class UsersTools {
         return list;
 
     }
-
-//    public static String getFullnameWithID(Users user) {
-//        return user.getName() + ", " + user.getVorname() + " [" + user.getUIDCiphered() + "]";
-//    }
-
 
     public static ArrayList<OPUsers> getUsers(String searchPattern, boolean inactiveToo) {
         EntityManager em = OPDE.createEM();
@@ -93,27 +89,6 @@ public class UsersTools {
 
         EntityManager em = OPDE.createEM();
 
-//        Query query1 = em.createQuery("SELECT v FROM MedInventory v WHERE v.resident.id = 'au1' ");
-//        query1.getResultList();
-
-//
-//        Query queryn = em.createNativeQuery("select * from medinventory where BWKennung='au1'");
-//        queryn.getResultList();
-//
-
-//        try {
-//            Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl("srv0001", "3309", null),"root", "db-jor-uk-c");
-//            jdbcConnection.setCatalog("opde");
-//            PreparedStatement stmt = jdbcConnection.prepareStatement("select * from medinventory where BWKennung='au1'");
-//            ResultSet rs = stmt.executeQuery();
-//            rs.beforeFirst();
-//            while(rs.next()) {
-//                System.out.println(rs.getTimestamp("Bis"));
-//            }
-//            rs.close();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
 
         Query query = em.createQuery("SELECT g FROM OPGroups g WHERE g.gid = 'admin' AND :user MEMBER OF g.members");
         query.setParameter("user", user);
@@ -147,10 +122,27 @@ public class UsersTools {
         EntityManager em = OPDE.createEM();
         OPUsers user = null;
         try {
-            Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.uid = :uKennung AND o.md5pw = :md5pw");
+            Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.uid = :uKennung AND o.hashed_pw = :hashed_pw");
             query.setParameter("uKennung", username);
-            query.setParameter("md5pw", SYSTools.hashword(password));
-            user = (OPUsers) query.getSingleResult();
+
+            // zwei versuche. Wenn das PW bereits in SHA256 vorliegt sind wir fertig
+            query.setParameter("hashed_pw", SYSTools.hashword(password, "SHA-256"));
+            List results = query.getResultList();
+
+            if (results.isEmpty()){ // PW falsch oder noch in MD5
+                log.debug("password seems to be wrong or wrong encoding. trying md5");
+                query.setParameter("hashed_pw", SYSTools.hashword(password, "MD5"));
+                results = query.getResultList();
+                if (!results.isEmpty()) {
+                    log.debug("old md5 encoding found. correcting");
+                    // passwort war noch in md5 gespeichert. aktualisieren
+                    user = (OPUsers) results.get(0);
+                    user.setHashed_pw(SYSTools.hashword(password, "SHA-256"));
+                    EntityTools.merge(user);
+                }
+            } else {
+                user = (OPUsers) results.get(0);
+            }
         } catch (Exception e) {
             log.info(e);
         } finally {

@@ -53,7 +53,6 @@ public class AppInfo {
 
 
     public static final String fileConfig = "opde.cfg";
-    public static final String fileConfigXML = "opde.xml";
     public static final String fileNewuser = "newuser.html";
     public static final String filePrinters = "printers.xml";
     public static final String fileStandardCSS = "standard.css";

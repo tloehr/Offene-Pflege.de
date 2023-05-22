@@ -61,8 +61,8 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
     @Column(name = "userstatus")
     private Short userstatus;
     @Basic(optional = false)
-    @Column(name = "MD5PW")
-    private String md5pw;
+    @Column(name = "hashed_pw")
+    private String hashed_pw;
     @Column(name = "EMail")
     private String eMail;
     @Basic(optional = false)
@@ -165,12 +165,12 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
         this.userstatus = status;
     }
 
-    public String getMd5pw() {
-        return md5pw;
+    public String getHashed_pw() {
+        return hashed_pw;
     }
 
-    public void setMd5pw(String md5pw) {
-        this.md5pw = md5pw;
+    public void setHashed_pw(String hashed_pw) {
+        this.hashed_pw = hashed_pw;
     }
 
     public String getEMail() {
@@ -233,7 +233,7 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
         OPUsers OPUsers = (OPUsers) o;
 
         if (eMail != null ? !eMail.equals(OPUsers.eMail) : OPUsers.eMail != null) return false;
-        if (md5pw != null ? !md5pw.equals(OPUsers.md5pw) : OPUsers.md5pw != null) return false;
+        if (hashed_pw != null ? !hashed_pw.equals(OPUsers.hashed_pw) : OPUsers.hashed_pw != null) return false;
         if (nachname != null ? !nachname.equals(OPUsers.nachname) : OPUsers.nachname != null) return false;
         if (userstatus != null ? !userstatus.equals(OPUsers.userstatus) : OPUsers.userstatus != null) return false;
         if (version != null ? !version.equals(OPUsers.version) : OPUsers.version != null) return false;
@@ -249,7 +249,7 @@ public class OPUsers implements Serializable, Comparable<OPUsers>, Attachable {
         result = 31 * result + (vorname != null ? vorname.hashCode() : 0);
         result = 31 * result + (nachname != null ? nachname.hashCode() : 0);
         result = 31 * result + (userstatus != null ? userstatus.hashCode() : 0);
-        result = 31 * result + (md5pw != null ? md5pw.hashCode() : 0);
+        result = 31 * result + (hashed_pw != null ? hashed_pw.hashCode() : 0);
         result = 31 * result + (eMail != null ? eMail.hashCode() : 0);
         return result;
     }
