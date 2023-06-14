@@ -1,13 +1,11 @@
 {{tag>versions}}
-====== V1.16.3 b54 ======
+====== V1.16.3 b__ ======
   * Datenbank Schema: **Version 19**
   * Release: **23.05.2023**
 
 <callout type="danger">
 Dieses Update ändert die Datenbankstruktur und teilweise auch die Inhalte. Fertigen Sie unbedingt **vorher** eine verlässliche Sicherung Ihrer Datenbank an.
-\\
-\\
-Außerdem kann OPDE nun nur noch **eine** Einrichtung pro Installation verwalten. Sollten Sie also **eine** OPDE Installation für **mehr als eine** Einrichtung benutzen, müssen Sie vor einem Update unbedingt Kontakt zu mir aufnehmen, damit die Datenbank Struktur angepasst werden kann.</callout>
+</callout>
 
   * Version: [[de:info:versions:1.16.3.54|1.16.3.54]]
   * Lizenz: [[http://www.gnu.org/licenses/gpl-2.0|GPLv2]]
@@ -22,19 +20,6 @@ Außerdem kann OPDE nun nur noch **eine** Einrichtung pro Installation verwalten
 
   * <label icon="glyphicon glyphicon-cog" type="info">Work in progress</label> Anpassungen für die neue [[https://www.das-pflege.de/spezifikationen#spezifikationen|Spezifikation v3.0]] der DAS-Pflege, gültig ab dem Erhebungszyklus 7((Beginn: 01.01.2024))
     * Diese Spezifikation wird für Stichtage ab dem 01.01.2024 benutzt, andernfalls wird die v02.1 verwendet.
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Weitere Anpassungen wegen der Log4J Migration waren nötig. So müssen die Config Verzeichnisse nun einheitlich umbenannt werden. **Leider müssen Sie das nach dem Update selbst machen.** Die Verzeichnisse heißen jetzt (je nach Plattform)
-    * win ''%HOMEDRIVE%%HOMEPATH%\AppData\Roaming\opde1''
-    * mac ''~/Library/Application Support/opde1''
-    * linux ''~/.local/share/opde1''
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> In der Dienstübergabe fehlten Bewohner:innen, wenn sie zwischenzeitlich ausgezogen sind.
   * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label>
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Wenn bei einer Verordnung schon vorab das End-Datum feststeht, setzte die Datenbank dieses Datum immer auf den Folgetag. Das geschah, weil die Nano-Sekunden von der Datenbank aufgerundet wurden. Behoben.
-  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label> Deprecated(([[https://en.wikipedia.org/wiki/Deprecation|veraltet]])) Funktionen aktualisiert.
-  * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Status "genesen" mit in die Impf-Angabe bei den BW-Infos aufgenommen.
-  * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Bestellwesen für Medikamente. Zur Bestellung bei den Praxen und späteres Abhaken, wenn die Präparate von der Apotheke angekommen sind.
-  * <label  icon="glyphicon glyphicon-plus" type="success">New</label> OHAT((Oral Health Assessment Tool - OHAT nach Murray und Schölten 2018)) Werkzeug zur Umsetzung des Expertenstandards "FÖRDERUNG DER MUNDGESUNDHEIT IN DER PFLEGE"
-  * <label  icon="glyphicon glyphicon-plus" type="success">New</label> Passwörter für die lokale Anmeldung waren bisher als MD5 Hashes abgelegt. Aus Sicherheitsgründen haben ich das Verfahren auf SHA-256 geändert. Alte Hashes werden automatisch bei der jeweils nächsten Anmeldung automatisch durch die neuen ersetzt. Danke für den Hinweis an [[https://bjoern-buettner.me/de|Herrn Büttner.]]
-  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Die Anzahl der zu verwaltenden Pflegeeinrichtung ist auf 1 reduziert. **Falls Sie bishere mehrere Einrichtungen mit **einer einzigen** Installation betreiben, dann nehmen Sie bitte vor einem Update Kontakt mit mir auf.**
-  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Dateien können nun auch an Elemente angehangen werden, die bereits abgeschlossen wurden.
-  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> In der Medikamenten Verwaltung können Produkte nun auch anhand der Bestandsnummer gesucht werden.
-  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label> Regel-Verordnungen die im Schema "alle n Tage" eingegeben wurden, zeigen nun auch die nächste Anwendung an und nicht nur die letzte.
+  * <label  icon="glyphicon glyphicon-plus" type="success">New</label>
+  * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label>

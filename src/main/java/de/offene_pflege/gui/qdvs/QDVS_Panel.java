@@ -28,6 +28,7 @@ import de.offene_pflege.services.qdvs.QSData;
 import de.offene_pflege.services.qdvs.QdvsService;
 import de.offene_pflege.services.qdvs.spec14.QdvsService14;
 import de.offene_pflege.services.qdvs.spec21.QdvsService21;
+import de.offene_pflege.services.qdvs.spec30.QdvsService30;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -166,7 +167,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
             STICHTAG = LocalDate.now();
 
 //        cbx21.addItemListener(e -> log.debug(e.getItem()));
-        select_specification();
+//        select_specification();
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -459,10 +460,9 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         } else if (STICHTAG.isBefore(LocalDate.of(2024, 1, 1))) {
             qdvsService = new QdvsService21(this);
         } else {
-            qdvsService = null;
+            qdvsService = new QdvsService30(this);
         }
     }
-
 
     private java.util.List<Component> addCommands() {
         FolderChooserComboBox fcWorkdir = new FolderChooserComboBox();

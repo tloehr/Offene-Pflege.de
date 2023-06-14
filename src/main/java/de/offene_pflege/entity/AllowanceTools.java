@@ -136,6 +136,7 @@ public class AllowanceTools {
     }
 
 
+    /* IMPLEMENTED IN BACKEND */
     public static BigDecimal getSUM(Resident resident, LocalDate to) {
         long time = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
@@ -157,6 +158,7 @@ public class AllowanceTools {
         return sum;
     }
 
+    /* IMPLEMENTED IN BACKEND */
     public static BigDecimal getSUM(Resident resident) {
         long time = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
@@ -177,6 +179,7 @@ public class AllowanceTools {
         return sum;
     }
 
+    /* IMPLEMENTED IN BACKEND */
     public static ArrayList<Allowance> getAll(Resident resident) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.pit DESC, al.id DESC ");
@@ -193,6 +196,8 @@ public class AllowanceTools {
         return result;
     }
 
+
+    /* IMPLEMENTED IN BACKEND */
     public static ArrayList<Allowance> getYear(Resident resident, Date year) {
         long time = System.currentTimeMillis();
         DateTime from = new DateTime(year).dayOfYear().withMinimumValue();
@@ -215,6 +220,7 @@ public class AllowanceTools {
         return result;
     }
 
+    /* IMPLEMENTED IN BACKEND */
     public static ArrayList<Allowance> getMonth(Resident resident, Date month) {
         long time = System.currentTimeMillis();
         DateTime from = new DateTime(month).dayOfMonth().withMinimumValue();
@@ -238,6 +244,9 @@ public class AllowanceTools {
     }
 
     /**
+     *
+     *
+     *
      * retrieves the first and the last entry in the allowance table.
      *
      * @param resident
@@ -283,7 +292,6 @@ public class AllowanceTools {
         Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.pit <= :end");
 
         DateMidnight from = new DateMidnight().dayOfMonth().withMinimumValue().minusMonths(monthsback);
-
 
         html += "<table>";
 
