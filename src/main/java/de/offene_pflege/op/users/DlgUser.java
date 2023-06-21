@@ -108,7 +108,7 @@ public class DlgUser extends MyJDialog {
         user.setNachname(txtName.getText().trim());
 
         if (txtUID.isEnabled()) {
-            user.setHashed_pw(SYSTools.hashword(txtPW.getText(), "SHA-256"));
+            user.setHashed_pw(SYSTools.hashword(txtPW.getText(), "bcrypt"));
             user.setUID(txtUID.getText().trim());
             SYSTools.printpw(txtPW.getText().trim(), user);
         }

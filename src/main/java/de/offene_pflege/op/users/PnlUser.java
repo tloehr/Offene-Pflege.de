@@ -433,7 +433,7 @@ public class PnlUser extends CleanablePanel {
                 OPUsers myUser = em.merge(usermap.get(user.getUID()));
                 String newpw = SYSTools.generatePassword(myUser.getVorname(), myUser.getName());
                 em.lock(myUser, LockModeType.OPTIMISTIC);
-                myUser.setHashed_pw(SYSTools.hashword(newpw, "SHA-256"));
+                myUser.setHashed_pw(SYSTools.hashword(newpw, "bcrypt"));
                 em.getTransaction().commit();
 
                 lstUsers.remove(user);

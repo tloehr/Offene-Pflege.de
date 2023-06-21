@@ -32,7 +32,7 @@ public class PnlPasswordChange extends DefaultPanel {
                     return;
                 }
 
-                OPDE.getLogin().getUser().setHashed_pw(SYSTools.hashword(evt.getData().getNewPassword().trim(), "SHA-256"));
+                OPDE.getLogin().getUser().setHashed_pw(SYSTools.hashword(evt.getData().getNewPassword().trim(), "bcrypt"));
                 OPDE.getLogin().setUser(EntityTools.merge(OPDE.getLogin().getUser()));
 
                 pbe.reload();

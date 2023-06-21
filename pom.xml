@@ -250,7 +250,12 @@
             <artifactId>jide-grids</artifactId>
             <version>${jide.version}</version>
         </dependency>
-
+<!--        https://central.sonatype.com/artifact/org.mindrot/jbcrypt/0.4-->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
         <dependency>
             <groupId>joda-time</groupId>

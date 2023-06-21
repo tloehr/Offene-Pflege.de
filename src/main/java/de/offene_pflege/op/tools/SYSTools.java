@@ -40,6 +40,7 @@ import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator;
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 import org.joda.time.DateTime;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
@@ -446,12 +447,15 @@ public class SYSTools {
     public static String hashword(String password, String algorithm) {
         String hashword = null;
         try {
-            if (algorithm.equalsIgnoreCase("md5")){
+            if (algorithm.equalsIgnoreCase("md5")) {
                 hashword = DigestUtils.md5Hex(password);
-            } else if (algorithm.equalsIgnoreCase("sha-256")){
+            } else if (algorithm.equalsIgnoreCase("sha-256")) {
                 hashword = DigestUtils.sha256Hex(password);
+            } else if (algorithm.equalsIgnoreCase("bcrypt")) {
+                hashword = BCrypt.hashpw(password, BCrypt.gensalt());
+                log.debug(hashword);
             } else {
-                throw new NoSuchAlgorithmException(algorithm + " not supported. only md5 and sha-256");
+                throw new NoSuchAlgorithmException(algorithm + " not supported. only bcrypt, md5 or sha-256");
             }
         } catch (NoSuchAlgorithmException nsae) {
             OPDE.fatal(nsae);
@@ -1218,7 +1222,7 @@ public class SYSTools {
                 betrag = null;
             }
         }
-        
+
         return betrag;
     }
 

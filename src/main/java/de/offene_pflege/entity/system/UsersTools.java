@@ -125,11 +125,24 @@ public class UsersTools {
             Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.uid = :uKennung AND o.hashed_pw = :hashed_pw");
             query.setParameter("uKennung", username);
 
-            // zwei versuche. Wenn das PW bereits in SHA256 vorliegt sind wir fertig
-            query.setParameter("hashed_pw", SYSTools.hashword(password, "SHA-256"));
+            // drei versuche. Wenn das PW bereits in bcrypt vorliegt sind wir fertig
+            query.setParameter("hashed_pw", SYSTools.hashword(password, "bcrypt"));
             List results = query.getResultList();
 
-            if (results.isEmpty()){ // PW falsch oder noch in MD5
+            if (results.isEmpty()) { // PW falsch oder noch in sha-256 oder md5
+                log.debug("password seems to be wrong or wrong encoding. trying sha256");
+                query.setParameter("hashed_pw", SYSTools.hashword(password, "sha-256"));
+                results = query.getResultList();
+                if (!results.isEmpty()) {
+                    log.debug("old sha-256 encoding found. correcting");
+                    // passwort war noch in md5 gespeichert. aktualisieren
+                    user = (OPUsers) results.get(0);
+                    user.setHashed_pw(SYSTools.hashword(password, "bcrypt"));
+                    EntityTools.merge(user);
+                }
+            }
+
+            if (results.isEmpty()) { // PW immer noch falsch oder noch in MD5
                 log.debug("password seems to be wrong or wrong encoding. trying md5");
                 query.setParameter("hashed_pw", SYSTools.hashword(password, "MD5"));
                 results = query.getResultList();
@@ -137,12 +150,13 @@ public class UsersTools {
                     log.debug("old md5 encoding found. correcting");
                     // passwort war noch in md5 gespeichert. aktualisieren
                     user = (OPUsers) results.get(0);
-                    user.setHashed_pw(SYSTools.hashword(password, "SHA-256"));
+                    user.setHashed_pw(SYSTools.hashword(password, "bcrypt6"));
                     EntityTools.merge(user);
                 }
-            } else {
-                user = (OPUsers) results.get(0);
             }
+
+            if (!results.isEmpty()) user = (OPUsers) results.get(0);
+
         } catch (Exception e) {
             log.info(e);
         } finally {
