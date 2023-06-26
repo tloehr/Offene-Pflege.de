@@ -64,7 +64,7 @@ public class QdvsService21 implements QdvsService {
     private static final String ORIENT = "orient02";
     private static final String MOBIL = "mobil02";
     private static final String AUSSCHEID = "aussch01";
-    private static final String KPFLEGE = "kpflege02";
+    private static final String KPFLEGE = "kpflege03";
     private static final String ERN = "ern01";
     private static final String ALLTAG = "alltag01";
     private static final String SCHLAF = "schlaf02";
@@ -1409,7 +1409,7 @@ public class QdvsService21 implements QdvsService {
                 // die booleans parsen true oder false
                 boolean wert_vorher = Boolean.valueOf(myprops.getProperty(o));
                 boolean neuer_wert = wert_vorher || Boolean.valueOf(myProperties.getProperty(o)); // logisches OR, wenn irgendeine INFO das auf TRUE setzt bleibt das so.
-                myProperties.setProperty(o, Boolean.toString(neuer_wert));
+                myprops.setProperty(o, Boolean.toString(neuer_wert));
             });
         });
 

@@ -1470,7 +1470,7 @@ public class QdvsService14 implements QdvsService {
                     // die booleans parsen true oder false
                     boolean wert_vorher = Boolean.valueOf(myprops.getProperty(o));
                     boolean neuer_wert = wert_vorher || Boolean.valueOf(myProperties.getProperty(o)); // logisches OR, wenn irgendeine INFO das auf TRUE setzt bleibt das so.
-                    myProperties.setProperty(o, Boolean.toString(neuer_wert));
+                    myprops.setProperty(o, Boolean.toString(neuer_wert));
                 });
             } else if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES) {
                 // Hier reicht schon die Tatsache, dass es einen Diabetes Eintrag gibt, der z.Zt. gültig ist

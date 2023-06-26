@@ -9,6 +9,7 @@ import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -120,50 +121,35 @@ public class UsersTools {
 
     public static OPUsers checkPassword(String username, String password) {
         EntityManager em = OPDE.createEM();
-        OPUsers user = null;
+        OPUsers result = null;
         try {
-            Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.uid = :uKennung AND o.hashed_pw = :hashed_pw");
+            // bcrypt has salted keys. We need to check if the hashed pw is correct
+            Query query = em.createQuery("SELECT o FROM OPUsers o WHERE o.uid = :uKennung");
             query.setParameter("uKennung", username);
-
-            // drei versuche. Wenn das PW bereits in bcrypt vorliegt sind wir fertig
-            query.setParameter("hashed_pw", SYSTools.hashword(password, "bcrypt"));
             List results = query.getResultList();
+            if (results.isEmpty()) return null;
+            OPUsers opUser = (OPUsers) results.get(0);
 
-            if (results.isEmpty()) { // PW falsch oder noch in sha-256 oder md5
-                log.debug("password seems to be wrong or wrong encoding. trying sha256");
-                query.setParameter("hashed_pw", SYSTools.hashword(password, "sha-256"));
-                results = query.getResultList();
-                if (!results.isEmpty()) {
-                    log.debug("old sha-256 encoding found. correcting");
-                    // passwort war noch in md5 gespeichert. aktualisieren
-                    user = (OPUsers) results.get(0);
-                    user.setHashed_pw(SYSTools.hashword(password, "bcrypt"));
-                    EntityTools.merge(user);
-                }
+            if (SYSTools.hashword(password, "sha-256").equals(opUser.getHashed_pw())) { // PW falsch oder noch in sha-256 oder md5
+                log.debug("old {}} encoding found. correcting", "sha-256");
+                opUser.setHashed_pw(SYSTools.hashword(password, "bcrypt"));
+                EntityTools.merge(opUser);
+                result = opUser;
+            } else if (SYSTools.hashword(password, "md5").equals(opUser.getHashed_pw())) { // PW falsch oder noch in sha-256 oder md5
+                log.debug("old {}} encoding found. correcting", "sha-256");
+                opUser.setHashed_pw(SYSTools.hashword(password, "bcrypt"));
+                EntityTools.merge(opUser);
+                result = opUser;
+            } else if (BCrypt.checkpw(password, opUser.getHashed_pw())) {
+                result = opUser;
             }
-
-            if (results.isEmpty()) { // PW immer noch falsch oder noch in MD5
-                log.debug("password seems to be wrong or wrong encoding. trying md5");
-                query.setParameter("hashed_pw", SYSTools.hashword(password, "MD5"));
-                results = query.getResultList();
-                if (!results.isEmpty()) {
-                    log.debug("old md5 encoding found. correcting");
-                    // passwort war noch in md5 gespeichert. aktualisieren
-                    user = (OPUsers) results.get(0);
-                    user.setHashed_pw(SYSTools.hashword(password, "bcrypt6"));
-                    EntityTools.merge(user);
-                }
-            }
-
-            if (!results.isEmpty()) user = (OPUsers) results.get(0);
-
         } catch (Exception e) {
             log.info(e);
+            result = null;
         } finally {
             em.close();
         }
-
-        return user;
+        return result;
     }
 
     public static String getFullname(OPUsers opUsers) {

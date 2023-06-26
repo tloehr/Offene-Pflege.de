@@ -386,8 +386,15 @@ public class QdvsService30 implements QdvsService {
                             abwesenheitsZeitraumInTagen = ChronoUnit.DAYS.between(JavaTimeConverter.toJavaLocalDateTime(absent.get().getFrom()).toLocalDate(), STICHTAG.toLocalDate()) + 1;
                         }
 
+
+                        ResInfo bewusst = ResInfoTools.getValidOnThatDayIfAny(resident, BEWUSST, STICHTAG).get();
+                        int bewzustand = Integer.valueOf(ResInfoTools.getContent(bewusst).getProperty("BEWUSSTSEINSZUSTAND"));
+                        boolean wachkoma = bewzustand == 5;
+
+                        List<String> ausschlussDiagnosen = getAusschlussDiagnosen(resident);
+
                         // Ausschlussgrund (4)
-                        if (abwesenheitsZeitraumInTagen >= 21) {
+                        if (abwesenheitsZeitraumInTagen >= 21) { // Ausschlussgrund (4)
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_MEHR_ALS_21_TAGE_WEG);
                             log.debug("Bewohner " + resident.getId() + " andauernde Abwesenheit länger als 21 Tage :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen);
                             textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + ": andauernde Abwesenheit 21 Tage oder länger :" + absent.get().getFrom() + " // " + abwesenheitsZeitraumInTagen + " Tage"));
@@ -403,6 +410,10 @@ public class QdvsService30 implements QdvsService {
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_PALLIATIV);
                             log.debug("Bewohner " + resident.getId() + " befindet sich in der Sterbephase");
                             textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + " befindet sich in der Sterbephase"));
+                        } else if (wachkoma || !ausschlussDiagnosen.isEmpty()) { // Ausschlussgrund (5)
+                            residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_HIRNSCHADEN_WACHKOMA_APALLISCH);
+                            log.debug("Bewohner " + resident.getId() + " wachkoma / apallisch");
+                            textListener.addLog(SYSConst.html_paragraph("AUSSCHLUSS Bewohner " + ResidentTools.getLabelText(resident) + "  wachkoma / apallisch"));
                         } else { // kein Ausschluss
                             residentInfoObjectMap.get(resident).setAusschluss_grund(QdvsResidentInfoObject.MDS_GRUND_KEIN_AUSSCHLUSS);
                         }
@@ -734,7 +745,10 @@ public class QdvsService30 implements QdvsService {
 
         /** SPEC20-19 */qsData.setBEWUSSTSEINSZUSTAND(of.createDasQsDataTypeBEWUSSTSEINSZUSTAND());
         ResInfo bewusst = ResInfoTools.getValidOnThatDayIfAny(resident, BEWUSST, STICHTAG).get();
-        qsData.getBEWUSSTSEINSZUSTAND().setValue(Integer.valueOf(ResInfoTools.getContent(bewusst).getProperty("BEWUSSTSEINSZUSTAND")));
+        int bewzustand = Integer.valueOf(ResInfoTools.getContent(bewusst).getProperty("BEWUSSTSEINSZUSTAND"));
+        // seit Version 3.0 kein Wachkoma mehr hier verwenden.
+        if (bewzustand < 5)
+            qsData.getBEWUSSTSEINSZUSTAND().setValue(bewzustand);
 
         /** SPEC20-18 */qsData.getDIAGNOSEN().addAll(getAktuelleDiagnosenFuerQDVS(resident));
 
@@ -1374,6 +1388,7 @@ public class QdvsService30 implements QdvsService {
      * true oder false. Wobei das über alle Diagnosen per logischem ODER zusammengefasst wird.
      * <p>
      * seit SPEC20 kein ("parkinson","osteo","ms","demenz","diabetes") mehr
+     * seit SPEC30 kein ("apallisch") mehr
      *
      * @param resident
      * @return Properties mit den folgenden Schlüsseln ("tumor","tetra","chorea","apallisch"). Die Values sind jeweils
@@ -1381,7 +1396,7 @@ public class QdvsService30 implements QdvsService {
      */
     private List<DasQsDataType.DIAGNOSEN> getAktuelleDiagnosenFuerQDVS(Resident resident) {
         // die reihenfolge entspricht den Ordnungsnummern die vom DAS erwartet werden. Tumor ist die 1 usw...
-        List<String> diagnosen_schluessel = Arrays.asList("tumor", "tetra", "chorea", "apallisch");
+        List<String> diagnosen_schluessel = Arrays.asList("tumor", "tetra", "chorea");
         List<DasQsDataType.DIAGNOSEN> result = new ArrayList<>();
         Properties myprops = new Properties();
 
@@ -1394,13 +1409,13 @@ public class QdvsService30 implements QdvsService {
         // Properties auswerten
         listInfos.forEach(info -> {
             Properties myProperties = ResInfoTools.getContent(info);
-            // Jede Diagnose Resinfo hat jeden der 9 diagnosen_schluessel gesetzt. Entweder auf TRUE oder FALSE
+            // Jede Diagnose Resinfo hat jeden der 3 diagnosen_schluessel gesetzt. Entweder auf TRUE oder FALSE
             // Daher bilden wir hier die Schnittmenge zwischen den Properties aus der Entity und der Liste der diagnosen_schlüssel.
             CollectionUtils.intersection(myProperties.stringPropertyNames(), diagnosen_schluessel).forEach(o -> {
                 // die booleans parsen true oder false
                 boolean wert_vorher = Boolean.valueOf(myprops.getProperty(o));
                 boolean neuer_wert = wert_vorher || Boolean.valueOf(myProperties.getProperty(o)); // logisches OR, wenn irgendeine INFO das auf TRUE setzt bleibt das so.
-                myProperties.setProperty(o, Boolean.toString(neuer_wert));
+                myprops.setProperty(o, Boolean.toString(neuer_wert));
             });
         });
 
@@ -1417,6 +1432,35 @@ public class QdvsService30 implements QdvsService {
             keine.setValue(0);
             result.add(keine);
         }
+        return result;
+    }
+
+
+    private List<String> getAusschlussDiagnosen(Resident resident) {
+        // die reihenfolge entspricht den Ordnungsnummern die vom DAS erwartet werden. Tumor ist die 1 usw...
+        List<String> diagnosen_schluessel = Arrays.asList("apallisch");
+        List<String> result = new ArrayList<>();
+        Properties myprops = new Properties();
+
+        // Defaults setzen
+        diagnosen_schluessel.forEach(s -> myprops.put(s, "false"));
+
+        // Alle in eine Liste zusammenfassen
+        ArrayList<ResInfo> listInfos = ResInfoTools.getAll(resident, typeDiagnosen.getID(), STICHTAG);
+
+        // Properties auswerten
+        listInfos.forEach(info -> {
+            Properties myProperties = ResInfoTools.getContent(info);
+            CollectionUtils.intersection(myProperties.stringPropertyNames(), diagnosen_schluessel).forEach(o -> {
+                // die booleans parsen true oder false
+                boolean wert_vorher = Boolean.valueOf(myprops.getProperty(o));
+                boolean neuer_wert = wert_vorher || Boolean.valueOf(myProperties.getProperty(o)); // logisches OR, wenn irgendeine INFO das auf TRUE setzt bleibt das so.
+                myprops.setProperty(o, Boolean.toString(neuer_wert));
+            });
+        });
+
+        myprops.entrySet().stream().filter(entry -> entry.getValue().toString().equalsIgnoreCase("true")).forEach(entry -> result.add(entry.getKey().toString()));
+
         return result;
     }
 

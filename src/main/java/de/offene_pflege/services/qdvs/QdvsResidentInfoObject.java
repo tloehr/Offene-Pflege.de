@@ -12,6 +12,8 @@ public class QdvsResidentInfoObject {
     public static final int MDS_GRUND_KURZZEIT = 2;
     public static final int MDS_GRUND_PALLIATIV = 3;
     public static final int MDS_GRUND_MEHR_ALS_21_TAGE_WEG = 4;
+    // erst ab Spec30
+    public static final int MDS_GRUND_HIRNSCHADEN_WACHKOMA_APALLISCH = 5;
     Resident resident;
     int ausschluss_grund;
     List<String> fehler;
