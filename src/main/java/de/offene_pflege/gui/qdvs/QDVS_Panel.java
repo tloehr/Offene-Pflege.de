@@ -458,7 +458,7 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         if (STICHTAG.isBefore(LocalDate.of(2023, 1, 1))) {
             qdvsService = new QdvsService14(this);
         } else if (STICHTAG.isBefore(LocalDate.of(2024, 1, 1))) {
-            qdvsService = new QdvsService30(this);
+            qdvsService = new QdvsService21(this);
         } else {
             qdvsService = new QdvsService30(this);
         }
