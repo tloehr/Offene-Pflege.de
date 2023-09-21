@@ -701,7 +701,7 @@ public class BHPTools {
 
         }
 
-        return prefix + text + postfix;
+        return text.equals("--") ? "" : prefix + text + postfix;
     }
 
     public static Icon getIcon(BHP bhp) {

@@ -387,6 +387,7 @@ public class PrescriptionTools {
                                         (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText()), 4, ".");
             }
         }
+
         return result;
     }
 

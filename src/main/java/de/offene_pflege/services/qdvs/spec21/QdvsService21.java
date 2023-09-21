@@ -933,7 +933,8 @@ public class QdvsService21 implements QdvsService {
         // Denn der Wundbeginn könnte ja auch VOR dem Betrachtungszeitraum liegen
         HashSet<Long> connectionIDs = new HashSet<>();
 
-        // Die statistischen Informationen sammele ich pro ConnectionID in einem Quartet (connectionid, entstehungsort, max_grade, beginn (der wunde), ende (der wunde) - BAW wenn noch aktiv)
+        // Die statistischen Informationen sammele ich pro ConnectionID in einem Quartet
+        // (connectionid, entstehungsort, max_grade, beginn (der wunde), ende (der wunde) - BAW wenn noch aktiv)
         // Das sammele ich dann in dieser Map, der key ist die ConnectionID und der Value die zugehörige statistik
         // (ConnectionID, entehungsort, grad, beginn, ende)
         HashMap<Long, Quintet<Long, Integer, Integer, LocalDateTime, LocalDateTime>> auswertung_dekubitus = new HashMap<>();
@@ -1009,11 +1010,9 @@ public class QdvsService21 implements QdvsService {
             qsData.getDEKUBITUSSTADIUM().setValue(maximales_dekubitus_stadium);
         }
 
-//        final int fin_dekubitus_schlussel = dekubitus_schluessel;
         optWunde1.ifPresent(wunde1 -> { // [Feld 60 = 1,2]
             // wenn [Feld 60 = 1,2] UND [Feld 61 = 2,3,4,9] UND [Feld 64 <> LEER] UND [Feld 64 = 1]
             if (qsData.getDEKUBITUSSTADIUM().getValue() > 1) { // Grad > 1  -> [Feld 61 = 2,3,4,9]
-
                 /** SPEC20-64 */
                 qsData.getDEKUBITUS1LOK().setValue(wunde1.getValue1());
 

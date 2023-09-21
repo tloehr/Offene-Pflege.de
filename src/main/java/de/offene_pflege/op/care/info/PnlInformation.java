@@ -1109,7 +1109,6 @@ public class PnlInformation extends NursingRecordsPanel {
                                 ResInfo editinfo = em.merge(resInfo);
 
                                 ResInfo tmpInfo = (ResInfo) o; //mapInfo2Editor.get(resInfo).getResInfo();
-//                                editinfo.setHtml(ResInfoTools.getContentAsHTML(tmpInfo));
                                 editinfo.setProperties(tmpInfo.getProperties());
                                 editinfo.setText(tmpInfo.getText());
                                 if (editinfo.getResValue() != null) {
@@ -1125,7 +1124,6 @@ public class PnlInformation extends NursingRecordsPanel {
                                 em.lock(editinfo, LockModeType.OPTIMISTIC);
 
                                 em.getTransaction().commit();
-
 
                                 synchronized (mapType2ResInfos) {
                                     int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);

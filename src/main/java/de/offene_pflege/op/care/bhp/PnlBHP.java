@@ -49,6 +49,7 @@ import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
@@ -96,6 +97,7 @@ public class PnlBHP extends NursingRecordsPanel {
     private JScrollPane jspBHP;
     private CollapsiblePanes cpBHP;
     // End of variables declaration//GEN-END:variables
+
     /**
      * @param resident
      * @param jspSearch
@@ -777,6 +779,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             SYSTools.left("&ldquo;" + PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                                     BHPTools.getScheduleText(bhp, "&rdquo;, ", "")
                     )
+
                     // https://github.com/tloehr/Offene-Pflege.de/issues/63
                     + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + (bhp.isOpen() ? "--" : DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + SYSTools.xx("misc.msg.Time.short")) +
                     (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
@@ -785,14 +788,16 @@ public class PnlBHP extends NursingRecordsPanel {
                     "</font></html>";
         } else {
 
-//            if (bhp.getPrescription().getID() == 11014l){
-//                log.debug(bhp.getPrescription());
-//            }
+            // nur für Bedarfs BHPs, die noch offen sind
+            Optional<String> bhp_text = bhp.isOnDemand() && bhp.isOpen() ? Optional.ofNullable(bhp.getPrescription().getText()) : Optional.empty();
+
             title = "<html><font size=+1>" +
                     SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                     (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
                             " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                     BHPTools.getScheduleText(bhp, ", ", "") +
+                    // zeige bemerkung bei den BHPs
+                    (bhp_text.isPresent() && !bhp_text.get().isEmpty() ? "&nbsp;&ldquo;" + SYSConst.html_italic(StringUtils.abbreviate(bhp_text.get(), 40))+"&rdquo;" : "") +
                     (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "") +
                     "</font></html>";
