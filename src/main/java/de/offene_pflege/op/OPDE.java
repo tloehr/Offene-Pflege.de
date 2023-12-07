@@ -418,21 +418,6 @@ public class OPDE {
         CommandLine cl = null;
         String footer = "https://www.Offene-Pflege.de" + " " + OPDE.getAppInfo().getBuildInformation();
 
-
-//        String a = BCrypt.hashpw("lt330975", BCrypt.gensalt());
-//        String b = BCrypt.hashpw("geheim", BCrypt.gensalt());
-//        String c = BCrypt.hashpw("geheim", BCrypt.gensalt());
-//
-//        log.debug("korrekt {}", BCrypt.checkpw("geheim",a));
-//        log.debug("korrekt {}", BCrypt.checkpw("geheim",b));
-//        log.debug("korrekt {}", BCrypt.checkpw("geheim",c));
-//        log.debug("korrekt {}", BCrypt.checkpw("geheim","$2a$10$JW3/DJf/bexfbpPHQrNp5.Qi4GzRlYS1cKuTonnTacfFwsiawpXU."));
-//        log.debug("korrekt {}", BCrypt.checkpw("geheim1",a));
-//        log.debug("korrekt {}", BCrypt.checkpw("geheim2",b));
-//        log.debug("korrekt {}", BCrypt.checkpw("geheim3",c));
-//        log.debug("korrekt {}", BCrypt.checkpw("geheim4","$2a$10$JW3/DJf/bexfbpPHQrNp5.Qi4GzRlYS1cKuTonnTacfFwsiawpXU."));
-//
-
         /***
          *      _          _
          *     | |__   ___| |_ __    ___  ___ _ __ ___  ___ _ __

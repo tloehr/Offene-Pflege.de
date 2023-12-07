@@ -565,7 +565,7 @@ public class PrescriptionTools {
             result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
         } else {
             for (PrescriptionSchedule schedule : listSchedules) {
-                result += PrescriptionScheduleTools.getDoseAsCompactText(schedule) + "; ";
+                result += PrescriptionScheduleTools.getDoseAsCompactText(schedule, true) + "; ";
             }
             result = result.substring(0, result.length() - 2);
         }

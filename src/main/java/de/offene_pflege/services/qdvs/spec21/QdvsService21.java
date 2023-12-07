@@ -1147,8 +1147,6 @@ public class QdvsService21 implements QdvsService {
             DasQsDataType.STURZFOLGEN sf = of.createDasQsDataTypeSTURZFOLGEN();
             qsData.getSTURZFOLGEN().add(sf);
         }
-
-
     }
 
     private void fixierung(DasQsDataType qsData, Resident resident) {

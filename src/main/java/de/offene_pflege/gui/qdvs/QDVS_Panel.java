@@ -383,6 +383,12 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
 
     }
 
+//
+//    String dechiffre_list_as_html(){
+//        liste_bewohner_zur_auswertung.sort((o1, o2) -> Long.compare(o1.getIdbewohner(), o2.getIdbewohner()));
+//
+//    }
+
 
     void kommentierung(final String kommentar) {
 

@@ -7,6 +7,7 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
+import de.offene_pflege.op.tools.HTMLTools;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
@@ -18,6 +19,7 @@ import org.joda.time.format.DateTimeFormat;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -258,7 +260,7 @@ public class BHPTools {
             log.debug("generation for schedule: " + pSchedule.toString());
             log.debug("targetdate: " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
             row = row.add(BigDecimal.ONE);
-            SYSTools.printProgBar(row.divide(maxrows, 2,  RoundingMode.HALF_UP).multiply(new BigDecimal(100)).intValue());
+            SYSTools.printProgBar(row.divide(maxrows, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).intValue());
 
             pSchedule = em.merge(pSchedule);
             em.lock(pSchedule, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
@@ -760,9 +762,6 @@ public class BHPTools {
     }
 
 
-
-
-
     public static String getBHPsAsHTMLtable(List<BHP> list, boolean withHeader) {
         String result = "";
 
@@ -857,7 +856,7 @@ public class BHPTools {
 
     /**
      * a BHP should be confirmed on the same day. unless its during the night shift. Then you can click the BHPs from the nightshift before, until the night shift is over.
-     *
+     * <p>
      * https://github.com/tloehr/Offene-Pflege.de/issues/64
      *
      * @param bhp
@@ -881,4 +880,60 @@ public class BHPTools {
 
         return true;
     }
+
+    public static List<BHP> get_due_today_not_every_day() {
+        EntityManager em = OPDE.createEM();
+
+        Query query = em.createQuery("" +
+                " SELECT b FROM BHP b " +
+                " WHERE b.soll = :today " +
+                " AND b.prescriptionSchedule.taeglich != 1 " +
+                " AND b.prescription.situation IS NULL " +
+                " AND b.ist IS NULL " +
+                " ORDER BY b.resident ");
+
+        query.setParameter("today", new Date(), TemporalType.DATE);
+        //query.setParameter("to", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+
+        List<BHP> result = query.getResultList();
+
+//
+//        result.forEach(bhp -> {
+//
+//        });
+//
+        log.debug(getBHPsAsHTMLtable(result));
+
+        return result;
+    }
+
+
+    public static String getBHPsAsHTMLtable(List<BHP> list) {
+        String result = "";
+
+        if (!list.isEmpty()) {
+
+            String table = SYSConst.html_table_tr(
+                    SYSConst.html_table_th("BW"),
+                    SYSConst.html_table_th("Medikament"),
+                    SYSConst.html_table_th("Wann")
+            );
+
+
+            for (BHP bhp : list) {
+
+
+                table += SYSConst.html_table_tr(
+                        SYSConst.html_table_td(bhp.getResident().toString()),
+                        SYSConst.html_table_td(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription())),
+                        SYSConst.html_table_td(PrescriptionScheduleTools.getDoseAsCompactText(bhp.getPrescriptionSchedule(), false))
+                );
+            }
+
+            result = SYSConst.html_table(table, "1");
+        }
+
+        return result;
+    }
+
 }

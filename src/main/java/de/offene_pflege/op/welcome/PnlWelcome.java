@@ -14,10 +14,7 @@ import com.jidesoft.wizard.WizardDialog;
 import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
-import de.offene_pflege.entity.prescription.MedStock;
-import de.offene_pflege.entity.prescription.MedStockTools;
-import de.offene_pflege.entity.prescription.Prescription;
-import de.offene_pflege.entity.prescription.PrescriptionTools;
+import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessTools;
 import de.offene_pflege.entity.values.ResValue;
@@ -201,6 +198,8 @@ public class PnlWelcome extends CleanablePanel {
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
                 strangeWeightList = ResValueTools.findNotableWeightChanges(WEIGHT_MONTHSBACK, WEIGHT_PERCENT);    // 3 monate, 5%
+
+                BHPTools.get_due_today_not_every_day();
 
                 Collections.sort(processList);
                 int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size();

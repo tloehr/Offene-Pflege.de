@@ -4,15 +4,23 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Phrase;
+import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.tools.*;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,6 +29,7 @@ import java.time.format.DateTimeFormatter;
  * Time: 15:35
  * To change this template use File | Settings | File Templates.
  */
+@Log4j2
 public class PrescriptionScheduleTools {
     public static final int ROUGHLY = 0;
     public static final int EXACTTIME = 1;
@@ -141,7 +150,7 @@ public class PrescriptionScheduleTools {
      * @param schedule
      * @return
      */
-    public static String getRepeatPatternAsCompactText(PrescriptionSchedule schedule) {
+    public static String getRepeatPatternAsCompactText(PrescriptionSchedule schedule, boolean with_prediction) {
         String result = "";
 
         if (schedule.isDaily()) {
@@ -213,7 +222,7 @@ public class PrescriptionScheduleTools {
         if (SYSCalendar.isInFuture(schedule.getLDatum().getTime())) {
             result += " !" + SYSTools.xx("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum());
         } else {
-            if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
+            if (with_prediction && schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
                 result += ", " + SYSTools.xx("misc.msg.mostRecent") + ": " + df.format(schedule.getLDatum());
                 if (schedule.getTaeglich() > 1) { // für so was wie alle 4 Tage...
                     result += ", nächstes mal: " + JavaTimeConverter.toJavaLocalDateTime(schedule.getLDatum()).plusDays(schedule.getTaeglich()).format(DateTimeFormatter.ofPattern("dd.MM.yy"));
@@ -411,7 +420,7 @@ public class PrescriptionScheduleTools {
 
             //result = result.substring(0, result.length() - 2);
 
-            String repeat = getRepeatPatternAsCompactText(schedule);
+            String repeat = getRepeatPatternAsCompactText(schedule, true);
             if (!repeat.isEmpty()) {
                 result = "(" + result + " => " + repeat + ")";
             }
@@ -434,7 +443,7 @@ public class PrescriptionScheduleTools {
             }
 
             result += SYSTools.xx("misc.msg.Time.short") + " " + SYSTools.formatBigDecimal(schedule.getUhrzeitDosis()) + "x";
-            String repeat = getRepeatPatternAsCompactText(schedule);
+            String repeat = getRepeatPatternAsCompactText(schedule, true);
             if (!repeat.isEmpty()) {
                 result = "(" + result + " => " + repeat + ")";
             }
@@ -444,7 +453,7 @@ public class PrescriptionScheduleTools {
         return result;
     }
 
-    public static String getDoseAsCompactText(PrescriptionSchedule schedule) {
+    public static String getDoseAsCompactText(PrescriptionSchedule schedule, boolean with_prediction) {
         String result = "";
         if (getTerminStatus(schedule) == ROUGHLY) {
 
@@ -457,7 +466,7 @@ public class PrescriptionScheduleTools {
 
             result = result.substring(0, result.length() - 2);
 
-            String repeat = getRepeatPatternAsCompactText(schedule);
+            String repeat = getRepeatPatternAsCompactText(schedule, with_prediction);
             if (!repeat.isEmpty()) {
                 result = "(" + result + " => " + repeat + ")";
             }
@@ -480,7 +489,7 @@ public class PrescriptionScheduleTools {
             }
 
             result += SYSTools.xx("misc.msg.Time.short") + " " + SYSTools.formatBigDecimal(schedule.getUhrzeitDosis()) + "x";
-            String repeat = getRepeatPatternAsCompactText(schedule);
+            String repeat = getRepeatPatternAsCompactText(schedule, with_prediction);
             if (!repeat.isEmpty()) {
                 result = "(" + result + " => " + repeat + ")";
             }
@@ -523,6 +532,7 @@ public class PrescriptionScheduleTools {
 
         return phrase;
     }
+
 
 
 }
