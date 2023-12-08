@@ -1,5 +1,6 @@
 package de.offene_pflege.entity.prescription;
 
+import com.google.common.primitives.Booleans;
 import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.Resident;
@@ -881,28 +882,23 @@ public class BHPTools {
         return true;
     }
 
-    public static List<BHP> get_due_today_not_every_day() {
+    public static List<BHP> get_due_today() {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery("" +
                 " SELECT b FROM BHP b " +
                 " WHERE b.soll = :today " +
-                " AND b.prescriptionSchedule.taeglich != 1 " +
-                " AND b.prescription.situation IS NULL " +
                 " AND b.ist IS NULL " +
-                " ORDER BY b.resident ");
+                " AND b.prescriptionSchedule.taeglich != 1 " +
+                " AND b.prescriptionSchedule.prescription.situation IS NULL " +
+                " AND b.prescriptionSchedule.prescription.tradeform IS NOT NULL " +
+                " AND b.prescriptionSchedule.prescription.never_remind = false " +
+                " ORDER BY b.resident "
+        );
 
         query.setParameter("today", new Date(), TemporalType.DATE);
-        //query.setParameter("to", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-
         List<BHP> result = query.getResultList();
-
-//
-//        result.forEach(bhp -> {
-//
-//        });
-//
-        log.debug(getBHPsAsHTMLtable(result));
+        em.close();
 
         return result;
     }

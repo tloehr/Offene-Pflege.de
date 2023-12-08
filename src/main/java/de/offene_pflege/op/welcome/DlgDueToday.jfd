@@ -1,0 +1,65 @@
+JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.9" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JDialog", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			name: "this"
+			"$sizePolicy": 1
+			"defaultCloseOperation": 2
+			"title": "Wichtige Information"
+			"modal": true
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+				name: "dialogPane"
+				"border": new javax.swing.border.EmptyBorder( 12, 12, 12, 12 )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+					"axis": 0
+				} ) {
+					name: "contentPanel"
+					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+						name: "scrollPane1"
+						add( new FormComponent( "javax.swing.JTextPane" ) {
+							name: "textArea1"
+							"contentType": "text/html"
+							"editable": false
+							"text": "<html><head>\n<style type=\"text/css\" media=\"all\">\nbody { margin:0;\npadding:0;\n}\n#fontsmall { font-size:10px; font-weight:bold; font-family:Arial,sans-serif;}\n#fonth1 { font-size:24px; font-family:Arial,sans-serif;}\n#fonth2 { font-size:16px; font-weight:bold; font-family:Arial,sans-serif;}\n#fonth3 { font-size:12px; font-weight:bold; font-family:Arial,sans-serif;}\n#fonttext { font-size:12px; font-family:Arial,sans-serif;}\n#font14 { font-size:14px; font-family:Arial,sans-serif;}\n#font16 { font-size:16px; font-family:Arial,sans-serif;}\n#font18 { font-size:18px; font-family:Arial,sans-serif;}\n#font20 { font-size:20px; font-family:Arial,sans-serif;}\n#fonttextgray { font-size:12px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n#fonttextgray14 { font-size:14px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n#fonttextgray16 { font-size:16px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n#fonttextgray18 { font-size:18px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n#fonttextgray20 { font-size:20px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n.boxed {border: 1px solid black; background-color:#CCCCCC;}\n</style></head><body><h1 id=\"fonth1\" >Bitte beachten</h1>\n<p id=\"font16\">\nHeute sind Depot-Spritzen und/oder andere Medikamente dran, die nicht t&auml;glich verabreicht werden.</p>\n</body></html>"
+						} )
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "Center"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+					"$columnSpecs": "0:1.0, 80, 80"
+					"$rowSpecs": "0"
+					"$hGap": 5
+					"$vGap": 5
+				} ) {
+					name: "buttonBar"
+					"border": new javax.swing.border.EmptyBorder( 12, 0, 0, 0 )
+					add( new FormComponent( "javax.swing.JCheckBox" ) {
+						name: "cbShutUp"
+						"text": "Heute nicht mehr melden"
+						"selected": true
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 1
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "okButton"
+						"text": "OK"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "ok", true ) )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 2
+						"gridy": 0
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "South"
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 375, 205 )
+		} )
+	}
+}

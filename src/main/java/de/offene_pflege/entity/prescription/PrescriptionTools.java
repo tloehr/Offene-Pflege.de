@@ -772,9 +772,9 @@ public class PrescriptionTools {
                 " WHERE p.to >= :now ");
         query.setParameter("now", new Date());
         List list = (List) query.getResultList().stream().map(o -> {
-            Prescription p = (Prescription) o;
-            return p.getDocON() != null ? p.getDocON() : p.getHospitalON();
-        })
+                    Prescription p = (Prescription) o;
+                    return p.getDocON() != null ? p.getDocON() : p.getHospitalON();
+                })
                 .distinct()
                 .sorted(Comparator.comparing(HasName::getName))
                 .collect(Collectors.toList());
@@ -783,7 +783,7 @@ public class PrescriptionTools {
         return list;
     }
 
-    public static HasName get_order_source(Prescription p){
+    public static HasName get_order_source(Prescription p) {
         return p.getDocON() != null ? p.getDocON() : p.getHospitalON();
     }
 
@@ -1167,5 +1167,15 @@ public class PrescriptionTools {
 
         return BigDecimal.valueOf(dosage.doubleValue()).divide(upr, 4, RoundingMode.HALF_UP);
     }
+
+
+    public static boolean is_remindable(Prescription prescription) {
+        if (!prescription.hasMed()) return false;
+        if (prescription.isOnDemand()) return false;
+        return prescription.getPrescriptionSchedule().stream().anyMatch(prescriptionSchedule ->
+                prescriptionSchedule.getTaeglich() != 1
+        );
+    }
+
 
 }

@@ -17,8 +17,10 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessTools;
+import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
+import de.offene_pflege.op.tools.*;
 import de.offene_pflege.services.ResvaluetypesService;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.CleanablePanel;
@@ -31,13 +33,10 @@ import de.offene_pflege.op.residents.bwassistant.AddBWWizard;
 import de.offene_pflege.op.system.InternalClass;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayMessage;
-import de.offene_pflege.op.tools.MyJDialog;
-import de.offene_pflege.op.tools.Pair;
-import de.offene_pflege.op.tools.SYSConst;
-import de.offene_pflege.op.tools.SYSTools;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Triple;
 
+import org.eclipse.wst.xml.xpath2.processor.internal.function.OpTo;
 import org.javatuples.Quintet;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
@@ -71,6 +70,7 @@ public class PnlWelcome extends CleanablePanel {
     private CollapsiblePanes searchPanes;
     private java.util.List<QProcess> processList;
     private java.util.List<MedStock> expiryList;
+    private java.util.List<BHP> important_due_today;
     private ArrayList<Triple<Resident, Long, Long>> birthdayList;
     //    private java.util.List<Prescription> emptyStocksList;  //https://github.com/tloehr/Offene-Pflege.de/issues/102
     // https://www.apotheken-umschau.de/gewichtsverlust
@@ -198,8 +198,8 @@ public class PnlWelcome extends CleanablePanel {
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
                 strangeWeightList = ResValueTools.findNotableWeightChanges(WEIGHT_MONTHSBACK, WEIGHT_PERCENT);    // 3 monate, 5%
-
-                BHPTools.get_due_today_not_every_day();
+                // damit keine Depot-Spritzen vergessen werden
+                important_due_today = BHPTools.get_due_today();
 
                 Collections.sort(processList);
                 int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size();
@@ -250,23 +250,6 @@ public class PnlWelcome extends CleanablePanel {
                     cp.setContentPane(pnlContent);
                     cpsWelcome.add(cp);
                 }
-
-//                if (!emptyStocksList.isEmpty()) {
-//                    Collections.sort(emptyStocksList, Comparator.comparing(Prescription::getResident));
-//                    String title = "<html><font size=+1>" +
-//                            SYSTools.xx("nursingrecords.handover.emptyInventories") +
-//                            "</font></html>";
-//
-//                    CollapsiblePane cp = new CollapsiblePane(title);
-//                    JPanel pnlContent = new JPanel(new VerticalLayout());
-//                    for (Prescription prescription : emptyStocksList) {
-//                        progress++;
-//                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
-//                        pnlContent.add(createCP4(prescription).getMain());
-//                    }
-//                    cp.setContentPane(pnlContent);
-//                    cpsWelcome.add(cp);
-//                }
 
                 if (!birthdayList.isEmpty()) {
                     String title = "<html><font size=+1>" +
@@ -322,6 +305,21 @@ public class PnlWelcome extends CleanablePanel {
                     cpsWelcome.add(cp);
                 }
 
+                if (!important_due_today.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            SYSTools.xx("Depot-Spritzen und andere wichtige Medikamente") +
+                            "</font></html>";
+
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    JTextPane t = new JTextPane();
+                    t.setContentType("text/html");
+                    t.setText(BHPTools.getBHPsAsHTMLtable(important_due_today));
+                    pnlContent.add(t);
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
+                }
+
 
                 if (max == 0) {
                     JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -340,6 +338,13 @@ public class PnlWelcome extends CleanablePanel {
                 try {
                     log.debug("Done");
                     get();
+
+                    Optional<java.time.LocalDate> date_to_leave_me_alone = SYSPropsTools.get_local_date(SYSPropsTools.KEY_LEAVE_ME_ALONE_TODAY, OPDE.getMe());
+                    if (!important_due_today.isEmpty() && !date_to_leave_me_alone.orElse(java.time.LocalDate.now().minusDays(1)).equals(java.time.LocalDate.now())) {
+                        DlgDueToday dlg = new DlgDueToday(OPDE.getMainframe());
+                        dlg.setVisible(true);
+                    }
+
                 } catch (ExecutionException e) {
                     e.getCause().printStackTrace();
                     log.debug(e);
@@ -388,7 +393,6 @@ public class PnlWelcome extends CleanablePanel {
 
         return cptitle;
     }
-
 
 
     private DefaultCPTitle createCP4HighLowIn(Object[] ns) {

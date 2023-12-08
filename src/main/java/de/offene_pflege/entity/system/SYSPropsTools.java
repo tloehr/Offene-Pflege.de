@@ -5,15 +5,17 @@
 package de.offene_pflege.entity.system;
 
 import de.offene_pflege.op.OPDE;
+import org.apache.poi.sl.draw.geom.GuideIf;
 
+import javax.persistence.Embeddable;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -117,6 +119,7 @@ public class SYSPropsTools {
     public static final String KEY_QDVS_TAGE_ERFASSUNGSPERIODE = "qdvs.tage.erfassungsperiode";
     public static final String KEY_QDVS_WORKPATH = "qdvs_path";
     public static final String KEY_QDVS_COMMENT = "qdvs_kommentar";
+    public static final String KEY_LEAVE_ME_ALONE_TODAY = "due.today.already.reported";
 
     public static void storeProp(EntityManager em, String key, String value, OPUsers user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
@@ -144,6 +147,17 @@ public class SYSPropsTools {
 
         em.merge(prop);
         OPDE.setProp(key, value);
+    }
+
+    public static Optional<LocalDate> get_local_date(String key, OPUsers users) {
+        Optional<LocalDate> result;
+        try {
+            result = Optional.of(LocalDate.parse(OPDE.getProps().getProperty(key, ""), DateTimeFormatter.ISO_DATE));
+        } catch (DateTimeParseException dte) {
+            result = Optional.empty();
+        }
+
+        return result;
     }
 
     public static void storeProp(String key, String value, OPUsers user) {
@@ -215,11 +229,11 @@ public class SYSPropsTools {
     }
 
     public static void storeInteger(String key, int value) {
-          storeProp(key, Integer.toString(value), null);
-      }
+        storeProp(key, Integer.toString(value), null);
+    }
 
 
-    public static int getInteger(String key){
+    public static int getInteger(String key) {
         return getInteger(key, 0);
     }
 
@@ -230,7 +244,6 @@ public class SYSPropsTools {
         }
         return i;
     }
-
 
 
     /**
@@ -312,7 +325,6 @@ public class SYSPropsTools {
             btn.setSelected(false);
         }
     }
-
 
 
     public static void storeState(String name, JComboBox cmb) {

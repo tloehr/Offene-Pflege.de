@@ -120,6 +120,9 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     @Basic(optional = false)
     @Column(name = "Stellplan")
     private boolean showOnDailyPlan;
+    @Basic(optional = false)
+    @Column(name = "never_remind")
+    private Boolean never_remind;
 //    @Basic(optional = false)
 //    @Column(name = "weightcontrol")
 //    private boolean weightControl;
@@ -308,6 +311,14 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
 
     public void setShowOnDailyPlan(boolean show) {
         this.showOnDailyPlan = show;
+    }
+
+    public boolean isNever_remind() {
+        return never_remind;
+    }
+
+    public void setNever_remind(boolean never_remind) {
+        this.never_remind = never_remind;
     }
 
     public OPUsers getUserOFF() {

@@ -63,6 +63,7 @@ import org.joda.time.LocalDate;
 import javax.persistence.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
@@ -1263,6 +1264,50 @@ public class PnlPrescription extends NursingRecordsPanel {
             });
             btnAnnotation.setEnabled(prescription.isMine() && !prescription.isClosed() && prescription.hasMed() && PrescriptionTools.isAnnotationNecessary(prescription));
             pnlMenu.add(btnAnnotation);
+
+
+            /***
+             *
+             *  _ __   _____   _____ _ __   _ __ ___ _ __ ___ (_)_ __   __| |
+             * | '_ \ / _ \ \ / / _ \ '__| | '__/ _ \ '_ ` _ \| | '_ \ / _` |
+             * | | | |  __/\ V /  __/ |    | | |  __/ | | | | | | | | | (_| |
+             * |_| |_|\___| \_/ \___|_|    |_|  \___|_| |_| |_|_|_| |_|\__,_|
+             *
+             * Gehört zu dem Aspekt, dass verhindert werden soll, dass Depot-Spritzen vergessen werden.
+             */
+            if (PrescriptionTools.is_remindable(prescription)) {
+                final JCheckBox cb_never_remind = new JCheckBox("Erinnern, wenn nötig", !prescription.isNever_remind());
+                cb_never_remind.setFont(SYSConst.ARIAL14);
+                cb_never_remind.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                cb_never_remind.addItemListener(e -> {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+
+                        Prescription myPrescription = em.merge(prescription);
+                        myPrescription.setNever_remind(e.getStateChange() == ItemEvent.DESELECTED);
+                        em.lock(myPrescription, LockModeType.OPTIMISTIC);
+
+                        em.getTransaction().commit();
+
+                        lstPrescriptions.remove(prescription);
+                        lstPrescriptions.add(myPrescription);
+
+                        Collections.sort(lstPrescriptions);
+                        final CollapsiblePane myCP = createCP4(myPrescription);
+                        buildPanel();
+
+                    } catch (Exception ex) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(ex);
+                    } finally {
+                        em.close();
+                    }
+                });
+                pnlMenu.add(cb_never_remind);
+            }
         }
 
         // checked for acls
@@ -1626,18 +1671,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 currentEditor.setVisible(true);
             });
             btnProcess.setEnabled(prescription.isActive() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
-
-//            if (!prescription.getAttachedProcessConnections().isEmpty()) {
-//                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
-//                lblNum.setFont(SYSConst.ARIAL10BOLD);
-//                lblNum.setForeground(Color.YELLOW);
-//                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-//                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnProcess, lblNum, DefaultOverlayable.SOUTH_EAST);
-//                overlayableBtn.setOpaque(false);
-//                pnlMenu.add(overlayableBtn);
-//            } else {
             pnlMenu.add(btnProcess);
-//            }
         }
         return pnlMenu;
     }
