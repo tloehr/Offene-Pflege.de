@@ -192,6 +192,12 @@ public class GUITools {
 //    }
 
     public static JToggleButton getNiceToggleButton(String titleORlangbundle) {
+        return getNiceToggleButton(titleORlangbundle,
+                new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("artwork/22x22/cb-on.png")),
+                new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("artwork/22x22/cb-off.png")));
+    }
+
+    public static JToggleButton getNiceToggleButton(String titleORlangbundle, ImageIcon on, ImageIcon off) {
         String title = SYSTools.catchNull(titleORlangbundle);
         try {
             title = SYSTools.xx(titleORlangbundle);
@@ -200,8 +206,8 @@ public class GUITools {
         }
 
         JToggleButton tb = new JToggleButton(title);
-        tb.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("artwork/22x22/cb-off.png")));
-        tb.setSelectedIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("artwork/22x22/cb-on.png")));
+        tb.setIcon(off);
+        tb.setSelectedIcon(on);
         tb.setContentAreaFilled(false);
         tb.setBorderPainted(false);
         tb.setBorder(null);
@@ -210,6 +216,7 @@ public class GUITools {
         tb.setAlignmentX(Component.LEFT_ALIGNMENT);
         return tb;
     }
+
 
 
     public static JButton getTinyButton(String tooltip, Icon icon) {

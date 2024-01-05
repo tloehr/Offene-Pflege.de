@@ -40,6 +40,7 @@ import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.*;
+import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
@@ -75,7 +76,6 @@ import java.util.*;
 @Log4j2
 public class PnlBHP extends NursingRecordsPanel {
 
-
     private Resident resident;
     private boolean initPhase;
 
@@ -93,6 +93,7 @@ public class PnlBHP extends NursingRecordsPanel {
     //    private JPanel thisPanel;
     private String outcomeText = null;
     private BigDecimal weight = null;
+    private HashSet<BHP> notified_already;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspBHP;
     private CollapsiblePanes cpBHP;
@@ -107,6 +108,7 @@ public class PnlBHP extends NursingRecordsPanel {
         super("nursingrecords.bhp");
         initComponents();
         this.jspSearch = jspSearch;
+        this.notified_already = new HashSet<>();
 //        thisPanel = this;
         initPanel();
         switchResident(resident);
@@ -588,6 +590,15 @@ public class PnlBHP extends NursingRecordsPanel {
 
         // only for BHPs with state OPEN
         ActionListener applyActionListener = actionEvent -> {
+
+            if (BHPTools.needs_to_be_notified_before_applying(bhp)
+                    && !notified_already.contains(bhp)) {
+                notified_already.add(bhp);
+                DlgDueToday dlg = new DlgDueToday(OPDE.getMainframe(), bhp);
+                dlg.setVisible(true);
+                return;
+            }
+
             if (bhp.getState() != BHPTools.STATE_OPEN) {
                 return;
             }
@@ -760,10 +771,6 @@ public class PnlBHP extends NursingRecordsPanel {
             }
         };
 
-
-//        JPanel titlePanelleft = new JPanel();
-//        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
-
         MedStock stock = mapPrescription2Stock.get(bhp.getPrescription());
         if (bhp.hasMed() && stock == null) {
             stock = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(resident, bhp.getTradeForm()));
@@ -791,13 +798,14 @@ public class PnlBHP extends NursingRecordsPanel {
             // nur für Bedarfs BHPs, die noch offen sind
             Optional<String> bhp_text = bhp.isOnDemand() && bhp.isOpen() ? Optional.ofNullable(bhp.getPrescription().getText()) : Optional.empty();
 
-            title = "<html><font size=+1>" +
+            String fontcolor = bhp.isOpen() && BHPTools.needs_to_be_notified_before_applying(bhp) ? "red" : "black";
+            title = "<html><font size=+1 color=\"" + fontcolor + "\">" +
                     SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                     (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
                             " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                     BHPTools.getScheduleText(bhp, ", ", "") +
                     // zeige bemerkung bei den BHPs
-                    (bhp_text.isPresent() && !bhp_text.get().isEmpty() ? "&nbsp;&ldquo;" + SYSConst.html_italic(StringUtils.abbreviate(bhp_text.get(), 40))+"&rdquo;" : "") +
+                    (bhp_text.isPresent() && !bhp_text.get().isEmpty() ? "&nbsp;&ldquo;" + SYSConst.html_italic(StringUtils.abbreviate(bhp_text.get(), 40)) + "&rdquo;" : "") +
                     (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
                     (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "") +
                     "</font></html>";
@@ -1141,6 +1149,8 @@ public class PnlBHP extends NursingRecordsPanel {
                         // already commented
                         return;
                     }
+
+                    notified_already.remove(bhp);
 
                     if (BHPTools.isChangeable(bhp)) {
                         EntityManager em = OPDE.createEM();

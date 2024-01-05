@@ -4,7 +4,7 @@ SET V = '20'
 WHERE K = 'dbstructure';
 --
 alter table prescription
-    add never_remind bool default true
+    add never_remind bool default false
         not null
         comment 'this object will never turn up as a reminder after the user''s login'
         after Stellplan;

@@ -1276,37 +1276,38 @@ public class PnlPrescription extends NursingRecordsPanel {
              * Gehört zu dem Aspekt, dass verhindert werden soll, dass Depot-Spritzen vergessen werden.
              */
             if (PrescriptionTools.is_remindable(prescription)) {
-                final JCheckBox cb_never_remind = new JCheckBox("Erinnern, wenn nötig", !prescription.isNever_remind());
-                cb_never_remind.setFont(SYSConst.ARIAL14);
-                cb_never_remind.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                cb_never_remind.addItemListener(e -> {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
+                String icon = prescription.isNever_remind() ? "artwork/22x22/no_bell.png": "artwork/22x22/bell.png";
+                String message = prescription.isNever_remind() ? "nursingrecords.prescription.btnRemindIsOff" : "nursingrecords.prescription.btnRemindIsOn";
+                final JButton btn_never_remind = GUITools.createHyperlinkButton(message,
+                        new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(icon)), e -> {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
 
-                        Prescription myPrescription = em.merge(prescription);
-                        myPrescription.setNever_remind(e.getStateChange() == ItemEvent.DESELECTED);
-                        em.lock(myPrescription, LockModeType.OPTIMISTIC);
+                                Prescription myPrescription = em.merge(prescription);
+                                myPrescription.setNever_remind(!prescription.isNever_remind());
+                                em.lock(myPrescription, LockModeType.OPTIMISTIC);
 
-                        em.getTransaction().commit();
+                                em.getTransaction().commit();
 
-                        lstPrescriptions.remove(prescription);
-                        lstPrescriptions.add(myPrescription);
+                                lstPrescriptions.remove(prescription);
+                                lstPrescriptions.add(myPrescription);
 
-                        Collections.sort(lstPrescriptions);
-                        final CollapsiblePane myCP = createCP4(myPrescription);
-                        buildPanel();
+                                Collections.sort(lstPrescriptions);
+                                final CollapsiblePane myCP = createCP4(myPrescription);
+                                buildPanel();
 
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
-                    }
-                });
-                pnlMenu.add(cb_never_remind);
+                            } catch (Exception ex) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(ex);
+                            } finally {
+                                em.close();
+                            }
+                        });
+
+                pnlMenu.add(btn_never_remind);
             }
         }
 

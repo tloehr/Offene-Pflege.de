@@ -338,13 +338,6 @@ public class PnlWelcome extends CleanablePanel {
                 try {
                     log.debug("Done");
                     get();
-
-                    Optional<java.time.LocalDate> date_to_leave_me_alone = SYSPropsTools.get_local_date(SYSPropsTools.KEY_LEAVE_ME_ALONE_TODAY, OPDE.getMe());
-                    if (!important_due_today.isEmpty() && !date_to_leave_me_alone.orElse(java.time.LocalDate.now().minusDays(1)).equals(java.time.LocalDate.now())) {
-                        DlgDueToday dlg = new DlgDueToday(OPDE.getMainframe());
-                        dlg.setVisible(true);
-                    }
-
                 } catch (ExecutionException e) {
                     e.getCause().printStackTrace();
                     log.debug(e);

@@ -8,10 +8,7 @@ import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.tools.HTMLTools;
-import de.offene_pflege.op.tools.SYSCalendar;
-import de.offene_pflege.op.tools.SYSConst;
-import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.op.tools.*;
 
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.*;
@@ -901,6 +898,16 @@ public class BHPTools {
         em.close();
 
         return result;
+    }
+
+    public static boolean needs_to_be_notified_before_applying(BHP bhp){
+        if (bhp.getPrescription().isNever_remind()) return false;
+        if (!bhp.isOpen()) return false;
+        if (!JavaTimeConverter.toJavaLocalDateTime(bhp.getSoll()).toLocalDate().equals(java.time.LocalDate.now())) return false; // due today ?
+        if (bhp.getPrescriptionSchedule().getTaeglich() == 1) return false;
+        if (!bhp.getPrescription().hasMed()) return false;
+        if (bhp.getPrescription().isOnDemand()) return false;
+        return true;
     }
 
 

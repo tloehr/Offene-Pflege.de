@@ -198,6 +198,7 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
         this.userON = OPDE.getLogin().getUser();
         this.commontags = new ArrayList<>();
         this.annotations = new ArrayList<>();
+        this.never_remind = false;
 //        this.weightControl = false;
     }
 
@@ -223,6 +224,7 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.commontags = new ArrayList<Commontags>();
         this.annotations = new ArrayList<>();
+        this.never_remind = false;
     }
 
     public Collection<Commontags> getCommontags() {

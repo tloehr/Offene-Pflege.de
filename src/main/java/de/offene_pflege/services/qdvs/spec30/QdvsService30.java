@@ -277,7 +277,8 @@ public class QdvsService30 implements QdvsService {
         body.getDataContainer().setResidents(of.createResidentsType());
 
         report.append("# Indikatoren Ermittlung" + NL);
-        report.append("Stichttag " + STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)) + NL);
+        report.append("## Stichtag " + STICHTAG.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)) + NL2);
+        report.append("Erstellt am  " + LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)) + NL2);
 
         // Hier ist die Schleife, die das ganze XML Dokument erzeugt.
         residentInfoObjectMap.values().stream().sorted(Comparator.comparing(QdvsResidentInfoObject::getResident)).forEach(infoObject -> {
@@ -343,7 +344,11 @@ public class QdvsService30 implements QdvsService {
         }
 
         String base_name = FilenameUtils.getFullPathNoEndSeparator(target.getPath());
-        FileUtils.writeStringToFile(new File(base_name, "report.md"), report.toString(), Charset.defaultCharset());
+        File report_file = new File(base_name, "report.md");
+        report.insert(0, String.format("<!-- " +
+                "/opt/homebrew/lib/node_modules/markdown-styles/bin/generate-md --layout witex --input %s --output ~/Desktop " +
+                "-->"+NL, report_file.getAbsoluteFile()));
+        FileUtils.writeStringToFile(report_file, report.toString(), Charset.defaultCharset());
 
         return fehlerfrei;
     }
@@ -450,7 +455,7 @@ public class QdvsService30 implements QdvsService {
                             String text = "AUSSCHLUSS: " + ResidentTools.getLabelText(resident) + " -> " + aus_grund;
                             log.debug(text);
                             textListener.addLog(SYSConst.html_paragraph(text));
-                            report.append("## " + aus_grund + NL);
+                            report.append("### " + aus_grund + NL);
                         }
                     }
                 }
@@ -543,7 +548,8 @@ public class QdvsService30 implements QdvsService {
         log.debug("Indikatoren Ermittlung für Bewohner:in");
         String title = ResidentTools.getLabelText(resident) + " (" + NF_IDBEWOHNER.format(resident.getIdbewohner()) + ")";
         log.debug(title);
-        report.append("# " + title + NL);
+        report.append("- - -"+ NL);
+        report.append("## " + title + NL);
         ResidentType residentType = of.createResidentType();
 
         try {
@@ -551,40 +557,40 @@ public class QdvsService30 implements QdvsService {
             final int WIDTH = 57;
             residentType.setQsData(of.createDasQsDataType());
             log.debug(String.format("===---%s---===", StringUtils.center("Allgemeine Angaben", WIDTH)));
-            report.append("## Allgemeine Angaben" + NL);
+            report.append("### Allgemeine Angaben" + NL);
             allgemeine_angaben(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Krankenhaus", WIDTH)));
-            report.append("## Krankenhaus" + NL);
+            report.append("### Krankenhaus" + NL);
             krankenhaus(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Mobilität", WIDTH)));
-            report.append("## Mobilität" + NL);
+            report.append("### Mobilität" + NL);
             mobilitaet(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Kognitiv / Kommunikativ", WIDTH)));
-            report.append("## Kognitiv / Kommunikativ" + NL);
+            report.append("### Kognitiv / Kommunikativ" + NL);
             kognitiv_kommunikativ(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Selbstversorgung", WIDTH)));
-            report.append("## Selbstversorgung" + NL);
+            report.append("### Selbstversorgung" + NL);
             selbstversorgung(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Alltag, Soziales", WIDTH)));
-            report.append("## Alltag, Soziales" + NL);
+            report.append("### Alltag, Soziales" + NL);
             alltag_soziales(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Dekubitus", WIDTH)));
-            report.append("## Dekubitus" + NL);
+            report.append("### Dekubitus" + NL);
             dekubitus(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Größe, Gewicht", WIDTH)));
-            report.append("## Größe, Gewicht" + NL);
+            report.append("### Größe, Gewicht" + NL);
             gewicht(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Sturz", WIDTH)));
-            report.append("## Sturz" + NL);
+            report.append("### Sturz" + NL);
             sturz(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Fixierung", WIDTH)));
-            report.append("## Fixierung" + NL);
+            report.append("### Fixierung" + NL);
             fixierung(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Schmerzen", WIDTH)));
-            report.append("## Schmerzen" + NL);
+            report.append("### Schmerzen" + NL);
             schmerzen(residentType.getQsData(), resident);
             log.debug(String.format("===---%s---===", StringUtils.center("Informationen zum Einzug", WIDTH)));
-            report.append("## Informationen zum Einzug" + NL);
+            report.append("### Informationen zum Einzug" + NL);
             einzug(residentType.getQsData(), resident);
 
         } catch (Exception e) {
@@ -679,11 +685,12 @@ public class QdvsService30 implements QdvsService {
         int pgrad = 0;
         // wenn es einen eintrag gibt und der auch noch größer 0 ist, dann ist pgrad ja
         if (ResInfoTools.getValidOnThatDayIfAny(resident, NINSUR, STICHTAG).isPresent()) {
-            if (Integer.valueOf(ResInfoTools.getContent(ResInfoTools.getValidOnThatDayIfAny(resident, NINSUR, STICHTAG).get()).getProperty("grade")) > 0)
+            int pflegegrad = Integer.valueOf(ResInfoTools.getContent(ResInfoTools.getValidOnThatDayIfAny(resident, NINSUR, STICHTAG).get()).getProperty("grade"));
+            report.append("Pflegegrad: " + pflegegrad + NL);
+            if (pflegegrad > 0)
                 pgrad = 1;
         }
         qsData.getPFLEGEGRAD().setValue(Integer.valueOf(pgrad));
-        report.append("Pflegegrad: " + pgrad + NL);
     }
 
     private void krankenhaus(DasQsDataType qsData, Resident resident) {
@@ -905,7 +912,7 @@ public class QdvsService30 implements QdvsService {
         //┏━┓╻ ╻┏━┓┏━┓┏━╸╻ ╻┏━╸╻╺┳┓╻ ╻┏┓╻┏━╸┏━╸┏┓╻
         //┣━┫┃ ┃┗━┓┗━┓┃  ┣━┫┣╸ ┃ ┃┃┃ ┃┃┗┫┃╺┓┣╸ ┃┗┫
         //╹ ╹┗━┛┗━┛┗━┛┗━╸╹ ╹┗━╸╹╺┻┛┗━┛╹ ╹┗━┛┗━╸╹ ╹
-        report.append("### Ausscheidungen");
+        report.append("#### Ausscheidungen"+NL);
         ResInfo aus = ResInfoTools.getValidOnThatDayIfAny(resident, AUSSCHEID, STICHTAG).get();
         /** SPEC30-40 */qsData.setSVHARNKONTINENZ(of.createDasQsDataTypeSVHARNKONTINENZ());
         qsData.getSVHARNKONTINENZ().setValue(Integer.valueOf(ResInfoTools.getContent(aus).getProperty("SVHARNKONTINENZ")));
@@ -933,7 +940,7 @@ public class QdvsService30 implements QdvsService {
         //┏┓ ┏━╸╻ ╻┏━╸┏━┓╺┳╸╻ ╻┏┓╻┏━╸
         //┣┻┓┣╸ ┃╻┃┣╸ ┣┳┛ ┃ ┃ ┃┃┗┫┃╺┓
         //┗━┛┗━╸┗┻┛┗━╸╹┗╸ ╹ ┗━┛╹ ╹┗━┛
-        report.append("### Körperpflege");
+        report.append("#### Körperpflege"+NL);
         ResInfo kpflege = ResInfoTools.getValidOnThatDayIfAny(resident, KPFLEGE, STICHTAG).get();
         /** SPEC30-42 */qsData.setSVOBERKOERPER(of.createDasQsDataTypeSVOBERKOERPER());
         qsData.getSVOBERKOERPER().setValue(Integer.valueOf(ResInfoTools.getContent(kpflege).getProperty("SVOBERKOERPER")));
@@ -955,7 +962,7 @@ public class QdvsService30 implements QdvsService {
         report.append("- An- und Auskleiden des Unterkörpers: **" + selbststaendig.get(qsData.getSVANAUSUNTERKOERPER().getValue()) + "**" + NL);
 
         // ERNÄHRUNG
-        report.append("### Ernährung");
+        report.append("#### Ernährung"+NL);
         ResInfo ern = ResInfoTools.getValidOnThatDayIfAny(resident, ERN, STICHTAG).get();
         /** SPEC30-48 */qsData.setSVNAHRUNGZUBEREITEN(of.createDasQsDataTypeSVNAHRUNGZUBEREITEN());
         qsData.getSVNAHRUNGZUBEREITEN().setValue(Integer.valueOf(ResInfoTools.getContent(ern).getProperty("SVNAHRUNGZUBEREITEN")));
@@ -1282,7 +1289,7 @@ public class QdvsService30 implements QdvsService {
                 qsData.getSTURZFOLGEN().add(sf);
             }
 
-            report.append("### Sturzfolgen" + NL);
+            report.append("#### Sturzfolgen" + NL);
             qsData.getSTURZFOLGEN().forEach(sturzfolgen -> report.append("- " + sturzfolg.get(sturzfolgen.getValue()) + NL));
 
 
