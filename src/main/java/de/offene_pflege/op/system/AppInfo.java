@@ -110,6 +110,7 @@ public class AppInfo {
         try {
 
             // lade context.properties
+            // werden dynamisch durch maven erzeugt
             InputStream in2 = OPDE.class.getResourceAsStream("/application.properties");
             context.load(in2);
             in2.close();

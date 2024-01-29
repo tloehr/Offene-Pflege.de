@@ -1221,12 +1221,12 @@ public class TXEssenDoc {
                 content.put(TXEAF.CONSCIOUSNESS_SOPOR, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "sopor")));
                 content.put(TXEAF.CONSCIOUSNESS_COMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "coma")));
                 content.put(TXEAF.CONSCIOUSNESS_SOMNOLENT, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "somnolent")));
-            } else if (constype.getID().equalsIgnoreCase("bewusst01")) {
+            } else if (constype.getID().startsWith("bewusst0")) {
                 // TXEssen hat bisher kein Feld für Wachkoma, daher kreuze ich dann auch komatös an.
                 String bewusstseinsWert = getValue(ResInfoTypeTools.TYPE_CONSCIOUS, "BEWUSSTSEINSZUSTAND");
                 content.put(TXEAF.CONSCIOUSNESS_AWAKE, setCheckbox(bewusstseinsWert.equalsIgnoreCase("1")));
-                content.put(TXEAF.CONSCIOUSNESS_SOPOR, setCheckbox(bewusstseinsWert.equalsIgnoreCase("2")));
-                content.put(TXEAF.CONSCIOUSNESS_SOMNOLENT, setCheckbox(bewusstseinsWert.equalsIgnoreCase("3")));
+                content.put(TXEAF.CONSCIOUSNESS_SOMNOLENT, setCheckbox(bewusstseinsWert.equalsIgnoreCase("2")));
+                content.put(TXEAF.CONSCIOUSNESS_SOPOR, setCheckbox(bewusstseinsWert.equalsIgnoreCase("3")));
                 content.put(TXEAF.CONSCIOUSNESS_COMA, setCheckbox(bewusstseinsWert.equalsIgnoreCase("4") || bewusstseinsWert.equalsIgnoreCase("5")));
             }
         }

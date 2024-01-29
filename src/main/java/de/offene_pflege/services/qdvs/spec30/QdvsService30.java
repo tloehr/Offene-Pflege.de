@@ -803,11 +803,14 @@ public class QdvsService30 implements QdvsService {
 
         // seit SPEC20 keine Beatmung mehr
 
-        /** SPEC20-19 */qsData.setBEWUSSTSEINSZUSTAND(of.createDasQsDataTypeBEWUSSTSEINSZUSTAND());
+        /** SPEC30-19 */qsData.setBEWUSSTSEINSZUSTAND(of.createDasQsDataTypeBEWUSSTSEINSZUSTAND());
         ResInfo bewusst = ResInfoTools.getValidOnThatDayIfAny(resident, BEWUSST, STICHTAG).get();
         int bewzustand = Integer.valueOf(ResInfoTools.getContent(bewusst).getProperty("BEWUSSTSEINSZUSTAND"));
-        report.append("- Bewusstsseinszustand: **" + List.of("wach", "somnolent", "soporös", "komatör").get(bewzustand - 1) + "**" + NL);
         // seit Version 3.0 kein Wachkoma mehr hier verwenden.
+        // Bereinigung
+        if (bewzustand == 5) bewzustand = 4; // wachkoma gilt hier als komatös
+        report.append("- Bewusstsseinszustand: **" + List.of("wach", "somnolent", "soporös", "komatös").get(bewzustand - 1) + "**" + NL);
+
         if (bewzustand < 5)
             qsData.getBEWUSSTSEINSZUSTAND().setValue(bewzustand);
 

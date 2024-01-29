@@ -611,12 +611,10 @@ public class PnlPrescription extends NursingRecordsPanel {
         list.add(new JSeparator());
         list.add(new JLabel(SYSTools.xx("misc.msg.key")));
         list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
-//        if (resident.getCalcMediUPR1()) {
         list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
         list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
         list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription5"), SYSConst.icon22ledOrangeOff, SwingConstants.LEADING));
         list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
-//        }
         return list;
     }
 
@@ -780,14 +778,6 @@ public class PnlPrescription extends NursingRecordsPanel {
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, actionEvent -> SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected(), true), true));
             list.add(printPrescription);
-
-//            JideButton printDaily = GUITools.createHyperlinkButton("nursingrecords.prescription.printdailyplan", SYSConst.icon22print2, new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    SYSFilesTools.print(PrescriptionTools.printDailyPlan(resident.getStation().getHome()), true);
-//                }
-//            });
-//            list.add(printDaily);
         }
 
         return list;

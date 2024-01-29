@@ -570,6 +570,7 @@ CREATE TABLE `prescription` (
   `DafID` bigint(20) unsigned DEFAULT NULL,
   `SitID` bigint(20) unsigned DEFAULT NULL,
   `Stellplan` tinyint(1) NOT NULL DEFAULT '0',
+  `never_remind` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'this prescription will remind, even when the application is due today',
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`VerID`),
   KEY `idx1` (`BWKennung`),
