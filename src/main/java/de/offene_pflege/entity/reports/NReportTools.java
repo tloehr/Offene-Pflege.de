@@ -220,6 +220,7 @@ public class NReportTools {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
         html += df.format(nReport.getPit()) + "; " + nReport.getNewBy().getFullname();
+        html += OPDE.isExperimental() ? "; " + nReport.getID() : "";
         return html;
     }
 
@@ -955,7 +956,7 @@ public class NReportTools {
 
         try {
 
-            long begin = System.currentTimeMillis();
+            //long begin = System.currentTimeMillis();
 
             // native sql. the generated one is awfully slow
             String nativeSQL = "SELECT nr.* FROM nreports nr " +
@@ -969,7 +970,39 @@ public class NReportTools {
             query.setParameter(3, tag.getId());
 
             list = new ArrayList<>(query.getResultList());
-            SYSTools.showTimeDifference(begin);
+            //SYSTools.showTimeDifference(begin);
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+    public static ArrayList<NReport> getNReports4TagType(int tag_type, java.time.LocalDateTime start, java.time.LocalDateTime end) {
+
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
+
+        try {
+
+            //long begin = System.currentTimeMillis();
+
+            // native sql. the generated one is awfully slow
+            String nativeSQL = "SELECT DISTINCT nr.* FROM nreports nr " +
+                    " INNER JOIN nreports2tags tg ON nr.`PBID` = tg.`PBID` " +
+                    " INNER JOIN opde.commontags ct ON ct.`id` = tg.`ctagid` " +
+                    " WHERE nr.`PIT` >= ? AND nr.`PIT` <= ? " +
+                    " AND ct.type = ?;";
+
+            Query query = em.createNativeQuery(nativeSQL, NReport.class);
+            query.setParameter(1, start);
+            query.setParameter(2, end);
+            query.setParameter(3, tag_type);
+
+            list = new ArrayList<>(query.getResultList());
+            //SYSTools.showTimeDifference(begin);
 
         } catch (Exception se) {
             OPDE.fatal(se);

@@ -324,7 +324,7 @@ public class ResInfo implements Serializable, QProcessElement, Comparable<ResInf
             result += "<td valign=\"top\">" + df.format(to) + "</td>";
             result += "</tr>\n";
             result += "<tr>";
-            result += "<td valign=\"top\">" + userON.getFullname() + "</td>";
+            result += "<td valign=\"top\">" + userON.getFullname() + getID() + "</td>";
             result += "<td valign=\"top\">&raquo;</td>";
             result += "<td valign=\"top\">" + userOFF.getFullname() + "</td>";
             result += "</tr>\n";

@@ -26,6 +26,7 @@
  */
 package de.offene_pflege.op.controlling;
 
+import com.google.common.collect.HashBasedTable;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
@@ -33,6 +34,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
+import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.services.StationService;
@@ -56,6 +58,7 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
@@ -78,8 +81,12 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * ACL ============ EXECUTE      Start this sub program and use the controlling queries UPDATE       Enter and edit new
@@ -731,7 +738,7 @@ public class PnlControlling extends CleanablePanel {
         } catch (NumberFormatException nfe) {
             complaintsMonthBack = 7;
         }
-        final JTextField txtComplaintsMonthsBack = GUITools.createIntegerTextField(1, 12, complaintsMonthBack);
+        final JTextField txtComplaintsMonthsBack = GUITools.createIntegerTextField(1, 100, complaintsMonthBack);
         txtComplaintsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
 
         btnComplaints.addActionListener(e -> {
@@ -1232,88 +1239,88 @@ public class PnlControlling extends CleanablePanel {
     static String getWounds(int monthsback, Closure progress) {
         StringBuilder html = new StringBuilder(1000);
 
-        int p = -1;
-        progress.execute(new Pair<>(p, 100));
+        final MyInteger p = new MyInteger();
+        progress.execute(new Pair<>(-1, 100));
 
         java.time.LocalDate from = java.time.LocalDate.now().minusMonths(monthsback).withDayOfMonth(1);
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
 
-        final MultiKeyMap<String, QProcessElement> wounds = new MultiKeyMap();
+        // eine Tabelle mit den Connection IDs zu den Bewohnern. In den Zellen stehen dann die Wunden drin.
+        final HashBasedTable<Resident, Long, List<ResInfo>> wounds = HashBasedTable.create();
         // diese Liste bezieht sich nur auf BW die noch da sind.
-        ResidentTools.getAllActive().forEach(resident -> {
+
+        ArrayList<Resident> allActive = ResidentTools.getAllActive();
+        List<NReport> nReports4TagType = NReportTools.getNReports4TagType(CommontagsTools.TYPE_SYS_WOUNDS, from.atStartOfDay(), java.time.LocalDate.now().atTime(LocalTime.MAX))
+                .stream().filter(NReport::isActive).collect(Collectors.toList());
+
+        final int max = allActive.size() * 2 + nReports4TagType.size();
+
+        allActive.forEach(resident -> {
                     ResInfoTools.getAll(resident, ResInfoTypeTools.TYPE_ALL_WOUNDS,
                             from.atStartOfDay(),
                             java.time.LocalDate.now().atTime(LocalTime.MAX)
-                    ).forEach(resInfo -> wounds.put(resident.getId(), resInfo.getConnectionid().toString(), resInfo));
-                    NReportTools.getNReports4Tags(CommontagsTools.getType(CommontagsTools.TYPE_SYS_WOUNDS), from, java.time.LocalDate.now());
+                    ).forEach(resInfo -> {
+                        if (!wounds.contains(resident, resInfo.getConnectionid()))
+                            wounds.put(resident, resInfo.getConnectionid(), new ArrayList<>());
+                        wounds.get(resident, resInfo.getConnectionid()).add(resInfo);
+                        progress.execute(new Pair<>(p.increment(), max));
+                    });
                 }
         );
 
-       /**
-        // todo: Der ganze Verlauf muss drin sein, wenn sie innerhalb des Zeitraums noch aktiv war.
-        String jpql1 = " SELECT b FROM ResInfo b WHERE b.from > :from AND b.resident.adminonly <> 2 AND b.bwinfotyp.type = :type ORDER BY b.resident.id, b.from DESC ";
-        Query query1 = em.createQuery(jpql1);
-        query1.setParameter("type", ResInfoTypeTools.TYPE_WOUNDS);
-        query1.setParameter("from", from.toDate());
-        ArrayList<QProcessElement> listVal = new ArrayList<QProcessElement>(query1.getResultList());
+        html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nursing.wounds") + ": " +
+                from.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)) + " &raquo;&raquo; " +
+                java.time.LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))));
+        html.append(SYSConst.html_h1("Auswertung aus Bewohner Informationen"));
 
-        String jpql2 = " " +
-                " SELECT n FROM NReport n " +
-                " JOIN n.commontags ct " +
-                " WHERE n.pit > :from " +
-                " AND n.resident.adminonly <> 2 " +
-                " AND n.replacedBy IS NULL " +
-                " AND ct.type = :type " +
-                " ORDER BY n.resident.id, n.pit DESC ";
-        Query query2 = em.createQuery(jpql2);
-        query2.setParameter("type", CommontagsTools.TYPE_SYS_WOUNDS);
-        query2.setParameter("from", from.toDate());
-        listVal.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
-        em.close();
-
-        HashMap<Resident, ArrayList<QProcessElement>> listData = new HashMap<Resident, ArrayList<QProcessElement>>();
-        for (QProcessElement element : listVal) {
-            if (!listData.containsKey(element.getResident())) {
-                listData.put(element.getResident(), new ArrayList<>());
-            }
-            listData.get(element.getResident()).add(element);
-        }
-
-        ArrayList<Resident> listResident = new ArrayList<Resident>(listData.keySet());
-        Collections.sort(listResident);
-
-        html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nursing.wounds") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
-//        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + );
-
-        p = 0;
-
-        for (Resident resident : listResident) {
-            progress.execute(new Pair<Integer, Integer>(p, listResident.size()));
-            p++;
-
+        // Jetzt habe ich eine Tabelle aus BWKennungen und zugehörige ConnectionIDs für die Wunden.
+        // in den Zellen stehen listen mit einzelnen Wund-Dokus. Darüber iteriere ich nun
+        // im rowkeyset stehen die Kennung der BWs drin
+        new ArrayList<Resident>(wounds.rowKeySet()).stream().sorted().forEach(resident -> {
             html.append(SYSConst.html_h2(ResidentTools.getTextCompact(resident)));
-
-            StringBuffer table = new StringBuffer(1000);
-
-            table.append(SYSConst.html_table_tr(
-                    SYSConst.html_table_th("misc.msg.Date") +
-                            SYSConst.html_table_th("misc.msg.details")
-            ));
-
-            Collections.sort(listData.get(resident), (o1, o2) -> new Long(o1.getPITInMillis()).compareTo(new Long(o2.getPITInMillis())) * -1);
-
-            for (QProcessElement element : listData.get(resident)) {
+            progress.execute(new Pair<>(p.increment(), max));
+            new ArrayList<Long>(wounds.row(resident).keySet()).stream().sorted().forEach(connid -> {
+                String wund_name = wounds.get(resident, connid).get(0).getResInfoType().getShortDescription();
+                StringBuffer table = new StringBuffer(1000);
                 table.append(SYSConst.html_table_tr(
-                        SYSConst.html_table_td(element.getPITAsHTML(), "left", "top") +
-                                SYSConst.html_table_td(element.getContentAsHTML())
+                        SYSConst.html_table_th("misc.msg.Date") +
+                                SYSConst.html_table_th("Wundverlauf " + wund_name + " #" + connid)
                 ));
-            }
+                wounds.get(resident, connid).stream().sorted((o1, o2) -> o1.getFrom().compareTo(o2.getFrom())).forEach(this_wound -> {
+                    table.append(SYSConst.html_table_tr(
+                            SYSConst.html_table_td(this_wound.getPITAsHTML(), "left", "top") +
+                                    SYSConst.html_table_td(this_wound.getContentAsHTML())
+                    ));
+                });
+                html.append(SYSConst.html_table(table.toString(), "1"));
+                html.append("<br/>");
+            });
+        });
 
-            html.append(SYSConst.html_table(table.toString(), "1"));
-        }
+        html.append(SYSConst.html_h1("Auswertung aus Pflegeberichten"));
+        nReports4TagType
+                .stream()
+                .collect(Collectors.groupingBy(NReport::getResident)).forEach((resident, nReports) -> {
+                            html.append(SYSConst.html_h2(ResidentTools.getTextCompact(resident)));
+                            final StringBuffer table = new StringBuffer(1000);
+                            table.append(SYSConst.html_table_tr(
+                                    SYSConst.html_table_th("misc.msg.Date") +
+                                            SYSConst.html_table_th("misc.msg.details")
+                            ));
+                            nReports.stream()
+                                    .sorted(Comparator.comparing(NReport::getPit))
+                                    .forEach(nReport -> {
+                                        table.append(SYSConst.html_table_tr(
+                                                SYSConst.html_table_td(nReport.getPITAsHTML(), "left", "top") +
+                                                        SYSConst.html_table_td(nReport.getContentAsHTML())
+                                        ));
+                                        progress.execute(new Pair<>(p.increment(), max));
+                                    });
+                            html.append(SYSConst.html_table(table.toString(), "1"));
+                        }
+                );
 
-        */
         return html.toString();
     }
 

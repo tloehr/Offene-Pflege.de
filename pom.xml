@@ -71,7 +71,8 @@
         <opde.major>1</opde.major>
         <opde.minor>16</opde.minor>
         <opde.release>4</opde.release>
-        <opde.dbversion>20</opde.dbversion>
+<!--        this is the only place where the software looks for the proper dbversion-->
+        <opde.dbversion>21</opde.dbversion>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
     </properties>
 

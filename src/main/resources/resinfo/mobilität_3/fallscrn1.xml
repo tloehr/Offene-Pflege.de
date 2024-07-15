@@ -1,0 +1,32 @@
+<resinfotype>
+    <label size="20" fontstyle="bold" name="hinweis"
+           label="Bei zwei oder mehr Auffälligkeiten, können Sie hier abbrechen."
+           color="blue"/>
+    <label size="20" fontstyle="bold" name="hinweis"
+           label="Füllen Sie dann stattdessen die ausführliche Risikoeinschätzung aus."
+           color="blue"/>
+    <separator/>
+    <tabgroup size="20" fontstyle="bold" label="Sturz- und Frakturvorgeschichte" name="tb01">
+        <checkbox name="past" label="Stürze in den letzten 12 Monaten" layout="br"/>
+        <textfield name="fall1" label="Wie oft" length="25" hfill="false" innerlayout="tab"/>
+        <checkbox name="injuries" label="Verletzungen ?" layout="br"/>
+        <checkbox name="frac" label="Frakturen in den letzten 12 Monaten" layout="left"/>
+    </tabgroup>
+    <tabgroup size="20" fontstyle="bold" label="Sturzangst" name="tb02">
+        <checkbox name="fear" label="Hat der BW Angst zu stürzen ?" layout="br"/>
+    </tabgroup>
+    <tabgroup size="20" fontstyle="bold" label="Mobilitätsbeeinträchtigung" name="tb03">
+        <checkbox name="insecure" label="BW fühlt sich unsicher beim Gehen oder Stehen" layout="left"/>
+        <checkbox name="immobile" label="Mobilitätsbeeinträchtigung"
+                  tooltip="Kraft, Ausdauer, Beweglichkeit, Balance" layout="left"/>
+        <checkbox name="balance" label="Probleme mit der Körperbalance"/>
+        <checkbox name="gang" label="Gangveränderungen / eingeschränkte Bewegungsfreiheit" layout="left"/>
+        <checkbox name="aid" label="BW verwendet Mobilitätshilfen" layout="left"/>
+    </tabgroup>
+    <tabgroup size="20" fontstyle="bold" label="kognitive Beeinträchtigungen" name="tb04"
+              tooltip="Prüfen der Orientierung zu Zeit, Ort, Person und Situation">
+        <checkbox name="demenz" label="Demenz"/>
+        <checkbox name="depression" label="Depression" layout="left"/>
+        <checkbox name="delir" label="Delir" layout="left"/>
+    </tabgroup>
+</resinfotype>

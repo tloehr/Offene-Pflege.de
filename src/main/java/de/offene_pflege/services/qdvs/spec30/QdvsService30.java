@@ -347,7 +347,7 @@ public class QdvsService30 implements QdvsService {
         File report_file = new File(base_name, "report.md");
         report.insert(0, String.format("<!-- " +
                 "/opt/homebrew/lib/node_modules/markdown-styles/bin/generate-md --layout witex --input %s --output ~/Desktop " +
-                "-->"+NL, report_file.getAbsoluteFile()));
+                "-->" + NL, report_file.getAbsoluteFile()));
         FileUtils.writeStringToFile(report_file, report.toString(), Charset.defaultCharset());
 
         return fehlerfrei;
@@ -548,7 +548,7 @@ public class QdvsService30 implements QdvsService {
         log.debug("Indikatoren Ermittlung für Bewohner:in");
         String title = ResidentTools.getLabelText(resident) + " (" + NF_IDBEWOHNER.format(resident.getIdbewohner()) + ")";
         log.debug(title);
-        report.append("- - -"+ NL);
+        report.append("- - -" + NL);
         report.append("## " + title + NL);
         ResidentType residentType = of.createResidentType();
 
@@ -780,7 +780,13 @@ public class QdvsService30 implements QdvsService {
                     laengsterAufenthalt = Optional.of(away);
                 }
 
-                String kh = "KH Aufenthalt **" + DateFormat.getDateInstance().format(away.getFrom()) + " - " + DateFormat.getDateInstance().format(away.getTo()) + "** Dauer **" + diese_periode_in_tagen + " Tage**";
+                String kh = "KH Aufenthalt **";
+                if (away.isClosed()) {
+                    kh += DateFormat.getDateInstance().format(away.getFrom()) + " - " + DateFormat.getDateInstance().format(away.getTo()) + "** Dauer **" + diese_periode_in_tagen + " Tage**";
+                } else {
+                    kh += " seit " + DateFormat.getDateInstance().format(away.getFrom());
+                }
+
                 log.debug(kh);
                 report.append("- " + kh + NL);
             }
@@ -915,7 +921,7 @@ public class QdvsService30 implements QdvsService {
         //┏━┓╻ ╻┏━┓┏━┓┏━╸╻ ╻┏━╸╻╺┳┓╻ ╻┏┓╻┏━╸┏━╸┏┓╻
         //┣━┫┃ ┃┗━┓┗━┓┃  ┣━┫┣╸ ┃ ┃┃┃ ┃┃┗┫┃╺┓┣╸ ┃┗┫
         //╹ ╹┗━┛┗━┛┗━┛┗━╸╹ ╹┗━╸╹╺┻┛┗━┛╹ ╹┗━┛┗━╸╹ ╹
-        report.append("#### Ausscheidungen"+NL);
+        report.append("#### Ausscheidungen" + NL);
         ResInfo aus = ResInfoTools.getValidOnThatDayIfAny(resident, AUSSCHEID, STICHTAG).get();
         /** SPEC30-40 */qsData.setSVHARNKONTINENZ(of.createDasQsDataTypeSVHARNKONTINENZ());
         qsData.getSVHARNKONTINENZ().setValue(Integer.valueOf(ResInfoTools.getContent(aus).getProperty("SVHARNKONTINENZ")));
@@ -943,7 +949,7 @@ public class QdvsService30 implements QdvsService {
         //┏┓ ┏━╸╻ ╻┏━╸┏━┓╺┳╸╻ ╻┏┓╻┏━╸
         //┣┻┓┣╸ ┃╻┃┣╸ ┣┳┛ ┃ ┃ ┃┃┗┫┃╺┓
         //┗━┛┗━╸┗┻┛┗━╸╹┗╸ ╹ ┗━┛╹ ╹┗━┛
-        report.append("#### Körperpflege"+NL);
+        report.append("#### Körperpflege" + NL);
         ResInfo kpflege = ResInfoTools.getValidOnThatDayIfAny(resident, KPFLEGE, STICHTAG).get();
         /** SPEC30-42 */qsData.setSVOBERKOERPER(of.createDasQsDataTypeSVOBERKOERPER());
         qsData.getSVOBERKOERPER().setValue(Integer.valueOf(ResInfoTools.getContent(kpflege).getProperty("SVOBERKOERPER")));
@@ -965,7 +971,7 @@ public class QdvsService30 implements QdvsService {
         report.append("- An- und Auskleiden des Unterkörpers: **" + selbststaendig.get(qsData.getSVANAUSUNTERKOERPER().getValue()) + "**" + NL);
 
         // ERNÄHRUNG
-        report.append("#### Ernährung"+NL);
+        report.append("#### Ernährung" + NL);
         ResInfo ern = ResInfoTools.getValidOnThatDayIfAny(resident, ERN, STICHTAG).get();
         /** SPEC30-48 */qsData.setSVNAHRUNGZUBEREITEN(of.createDasQsDataTypeSVNAHRUNGZUBEREITEN());
         qsData.getSVNAHRUNGZUBEREITEN().setValue(Integer.valueOf(ResInfoTools.getContent(ern).getProperty("SVNAHRUNGZUBEREITEN")));
@@ -1404,26 +1410,41 @@ public class QdvsService30 implements QdvsService {
 
         if (SCHMERZEN == 1) {
             report.append("- Bewohner hat Schmerzen" + NL);
-            if (SCHMERZFREI > 0) report.append("  - ist aber schmerzfrei durch Medikamente" + NL);
+            // fixed 240710
+            // wenn jemand schmerzfrei durch MEDIs ist, dann bleiben die Felder 76-79, MÜSSEN aber trotzdem in
+            // der XML Datei drinstehen. Nur eben ohne Werte.
             // Bei den verwendeten Formularen gehe ich immer von einer differenzierten Einschätzung aus
-            qsData.getSCHMERZEINSCH().setValue(1); // JA
-            qsData.getSCHMERZEINSCHDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(pit)); // JA
-            report.append("- Datum der letzten Schmerzeinschätzung " + pit.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)) + NL);
+            int schmerzeinsch_liegt_vor;
+            if (SCHMERZFREI > 0) {
+                report.append("  - ist aber schmerzfrei durch Medikamente" + NL);
+                // allerdings nur, wenn die Schmerzfreiheit NICHT durch Medikamente erreicht wurde.
+                schmerzeinsch_liegt_vor = 0;
+                // ein leerer Eintrag ist nötig, sonst schimpft die XSD
+                DasQsDataType.SCHMERZEINSCHINFO infoleer = of.createDasQsDataTypeSCHMERZEINSCHINFO();
+                qsData.getSCHMERZEINSCHINFO().add(infoleer);
+            } else {
+                schmerzeinsch_liegt_vor = 1;
+                qsData.getSCHMERZEINSCH().setValue(schmerzeinsch_liegt_vor); // Ja, aber nur wenn Feld 76 == 0
+                if (schmerzeinsch_liegt_vor > 0) {
+                    qsData.getSCHMERZEINSCHDATUM().setValue(JavaTimeConverter.toXMLGregorianCalendar(pit)); // JA
+                    report.append("- Datum der letzten Schmerzeinschätzung " + pit.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)) + NL);
 
-            // SCHMERZE2 hat alle Infos
-            /** SPEC30-79 */
-            DasQsDataType.SCHMERZEINSCHINFO info1 = of.createDasQsDataTypeSCHMERZEINSCHINFO();
-            info1.setValue(1);
-            DasQsDataType.SCHMERZEINSCHINFO info2 = of.createDasQsDataTypeSCHMERZEINSCHINFO();
-            info2.setValue(2);
-            DasQsDataType.SCHMERZEINSCHINFO info3 = of.createDasQsDataTypeSCHMERZEINSCHINFO();
-            info3.setValue(3);
-            DasQsDataType.SCHMERZEINSCHINFO info4 = of.createDasQsDataTypeSCHMERZEINSCHINFO();
-            info4.setValue(4);
-            qsData.getSCHMERZEINSCHINFO().add(info1);
-            qsData.getSCHMERZEINSCHINFO().add(info2);
-            qsData.getSCHMERZEINSCHINFO().add(info3);
-            qsData.getSCHMERZEINSCHINFO().add(info4);
+                    // SCHMERZE2 hat alle Infos
+                    /** SPEC30-79 */
+                    DasQsDataType.SCHMERZEINSCHINFO info1 = of.createDasQsDataTypeSCHMERZEINSCHINFO();
+                    info1.setValue(1);
+                    DasQsDataType.SCHMERZEINSCHINFO info2 = of.createDasQsDataTypeSCHMERZEINSCHINFO();
+                    info2.setValue(2);
+                    DasQsDataType.SCHMERZEINSCHINFO info3 = of.createDasQsDataTypeSCHMERZEINSCHINFO();
+                    info3.setValue(3);
+                    DasQsDataType.SCHMERZEINSCHINFO info4 = of.createDasQsDataTypeSCHMERZEINSCHINFO();
+                    info4.setValue(4);
+                    qsData.getSCHMERZEINSCHINFO().add(info1);
+                    qsData.getSCHMERZEINSCHINFO().add(info2);
+                    qsData.getSCHMERZEINSCHINFO().add(info3);
+                    qsData.getSCHMERZEINSCHINFO().add(info4);
+                }
+            }
 
             // erhält nur einen Value, wenn es Schmerzen gibt. Sonst nicht.
             qsData.getSCHMERZFREI().setValue(SCHMERZFREI);
