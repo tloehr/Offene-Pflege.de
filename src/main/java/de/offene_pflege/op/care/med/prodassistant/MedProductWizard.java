@@ -18,6 +18,8 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -55,8 +57,10 @@ public class MedProductWizard {
 //                prodtemplate = template.trim();
 //            }
 //        }
+
         createWizard();
     }
+
 
     private void createWizard() {
         wizard = new WizardDialog(OPDE.getMainframe(), false);
@@ -100,6 +104,13 @@ public class MedProductWizard {
             }
         });
         ((JPanel) wizard.getContentPane()).setBorder(new LineBorder(Color.BLACK, 1));
+        wizard.getContentPane().setPreferredSize(new Dimension(850, 650));
+        wizard.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                log.debug(e);
+            }
+        });
         wizard.pack();
     }
 
@@ -149,6 +160,8 @@ public class MedProductWizard {
             super.initContentPane();
 
             JPanel main = new JPanel(new BorderLayout(5, 5));
+
+
 
             JTextPane txt = new JTextPane();
             txt.setEditable(false);

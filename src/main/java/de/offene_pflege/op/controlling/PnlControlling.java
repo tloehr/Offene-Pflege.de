@@ -1274,6 +1274,9 @@ public class PnlControlling extends CleanablePanel {
                 java.time.LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))));
         html.append(SYSConst.html_h1("Auswertung aus Bewohner Informationen"));
 
+
+        List<NReport> list_of_reports_to_remove = new ArrayList<>();
+
         // Jetzt habe ich eine Tabelle aus BWKennungen und zugehörige ConnectionIDs für die Wunden.
         // in den Zellen stehen listen mit einzelnen Wund-Dokus. Darüber iteriere ich nun
         // im rowkeyset stehen die Kennung der BWs drin
@@ -1285,42 +1288,69 @@ public class PnlControlling extends CleanablePanel {
                 StringBuffer table = new StringBuffer(1000);
                 table.append(SYSConst.html_table_tr(
                         SYSConst.html_table_th("misc.msg.Date") +
-                                SYSConst.html_table_th("Wundverlauf " + wund_name + " #" + connid)
+                                SYSConst.html_table_th(ResidentTools.getTextCompact(resident) + "  " + wund_name + " #" + connid)
                 ));
                 wounds.get(resident, connid).stream().sorted((o1, o2) -> o1.getFrom().compareTo(o2.getFrom())).forEach(this_wound -> {
+
+                    // prepare Reports
+                    //StringBuilder reports = new StringBuilder(1000);
+
+                    List<NReport> report_list = nReports4TagType.stream()
+                            .filter(nReport -> nReport.getResident().equals(resident)
+                                    && nReport.getPit().compareTo(this_wound.getFrom()) >= 0
+                                    && nReport.getPit().compareTo(this_wound.getTo()) <= 0
+                            )
+                            .sorted((o1, o2) -> o1.getPit().compareTo(o2.getPit()))
+                            .collect(Collectors.toList());
+
+                    list_of_reports_to_remove.addAll(report_list);
+
                     table.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(this_wound.getPITAsHTML(), "left", "top") +
-                                    SYSConst.html_table_td(this_wound.getContentAsHTML())
+                                    SYSConst.html_table_td(this_wound.getContentAsHTML() + "<p/>" +
+                                            NReportTools.getNReportsAsHTML(report_list, false, false, "", "", false))
                     ));
+
                 });
                 html.append(SYSConst.html_table(table.toString(), "1"));
                 html.append("<br/>");
             });
+            nReports4TagType.removeAll(list_of_reports_to_remove);
+            list_of_reports_to_remove.clear();
+            List<NReport> report_list = nReports4TagType.stream()
+                    .filter(nReport -> nReport.getResident().equals(resident))
+                    .sorted((o1, o2) -> o1.getPit().compareTo(o2.getPit()))
+                    .collect(Collectors.toList());
+            if (!report_list.isEmpty())
+                html.append(NReportTools.getNReportsAsHTML(report_list, false, false, "", "", false));
         });
 
-        html.append(SYSConst.html_h1("Auswertung aus Pflegeberichten"));
-        nReports4TagType
-                .stream()
-                .collect(Collectors.groupingBy(NReport::getResident)).forEach((resident, nReports) -> {
-                            html.append(SYSConst.html_h2(ResidentTools.getTextCompact(resident)));
-                            final StringBuffer table = new StringBuffer(1000);
-                            table.append(SYSConst.html_table_tr(
-                                    SYSConst.html_table_th("misc.msg.Date") +
-                                            SYSConst.html_table_th("misc.msg.details")
-                            ));
-                            nReports.stream()
-                                    .sorted(Comparator.comparing(NReport::getPit))
-                                    .forEach(nReport -> {
-                                        table.append(SYSConst.html_table_tr(
-                                                SYSConst.html_table_td(nReport.getPITAsHTML(), "left", "top") +
-                                                        SYSConst.html_table_td(nReport.getContentAsHTML())
-                                        ));
-                                        progress.execute(new Pair<>(p.increment(), max));
-                                    });
-                            html.append(SYSConst.html_table(table.toString(), "1"));
-                        }
-                );
+        nReports4TagType.removeAll(list_of_reports_to_remove); // diese Berichte haben wir schon verwendet.
 
+        if (!nReports4TagType.isEmpty()) {
+            html.append(SYSConst.html_h1("Sonstige Pflegeberichte"));
+            nReports4TagType
+                    .stream()
+                    .collect(Collectors.groupingBy(NReport::getResident)).forEach((resident, nReports) -> {
+                                html.append(SYSConst.html_h2(ResidentTools.getTextCompact(resident)));
+                                final StringBuffer table = new StringBuffer(1000);
+                                table.append(SYSConst.html_table_tr(
+                                        SYSConst.html_table_th("misc.msg.Date") +
+                                                SYSConst.html_table_th("misc.msg.details")
+                                ));
+                                nReports.stream()
+                                        .sorted(Comparator.comparing(NReport::getPit))
+                                        .forEach(nReport -> {
+                                            table.append(SYSConst.html_table_tr(
+                                                    SYSConst.html_table_td(nReport.getPITAsHTML(), "left", "top") +
+                                                            SYSConst.html_table_td(nReport.getContentAsHTML())
+                                            ));
+                                            progress.execute(new Pair<>(p.increment(), max));
+                                        });
+                                html.append(SYSConst.html_table(table.toString(), "1"));
+                            }
+                    );
+        }
         return html.toString();
     }
 

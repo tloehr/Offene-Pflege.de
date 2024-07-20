@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -890,20 +891,25 @@ public class BHPTools {
                 " AND b.prescriptionSchedule.prescription.situation IS NULL " +
                 " AND b.prescriptionSchedule.prescription.tradeform IS NOT NULL " +
                 " AND b.prescriptionSchedule.prescription.never_remind = false " +
+                " AND b.prescriptionSchedule.prescription.to >= :now " + // to remove closed BHPs
                 " ORDER BY b.resident "
         );
 
         query.setParameter("today", new Date(), TemporalType.DATE);
+        query.setParameter("now", new Date(), TemporalType.TIMESTAMP);
         List<BHP> result = query.getResultList();
+
         em.close();
 
-        return result;
+        // remove absent residents
+        return result.stream().filter(bhp -> !ResInfoTools.isAway(bhp.getResident())).collect(Collectors.toList());
     }
 
-    public static boolean needs_to_be_notified_before_applying(BHP bhp){
+    public static boolean needs_to_be_notified_before_applying(BHP bhp) {
         if (bhp.getPrescription().isNever_remind()) return false;
         if (!bhp.isOpen()) return false;
-        if (!JavaTimeConverter.toJavaLocalDateTime(bhp.getSoll()).toLocalDate().equals(java.time.LocalDate.now())) return false; // due today ?
+        if (!JavaTimeConverter.toJavaLocalDateTime(bhp.getSoll()).toLocalDate().equals(java.time.LocalDate.now()))
+            return false; // due today ?
         if (bhp.getPrescriptionSchedule().getTaeglich() == 1) return false;
         if (!bhp.getPrescription().hasMed()) return false;
         if (bhp.getPrescription().isOnDemand()) return false;

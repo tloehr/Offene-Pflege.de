@@ -298,17 +298,18 @@ public class PnlMed extends CleanablePanel {
                     // keine Maßnahme nötig
                 }).getWizard();
 
+
                 currentPopup.setMovable(false);
-                currentPopup.setPreferredSize((new Dimension(800, 450)));
-                currentPopup.setResizable(false);
+                currentPopup.setPreferredSize(wizard.getPreferredSize());
+                currentPopup.setResizable(true);
                 currentPopup.getContentPane().setLayout(new BoxLayout(currentPopup.getContentPane(), BoxLayout.LINE_AXIS));
                 currentPopup.getContentPane().add(wizard.getContentPane());
-                currentPopup.setOwner(addButton);
+                currentPopup.setOwner(this);
                 currentPopup.removeExcludedComponent(addButton);
                 currentPopup.setTransient(false);
                 currentPopup.setDefaultFocusComponent(wizard.getContentPane());
 
-                GUITools.showPopup(currentPopup, SwingConstants.NORTH_EAST);
+                GUITools.showPopup(currentPopup, SwingConstants.CENTER);
             });
 
             list.add(addButton);

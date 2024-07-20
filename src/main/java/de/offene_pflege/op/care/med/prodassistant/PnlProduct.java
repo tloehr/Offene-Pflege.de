@@ -102,7 +102,7 @@ public class PnlProduct extends JPanel {
         setPreferredSize(new Dimension(610, 198));
         setLayout(new FormLayout(
             "2*(default, $lcgap), default:grow, $lcgap, default",
-            "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
+            "2*(default), $ugap, default, $lgap, fill:default:grow, $lgap, default"));
 
         //---- txtProd ----
         txtProd.setFont(new Font("Arial", Font.PLAIN, 14));

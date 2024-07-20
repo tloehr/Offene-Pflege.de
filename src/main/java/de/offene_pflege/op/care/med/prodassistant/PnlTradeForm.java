@@ -91,6 +91,9 @@ public class PnlTradeForm extends JPanel {
         txtUPR.setEnabled(false);
         pnlUPR.setVisible(false);
 
+        jsp1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jsp1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
         validate.execute(tradeForm);
     }
 
@@ -373,10 +376,10 @@ public class PnlTradeForm extends JPanel {
             lstDaf.addListSelectionListener(e -> lstDafValueChanged(e));
             jsp1.setViewportView(lstDaf);
         }
-        add(jsp1, CC.xywh(5, 15, 3, 1, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xywh(5, 15, 3, 1, CC.FILL, CC.FILL));
 
         //---- buttonGroup1 ----
-        ButtonGroup buttonGroup1 = new ButtonGroup();
+        var buttonGroup1 = new ButtonGroup();
         buttonGroup1.add(rbCalcUPR);
         buttonGroup1.add(rbSetUPR);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

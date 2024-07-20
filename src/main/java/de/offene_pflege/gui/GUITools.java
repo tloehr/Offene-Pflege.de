@@ -218,7 +218,6 @@ public class GUITools {
     }
 
 
-
     public static JButton getTinyButton(String tooltip, Icon icon) {
         JButton jButton = new JButton(icon);
         jButton.setContentAreaFilled(false);
@@ -278,6 +277,11 @@ public class GUITools {
 
         popup.showPopup(desiredPosition.x, desiredPosition.y);
 
+    }
+
+    public static void show_popup_center_of_screen(JidePopup popup) {
+        Point desiredPosition = centerOnScreen(popup);
+        popup.showPopup(desiredPosition.x, desiredPosition.y);
     }
 
     private static Point centerOnScreen(JidePopup popup) {

@@ -658,11 +658,11 @@ public class DlgNewStocks extends JDialog {
 
 
         popup.setMovable(false);
-        popup.setPreferredSize((new Dimension(800, 450)));
-        popup.setResizable(false);
+        popup.setPreferredSize(wizard.getPreferredSize());
+        popup.setResizable(true);
         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
         popup.getContentPane().add(wizard.getContentPane());
-        popup.setOwner(btnMed);
+        popup.setOwner(this);
         popup.removeExcludedComponent(btnMed);
         popup.setTransient(true);
         popup.setDefaultFocusComponent(wizard.getContentPane());
@@ -671,7 +671,7 @@ public class DlgNewStocks extends JDialog {
             popup.getContentPane().getComponentCount();
         });
 
-        GUITools.showPopup(popup, SwingConstants.WEST);
+        GUITools.showPopup(popup, SwingConstants.CENTER);
 
 //        popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
 

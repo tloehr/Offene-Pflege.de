@@ -659,8 +659,8 @@ public class DlgRegular extends MyJDialog {
         }).getWizard();
 
         popup.setMovable(false);
-        popup.setPreferredSize((new Dimension(800, 450)));
-        popup.setResizable(false);
+        popup.setPreferredSize(wizard.getPreferredSize());
+        popup.setResizable(true);
         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
         popup.getContentPane().add(wizard.getContentPane());
         popup.setOwner(btnMed);
@@ -668,7 +668,9 @@ public class DlgRegular extends MyJDialog {
         popup.setTransient(true);
         popup.setDefaultFocusComponent(wizard.getContentPane());
 
-        popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
+        GUITools.showPopup(popup, SwingConstants.CENTER);
+
+        //popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
 
     }//GEN-LAST:event_btnMedActionPerformed
 
