@@ -239,19 +239,6 @@ public class PnlMedOrders extends JPanel {
         });
         menu.add(itemClose);
 
-        //        JButton delete_orders = GUITools.createHyperlinkButton("markierte Bestellungen löschen", SYSConst.icon22delete, null);
-        //        delete_orders.addActionListener(evt1 -> {
-        //            optPnlMedOrders.ifPresent(pnlMedOrders -> {
-        //                pnlMedOrders.getSelected().forEach(medOrder -> {
-        //                    EntityTools.delete(medOrder);
-        //                });
-        //                reload();
-        //            });
-        //        });
-        //        list.add(delete_orders);
-        //        delete_orders.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
-
-
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }
 

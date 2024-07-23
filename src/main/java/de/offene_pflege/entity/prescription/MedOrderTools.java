@@ -1,5 +1,6 @@
 package de.offene_pflege.entity.prescription;
 
+import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.OPUsers;
@@ -28,6 +29,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class MedOrderTools {
@@ -255,7 +257,14 @@ public class MedOrderTools {
     public static List<MedOrder> generate_orders(final int cover_days, final int type, Optional<HasName> order_source, List<MedOrder> open_orders) {
         List<MedOrder> result = new ArrayList<>();
         final MultiKeyMap<Object, Quintet<BigDecimal, BigDecimal, BigDecimal, GP, Hospital>> map = new MultiKeyMap();
-        List<Resident> residents = ResidentTools.getAllActive();
+
+        //>> since 1.16.4_b331
+        // alle aktiven BW, aber ohne die abwesenden
+        List<Resident> residents = ResidentTools.getAllActive()
+                .stream()
+                .filter(resident -> !ResInfoTools.isAway(resident))
+                .collect(Collectors.toList());
+        //<< since 1.16.4_b331
 
         MutableInt running_integer = new MutableInt(0);
         residents.forEach(resident -> {
