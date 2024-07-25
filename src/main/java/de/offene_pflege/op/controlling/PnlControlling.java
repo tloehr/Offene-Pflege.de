@@ -1290,11 +1290,13 @@ public class PnlControlling extends CleanablePanel {
                         SYSConst.html_table_th("misc.msg.Date") +
                                 SYSConst.html_table_th(ResidentTools.getTextCompact(resident) + "  " + wund_name + " #" + connid)
                 ));
+
+                // wir wollen auch wissen, ob diese Wund-Serie bereits abgeschlossen ist, d.h.
+                // ob die letzte Wunde in der Reihe ein Ende hat und nicht "bis auf weiteres" läuft
+                final ResInfo letzte_wunde_in_dieser_serie = wounds.get(resident, connid).stream().sorted((o1, o2) -> o1.getFrom().compareTo(o2.getFrom()) * -1).findFirst().get();
+
                 wounds.get(resident, connid).stream().sorted((o1, o2) -> o1.getFrom().compareTo(o2.getFrom())).forEach(this_wound -> {
-
                     // prepare Reports
-                    //StringBuilder reports = new StringBuilder(1000);
-
                     List<NReport> report_list = nReports4TagType.stream()
                             .filter(nReport -> nReport.getResident().equals(resident)
                                     && nReport.getPit().compareTo(this_wound.getFrom()) >= 0
@@ -1308,12 +1310,19 @@ public class PnlControlling extends CleanablePanel {
                     table.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(this_wound.getPITAsHTML(), "left", "top") +
                                     SYSConst.html_table_td(this_wound.getContentAsHTML() + "<p/>" +
-                                            NReportTools.getNReportsAsHTML(report_list, false, false, "", "", false))
+                                            NReportTools.getNReportsAsHTML(report_list, false, false, "", "", false, false)+
+                                            (this_wound.equals(letzte_wunde_in_dieser_serie) && letzte_wunde_in_dieser_serie.isClosed() ? "<h2 style=\"background-color:lightgreen\">\n" +
+                                                    "Wunde ist abgeschlossen.\n" +
+                                                    "</h2>" : ""))
+
                     ));
 
                 });
                 html.append(SYSConst.html_table(table.toString(), "1"));
                 html.append("<br/>");
+
+
+
             });
             nReports4TagType.removeAll(list_of_reports_to_remove);
             list_of_reports_to_remove.clear();

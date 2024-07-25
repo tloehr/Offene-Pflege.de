@@ -225,10 +225,14 @@ public class NReportTools {
     }
 
     public static String getNReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight) {
-        return getNReportsAsHTML(nReports, true, withlongheader, subtitle, highlight, true);
+        return getNReportsAsHTML(nReports, true, withlongheader, subtitle, highlight, true, true);
     }
 
     public static String getNReportsAsHTML(List<NReport> nReports, boolean withHeader, boolean withlongheader, String subtitle, String highlight, boolean withObsoletes) {
+        return getNReportsAsHTML(nReports, withHeader, withlongheader, subtitle, highlight, withObsoletes, true);
+    }
+
+    public static String getNReportsAsHTML(List<NReport> nReports, boolean withHeader, boolean withlongheader, String subtitle, String highlight, boolean withObsoletes, boolean report_empty_list) {
         String result = "";
 
         if (!nReports.isEmpty()) {
@@ -278,7 +282,7 @@ public class NReportTools {
             result += html;
 
         } else {
-            result = SYSConst.html_italic("misc.msg.noentryyet");
+            result = report_empty_list ? SYSConst.html_italic("misc.msg.noentryyet") : "";
         }
 
 
