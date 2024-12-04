@@ -1,0 +1,8 @@
+<resinfotype bwinftyp="fraktur02" sinceversion="22" category="15" abstract_type="162" equivalent="0"
+             intervalmode="3" infokurz="Knochenbruch (Fraktur)" infolang="" tx="true" qpr="true">
+
+   <qdvs optional="true"/>
+   <label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
+   <checkbox label="Knochenbruch aufgrund eines Sturzes" name="fall" layout="br left"/>
+
+</resinfotype>

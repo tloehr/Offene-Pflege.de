@@ -21,5 +21,6 @@ Dieses Update ändert die Datenbankstruktur und teilweise auch die Inhalte. Fert
   * <label icon="glyphicon glyphicon-cog" type="info">Work in progress</label> Anpassungen für die neue [[https://www.das-pflege.de/spezifikationen#spezifikationen|Spezifikation v3.0]] der DAS-Pflege, gültig ab dem Erhebungszyklus 7((Beginn: 01.01.2024))
     * Diese Spezifikation wird für Stichtage ab dem 01.01.2024 benutzt, andernfalls wird die v02.1 verwendet.
   * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label>
+  * <label icon="glyphicon glyphicon-wrench" type="danger">Fix</label>
   * <label  icon="glyphicon glyphicon-plus" type="success">New</label>
   * <label icon="glyphicon glyphicon-circle-arrow-right" type="warning">Change</label>

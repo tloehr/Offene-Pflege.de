@@ -36,7 +36,7 @@ public class PnlMedication extends DefaultPanel {
 
         JComboBox<DayOfWeek> cmb_start_day = new JComboBox<>(DayOfWeek.values());
         cmb_start_day.setFont(SYSConst.ARIAL20);
-        cmb_start_day.setSelectedIndex(SYSPropsTools.getInteger(SYSPropsTools.KEY_CALC_MEDI_START_ORDER_WEEK) - 1);
+        cmb_start_day.setSelectedIndex(Math.max(SYSPropsTools.getInteger(SYSPropsTools.KEY_CALC_MEDI_START_ORDER_WEEK, DayOfWeek.MONDAY.getValue()) - 1, 0));
         cmb_start_day.addItemListener(e -> SYSPropsTools.storeInteger(SYSPropsTools.KEY_CALC_MEDI_START_ORDER_WEEK, cmb_start_day.getSelectedIndex() + 1));
         cmb_start_day.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
             DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
@@ -57,17 +57,6 @@ public class PnlMedication extends DefaultPanel {
          */
         mainPanel.setLayout(new RiverLayout());
 
-
-//        JPanel yesnopnl = new JPanel();
-//        yesnopnl.setLayout(new BoxLayout(yesnopnl, BoxLayout.LINE_AXIS));
-//        yesnopnl.add(lbl);
-//        yesnopnl.add(btn);
-//
-//        JPanel cmbpanel = new JPanel();
-//        cmbpanel.setLayout(new BoxLayout(cmbpanel, BoxLayout.LINE_AXIS));
-//        cmbpanel.add(new JLabel("Bestell Woche beginnt: "));
-//        cmbpanel.add(cmb_start_day);
-
         mainPanel.add("p left", lbl);
         mainPanel.add("tab", btn);
 
@@ -80,37 +69,5 @@ public class PnlMedication extends DefaultPanel {
     }
 
 
-//    private void createCountryList() {
-//
-//
-//
-//           String[] countries = new String[]{"germany", "austria", "switzerland"};
-//           cmbCountry.setModel(SYSTools.list2cmb(Arrays.asList(countries)));
-//           cmbCountry.setRenderer(new ListCellRenderer() {
-//               @Override
-//               public Component getListCellRendererComponent(JList jList, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-//                   String text = SYSTools.xx("country." + value.toString());
-//                   return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, index, isSelected, cellHasFocus);
-//               }
-//           });
-//
-//           cmbCountry.addItemListener(new ItemListener() {
-//               @Override
-//               public void itemStateChanged(ItemEvent e) {
-//                   if (e.getStateChange() == ItemEvent.SELECTED) {
-//                       SYSPropsTools.storeProp(SYSPropsTools.KEY_COUNTRY, e.getItem().toString());
-//                   }
-//               }
-//           });
-//
-//
-//           if (OPDE.getProps().containsKey(SYSPropsTools.KEY_COUNTRY)) {
-//               cmbCountry.setSelectedItem(OPDE.getProps().getProperty(SYSPropsTools.KEY_COUNTRY));
-//           } else {
-//               cmbCountry.setSelectedItem("germany");
-//               SYSPropsTools.storeProp(SYSPropsTools.KEY_COUNTRY, "germany");
-//           }
-//
-//       }
 
 }

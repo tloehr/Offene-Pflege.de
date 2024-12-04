@@ -23,6 +23,7 @@ public class JavaTimeConverter {
         return toJavaLocalDateTime(one).toLocalDate().isAfter(toJavaLocalDateTime(two).toLocalDate());
     }
 
+
     public static Date toDate(LocalDate ld) {
         return toDate(ld.atStartOfDay());
     }

@@ -159,6 +159,22 @@ public class ResInfoTools {
         return resInfo;
     }
 
+    public static boolean is_between(ResInfo resInfo, java.time.LocalDateTime from, java.time.LocalDateTime to) {
+        if (resInfo.getResInfoType().getIntervalMode() != ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) return false;
+        java.time.LocalDateTime reference_time = JavaTimeConverter.toJavaLocalDateTime(resInfo.getFrom());
+        // inclusive comparison
+        return !reference_time.isBefore(from) && !reference_time.isAfter(to);
+    }
+
+
+    public static Optional<ResInfo> getLastResInfoWithinRange(Resident bewohner, ResInfoType bwinfotyp, java.time.LocalDateTime from, java.time.LocalDateTime to) {
+        Optional<ResInfo> opt_last_entry = Optional.ofNullable(getLastResinfo(bewohner, bwinfotyp));
+        if (opt_last_entry.isEmpty()) return opt_last_entry;
+        ResInfo last_entry = opt_last_entry.get();
+        if (is_between(last_entry, from, to)) return opt_last_entry;
+        return Optional.empty();
+    }
+
     /**
      * sucht den letzten Eintrag eines bestimmten Types.
      *
@@ -1733,7 +1749,7 @@ public class ResInfoTools {
         p = 0;
         for (LocalDate month = from; !month.isAfter(SYSCalendar.bom(new LocalDate())); month = month.plusMonths(1)) {
             p++;
-            progress.execute(new Pair<Integer, Integer>(p,Long.valueOf(interval.toDuration().getStandardDays() / 30l).intValue()));
+            progress.execute(new Pair<Integer, Integer>(p, Long.valueOf(interval.toDuration().getStandardDays() / 30l).intValue()));
             BigDecimal occupantDays = new BigDecimal(getOccupantDays(SYSCalendar.bom(month), SYSCalendar.min(SYSCalendar.eom(month), new LocalDate())));
             BigDecimal sumFalls = new BigDecimal(getFalls(SYSCalendar.bom(month), SYSCalendar.eom(month)).size());
             BigDecimal fallsIndicator = sumFalls.divide(occupantDays, 6, RoundingMode.HALF_UP).multiply(new BigDecimal(1000));

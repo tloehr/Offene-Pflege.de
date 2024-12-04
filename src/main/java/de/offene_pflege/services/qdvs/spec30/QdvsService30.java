@@ -1255,9 +1255,11 @@ public class QdvsService30 implements QdvsService {
         if (sturz > 0) { // es gab also mindestens einen Sturz
 
             // erhöter Unterstützungsbedarf
-            ArrayList<ResInfo> auswirkungen = ResInfoTools.getAll(resident, FALLAUSWIRKUNG, BEGINN_ERFASSUNGSZEITRAUM, STICHTAG);
-            if (!auswirkungen.isEmpty()) {
-                Properties auswirkung_props = ResInfoTools.getContent(auswirkungen.get(auswirkungen.size() - 1));
+            // es gilt immer der letzte Eintrag
+            // wenn er in dem Zeitraum ist. Sonst nicht.
+            Optional<ResInfo> opt_auswirkung = ResInfoTools.getLastResInfoWithinRange(resident, FALLAUSWIRKUNG, BEGINN_ERFASSUNGSZEITRAUM, STICHTAG);
+            opt_auswirkung.ifPresent(auswirkung ->{
+                Properties auswirkung_props = ResInfoTools.getContent(auswirkung);
                 if (auswirkung_props.getProperty("erhoehter_bedarf_alltag").equalsIgnoreCase("true")) {
                     DasQsDataType.STURZFOLGEN alltag = of.createDasQsDataTypeSTURZFOLGEN();
                     alltag.setValue(3);
@@ -1268,10 +1270,17 @@ public class QdvsService30 implements QdvsService {
                     mobilitaet.setValue(4);
                     qsData.getSTURZFOLGEN().add(mobilitaet);
                 }
-            }
+            });
+
             // Auswertung für Frakturen oder Arzt Kontakt
             boolean frakturen = false;
             boolean arzt = false;
+
+            // Sturzbedingte Brüche aus den fraktur02 einsammeln und mit auswerten.
+            for (ResInfo fraktur : ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_FRAKTUR), BEGINN_ERFASSUNGSZEITRAUM, STICHTAG)) {
+                Properties props = ResInfoTools.getContent(fraktur);
+                frakturen |= props.getProperty("fall", "false").equalsIgnoreCase("true");
+            }
 
             // schlimmste auswirkung über Sturzprotokolle muss ermittelt werden
             for (ResInfo s : stuerze) { // alle stürze durchsuchen und das schlimmste einsammlen (daher auch die OR verknüpfung)

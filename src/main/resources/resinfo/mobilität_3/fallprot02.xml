@@ -82,7 +82,7 @@
         <checkbox label="Platzwunde" name="laceration" layout="br"/>
         <checkbox label="Schürfwunde" name="graze" layout="left"/>
         <checkbox label="Hämatome" name="bruise" layout="left"/>
-        <checkbox label="Fraktur" name="fracture" layout="left"/>
+        <checkbox label="Fraktur" tooltip="Führt dazu, dass dieser Sturz mit in die MDK Erhebung aufgenommen wird." name="fracture" layout="left"/>
         <checkbox label="Schmerzen" name="pain" layout="left"/>
     </tabgroup>
     <textfield name="othertext5" label="Andere" hfill="false"/>
@@ -95,8 +95,8 @@
         <checkbox label="Wundverband" name="wound"/>
         <checkbox label="Lagerung / Kühlung" name="wound"/>
         <checkbox label="pflegerische Unterstützung" name="pflegerisch"/>
-        <checkbox label="Arztkontakt" name="gp"/>
-        <checkbox label="Krankenhauseinweisung" name="hospital"/>
+        <checkbox label="Arztkontakt" tooltip="Führt dazu, dass dieser Sturz mit in die MDK Erhebung aufgenommen wird." name="gp"/>
+        <checkbox label="Krankenhauseinweisung" tooltip="Führt dazu, dass dieser Sturz mit in die MDK Erhebung aufgenommen wird." name="hospital"/>
     </tabgroup>
     <textfield name="othertext6" label="Anmerkungen zu den Massnahmen" hfill="false"/>
 

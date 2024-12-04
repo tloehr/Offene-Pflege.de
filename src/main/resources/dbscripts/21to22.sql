@@ -1,0 +1,129 @@
+-- Ab Version 1.16.3
+UPDATE `sysprops`
+SET V = '22'
+WHERE K = 'dbstructure';
+-- Umwandlung von Intervall zu Zeitpunkt
+UPDATE `resinfotype`
+SET IntervalMode = 3
+WHERE BWINFTYP LIKE 'strzfolg01';
+--
+-- Korrektur der bestehenden Einträge
+UPDATE `resinfo`
+SET Bis = Von
+WHERE BWINFTYP LIKE 'strzfolg01';
+--
+-- tooltips nachgetragen bzgl. Frakturen und Arztkontakt
+UPDATE `resinfotype`
+SET XML = ' <qdvs optional="true"/>
+          <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+                 label="1. Grundlegende Angaben"/>
+
+          <tabgroup size="16" label="Datum und Uhrzeit des Sturzes" name="date1">
+              <textfield label="Datum" length="12" name="falldate" type="date" preset="currentdate"/>
+              <textfield label="Uhrzeit" length="12" name="falltime" type="time" layout="left" preset="currenttime"/>
+          </tabgroup>
+          <tabgroup size="16"
+                    label="letzter Zeitpunkt, wann die Person vor dem Sturz gesehen wurde."
+                    name="date2">
+              <textfield label="Datum" length="12" name="b4falldate" type="date" preset="currentdate"/>
+              <textfield label="Uhrzeit" length="12" name="b4falltime" type="time" layout="left" preset="currenttime"/>
+              <textfield name="textb4fall" label="Aktivitäten des Bewohners unmittelbar vor dem Sturz" innerlayout="br"
+                         hfill="false"/>
+          </tabgroup>
+
+          <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+                 label="2. Beschreibung des Sturzereignisses"/>
+          <optiongroup label="Sturzort" name="sturzort">
+              <option label="BW-Zimmer" name="room" default="true"/>
+              <option label="BW Badezimmer" name="bathroom"/>
+              <option label="Gemeinschafts-Badezimmer" name="commbathroom"/>
+              <option label="Flur" name="hallway"/>
+              <option label="Gemeinschaftsraum" name="livingroom" layout="br"/>
+              <option label="Außerhalb des Hauses" name="outside"/>
+              <option label="Sonstiges (siehe unten)" name="other1"/>
+          </optiongroup>
+          <textfield name="othertext1" label="Sonstiges oder Erläuterung" hfill="false"/>
+
+          <optiongroup label="Wie aufgefunden" name="aufgefunden">
+              <option label="auf dem Bauch liegend" name="bauch" default="true"/>
+              <option label="auf dem Rücken liegend" name="ruecken"/>
+              <option label="sitzend" name="sitzend"/>
+              <option label="kniend/kriechend" name="knie"/>
+              <option label="Sonstiges" name="sonst" layout="br"/>
+          </optiongroup>
+          <textfield name="aufgefundentext" default="" label="Beschreiben Sie, wie der BW aufgefunden wurde." length="30"
+                     hfill="true"
+                     layout="br left" depends-on="aufgefunden" visible-when-dependency-eq="sonst"
+                            default-value-when-shown=""/>
+
+          <optiongroup label="Körperstellung unmittelbar vor dem Sturz" name="b4fall">
+              <option label="Liegen" name="lying"/>
+              <option label="Sitzen" name="sitting"/>
+              <option label="Aufstehen/Hinsetzen vom/aufs Bett" name="getupsitdown1"/>
+              <option label="Aufstehen/Hinsetzen vom/auf Sessel/Stuhl" name="getupsitdown2" layout="br"/>
+              <option label="Aufstehen/Hinsetzen vom/auf Rollstuhl" name="getupsitdown3"/>
+              <option label="Aufstehen/Hinsetzen vom/auf Toilettenstuhl" name="getupsitdown4" layout="br"/>
+              <option label="Aufstehen/Hinsetzen (andere, bitte unten beschreiben)" name="getupsitdown5"/>
+              <option label="Stehen" name="standing" layout="br"/>
+              <option label="Gehen" name="walking" default="true"/>
+          </optiongroup>
+          <textfield name="othertext2" label="Andere" hfill="false"/>
+
+          <optiongroup label="Hilfsmittel" name="aux">
+              <option label="keine Hilfsmittel" name="none" default="true"/>
+              <option label="einseitige Gehhilfe" name="onesided"/>
+              <option label="beidseitige Gehhilfe" name="twosided"/>
+              <option label="Handstock" name="cane" layout="br"/>
+              <option label="Rollator" name="rollator"/>
+              <option label="Gehwagen (KG)" name="walker"/>
+              <option label="Andere, bitte unten beschreiben" name="other3"/>
+          </optiongroup>
+          <textfield name="othertext3" label="Andere" hfill="false"/>
+
+          <optiongroup label="Hindernisse/Umgebungsfaktoren" name="evironment"
+                       tooltip="Bedingungen, die durch die Umgebung vorgegeben sind, beeinflussen in ganz erheblichem Maße die Sturzgefährdung. Gerade im Begründungszusammenhang, warum es zu einem Sturzereignis gekommen ist, sollten Aspekte, die im Sturzumfeld liegen unbedingt beschrieben werden. Dies kann z.B. eine mangelhafte Beleuchtung, eine im Weg stehende Reisetasche, ein unebener oder besonders glatter Boden oder die Verwendung von nicht geeignetem Schuhwerk sein.">
+              <option label="keine" name="none" default="true"/>
+              <option label="Boden rutschig" name="slippery"/>
+              <option label="Hindernis im Weg" name="obstacle"/>
+              <option label="Beleuchtung unzureichend" name="badlight" layout="br"/>
+              <option label="Andere, bitte unten beschreiben" name="other4"/>
+          </optiongroup>
+          <textfield name="othertext4" label="Andere" hfill="false"/>
+
+          <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+                 label="3. Beschreibung der Sturzfolgen"/>
+          <tabgroup label="Verletzungfolgen" name="consequences" hfill="false">
+              <checkbox label="Platzwunde" name="laceration" layout="br"/>
+              <checkbox label="Schürfwunde" name="graze" layout="left"/>
+              <checkbox label="Hämatome" name="bruise" layout="left"/>
+              <checkbox label="Fraktur" tooltip="Führt dazu, dass dieser Sturz mit in die MDK Erhebung aufgenommen wird." name="fracture" layout="left"/>
+              <checkbox label="Schmerzen" name="pain" layout="left"/>
+          </tabgroup>
+          <textfield name="othertext5" label="Andere" hfill="false"/>
+          <textfield name="fear" label="Sturzangst" hfill="false"
+                     tooltip="zukünftige präventive Maßnahmen hängen von der Sturzangst des Patienten ab, da das Sturzereignis im Gedächtnis des Patienten haften bleibt und wissenschaftlich nachgewiesen ist, dass es einen negativen Einfluss auf ein mögliches weiteres Sturzgeschehen hat"/>
+
+          <label layout="br left hfill" size="20" fontstyle="bold" color="yellow" bgcolor="blue"
+                 label="4. Massnahmen nach dem Sturz"/>
+          <tabgroup name="massnahmen" label="Eingeleitete Maßnahmen" hfill="false">
+              <checkbox label="Wundverband" name="wound"/>
+              <checkbox label="Lagerung / Kühlung" name="wound"/>
+              <checkbox label="pflegerische Unterstützung" name="pflegerisch"/>
+              <checkbox label="Arztkontakt" tooltip="Führt dazu, dass dieser Sturz mit in die MDK Erhebung aufgenommen wird." name="gp"/>
+              <checkbox label="Krankenhauseinweisung" tooltip="Führt dazu, dass dieser Sturz mit in die MDK Erhebung aufgenommen wird." name="hospital"/>
+          </tabgroup>
+          <textfield name="othertext6" label="Anmerkungen zu den Massnahmen" hfill="false"/>
+
+          <url label="Das neue Formular \'Sturzprotokoll\' (Uni Bonn, siehe OPDE Quellen UNIBONN2008-01)"
+               link="https://www.offene-pflege.de/de/sources-de"/>'
+WHERE BWINFTYP LIKE 'fallprot02';
+#
+UPDATE `resinfotype`
+SET deprecated = 1,
+    equiv      = 151
+WHERE BWINFTYP LIKE 'fraktur01';
+#
+INSERT INTO `resinfotype` (BWINFTYP, XML, BWInfoKurz, BWInfoLang, BWIKID, type, version, IntervalMode, equiv,
+                           deprecated)
+VALUES ('fraktur02', '<qdvs optional="true"/><label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
+   <checkbox label="Knochenbruch aufgrund eines Sturzes" name="fall" layout="br left"/>', '', 15, 162, 0, 3, 0, 151, 0);
