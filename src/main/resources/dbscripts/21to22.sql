@@ -123,7 +123,8 @@ SET deprecated = 1,
     equiv      = 151
 WHERE BWINFTYP LIKE 'fraktur01';
 #
-INSERT INTO `resinfotype` (BWINFTYP, XML, BWInfoKurz, BWInfoLang, BWIKID, type, version, IntervalMode, equiv,
-                           deprecated)
+INSERT INTO `resinfotype` (BWINFTYP, XML, BWInfoKurz, BWInfoLang, BWIKID, type, version, IntervalMode, equiv, deprecated)
 VALUES ('fraktur02', '<qdvs optional="true"/><label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
-   <checkbox label="Knochenbruch aufgrund eines Sturzes" name="fall" layout="br left"/>', '', 15, 162, 0, 3, 0, 151, 0);
+   <checkbox label="Knochenbruch aufgrund eines Sturzes" name="fall" layout="br left"/>', 'Knochenbruch (Fraktur)', '',
+        15, 162, 0, 3, 151, 0);
+#
