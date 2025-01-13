@@ -941,25 +941,6 @@ public class ResInfoTools {
         return s;
 
     }
-//
-//    public static ResInfo getAnnotation4Prescription(Prescription prescription, Commontags tag) {
-//        EntityManager em = OPDE.createEM();
-//
-//        int resinfotype_type = -1;
-//        if (tag.getType() == CommontagsTools.TYPE_SYS_ANTIBIOTICS) {
-//            resinfotype_type = ResInfoTypeTools.TYPE_ANTIBIOTICS;
-//        }
-//        if (resinfotype_type == -1) return null;
-//
-//        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.prescription= :prescription AND b.bwinfotyp.type = :resinfotype ");
-//        query.setParameter("prescription", prescription);
-//        query.setParameter("resinfotype", resinfotype_type);
-//
-//        List<ResInfo> bwinfos = query.getResultList();
-//        em.close();
-//
-//        return bwinfos.isEmpty() ? null : bwinfos.get(0);
-//    }
 
     public static ResInfo getAnnotation4Prescription(Prescription prescription, Commontags tag) {
         for (ResInfo annotation : prescription.getAnnotations()) {

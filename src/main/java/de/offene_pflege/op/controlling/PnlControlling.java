@@ -34,7 +34,10 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 import com.toedter.calendar.JDateChooser;
+import de.offene_pflege.entity.prescription.Prescription;
+import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.reports.NReport;
+import de.offene_pflege.op.system.InternalClass;
 import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.services.StationService;
@@ -56,6 +59,9 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections4.keyvalue.MultiKey;
@@ -76,6 +82,7 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -988,58 +995,57 @@ public class PnlControlling extends CleanablePanel {
             worker.execute();
         });
 
-//        final JToggleButton btnNotify = new JToggleButton(SYSConst.icon22mailOFF);
-//        btnNotify.setSelectedIcon(SYSConst.icon22mailON);
-//        btnNotify.setSelected(NotificationTools.find(OPDE.getLogin().getUser(), NotificationTools.NKEY_DRUG_WEIGHT_CONTROL) != null);
-//        btnNotify.setToolTipText(SYSTools.xx("opde.notification.enable.for.this.topic"));
-//
-//        btnNotify.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//
-//                EntityManager em = OPDE.createEM();
-//                try {
-//                    em.getTransaction().begin();
-//                    Users user = em.merge(OPDE.getLogin().getUser());
-//                    em.lock(user, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//
-//                    if (e.getStateChange() == ItemEvent.SELECTED) {
-//                        Notification myNotification = em.merge(new Notification(NotificationTools.NKEY_DRUG_WEIGHT_CONTROL, user));
-//                        user.getNotifications().add(myNotification);
-//                    } else {
-//                        Notification myNotification = em.merge(NotificationTools.find(OPDE.getLogin().getUser(), NotificationTools.NKEY_DRUG_WEIGHT_CONTROL));
-//                        user.getNotifications().remove(myNotification);
-//                        em.remove(myNotification);
-//                    }
-//
-//                    em.getTransaction().commit();
-//                    OPDE.getLogin().setUser(user);
-//                } catch (OptimisticLockException ole) {
-//                    log.warn(ole);
-//                    if (em.getTransaction().isActive()) {
-//                        em.getTransaction().rollback();
-//                    }
-//                    if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-//                        OPDE.getMainframe().emptyFrame();
-//                        OPDE.getMainframe().afterLogin();
-//                    }
-//                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-//                } catch (Exception ex) {
-//                    if (em.getTransaction().isActive()) {
-//                        em.getTransaction().rollback();
-//                    }
-//                    OPDE.fatal(ex);
-//                } finally {
-//                    em.close();
-//                }
-//
-//            }
-//        });
-
         pnlWeightControllNarcotics.add(btnWeightControl, BorderLayout.WEST);
-//        pnlWeightControllNarcotics.add(btnNotify, BorderLayout.EAST);
         pnlContent.add(pnlWeightControllNarcotics);
 
+        /*
+          ____       ___                         ____   _     __
+         / __ \___  / _ \___ __ _  ___ ____  ___/ / /  (_)__ / /_
+        / /_/ / _ \/ // / -_)  ' \/ _ `/ _ \/ _  / /__/ (_-</ __/
+        \____/_//_/____/\__/_/_/_/\_,_/_//_/\_,_/____/_/___/\__/
+
+         */
+        JPanel pnlOnDemandList = new JPanel(new BorderLayout());
+        final JButton btnOnDemandList = GUITools.createHyperlinkButton("Bedarfsverordnungen", null, null);
+        btnOnDemandList.addActionListener(e -> {
+            OPDE.getMainframe().setBlocked(true);
+            SwingWorker worker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    final StringBuffer html = new StringBuffer(SYSConst.html_h1("Übersicht über Bedarfsverordnungen"));
+                    final Counter counter = new Counter();
+                    ArrayList<Resident> list_residents = ResidentTools.getAllActive();
+                    progressClosure.execute(new Pair<Integer, Integer>(counter.getCounter(), list_residents.size()));
+                    list_residents.stream().sorted().forEach(resident -> {
+                        html.append(SYSConst.html_h2(ResidentTools.getLabelText(resident)));
+                        progressClosure.execute(new Pair<Integer, Integer>(counter.increase(), list_residents.size()));
+                        ArrayList<Prescription> list_prescriptions = PrescriptionTools.getAllActiveOnDemandMedsOnly(resident);
+                        list_prescriptions.forEach(prescription -> {
+                            html.append(PrescriptionTools.toPrettyHTML(prescription)+"<br/>");
+                        });
+                        if (list_prescriptions.isEmpty()) html.append(SYSConst.html_h3("Keine Bedarfsverodnugen"));
+                    });
+                    return HTMLTools.toHTML(html.toString());
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        SYSFilesTools.print(get().toString(), true);
+                    } catch (ExecutionException ee) {
+                        OPDE.fatal(ee);
+                    } catch (InterruptedException ie) {
+                        // nop
+                    }
+
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                }
+            };
+            worker.execute();
+        });
+        pnlOnDemandList.add(btnOnDemandList, BorderLayout.WEST);
+        pnlContent.add(pnlOnDemandList);
 
         return pnlContent;
     }
@@ -1310,7 +1316,7 @@ public class PnlControlling extends CleanablePanel {
                     table.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(this_wound.getPITAsHTML(), "left", "top") +
                                     SYSConst.html_table_td(this_wound.getContentAsHTML() + "<p/>" +
-                                            NReportTools.getNReportsAsHTML(report_list, false, false, "", "", false, false)+
+                                            NReportTools.getNReportsAsHTML(report_list, false, false, "", "", false, false) +
                                             (this_wound.equals(letzte_wunde_in_dieser_serie) && letzte_wunde_in_dieser_serie.isClosed() ? "<h2 style=\"background-color:lightgreen\">\n" +
                                                     "Wunde ist abgeschlossen.\n" +
                                                     "</h2>" : ""))
@@ -1320,7 +1326,6 @@ public class PnlControlling extends CleanablePanel {
                 });
                 html.append(SYSConst.html_table(table.toString(), "1"));
                 html.append("<br/>");
-
 
 
             });
@@ -1396,4 +1401,13 @@ public class PnlControlling extends CleanablePanel {
     }
 
 
+}
+
+@Getter
+@NoArgsConstructor
+class Counter {
+    int counter = 0;
+    int increase() {
+        return counter++;
+    }
 }
