@@ -58,7 +58,7 @@
         <junit.version>4.13.2</junit.version>
         <lombok.version>1.18.24</lombok.version>
         <mysql.connector.version>8.0.32</mysql.connector.version>
-        <poi.ooxml.version>5.2.2</poi.ooxml.version>
+        <poi.ooxml.version>5.4.0</poi.ooxml.version>
         <swingx.core.version>1.6.5-1</swingx.core.version>
         <timing.framework.version>7.3.1</timing.framework.version>
         <xerces.version>2.12-beta-r1667115</xerces.version>
