@@ -35,7 +35,7 @@
         <commons.net.version>3.9.0</commons.net.version>
         <commons.text.version>1.10.0</commons.text.version>
         <eclipselink.version>2.7.10</eclipselink.version>
-        <guava.version>31.1-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <hibernate.validator.version>6.2.3.Final</hibernate.validator.version>
         <icu4j.version>71.1</icu4j.version> <!-- war 69.1 -->
         <javatuples.version>1.2</javatuples.version>
