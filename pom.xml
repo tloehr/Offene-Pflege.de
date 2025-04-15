@@ -61,7 +61,8 @@
         <poi.ooxml.version>5.2.2</poi.ooxml.version>
         <swingx.core.version>1.6.5-1</swingx.core.version>
         <timing.framework.version>7.3.1</timing.framework.version>
-        <xerces.version>2.12-beta-r1667115</xerces.version>
+        <jfiglet.version>0.0.9</jfiglet.version>
+        <xerces.version>2.12.2</xerces.version>
         <xml.bind.impl.version>3.0.2</xml.bind.impl.version>
         <xml.bind.version>3.0.1</xml.bind.version>
         <json.version>20231013</json.version>
@@ -70,7 +71,7 @@
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>
         <opde.major>1</opde.major>
         <opde.minor>16</opde.minor>
-        <opde.release>4</opde.release>
+        <opde.release>5</opde.release>
 <!--        this is the only place where the software looks for the proper dbversion-->
         <opde.dbversion>21</opde.dbversion>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -121,6 +122,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-digester3</artifactId>
             <version>${commons.digester3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.lalyos</groupId>
+            <artifactId>jfiglet</artifactId>
+            <version>${jfiglet.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -327,8 +333,8 @@
         </dependency>
         <!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
         <dependency>
-            <groupId>org.opengis.cite.xerces</groupId>
-            <artifactId>xercesImpl-xsd11</artifactId>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
             <version>${xerces.version}</version>
         </dependency>
         <dependency>

@@ -29,6 +29,7 @@ import de.offene_pflege.services.qdvs.QdvsService;
 import de.offene_pflege.services.qdvs.spec14.QdvsService14;
 import de.offene_pflege.services.qdvs.spec21.QdvsService21;
 import de.offene_pflege.services.qdvs.spec30.QdvsService30;
+import de.offene_pflege.services.qdvs.spec40.QdvsService40;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -466,8 +467,12 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
         } else if (STICHTAG.isBefore(LocalDate.of(2024, 1, 1))) {
             qdvsService = new QdvsService21(this);
         } else {
-            qdvsService = new QdvsService30(this);
+            qdvsService = new QdvsService40(this);
         }
+        // else if (STICHTAG.isBefore(LocalDate.of(2026, 1, 1))) {
+//        else {
+//            qdvsService = new QdvsService40(this);
+//        }
     }
 
     private java.util.List<Component> addCommands() {
