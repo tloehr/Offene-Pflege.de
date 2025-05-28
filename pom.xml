@@ -23,7 +23,7 @@
         <!-- Library Versions -->
         <!-- Versions checked June 2021 -->
         <com.itextpdf.version>5.5.13.3</com.itextpdf.version>
-        <commons.beanutils.version>1.9.4</commons.beanutils.version>
+        <commons.beanutils.version>1.11.0</commons.beanutils.version>
         <commons.cli.version>1.5.0</commons.cli.version>
         <commons.collections4.version>4.4</commons.collections4.version>
         <commons.csv.version>1.9.0</commons.csv.version>
