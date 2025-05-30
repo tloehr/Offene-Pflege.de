@@ -63,7 +63,7 @@
         <checkbox name="fibrin" label="Fibrinbelag" layout="left"/>
         <checkbox name="fnekr" label="Feuchte Nekrose" layout="left"/>
         <checkbox name="tnekr" label="Trockene Nekrose" layout="br"/>
-        <checkbox name="inseln" label="Wundheilungsinseln" layout="left"/>
+        <checkbox name="inseln" label="Inseln" layout="left"/>
         <checkbox name="hyper" label="Hypergranulation" layout="left"/>
     </tabgroup>
 
@@ -77,6 +77,7 @@
     </tabgroup>
 
     <tabgroup size="16" fontstyle="bold" label="Wundrand" name="tg3">
+        <checkbox name="blass2" label="blass" layout="left"/>
         <checkbox name="rosig2" label="rosig" layout="left"/>
         <checkbox name="rot2" label="rot" layout="left"/>
         <checkbox name="glatt2" label="glatt" layout="left"/>
@@ -92,6 +93,7 @@
     <tabgroup size="16" fontstyle="bold" label="Wundexsudat" name="tg4">
         <checkbox name="kein3" label="kein" layout="left"/>
         <checkbox name="wenig3" label="wenig" layout="left"/>
+        <checkbox name="maessig3" label="mäßig" layout="left"/>
         <checkbox name="viel3" label="viel" layout="left"/>
         <checkbox name="klar3" label="klar" layout="left"/>
         <checkbox name="blut3" label="blutig" layout="left"/>

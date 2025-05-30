@@ -10,27 +10,29 @@ package de.offene_pflege.services.qdvs.spec40.schema;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
+
+import de.offene_pflege.op.OPDE;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.annotation.XmlElementDecl;
 import jakarta.xml.bind.annotation.XmlRegistry;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the de.offene_pflege.services.qdvs.spec40.schema package. 
- * <p>An ObjectFactory allows you to programmatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
+ * generated in the de.offene_pflege.services.qdvs.spec40.schema package.
+ * <p>An ObjectFactory allows you to programmatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -39,16 +41,14 @@ public class ObjectFactory {
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: de.offene_pflege.services.qdvs.spec40.schema
-     * 
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link DasCommentationType }
-     * 
-     * @return
-     *     the new instance of {@link DasCommentationType }
+     *
+     * @return the new instance of {@link DasCommentationType }
      */
     public DasCommentationType createDasCommentationType() {
         return new DasCommentationType();
@@ -56,9 +56,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataMdsType }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataMdsType }
+     *
+     * @return the new instance of {@link DasQsDataMdsType }
      */
     public DasQsDataMdsType createDasQsDataMdsType() {
         return new DasQsDataMdsType();
@@ -66,9 +65,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataFacilityType }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataFacilityType }
+     *
+     * @return the new instance of {@link DasQsDataFacilityType }
      */
     public DasQsDataFacilityType createDasQsDataFacilityType() {
         return new DasQsDataFacilityType();
@@ -76,9 +74,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType }
+     *
+     * @return the new instance of {@link DasQsDataType }
      */
     public DasQsDataType createDasQsDataType() {
         return new DasQsDataType();
@@ -86,9 +83,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link RootType }
-     * 
-     * @return
-     *     the new instance of {@link RootType }
+     *
+     * @return the new instance of {@link RootType }
      */
     public RootType createRootType() {
         return new RootType();
@@ -96,19 +92,23 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link TextType }
-     * 
-     * @return
-     *     the new instance of {@link TextType }
+     *
+     * @return the new instance of {@link TextType }
      */
     public TextType createTextType() {
         return new TextType();
     }
 
+    public TextType createTextType(String text) {
+        TextType textType = new TextType();
+        textType.setValue(text);
+        return textType;
+    }
+
     /**
      * Create an instance of {@link LongTextType }
-     * 
-     * @return
-     *     the new instance of {@link LongTextType }
+     *
+     * @return the new instance of {@link LongTextType }
      */
     public LongTextType createLongTextType() {
         return new LongTextType();
@@ -116,49 +116,34 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link NumberType }
-     * 
-     * @return
-     *     the new instance of {@link NumberType }
+     *
+     * @return the new instance of {@link NumberType }
      */
     public NumberType createNumberType() {
         return new NumberType();
     }
 
-    /**
-     * Create an instance of {@link DateTimeType }
-     * 
-     * @return
-     *     the new instance of {@link DateTimeType }
-     */
-    public DateTimeType createDateTimeType() {
-        return new DateTimeType();
-    }
+
 
     /**
      * Create an instance of {@link DateType }
-     * 
-     * @return
-     *     the new instance of {@link DateType }
+     *
+     * @return the new instance of {@link DateType }
      */
     public DateType createDateType() {
         return new DateType();
     }
 
-    /**
-     * Create an instance of {@link GuidType }
-     * 
-     * @return
-     *     the new instance of {@link GuidType }
-     */
     public GuidType createGuidType() {
-        return new GuidType();
+        GuidType guidType = new GuidType();
+        guidType.setValue(UUID.randomUUID().toString());
+        return guidType;
     }
 
     /**
      * Create an instance of {@link RegistrationType }
-     * 
-     * @return
-     *     the new instance of {@link RegistrationType }
+     *
+     * @return the new instance of {@link RegistrationType }
      */
     public RegistrationType createRegistrationType() {
         return new RegistrationType();
@@ -179,12 +164,10 @@ public class ObjectFactory {
     }
 
 
-
     /**
      * Create an instance of {@link SpecificationType }
-     * 
-     * @return
-     *     the new instance of {@link SpecificationType }
+     *
+     * @return the new instance of {@link SpecificationType }
      */
     public SpecificationType createSpecificationType() {
         return new SpecificationType();
@@ -192,9 +175,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DeliveryStatusType }
-     * 
-     * @return
-     *     the new instance of {@link DeliveryStatusType }
+     *
+     * @return the new instance of {@link DeliveryStatusType }
      */
     public DeliveryStatusType createDeliveryStatusType() {
         return new DeliveryStatusType();
@@ -202,9 +184,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ValidationStatusType }
-     * 
-     * @return
-     *     the new instance of {@link ValidationStatusType }
+     *
+     * @return the new instance of {@link ValidationStatusType }
      */
     public ValidationStatusType createValidationStatusType() {
         return new ValidationStatusType();
@@ -212,19 +193,34 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ErrorType }
-     * 
-     * @return
-     *     the new instance of {@link ErrorType }
+     *
+     * @return the new instance of {@link ErrorType }
      */
     public ErrorType createErrorType() {
         return new ErrorType();
     }
 
     /**
+     * Create an instance of {@link DateTimeType }
+     */
+    public DateTimeType createDateTimeType() {
+        return createDateTimeType(LocalDateTime.now()); //ZoneId.of("Z")
+    }
+
+    public DateTimeType createDateTimeType(LocalDateTime ldt) {
+      DateTimeType dateTimeType = new DateTimeType();
+        try {
+            dateTimeType.setValue(DatatypeFactory.newInstance().newXMLGregorianCalendar(ldt.toString()));
+        } catch (DatatypeConfigurationException e) {
+            e.printStackTrace();
+        }
+        return dateTimeType;
+    }
+
+    /**
      * Create an instance of {@link ValRuleType }
-     * 
-     * @return
-     *     the new instance of {@link ValRuleType }
+     *
+     * @return the new instance of {@link ValRuleType }
      */
     public ValRuleType createValRuleType() {
         return new ValRuleType();
@@ -232,9 +228,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link HeaderType }
-     * 
-     * @return
-     *     the new instance of {@link HeaderType }
+     *
+     * @return the new instance of {@link HeaderType }
      */
     public HeaderType createHeaderType() {
         return new HeaderType();
@@ -242,9 +237,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DocumentType }
-     * 
-     * @return
-     *     the new instance of {@link DocumentType }
+     *
+     * @return the new instance of {@link DocumentType }
      */
     public DocumentType createDocumentType() {
         return new DocumentType();
@@ -252,29 +246,30 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link CareProviderType }
-     * 
-     * @return
-     *     the new instance of {@link CareProviderType }
+     *
+     * @return the new instance of {@link CareProviderType }
      */
     public CareProviderType createCareProviderType() {
         return new CareProviderType();
     }
 
     /**
-     * Create an instance of {@link SoftwareType }
-     * 
-     * @return
-     *     the new instance of {@link SoftwareType }
+     * Create an instance of {@link de.offene_pflege.services.qdvs.spec21.schema.SoftwareType }
      */
+
     public SoftwareType createSoftwareType() {
-        return new SoftwareType();
+        SoftwareType softwareType = new SoftwareType();
+        softwareType.setProvider(createTextType("Offene-Pflege.de"));
+        softwareType.setName(createTextType("OPDE"));
+        softwareType.setVersion(createTextType(OPDE.getAppInfo().getProperty("opde.major") + "." + OPDE.getAppInfo().getProperty("opde.minor")));
+        softwareType.setRelease(createTextType(OPDE.getAppInfo().getProperty("opde.release")));
+        return softwareType;
     }
 
     /**
      * Create an instance of {@link BodyType }
-     * 
-     * @return
-     *     the new instance of {@link BodyType }
+     *
+     * @return the new instance of {@link BodyType }
      */
     public BodyType createBodyType() {
         return new BodyType();
@@ -282,9 +277,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link CareDataType }
-     * 
-     * @return
-     *     the new instance of {@link CareDataType }
+     *
+     * @return the new instance of {@link CareDataType }
      */
     public CareDataType createCareDataType() {
         return new CareDataType();
@@ -292,9 +286,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link FacilityDataType }
-     * 
-     * @return
-     *     the new instance of {@link FacilityDataType }
+     *
+     * @return the new instance of {@link FacilityDataType }
      */
     public FacilityDataType createFacilityDataType() {
         return new FacilityDataType();
@@ -302,9 +295,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ResidentsType }
-     * 
-     * @return
-     *     the new instance of {@link ResidentsType }
+     *
+     * @return the new instance of {@link ResidentsType }
      */
     public ResidentsType createResidentsType() {
         return new ResidentsType();
@@ -312,9 +304,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ResidentType }
-     * 
-     * @return
-     *     the new instance of {@link ResidentType }
+     *
+     * @return the new instance of {@link ResidentType }
      */
     public ResidentType createResidentType() {
         return new ResidentType();
@@ -322,9 +313,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasCommentationType.KOMMENTAR }
-     * 
-     * @return
-     *     the new instance of {@link DasCommentationType.KOMMENTAR }
+     *
+     * @return the new instance of {@link DasCommentationType.KOMMENTAR }
      */
     public DasCommentationType.KOMMENTAR createDasCommentationTypeKOMMENTAR() {
         return new DasCommentationType.KOMMENTAR();
@@ -332,9 +322,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataMdsType.IDBEWOHNER }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataMdsType.IDBEWOHNER }
+     *
+     * @return the new instance of {@link DasQsDataMdsType.IDBEWOHNER }
      */
     public DasQsDataMdsType.IDBEWOHNER createDasQsDataMdsTypeIDBEWOHNER() {
         return new DasQsDataMdsType.IDBEWOHNER();
@@ -342,9 +331,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataMdsType.WOHNBEREICH }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataMdsType.WOHNBEREICH }
+     *
+     * @return the new instance of {@link DasQsDataMdsType.WOHNBEREICH }
      */
     public DasQsDataMdsType.WOHNBEREICH createDasQsDataMdsTypeWOHNBEREICH() {
         return new DasQsDataMdsType.WOHNBEREICH();
@@ -352,9 +340,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataMdsType.ERHEBUNGSDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataMdsType.ERHEBUNGSDATUM }
+     *
+     * @return the new instance of {@link DasQsDataMdsType.ERHEBUNGSDATUM }
      */
     public DasQsDataMdsType.ERHEBUNGSDATUM createDasQsDataMdsTypeERHEBUNGSDATUM() {
         return new DasQsDataMdsType.ERHEBUNGSDATUM();
@@ -362,9 +349,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataMdsType.EINZUGSDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataMdsType.EINZUGSDATUM }
+     *
+     * @return the new instance of {@link DasQsDataMdsType.EINZUGSDATUM }
      */
     public DasQsDataMdsType.EINZUGSDATUM createDasQsDataMdsTypeEINZUGSDATUM() {
         return new DasQsDataMdsType.EINZUGSDATUM();
@@ -372,9 +358,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataMdsType.GEBURTSMONAT }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataMdsType.GEBURTSMONAT }
+     *
+     * @return the new instance of {@link DasQsDataMdsType.GEBURTSMONAT }
      */
     public DasQsDataMdsType.GEBURTSMONAT createDasQsDataMdsTypeGEBURTSMONAT() {
         return new DasQsDataMdsType.GEBURTSMONAT();
@@ -382,9 +367,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataMdsType.GEBURTSJAHR }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataMdsType.GEBURTSJAHR }
+     *
+     * @return the new instance of {@link DasQsDataMdsType.GEBURTSJAHR }
      */
     public DasQsDataMdsType.GEBURTSJAHR createDasQsDataMdsTypeGEBURTSJAHR() {
         return new DasQsDataMdsType.GEBURTSJAHR();
@@ -392,9 +376,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataMdsType.AUSSCHLUSSGRUND }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataMdsType.AUSSCHLUSSGRUND }
+     *
+     * @return the new instance of {@link DasQsDataMdsType.AUSSCHLUSSGRUND }
      */
     public DasQsDataMdsType.AUSSCHLUSSGRUND createDasQsDataMdsTypeAUSSCHLUSSGRUND() {
         return new DasQsDataMdsType.AUSSCHLUSSGRUND();
@@ -402,9 +385,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataFacilityType.BELEGUNGAMSTICHTAG }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataFacilityType.BELEGUNGAMSTICHTAG }
+     *
+     * @return the new instance of {@link DasQsDataFacilityType.BELEGUNGAMSTICHTAG }
      */
     public DasQsDataFacilityType.BELEGUNGAMSTICHTAG createDasQsDataFacilityTypeBELEGUNGAMSTICHTAG() {
         return new DasQsDataFacilityType.BELEGUNGAMSTICHTAG();
@@ -412,9 +394,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.IDBEWOHNER }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.IDBEWOHNER }
+     *
+     * @return the new instance of {@link DasQsDataType.IDBEWOHNER }
      */
     public DasQsDataType.IDBEWOHNER createDasQsDataTypeIDBEWOHNER() {
         return new DasQsDataType.IDBEWOHNER();
@@ -422,9 +403,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.WOHNBEREICH }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.WOHNBEREICH }
+     *
+     * @return the new instance of {@link DasQsDataType.WOHNBEREICH }
      */
     public DasQsDataType.WOHNBEREICH createDasQsDataTypeWOHNBEREICH() {
         return new DasQsDataType.WOHNBEREICH();
@@ -432,9 +412,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.ERHEBUNGSDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.ERHEBUNGSDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.ERHEBUNGSDATUM }
      */
     public DasQsDataType.ERHEBUNGSDATUM createDasQsDataTypeERHEBUNGSDATUM() {
         return new DasQsDataType.ERHEBUNGSDATUM();
@@ -442,9 +421,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGSDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGSDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGSDATUM }
      */
     public DasQsDataType.EINZUGSDATUM createDasQsDataTypeEINZUGSDATUM() {
         return new DasQsDataType.EINZUGSDATUM();
@@ -452,9 +430,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GEBURTSMONAT }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GEBURTSMONAT }
+     *
+     * @return the new instance of {@link DasQsDataType.GEBURTSMONAT }
      */
     public DasQsDataType.GEBURTSMONAT createDasQsDataTypeGEBURTSMONAT() {
         return new DasQsDataType.GEBURTSMONAT();
@@ -462,9 +439,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GEBURTSJAHR }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GEBURTSJAHR }
+     *
+     * @return the new instance of {@link DasQsDataType.GEBURTSJAHR }
      */
     public DasQsDataType.GEBURTSJAHR createDasQsDataTypeGEBURTSJAHR() {
         return new DasQsDataType.GEBURTSJAHR();
@@ -472,9 +448,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.PFLEGEGRAD }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.PFLEGEGRAD }
+     *
+     * @return the new instance of {@link DasQsDataType.PFLEGEGRAD }
      */
     public DasQsDataType.PFLEGEGRAD createDasQsDataTypePFLEGEGRAD() {
         return new DasQsDataType.PFLEGEGRAD();
@@ -482,9 +457,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.APOPLEX }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.APOPLEX }
+     *
+     * @return the new instance of {@link DasQsDataType.APOPLEX }
      */
     public DasQsDataType.APOPLEX createDasQsDataTypeAPOPLEX() {
         return new DasQsDataType.APOPLEX();
@@ -492,9 +466,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.APOPLEXDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.APOPLEXDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.APOPLEXDATUM }
      */
     public DasQsDataType.APOPLEXDATUM createDasQsDataTypeAPOPLEXDATUM() {
         return new DasQsDataType.APOPLEXDATUM();
@@ -502,9 +475,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.FRAKTUR }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.FRAKTUR }
+     *
+     * @return the new instance of {@link DasQsDataType.FRAKTUR }
      */
     public DasQsDataType.FRAKTUR createDasQsDataTypeFRAKTUR() {
         return new DasQsDataType.FRAKTUR();
@@ -512,9 +484,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.FRAKTURDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.FRAKTURDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.FRAKTURDATUM }
      */
     public DasQsDataType.FRAKTURDATUM createDasQsDataTypeFRAKTURDATUM() {
         return new DasQsDataType.FRAKTURDATUM();
@@ -522,9 +493,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.HERZINFARKT }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.HERZINFARKT }
+     *
+     * @return the new instance of {@link DasQsDataType.HERZINFARKT }
      */
     public DasQsDataType.HERZINFARKT createDasQsDataTypeHERZINFARKT() {
         return new DasQsDataType.HERZINFARKT();
@@ -532,9 +502,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.HERZINFARKTDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.HERZINFARKTDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.HERZINFARKTDATUM }
      */
     public DasQsDataType.HERZINFARKTDATUM createDasQsDataTypeHERZINFARKTDATUM() {
         return new DasQsDataType.HERZINFARKTDATUM();
@@ -542,9 +511,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.AMPUTATION }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.AMPUTATION }
+     *
+     * @return the new instance of {@link DasQsDataType.AMPUTATION }
      */
     public DasQsDataType.AMPUTATION createDasQsDataTypeAMPUTATION() {
         return new DasQsDataType.AMPUTATION();
@@ -552,9 +520,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.AMPUTATIONDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.AMPUTATIONDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.AMPUTATIONDATUM }
      */
     public DasQsDataType.AMPUTATIONDATUM createDasQsDataTypeAMPUTATIONDATUM() {
         return new DasQsDataType.AMPUTATIONDATUM();
@@ -562,9 +529,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KHBEHANDLUNG }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KHBEHANDLUNG }
+     *
+     * @return the new instance of {@link DasQsDataType.KHBEHANDLUNG }
      */
     public DasQsDataType.KHBEHANDLUNG createDasQsDataTypeKHBEHANDLUNG() {
         return new DasQsDataType.KHBEHANDLUNG();
@@ -572,9 +538,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KHBEGINNDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KHBEGINNDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.KHBEGINNDATUM }
      */
     public DasQsDataType.KHBEGINNDATUM createDasQsDataTypeKHBEGINNDATUM() {
         return new DasQsDataType.KHBEGINNDATUM();
@@ -582,9 +547,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KHENDEDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KHENDEDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.KHENDEDATUM }
      */
     public DasQsDataType.KHENDEDATUM createDasQsDataTypeKHENDEDATUM() {
         return new DasQsDataType.KHENDEDATUM();
@@ -592,9 +556,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.BEWUSSTSEINSZUSTAND }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.BEWUSSTSEINSZUSTAND }
+     *
+     * @return the new instance of {@link DasQsDataType.BEWUSSTSEINSZUSTAND }
      */
     public DasQsDataType.BEWUSSTSEINSZUSTAND createDasQsDataTypeBEWUSSTSEINSZUSTAND() {
         return new DasQsDataType.BEWUSSTSEINSZUSTAND();
@@ -602,9 +565,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DIAGNOSEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DIAGNOSEN }
+     *
+     * @return the new instance of {@link DasQsDataType.DIAGNOSEN }
      */
     public DasQsDataType.DIAGNOSEN createDasQsDataTypeDIAGNOSEN() {
         return new DasQsDataType.DIAGNOSEN();
@@ -612,9 +574,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.MOBILPOSWECHSEL }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.MOBILPOSWECHSEL }
+     *
+     * @return the new instance of {@link DasQsDataType.MOBILPOSWECHSEL }
      */
     public DasQsDataType.MOBILPOSWECHSEL createDasQsDataTypeMOBILPOSWECHSEL() {
         return new DasQsDataType.MOBILPOSWECHSEL();
@@ -622,9 +583,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.MOBILSITZPOSITION }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.MOBILSITZPOSITION }
+     *
+     * @return the new instance of {@link DasQsDataType.MOBILSITZPOSITION }
      */
     public DasQsDataType.MOBILSITZPOSITION createDasQsDataTypeMOBILSITZPOSITION() {
         return new DasQsDataType.MOBILSITZPOSITION();
@@ -632,9 +592,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.MOBILUMSETZEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.MOBILUMSETZEN }
+     *
+     * @return the new instance of {@link DasQsDataType.MOBILUMSETZEN }
      */
     public DasQsDataType.MOBILUMSETZEN createDasQsDataTypeMOBILUMSETZEN() {
         return new DasQsDataType.MOBILUMSETZEN();
@@ -642,9 +601,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.MOBILFORTBEWEGUNG }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.MOBILFORTBEWEGUNG }
+     *
+     * @return the new instance of {@link DasQsDataType.MOBILFORTBEWEGUNG }
      */
     public DasQsDataType.MOBILFORTBEWEGUNG createDasQsDataTypeMOBILFORTBEWEGUNG() {
         return new DasQsDataType.MOBILFORTBEWEGUNG();
@@ -652,9 +610,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.MOBILTREPPENSTEIGEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.MOBILTREPPENSTEIGEN }
+     *
+     * @return the new instance of {@link DasQsDataType.MOBILTREPPENSTEIGEN }
      */
     public DasQsDataType.MOBILTREPPENSTEIGEN createDasQsDataTypeMOBILTREPPENSTEIGEN() {
         return new DasQsDataType.MOBILTREPPENSTEIGEN();
@@ -662,9 +619,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFERKENNEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFERKENNEN }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFERKENNEN }
      */
     public DasQsDataType.KKFERKENNEN createDasQsDataTypeKKFERKENNEN() {
         return new DasQsDataType.KKFERKENNEN();
@@ -672,9 +628,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFORIENTOERTLICH }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFORIENTOERTLICH }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFORIENTOERTLICH }
      */
     public DasQsDataType.KKFORIENTOERTLICH createDasQsDataTypeKKFORIENTOERTLICH() {
         return new DasQsDataType.KKFORIENTOERTLICH();
@@ -682,9 +637,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFORIENTZEITLICH }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFORIENTZEITLICH }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFORIENTZEITLICH }
      */
     public DasQsDataType.KKFORIENTZEITLICH createDasQsDataTypeKKFORIENTZEITLICH() {
         return new DasQsDataType.KKFORIENTZEITLICH();
@@ -692,9 +646,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFERINNERN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFERINNERN }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFERINNERN }
      */
     public DasQsDataType.KKFERINNERN createDasQsDataTypeKKFERINNERN() {
         return new DasQsDataType.KKFERINNERN();
@@ -702,9 +655,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFHANDLUNGEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFHANDLUNGEN }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFHANDLUNGEN }
      */
     public DasQsDataType.KKFHANDLUNGEN createDasQsDataTypeKKFHANDLUNGEN() {
         return new DasQsDataType.KKFHANDLUNGEN();
@@ -712,9 +664,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFENTSCHEIDUNGEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFENTSCHEIDUNGEN }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFENTSCHEIDUNGEN }
      */
     public DasQsDataType.KKFENTSCHEIDUNGEN createDasQsDataTypeKKFENTSCHEIDUNGEN() {
         return new DasQsDataType.KKFENTSCHEIDUNGEN();
@@ -722,9 +673,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFVERSTEHENINFO }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFVERSTEHENINFO }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFVERSTEHENINFO }
      */
     public DasQsDataType.KKFVERSTEHENINFO createDasQsDataTypeKKFVERSTEHENINFO() {
         return new DasQsDataType.KKFVERSTEHENINFO();
@@ -732,9 +682,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFGEFAHRERKENNEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFGEFAHRERKENNEN }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFGEFAHRERKENNEN }
      */
     public DasQsDataType.KKFGEFAHRERKENNEN createDasQsDataTypeKKFGEFAHRERKENNEN() {
         return new DasQsDataType.KKFGEFAHRERKENNEN();
@@ -742,9 +691,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFMITTEILEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFMITTEILEN }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFMITTEILEN }
      */
     public DasQsDataType.KKFMITTEILEN createDasQsDataTypeKKFMITTEILEN() {
         return new DasQsDataType.KKFMITTEILEN();
@@ -752,9 +700,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFVERSTEHENAUF }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFVERSTEHENAUF }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFVERSTEHENAUF }
      */
     public DasQsDataType.KKFVERSTEHENAUF createDasQsDataTypeKKFVERSTEHENAUF() {
         return new DasQsDataType.KKFVERSTEHENAUF();
@@ -762,9 +709,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KKFBETEILIGUNG }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KKFBETEILIGUNG }
+     *
+     * @return the new instance of {@link DasQsDataType.KKFBETEILIGUNG }
      */
     public DasQsDataType.KKFBETEILIGUNG createDasQsDataTypeKKFBETEILIGUNG() {
         return new DasQsDataType.KKFBETEILIGUNG();
@@ -772,9 +718,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVERNAEHRUNG }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVERNAEHRUNG }
+     *
+     * @return the new instance of {@link DasQsDataType.SVERNAEHRUNG }
      */
     public DasQsDataType.SVERNAEHRUNG createDasQsDataTypeSVERNAEHRUNG() {
         return new DasQsDataType.SVERNAEHRUNG();
@@ -782,9 +727,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVFREMDHILFE }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVFREMDHILFE }
+     *
+     * @return the new instance of {@link DasQsDataType.SVFREMDHILFE }
      */
     public DasQsDataType.SVFREMDHILFE createDasQsDataTypeSVFREMDHILFE() {
         return new DasQsDataType.SVFREMDHILFE();
@@ -792,9 +736,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVERNAEHRUNGUMFANG }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVERNAEHRUNGUMFANG }
+     *
+     * @return the new instance of {@link DasQsDataType.SVERNAEHRUNGUMFANG }
      */
     public DasQsDataType.SVERNAEHRUNGUMFANG createDasQsDataTypeSVERNAEHRUNGUMFANG() {
         return new DasQsDataType.SVERNAEHRUNGUMFANG();
@@ -802,9 +745,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVHARNKONTINENZ }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVHARNKONTINENZ }
+     *
+     * @return the new instance of {@link DasQsDataType.SVHARNKONTINENZ }
      */
     public DasQsDataType.SVHARNKONTINENZ createDasQsDataTypeSVHARNKONTINENZ() {
         return new DasQsDataType.SVHARNKONTINENZ();
@@ -812,9 +754,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVSTUHLKONTINENZ }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVSTUHLKONTINENZ }
+     *
+     * @return the new instance of {@link DasQsDataType.SVSTUHLKONTINENZ }
      */
     public DasQsDataType.SVSTUHLKONTINENZ createDasQsDataTypeSVSTUHLKONTINENZ() {
         return new DasQsDataType.SVSTUHLKONTINENZ();
@@ -822,9 +763,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVOBERKOERPER }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVOBERKOERPER }
+     *
+     * @return the new instance of {@link DasQsDataType.SVOBERKOERPER }
      */
     public DasQsDataType.SVOBERKOERPER createDasQsDataTypeSVOBERKOERPER() {
         return new DasQsDataType.SVOBERKOERPER();
@@ -832,9 +772,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVKOPF }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVKOPF }
+     *
+     * @return the new instance of {@link DasQsDataType.SVKOPF }
      */
     public DasQsDataType.SVKOPF createDasQsDataTypeSVKOPF() {
         return new DasQsDataType.SVKOPF();
@@ -842,9 +781,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVINTIMBEREICH }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVINTIMBEREICH }
+     *
+     * @return the new instance of {@link DasQsDataType.SVINTIMBEREICH }
      */
     public DasQsDataType.SVINTIMBEREICH createDasQsDataTypeSVINTIMBEREICH() {
         return new DasQsDataType.SVINTIMBEREICH();
@@ -852,9 +790,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVDUSCHENBADEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVDUSCHENBADEN }
+     *
+     * @return the new instance of {@link DasQsDataType.SVDUSCHENBADEN }
      */
     public DasQsDataType.SVDUSCHENBADEN createDasQsDataTypeSVDUSCHENBADEN() {
         return new DasQsDataType.SVDUSCHENBADEN();
@@ -862,9 +799,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVANAUSOBERKOERPER }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVANAUSOBERKOERPER }
+     *
+     * @return the new instance of {@link DasQsDataType.SVANAUSOBERKOERPER }
      */
     public DasQsDataType.SVANAUSOBERKOERPER createDasQsDataTypeSVANAUSOBERKOERPER() {
         return new DasQsDataType.SVANAUSOBERKOERPER();
@@ -872,9 +808,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVANAUSUNTERKOERPER }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVANAUSUNTERKOERPER }
+     *
+     * @return the new instance of {@link DasQsDataType.SVANAUSUNTERKOERPER }
      */
     public DasQsDataType.SVANAUSUNTERKOERPER createDasQsDataTypeSVANAUSUNTERKOERPER() {
         return new DasQsDataType.SVANAUSUNTERKOERPER();
@@ -882,9 +817,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVNAHRUNGZUBEREITEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVNAHRUNGZUBEREITEN }
+     *
+     * @return the new instance of {@link DasQsDataType.SVNAHRUNGZUBEREITEN }
      */
     public DasQsDataType.SVNAHRUNGZUBEREITEN createDasQsDataTypeSVNAHRUNGZUBEREITEN() {
         return new DasQsDataType.SVNAHRUNGZUBEREITEN();
@@ -892,9 +826,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVESSEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVESSEN }
+     *
+     * @return the new instance of {@link DasQsDataType.SVESSEN }
      */
     public DasQsDataType.SVESSEN createDasQsDataTypeSVESSEN() {
         return new DasQsDataType.SVESSEN();
@@ -902,9 +835,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVTRINKEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVTRINKEN }
+     *
+     * @return the new instance of {@link DasQsDataType.SVTRINKEN }
      */
     public DasQsDataType.SVTRINKEN createDasQsDataTypeSVTRINKEN() {
         return new DasQsDataType.SVTRINKEN();
@@ -912,9 +844,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVTOILETTE }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVTOILETTE }
+     *
+     * @return the new instance of {@link DasQsDataType.SVTOILETTE }
      */
     public DasQsDataType.SVTOILETTE createDasQsDataTypeSVTOILETTE() {
         return new DasQsDataType.SVTOILETTE();
@@ -922,9 +853,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVHARNKONTINENZBEW }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVHARNKONTINENZBEW }
+     *
+     * @return the new instance of {@link DasQsDataType.SVHARNKONTINENZBEW }
      */
     public DasQsDataType.SVHARNKONTINENZBEW createDasQsDataTypeSVHARNKONTINENZBEW() {
         return new DasQsDataType.SVHARNKONTINENZBEW();
@@ -932,9 +862,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SVSTUHLKONTINENZBEW }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SVSTUHLKONTINENZBEW }
+     *
+     * @return the new instance of {@link DasQsDataType.SVSTUHLKONTINENZBEW }
      */
     public DasQsDataType.SVSTUHLKONTINENZBEW createDasQsDataTypeSVSTUHLKONTINENZBEW() {
         return new DasQsDataType.SVSTUHLKONTINENZBEW();
@@ -942,9 +871,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GATAGESABLAUF }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GATAGESABLAUF }
+     *
+     * @return the new instance of {@link DasQsDataType.GATAGESABLAUF }
      */
     public DasQsDataType.GATAGESABLAUF createDasQsDataTypeGATAGESABLAUF() {
         return new DasQsDataType.GATAGESABLAUF();
@@ -952,9 +880,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GARUHENSCHLAFEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GARUHENSCHLAFEN }
+     *
+     * @return the new instance of {@link DasQsDataType.GARUHENSCHLAFEN }
      */
     public DasQsDataType.GARUHENSCHLAFEN createDasQsDataTypeGARUHENSCHLAFEN() {
         return new DasQsDataType.GARUHENSCHLAFEN();
@@ -962,9 +889,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GABESCHAEFTIGEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GABESCHAEFTIGEN }
+     *
+     * @return the new instance of {@link DasQsDataType.GABESCHAEFTIGEN }
      */
     public DasQsDataType.GABESCHAEFTIGEN createDasQsDataTypeGABESCHAEFTIGEN() {
         return new DasQsDataType.GABESCHAEFTIGEN();
@@ -972,9 +898,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GAPLANUNGEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GAPLANUNGEN }
+     *
+     * @return the new instance of {@link DasQsDataType.GAPLANUNGEN }
      */
     public DasQsDataType.GAPLANUNGEN createDasQsDataTypeGAPLANUNGEN() {
         return new DasQsDataType.GAPLANUNGEN();
@@ -982,9 +907,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GAINTERAKTION }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GAINTERAKTION }
+     *
+     * @return the new instance of {@link DasQsDataType.GAINTERAKTION }
      */
     public DasQsDataType.GAINTERAKTION createDasQsDataTypeGAINTERAKTION() {
         return new DasQsDataType.GAINTERAKTION();
@@ -992,9 +916,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GAKONTAKTPFLEGE }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GAKONTAKTPFLEGE }
+     *
+     * @return the new instance of {@link DasQsDataType.GAKONTAKTPFLEGE }
      */
     public DasQsDataType.GAKONTAKTPFLEGE createDasQsDataTypeGAKONTAKTPFLEGE() {
         return new DasQsDataType.GAKONTAKTPFLEGE();
@@ -1002,9 +925,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DEKUBITUS }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DEKUBITUS }
+     *
+     * @return the new instance of {@link DasQsDataType.DEKUBITUS }
      */
     public DasQsDataType.DEKUBITUS createDasQsDataTypeDEKUBITUS() {
         return new DasQsDataType.DEKUBITUS();
@@ -1012,9 +934,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DEKUBITUSSTADIUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DEKUBITUSSTADIUM }
+     *
+     * @return the new instance of {@link DasQsDataType.DEKUBITUSSTADIUM }
      */
     public DasQsDataType.DEKUBITUSSTADIUM createDasQsDataTypeDEKUBITUSSTADIUM() {
         return new DasQsDataType.DEKUBITUSSTADIUM();
@@ -1022,9 +943,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DEKUBITUS1BEGINNDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DEKUBITUS1BEGINNDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.DEKUBITUS1BEGINNDATUM }
      */
     public DasQsDataType.DEKUBITUS1BEGINNDATUM createDasQsDataTypeDEKUBITUS1BEGINNDATUM() {
         return new DasQsDataType.DEKUBITUS1BEGINNDATUM();
@@ -1032,9 +952,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DEKUBITUS1ENDEDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DEKUBITUS1ENDEDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.DEKUBITUS1ENDEDATUM }
      */
     public DasQsDataType.DEKUBITUS1ENDEDATUM createDasQsDataTypeDEKUBITUS1ENDEDATUM() {
         return new DasQsDataType.DEKUBITUS1ENDEDATUM();
@@ -1042,9 +961,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DEKUBITUS1LOK }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DEKUBITUS1LOK }
+     *
+     * @return the new instance of {@link DasQsDataType.DEKUBITUS1LOK }
      */
     public DasQsDataType.DEKUBITUS1LOK createDasQsDataTypeDEKUBITUS1LOK() {
         return new DasQsDataType.DEKUBITUS1LOK();
@@ -1052,9 +970,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DEKUBITUS2BEGINNDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DEKUBITUS2BEGINNDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.DEKUBITUS2BEGINNDATUM }
      */
     public DasQsDataType.DEKUBITUS2BEGINNDATUM createDasQsDataTypeDEKUBITUS2BEGINNDATUM() {
         return new DasQsDataType.DEKUBITUS2BEGINNDATUM();
@@ -1062,9 +979,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DEKUBITUS2ENDEDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DEKUBITUS2ENDEDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.DEKUBITUS2ENDEDATUM }
      */
     public DasQsDataType.DEKUBITUS2ENDEDATUM createDasQsDataTypeDEKUBITUS2ENDEDATUM() {
         return new DasQsDataType.DEKUBITUS2ENDEDATUM();
@@ -1072,9 +988,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.DEKUBITUS2LOK }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.DEKUBITUS2LOK }
+     *
+     * @return the new instance of {@link DasQsDataType.DEKUBITUS2LOK }
      */
     public DasQsDataType.DEKUBITUS2LOK createDasQsDataTypeDEKUBITUS2LOK() {
         return new DasQsDataType.DEKUBITUS2LOK();
@@ -1082,9 +997,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KOERPERGEWICHT }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KOERPERGEWICHT }
+     *
+     * @return the new instance of {@link DasQsDataType.KOERPERGEWICHT }
      */
     public DasQsDataType.KOERPERGEWICHT createDasQsDataTypeKOERPERGEWICHT() {
         return new DasQsDataType.KOERPERGEWICHT();
@@ -1092,9 +1006,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KOERPERGEWICHTDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KOERPERGEWICHTDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.KOERPERGEWICHTDATUM }
      */
     public DasQsDataType.KOERPERGEWICHTDATUM createDasQsDataTypeKOERPERGEWICHTDATUM() {
         return new DasQsDataType.KOERPERGEWICHTDATUM();
@@ -1102,9 +1015,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.KOERPERGEWICHTDOKU }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.KOERPERGEWICHTDOKU }
+     *
+     * @return the new instance of {@link DasQsDataType.KOERPERGEWICHTDOKU }
      */
     public DasQsDataType.KOERPERGEWICHTDOKU createDasQsDataTypeKOERPERGEWICHTDOKU() {
         return new DasQsDataType.KOERPERGEWICHTDOKU();
@@ -1112,9 +1024,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.STURZ }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.STURZ }
+     *
+     * @return the new instance of {@link DasQsDataType.STURZ }
      */
     public DasQsDataType.STURZ createDasQsDataTypeSTURZ() {
         return new DasQsDataType.STURZ();
@@ -1122,9 +1033,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.STURZFOLGEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.STURZFOLGEN }
+     *
+     * @return the new instance of {@link DasQsDataType.STURZFOLGEN }
      */
     public DasQsDataType.STURZFOLGEN createDasQsDataTypeSTURZFOLGEN() {
         return new DasQsDataType.STURZFOLGEN();
@@ -1132,9 +1042,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.GURT }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.GURT }
+     *
+     * @return the new instance of {@link DasQsDataType.GURT }
      */
     public DasQsDataType.GURT createDasQsDataTypeGURT() {
         return new DasQsDataType.GURT();
@@ -1142,9 +1051,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SEITENTEILE }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SEITENTEILE }
+     *
+     * @return the new instance of {@link DasQsDataType.SEITENTEILE }
      */
     public DasQsDataType.SEITENTEILE createDasQsDataTypeSEITENTEILE() {
         return new DasQsDataType.SEITENTEILE();
@@ -1152,9 +1060,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SCHMERZEN }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SCHMERZEN }
+     *
+     * @return the new instance of {@link DasQsDataType.SCHMERZEN }
      */
     public DasQsDataType.SCHMERZEN createDasQsDataTypeSCHMERZEN() {
         return new DasQsDataType.SCHMERZEN();
@@ -1162,9 +1069,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SCHMERZFREI }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SCHMERZFREI }
+     *
+     * @return the new instance of {@link DasQsDataType.SCHMERZFREI }
      */
     public DasQsDataType.SCHMERZFREI createDasQsDataTypeSCHMERZFREI() {
         return new DasQsDataType.SCHMERZFREI();
@@ -1172,9 +1078,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SCHMERZEINSCH }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SCHMERZEINSCH }
+     *
+     * @return the new instance of {@link DasQsDataType.SCHMERZEINSCH }
      */
     public DasQsDataType.SCHMERZEINSCH createDasQsDataTypeSCHMERZEINSCH() {
         return new DasQsDataType.SCHMERZEINSCH();
@@ -1182,9 +1087,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SCHMERZEINSCHDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SCHMERZEINSCHDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.SCHMERZEINSCHDATUM }
      */
     public DasQsDataType.SCHMERZEINSCHDATUM createDasQsDataTypeSCHMERZEINSCHDATUM() {
         return new DasQsDataType.SCHMERZEINSCHDATUM();
@@ -1192,9 +1096,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.SCHMERZEINSCHINFO }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.SCHMERZEINSCHINFO }
+     *
+     * @return the new instance of {@link DasQsDataType.SCHMERZEINSCHINFO }
      */
     public DasQsDataType.SCHMERZEINSCHINFO createDasQsDataTypeSCHMERZEINSCHINFO() {
         return new DasQsDataType.SCHMERZEINSCHINFO();
@@ -1202,9 +1105,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.NEUEINZUG }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.NEUEINZUG }
+     *
+     * @return the new instance of {@link DasQsDataType.NEUEINZUG }
      */
     public DasQsDataType.NEUEINZUG createDasQsDataTypeNEUEINZUG() {
         return new DasQsDataType.NEUEINZUG();
@@ -1212,9 +1114,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGNACHKZP }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGNACHKZP }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGNACHKZP }
      */
     public DasQsDataType.EINZUGNACHKZP createDasQsDataTypeEINZUGNACHKZP() {
         return new DasQsDataType.EINZUGNACHKZP();
@@ -1222,9 +1123,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGNACHKZPDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGNACHKZPDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGNACHKZPDATUM }
      */
     public DasQsDataType.EINZUGNACHKZPDATUM createDasQsDataTypeEINZUGNACHKZPDATUM() {
         return new DasQsDataType.EINZUGNACHKZPDATUM();
@@ -1232,9 +1132,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGKHBEHANDLUNG }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGKHBEHANDLUNG }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGKHBEHANDLUNG }
      */
     public DasQsDataType.EINZUGKHBEHANDLUNG createDasQsDataTypeEINZUGKHBEHANDLUNG() {
         return new DasQsDataType.EINZUGKHBEHANDLUNG();
@@ -1242,9 +1141,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGKHBEGINNDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGKHBEGINNDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGKHBEGINNDATUM }
      */
     public DasQsDataType.EINZUGKHBEGINNDATUM createDasQsDataTypeEINZUGKHBEGINNDATUM() {
         return new DasQsDataType.EINZUGKHBEGINNDATUM();
@@ -1252,9 +1150,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGKHENDEDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGKHENDEDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGKHENDEDATUM }
      */
     public DasQsDataType.EINZUGKHENDEDATUM createDasQsDataTypeEINZUGKHENDEDATUM() {
         return new DasQsDataType.EINZUGKHENDEDATUM();
@@ -1262,9 +1159,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGGESPR }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGGESPR }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGGESPR }
      */
     public DasQsDataType.EINZUGGESPR createDasQsDataTypeEINZUGGESPR() {
         return new DasQsDataType.EINZUGGESPR();
@@ -1272,9 +1168,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGGESPRDATUM }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGGESPRDATUM }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGGESPRDATUM }
      */
     public DasQsDataType.EINZUGGESPRDATUM createDasQsDataTypeEINZUGGESPRDATUM() {
         return new DasQsDataType.EINZUGGESPRDATUM();
@@ -1282,9 +1177,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGGESPRTEILNEHMER }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGGESPRTEILNEHMER }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGGESPRTEILNEHMER }
      */
     public DasQsDataType.EINZUGGESPRTEILNEHMER createDasQsDataTypeEINZUGGESPRTEILNEHMER() {
         return new DasQsDataType.EINZUGGESPRTEILNEHMER();
@@ -1292,9 +1186,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DasQsDataType.EINZUGGESPRDOKU }
-     * 
-     * @return
-     *     the new instance of {@link DasQsDataType.EINZUGGESPRDOKU }
+     *
+     * @return the new instance of {@link DasQsDataType.EINZUGGESPRDOKU }
      */
     public DasQsDataType.EINZUGGESPRDOKU createDasQsDataTypeEINZUGGESPRDOKU() {
         return new DasQsDataType.EINZUGGESPRDOKU();
@@ -1302,11 +1195,9 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link RootType }{@code >}
-     * 
-     * @param value
-     *     Java instance representing xml element's value.
-     * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link RootType }{@code >}
+     *
+     * @param value Java instance representing xml element's value.
+     * @return the new instance of {@link JAXBElement }{@code <}{@link RootType }{@code >}
      */
     @XmlElementDecl(namespace = "https://www.das-pflege.de", name = "root")
     public JAXBElement<RootType> createRoot(RootType value) {

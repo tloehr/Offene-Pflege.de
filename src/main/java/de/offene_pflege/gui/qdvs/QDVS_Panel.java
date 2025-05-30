@@ -466,13 +466,11 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
             qdvsService = new QdvsService14(this);
         } else if (STICHTAG.isBefore(LocalDate.of(2024, 1, 1))) {
             qdvsService = new QdvsService21(this);
+        } else if (STICHTAG.isBefore(LocalDate.of(2026, 1, 1))) {
+            qdvsService = new QdvsService30(this);
         } else {
             qdvsService = new QdvsService40(this);
         }
-        // else if (STICHTAG.isBefore(LocalDate.of(2026, 1, 1))) {
-//        else {
-//            qdvsService = new QdvsService40(this);
-//        }
     }
 
     private java.util.List<Component> addCommands() {
@@ -578,7 +576,8 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
     // der key ist ein Paar aus zeile und spalte des closing tags der zu dem Fehler gehört
     // der value ist eine Liste aller Fehler die dazu gehören
     // diese Fehlerliste lässt sich mit den Regeln der CSV Datei Matchen um die restlichen Daten zu den Regeln zu erhalten.
-    private MultiKeyMap<MultiKey<Integer>, ArrayList<String>> validateFile(File xmlFile, File xsdFile) throws SAXException, IOException, XMLStreamException {
+    private MultiKeyMap<MultiKey<Integer>, ArrayList<String>> validateFile(File xmlFile, File xsdFile) throws
+            SAXException, IOException, XMLStreamException {
         // 1. Lookup a factory for the W3C XML Schema language
         SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/XML/XMLSchema/v1.1");
 //                factory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.VALIDATE_ANNOTATIONS_FEATURE, true);
@@ -621,7 +620,8 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
      * @throws SAXException
      * @throws IOException
      */
-    private MultiKeyMap<MultiKey<Integer>, Long> getLookupTable(File xmlFile) throws ParserConfigurationException, SAXException, IOException {
+    private MultiKeyMap<MultiKey<Integer>, Long> getLookupTable(File xmlFile) throws
+            ParserConfigurationException, SAXException, IOException {
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         SAXParser parser = parserFactory.newSAXParser();
         XMLReader reader = parser.getXMLReader();
@@ -645,7 +645,8 @@ public class QDVS_Panel extends CleanablePanel implements AddTextListener {
             if (tnode.getType() <= TreeInfoNode.RESIDENT_RED) { // mieser Trick. :-D
                 Resident bw = (Resident) tnode.getUserObject();
                 String strResident = QdvsService14.toString(bw);
-                if (!liste_bewohner_zur_auswertung.contains(bw)) strResident = "<strike>" + strResident + "</strike>";
+                if (!liste_bewohner_zur_auswertung.contains(bw))
+                    strResident = "<strike>" + strResident + "</strike>";
                 Collections.list(tnode.children()).forEach(treeNode -> buffer.append(toHTML((DefaultMutableTreeNode) treeNode)));
                 if (buffer.length() > 0)
                     html = SYSConst.html_ul(SYSConst.html_li(strResident + SYSConst.html_ul(buffer.toString())));
