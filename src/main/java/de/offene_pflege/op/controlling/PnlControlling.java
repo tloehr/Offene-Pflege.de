@@ -1023,7 +1023,7 @@ public class PnlControlling extends CleanablePanel {
                         list_prescriptions.forEach(prescription -> {
                             html.append(PrescriptionTools.toPrettyHTML(prescription)+"<br/>");
                         });
-                        if (list_prescriptions.isEmpty()) html.append(SYSConst.html_h3("Keine Bedarfsverodnugen"));
+                        if (list_prescriptions.isEmpty()) html.append(SYSConst.html_h3("Keine Bedarfsverodnungen"));
                     });
                     return HTMLTools.toHTML(html.toString());
                 }
@@ -1046,6 +1046,64 @@ public class PnlControlling extends CleanablePanel {
         });
         pnlOnDemandList.add(btnOnDemandList, BorderLayout.WEST);
         pnlContent.add(pnlOnDemandList);
+
+
+
+        /*   __  __          _ _ __     __                 _
+            |  \/  | ___  __| (_)\ \   / /__ _ __ ___   __| |_ __  _   _ _ __   __ _  ___ _ __
+            | |\/| |/ _ \/ _` | | \ \ / / _ \ '__/ _ \ / _` | '_ \| | | | '_ \ / _` |/ _ \ '_ \
+            | |  | |  __/ (_| | |  \ V /  __/ | | (_) | (_| | | | | |_| | | | | (_| |  __/ | | |
+            |_|  |_|\___|\__,_|_|___\_/ \___|_|  \___/ \__,_|_| |_|\__,_|_| |_|\__, |\___|_| |_|
+                               |_____|                                         |___/
+         */
+        JPanel pnlAllMediList = new JPanel(new BorderLayout());
+        final JButton btnAllMediList = GUITools.createHyperlinkButton("Alle Verordnungen mit Medikamenten", null, null);
+        btnAllMediList.addActionListener(e -> {
+            OPDE.getMainframe().setBlocked(true);
+            SwingWorker worker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    final StringBuffer html = new StringBuffer(SYSConst.html_h1("Liste aller Verordnungen mit Medikamenten"));
+                    final Counter counter = new Counter();
+                    ArrayList<Resident> list_residents = ResidentTools.getAllActive();
+                    progressClosure.execute(new Pair<Integer, Integer>(counter.getCounter(), list_residents.size()));
+                    list_residents.stream().sorted().forEach(resident -> {
+                        //html.append(SYSConst.html_h2(ResidentTools.getLabelText(resident)));
+                        progressClosure.execute(new Pair<Integer, Integer>(counter.increase(), list_residents.size()));
+
+                        List<Prescription> list_prescriptions = PrescriptionTools.getAllActive(resident).stream()
+                                .filter(prescription -> prescription.hasMed())
+                                .sorted(Comparator.comparing(prescription -> prescription.getTradeForm().getMedProduct().getText()))
+                                .collect(Collectors.toList());
+                        html.append(PrescriptionTools.getPrescriptionsAsHTML(list_prescriptions, true, true, false, false, false));
+//                        list_prescriptions.stream().filter(prescription -> prescription.hasMed())
+//                                .forEach(prescription -> {
+//                            html.append(PrescriptionTools.getPrescriptionAsHTML(prescription, false, false, true, false)+"<br/>");
+//                        });
+//                        if (list_prescriptions.isEmpty()) html.append(SYSConst.html_h3("Keine Verodnungen"));
+                    });
+                    return HTMLTools.toHTML(html.toString());
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        SYSFilesTools.print(get().toString(), true);
+                    } catch (ExecutionException ee) {
+                        OPDE.fatal(ee);
+                    } catch (InterruptedException ie) {
+                        // nop
+                    }
+
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                }
+            };
+            worker.execute();
+        });
+        pnlAllMediList.add(btnAllMediList, BorderLayout.WEST);
+        pnlContent.add(pnlAllMediList);
+
 
         return pnlContent;
     }

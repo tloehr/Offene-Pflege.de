@@ -25,6 +25,7 @@
         </RollingFile>
 
     </Appenders>
+    <!-- Loglevels können nur zum Startzeitpunkt über die Kommandozeile gesetzt, danach geht das nicht mehr.-->
     <Loggers>
         <Root level="${sys:loglevel:-INFO}">
             <AppenderRef ref="RollingFile"/>

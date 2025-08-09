@@ -9,6 +9,7 @@ import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.building.Station;
 import de.offene_pflege.entity.nursingprocess.NursingProcessTools;
 import de.offene_pflege.entity.prescription.MedInventoryTools;
+import de.offene_pflege.entity.prescription.MedOrderTools;
 import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.process.QProcessTools;
 import de.offene_pflege.entity.system.OPUsers;
@@ -248,6 +249,7 @@ public class ResidentTools {
         // The prescriptions must be closed after the MedInventories. Ohterwise there may be a locking exception.
         PrescriptionTools.closeAll(em, resident, enddate);
         QProcessTools.closeAll(em, resident, enddate);
+        MedOrderTools.close_all(em, resident, JavaTimeConverter.toJavaLocalDateTime(enddate));
     }
 
     public static ArrayList<Resident> getAllActive(Homes homes) {

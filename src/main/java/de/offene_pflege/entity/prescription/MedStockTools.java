@@ -535,7 +535,9 @@ public class MedStockTools {
                 prevResident = bestand.getInventory().getResident();
             }
 
+            String bgcolor = zebra % 2 == 0 ? "lightgrey" : "white";
             table.append(SYSConst.html_table_tr(
+                    Optional.of(bgcolor),
                     SYSConst.html_table_td(ResidentTools.getTextCompact(bestand.getInventory().getResident())) +
                             SYSConst.html_table_td(bestand.getID().toString()) +
                             SYSConst.html_table_td(TradeFormTools.toPrettyString(bestand.getTradeForm())) +
@@ -548,7 +550,7 @@ public class MedStockTools {
                             SYSConst.html_table_td("&nbsp;") +
                             SYSConst.html_table_td("&nbsp;") +
                             SYSConst.html_table_td("&nbsp;")
-                    , zebra % 2 == 0));
+                    ));
         }
         html.append(SYSConst.html_table(table.toString(), "1"));
         return html.toString();

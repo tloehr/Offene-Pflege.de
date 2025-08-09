@@ -784,12 +784,14 @@ public class BHPTools {
 
             if (b1.isOnDemand()) {
                 table += SYSConst.html_table_tr(
+                        Optional.empty(),
                         SYSConst.html_table_th("nursingrecords.nursingprocess.interventions"),
                         SYSConst.html_table_th("misc.msg.state", "center"),
                         SYSConst.html_table_th("misc.msg.outcome", "center")
                 );
             } else {
                 table += SYSConst.html_table_tr(
+                        Optional.empty(),
                         SYSConst.html_table_th("nursingrecords.nursingprocess.interventions"),
                         SYSConst.html_table_th("misc.msg.state", "center")
                 );
@@ -817,6 +819,7 @@ public class BHPTools {
                     }
 
                     table += SYSConst.html_table_tr(
+                            Optional.empty(),
                             SYSConst.html_table_td(text, "top"),
                             SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUIDCiphered() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center"),
                             SYSConst.html_table_td(outcomeText, "center")
@@ -824,6 +827,7 @@ public class BHPTools {
 
                 } else {
                     table += SYSConst.html_table_tr(
+                            Optional.empty(),
                             SYSConst.html_table_td(text, "top"),
                             SYSConst.html_table_td(getStateAsHTML(bhp) + " " + (bhp.isOpen() ? "" : bhp.getUser().getUIDCiphered() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(bhp.getIst())), "center")
                     );
@@ -918,28 +922,35 @@ public class BHPTools {
 
 
     public static String getBHPsAsHTMLtable(List<BHP> list) {
+        /*
+         * 22.7.25: die Spritzen sollen farbig hinterlegt werden. Dazu verwende ich die Spalte Stellplan aus DosageForm. Die wird schon lange verwendet. Wert 2 heisst hervorheben
+         */
         String result = "";
 
         if (!list.isEmpty()) {
 
-            String table = SYSConst.html_table_tr(
+            StringBuilder table = new StringBuilder(SYSConst.html_table_tr(
+                    Optional.empty(),
                     SYSConst.html_table_th("BW"),
                     SYSConst.html_table_th("Medikament"),
                     SYSConst.html_table_th("Wann")
-            );
+            ));
 
+            final short INJECTION = 2;
 
             for (BHP bhp : list) {
 
+                Optional<String> bgcolor = bhp.getPrescription().getTradeForm().getDosageForm().getDailyPlan() == INJECTION ? Optional.of("yellow") : Optional.empty();
 
-                table += SYSConst.html_table_tr(
+                table.append(SYSConst.html_table_tr(
+                        bgcolor,
                         SYSConst.html_table_td(bhp.getResident().toString()),
                         SYSConst.html_table_td(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription())),
                         SYSConst.html_table_td(PrescriptionScheduleTools.getDoseAsCompactText(bhp.getPrescriptionSchedule(), false))
-                );
+                ));
             }
 
-            result = SYSConst.html_table(table, "1");
+            result = SYSConst.html_table(table.toString(), "1");
         }
 
         return result;

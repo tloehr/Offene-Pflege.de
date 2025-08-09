@@ -35,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * @author tloehr
@@ -320,16 +321,13 @@ public class SYSConst {
         return html_table_td(content, null);
     }
 
-    public static String html_table_td(String content, boolean bold) {
-        return html_table_td((bold ? "<b>" : "") + content + (bold ? "</b>" : ""), null);
-    }
 
-    public static String html_table_tr(String... content) {
+    public static String html_table_tr(Optional<String> bgcolor, String... content) {
         String row = "";
         for (String line : content) {
             row += line;
         }
-        return html_table_tr(row);
+        return html_table_tr(row, bgcolor);
     }
 
 
@@ -342,8 +340,13 @@ public class SYSConst {
         return "<tr>" + SYSTools.xx(content) + "</tr>\n";
     }
 
-    public static String html_table_tr(String content, boolean highlight) {
-        return "<tr " + (highlight ? "id=\"fonttextgray\"" : "") + ">" + SYSTools.xx(content) + "</tr>\n";
+    public static String html_table_tr(String content, Optional<String> bgcolor) {
+        return "<tr " +
+                (bgcolor.map(s -> String.format(" bgcolor=\"%s\"", s)).orElse("")) +
+                (bgcolor.isEmpty() || bgcolor.get().equals("white") ? "" : "id=\"fonttextgray\"")
+                + ">"
+                + SYSTools.xx(content) +
+                "</tr>\n";
     }
 
     public static String html_bold(String content) {
@@ -351,8 +354,8 @@ public class SYSConst {
     }
 
     public static String html_critical(String content) {
-            return html_paragraph(html_color(Color.red, content));
-        }
+        return html_paragraph(html_color(Color.red, content));
+    }
 
     public static String html_italic(String content) {
         return "<i>" + SYSTools.xx(content) + "</i>";
@@ -639,7 +642,7 @@ public class SYSConst {
     public static final Icon icon22todo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo.png"));
     public static final Icon icon22todoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo_pressed.png"));
     public static final Icon icon22checkbox = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/checkbox.png"));
-    public static final Icon icon22checked= new ImageIcon(SYSConst.class.getResource("/artwork/22x22/checked.png"));
+    public static final Icon icon22checked = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/checked.png"));
 
     public static final Icon icon22checkboxPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/checkbox_pressed.png"));
     public static final Icon icon22undo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/undo.png"));
@@ -744,7 +747,7 @@ public class SYSConst {
     public static String icon16kzp = "/artwork/16x16/stopwatch.png";
     public static String strIcon16ambulance = "/artwork/16x16/ambulance2.png";
     public static String strIcon22ambulance = "/artwork/22x22/ambulance2.png";
-//    public static String icon16bi = "/artwork/16x16/bi16.png";
+    //    public static String icon16bi = "/artwork/16x16/bi16.png";
     public static String icon16qi = "/artwork/16x16/tasks-solid-16.png";
     public static String icon16qiRed = "/artwork/16x16/tasks-solid-red-16.png";
     public static String icon22bi = "/artwork/22x22/bi22.png";

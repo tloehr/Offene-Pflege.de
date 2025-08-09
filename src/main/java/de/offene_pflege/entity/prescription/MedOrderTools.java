@@ -1,5 +1,6 @@
 package de.offene_pflege.entity.prescription;
 
+import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
@@ -61,6 +62,13 @@ public class MedOrderTools {
         return Optional.of(medOrder);
     }
 
+    public static void close_all(EntityManager em, Resident resident, LocalDateTime end) {
+        get_open_medorders(em).stream().filter(medOrder -> medOrder.getResident().equals(resident)).forEach(medOrder -> {
+            medOrder.setClosed_on(end);
+            medOrder.setClosed_by(OPDE.getLogin().getUser());
+        });
+    }
+
     public static Optional<MedOrder> find(EntityManager em, Resident resident, TradeForm tradeForm) {
         try {
             String jpql = " SELECT p " +
@@ -79,7 +87,6 @@ public class MedOrderTools {
         }
         return Optional.empty();
     }
-
 
     public static Optional<MedOrder> find(Prescription prescription) {
         EntityManager em = OPDE.createEM();
@@ -187,22 +194,6 @@ public class MedOrderTools {
             list.addAll(query.getResultList());
         } catch (Exception e) {
             OPDE.fatal(e);
-        }
-        return list;
-    }
-
-    public static List<MedOrder> get_medorders(int within_last_days) {
-        List<MedOrder> list = new ArrayList<>();
-        EntityManager em = OPDE.createEM();
-        try {
-            list = get_open_orders(em);
-            if (within_last_days > 0) {
-                list.addAll(get_closed_medorders(em, within_last_days));
-            }
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        } finally {
-            em.close();
         }
         return list;
     }

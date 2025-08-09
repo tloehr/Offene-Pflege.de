@@ -15,7 +15,6 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "syslog")
-
 public class Syslog implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

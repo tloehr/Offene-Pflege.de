@@ -107,7 +107,6 @@ public class PrescriptionTools {
 
             printDailyPlanAsPDF(station, query.getResultList());
 
-
             em.close();
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -350,18 +349,6 @@ public class PrescriptionTools {
         }
         return result;
     }
-
-    /**
-     * setzt das medikament aus dieser Verordnung auf die Bestellliste oder löscht sie davon, falls es schon drauf war.
-     *
-     * @param prescription
-     */
-    public static void toggle_order_status_for(Prescription prescription) {
-        if (!prescription.hasMed()) return;
-        // if (MedOrderTools.contains(prescription)) MedOrderTools.remove(prescription)
-        // else MedOrderTools.add(prescription);
-    }
-
 
     public static String getShortDescriptionAsCompactText(Prescription prescription) {
         String result = "";

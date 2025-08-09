@@ -543,7 +543,7 @@ public class PnlDev extends CleanablePanel {
 
         log.debug("reports");
         html.append("<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.reports") + "</h1>\n");
-        html.append(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate())), false, null, null));
+        html.append(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, new LocalDate(dcFrom.getDate()), new LocalDate(dcTo.getDate()), false), false, null, null));
 
 
     }

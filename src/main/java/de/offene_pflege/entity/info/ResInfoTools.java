@@ -1605,11 +1605,12 @@ public class ResInfoTools {
         for (LocalDate currentMonth : listMonths) {
             zebra++;
             for (Station station : listStation) {
+                String bgcolor = zebra % 2 == 0 ? "lightgrey" : "white";
                 table.append(SYSConst.html_table_tr(
                         SYSConst.html_table_td(monthFormatter.format(currentMonth.toDate())) +
                                 SYSConst.html_table_td(station.getName()) +
                                 SYSConst.html_table_td(statMap.get(currentMonth).get(station).toString(), "right")
-                        , zebra % 2 == 0   // <= highlight
+                        , Optional.of(bgcolor)   // <= highlight
                 ));
             }
         }

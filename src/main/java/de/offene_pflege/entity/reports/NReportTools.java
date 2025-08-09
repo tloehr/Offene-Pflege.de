@@ -439,9 +439,9 @@ public class NReportTools {
         if (nReport.isDeleted()) {
             result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getDelPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getDeletedBy().getFullname() + "<br/>";
         }
-        if (nReport.isReplacement() && !nReport.isReplaced()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getNewPIT()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
-        }
+//        if (nReport.isReplacement() && !nReport.isReplaced()) {
+//            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getNewPIT()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
+//        }
         if (nReport.isReplaced()) {
             result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
             result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
@@ -632,11 +632,15 @@ public class NReportTools {
         return list;
     }
 
-    public static ArrayList<NReport> getNReports(Resident resident, LocalDate ldfrom, LocalDate ldto) {
+    public static ArrayList<NReport> getNReports(Resident resident, LocalDate from, LocalDate to, boolean without_edited_or_deleted) {
+        DateTime start = from.toDateTimeAtStartOfDay();
+        DateTime end = SYSCalendar.eod(to);
+        return getNReports(resident, start, end, without_edited_or_deleted);
+    }
+
+    public static ArrayList<NReport> getNReports(Resident resident, DateTime from, DateTime to, boolean without_edited_or_deleted) {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
-        DateTime from = ldfrom.toDateTimeAtStartOfDay();
-        DateTime to = SYSCalendar.eod(ldto);
 
         log.debug(to);
         try {
@@ -655,6 +659,10 @@ public class NReportTools {
 
             list = new ArrayList<NReport>(query.getResultList());
 
+            if (without_edited_or_deleted) {
+                list.removeIf(NReport::isObsolete);
+            }
+
         } catch (Exception se) {
             OPDE.fatal(se);
         } finally {
@@ -663,102 +671,26 @@ public class NReportTools {
         return list;
     }
 
-    public static ArrayList<NReport> getNReports4Month(Resident resident, LocalDate month) {
-        EntityManager em = OPDE.createEM();
-        ArrayList<NReport> list = null;
+    public static ArrayList<NReport> getNReports4Month(Resident resident, LocalDate month, boolean without_edited_or_deleted) {
         DateTime from = SYSCalendar.bom(month).toDateTimeAtStartOfDay();
         DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
 
-        log.debug(to);
-        try {
-
-            String jpql = " SELECT nr " +
-                    " FROM NReport nr " +
-                    " WHERE nr.resident = :resident " +
-                    " AND nr.pit >= :from AND nr.pit <= :to " +
-                    " ORDER BY nr.pit ASC ";
-
-            Query query = em.createQuery(jpql);
-
-            query.setParameter("resident", resident);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
-
-            list = new ArrayList<NReport>(query.getResultList());
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return list;
+        return getNReports(resident, from, to, without_edited_or_deleted);
     }
 
-    public static ArrayList<NReport> getNReports4Week(Resident resident, LocalDate week) {
-        EntityManager em = OPDE.createEM();
-        ArrayList<NReport> list = null;
+    public static ArrayList<NReport> getNReports4Week(Resident resident, LocalDate week, boolean without_edited_or_deleted) {
         DateTime from = SYSCalendar.bow(week).toDateTimeAtStartOfDay();
         DateTime to = SYSCalendar.eod(SYSCalendar.eow(week));
 
-        log.debug(to);
-        try {
-
-            String jpql = " SELECT nr " +
-                    " FROM NReport nr " +
-                    " WHERE nr.resident = :resident " +
-                    " AND nr.pit >= :from AND nr.pit <= :to " +
-                    " ORDER BY nr.pit ASC ";
-
-            Query query = em.createQuery(jpql);
-
-            query.setParameter("resident", resident);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
-
-            list = new ArrayList<NReport>(query.getResultList());
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return list;
+        return getNReports(resident, from, to, without_edited_or_deleted);
     }
 
-    public static ArrayList<NReport> getNReports4Day(Resident resident, LocalDate day) {
-        EntityManager em = OPDE.createEM();
-        ArrayList<NReport> list = null;
+    public static ArrayList<NReport> getNReports4Day(Resident resident, LocalDate day, boolean without_edited_or_deleted) {
 
-//        log.debug(day.toString());
+        DateTime from = day.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(day);
 
-        try {
-
-            String jpql = " SELECT nr " +
-                    " FROM NReport nr " +
-                    " WHERE nr.resident = :resident " +
-                    " AND nr.pit >= :from AND nr.pit <= :to " +
-                    " ORDER BY nr.pit DESC ";
-
-            Query query = em.createQuery(jpql);
-
-            query.setParameter("resident", resident);
-            query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
-            query.setParameter("to", SYSCalendar.eod(day).toDate());
-
-//            long a = System.currentTimeMillis();
-
-            list = new ArrayList<NReport>(query.getResultList());
-
-//            long b = System.currentTimeMillis();
-
-//            log.debug((b - a) + " ms");
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return list;
+        return getNReports(resident, from, to, without_edited_or_deleted);
     }
 
     /**

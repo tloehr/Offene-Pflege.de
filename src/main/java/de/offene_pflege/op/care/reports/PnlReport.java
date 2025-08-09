@@ -1,28 +1,28 @@
 /*
  * OffenePflege
  * Copyright (C) 2006-2012 Torsten Löhr
- * This program is free software; you can redistribute it and/or modify it under the terms of the 
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License V2 as published by the Free Software Foundation
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with this program; if not, write to 
+ *
+ * You should have received a copy of the GNU General Public License along with this program; if not, write to
  * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  * www.offene-pflege.de
- * ------------------------ 
+ * ------------------------
  * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
- * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
+ * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License,
  * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
  *
- * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
- * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN
  * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
  *
- * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
+ * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
- * 
+ *
  */
 package de.offene_pflege.op.care.reports;
 
@@ -515,14 +515,14 @@ public class PnlReport extends NursingRecordsPanel {
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
-            final JButton btnPrintMonth = new JButton(SYSConst.icon22print2);
-            btnPrintMonth.setPressedIcon(SYSConst.icon22print2Pressed);
-            btnPrintMonth.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnPrintMonth.setContentAreaFilled(false);
-            btnPrintMonth.setBorder(null);
-            btnPrintMonth.setToolTipText(SYSTools.xx("misc.tooltips.btnprintmonth"));
-            btnPrintMonth.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, start, end), true, null, null), false));
-            cptitle.getRight().add(btnPrintMonth);
+            final JButton btnPrintYear = new JButton(SYSConst.icon22print2);
+            btnPrintYear.setPressedIcon(SYSConst.icon22print2Pressed);
+            btnPrintYear.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnPrintYear.setContentAreaFilled(false);
+            btnPrintYear.setBorder(null);
+            btnPrintYear.setToolTipText(SYSTools.xx("misc.tooltips.btnprintyear"));
+            btnPrintYear.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports(resident, start, end, !tbShowReplaced.isSelected()), true, null, null), false));
+            cptitle.getRight().add(btnPrintYear);
         }
 
 
@@ -624,7 +624,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintMonth.setContentAreaFilled(false);
             btnPrintMonth.setBorder(null);
             btnPrintMonth.setToolTipText(SYSTools.xx("misc.tooltips.btnprintmonth"));
-            btnPrintMonth.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month), true, null, null), false));
+            btnPrintMonth.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Month(resident, month, !tbShowReplaced.isSelected()), true, null, null), false));
             cptitle.getRight().add(btnPrintMonth);
         }
         cpMonth.setTitleLabelComponent(cptitle.getMain());
@@ -671,7 +671,7 @@ public class PnlReport extends NursingRecordsPanel {
         boolean sameMonth = now.dayOfMonth().withMaximumValue().equals(month.dayOfMonth().withMaximumValue());
 
         final LocalDate start = sameMonth ? now : SYSCalendar.eom(month);
-        
+
         // the end is usually the bom(of the current month). But there are some odd
         // circumstances (when the resident moved in during the first week within that month)
         // and the first day of that week belongs to the prior month, when this
@@ -730,7 +730,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintWeek.setContentAreaFilled(false);
             btnPrintWeek.setBorder(null);
             btnPrintWeek.setToolTipText(SYSTools.xx("misc.tooltips.btnprintweek"));
-            btnPrintWeek.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week), true, null, null), false));
+            btnPrintWeek.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Week(resident, week, !tbShowReplaced.isSelected()), true, null, null), false));
             cptitle.getRight().add(btnPrintWeek);
         }
 
@@ -817,7 +817,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintDay.setContentAreaFilled(false);
             btnPrintDay.setBorder(null);
             btnPrintDay.setToolTipText(SYSTools.xx("misc.tooltips.btnprintday"));
-            btnPrintDay.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day), true, null, null), false));
+            btnPrintDay.addActionListener(actionEvent -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Day(resident, day, !tbShowReplaced.isSelected()), true, null, null), false));
             titleCPDay.getRight().add(btnPrintDay);
         }
 
@@ -863,7 +863,7 @@ public class PnlReport extends NursingRecordsPanel {
         dayPanel.setOpaque(false);
         synchronized (valuecache) {
             if (!valuecache.containsKey(key)) {
-                valuecache.put(key, NReportTools.getNReports4Day(resident, day));
+                valuecache.put(key, NReportTools.getNReports4Day(resident, day, !tbShowReplaced.isSelected()));
             }
 
 
