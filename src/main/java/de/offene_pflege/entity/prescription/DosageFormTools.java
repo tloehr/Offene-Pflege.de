@@ -26,12 +26,11 @@ public class DosageFormTools {
 
     public static ArrayList<DosageForm> getAll() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT a FROM DosageForm a WHERE a.dailyPlan >= 0");
+        Query query = em.createQuery("SELECT m FROM DosageForm m WHERE m.dailyPlan >= 0 ORDER BY m.preparation, m.usageText");
         ArrayList<DosageForm> listDF = new ArrayList<DosageForm>(query.getResultList());
         em.close();
 
         return listDF;
-
     }
 
 

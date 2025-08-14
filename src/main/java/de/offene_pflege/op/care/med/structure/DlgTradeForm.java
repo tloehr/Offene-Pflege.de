@@ -49,6 +49,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
 
 /**
  * @author root
@@ -56,9 +57,6 @@ import java.awt.event.ItemEvent;
 public class DlgTradeForm extends MyJDialog {
     private TradeForm tradeForm;
     private boolean initPhase;
-
-
-
 
     private void btnEditActionPerformed(ActionEvent e) {
         PnlDosageForm pnl = new PnlDosageForm((DosageForm) cmbForm.getSelectedItem());
@@ -157,11 +155,15 @@ public class DlgTradeForm extends MyJDialog {
             cmbDaysWeeks.setSelectedIndex(pair.getFirst() > 0 ? 0 : 1);
         }
 
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
-        cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT m FROM DosageForm m WHERE m.dailyPlan >= 0 ORDER BY m.preparation, m.usageText");
+        ArrayList<DosageForm> list = DosageFormTools.getAll();
+        // falls diese DF ausgefiltert wurde.
+        if (!list.contains(tradeForm.getDosageForm())) list.add(tradeForm.getDosageForm());
+
+        cmbForm.setModel(SYSTools.list2cmb(list));
         cmbForm.setRenderer(DosageFormTools.getRenderer(0));
-        em.close();
+//        em.close();
 
         cmbForm.setSelectedItem(tradeForm.getDosageForm());
         txtZusatz.setText(SYSTools.catchNull(tradeForm.getSubtext()));
@@ -216,12 +218,6 @@ public class DlgTradeForm extends MyJDialog {
             jPanel1.add(txtZusatz, CC.xywh(3, 3, 5, 1));
 
             //---- cmbForm ----
-            cmbForm.setModel(new DefaultComboBoxModel<>(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
-            }));
             cmbForm.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbForm, CC.xywh(3, 5, 3, 1));
 
@@ -341,7 +337,7 @@ public class DlgTradeForm extends MyJDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
     private JTextField txtZusatz;
-    private JComboBox<String> cmbForm;
+    private JComboBox<DosageForm> cmbForm;
     private JPanel panel2;
     private JButton btnAdd;
     private JPanel hSpacer1;

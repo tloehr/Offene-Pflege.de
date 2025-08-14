@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * @author Torsten Löhr
@@ -67,16 +68,16 @@ public class PnlTradeForm extends JPanel {
 
     private void initPanel() {
 
+//
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery(" SELECT m FROM DosageForm m ");
+//
+//        java.util.List listDosageForm = DosageFormTools.getAll();
+//        Collections.sort(listDosageForm, Comparator.comparing(us -> DosageFormTools.toPrettyString((DosageForm) us)));
 
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery(" SELECT m FROM DosageForm m ");
-
-        java.util.List listDosageForm = query.getResultList();
-        Collections.sort(listDosageForm, (us, them) -> DosageFormTools.toPrettyString((DosageForm) us).compareTo(DosageFormTools.toPrettyString((DosageForm) them)));
-
-        cmbFormen.setModel(SYSTools.list2cmb(listDosageForm));
+        cmbFormen.setModel(SYSTools.list2cmb(DosageFormTools.getAll()));
         cmbFormen.setRenderer(DosageFormTools.getRenderer(0));
-        em.close();
+        //em.close();
 
         cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.Days"), SYSTools.xx("misc.msg.weeks")}));
 
@@ -267,8 +268,8 @@ public class PnlTradeForm extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
-            "2*(default, $lgap), default, $rgap, pref, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
+                "default, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
+                "2*(default, $lgap), default, $rgap, pref, 3*($lgap, default), $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));

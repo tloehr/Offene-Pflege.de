@@ -258,7 +258,7 @@ public class TradeFormTools {
         EntityManager em = OPDE.createEM();
         List<MedInventory> liste;
 
-        // 1. PrinterForm der gesuchten darreichung bestimmen.
+        // 1. DosageForm der gesuchten Darreichung bestimmen.
         DosageForm meineForm = tradeform.getDosageForm();
 
         // 2. Alle äquivalenten Formen dazu finden
@@ -268,7 +268,7 @@ public class TradeFormTools {
             query.setParameter("equiv", meineForm.getSameAs());
             aehnlicheFormen = query.getResultList();
         } else {
-            aehnlicheFormen = new ArrayList<DosageForm>();
+            aehnlicheFormen = new ArrayList<>();
             aehnlicheFormen.add(meineForm);
         }
 
