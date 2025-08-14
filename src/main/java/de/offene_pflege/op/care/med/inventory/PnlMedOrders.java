@@ -98,20 +98,17 @@ public class PnlMedOrders extends JPanel {
 
         SwingUtilities.invokeLater(() -> {
 
-            java.util.List<HasName> liste = new ArrayList();
+            java.util.List<GP> liste = new ArrayList();
             liste.addAll(GPTools.getAllActive());
-            liste.addAll(HospitalTools.getAll());
             Collections.sort(liste, (o1, o2) -> {
                 return o1.getName().compareTo(o2.getName());
             });
-            JComboBox<HasName> cmb = new JComboBox<>(SYSTools.list2cmb(liste));
+            JComboBox<GP> cmb = new JComboBox<>(SYSTools.list2cmb(liste));
             cmb.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                    return super.getListCellRendererComponent(list, (value instanceof GP ?
-                                    SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getFirstname(), SYSTools.INDEX_FIRSTNAME_MALE) :
-                                    ((Hospital) value).getName() + ", " + ((Hospital) value).getCity()
-                            ),
+                    return super.getListCellRendererComponent(list,
+                            SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getFirstname(), SYSTools.INDEX_FIRSTNAME_MALE),
                             index, isSelected, cellHasFocus);
                 }
             });
@@ -252,8 +249,7 @@ public class PnlMedOrders extends JPanel {
     }
 
     private String filter_text(MedOrder medOrder) {
-        return medOrder.getGp() != null ? medOrder.getGp().getName() :
-                medOrder.getHospital().getName();
+        return  medOrder.getGp().getName();
     }
 
     public void print(Optional<HasName> filter) {
@@ -281,11 +277,11 @@ public class PnlMedOrders extends JPanel {
                 HTMLTools.getTable(
                         HTMLTools.getTableRow("th", "fonttextgray", Arrays.asList(Arrays.copyOfRange(model.getHeader(), 0, cols - 3))) +
                                 table_content, "border=1"
-                )+getDosisAnmerkung(), false
+                ) + getDosisAnmerkung(), false
         );
     }
 
-    private String getDosisAnmerkung(){
+    private String getDosisAnmerkung() {
         return "<p><b>Regel</b>dosierungen werden in der Form <b><em>fm - mo - mi - nm - ab - sa</em></b> angegeben. Mit folgender Bedeutung</p>" +
                 "<ul>" +
                 "<li><b>fm</b> - früh morgens</li>\n" +

@@ -10,6 +10,7 @@ import de.offene_pflege.entity.prescription.*;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.structure.PnlDosageForm;
+import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -120,7 +121,7 @@ public class PnlTradeForm extends JPanel {
                 tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
             }
             // https://github.com/tloehr/Offene-Pflege.de/issues/34
-            btnAdd.setEnabled(lstDaf.getSelectedIndex() <= 0);
+            btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, "opde.medication") && lstDaf.getSelectedIndex() <= 0);
             cmbFormen.setEnabled(lstDaf.getSelectedIndex() <= 0);
             SYSTools.setXEnabled(pnlUPR, lstDaf.getSelectedIndex() <= 0);
             SYSTools.setXEnabled(panel1, lstDaf.getSelectedIndex() <= 0);

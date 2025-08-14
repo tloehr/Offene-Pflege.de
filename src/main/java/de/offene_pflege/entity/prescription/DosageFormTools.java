@@ -26,7 +26,7 @@ public class DosageFormTools {
 
     public static ArrayList<DosageForm> getAll() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT a FROM DosageForm a ");
+        Query query = em.createQuery("SELECT a FROM DosageForm a WHERE a.dailyPlan >= 0");
         ArrayList<DosageForm> listDF = new ArrayList<DosageForm>(query.getResultList());
         em.close();
 

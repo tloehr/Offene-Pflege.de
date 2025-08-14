@@ -752,19 +752,14 @@ public class PrescriptionTools {
         return prescriptions;
     }
 
-    public static List get_active_order_sources() {
+    public static List<GP> get_active_order_sources() {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
-                " SELECT p FROM Prescription p " +
-                " WHERE p.to >= :now ");
+                " SELECT DISTINCT p.docON FROM Prescription p " +
+                " WHERE p.to >= :now " +
+                " ORDER BY p.docON.name ");
         query.setParameter("now", new Date());
-        List list = (List) query.getResultList().stream().map(o -> {
-                    Prescription p = (Prescription) o;
-                    return p.getDocON() != null ? p.getDocON() : p.getHospitalON();
-                })
-                .distinct()
-                .sorted(Comparator.comparing(HasName::getName))
-                .collect(Collectors.toList());
+        ArrayList<GP> list = new ArrayList<GP>(query.getResultList());
         em.close();
 
         return list;

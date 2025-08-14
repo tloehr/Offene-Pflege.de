@@ -57,6 +57,9 @@ public class DlgTradeForm extends MyJDialog {
     private TradeForm tradeForm;
     private boolean initPhase;
 
+
+
+
     private void btnEditActionPerformed(ActionEvent e) {
         PnlDosageForm pnl = new PnlDosageForm((DosageForm) cmbForm.getSelectedItem());
 
@@ -199,25 +202,25 @@ public class DlgTradeForm extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         setModal(true);
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
         //======== jPanel1 ========
         {
             jPanel1.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
-                    "fill:14dlu, 2*($lgap, fill:default), $lgap, default, 2*($lgap, fill:default), $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
+                "fill:14dlu, 2*($lgap, fill:default), $lgap, default, 2*($lgap, fill:default), $lgap, 14dlu"));
 
             //---- txtZusatz ----
             txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(txtZusatz, CC.xywh(3, 3, 5, 1));
 
             //---- cmbForm ----
-            cmbForm.setModel(new DefaultComboBoxModel<>(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbForm.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbForm.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbForm, CC.xywh(3, 5, 3, 1));

@@ -529,7 +529,7 @@ public class SYSConst {
 //    public static final Icon icon22mailSend = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_send.png"));
 //    public static final Icon icon22mailGeneric = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_generic.png"));
 //    public static final Icon icon22mailGet = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_get.png"));
-//    public static final Icon icon22mailNew = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_new.png"));
+    public static final Icon icon22mailNew = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_new.png"));
 //    public static final Icon icon22mailReply = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_reply.png"));
 //    public static final Icon icon22mailReplayAll = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/mail_replyall.png"));
 

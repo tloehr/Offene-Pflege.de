@@ -268,7 +268,7 @@ public class PnlReport extends NursingRecordsPanel {
             pnlTags.setOpaque(false);
 
             for (final Commontags commontag : listUsedCommontags) {
-                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), true, null, null), false));
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesTools.print(NReportTools.getNReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag, tbShowReplaced.isSelected()), true, null, null), false));
                 btnTag.setForeground(GUITools.getColor(commontag.getColor()));
                 pnlTags.add(btnTag);
             }
@@ -865,7 +865,6 @@ public class PnlReport extends NursingRecordsPanel {
             if (!valuecache.containsKey(key)) {
                 valuecache.put(key, NReportTools.getNReports4Day(resident, day, !tbShowReplaced.isSelected()));
             }
-
 
             int i = 0; // for zebra pattern
             for (final NReport nreport : valuecache.get(key)) {

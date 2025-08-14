@@ -733,7 +733,7 @@ public class DlgOnDemand extends MyJDialog {
 
     private boolean saveOK() {
         if (ignoreEvent) return false;
-        boolean OnOK = (cmbDocON.getSelectedIndex() > 0 || cmbHospitalON.getSelectedIndex() > 0);
+        boolean OnOK = cmbDocON.getSelectedIndex() > 0;
 //        boolean OffOK = rbActive.isSelected() || jdcAB.getDate() != null;
         boolean sitOK = cmbSit.getSelectedItem() != null;
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;

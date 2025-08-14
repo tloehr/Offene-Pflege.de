@@ -304,7 +304,7 @@ public class DlgRegular extends MyJDialog {
                 thisWindowClosing(e);
             }
         });
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "$rgap, $lcgap, default, $lcgap, pref, $lcgap, $rgap",
             "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
@@ -567,7 +567,7 @@ public class DlgRegular extends MyJDialog {
         setLocationRelativeTo(getOwner());
 
         //---- bgMedikament ----
-        ButtonGroup bgMedikament = new ButtonGroup();
+        var bgMedikament = new ButtonGroup();
         bgMedikament.add(rbActive);
         bgMedikament.add(rbDate);
         bgMedikament.add(rbEndOfPackage);
@@ -696,15 +696,15 @@ public class DlgRegular extends MyJDialog {
             day = null;
         }
 
-        boolean OnOK = (cmbDocON.getSelectedItem() != null || cmbHospitalON.getSelectedIndex() > 0);
+        boolean OnOK = cmbDocON.getSelectedItem() != null;
         boolean OffOK = !rbDate.isSelected() || day != null;
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
         boolean intervOK = cmbIntervention.getSelectedItem() != null;
         boolean doseOK = tblDosis.getModel().getRowCount() > 0;
 
         String reason = "";
-        reason += (OnOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Arzt</b> oder KH sind unvollständig. ");
-        reason += (OffOK ? "" : "Die Informationen zum <b>ab</b>setzenden <b>Arzt</b> oder KH sind unvollständig. ");
+        reason += (OnOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Arzt</b> sind unvollständig.");
+        reason += (OffOK ? "" : "Die Informationen zum <b>ab</b>setzenden <b>Arzt</b> sind unvollständig. ");
         reason += (medOK ? "" : "Die <b>Medikamentenangabe</b> ist falsch. ");
         reason += (intervOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
         reason += (doseOK ? "" : "Sie müssen mindestens eine <b>Dosierung</b> angegeben. ");

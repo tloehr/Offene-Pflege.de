@@ -225,14 +225,10 @@ public class NReportTools {
     }
 
     public static String getNReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight) {
-        return getNReportsAsHTML(nReports, true, withlongheader, subtitle, highlight, true, true);
+        return getNReportsAsHTML(nReports, true, withlongheader, subtitle, highlight, true);
     }
 
-    public static String getNReportsAsHTML(List<NReport> nReports, boolean withHeader, boolean withlongheader, String subtitle, String highlight, boolean withObsoletes) {
-        return getNReportsAsHTML(nReports, withHeader, withlongheader, subtitle, highlight, withObsoletes, true);
-    }
-
-    public static String getNReportsAsHTML(List<NReport> nReports, boolean withHeader, boolean withlongheader, String subtitle, String highlight, boolean withObsoletes, boolean report_empty_list) {
+    public static String getNReportsAsHTML(List<NReport> nReports, boolean withHeader, boolean withlongheader, String subtitle, String highlight, boolean report_empty_list) {
         String result = "";
 
         if (!nReports.isEmpty()) {
@@ -248,7 +244,7 @@ public class NReportTools {
             LocalDate prevDate = null;
             for (NReport nreport : nReports) {
 
-                if (withObsoletes || !nreport.isObsolete()) {
+
 
                     LocalDate currentDate = new LocalDate(nreport.getPit());
 
@@ -276,7 +272,7 @@ public class NReportTools {
 //                    result = SYSConst.html_paragraph(html);
 
 
-                }
+
             }
 
             result += html;
@@ -290,76 +286,6 @@ public class NReportTools {
     }
 
 
-//    public static ArrayList<Element> getNReportsAsPDF(List<NReport> nReports, boolean withObsoletes) throws DocumentException, IOException {
-//        String result = "";
-//
-//        ArrayList<Element> listElements = new ArrayList<>();
-//
-//        String header = SYSTools.xx("nursingrecords.reports") + " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident());
-//
-//        Paragraph h1 = new Paragraph(new Phrase(header, PDF.plain(PDF.sizeH1())));
-//        h1.setAlignment(Element.ALIGN_CENTER);
-//        listElements.add(h1);
-//
-//
-//        Paragraph p = new Paragraph(SYSTools.xx("nursingrecords.prescription.dailyplan.warning"));
-//        p.setAlignment(Element.ALIGN_CENTER);
-//        listElements.add(p);
-//        listElements.add(Chunk.NEWLINE);
-//
-//        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
-//
-//        if (!nReports.isEmpty()) {
-//
-//
-//            LocalDate prevDate = null;
-//            for (NReport nreport : nReports) {
-//
-//                if (withObsoletes || !nreport.isObsolete()) {
-//
-//                    LocalDate currentDate = new LocalDate(nreport.getPit());
-//
-//                    if (prevDate == null || !prevDate.equals(currentDate)) {
-//                        prevDate = currentDate;
-//
-//                        Paragraph h2 = new Paragraph(new Phrase(currentDate.toString("EEEE, dd.MM.yyyy"), PDF.plain(PDF.sizeH2())));
-//                        h2.setAlignment(Element.ALIGN_CENTER);
-//                        listElements.add(h2);
-//                    }
-//
-//                    listElements.add(SYSConst.getPDF_16x16_tagPurple());
-//
-//                    html += SYSConst.html_bold(
-//
-//                            (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
-//                                    (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
-//                                    DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-//                                    " " + SYSTools.xx("misc.msg.Time.short") +
-//                                    ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
-//                                    ", " + nreport.getUser().getFullname() +
-//                                    (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
-//
-//                    );
-//
-//                    html += "<br/>";
-//                    html += getAsHTML(nreport, highlight);
-//
-//
-//                    //                    result = SYSConst.html_paragraph(html);
-//
-//
-//                }
-//            }
-//
-//            result += html;
-//
-//        } else {
-//            result = SYSConst.html_italic("misc.msg.noentryyet");
-//        }
-//
-//
-//        return listElements;
-//    }
 
     public static String getReportsAndHandoversAsHTML(List<QProcessElement> reports, String highlight, int year) {
         String html = "";
@@ -409,7 +335,6 @@ public class NReportTools {
 //        }
         return html;
     }
-
 
     public static String getDateAndUser(NReport nReport, boolean showIDs, boolean showMinutes) {
         String result = "";
@@ -820,9 +745,7 @@ public class NReportTools {
         return list;
     }
 
-    public static ArrayList<NReport> getNReports4Tags(Resident resident, Commontags tag) {
-
-
+    public static ArrayList<NReport> getNReports4Tags(Resident resident, Commontags tag, boolean with_edited_or_obsolete) {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
 
@@ -832,6 +755,7 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " JOIN nr.commontags t " +
                     " WHERE nr.resident = :resident " +
+                    (with_edited_or_obsolete ? "" : " AND nr.editedBy IS NULL ")  +
                     " AND t = :tag " +
 //                    " AND nr.pit >= :from AND nr.pit <= :to  " +
                     " ORDER BY nr.pit DESC ";

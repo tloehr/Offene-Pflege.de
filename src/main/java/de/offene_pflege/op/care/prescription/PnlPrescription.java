@@ -44,10 +44,7 @@ import de.offene_pflege.entity.system.UniqueTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.gui.interfaces.DefaultCPTitle;
 import de.offene_pflege.op.OPDE;
-import de.offene_pflege.op.care.med.inventory.DlgCloseStock;
-import de.offene_pflege.op.care.med.inventory.DlgNewStocks;
-import de.offene_pflege.op.care.med.inventory.DlgOpenStock;
-import de.offene_pflege.op.care.med.inventory.PnlExpiry;
+import de.offene_pflege.op.care.med.inventory.*;
 import de.offene_pflege.op.care.sysfiles.DlgFiles;
 import de.offene_pflege.op.process.DlgProcessAssign;
 import de.offene_pflege.op.system.InternalClassACL;
@@ -56,6 +53,7 @@ import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
+import org.apache.poi.sl.draw.geom.GuideIf;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -63,7 +61,6 @@ import org.joda.time.LocalDate;
 import javax.persistence.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
@@ -262,7 +259,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         final DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
         cpPres.setCollapsible(false);
         cptitle.getButton().setIcon(getIcon(prescription));
-        get_order_toggle(prescription).ifPresent(jButton -> {
+        get_order_button(prescription).ifPresent(jButton -> {
             cptitle.get_buttons_under_title().add(jButton);
             jButton.setHorizontalAlignment(SwingConstants.RIGHT);
         });
@@ -460,9 +457,37 @@ public class PnlPrescription extends NursingRecordsPanel {
         return cpPres;
     }
 
-    private Optional<JButton> get_order_toggle(final Prescription prescription) {
-        if (!prescription.hasMed() || !OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.medication"))
+    private Optional<JButton> get_order_button(final Prescription prescription) {
+        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, "opde.medication"))
             return Optional.empty();
+
+        if (prescription.isClosed())
+            return Optional.empty();
+
+        if (prescription.hasMed()) return Optional.of(get_toggle_button(prescription));
+
+        // if not
+        return Optional.of(get_order_text_button(prescription));
+    }
+
+    private JButton get_order_text_button(final Prescription prescription) {
+
+        Optional<MedOrder> optMedOrder = MedOrderTools.find(prescription);
+        String button_label = "Bestellung schreiben";
+        Icon icon = SYSConst.icon22mailNew;
+
+        JButton btnWriteOrderMessage = GUITools.createHyperlinkButton(button_label, icon, null);
+        btnWriteOrderMessage.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnWriteOrderMessage.addActionListener(actionEvent -> {
+            new DlgNewOrder(OPDE.getMainframe(),
+                    new ArrayList<>(List.of(prescription.getDocON())),
+                    new ArrayList<>(List.of(resident))).setVisible(true);
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.entrysuccessful"));
+        });
+        return btnWriteOrderMessage;
+    }
+
+    private JButton get_toggle_button(final Prescription prescription) {
         /**
          *  _____                 _         ___          _
          * |_   _|__   __ _  __ _| | ___   / _ \ _ __ __| | ___ _ __
@@ -501,7 +526,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 em.close();
             }
         });
-        return Optional.of(btnToggleOrderStatus);
+        return btnToggleOrderStatus;
     }
 
     private Icon getIcon(Prescription mypres) {

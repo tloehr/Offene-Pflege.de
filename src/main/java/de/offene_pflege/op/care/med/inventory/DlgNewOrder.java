@@ -29,11 +29,11 @@ import org.jdesktop.swingx.*;
  */
 public class DlgNewOrder extends JDialog {
 
-
-    public DlgNewOrder(JFrame owner) {
+    public DlgNewOrder(JFrame owner, ArrayList<GP> list_where_to_order, ArrayList<Resident> list_residents) {
         super(owner, true);
         initComponents();
-        cmbBW.setModel(new DefaultComboBoxModel(ResidentTools.getAllActive().toArray()));
+
+        cmbBW.setModel(new DefaultComboBoxModel(list_residents.toArray()));
         cmbBW.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -41,31 +41,31 @@ public class DlgNewOrder extends JDialog {
             }
         });
 
-        final java.util.List<HasName> list_where_to_order = new ArrayList();
-        list_where_to_order.addAll(GPTools.getAllActive());
-        list_where_to_order.addAll(HospitalTools.getAll());
-        Collections.sort(list_where_to_order, Comparator.comparing(HasName::getName));
+        list_where_to_order.sort(Comparator.comparing(HasName::getName));
+
         cmbWhereToOrder.setModel(SYSTools.list2cmb(list_where_to_order));
         cmbWhereToOrder.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return super.getListCellRendererComponent(list, (value instanceof GP ?
-                                SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getFirstname(), SYSTools.INDEX_FIRSTNAME_MALE) :
-                                ((Hospital) value).getName() + ", " + ((Hospital) value).getCity()
-                        ),
+                return super.getListCellRendererComponent(list,
+                        SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getFirstname(), SYSTools.INDEX_FIRSTNAME_MALE),
                         index, isSelected, cellHasFocus);
             }
         });
 
-        String[] prop = StringUtils.split(OPDE.getProps().getProperty(this.getClass().getName() + ":cmbwhere", ""), ":");
-        if (prop.length > 1) {
-            long id = Long.parseLong(prop[1]);
-            if (prop[0].equalsIgnoreCase("gp")) {
-                list_where_to_order.stream().filter(hasName -> hasName instanceof GP && ((GP) hasName).getArztID().equals(id)).findFirst().ifPresent(hasName -> cmbWhereToOrder.setSelectedItem(hasName));
-            } else if (prop[0].equalsIgnoreCase("Hospital")) {
-                list_where_to_order.stream().filter(hasName ->  hasName instanceof Hospital && ((Hospital) hasName).getKhid().equals(id)).findFirst().ifPresent(hasName -> cmbWhereToOrder.setSelectedItem(hasName));
-            }
-        }
+//        String[] prop = StringUtils.split(OPDE.getProps().getProperty(this.getClass().getName() + ":cmbwhere", ""), ":");
+//        if (prop.length > 1) {
+//            long id = Long.parseLong(prop[1]);
+//            if (prop[0].equalsIgnoreCase("gp")) {
+//                list_where_to_order.stream().filter(hasName -> hasName instanceof GP && ((GP) hasName).getArztID().equals(id)).findFirst().ifPresent(hasName -> cmbWhereToOrder.setSelectedItem(hasName));
+//            } else if (prop[0].equalsIgnoreCase("Hospital")) {
+//                list_where_to_order.stream().filter(hasName ->  hasName instanceof Hospital && ((Hospital) hasName).getKhid().equals(id)).findFirst().ifPresent(hasName -> cmbWhereToOrder.setSelectedItem(hasName));
+//            }
+//        }
+    }
+
+    public DlgNewOrder(JFrame owner) {
+        this(owner, GPTools.getAllActive(), ResidentTools.getAllActive());
     }
 
     private void cancel(ActionEvent e) {
@@ -83,7 +83,7 @@ public class DlgNewOrder extends JDialog {
         if (hasName instanceof GP) medOrder.setGp((GP) hasName);
         else medOrder.setHospital((Hospital) hasName);
         medOrder.setClosing_med_stock(null);
-        medOrder.setNote(StringUtils.abbreviate(textField1.getText().trim(),200));
+        medOrder.setNote(StringUtils.abbreviate(textField1.getText().trim(), 200));
         EntityTools.persist(medOrder);
         dispose();
     }
@@ -173,7 +173,7 @@ public class DlgNewOrder extends JDialog {
     private JPanel contentPanel;
     private JLabel label1;
     private JTextArea textField1;
-    private JComboBox<HasName> cmbWhereToOrder;
+    private JComboBox<GP> cmbWhereToOrder;
     private JComboBox<Resident> cmbBW;
     private JPanel buttonBar;
     private JButton cancelButton;

@@ -1291,7 +1291,6 @@ public class ResInfoTools {
          */
         String result = "<h1 id=\"fonth1\">Pflegeinformationen</h1>";
 
-        DateFormat df = DateFormat.getDateInstance();
         if (withlongheader) {
             result += "<h2 id=\"fonth2\">" + ResidentTools.getLabelText(resident) + "</h2>";
         }

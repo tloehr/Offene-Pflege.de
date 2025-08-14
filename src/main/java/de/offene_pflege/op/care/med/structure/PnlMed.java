@@ -394,7 +394,7 @@ public class PnlMed extends CleanablePanel {
         cmb_filter_for_generate.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return super.getListCellRendererComponent(list, value == null ? "für alle" : SYSTools.anonymizeName(((HasName) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
+                return super.getListCellRendererComponent(list, value == null ? "für alle" : SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
             }
         });
         list.add(cmb_filter_for_generate);

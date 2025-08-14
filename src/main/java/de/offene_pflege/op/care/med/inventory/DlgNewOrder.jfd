@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "7.0.7.1.1184" Java: "11.0.14.1" encoding: "UTF-8"
+JFDML JFormDesigner: "8.2.4.0.393" Java: "21.0.7" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -34,7 +34,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JComboBox" ) {
 						name: "cmbWhereToOrder"
 						auxiliary() {
-							"JavaCodeGenerator.typeParameters": "HasName"
+							"JavaCodeGenerator.typeParameters": "GP"
 						}
 						addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "cmbWhereToOrderItemStateChanged", true ) )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {

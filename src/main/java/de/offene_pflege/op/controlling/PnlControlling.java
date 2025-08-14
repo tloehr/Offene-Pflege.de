@@ -1374,7 +1374,7 @@ public class PnlControlling extends CleanablePanel {
                     table.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(this_wound.getPITAsHTML(), "left", "top") +
                                     SYSConst.html_table_td(this_wound.getContentAsHTML() + "<p/>" +
-                                            NReportTools.getNReportsAsHTML(report_list, false, false, "", "", false, false) +
+                                            NReportTools.getNReportsAsHTML(report_list, false, false, "", "", false) +
                                             (this_wound.equals(letzte_wunde_in_dieser_serie) && letzte_wunde_in_dieser_serie.isClosed() ? "<h2 style=\"background-color:lightgreen\">\n" +
                                                     "Wunde ist abgeschlossen.\n" +
                                                     "</h2>" : ""))
