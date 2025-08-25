@@ -17,6 +17,7 @@ import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 
+import org.checkerframework.checker.units.qual.A;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.MutableInterval;
@@ -29,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author tloehr
@@ -615,7 +617,7 @@ public class NReportTools {
         DateTime from = day.toDateTimeAtStartOfDay();
         DateTime to = SYSCalendar.eod(day);
 
-        return getNReports(resident, from, to, without_edited_or_deleted);
+        return new ArrayList<>(getNReports(resident, from, to, without_edited_or_deleted).stream().sorted(Comparator.comparing(NReport::getPit).reversed()).collect(Collectors.toList()));
     }
 
     /**

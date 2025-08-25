@@ -30,7 +30,7 @@
         <commons.digester3.version>3.2</commons.digester3.version>
         <commons.exec.version>1.3</commons.exec.version>
         <commons.io.version>2.14.0</commons.io.version>
-        <commons.lang3.version>3.12.0</commons.lang3.version>
+        <commons.lang3.version>3.18.0</commons.lang3.version>
         <commons.log4j.version>2.17.2</commons.log4j.version>
         <commons.net.version>3.9.0</commons.net.version>
         <commons.text.version>1.10.0</commons.text.version>
@@ -57,8 +57,8 @@
         <joda.time.version>2.10.14</joda.time.version>
         <junit.version>4.13.2</junit.version>
         <lombok.version>1.18.24</lombok.version>
-        <mysql.connector.version>8.0.32</mysql.connector.version>
-        <poi.ooxml.version>5.2.2</poi.ooxml.version>
+        <mysql.connector.version>9.4.0</mysql.connector.version>
+        <poi.ooxml.version>5.4.1</poi.ooxml.version>
         <swingx.core.version>1.6.5-1</swingx.core.version>
         <timing.framework.version>7.3.1</timing.framework.version>
         <jfiglet.version>0.0.9</jfiglet.version>
@@ -72,7 +72,7 @@
         <opde.major>1</opde.major>
         <opde.minor>16</opde.minor>
         <opde.release>5</opde.release>
-<!--        this is the only place where the software looks for the proper dbversion-->
+<!--        this is the only place where the software looks for the proper dbversion -->
         <opde.dbversion>21</opde.dbversion>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
     </properties>
@@ -104,8 +104,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.connector.version}</version>
         </dependency>
         <dependency>

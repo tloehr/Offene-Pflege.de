@@ -105,11 +105,7 @@ public class QdvsService40 implements QdvsService {
     List<String> sturzfolg = List.of("keine", "Frakturen", "arztlich behandlungsbedürftige Wunde",
             "erhöhter Unterstützungsbedarf bei Alltagsverrichtungen",
             "erhöhter Unterstützungsbedarf bei Mobilität");
-    List<String> schmerzein = List.of("keine Informationen",
-            "Schmerzintensität",
-            "Schmerzqualität",
-            "Schmerzlokalisation",
-            "Folgen für Lebensalltag");
+
 
     @Override
     public Map<Resident, QdvsResidentInfoObject> getResidentInfoObjectMap() {

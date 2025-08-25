@@ -57,10 +57,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -148,7 +145,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
         ArrayList<SYSFiles> listFiles = new ArrayList<>(filesSet);
 
-        Collections.sort(listFiles);
+        Collections.sort(listFiles, Comparator.comparing(SYSFiles::getPit).reversed());
 
 //        createFilters();
         tmSYSFiles = new TMSYSFiles(listFiles);

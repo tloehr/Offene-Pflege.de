@@ -1149,7 +1149,7 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
     private void expandDay(LocalDate day) {
-        final String keyYear = Integer.toString(day.getYear()) + ".year";
+        final String keyYear = day.getYear() + ".year";
         if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
             try {
                 cpMap.get(keyYear).setCollapsed(false);

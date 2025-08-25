@@ -128,3 +128,6 @@ VALUES ('fraktur02', '<qdvs optional="true"/><label layout="br left hfill" size=
    <checkbox label="Knochenbruch aufgrund eines Sturzes" name="fall" layout="br left"/>', 'Knochenbruch (Fraktur)', '',
         15, 162, 0, 3, 151, 0);
 #
+-- Um unliebsame Formen loszuwerden (Stomaplatte)
+alter table `dosageform`
+    modify Stellplan tinyint(3) default 0 not null;
