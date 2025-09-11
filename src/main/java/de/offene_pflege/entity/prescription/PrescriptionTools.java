@@ -17,6 +17,7 @@ import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.system.Commontags;
 import de.offene_pflege.entity.system.CommontagsTools;
+import de.offene_pflege.entity.system.UsersTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.system.PDF;
 import de.offene_pflege.op.threads.DisplayMessage;
@@ -39,6 +40,9 @@ import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -1062,17 +1066,26 @@ public class PrescriptionTools {
     }
 
     public static String toPrettyHTML(Prescription verordnung) {
-        String myPretty = "";
+        final StringBuffer myPretty = new StringBuffer();
 
         if (verordnung.hasMed()) {
-            myPretty = "[" + verordnung.getID() + "] " + SYSConst.html_bold(TradeFormTools.toPrettyString(verordnung.getTradeForm()));
+            myPretty.append("[").append(verordnung.getID()).append("] ").append(SYSConst.html_bold(TradeFormTools.toPrettyString(verordnung.getTradeForm())));
         } else {
-            myPretty = SYSConst.html_bold(verordnung.getIntervention().getBezeichnung());
+            myPretty.append(SYSConst.html_bold(verordnung.getIntervention().getBezeichnung()));
         }
 
-        myPretty += verordnung.isOnDemand() ? " (" + SYSTools.xx("misc.msg.ondemand") + ": " + SYSConst.html_color(Color.blue, verordnung.getSituation().getText()) + ")" : "";
+        if (verordnung.isOnDemand()) {
+            myPretty.append(" (").append(SYSTools.xx("misc.msg.ondemand")).append(": ").append(SYSConst.html_color(Color.blue, verordnung.getSituation().getText()));
+            BHPTools.getLastBHP(verordnung).ifPresent(bhp -> {
+                if (bhp.hasMed()) myPretty.append(", Zuletzt am: ")
+                        .append(LocalDateTime.ofInstant(bhp.getIst().toInstant(), ZoneId.systemDefault()).format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)))
+                        .append(", "+ UsersTools.getFullname(bhp.getUser()));
+            });
+            myPretty.append(")");
+        }
 
-        return myPretty;
+
+        return myPretty.toString();
     }
 
 

@@ -51,7 +51,6 @@ import java.util.*;
 public class SYSCalendar {
 
     // Both for DFN and BHP
-    public static final byte SHIFT_OUTCOMES = -2;
     public static final byte SHIFT_ON_DEMAND = -1;
     public static final byte SHIFT_VERY_EARLY = 0;
     public static final byte SHIFT_EARLY = 1;
@@ -1172,8 +1171,6 @@ public class SYSCalendar {
     public static Color getFGSHIFT(Byte shift) {
         if (shift == SHIFT_ON_DEMAND) {
             return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_ONDEMAND_FGSHIFT));
-        } else if (shift == SHIFT_OUTCOMES) {
-            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_OUTCOME_FGSHIFT));
         } else if (shift == SHIFT_VERY_EARLY) {
             return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_EARLY_FGSHIFT));
         } else if (shift == SHIFT_EARLY) {
@@ -1189,8 +1186,6 @@ public class SYSCalendar {
     public static Color getBGSHIFT(Byte shift) {
         if (shift == SHIFT_ON_DEMAND) {
             return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_ONDEMAND_BGSHIFT));
-        } else if (shift == SHIFT_OUTCOMES) {
-            return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_OUTCOME_BGSHIFT));
         } else if (shift == SHIFT_VERY_EARLY) {
             return GUITools.getColor(OPDE.getProps().getProperty(SYSPropsTools.KEY_VERY_EARLY_BGSHIFT));
         } else if (shift == SHIFT_EARLY) {

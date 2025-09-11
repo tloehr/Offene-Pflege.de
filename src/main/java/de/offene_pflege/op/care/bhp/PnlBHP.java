@@ -90,8 +90,6 @@ public class PnlBHP extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
     private JDateChooser jdcDatum;
 
-    //    private JPanel thisPanel;
-    private String outcomeText = null;
     private BigDecimal weight = null;
     private HashSet<BHP> notified_already;
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -229,17 +227,14 @@ public class PnlBHP extends NursingRecordsPanel {
                                 mapShift2BHP.put(SYSCalendar.SHIFT_ON_DEMAND, new ArrayList<BHP>());
                             }
                             mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
-                            if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_OUTCOMES)) {
-                                mapShift2BHP.put(SYSCalendar.SHIFT_OUTCOMES, new ArrayList<BHP>());
-                            }
-                            mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
+
                         }
 
                         synchronized (mapShift2Pane) {
-                            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
+                            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                                 mapShift2Pane.put(shift, createCP4(shift));
                                 try {
-                                    mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift == SYSCalendar.SHIFT_OUTCOMES || shift != SYSCalendar.whatShiftIs(new Date()));
+                                    mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
                                 } catch (PropertyVetoException e) {
                                     log.debug(e);
                                 }
@@ -291,15 +286,11 @@ public class PnlBHP extends NursingRecordsPanel {
                 mapShift2BHP.put(SYSCalendar.SHIFT_ON_DEMAND, new ArrayList<BHP>());
             }
             mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
-            if (!mapShift2BHP.containsKey(SYSCalendar.SHIFT_OUTCOMES)) {
-                mapShift2BHP.put(SYSCalendar.SHIFT_OUTCOMES, new ArrayList<BHP>());
-            }
-            mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
 
-            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
+            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND,  SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                 mapShift2Pane.put(shift, createCP4(shift));
                 try {
-                    mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND || shift == SYSCalendar.SHIFT_OUTCOMES || shift != SYSCalendar.whatShiftIs(new Date()));
+                    mapShift2Pane.get(shift).setCollapsed(shift == SYSCalendar.SHIFT_ON_DEMAND  || shift != SYSCalendar.whatShiftIs(new Date()));
                 } catch (PropertyVetoException e) {
                     log.debug(e);
                 }
@@ -315,7 +306,7 @@ public class PnlBHP extends NursingRecordsPanel {
         synchronized (mapShift2Pane) {
             cpBHP.removeAll();
             cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
-            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
+            for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                 cpBHP.add(mapShift2Pane.get(shift));
 
                 if (resetCollapseState) {
@@ -324,8 +315,6 @@ public class PnlBHP extends NursingRecordsPanel {
                         LocalDate day = new LocalDate(jdcDatum.getDate());
                         if (shift == SYSCalendar.SHIFT_ON_DEMAND) {
                             mapShift2Pane.get(SYSCalendar.SHIFT_ON_DEMAND).setCollapsed(!BHPTools.isOnDemandBHPs(resident, day));
-                        } else if (shift == SYSCalendar.SHIFT_OUTCOMES) {
-                            mapShift2Pane.get(SYSCalendar.SHIFT_OUTCOMES).setCollapsed(BHPTools.getOutcomeBHPs(resident, day).isEmpty());
                         } else {
                             mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
                         }
@@ -343,51 +332,11 @@ public class PnlBHP extends NursingRecordsPanel {
     private CollapsiblePane createCP4(Byte shift) {
         if (shift == SYSCalendar.SHIFT_ON_DEMAND) {
             return createCP4OnDemand();
-        } else if (shift == SYSCalendar.SHIFT_OUTCOMES) {
-            return createCP4Outcome();
         } else {
             return createCP4Shift(shift);
         }
     }
 
-    private CollapsiblePane createCP4Outcome() {
-        /***
-         *       ____ ____  _  _    ___        _
-         *      / ___|  _ \| || |  / _ \ _   _| |_ ___ ___  _ __ ___   ___
-         *     | |   | |_) | || |_| | | | | | | __/ __/ _ \| '_ ` _ \ / _ \
-         *     | |___|  __/|__   _| |_| | |_| | || (_| (_) | | | | | |  __/
-         *      \____|_|      |_|  \___/ \__,_|\__\___\___/|_| |_| |_|\___|
-         *
-         */
-        String title = "<html><font size=+1><b>" + SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + "</b></font></html>";
-
-        final CollapsiblePane mainPane = new CollapsiblePane(title);
-        mainPane.setSlidingDirection(SwingConstants.SOUTH);
-        mainPane.setBackground(SYSCalendar.getBGSHIFT(SYSCalendar.SHIFT_OUTCOMES));
-        mainPane.setForeground(SYSCalendar.getFGSHIFT(SYSCalendar.SHIFT_OUTCOMES));
-        mainPane.setLayout(new VerticalLayout());
-        mainPane.setOpaque(false);
-
-        if (!mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES).isEmpty()) {
-//            Prescription currentPrescription = null;
-//            CollapsiblePane sitPane = null;
-//            JPanel sitPanel = null;
-//            JPanel panel = new JPanel();
-//            panel.setLayout(new VerticalLayout());
-            for (BHP bhp : mapShift2BHP.get(SYSCalendar.SHIFT_OUTCOMES)) {
-
-                mapBHP2Pane.put(bhp, createCP4(bhp));
-                mainPane.add(mapBHP2Pane.get(bhp));
-            }
-//            mainPane.setContentPane(sitOuterPanel);
-            mainPane.setCollapsible(true);
-        } else {
-            mainPane.setContentPane(new JPanel());
-            mainPane.setCollapsible(false);
-        }
-
-        return mainPane;
-    }
 
     private CollapsiblePane createCP4OnDemand() {
         /***
@@ -611,25 +560,6 @@ public class PnlBHP extends NursingRecordsPanel {
             }
 
             if (BHPTools.isChangeable(bhp)) {
-                outcomeText = null;
-                if (bhp.getNeedsText()) {
-                    currentEditor = new DlgYesNo(SYSConst.icon48comment, o -> {
-                        if (SYSTools.catchNull(o).isEmpty()) {
-                            outcomeText = null;
-                        } else {
-                            outcomeText = o.toString();
-                        }
-                        currentEditor = null;
-                    }, "nursingrecords.bhp.describe.outcome", null, null);
-                    currentEditor.setVisible(true);
-
-                }
-
-                if (bhp.getNeedsText() && outcomeText == null) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.notext.nooutcome", DisplayMessage.WARNING));
-                    return;
-                }
-
 
                 if (bhp.getPrescription().isWeightControlled()) {
                     currentEditor = new DlgYesNo(SYSConst.icon48scales, o -> {
@@ -683,7 +613,6 @@ public class PnlBHP extends NursingRecordsPanel {
                     myBHP.setIst(new Date());
                     myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
                     myBHP.setMDate(new Date());
-                    myBHP.setText(outcomeText);
 
                     Prescription involvedPresciption = null;
                     if (myBHP.shouldBeCalculated()) {
@@ -693,18 +622,9 @@ public class PnlBHP extends NursingRecordsPanel {
                         involvedPresciption = em.find(Prescription.class, myBHP.getPrescription().getID());
                     }
 
-                    BHP outcomeBHP = null;
-                    // add outcome check BHP if necessary
-                    if (!myBHP.isOutcomeText() && myBHP.getPrescriptionSchedule().getCheckAfterHours() != null) {
-                        outcomeBHP = em.merge(new BHP(myBHP)); // the outcome BHPs are created on the fly, if necessary
-                        mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND).add(outcomeBHP);
-                    }
-
                     em.getTransaction().commit();
 
                     if (myBHP.shouldBeCalculated() && involvedPresciption.isClosed()) { // &&
-                        reload();
-                    } else if (outcomeBHP != null) {
                         reload();
                     } else {
                         mapBHP2Pane.put(myBHP, createCP4(myBHP));
@@ -780,36 +700,22 @@ public class PnlBHP extends NursingRecordsPanel {
 
         String title;
 
-        if (bhp.isOutcomeText()) {
-            title = "<html><font size=+1>" +
-                    SYSConst.html_italic(
-                            SYSTools.left("&ldquo;" + PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
-                                    BHPTools.getScheduleText(bhp, "&rdquo;, ", "")
-                    )
 
-                    // https://github.com/tloehr/Offene-Pflege.de/issues/63
-                    + " [" + bhp.getPrescriptionSchedule().getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)") + "] " + (bhp.isOpen() ? "--" : DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + SYSTools.xx("misc.msg.Time.short")) +
-                    (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
-                    (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "") +
+        // nur für Bedarfs BHPs, die noch offen sind
+        Optional<String> bhp_text = bhp.isOnDemand() && bhp.isOpen() ? Optional.ofNullable(bhp.getPrescription().getText()) : Optional.empty();
 
-                    "</font></html>";
-        } else {
+        String fontcolor = bhp.isOpen() && BHPTools.needs_to_be_notified_before_applying(bhp) ? "red" : "black";
+        title = "<html><font size=+1 color=\"" + fontcolor + "\">" +
+                SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
+                (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
+                        " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
+                BHPTools.getScheduleText(bhp, ", ", "") +
+                // zeige bemerkung bei den BHPs
+                (bhp_text.isPresent() && !bhp_text.get().isEmpty() ? "&nbsp;&ldquo;" + SYSConst.html_italic(StringUtils.abbreviate(bhp_text.get(), 40)) + "&rdquo;" : "") +
+                (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
+                (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "") +
+                "</font></html>";
 
-            // nur für Bedarfs BHPs, die noch offen sind
-            Optional<String> bhp_text = bhp.isOnDemand() && bhp.isOpen() ? Optional.ofNullable(bhp.getPrescription().getText()) : Optional.empty();
-
-            String fontcolor = bhp.isOpen() && BHPTools.needs_to_be_notified_before_applying(bhp) ? "red" : "black";
-            title = "<html><font size=+1 color=\"" + fontcolor + "\">" +
-                    SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
-                    (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
-                            " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
-                    BHPTools.getScheduleText(bhp, ", ", "") +
-                    // zeige bemerkung bei den BHPs
-                    (bhp_text.isPresent() && !bhp_text.get().isEmpty() ? "&nbsp;&ldquo;" + SYSConst.html_italic(StringUtils.abbreviate(bhp_text.get(), 40)) + "&rdquo;" : "") +
-                    (bhp.getPrescription().isWeightControlled() ? " " + SYSConst.html_16x16_scales_internal + (bhp.isOpen() ? "" : (bhp.getStockTransaction().isEmpty() ? " " : SYSTools.formatBigDecimal(bhp.getStockTransaction().get(0).getWeight()) + "g ")) : "") +
-                    (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "") +
-                    "</font></html>";
-        }
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? applyActionListener : null);
 
@@ -830,19 +736,6 @@ public class PnlBHP extends NursingRecordsPanel {
             icon3.setOpaque(false);
             cptitle.getAdditionalIconPanel().add(icon3);
         }
-
-        if (bhp.isOutcomeText()) {
-            JLabel icon4 = new JLabel(SYSConst.icon22comment);
-            icon4.setOpaque(false);
-            cptitle.getAdditionalIconPanel().add(icon4);
-        }
-
-        if (!bhp.isOutcomeText() && bhp.getPrescriptionSchedule().getCheckAfterHours() != null) {
-            JLabel icon4 = new JLabel(SYSConst.findIcon(SYSConst.icon22intervalBySecond));
-            icon4.setOpaque(false);
-            cptitle.getAdditionalIconPanel().add(icon4);
-        }
-
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             if (!bhp.getPrescription().isClosed()) {
@@ -923,234 +816,28 @@ public class PnlBHP extends NursingRecordsPanel {
                     cptitle.getRight().add(btnOpenStock);
                 }
 
-                if (!bhp.isOutcomeText()) {
-                    /***
-                     *      _     _         ____       __
-                     *     | |__ | |_ _ __ |  _ \ ___ / _|_   _ ___  ___
-                     *     | '_ \| __| '_ \| |_) / _ \ |_| | | / __|/ _ \
-                     *     | |_) | |_| | | |  _ <  __/  _| |_| \__ \  __/
-                     *     |_.__/ \__|_| |_|_| \_\___|_|  \__,_|___/\___|
-                     *
-                     */
-                    final JButton btnRefuse = new JButton(SYSConst.icon22cancel);
-                    btnRefuse.setPressedIcon(SYSConst.icon22cancelPressed);
-                    btnRefuse.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    btnRefuse.setContentAreaFilled(false);
-                    btnRefuse.setBorder(null);
-                    btnRefuse.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuse.tooltip")));
-                    btnRefuse.addActionListener(actionEvent -> {
-                        if (bhp.getState() != BHPTools.STATE_OPEN) {
-                            return;
-                        }
-                        if (bhp.getPrescription().isClosed()) {
-                            return;
-                        }
-
-                        if (BHPTools.isChangeable(bhp)) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                BHP myBHP = em.merge(bhp);
-                                em.lock(myBHP, LockModeType.OPTIMISTIC);
-                                em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
-                                em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
-
-                                myBHP.setState(BHPTools.STATE_REFUSED);
-                                myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
-                                myBHP.setIst(new Date());
-                                myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
-                                myBHP.setMDate(new Date());
-
-                                mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
-                                mapShift2BHP.get(bhp.getShift()).remove(position);
-                                mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
-                                if (myBHP.isOnDemand()) {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
-                                } else {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()));
-                                }
-
-                                em.getTransaction().commit();
-                                mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
-                                buildPanel(false);
-                            } catch (OptimisticLockException ole) {
-                                log.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-
-                        } else {
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
-                        }
-                    });
-                    btnRefuse.setEnabled(!bhp.isOnDemand() && bhp.isOpen());
-                    cptitle.getRight().add(btnRefuse);
-
-                    /***
-                     *      _     _         ____       __                ____  _                       _
-                     *     | |__ | |_ _ __ |  _ \ ___ / _|_   _ ___  ___|  _ \(_)___  ___ __ _ _ __ __| |
-                     *     | '_ \| __| '_ \| |_) / _ \ |_| | | / __|/ _ \ | | | / __|/ __/ _` | '__/ _` |
-                     *     | |_) | |_| | | |  _ <  __/  _| |_| \__ \  __/ |_| | \__ \ (_| (_| | | | (_| |
-                     *     |_.__/ \__|_| |_|_| \_\___|_|  \__,_|___/\___|____/|_|___/\___\__,_|_|  \__,_|
-                     *
-                     */
-                    final JButton btnRefuseDiscard = new JButton(SYSConst.icon22deleteall);
-                    btnRefuseDiscard.setPressedIcon(SYSConst.icon22deleteallPressed);
-                    btnRefuseDiscard.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    btnRefuseDiscard.setContentAreaFilled(false);
-                    btnRefuseDiscard.setBorder(null);
-                    btnRefuseDiscard.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuseDiscard.tooltip")));
-                    btnRefuseDiscard.addActionListener(actionEvent -> {
-                        if (bhp.getState() != BHPTools.STATE_OPEN) {
-                            return;
-                        }
-                        if (bhp.getPrescription().isClosed()) {
-                            return;
-                        }
-
-                        if (BHPTools.isChangeable(bhp)) {
-                            if (bhp.getPrescription().isWeightControlled()) {
-                                currentEditor = new DlgYesNo(SYSConst.icon48scales, o -> {
-                                    if (SYSTools.catchNull(o).isEmpty()) {
-                                        weight = null;
-                                    } else {
-                                        weight = (BigDecimal) o;
-                                    }
-                                    currentEditor = null;
-                                }, "nursingrecords.bhp.weight", null, new Validator<BigDecimal>() {
-                                    @Override
-                                    public boolean isValid(String value) {
-                                        BigDecimal bd = parse(value);
-                                        return bd != null && bd.compareTo(BigDecimal.ZERO) > 0;
-
-                                    }
-
-                                    @Override
-                                    public BigDecimal parse(String text) {
-                                        return SYSTools.parseDecimal(text);
-                                    }
-                                });
-                                currentEditor.setVisible(true);
-                            }
-
-                            if (bhp.getPrescription().isWeightControlled() && weight == null) {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.noweight.nosuccess", DisplayMessage.WARNING));
-                                return;
-                            }
-
-
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                BHP myBHP = em.merge(bhp);
-                                em.lock(myBHP, LockModeType.OPTIMISTIC);
-                                em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
-                                em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
-
-                                myBHP.setState(BHPTools.STATE_REFUSED_DISCARDED);
-                                myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
-                                myBHP.setIst(new Date());
-                                myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
-                                myBHP.setMDate(new Date());
-
-                                if (myBHP.shouldBeCalculated()) {
-                                    MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
-                                    if (inventory != null) {
-                                        MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), weight, myBHP);
-                                    } else {
-                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.NoInventory"));
-                                    }
-                                }
-
-                                mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
-                                mapShift2BHP.get(bhp.getShift()).remove(position);
-                                mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
-                                if (myBHP.isOnDemand()) {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
-                                } else {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()));
-                                }
-
-                                em.getTransaction().commit();
-                                mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
-                                buildPanel(false);
-                            } catch (OptimisticLockException ole) {
-                                log.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-
-                        } else {
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
-                        }
-                    });
-
-                    btnRefuseDiscard.setEnabled(!bhp.isOnDemand() && bhp.hasMed() && bhp.shouldBeCalculated() && bhp.isOpen());
-                    cptitle.getRight().add(btnRefuseDiscard);
-                }
 
                 /***
-                 *      _   _           _
-                 *     | | | |_ __   __| | ___
-                 *     | | | | '_ \ / _` |/ _ \
-                 *     | |_| | | | | (_| | (_) |
-                 *      \___/|_| |_|\__,_|\___/
+                 *      _     _         ____       __
+                 *     | |__ | |_ _ __ |  _ \ ___ / _|_   _ ___  ___
+                 *     | '_ \| __| '_ \| |_) / _ \ |_| | | / __|/ _ \
+                 *     | |_) | |_| | | |  _ <  __/  _| |_| \__ \  __/
+                 *     |_.__/ \__|_| |_|_| \_\___|_|  \__,_|___/\___|
                  *
                  */
-                final JButton btnUndo = new JButton(SYSConst.icon22empty);
-                btnUndo.setPressedIcon(SYSConst.icon22emptyPressed);
-                btnUndo.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnUndo.setContentAreaFilled(false);
-                btnUndo.setBorder(null);
-                btnUndo.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnEmpty.tooltip"));
-                btnUndo.addActionListener(actionEvent -> {
-                    if (bhp.getState() == BHPTools.STATE_OPEN) {
+                final JButton btnRefuse = new JButton(SYSConst.icon22cancel);
+                btnRefuse.setPressedIcon(SYSConst.icon22cancelPressed);
+                btnRefuse.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnRefuse.setContentAreaFilled(false);
+                btnRefuse.setBorder(null);
+                btnRefuse.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuse.tooltip")));
+                btnRefuse.addActionListener(actionEvent -> {
+                    if (bhp.getState() != BHPTools.STATE_OPEN) {
                         return;
                     }
                     if (bhp.getPrescription().isClosed()) {
                         return;
                     }
-
-                    BHP outcomeBHP = BHPTools.getComment(bhp);
-
-                    if (outcomeBHP != null && !outcomeBHP.isOpen()) {
-                        // already commented
-                        return;
-                    }
-
-                    notified_already.remove(bhp);
 
                     if (BHPTools.isChangeable(bhp)) {
                         EntityManager em = OPDE.createEM();
@@ -1159,55 +846,29 @@ public class PnlBHP extends NursingRecordsPanel {
 
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                             BHP myBHP = em.merge(bhp);
-
                             em.lock(myBHP, LockModeType.OPTIMISTIC);
                             em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
                             em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
 
-                            // the normal BHPs (those assigned to a NursingProcess) are reset to the OPEN state.
-                            // TXs are deleted
-                            myBHP.setState(BHPTools.STATE_OPEN);
-                            myBHP.setUser(null);
-                            myBHP.setIst(null);
-                            myBHP.setiZeit(null);
+                            myBHP.setState(BHPTools.STATE_REFUSED);
+                            myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
+                            myBHP.setIst(new Date());
+                            myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
                             myBHP.setMDate(new Date());
-                            myBHP.setText(null);
 
-                            if (myBHP.shouldBeCalculated()) {
-                                for (MedStockTransaction tx : myBHP.getStockTransaction()) {
-                                    em.remove(tx);
-                                }
-                                myBHP.getStockTransaction().clear();
-                            }
-
-                            if (outcomeBHP != null) {
-                                BHP myOutcomeBHP = em.merge(outcomeBHP);
-                                em.remove(myOutcomeBHP);
-                            }
-
+                            mapBHP2Pane.put(myBHP, createCP4(myBHP));
+                            int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
+                            mapShift2BHP.get(bhp.getShift()).remove(position);
+                            mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
                             if (myBHP.isOnDemand()) {
-                                em.remove(myBHP);
+                                Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                            } else {
+                                Collections.sort(mapShift2BHP.get(myBHP.getShift()));
                             }
 
                             em.getTransaction().commit();
-
-                            if (myBHP.isOnDemand()) {
-                                reload();
-                            } else {
-                                mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
-                                mapShift2BHP.get(bhp.getShift()).remove(position);
-                                mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
-                                if (myBHP.isOnDemand()) {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
-                                } else {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()));
-                                }
-
-
-                                mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
-                                buildPanel(false);
-                            }
+                            mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
+                            buildPanel(false);
                         } catch (OptimisticLockException ole) {
                             log.warn(ole);
                             if (em.getTransaction().isActive()) {
@@ -1231,58 +892,265 @@ public class PnlBHP extends NursingRecordsPanel {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
                     }
                 });
-                btnUndo.setEnabled(!bhp.isOpen());
-                cptitle.getRight().add(btnUndo);
-            }
+                btnRefuse.setEnabled(!bhp.isOnDemand() && bhp.isOpen());
+                cptitle.getRight().add(btnRefuse);
 
+                /***
+                 *      _     _         ____       __                ____  _                       _
+                 *     | |__ | |_ _ __ |  _ \ ___ / _|_   _ ___  ___|  _ \(_)___  ___ __ _ _ __ __| |
+                 *     | '_ \| __| '_ \| |_) / _ \ |_| | | / __|/ _ \ | | | / __|/ __/ _` | '__/ _` |
+                 *     | |_) | |_| | | |  _ <  __/  _| |_| \__ \  __/ |_| | \__ \ (_| (_| | | | (_| |
+                 *     |_.__/ \__|_| |_|_| \_\___|_|  \__,_|___/\___|____/|_|___/\___\__,_|_|  \__,_|
+                 *
+                 */
+                final JButton btnRefuseDiscard = new JButton(SYSConst.icon22deleteall);
+                btnRefuseDiscard.setPressedIcon(SYSConst.icon22deleteallPressed);
+                btnRefuseDiscard.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnRefuseDiscard.setContentAreaFilled(false);
+                btnRefuseDiscard.setBorder(null);
+                btnRefuseDiscard.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuseDiscard.tooltip")));
+                btnRefuseDiscard.addActionListener(actionEvent -> {
+                    if (bhp.getState() != BHPTools.STATE_OPEN) {
+                        return;
+                    }
+                    if (bhp.getPrescription().isClosed()) {
+                        return;
+                    }
+
+                    if (BHPTools.isChangeable(bhp)) {
+                        if (bhp.getPrescription().isWeightControlled()) {
+                            currentEditor = new DlgYesNo(SYSConst.icon48scales, o -> {
+                                if (SYSTools.catchNull(o).isEmpty()) {
+                                    weight = null;
+                                } else {
+                                    weight = (BigDecimal) o;
+                                }
+                                currentEditor = null;
+                            }, "nursingrecords.bhp.weight", null, new Validator<BigDecimal>() {
+                                @Override
+                                public boolean isValid(String value) {
+                                    BigDecimal bd = parse(value);
+                                    return bd != null && bd.compareTo(BigDecimal.ZERO) > 0;
+
+                                }
+
+                                @Override
+                                public BigDecimal parse(String text) {
+                                    return SYSTools.parseDecimal(text);
+                                }
+                            });
+                            currentEditor.setVisible(true);
+                        }
+
+                        if (bhp.getPrescription().isWeightControlled() && weight == null) {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.noweight.nosuccess", DisplayMessage.WARNING));
+                            return;
+                        }
+
+
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+
+                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                            BHP myBHP = em.merge(bhp);
+                            em.lock(myBHP, LockModeType.OPTIMISTIC);
+                            em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
+                            em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
+
+                            myBHP.setState(BHPTools.STATE_REFUSED_DISCARDED);
+                            myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
+                            myBHP.setIst(new Date());
+                            myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
+                            myBHP.setMDate(new Date());
+
+                            if (myBHP.shouldBeCalculated()) {
+                                MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
+                                if (inventory != null) {
+                                    MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), weight, myBHP);
+                                } else {
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.NoInventory"));
+                                }
+                            }
+
+                            mapBHP2Pane.put(myBHP, createCP4(myBHP));
+                            int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
+                            mapShift2BHP.get(bhp.getShift()).remove(position);
+                            mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
+                            if (myBHP.isOnDemand()) {
+                                Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                            } else {
+                                Collections.sort(mapShift2BHP.get(myBHP.getShift()));
+                            }
+
+                            em.getTransaction().commit();
+                            mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
+                            buildPanel(false);
+                        } catch (OptimisticLockException ole) {
+                            log.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
+                    }
+                });
+
+                btnRefuseDiscard.setEnabled(!bhp.isOnDemand() && bhp.hasMed() && bhp.shouldBeCalculated() && bhp.isOpen());
+                cptitle.getRight().add(btnRefuseDiscard);
+            }
 
             /***
-             *      _     _         ___        __
-             *     | |__ | |_ _ __ |_ _|_ __  / _| ___
-             *     | '_ \| __| '_ \ | || '_ \| |_ / _ \
-             *     | |_) | |_| | | || || | | |  _| (_) |
-             *     |_.__/ \__|_| |_|___|_| |_|_|  \___/
+             *      _   _           _
+             *     | | | |_ __   __| | ___
+             *     | | | | '_ \ / _` |/ _ \
+             *     | |_| | | | | (_| | (_) |
+             *      \___/|_| |_|\__,_|\___/
              *
              */
-            final JButton btnInfo = new JButton(SYSConst.icon22info);
-
-            btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
-            btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnInfo.setContentAreaFilled(false);
-            btnInfo.setBorder(null);
-            btnInfo.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnInfo.tooltip"));
-            final JTextPane txt = new JTextPane();
-            txt.setContentType("text/html");
-            txt.setEditable(false);
-            final JidePopup popupInfo = new JidePopup();
-            popupInfo.setMovable(false);
-            popupInfo.setContentPane(new JScrollPane(txt));
-            popupInfo.removeExcludedComponent(txt);
-            popupInfo.setDefaultFocusComponent(txt);
-
-
-            btnInfo.addActionListener(actionEvent -> {
-                popupInfo.setOwner(btnInfo);
-
-                if (bhp.isOutcomeText() && !bhp.isOpen()) {
-                    txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getText())));
-                } else {
-                    txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
+            final JButton btnUndo = new JButton(SYSConst.icon22empty);
+            btnUndo.setPressedIcon(SYSConst.icon22emptyPressed);
+            btnUndo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnUndo.setContentAreaFilled(false);
+            btnUndo.setBorder(null);
+            btnUndo.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnEmpty.tooltip"));
+            btnUndo.addActionListener(actionEvent -> {
+                if (bhp.getState() == BHPTools.STATE_OPEN) {
+                    return;
+                }
+                if (bhp.getPrescription().isClosed()) {
+                    return;
                 }
 
-//                    txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
-                GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+                notified_already.remove(bhp);
+
+                if (BHPTools.isChangeable(bhp)) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        BHP myBHP = em.merge(bhp);
+
+                        em.lock(myBHP, LockModeType.OPTIMISTIC);
+                        em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
+                        em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
+
+                        // the normal BHPs (those assigned to a NursingProcess) are reset to the OPEN state.
+                        // TXs are deleted
+                        myBHP.setState(BHPTools.STATE_OPEN);
+                        myBHP.setUser(null);
+                        myBHP.setIst(null);
+                        myBHP.setiZeit(null);
+                        myBHP.setMDate(new Date());
+                        myBHP.setText(null);
+
+                        if (myBHP.shouldBeCalculated()) {
+                            for (MedStockTransaction tx : myBHP.getStockTransaction()) {
+                                em.remove(tx);
+                            }
+                            myBHP.getStockTransaction().clear();
+                        }
+
+                        if (myBHP.isOnDemand()) {
+                            em.remove(myBHP);
+                        }
+
+                        em.getTransaction().commit();
+
+                        if (myBHP.isOnDemand()) {
+                            reload();
+                        } else {
+                            mapBHP2Pane.put(myBHP, createCP4(myBHP));
+                            int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
+                            mapShift2BHP.get(bhp.getShift()).remove(position);
+                            mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
+                            if (myBHP.isOnDemand()) {
+                                Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                            } else {
+                                Collections.sort(mapShift2BHP.get(myBHP.getShift()));
+                            }
+
+
+                            mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
+                            buildPanel(false);
+                        }
+                    } catch (OptimisticLockException ole) {
+                        log.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Resident") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
+                }
             });
-
-            if (bhp.isOutcomeText() && !bhp.isOpen()) {
-                btnInfo.setEnabled(true);
-            } else {
-                btnInfo.setEnabled(!SYSTools.catchNull(bhp.getPrescription().getText()).isEmpty());
-            }
-
-            cptitle.getRight().add(btnInfo);
-
+            btnUndo.setEnabled(!bhp.isOpen());
+            cptitle.getRight().add(btnUndo);
         }
+
+
+        /***
+         *      _     _         ___        __
+         *     | |__ | |_ _ __ |_ _|_ __  / _| ___
+         *     | '_ \| __| '_ \ | || '_ \| |_ / _ \
+         *     | |_) | |_| | | || || | | |  _| (_) |
+         *     |_.__/ \__|_| |_|___|_| |_|_|  \___/
+         *
+         */
+        final JButton btnInfo = new JButton(SYSConst.icon22info);
+
+        btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
+        btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnInfo.setContentAreaFilled(false);
+        btnInfo.setBorder(null);
+        btnInfo.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnInfo.tooltip"));
+        final JTextPane txt = new JTextPane();
+        txt.setContentType("text/html");
+        txt.setEditable(false);
+        final JidePopup popupInfo = new JidePopup();
+        popupInfo.setMovable(false);
+        popupInfo.setContentPane(new JScrollPane(txt));
+        popupInfo.removeExcludedComponent(txt);
+        popupInfo.setDefaultFocusComponent(txt);
+
+
+        btnInfo.addActionListener(actionEvent -> {
+            popupInfo.setOwner(btnInfo);
+            txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
+            GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+        });
+
+        btnInfo.setEnabled(!SYSTools.catchNull(bhp.getPrescription().getText()).isEmpty());
+        cptitle.getRight().add(btnInfo);
+
 
         bhpPane.setTitleLabelComponent(cptitle.getMain());
         bhpPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -1477,7 +1345,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     html += "<h1 id=\"fonth1\" >" + ResidentTools.getFullName(resident) + "</h1>";
                     html += SYSConst.html_h2(SYSTools.xx("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDatum.getDate())));
 
-                    for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_OUTCOMES, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
+                    for (Byte shift : new Byte[]{SYSCalendar.SHIFT_ON_DEMAND, SYSCalendar.SHIFT_VERY_EARLY, SYSCalendar.SHIFT_EARLY, SYSCalendar.SHIFT_LATE, SYSCalendar.SHIFT_VERY_LATE}) {
                         if (mapShift2BHP.containsKey(shift)) {
                             html += BHPTools.getBHPsAsHTMLtable(mapShift2BHP.get(shift), true);
                         }

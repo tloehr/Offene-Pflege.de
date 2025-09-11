@@ -915,9 +915,9 @@ public class TXEssenDoc {
         if (!presCatheterChange.isEmpty()) {
             Date lastChange = SYSConst.DATE_THE_VERY_BEGINNING;
             for (Prescription prescription : presCatheterChange) { // usually there shouldn't be more than 1, but you never know
-                BHP bhp = BHPTools.getLastBHP(prescription);
-                if (bhp != null) {
-                    lastChange = new Date(Math.max(lastChange.getTime(), BHPTools.getLastBHP(prescription).getIst().getTime()));
+                Optional<BHP> optBHP = BHPTools.getLastBHP(prescription);
+                if (optBHP.isPresent()) {
+                    lastChange = new Date(Math.max(lastChange.getTime(), optBHP.get().getIst().getTime()));
                 }
             }
             if (!lastChange.equals(SYSConst.DATE_THE_VERY_BEGINNING)) {

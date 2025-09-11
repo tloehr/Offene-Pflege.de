@@ -1,7 +1,4 @@
--- Ab Version 1.16.3
-UPDATE `sysprops`
-SET V = '22'
-WHERE K = 'dbstructure';
+-- Ab Version 1.16.6
 -- Umwandlung von Intervall zu Zeitpunkt
 UPDATE `resinfotype`
 SET IntervalMode = 3
@@ -131,3 +128,13 @@ VALUES ('fraktur02', '<qdvs optional="true"/><label layout="br left hfill" size=
 -- Um unliebsame Formen loszuwerden (Stomaplatte)
 alter table `dosageform`
     modify Stellplan tinyint(3) default 0 not null;
+# since 1.16.6
+UPDATE `sysprops`
+SET V = '22'
+WHERE K = 'dbstructure';
+#
+delete from `bhp` where outcome4 is not null;
+#
+alter table `bhp`
+    drop column needsText,
+    change outcome4 outcome_nreport bigint unsigned null;

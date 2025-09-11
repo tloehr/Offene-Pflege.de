@@ -51,14 +51,9 @@ public class BHP implements Serializable, Comparable<BHP> {
     @Column(name = "MDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
-    @Column(name = "needsText")
-    private Boolean needsText;
     @Basic(optional = false)
     @Column(name = "nanotime")
     private Long nanotime;
-    @JoinColumn(name = "outcome4", referencedColumnName = "BHPID")
-    @ManyToOne
-    private BHP outcome4;
 
     public BHP() {
     }
@@ -73,7 +68,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.version = 0l;
         this.nanotime = System.nanoTime();
         this.mdate = new Date();
-        this.needsText = false;
     }
 
     /**
@@ -100,8 +94,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
         stockTransaction = new ArrayList<MedStockTransaction>();
-        this.outcome4 = bhp;
-        this.needsText = true;
     }
 
     public BHP(PrescriptionSchedule prescriptionSchedule, Date soll, Byte sZeit, BigDecimal dosis) {
@@ -118,7 +110,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
         stockTransaction = new ArrayList<MedStockTransaction>();
-        this.needsText = false;
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bhp")
@@ -217,11 +208,11 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     public boolean hasMed() {
-        return !isOutcomeText() && prescription.getTradeForm() != null;
+        return prescription.getTradeForm() != null;
     }
 
     public boolean shouldBeCalculated() {
-        return !isOutcomeText() && hasMed() && resident.getCalcMediUPR1();
+        return hasMed() && resident.getCalcMediUPR1();
     }
 
     public boolean isOpen() {
@@ -275,47 +266,12 @@ public class BHP implements Serializable, Comparable<BHP> {
      * @return
      */
     public boolean isOnDemand() {
-        return prescription.isOnDemand() && !isOutcomeText();
-    }
-
-    /**
-     * determines whether the confirmation of a BHP should trigger a mandantory note or not. (default NOT)
-     *
-     * @return
-     */
-    public Boolean getNeedsText() {
-        return needsText;
-    }
-
-    public void setNeedsText(Boolean needsText) {
-        this.needsText = needsText;
-    }
-
-
-    /**
-     * BHPs which are "outcome4" another BHP are supposed to have a description text.
-     *
-     * @return
-     */
-    public boolean isOutcomeText() {
-        return outcome4 != null;
-    }
-
-
-    public BHP getOutcome4() {
-        return outcome4;
-    }
-
-    public void setOutcome4(BHP outcome4) {
-        this.outcome4 = outcome4;
+        return prescription.isOnDemand();
     }
 
     public Byte getShift() {
         if (isOnDemand()) {
             return SYSCalendar.SHIFT_ON_DEMAND;
-        }
-        if (isOutcomeText()) {
-            return SYSCalendar.SHIFT_OUTCOMES;
         }
         if (sZeit == SYSCalendar.BYTE_TIMEOFDAY) {
             return SYSCalendar.whatShiftIs(this.soll);

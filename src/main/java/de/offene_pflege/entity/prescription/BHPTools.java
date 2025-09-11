@@ -40,23 +40,9 @@ public class BHPTools {
     public static final byte STATE_REFUSED = 2;
     public static final byte STATE_REFUSED_DISCARDED = 3;
 
-//    public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
-//    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.bhp.shift.veryearly", "nursingrecords.bhp.shift.early", "nursingrecords.bhp.shift.late", "nursingrecords.bhp.shift.verylate"};
-//    public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
-//    public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
-//
-//    public static final byte BYTE_TIMEOFDAY = 0;
-//    public static final byte BYTE_EARLY_IN_THE_MORNING = 1;
-//    public static final byte BYTE_MORNING = 2;
-//    public static final byte BYTE_NOON = 3;
-//    public static final byte BYTE_AFTERNOON = 4;
-//    public static final byte BYTE_EVENING = 5;
-//    public static final byte BYTE_LATE_AT_NIGHT = 6;
-
-
     public static final String UIDPREFIX = "__bhp";
 
-    public static BHP getLastBHP(Prescription prescription) {
+    public static Optional<BHP> getLastBHP(Prescription prescription) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM BHP b WHERE b.prescription = :prescription AND b.state = :state ORDER BY b.ist DESC");
         query.setParameter("prescription", prescription);
@@ -65,7 +51,7 @@ public class BHPTools {
         query.setMaxResults(1);
         List<BHP> bhp = query.getResultList();
         em.close();
-        return bhp.isEmpty() ? null : bhp.get(0);
+        return bhp.isEmpty() ? Optional.empty() : Optional.of(bhp.get(0));
     }
 
     public static BHP getLastBHP(Resident resident, int flag) {
@@ -92,35 +78,12 @@ public class BHPTools {
         return num;
     }
 
-    public static boolean hasBeenUsedAlready(Prescription prescription) {
-        long begin = System.currentTimeMillis();
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT bhp FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.state <> :status");
-        query.setParameter("prescription", prescription);
-        query.setParameter("status", STATE_OPEN);
-        query.setMaxResults(1);
-        boolean used = query.getResultList().size() > 0;
-        em.close();
-        SYSTools.showTimeDifference(begin);
-        return used;
-    }
-
     public static Comparator<BHP> getOnDemandComparator() {
         return (o1, o2) -> {
             int result = o1.getPrescription().getSituation().getText().toUpperCase().compareTo(o2.getPrescription().getSituation().getText().toUpperCase());
             if (result == 0) {
                 result = o1.getPrescription().compareTo(o2.getPrescription());
             }
-//                if (result == 0) {
-//                    Long l1 = o1.getOutcome4();
-//                    Long l2 = o2.getOutcome4();
-//                    if (l1 != null && l2 != null) {
-//                        result = l1.compareTo(l2);
-//                    } else {
-//                        result = SYSTools.nullCompare(l1, l2);
-//                    }
-//                }
-
             return result;
         };
     }
@@ -451,7 +414,6 @@ public class BHPTools {
             String jpql = " SELECT bhp " +
                     " FROM BHP bhp " +
                     " WHERE bhp.prescription = :prescription " +
-                    " AND bhp.outcome4 IS NULL" +
                     " AND bhp.soll >= :from AND bhp.soll <= :to " +
                     " ORDER BY bhp.soll ";
             Query queryOnDemand = em.createQuery(jpql);
@@ -511,111 +473,6 @@ public class BHPTools {
         return listBHP;
     }
 
-
-    /**
-     * tells us, if the BHP is commented
-     *
-     * @param bhp
-     * @return
-     */
-    public static BHP getComment(BHP bhp) {
-        if (bhp.getPrescriptionSchedule().getCheckAfterHours() == null) {
-            return null;
-        }
-
-        if (bhp.isOutcomeText()) {
-            return null;
-        }
-
-        EntityManager em = OPDE.createEM();
-        ArrayList<BHP> listBHP = null;
-
-        try {
-
-            String jpql = " SELECT bhp " +
-                    " FROM BHP bhp " +
-                    " WHERE bhp.outcome4 = :outcome4  ";
-
-            Query query = em.createQuery(jpql);
-
-            query.setParameter("outcome4", bhp);
-
-            listBHP = new ArrayList<BHP>(query.getResultList());
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return listBHP.isEmpty() ? null : listBHP.get(0);
-    }
-
-    /**
-     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand).
-     * Outcome BHPs included, even if they originate from onDemand Prescriptions.
-     *
-     * @param resident
-     * @param date
-     * @return
-     */
-    public static ArrayList<BHP> getOutcomeBHPs(Resident resident, LocalDate date) {
-//            long begin = System.currentTimeMillis();
-        EntityManager em = OPDE.createEM();
-        ArrayList<BHP> listBHP = null;
-
-        try {
-
-            String jpql = " SELECT bhp " +
-                    " FROM BHP bhp " +
-                    " WHERE bhp.resident = :resident AND bhp.outcome4 IS NOT NULL " +
-                    " AND bhp.soll >= :von AND bhp.soll <= :bis ";
-
-            Query query = em.createQuery(jpql);
-
-            query.setParameter("resident", resident);
-            query.setParameter("von", date.toDateTimeAtStartOfDay().toDate());
-            query.setParameter("bis", SYSCalendar.eod(date).toDate());
-
-            listBHP = new ArrayList<BHP>(query.getResultList());
-            Collections.sort(listBHP);
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-//            SYSTools.showTimeDifference(begin);
-        return listBHP;
-    }
-
-
-//    public static BHP getOutcome4(BHP bhp) {
-//        long begin = System.currentTimeMillis();
-//        EntityManager em = OPDE.createEM();
-//        ArrayList<BHP> listBHP = null;
-//
-//        try {
-//
-//            String jpql = " SELECT bhp " +
-//                    " FROM BHP bhp " +
-//                    " WHERE bhp.outcome4 = :bhp ";
-//
-//            Query query = em.createQuery(jpql);
-//
-//            query.setParameter("bhp", bhp);
-//
-//            listBHP = new ArrayList<>(query.getResultList());
-//
-//        } catch (Exception se) {
-//            OPDE.fatal(se);
-//        } finally {
-//            em.close();
-//        }
-//        SYSTools.showTimeDifference(begin);
-//        return listBHP.isEmpty() ? null : listBHP.get(0);
-//    }
-
-
     public static boolean isOnDemandBHPs(Resident resident, LocalDate date) {
         EntityManager em = OPDE.createEM();
         boolean result = false;
@@ -625,7 +482,6 @@ public class BHPTools {
                     " FROM BHP bhp " +
                     " WHERE bhp.prescription.situation IS NOT NULL " +
                     " AND bhp.resident = :resident " +
-                    " AND bhp.outcome4 IS NULL " +
                     " AND bhp.soll >= :from AND bhp.soll <= :to ";
 
             Query query = em.createQuery(jpql);
@@ -684,9 +540,7 @@ public class BHPTools {
         String text = "";
 
         // https://github.com/tloehr/Offene-Pflege.de/issues/63
-        if (bhp.isOutcomeText()) {
-            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short");
-        } else if (!bhp.isOnDemand() && !bhp.isOutcomeText()) {
+       if (!bhp.isOnDemand()) {
             if (bhp.getSollZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
                 text += "<font color=\"blue\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short") + "</font>";
             } else {
@@ -768,16 +622,6 @@ public class BHPTools {
 
             BHP b1 = list.get(0);
 
-            if (withHeader) {
-                if (b1.isOnDemand()) {
-                    result += SYSConst.html_h2("nursingrecords.bhp.ondemand");
-                } else if (b1.isOutcomeText()) {
-                    result += SYSConst.html_h2("nursingrecords.bhp.outcome");
-                } else {
-                    result += SYSConst.html_h2(SYSCalendar.SHIFT_TEXT[b1.getShift()]);
-                }
-            }
-
 
             String table = "";
 
@@ -802,21 +646,10 @@ public class BHPTools {
                         PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()) +
                                 (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
                                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
-                                (bhp.isOnDemand() || bhp.isOutcomeText() ? "" : getScheduleText(bhp, ", ", ""));
-
-                if (bhp.isOutcomeText() && bhp.getState() == BHPTools.STATE_DONE) {
-                    text += "\n" + SYSConst.html_paragraph(bhp.getText());
-                }
-
+                                (bhp.isOnDemand() ? "" : getScheduleText(bhp, ", ", ""));
 
                 if (b1.isOnDemand()) {
                     String outcomeText = "/";
-                    BHP outcome = getComment(bhp);
-                    if (outcome != null && !outcome.isOpen()) {
-                        outcomeText = getStateAsHTML(outcome) + " ";
-                        outcomeText += (bhp.isOpen() ? "" : outcome.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(outcome.getIst()));
-                        outcomeText += (bhp.isOpen() ? "" : "<br/>" + SYSConst.html_paragraph(bhp.getText()));
-                    }
 
                     table += SYSConst.html_table_tr(
                             Optional.empty(),
