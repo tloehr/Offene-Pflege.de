@@ -642,18 +642,6 @@ public class PnlWelcome extends CleanablePanel {
 
     }
 
-    private void btnAboutActionPerformed(ActionEvent e) {
-        Desktop desktop = Desktop.getDesktop();
-        try {
-            desktop.browse(new URI(SYSTools.xx("opde.general.website.url")));
-        } catch (IOException ioe) {
-            log.warn(ioe);
-        } catch (URISyntaxException use) {
-            log.warn(use);
-        }
-    }
-
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
@@ -669,8 +657,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow, $lcgap, pref",
-                    "default, default:grow"));
+                "default:grow, $lcgap, pref",
+                "default, default:grow"));
 
             //---- btnAbout ----
             btnAbout.setText(null);
@@ -683,7 +671,6 @@ public class PnlWelcome extends CleanablePanel {
             btnAbout.setContentAreaFilled(false);
             btnAbout.setBorder(null);
             btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnAbout.addActionListener(e -> btnAboutActionPerformed(e));
             panel1.add(btnAbout, CC.xy(3, 1));
 
             //======== scrollPane1 ========

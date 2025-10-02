@@ -71,7 +71,8 @@ public class QdvsService40 implements QdvsService {
     private static final String INTEGRATION = "intgesp01";
     private static final String KOERPERGEWICHTDOKU = "gewdoku1";
     private static final String BESD = "besd2";
-    private static final String SCHMERZ = "schmerze2";
+    private static final String SCHMERZ2 = "schmerze2";
+    private static final String SCHMERZ3 = "schmerze3";
 
     private JSONObject MANDANTORY_RESINFOTYPES;
 
@@ -173,7 +174,7 @@ public class QdvsService40 implements QdvsService {
         }
 
         // todo: change this mechanism to JSON.
-        MANDANTORY_RESINFOTYPES = new JSONObject(Resources.toString(Resources.getResource("mandantory_resinfotypes_regular_qdvs_v2.json"), StandardCharsets.UTF_8));
+        MANDANTORY_RESINFOTYPES = new JSONObject(Resources.toString(Resources.getResource("mandantory_resinfotypes_regular_qdvs_v3.json"), StandardCharsets.UTF_8));
 
         /**
          * Diese Resinfotypes müssen gesetzt sein, wenn der BW mit in der Stichprobe drin ist. Sonst muss der Lauf abgebrochen werden.
@@ -335,7 +336,7 @@ public class QdvsService40 implements QdvsService {
                 "/opt/homebrew/lib/node_modules/markdown-styles/bin/generate-md --layout witex --input %s --output ~/Desktop " +
                 "-->" + NL, report_file.getAbsoluteFile()));
         FileUtils.writeStringToFile(report_file, report.toString(), Charset.defaultCharset());
-
+        report.setLength(0); // clear the builder
         return fehlerfrei;
     }
 
@@ -460,12 +461,11 @@ public class QdvsService40 implements QdvsService {
                 runningNumber++;
                 textListener.setProgress(runningNumber, numResidents * 3, "");
 
-                boolean schmerze2 = used_resinfotypes_for_this_resident.stream().anyMatch(resInfoType -> resInfoType.getID().equals(SCHMERZ));
+                boolean schmerze = used_resinfotypes_for_this_resident.stream().anyMatch(resInfoType -> resInfoType.getID().matches(SCHMERZ2+"|"+SCHMERZ3));
                 boolean besd2 = used_resinfotypes_for_this_resident.stream().anyMatch(resInfoType -> resInfoType.getID().equals(BESD));
 
-
-                if (!(schmerze2 || besd2)) {
-                    residentInfoObjectMap.get(resident).addLog("Schmerzeinschätzung fehlt (SCHMERZE2 oder BESD2)");
+                if (!(schmerze || besd2)) {
+                    residentInfoObjectMap.get(resident).addLog("Schmerzeinschätzung fehlt (SCHMERZE2, SCHMERZE3 oder BESD2)");
                     textListener.addLog(SYSConst.html_critical("KRITISCHER FEHLER Bewohner " + ResidentTools.getLabelText(resident) + ": Schmerzeinschätzung fehlt (SCHMERZE2 oder BESD2)"));
                     listeBWFehlerfrei.remove(resident);
                 }
@@ -1355,24 +1355,35 @@ public class QdvsService40 implements QdvsService {
 
         // Letzten Eintrag suchen
 
-        List<ResInfo> list_schmerz = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_PAIN), BEGINN_ERFASSUNGSZEITRAUM, STICHTAG); // DESC sortiert
+        List<ResInfo> list_schmerz = ResInfoTools.getAll(resident, SCHMERZ2, BEGINN_ERFASSUNGSZEITRAUM, STICHTAG);
+        list_schmerz.addAll(ResInfoTools.getAll(resident, SCHMERZ3, BEGINN_ERFASSUNGSZEITRAUM, STICHTAG));
         List<ResInfo> list_besd = ResInfoTools.getAll(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BESD), BEGINN_ERFASSUNGSZEITRAUM, STICHTAG); // DESC sortiert
 
-        Optional<ResInfo> letzter_schmerz = list_schmerz.stream().findFirst();
+        Optional<ResInfo> letzter_schmerz = list_schmerz.stream().max(Comparator.comparing(ResInfo::getFrom));
         Optional<ResInfo> letzter_besd = list_besd.stream().findFirst();
 
         // falls es mehrere Einträge gibt, dann verwende ich immer den aktuelleren (also falls ein BESD und ein SCHMERZE2 vorliegt.
         // einer von beiden muss mindestens da sein
-        boolean verwende_schmerze2_zur_auswertung;
+        boolean verwende_schmerze_zur_auswertung;
         if (letzter_besd.isPresent() && letzter_schmerz.isPresent()) { // sehr seltener Fall
-            verwende_schmerze2_zur_auswertung = letzter_besd.get().getFrom().compareTo(letzter_schmerz.get().getFrom()) < 0;
+            verwende_schmerze_zur_auswertung = letzter_besd.get().getFrom().compareTo(letzter_schmerz.get().getFrom()) < 0;
         } else {
-            verwende_schmerze2_zur_auswertung = letzter_schmerz.isPresent();
+            verwende_schmerze_zur_auswertung = letzter_schmerz.isPresent();
         }
 
-        if (verwende_schmerze2_zur_auswertung) { // bei einer NRS Angabe durch den BW selbst
+        if (verwende_schmerze_zur_auswertung) { // bei einer NRS Angabe durch den BW selbst
             Properties props = ResInfoTools.getContent(letzter_schmerz.get());
-            int nrs = Integer.valueOf(props.getProperty("schmerzint"));
+
+            // schmerze2 und schmerze3 haben unterschiedliche schmerzint felder. Die 3 hat zwei Felder (eins in Ruhe und eins unter Last).
+            // Wird hier berücksichtigt.
+            int nrs = 0;
+
+            // gibt es ein scherzint feld - dann nehmen wir das. (bei SCHMERZE2 und älter)
+            if (props.containsKey("schmerzint"))
+                nrs = Integer.valueOf(props.getProperty("schmerzint"));
+            else // ansonsten das größere der beiden - (ab SCHMERZE3 und neuer)
+                nrs = Math.max(Integer.valueOf(props.getProperty("schmerzint_ruhe")),Integer.valueOf(props.getProperty("schmerzint_last")));
+
             boolean chronisch = props.getProperty("schmerztyp", "0").equalsIgnoreCase("1");
             // Schmerzen hat er dann, wenn sie chronisch und NRS >3 sind.
             /**

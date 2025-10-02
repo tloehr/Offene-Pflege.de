@@ -10,7 +10,7 @@
     <version>${opde.major}.${opde.minor}.${opde.release}</version>
 
     <name>OPDE1</name>
-    <url>https://www.offene-pflege.de</url>
+    <url>https://www.wiedenhof.info</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

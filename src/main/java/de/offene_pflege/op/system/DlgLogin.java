@@ -109,7 +109,7 @@ public class DlgLogin extends MyJDialog {
                 thisWindowActivated(e);
             }
         });
-        Container contentPane = getContentPane();
+        var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "13dlu, default, 13dlu",
             "13dlu, $lgap, fill:48dlu:grow, $lgap, default, $lgap, 13dlu"));
@@ -134,7 +134,6 @@ public class DlgLogin extends MyJDialog {
             btnAbout.setContentAreaFilled(false);
             btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnAbout.setToolTipText(null);
-            btnAbout.addActionListener(e -> btnAboutActionPerformed(e));
             jPanel2.add(btnAbout);
 
             //---- lblUsernamePassword ----
@@ -236,20 +235,6 @@ public class DlgLogin extends MyJDialog {
             System.exit(1);
         }
     }//GEN-LAST:event_DoLogin
-
-    private void btnAboutActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnAboutActionPerformed
-        if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
-            try {
-                desktop.browse(new URI("http://www.offene-pflege.de"));
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            } catch (URISyntaxException use) {
-                use.printStackTrace();
-
-            }
-        }
-    }//GEN-LAST:event_btnAboutActionPerformed
 
     private void registerLogin() {
         String username = txtUsername.getText().trim();

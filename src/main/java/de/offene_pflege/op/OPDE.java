@@ -416,7 +416,7 @@ public class OPDE {
 
         DefaultParser parser = new DefaultParser();
         CommandLine cl = null;
-        String footer = "https://www.Offene-Pflege.de" + " " + OPDE.getAppInfo().getBuildInformation();
+        String footer = "https://www.wiedenhof.info" + " " + OPDE.getAppInfo().getBuildInformation();
 
         /***
          *      _          _

@@ -146,7 +146,7 @@ public class FrmMain extends JFrame {
         lblWait.setText(SYSTools.xx("misc.msg.wait"));
         lblWait.setVisible(false);
         listOfNursingrecords = new ArrayList<>();
-        btnHelp.setToolTipText(SYSTools.xx("opde.mainframe.btnHelp.tooltip"));
+        //btnHelp.setToolTipText(SYSTools.xx("opde.mainframe.btnHelp.tooltip"));
 
         iconPanels = Collections.synchronizedMap(new HashMap<Resident, JPanel>());
 
@@ -448,7 +448,6 @@ public class FrmMain extends JFrame {
         lblMainMsg = new JLabel();
         btnExit = new JButton();
         lblSubMsg = new JideLabel();
-        btnHelp = new JButton();
         pbMsg = new JProgressBar();
         btnReload = new JButton();
         splitPaneLeft = new JideSplitPane();
@@ -481,16 +480,16 @@ public class FrmMain extends JFrame {
                 }
             });
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, pref, $rgap, default:grow, 3dlu, $nlgap, bottom:pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
-                pnlMainMessage.setBackground(new Color(220, 223, 208));
+                pnlMainMessage.setBackground(new Color(0xdcdfd0));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, 15dlu, $lgap, fill:11dlu, $lgap, fill:pref:grow, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -519,7 +518,7 @@ public class FrmMain extends JFrame {
                     //---- lblMainMsg ----
                     lblMainMsg.setText("OPDE");
                     lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 22));
-                    lblMainMsg.setForeground(new Color(105, 80, 69));
+                    lblMainMsg.setForeground(new Color(0x695045));
                     lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
                     lblMainMsg.setIcon(null);
                     lblMainMsg.setHorizontalTextPosition(SwingConstants.LEADING);
@@ -542,25 +541,15 @@ public class FrmMain extends JFrame {
                 //---- lblSubMsg ----
                 lblSubMsg.setText("OPDE");
                 lblSubMsg.setFont(new Font("Arial", Font.PLAIN, 14));
-                lblSubMsg.setForeground(new Color(105, 80, 69));
+                lblSubMsg.setForeground(new Color(0x695045));
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
                 lblSubMsg.setVerticalAlignment(SwingConstants.TOP);
                 pnlMainMessage.add(lblSubMsg, CC.xywh(5, 5, 1, 3));
 
-                //---- btnHelp ----
-                btnHelp.setText(null);
-                btnHelp.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/help_circle_blue.png")));
-                btnHelp.setBorderPainted(false);
-                btnHelp.setContentAreaFilled(false);
-                btnHelp.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/help_pressed.png")));
-                btnHelp.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnHelp.addActionListener(e -> btnHelpActionPerformed(e));
-                pnlMainMessage.add(btnHelp, CC.xywh(3, 7, 1, 3));
-
                 //---- pbMsg ----
                 pbMsg.setValue(50);
                 pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
-                pbMsg.setForeground(new Color(105, 80, 69));
+                pbMsg.setForeground(new Color(0x695045));
                 pnlMainMessage.add(pbMsg, CC.xy(5, 9, CC.FILL, CC.FILL));
 
                 //---- btnReload ----
@@ -615,7 +604,7 @@ public class FrmMain extends JFrame {
                 panel2.add(btnResetSplitpane);
 
                 //---- statusBar ----
-                statusBar.setBackground(new Color(238, 238, 238));
+                statusBar.setBackground(new Color(0xeeeeee));
                 statusBar.setAlignmentY(1.0F);
                 panel2.add(statusBar);
             }
@@ -1038,7 +1027,6 @@ public class FrmMain extends JFrame {
     private JLabel lblMainMsg;
     private JButton btnExit;
     private JideLabel lblSubMsg;
-    private JButton btnHelp;
     private JProgressBar pbMsg;
     private JButton btnReload;
     private JideSplitPane splitPaneLeft;

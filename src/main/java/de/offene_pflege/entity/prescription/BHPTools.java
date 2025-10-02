@@ -54,7 +54,7 @@ public class BHPTools {
         return bhp.isEmpty() ? Optional.empty() : Optional.of(bhp.get(0));
     }
 
-    public static BHP getLastBHP(Resident resident, int flag) {
+    public static Optional<BHP>  getLastBHP(Resident resident, int flag) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM BHP b WHERE b.resident = :resident AND b.prescription.intervention.flag = :flag AND b.state = :state AND b.prescription.to > :now ORDER BY b.ist DESC");
         query.setParameter("resident", resident);
@@ -65,7 +65,7 @@ public class BHPTools {
         query.setMaxResults(1);
         List<BHP> bhp = query.getResultList();
         em.close();
-        return bhp.isEmpty() ? null : bhp.get(0);
+        return bhp.isEmpty() ? Optional.empty() : Optional.of(bhp.get(0));
     }
 
     public static long getConfirmedBHPs(Prescription prescription) {

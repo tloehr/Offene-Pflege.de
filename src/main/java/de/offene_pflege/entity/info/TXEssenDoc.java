@@ -670,7 +670,7 @@ public class TXEssenDoc {
                 content.put(TXEAF.DRESSING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.bed")));
                 content.put(TXEAF.DRESSING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.shower")));
                 content.put(TXEAF.DRESSING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.basin")));
-            } else if (caretype.getID().equalsIgnoreCase("kpflege02")) { // Diese Version ist noch vor der QDVS01.1
+            } else if (caretype.getID().matches("kpflege02|kpflege03")) {
                 // Die Struktur des Überleitbogens und der QDVS unterscheiden sich teilweise deutlich, so dass ich hier
                 // ein paar Entscheidungen treffen muss, wass ich wie abbilde.
 
@@ -1026,12 +1026,12 @@ public class TXEssenDoc {
             content.put(TXEAF.FOOD_PARENTERAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "parenteral")));
         }
 
-        long lastMeal = 0;
+        long lastMeal = 0L;
 
-        BHP bhp = BHPTools.getLastBHP(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
+        Optional<BHP> optBHP = BHPTools.getLastBHP(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
         DFN dfn = DFNTools.getLastDFN(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
 
-        lastMeal = Math.max((bhp == null ? 0 : bhp.getIst().getTime()), (dfn == null ? 0 : dfn.getIst().getTime()));
+        lastMeal = Math.max((optBHP.isEmpty() ? 0 : optBHP.get().getIst().getTime()), (dfn == null ? 0 : dfn.getIst().getTime()));
 
         if (lastMeal != 0) {
             content.put(TXEAF.FOOD_LAST_MEAL, DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(lastMeal));
@@ -1346,7 +1346,7 @@ public class TXEssenDoc {
     }
 
     private void createContent4Section15() {
-        // nothing yet
+        // empty on purpose
     }
 
 
@@ -1361,13 +1361,10 @@ public class TXEssenDoc {
         content.put(TXEAF.MEDS_CONTROL, setCheckbox(getValue(ResInfoTypeTools.TYPE_MEDS, "control")));
         content.put(TXEAF.MEDS_MARCUMARPASS, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_MEDS, "marcumarpass")));
 
-        BHP lastMed = BHPTools.getLastBHP(resident, InterventionTools.FLAG_MEDS_APPLICATION);
-        if (lastMed != null) {
-            content.put(TXEAF.MEDS_LAST_APPLICATION, DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(lastMed.getIst()));
-        } else {
-            content.put(TXEAF.MEDS_LAST_APPLICATION, "--");
-        }
-
+        content.put(TXEAF.MEDS_LAST_APPLICATION, "--");
+        BHPTools.getLastBHP(resident, InterventionTools.FLAG_MEDS_APPLICATION).ifPresent(bhp ->
+                content.put(TXEAF.MEDS_LAST_APPLICATION, DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(bhp.getIst()))
+        );
 
         ArrayList<Prescription> listGlucose = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GLUCOSE_MONITORING);
         if (!listGlucose.isEmpty()) {
