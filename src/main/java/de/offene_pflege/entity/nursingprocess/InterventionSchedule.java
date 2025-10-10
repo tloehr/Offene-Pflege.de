@@ -10,6 +10,7 @@ import de.offene_pflege.op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -88,7 +89,7 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
     private NursingProcess nursingProcess;
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
-    private Intervention intervention;
+    private Intervention intervention;;
 
     public InterventionSchedule() {
     }
@@ -548,8 +549,13 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
     }
 
     @Override
-    public int compareTo(InterventionSchedule interventionSchedule) {
-        return intervention.getBezeichnung().compareTo(interventionSchedule.getIntervention().getBezeichnung());
+    public int compareTo(InterventionSchedule that) {
+        // Uhrzeiten stehen immer unten
+        if (this.uhrzeitAnzahl > 0 && that.uhrzeitAnzahl == 0) return -1;
+        if (this.uhrzeitAnzahl == 0 && that.uhrzeitAnzahl > 0) return 1;
+        // wenn uhrzeit keine Rolle spielt sortieren wir alphabetisch
+        if (this.uhrzeitAnzahl == 0) return this.intervention.getBezeichnung().compareTo(that.getIntervention().getBezeichnung());
+        return this.uhrzeit.compareTo(that.uhrzeit);
     }
 
     @Override

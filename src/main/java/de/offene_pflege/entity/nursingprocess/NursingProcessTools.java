@@ -166,6 +166,8 @@ public class NursingProcessTools {
             html += "<ul><li><b>" + SYSTools.xx("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
         } else {
             html += "<ul>";
+            Collections.sort(np.getInterventionSchedule());
+            //List<InterventionSchedule> l = np.getInterventionSchedule().stream().sorted(InterventionSchedule::compareTo).collect(Collectors.toList());
             for (InterventionSchedule interventionSchedule : np.getInterventionSchedule()) {
                 html += "<li>";
                 html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b></div>";

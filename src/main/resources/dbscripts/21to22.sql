@@ -123,10 +123,10 @@ SET deprecated = 1,
     equiv      = 151
 WHERE BWINFTYP LIKE 'fraktur01';
 #
-INSERT INTO `resinfotype` (BWINFTYP, XML, BWInfoKurz, BWInfoLang, BWIKID, type, version, IntervalMode, equiv, deprecated)
-VALUES ('fraktur02', '<qdvs optional="true"/><label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
-   <checkbox label="Knochenbruch aufgrund eines Sturzes" name="fall" layout="br left"/>', 'Knochenbruch (Fraktur)', '',
-        15, 162, 0, 3, 151, 0);
+# INSERT INTO `resinfotype` (BWINFTYP, XML, BWInfoKurz, BWInfoLang, BWIKID, type, version, IntervalMode, equiv, deprecated)
+# VALUES ('fraktur02', '<qdvs optional="true"/><label layout="br left hfill" size="14" fontstyle="bold" label="Setzen Sie den Zeitpunkt des Ereignis nach dem Speichern."/>
+#    <checkbox label="Knochenbruch aufgrund eines Sturzes" name="fall" layout="br left"/>', 'Knochenbruch (Fraktur)', '',
+#         15, 162, 0, 3, 151, 0);
 #
 UPDATE `resinfotype`
 SET deprecated = 1,
@@ -202,6 +202,72 @@ VALUES ('schmerze3', '
     </combobox>
 ', 'Schmerzeinschätzung', 'Schmerzeinschätzung durch den Bewohner selbst',
         15, 137, 0, 3, 28, 0);
+#
+UPDATE `resinfotype`
+SET deprecated = 1
+WHERE BWINFTYP LIKE 'skin';
+#
+INSERT INTO `resinfotype` (BWINFTYP, XML, BWInfoKurz, BWInfoLang, BWIKID, type, version, IntervalMode, equiv, deprecated)
+VALUES ('skin2', '
+       <label label="Schnelleinschätzung" size="24" fontstyle="bold"/>
+    <label label=" Sollte eine oder mehrere Fragen mit Ja beantwortet werden, muss eine vertiefte Einschätzung durchgeführt werden." fontstyle="bold"/>
+
+    <tabgroup  size="16" label="Risikogruppe" name="riskgroup" >
+        <checkbox name="risk.old" label="Ältere Menschen"/>
+        <checkbox name="risk.inko" label="Inkontinenz" layout="left"/>
+        <checkbox name="risk.diabetes" label="Diabetes mellitus" layout="left"/>
+        <checkbox name="risk.chron.insuff" label="Chronisch venöse Insuffizienz" layout="br"/>
+        <checkbox name="risk.adipositas" label="Adipositas" layout="left"/>
+        <checkbox name="risk.mobility" label="Eingeschränkte Mobilität" layout="br"/>
+        <checkbox name="risk.medication" label="Besondere Medikamente (z.B. Diuretika, Kortison)" layout="left"/>
+    </tabgroup>
+
+    <tabgroup  size="16" label="Hautbeschaffenheit" name="skintype" tx="Seite 1, Abschnitt 3">
+        <checkbox name="skin.normal" label="intakt" layout="br"/>
+        <checkbox name="skin.dry" label="trocken"  layout="left"/>
+        <checkbox name="skin.greasy" label="fettig" layout="left"/>
+        <checkbox name="skin.prob" label="Gegenwärtige Hautprobleme"  layout="left"/>
+        <checkbox name="skin.changes" label="Aktuelle Veränderungen der Haut" layout="br"/>
+        <checkbox name="skin.allergies" label="Kontaktallergien oder Unverträglichkeiten" layout="left"/>
+        <checkbox name="skin.sweat" label="Starkes oder häufiges Schwitzen" layout="br"/>
+        <checkbox name="skin.wound" label="Wunde Stellen" layout="left"/>
+        <checkbox name="skin.tension" label="Spannungsgefühl" layout="left"/>
+        <checkbox name="skin.bruises" label="Blutergüsse oder Einrisse" layout="br"/>
+        <checkbox name="skin.itch" label="Jucken oder Schuppen" layout="left"/>
+        <checkbox name="skin.burn" label="Brennen oder Schmerzen" layout="left"/>
+    </tabgroup>
+
+    <label label="Vertiefte Einschätzung" size="24" fontstyle="bold"/>
+
+    <label label="[html][h2]Bitte prüfen Sie folgende Punkte und vermerken die Ergebnisse unten im Bemerkungsfeld[/h2]
+
+                  [ul]
+                  [li]Körperhygiene und Waschverhalten (wie oft und wie lange wird geduscht oder gebadet, welche Produkte werden zur Reinigung und Pflege der Haut verwendet und wie oft.[/li]
+                  [li]Unterstützungsbedarf bei der Körperpflege gibt, zum Beispiel im Zusammenhang mit Ausscheidungen oder beim Waschen.[/li]
+                  [li]Mangelernährung beziehungsweise Übergewicht[/li]
+                  [li]Wie ist das Trinkverhalten ?[/li]
+                  [li]Kontaktdermatitis oder Allergien[/li]
+                  [li]Fähigkeit zur Selbstpflege[/li]
+                  [/ul]
+
+                  [h2]Achten Sie bei der Hautinspektion auf folgende Auffälligkeiten[/h2]
+
+                  [ul]
+                   [li]Farbe (z. B. rot, bräunlich, bläulich)[/li]
+                   [li]Feuchtigkeit der Haut[/li]
+                   [li]Erhabenheiten (z. B. Papeln, Bläschen)[/li]
+                   [li]Schuppen[/li]
+                   [li]Erosionen[/li]
+                   [li]Schmerzen[/li]
+                   [li]Juckreiz[/li]
+                   [li]Brennen[/li]
+                   [li]Spannungsgefühl[/li]
+                  [/ul]
+                  [/html]"/>
+
+    <bodyscheme name="bs1"/>
+', 'Hautintegrität', '',
+        9, 109, 0, 0, 13, 0);
 #
 -- Um unliebsame Formen loszuwerden (Stomaplatte)
 alter table `dosageform`

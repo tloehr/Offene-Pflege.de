@@ -645,7 +645,6 @@ public class PnlWelcome extends CleanablePanel {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
-        btnAbout = new JButton();
         scrollPane1 = new JScrollPane();
         cpsWelcome = new CollapsiblePanes();
         panel2 = new JScrollPane();
@@ -659,19 +658,6 @@ public class PnlWelcome extends CleanablePanel {
             panel1.setLayout(new FormLayout(
                 "default:grow, $lcgap, pref",
                 "default, default:grow"));
-
-            //---- btnAbout ----
-            btnAbout.setText(null);
-            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/opde-logo.png")));
-            btnAbout.setHorizontalAlignment(SwingConstants.TRAILING);
-            btnAbout.setFont(new Font("Arial", Font.BOLD, 14));
-            btnAbout.setForeground(Color.red);
-            btnAbout.setHorizontalTextPosition(SwingConstants.LEADING);
-            btnAbout.setBorderPainted(false);
-            btnAbout.setContentAreaFilled(false);
-            btnAbout.setBorder(null);
-            btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            panel1.add(btnAbout, CC.xy(3, 1));
 
             //======== scrollPane1 ========
             {
@@ -754,7 +740,6 @@ public class PnlWelcome extends CleanablePanel {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel panel1;
-    private JButton btnAbout;
     private JScrollPane scrollPane1;
     private CollapsiblePanes cpsWelcome;
     private JScrollPane panel2;

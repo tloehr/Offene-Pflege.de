@@ -1,0 +1,62 @@
+<resinfotype bwinftyp="skin2" sinceversion="22" abstract_type="109" equivalent="13" intervalmode="0"
+             infokurz="Hautintegrität" infolang="" category="9" tx="false" qpr="false">
+
+    <label label="Schnelleinschätzung" size="24" fontstyle="bold"/>
+    <label label=" Sollte eine oder mehrere Fragen mit Ja beantwortet werden, muss eine vertiefte Einschätzung durchgeführt werden." fontstyle="bold"/>
+
+    <tabgroup  size="16" label="Risikogruppe" name="riskgroup" >
+        <checkbox name="risk.old" label="Ältere Menschen"/>
+        <checkbox name="risk.inko" label="Inkontinenz" layout="left"/>
+        <checkbox name="risk.diabetes" label="Diabetes mellitus" layout="left"/>
+        <checkbox name="risk.chron.insuff" label="Chronisch venöse Insuffizienz" layout="br"/>
+        <checkbox name="risk.adipositas" label="Adipositas" layout="left"/>
+        <checkbox name="risk.mobility" label="Eingeschränkte Mobilität" layout="br"/>
+        <checkbox name="risk.medication" label="Besondere Medikamente (z.B. Diuretika, Kortison)" layout="left"/>
+    </tabgroup>
+
+    <tabgroup  size="16" label="Hautbeschaffenheit" name="skintype" tx="Seite 1, Abschnitt 3">
+        <checkbox name="skin.normal" label="intakt" layout="br"/>
+        <checkbox name="skin.dry" label="trocken"  layout="left"/>
+        <checkbox name="skin.greasy" label="fettig" layout="left"/>
+        <checkbox name="skin.prob" label="Gegenwärtige Hautprobleme"  layout="left"/>
+        <checkbox name="skin.changes" label="Aktuelle Veränderungen der Haut" layout="br"/>
+        <checkbox name="skin.allergies" label="Kontaktallergien oder Unverträglichkeiten" layout="left"/>
+        <checkbox name="skin.sweat" label="Starkes oder häufiges Schwitzen" layout="br"/>
+        <checkbox name="skin.wound" label="Wunde Stellen" layout="left"/>
+        <checkbox name="skin.tension" label="Spannungsgefühl" layout="left"/>
+        <checkbox name="skin.bruises" label="Blutergüsse oder Einrisse" layout="br"/>
+        <checkbox name="skin.itch" label="Jucken oder Schuppen" layout="left"/>
+        <checkbox name="skin.burn" label="Brennen oder Schmerzen" layout="left"/>
+    </tabgroup>
+
+    <label label="Vertiefte Einschätzung" size="24" fontstyle="bold"/>
+
+    <label label="[html][h2]Bitte prüfen Sie folgende Punkte und vermerken die Ergebnisse unten im Bemerkungsfeld[/h2]
+
+                  [ul]
+                  [li]Körperhygiene und Waschverhalten (wie oft und wie lange wird geduscht oder gebadet, welche Produkte werden zur Reinigung und Pflege der Haut verwendet und wie oft.[/li]
+                  [li]Unterstützungsbedarf bei der Körperpflege gibt, zum Beispiel im Zusammenhang mit Ausscheidungen oder beim Waschen.[/li]
+                  [li]Mangelernährung beziehungsweise Übergewicht[/li]
+                  [li]Wie ist das Trinkverhalten ?[/li]
+                  [li]Kontaktdermatitis oder Allergien[/li]
+                  [li]Fähigkeit zur Selbstpflege[/li]
+                  [/ul]
+
+                  [h2]Achten Sie bei der Hautinspektion auf folgende Auffälligkeiten[/h2]
+
+                  [ul]
+                   [li]Farbe (z. B. rot, bräunlich, bläulich)[/li]
+                   [li]Feuchtigkeit der Haut[/li]
+                   [li]Erhabenheiten (z. B. Papeln, Bläschen)[/li]
+                   [li]Schuppen[/li]
+                   [li]Erosionen[/li]
+                   [li]Schmerzen[/li]
+                   [li]Juckreiz[/li]
+                   [li]Brennen[/li]
+                   [li]Spannungsgefühl[/li]
+                  [/ul]
+                  [/html]"/>
+
+    <bodyscheme name="bs1"/>
+
+</resinfotype>

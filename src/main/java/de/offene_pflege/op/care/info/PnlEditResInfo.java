@@ -875,7 +875,7 @@ public class PnlEditResInfo {
 
             ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
             content.put(j.getName(), bean.getName());
-            j.setToolTipText(bean.getTooltip());
+            //j.setToolTipText(bean.getTooltip());
             checkDependency(j.getName(), bean.getName());
             changed = true;
         }
@@ -1495,7 +1495,7 @@ public class PnlEditResInfo {
 
             if (tagName.equalsIgnoreCase("tx")) {
                 JLabel jl = new JLabel(SYSConst.findIcon(SYSConst.strIcon22ambulance));
-                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                //jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
             // <qdvs/>
@@ -1505,12 +1505,12 @@ public class PnlEditResInfo {
                 JLabel jl = new JLabel(optionalQDVS ? SYSConst.findIcon(SYSConst.icon22qi) : SYSConst.findIcon(SYSConst.icon22qiRed));
                 String tooltip_template = optionalQDVS ? "qdvs.resinfo.standard.tooltip" : "qdvs.resinfo.notwendig.tooltip";
                 String tooltip = SYSTools.catchNull(attributes.getValue("tooltip"), tooltip_template);
-                jl.setToolTipText(SYSTools.toHTML(("<p style=\"width:300px;\">" + tooltip).replace('[', '<').replace(']', '>')) + "</p>");
+                //jl.setToolTipText(SYSTools.toHTML(("<p style=\"width:300px;\">" + tooltip).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
             if (tagName.equalsIgnoreCase("bi")) {
                 JLabel jl = new JLabel(SYSConst.findIcon(SYSConst.icon22bi));
-                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                //jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
 
@@ -1534,7 +1534,7 @@ public class PnlEditResInfo {
 
                     }
                 });
-                link.setToolTipText(attributes.getValue("link"));
+                //link.setToolTipText(attributes.getValue("link"));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, link);
             }
@@ -1548,7 +1548,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("imagelabel")) {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(new ImageIcon(getClass().getResource(attributes.getValue("image"))));
-                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                //jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
                 jl.setText(attributes.getValue("text"));
                 outerpanel.add(layout, jl);
@@ -1575,19 +1575,11 @@ public class PnlEditResInfo {
 
                 jl.setFont(new Font(FONT, getFontStyle(attributes), getFontSize(attributes)));
 
-                String content_for_label = SYSTools.xx(attributes.getValue("label"));
-                if (!SYSTools.catchNull(attributes.getValue("parwidth")).isEmpty()) {
-                    content_for_label = "<html><p style=\"width:" + attributes.getValue("parwidth") + ";\">" + content_for_label + "</p></html>";
-                }
+                String content_for_label = SYSTools.xx(attributes.getValue("label")).replace('[', '<').replace(']', '>');
+
                 jl.setText(content_for_label);
 
-
-//                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 createComponent(outerpanel, jl, attributes);
-                //outerpanel.add(layout, jl);
-                //addInfoButtons(outerpanel, attributes);
-//                addDepenciesIfUsed(outerpanel, jl, attributes);
-//                components.put(groupname, jl); // das ist nötig, damit die dependencies funktionieren.
             }
             /***
              *                   _         _
@@ -1692,7 +1684,9 @@ public class PnlEditResInfo {
          * @param attributes
          */
         private void addInfoButtons(JPanel pnl, Attributes attributes) {
-            String tooltip = attributes.getValue("tooltip");
+            String tooltip = attributes.getValue("tooltip") == null ? null : "<html>" +
+                    "<p>" + SYSTools.xx(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')
+                            + "</p></html>";
             String tx = attributes.getValue("tx");
             String bi = attributes.getValue("bi");
             String qdvs = attributes.getValue("qdvs"); // qdvs= attribute NOT Tag
@@ -1720,18 +1714,6 @@ public class PnlEditResInfo {
                 pnl.add("left", btntx);
             }
 
-            // BI will ich nicht mehr
-//            if (bi != null) { // Begutachtungsinstrument
-//                final JButton btnbi = GUITools.getTinyButton(HTMLTools.toHTML(bi), SYSConst.findIcon(SYSConst.icon22bi));
-//                btnbi.addActionListener(e -> {
-//                    if (popupInfo != null) popupInfo.hidePopupImmediately();
-//                    popupInfo = createPopupInfo(HTMLTools.toHTML(prepareTooltip(bi)), btnbi);
-//                    GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
-//                });
-//
-//
-//                pnl.add("left", btnbi);
-//            }
 
             if (qdvs != null) { // indikator
                 boolean optionalQDVS = qdvs.equalsIgnoreCase("optional");
@@ -1861,7 +1843,7 @@ public class PnlEditResInfo {
                 JComboBox j = (JComboBox) components.get(groupname);
                 j.setModel(boxModel);
                 ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
-                j.setToolTipText(bean.getTooltip());
+                //j.setToolTipText(bean.getTooltip());
                 content.put(j.getName(), bean.getName());
             }
         }
