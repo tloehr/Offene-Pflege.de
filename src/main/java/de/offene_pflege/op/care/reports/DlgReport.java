@@ -9,13 +9,12 @@ import com.jgoodies.forms.layout.FormLayout;
 import de.offene_pflege.entity.info.ResInfo;
 import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.ResInfoTypeTools;
+import de.offene_pflege.entity.prescription.BHPTools;
 import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
-import de.offene_pflege.op.tools.MyJDialog;
-import de.offene_pflege.op.tools.PnlCommonTags;
-import de.offene_pflege.op.tools.PnlPIT;
-import de.offene_pflege.op.tools.SYSTools;
+import de.offene_pflege.op.tools.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -23,14 +22,19 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Date;
+
+import org.jdesktop.swingx.*;
 
 /**
  * @author Torsten Löhr
  */
+@Log4j2
 public class DlgReport extends MyJDialog {
     private NReport nReport;
     private Closure actionBlock;
+    private JCheckBox cb_close_bhps;
 
     private PnlPIT pnlPIT;
     private PnlCommonTags pnlCommonTags;
@@ -42,10 +46,17 @@ public class DlgReport extends MyJDialog {
         initComponents();
         initDialog();
         pack();
-
     }
 
     private void initDialog() {
+        cb_close_bhps = new JCheckBox("Ergebnis der BHPs bestätigen.");
+        if (nReport.getPbid() == null) { // new, empty report
+            int num_of_bhps = BHPTools.get_on_demand_bhps_with_pending_outcome_last_two_days(nReport.getResident()).size();
+            if (num_of_bhps > 0) {
+                cb_close_bhps.setToolTipText(num_of_bhps + " BHPs erwarten eine Dokumentation der Wirksamkeit (Outcome)");
+                opt_panel.add(cb_close_bhps, BorderLayout.WEST);
+            }
+        }
 
         ResInfo firstStay = ResInfoTools.getFirstResinfo(nReport.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         pnlPIT = new PnlPIT(nReport.getPit(), new Date(), firstStay == null ? new Date() : firstStay.getFrom());
@@ -63,7 +74,15 @@ public class DlgReport extends MyJDialog {
     @Override
     public void dispose() {
         super.dispose();
-        actionBlock.execute(nReport);
+        if (nReport != null)
+            actionBlock.execute(new Pair<>(nReport,
+                            cb_close_bhps.isSelected() ?
+                                    BHPTools.get_on_demand_bhps_with_pending_outcome_last_two_days(nReport.getResident()) :
+                                    new ArrayList<>()
+                    )
+            );
+        else
+            actionBlock.execute(null);
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -94,6 +113,7 @@ public class DlgReport extends MyJDialog {
         scrollPane1 = new JScrollPane();
         txtBericht = new JTextArea();
         panel2 = new JPanel();
+        opt_panel = new JPanel();
         btnCancel = new JButton();
         btnApply = new JButton();
 
@@ -109,8 +129,8 @@ public class DlgReport extends MyJDialog {
         });
         var contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "13dlu, pref, $rgap, 336dlu, 13dlu",
-            "13dlu, default, $nlgap, fill:143dlu, fill:46dlu, default, 13dlu"));
+                "13dlu, pref, $rgap, 336dlu, $rgap, 13dlu",
+                "13dlu, default, $nlgap, fill:143dlu, fill:46dlu, default, 13dlu"));
 
         //======== scrollPane1 ========
         {
@@ -127,6 +147,12 @@ public class DlgReport extends MyJDialog {
         {
             panel2.setLayout(new BoxLayout(panel2, BoxLayout.LINE_AXIS));
 
+            //======== opt_panel ========
+            {
+                opt_panel.setLayout(new BorderLayout());
+            }
+            panel2.add(opt_panel);
+
             //---- btnCancel ----
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
             btnCancel.addActionListener(e -> btnCancelActionPerformed(e));
@@ -137,7 +163,7 @@ public class DlgReport extends MyJDialog {
             btnApply.addActionListener(e -> btnApplyActionPerformed(e));
             panel2.add(btnApply);
         }
-        contentPane.add(panel2, CC.xy(4, 6, CC.RIGHT, CC.FILL));
+        contentPane.add(panel2, CC.xy(4, 6, CC.DEFAULT, CC.FILL));
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -147,6 +173,7 @@ public class DlgReport extends MyJDialog {
     private JScrollPane scrollPane1;
     private JTextArea txtBericht;
     private JPanel panel2;
+    private JPanel opt_panel;
     private JButton btnCancel;
     private JButton btnApply;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

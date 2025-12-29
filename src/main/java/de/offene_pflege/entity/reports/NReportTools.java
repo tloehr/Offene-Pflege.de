@@ -784,11 +784,16 @@ public class NReportTools {
      * @param deletedBy
      * @return
      */
-    public static NReport delete(NReport report, OPUsers deletedBy) {
+    public static NReport delete(final EntityManager em, NReport report, OPUsers deletedBy) {
         report.setDeletedBy(deletedBy);
         report.setDelPIT(new Date());
         report.getAttachedFilesConnections().clear();
         report.getAttachedQProcessConnections().clear();
+        report.getOutcomes().forEach(bhp -> {
+            em.merge(bhp);
+            bhp.setOutcome_report(null);
+        });
+        report.getOutcomes().clear();
         return report;
     }
 

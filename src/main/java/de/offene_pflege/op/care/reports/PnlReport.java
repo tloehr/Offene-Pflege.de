@@ -36,6 +36,7 @@ import com.jidesoft.swing.JideButton;
 import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
+import de.offene_pflege.entity.prescription.BHP;
 import de.offene_pflege.entity.process.*;
 import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.entity.reports.NReportTools;
@@ -259,8 +260,6 @@ public class PnlReport extends NursingRecordsPanel {
         list.add(tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
 
-
-//        ArrayList<Commontags> listTags = listUsedCommonTags;
         if (!listUsedCommontags.isEmpty()) {
 
             JPanel pnlTags = new JPanel();
@@ -296,13 +295,22 @@ public class PnlReport extends NursingRecordsPanel {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                     return;
                 }
-                currentEditor = new DlgReport(new NReport(resident), report -> {
-                    if (report != null) {
+                currentEditor = new DlgReport(new NReport(resident), pair -> {
+                    if (pair != null) {
+                        Pair<NReport, List<BHP>> my_pair = (Pair) pair;
+                        NReport report = my_pair.getFirst();
+                        final List<BHP> confirm_list_outcomes = my_pair.getSecond();
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                            final NReport myReport = (NReport) em.merge(report);
+                            final NReport myReport = em.merge(report);
+                            // close open outcome bhps with this nreport
+                            confirm_list_outcomes.forEach(bhp -> {
+                                final BHP my_bhp = em.merge(bhp);
+                                my_bhp.setOutcome_report(myReport);
+                            });
+
                             em.getTransaction().commit();
 
                             final String keyYear = Integer.toString(new DateTime(myReport.getPit()).getYear()) + ".year";
@@ -1316,7 +1324,8 @@ public class PnlReport extends NursingRecordsPanel {
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                             NReport delReport = em.merge(nreport);
                             em.lock(delReport, LockModeType.OPTIMISTIC);
-                            delReport = NReportTools.delete(delReport, em.merge(OPDE.getMe()));
+                            delReport = NReportTools.delete(em, delReport, em.merge(OPDE.getMe()));
+
 
                             em.getTransaction().commit();
 

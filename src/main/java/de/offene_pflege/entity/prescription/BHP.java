@@ -2,6 +2,7 @@ package de.offene_pflege.entity.prescription;
 
 
 import de.offene_pflege.entity.info.Resident;
+import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
@@ -14,12 +15,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-//import org.eclipse.persistence.annotations.OptimisticLocking;
-//import org.eclipse.persistence.annotations.OptimisticLockingType;
-
 @Entity
 @Table(name = "bhp")
-//@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
 public class BHP implements Serializable, Comparable<BHP> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -54,50 +51,36 @@ public class BHP implements Serializable, Comparable<BHP> {
     @Basic(optional = false)
     @Column(name = "nanotime")
     private Long nanotime;
+    @JoinColumn(name = "outcome_nreport", referencedColumnName = "PBID")
+    @ManyToOne
+    private NReport outcome_report;
+
+    public NReport getOutcome_report() {
+        return outcome_report;
+    }
+
+    public void setOutcome_report(NReport outcome_report) {
+        this.outcome_report = outcome_report;
+    }
 
     public BHP() {
     }
 
     public BHP(PrescriptionSchedule prescriptionSchedule) {
-        // looks redundant but simplifies enormously
+        // looks redundant but simplifies
         this.prescriptionSchedule = prescriptionSchedule;
         this.prescription = this.prescriptionSchedule.getPrescription();
         this.resident = this.prescriptionSchedule.getPrescription().getResident();
         this.tradeform = this.prescriptionSchedule.getPrescription().getTradeForm();
-        stockTransaction = new ArrayList<MedStockTransaction>();
+        stockTransaction = new ArrayList<>();
         this.version = 0l;
         this.nanotime = System.nanoTime();
         this.mdate = new Date();
-    }
-
-    /**
-     * constructs an outcome text BHP
-     *
-     * @param bhp
-     */
-    public BHP(BHP bhp) {
-        // looks redundant but simplifies enormously
-        this.prescriptionSchedule = bhp.getPrescriptionSchedule();
-        this.prescription = this.prescriptionSchedule.getPrescription();
-        this.resident = this.prescriptionSchedule.getPrescription().getResident();
-        this.tradeform = this.prescriptionSchedule.getPrescription().getTradeForm();
-
-        // the target time depends on the moment when the original OnDemand BHP is clicked.
-        // the outcome needs to be checked "check after hours" + this moment
-        DateTime targetTime = new DateTime().plusMinutes(this.prescriptionSchedule.getCheckAfterHours().multiply(new BigDecimal(60)).intValue());
-
-        this.soll = targetTime.toDate();
-        this.version = 0l;
-        this.nanotime = System.nanoTime();
-        this.sZeit = SYSCalendar.BYTE_TIMEOFDAY;
-        this.dosis = BigDecimal.ONE.negate(); // this is ALWAYS -1. its NOT the negation of the original dose
-        this.state = BHPTools.STATE_OPEN;
-        this.mdate = new Date();
-        stockTransaction = new ArrayList<MedStockTransaction>();
+        this.outcome_report = null;
     }
 
     public BHP(PrescriptionSchedule prescriptionSchedule, Date soll, Byte sZeit, BigDecimal dosis) {
-        // looks redundant but simplifies enormously
+        // looks redundant but simplifies
         this.prescriptionSchedule = prescriptionSchedule;
         this.prescription = this.prescriptionSchedule.getPrescription();
         this.resident = this.prescriptionSchedule.getPrescription().getResident();
@@ -109,7 +92,8 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.dosis = dosis;
         this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
-        stockTransaction = new ArrayList<MedStockTransaction>();
+        stockTransaction = new ArrayList<>();
+        this.outcome_report = null;
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bhp")

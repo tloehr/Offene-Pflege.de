@@ -39,6 +39,9 @@ import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.process.*;
+import de.offene_pflege.entity.reports.NReportTools;
+import de.offene_pflege.entity.system.Commontags;
+import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.entity.values.ResValue;
 import de.offene_pflege.entity.values.ResValueTools;
 import de.offene_pflege.entity.values.Resvaluetypes;
@@ -53,15 +56,21 @@ import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
+import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.*;
+import java.util.List;
 
 /**
  * Structure: createCP4Type - Creates the main Collapsible Panes for every available type. createContent4Type - Creates
@@ -76,6 +85,8 @@ import java.util.*;
 public class PnlValues extends NursingRecordsPanel {
 
 
+    private JFormattedTextField txt_max_results;
+    private JToggleButton tb_limit_list;
     private Resident resident;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
@@ -84,15 +95,11 @@ public class PnlValues extends NursingRecordsPanel {
     private Map<String, CollapsiblePane> cpMap;
     private Map<ResValue, JPanel> linemap;
     private Map<String, ArrayList<ResValue>> mapType2Values;
-//    private final Resvaluetypes LIQUIDBALANCE;
-
-//    private Color[] color1, color2;
 
     public PnlValues(Resident resident, JScrollPane jspSearch) {
         super("nursingrecords.vitalparameters");
         this.resident = resident;
         this.jspSearch = jspSearch;
-//        LIQUIDBALANCE = ResvaluetypesTools.getType(ResvaluetypesTools.LIQUIDBALANCE);
         initComponents();
         initPanel();
         prepareSearchArea();
@@ -108,9 +115,33 @@ public class PnlValues extends NursingRecordsPanel {
         Query query = em.createQuery("SELECT t FROM Resvaluetypes t WHERE t.valType != :valtype ORDER BY t.text");
         query.setParameter("valtype", ResvaluetypesService.LIQUIDBALANCE);
         lstValueTypes = Collections.synchronizedList(new ArrayList<Resvaluetypes>(query.getResultList()));
-
         em.close();
 
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new NumberFormatter(format);
+        formatter.setValueClass(Integer.class);
+        formatter.setMinimum(0);
+        formatter.setMaximum(Integer.MAX_VALUE);
+        formatter.setAllowsInvalid(false);
+        // If you want the value to be committed on each keystroke instead of focus lost
+        formatter.setCommitsOnValidEdit(true);
+
+        txt_max_results = new JFormattedTextField(formatter);
+        txt_max_results.setText(OPDE.getProps().getProperty(internalClassID + "::txt_max_results", "20"));
+        txt_max_results.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                SYSPropsTools.storeProp(internalClassID + "::txt_max_results", txt_max_results.getText(), OPDE.getMe());
+                reloadDisplay();
+            }
+        });
+
+        tb_limit_list = GUITools.getNiceToggleButton("Maximal ");
+        tb_limit_list.setSelected(SYSPropsTools.isBooleanTrue(internalClassID + "::tb_limit_list", true));
+        tb_limit_list.addItemListener(e -> {
+            SYSPropsTools.storeState(internalClassID + "::tb_limit_list", tb_limit_list);
+            reloadDisplay();
+        });
     }
 
     private void prepareSearchArea() {
@@ -133,7 +164,7 @@ public class PnlValues extends NursingRecordsPanel {
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
-//        GUITools.addAllComponents(mypanel, addKey());
+        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
 
@@ -148,8 +179,28 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
+    private List<Component> addFilters() {
+        List<Component> list = new ArrayList<>();
+
+
+//
+//        JideButton show_all = GUITools.createHyperlinkButton(SYSTools.xx("alle Werte anzeigen"), SYSConst.icon22exec, actionEvent -> {
+//           txt_max_results.setValue(20);
+//           reloadDisplay();
+//        });
+
+        JPanel panel = new JPanel();
+        panel.add(tb_limit_list);
+        panel.add(txt_max_results);
+        panel.add(new JLabel(" Einträge"));
+        list.add(panel);
+
+
+        return list;
+    }
+
     private java.util.List<Component> addCommands() {
-        java.util.List<Component> list = new ArrayList<Component>();
+        java.util.List<Component> list = new ArrayList<>();
 
         JideButton controlButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.vitalparameters.btnControlling.tooltip"), SYSConst.icon22magnify1, actionEvent -> {
             if (!ResidentTools.isActive(resident)) {
@@ -231,8 +282,7 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
     private void reloadDisplay() {
-        /***
-         *               _                 _ ____  _           _
+        /***         *               _                 _ ____  _           _
          *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
          *     | '__/ _ \ |/ _ \ / _` |/ _` | | | | / __| '_ \| |/ _` | | | |
          *     | | |  __/ | (_) | (_| | (_| | |_| | \__ \ |_) | | (_| | |_| |
@@ -354,7 +404,7 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
     private CollapsiblePane createCP4Year(final Resvaluetypes vtype, final int year) {
-        final String keyYears = vtype.getId() + ".xtypes." + Integer.toString(year) + ".year";
+        final String keyYears = vtype.getId() + ".xtypes." + year + ".year";
         final CollapsiblePane cpYear = getCP(keyYears);
 
         DefaultCPTitle cptitle = new DefaultCPTitle(Integer.toString(year), e -> {
@@ -420,12 +470,15 @@ public class PnlValues extends NursingRecordsPanel {
 
     // containts all resvalues but NOT the LIQUIDBALANCES
     private JPanel createContentPanel4Year(final Resvaluetypes vtype, final int year) {
-        final String keyYears = vtype.getId() + ".xtypes." + Integer.toString(year) + ".year";
+        final String keyYears = vtype.getId() + ".xtypes." + year + ".year";
 
         java.util.List<ResValue> myValues;
+
+        int max_results = tb_limit_list.isSelected() ? Integer.parseInt(txt_max_results.getText()) : 0;
+
         synchronized (mapType2Values) {
             if (!mapType2Values.containsKey(keyYears)) {
-                mapType2Values.put(keyYears, ResValueTools.getResValues(resident, vtype, year));
+                mapType2Values.put(keyYears, ResValueTools.getResValues(resident, vtype, year, max_results));
             }
             if (mapType2Values.get(keyYears).isEmpty()) {
                 JLabel lbl = new JLabel(SYSTools.xx("misc.msg.novalue"));

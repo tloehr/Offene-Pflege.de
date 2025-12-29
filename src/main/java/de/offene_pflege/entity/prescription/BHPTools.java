@@ -5,6 +5,8 @@ import de.offene_pflege.entity.building.Homes;
 import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
+import de.offene_pflege.entity.reports.NReport;
+import de.offene_pflege.entity.reports.NReportTools;
 import de.offene_pflege.entity.system.SYSPropsTools;
 import de.offene_pflege.gui.GUITools;
 import de.offene_pflege.op.OPDE;
@@ -22,6 +24,7 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,7 +57,7 @@ public class BHPTools {
         return bhp.isEmpty() ? Optional.empty() : Optional.of(bhp.get(0));
     }
 
-    public static Optional<BHP>  getLastBHP(Resident resident, int flag) {
+    public static Optional<BHP> getLastBHP(Resident resident, int flag) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM BHP b WHERE b.resident = :resident AND b.prescription.intervention.flag = :flag AND b.state = :state AND b.prescription.to > :now ORDER BY b.ist DESC");
         query.setParameter("resident", resident);
@@ -381,8 +384,6 @@ public class BHPTools {
                     }
                 }
                 listBHP.addAll(listBHP4ThisPrescription);
-                // outcome BHPs
-//                listBHP.addAll(new ArrayList<BHP>(queryOutcome.getResultList()));
             }
 
             Collections.sort(listBHP, getOnDemandComparator());
@@ -393,6 +394,29 @@ public class BHPTools {
         }
         SYSTools.showTimeDifference(begin);
         return listBHP;
+    }
+
+    /**
+     *
+     * @param resident
+     * @return
+     */
+    public static List<BHP> get_on_demand_bhps_with_pending_outcome_last_two_days(Resident resident) {
+        List<BHP> listBHPs = getBHPsOnDemand(resident, JavaTimeConverter.toDate(java.time.LocalDate.now()));
+        listBHPs.addAll(getBHPsOnDemand(resident, JavaTimeConverter.toDate(java.time.LocalDate.now().minusDays(-1))));
+        return listBHPs.stream()
+                .filter(bhp -> bhp.getState() == BHPTools.STATE_DONE && bhp.getPrescriptionSchedule().getCheckAfterHours() != null && bhp.getOutcome_report() == null)
+                .collect(Collectors.toList());
+    }
+
+    public static String getDetailsAsHTML(BHP bhp){
+        String details = PrescriptionTools.getPrescriptionAsHTML(bhp.getPrescription(), false, false, true, false);
+        if (bhp.getOutcome_report() != null){
+            details += SYSConst.html_h2("Ergebnisbericht (Outcome)");
+            details += NReportTools.getPITAsHTML(bhp.getOutcome_report());
+            details += NReportTools.getAsHTML(bhp.getOutcome_report(), "");
+        }
+        return details;
     }
 
     /**
@@ -443,7 +467,6 @@ public class BHPTools {
      * @return
      */
     public static ArrayList<BHP> getBHPs(Resident resident, Date date) {
-//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = null;
 
@@ -540,7 +563,7 @@ public class BHPTools {
         String text = "";
 
         // https://github.com/tloehr/Offene-Pflege.de/issues/63
-       if (!bhp.isOnDemand()) {
+        if (!bhp.isOnDemand()) {
             if (bhp.getSollZeit() == SYSCalendar.BYTE_TIMEOFDAY) {
                 text += "<font color=\"blue\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short") + "</font>";
             } else {

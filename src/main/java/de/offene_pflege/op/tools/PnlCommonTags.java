@@ -66,22 +66,8 @@ public class PnlCommonTags extends JPanel {
         initPanel();
     }
 
-//    public PnlCommonTags(Collection<Commontags> listSelectedTags, Closure editAction) {
-//        this.editAction = editAction;
-//        this.editmode = editAction != null;
-//
-//        setLayout(new RiverLayout(10, 5));
-//
-//        this.listSelectedTags = new HashSet<>(listSelectedTags);
-//        this.completionList = new ArrayList<>();
-//
-//        initPanel();
-//
-//    }
-
     public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode) {
         listeners = new ArrayList<>();
-//        editAction = null;
         this.editmode = editmode;
         this.addNewTags = false;
 
@@ -91,10 +77,6 @@ public class PnlCommonTags extends JPanel {
         this.completionList = new ArrayList<>();
 
         initPanel();
-    }
-
-    public void addNotifyListeners(Closure listener) {
-        listeners.add(listener);
     }
 
     void notifyListeners(Commontags commontag) {
@@ -164,15 +146,6 @@ public class PnlCommonTags extends JPanel {
                 final JidePopup popup = new JidePopup();
                 JPanel pnl = new JPanel(new BorderLayout());
                 pnl.add(new JScrollPane(getClickableTagsPanel()), BorderLayout.CENTER);
-//                        JButton btnApply = new JButton(SYSConst.icon22apply);
-//                        pnl.add(btnApply, BorderLayout.SOUTH);
-//
-//                        btnApply.addActionListener(new ActionListener() {
-//                            @Override
-//                            public void actionPerformed(ActionEvent ae) {
-//                                popup.hidePopup();
-//                            }
-//                        });
 
                 popup.setMovable(false);
                 popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));

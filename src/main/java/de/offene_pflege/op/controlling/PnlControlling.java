@@ -37,6 +37,9 @@ import com.toedter.calendar.JDateChooser;
 import de.offene_pflege.entity.prescription.Prescription;
 import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.reports.NReport;
+import de.offene_pflege.entity.values.ResValue;
+import de.offene_pflege.entity.values.ResValueTypeTools;
+import de.offene_pflege.entity.values.Resvaluetypes;
 import de.offene_pflege.op.system.InternalClass;
 import de.offene_pflege.services.HomesService;
 import de.offene_pflege.entity.building.Station;
@@ -910,6 +913,63 @@ public class PnlControlling extends CleanablePanel {
         pnlWounds.add(txtWoundsMonthsBack, BorderLayout.EAST);
         pnlContent.add(pnlWounds);
 
+
+        /**
+         *  ____         __     __    _
+         * |  _ \ ___  __\ \   / /_ _| |_   _  ___  ___
+         * | |_) / _ \/ __\ \ / / _` | | | | |/ _ \/ __|
+         * |  _ <  __/\__ \\ V / (_| | | |_| |  __/\__ \
+         * |_| \_\___||___/ \_/ \__,_|_|\__,_|\___||___/
+         */
+        JPanel pnlValues = new JPanel(new BorderLayout());
+        final JButton btnValues = GUITools.createHyperlinkButton("Aktuelle Bewohner Werte", null, null);
+        final JComboBox cmbResValueTypes = new JComboBox(new DefaultComboBoxModel(ResValueTypeTools.getAll().toArray(new Resvaluetypes[0])));
+        cmbResValueTypes.setRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                return new JLabel(((Resvaluetypes) value).getText());
+            }
+        });
+        cmbResValueTypes.setSelectedIndex(SYSPropsTools.getInteger("opde.controlling::cmbResValueTypes"));
+
+        btnValues.addActionListener(e -> {
+            OPDE.getMainframe().setBlocked(true);
+            SwingWorker worker = new SwingWorker() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    short res_value_type = ((Resvaluetypes) cmbResValueTypes.getSelectedItem()).getValType();
+                    SYSPropsTools.storeProp("opde.controlling::cmbResValueTypes", Integer.toString(cmbResValueTypes.getSelectedIndex()), OPDE.getLogin().getUser());
+                    List<ResValue> list_most_recent = new ArrayList<>();
+                    ResidentTools.getAllActive().forEach(resident -> {
+                        ResValueTools.getLast(resident, res_value_type).ifPresent(resValue -> list_most_recent.add(resValue));
+                    });
+
+                    return list_most_recent;
+                }
+
+                @Override
+                protected void done() {
+
+                    try {
+                        List<ResValue> result = (List<ResValue>) get();
+                        SYSFilesTools.print(ResValueTools.getAsHTMLMixedResidents(result), false);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ExecutionException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                }
+            };
+            worker.execute();
+        });
+        pnlValues.add(btnValues, BorderLayout.WEST);
+        pnlValues.add(cmbResValueTypes, BorderLayout.EAST);
+        pnlContent.add(pnlValues);
+
+
         return pnlContent;
     }
 
@@ -1021,7 +1081,7 @@ public class PnlControlling extends CleanablePanel {
                         progressClosure.execute(new Pair<Integer, Integer>(counter.increase(), list_residents.size()));
                         ArrayList<Prescription> list_prescriptions = PrescriptionTools.getAllActiveOnDemandMedsOnly(resident);
                         list_prescriptions.forEach(prescription -> {
-                            html.append(PrescriptionTools.toPrettyHTML(prescription)+"<br/>");
+                            html.append(PrescriptionTools.toPrettyHTML(prescription) + "<br/>");
                         });
                         if (list_prescriptions.isEmpty()) html.append(SYSConst.html_h3("Keine Bedarfsverodnungen"));
                     });
@@ -1244,8 +1304,8 @@ public class PnlControlling extends CleanablePanel {
         cpsControlling.add(createCP4Nutrition());
         cpsControlling.add(createCP4Pain());
         cpsControlling.add(createCP4Fall());
-
         cpsControlling.add(createCP4Hygiene());
+
 
         if (OPDE.isCalcMediUPR1()) {
             cpsControlling.add(createCP4Drugs());
@@ -1465,6 +1525,7 @@ public class PnlControlling extends CleanablePanel {
 @NoArgsConstructor
 class Counter {
     int counter = 0;
+
     int increase() {
         return counter++;
     }

@@ -737,6 +737,12 @@ public class PnlBHP extends NursingRecordsPanel {
             cptitle.getAdditionalIconPanel().add(icon3);
         }
 
+        if (bhp.getPrescriptionSchedule().getCheckAfterHours() != null) {
+            JLabel icon4 = new JLabel(SYSConst.findIcon(SYSConst.icon22intervalBySecond));
+            icon4.setOpaque(false);
+            cptitle.getAdditionalIconPanel().add(icon4);
+        }
+
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             if (!bhp.getPrescription().isClosed()) {
 
@@ -1171,7 +1177,7 @@ public class PnlBHP extends NursingRecordsPanel {
         bhpPane.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                contentPane.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(bhp.getPrescription(), false, false, true, false)));
+                contentPane.setText(SYSTools.toHTML(BHPTools.getDetailsAsHTML(bhp)));
             }
         });
 

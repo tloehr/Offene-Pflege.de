@@ -224,6 +224,44 @@ public class ResValueTools {
         return result;
     }
 
+    public static String getAsHTMLMixedResidents(List<ResValue> resValues) {
+
+        if (resValues.isEmpty()) {
+            return SYSConst.html_italic("misc.msg.noentryyet");
+        }
+
+
+        String html = "";
+
+        html += SYSConst.html_h1(resValues.get(0).getType().getText());
+
+
+        html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
+                "<th style=\"width:40%\">" + SYSTools.xx("misc.msg.resident") +
+                "<th style=\"width:20%\">" + SYSTools.xx("nursingrecords.vitalparameters.tabheader1") +
+                "</th><th style=\"width:40%\">" + SYSTools.xx("nursingrecords.vitalparameters.tabheader2") + "</th>" +
+                "</th><th style=\"width:40%\">" + SYSTools.xx("nursingrecords.vitalparameters.tabheader3") + "</th></tr>\n";
+
+        for (ResValue resValue : resValues) {
+            html += "<tr>";
+            html += "<td>";
+            html += ResidentTools.getTextCompact(resValue.getResident());
+            html += "</td>";
+            html += "<td>";
+            html += resValue.isReplaced() ? SYSConst.html_22x22_Eraser + "&nbsp;" : "";
+            html += resValue.isReplacement() ? SYSConst.html_22x22_Edited + "&nbsp;" : "";
+            html += getPITasHTML(resValue, true, false);
+            html += "</td>";
+            html += "<td>" + getValueAsHTML(resValue) + "</td>";
+            html += "<td>" + getTextAsHTML(resValue, false) + "</td>";
+            html += "</tr>\n";
+        }
+
+        html += "</table>\n";
+
+        return html;
+    }
+
 
     public static String getAsHTML(List<ResValue> resValues) {
 
@@ -447,9 +485,7 @@ public class ResValueTools {
         return list;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident, Resvaluetypes vtype, int year) {
-
-//        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+    public static ArrayList<ResValue> getResValues(Resident resident, Resvaluetypes vtype, int year, int max_results) {
         DateTime from = SYSCalendar.boy(year);
         DateTime to = SYSCalendar.eoy(year);
 
@@ -465,10 +501,15 @@ public class ResValueTools {
         query.setParameter("vtype", vtype);
         query.setParameter("from", from.toDate());
         query.setParameter("to", to.toDate());
+        if (max_results > 0) query.setMaxResults(max_results);
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
         em.close();
 
         return list;
+    }
+
+    public static ArrayList<ResValue> getResValues(Resident resident, Resvaluetypes vtype, int year) {
+        return getResValues(resident, vtype, year, -1);
     }
 
     public static String getValueAsHTML(ResValue rv) {

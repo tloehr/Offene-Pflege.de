@@ -4,6 +4,7 @@ import de.offene_pflege.entity.Ownable;
 import de.offene_pflege.entity.files.SYSNR2FILE;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
+import de.offene_pflege.entity.prescription.BHP;
 import de.offene_pflege.entity.process.QProcess;
 import de.offene_pflege.entity.process.QProcessElement;
 import de.offene_pflege.entity.process.SYSNR2PROCESS;
@@ -159,6 +160,12 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     private List<NR2User> usersAcknowledged;
 
     /**
+     * Das hier gilt nur für Übergabe Berichte. Es enthält alle User, die diesen Berichte zur Kenntnis genommen haben.
+     */
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "outcome_report", fetch = FetchType.LAZY)
+    private Collection<BHP> outcomes;
+
+    /**
      * die Liste alles Qualitätsprozesse, zu dem dieser Bericht zugeordnet wurde.
      */
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "nreport")
@@ -187,11 +194,12 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.text = "";
         this.resident = resident;
         this.newBy = OPDE.getLogin().getUser();
-        this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
-        this.commontags = new ArrayList<Commontags>();
-        this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
-        this.usersAcknowledged = new ArrayList<NR2User>();
-        this.version = 0l;
+        this.attachedFilesConnections = new ArrayList<>();
+        this.commontags = new ArrayList<>();
+        this.attachedProcessConnections = new ArrayList<>();
+        this.usersAcknowledged = new ArrayList<>();
+        this.outcomes = new ArrayList<>();
+        this.version = 0L;
     }
 
     /**
@@ -217,11 +225,12 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         this.editedBy = editedBy;
         this.replacedBy = replacedBy;
         this.replacementFor = replacementFor;
-        this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
-        this.commontags = new ArrayList<Commontags>();
-        this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
-        this.usersAcknowledged = new ArrayList<NR2User>();
-        this.version = 0l;
+        this.attachedFilesConnections = new ArrayList<>();
+        this.commontags = new ArrayList<>();
+        this.attachedProcessConnections = new ArrayList<>();
+        this.usersAcknowledged = new ArrayList<>();
+        this.outcomes = new ArrayList<>();
+        this.version = 0L;
     }
 
     public Long getPbid() {
@@ -246,6 +255,14 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
 
     public Date getEditedPIT() {
         return editedPIT;
+    }
+
+    public Collection<BHP> getOutcomes() {
+        return outcomes;
+    }
+
+    public void setOutcomes(Collection<BHP> outcomes) {
+        this.outcomes = outcomes;
     }
 
     public String getText() {
