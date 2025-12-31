@@ -600,7 +600,6 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
 
     @Override
     public int compareTo(Prescription them) {
-//        int result = ((Boolean) isClosed()).compareTo(them.isClosed()) * -1;
         int result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;
         if (result == 0) {
             result = ((Boolean) hasMed()).compareTo(them.hasMed());
@@ -613,13 +612,6 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
         if (result == 0) {
             result = from.compareTo(them.getFrom()) * -1;
         }
-//        if (result == 0) {
-//            result = Long.valueOf(relation).compareTo(them.getRelation());
-//        }
-//        if (result == 0) {
-//            result = ((Boolean) isClosed()).compareTo(them.isClosed());
-//        }
-//        
         return result;
     }
 

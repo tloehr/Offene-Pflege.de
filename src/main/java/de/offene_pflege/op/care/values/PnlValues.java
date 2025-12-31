@@ -64,8 +64,7 @@ import javax.persistence.*;
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -128,9 +127,19 @@ public class PnlValues extends NursingRecordsPanel {
 
         txt_max_results = new JFormattedTextField(formatter);
         txt_max_results.setText(OPDE.getProps().getProperty(internalClassID + "::txt_max_results", "20"));
-        txt_max_results.addFocusListener(new FocusAdapter() {
+//        txt_max_results.addFocusListener(new FocusAdapter() {
+//            @Override
+//            public void focusLost(FocusEvent e) {
+//                SYSPropsTools.storeProp(internalClassID + "::txt_max_results", txt_max_results.getText(), OPDE.getMe());
+//                reloadDisplay();
+//            }
+//        });
+
+        InputMap inputMap = txt_max_results.getInputMap(JComponent.WHEN_FOCUSED);
+        inputMap.put(KeyStroke.getKeyStroke((char)KeyEvent.VK_ENTER), "enterPressed");
+        txt_max_results.getActionMap().put("enterPressed", new AbstractAction() {
             @Override
-            public void focusLost(FocusEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 SYSPropsTools.storeProp(internalClassID + "::txt_max_results", txt_max_results.getText(), OPDE.getMe());
                 reloadDisplay();
             }
@@ -181,13 +190,6 @@ public class PnlValues extends NursingRecordsPanel {
 
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<>();
-
-
-//
-//        JideButton show_all = GUITools.createHyperlinkButton(SYSTools.xx("alle Werte anzeigen"), SYSConst.icon22exec, actionEvent -> {
-//           txt_max_results.setValue(20);
-//           reloadDisplay();
-//        });
 
         JPanel panel = new JPanel();
         panel.add(tb_limit_list);

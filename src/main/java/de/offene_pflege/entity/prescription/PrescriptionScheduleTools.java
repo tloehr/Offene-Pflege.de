@@ -371,14 +371,7 @@ public class PrescriptionScheduleTools {
             result += schedule.getMaxAnzahl() + "x " + SYSTools.formatBigDecimal(schedule.getMaxEDosis());
             result += "</b><br/>";
             if (schedule.getCheckAfterHours() != null) {
-                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
-                if (schedule.getCheckAfterHours().equals(new BigDecimal("0.5"))) {
-                    result += "&frac12; " + SYSTools.xx("misc.msg.Hour");
-                } else if (schedule.getCheckAfterHours().equals(BigDecimal.ONE)) {
-                    result += "1 " + SYSTools.xx("misc.msg.Hour");
-                } else {
-                    result += schedule.getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hours");
-                }
+                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck");
                 result += "<br/>";
             }
         } else if (getTerminStatus(schedule) == EXACTTIME) {
@@ -429,8 +422,7 @@ public class PrescriptionScheduleTools {
             result += schedule.getMaxAnzahl() + "x " + SYSTools.formatBigDecimal(schedule.getMaxEDosis());
             if (schedule.getCheckAfterHours() != null) {
                 result += "\n";
-                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
-                result += schedule.getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)");
+                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck");
             }
         } else if (getTerminStatus(schedule) == EXACTTIME) {
 
@@ -475,8 +467,7 @@ public class PrescriptionScheduleTools {
             result += schedule.getMaxAnzahl() + "x " + SYSTools.formatBigDecimal(schedule.getMaxEDosis());
             if (schedule.getCheckAfterHours() != null) {
                 result += "\n";
-                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
-                result += schedule.getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)");
+                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck");
             }
         } else if (getTerminStatus(schedule) == EXACTTIME) {
 

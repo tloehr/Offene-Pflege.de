@@ -37,6 +37,9 @@ import de.offene_pflege.entity.files.SYSFilesTools;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.prescription.BHP;
+import de.offene_pflege.entity.prescription.BHPTools;
+import de.offene_pflege.entity.prescription.DosageFormTools;
+import de.offene_pflege.entity.prescription.PrescriptionTools;
 import de.offene_pflege.entity.process.*;
 import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.entity.reports.NReportTools;
@@ -295,18 +298,16 @@ public class PnlReport extends NursingRecordsPanel {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                     return;
                 }
-                currentEditor = new DlgReport(new NReport(resident), pair -> {
-                    if (pair != null) {
-                        Pair<NReport, List<BHP>> my_pair = (Pair) pair;
-                        NReport report = my_pair.getFirst();
-                        final List<BHP> confirm_list_outcomes = my_pair.getSecond();
+                currentEditor = new DlgReport(new NReport(resident), obj -> {
+                    if (obj != null) {
+                        NReport report = (NReport) obj;
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                             final NReport myReport = em.merge(report);
                             // close open outcome bhps with this nreport
-                            confirm_list_outcomes.forEach(bhp -> {
+                            myReport.getOutcomes().forEach(bhp -> {
                                 final BHP my_bhp = em.merge(bhp);
                                 my_bhp.setOutcome_report(myReport);
                             });
@@ -858,9 +859,6 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
     private JPanel createContentPanel4Day(LocalDate day) {
-//        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("misc.msg.wait", progress, progressMax));
-//        progress++;
-
         final String key = DateFormat.getDateInstance().format(day.toDate());
         synchronized (contentmap) {
             if (contentmap.containsKey(key)) {
@@ -879,6 +877,26 @@ public class PnlReport extends NursingRecordsPanel {
 
                 if (tbShowReplaced.isSelected() || !nreport.isObsolete()) {
 
+
+                    String outcome = "";
+                    if (!nreport.getOutcomes().isEmpty()){
+                        final StringBuilder on_demand_outcomes = new StringBuilder();
+                        on_demand_outcomes.append("<td width=\"800\" align=\"left\">");
+                        on_demand_outcomes.append("<h3>Dieser Bericht beschreibt die Wirksamkeit der folgenden Bedarfsvergaben</h3>");
+                        on_demand_outcomes.append("<ul>");
+                        nreport.getOutcomes().forEach(bhp ->
+                                on_demand_outcomes.append(SYSConst.html_li(
+                                        SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), 65) +
+                                                (bhp.hasMed() ? ", <b>" + SYSTools.formatBigDecimal(bhp.getDose()) +
+                                                        " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
+                                                BHPTools.getScheduleText(bhp, ", ", "")+
+                                                (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser()) + "</i>" : "")
+                                ))
+                        );
+                        on_demand_outcomes.append("</td>");
+                        outcome = SYSConst.html_table_tr(on_demand_outcomes.toString());
+                    }
+
                     String title = SYSTools.toHTMLForScreen(
                             SYSConst.html_table(
                                     SYSConst.html_table_tr(
@@ -895,7 +913,8 @@ public class PnlReport extends NursingRecordsPanel {
                                             SYSConst.html_table_tr(
                                                     "<td width=\"800\" align=\"left\">" + SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
                                                             "</td>"
-                                            )
+                                            ) +
+                                            outcome // usually empty
                                     , "0")
                     );
 

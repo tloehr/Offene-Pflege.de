@@ -73,15 +73,23 @@ import java.util.*;
  */
 @Log4j2
 public class PnlPrescription extends NursingRecordsPanel {
+    private final int show_active_group = 0;
+    private final int show_active_date = 1;
+    private final int show_old_group = 2;
+    private final int show_old_date = 3;
+    private final int show_all_group = 4;
+    private final int show_all_date = 5;
 
     private Resident resident;
 
     private ArrayList<Prescription> lstPrescriptions, lstVisiblePrescriptions; // <= the latter is only for the zebra pattern
     private HashMap<String, CollapsiblePane> cpMap;
 
+    private int sort_order = show_active_group;
+
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private JToggleButton tbClosed;
+    //private JToggleButton tbClosed;
 
     private Color[] color1, color2;
 
@@ -100,6 +108,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     }
 
     private void initPanel() {
+        sort_order = show_active_group;
         color1 = SYSConst.greyscale;
         color2 = SYSConst.blue1;
         cpMap = new HashMap<String, CollapsiblePane>();
@@ -135,68 +144,59 @@ public class PnlPrescription extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-        final boolean withworker = true;
         cpsPrescription.removeAll();
         lstVisiblePrescriptions.clear();
         cpMap.clear();
         lstPrescriptions.clear();
 
-        if (withworker) {
 
-            OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
-            SwingWorker worker = new SwingWorker() {
+        SwingWorker worker = new SwingWorker() {
 
-                @Override
-                protected Object doInBackground() throws Exception {
-                    int progress = -1;
+            @Override
+            protected Object doInBackground() throws Exception {
+                int progress = -1;
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstPrescriptions.size()));
+
+                if (sort_order == show_active_date || sort_order == show_active_group) {
+                    lstPrescriptions = PrescriptionTools.getAllActive(resident);
+                } else if (sort_order == show_old_date || sort_order == show_old_group) {
+                    lstPrescriptions = PrescriptionTools.getAllStopped(resident);
+                } else {
+                    lstPrescriptions = PrescriptionTools.getAll(resident);
+                }
+
+                if (sort_order == show_active_date || sort_order == show_all_date)
+                    Collections.sort(lstPrescriptions, Comparator.comparing(Prescription::getFrom).reversed());
+                else if (sort_order == show_old_date)
+                    Collections.sort(lstPrescriptions, Comparator.comparing(Prescription::getTo).reversed());
+                else Collections.sort(lstPrescriptions);
+
+                for (Prescription prescription : lstPrescriptions) {
+                    progress++;
+                    createCP4(prescription);
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstPrescriptions.size()));
-
-                    if (tbClosed.isSelected()) {
-                        lstPrescriptions = PrescriptionTools.getAll(resident);
-                    } else {
-                        lstPrescriptions = PrescriptionTools.getAllActive(resident);
-                    }
-                    Collections.sort(lstPrescriptions);
-
-                    for (Prescription prescription : lstPrescriptions) {
-                        progress++;
-                        createCP4(prescription);
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstPrescriptions.size()));
-                    }
-
-                    return null;
                 }
 
-                @Override
-                protected void done() {
-                    try {
-                        get();
-                        buildPanel();
-                    } catch (Exception e) {
-                        OPDE.fatal(e);
-                    } finally {
-                        OPDE.getDisplayManager().setProgressBarMessage(null);
-                        OPDE.getMainframe().setBlocked(false);
-                    }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    buildPanel();
+                } catch (Exception e) {
+                    OPDE.fatal(e);
+                } finally {
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
                 }
-            };
-            worker.execute();
-
-        } else {
-            if (tbClosed.isSelected()) {
-                lstPrescriptions = PrescriptionTools.getAll(resident);
-            } else {
-                lstPrescriptions = PrescriptionTools.getAllActive(resident);
             }
-            Collections.sort(lstPrescriptions);
-            for (Prescription prescription : lstPrescriptions) {
-                createCP4(prescription);
-            }
-
-            buildPanel();
-        }
+        };
+        worker.execute();
 
     }
 
@@ -646,27 +646,84 @@ public class PnlPrescription extends NursingRecordsPanel {
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
 
-        tbClosed = GUITools.getNiceToggleButton("nursingrecords.prescription.showclosed");
-        tbClosed.addItemListener(e -> {
-            log.debug("from addFilters");
+//        tbClosed = GUITools.getNiceToggleButton("nursingrecords.prescription.showclosed");
+//        tbClosed.addItemListener(e -> {
+//            log.debug("from addFilters");
+//            reloadDisplay();
+//        });
+//        tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
+//        list.add(tbClosed);
+
+        JRadioButton rb_active_group = new JRadioButton("aktive");
+        JRadioButton rb_active_date = new JRadioButton("aktive nach Start-Datum");
+        JRadioButton rb_old_group = new JRadioButton("abgesetzte");
+        JRadioButton rb_old_date = new JRadioButton("abgesetzte nach End-Datum");
+        JRadioButton rb_all_group = new JRadioButton("alle");
+        JRadioButton rb_all_date = new JRadioButton("alle nach Start-Datum");
+
+        rb_active_group.setOpaque(false);
+        rb_active_date.setOpaque(false);
+        rb_old_group.setOpaque(false);
+        rb_old_date.setOpaque(false);
+        rb_all_group.setOpaque(false);
+        rb_all_date.setOpaque(false);
+
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(rb_active_group);
+        bg.add(rb_active_date);
+        bg.add(rb_old_group);
+        bg.add(rb_old_date);
+        bg.add(rb_all_group);
+        bg.add(rb_all_date);
+
+        rb_active_group.setSelected(true);
+
+        list.add(rb_active_group);
+        list.add(rb_active_date);
+        list.add(rb_old_group);
+        list.add(rb_old_date);
+        list.add(rb_all_group);
+        list.add(rb_all_date);
+
+        rb_active_group.addActionListener(e -> {
+            sort_order = show_active_group;
             reloadDisplay();
         });
-        tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
-        list.add(tbClosed);
+        rb_active_date.addActionListener(e -> {
+            sort_order = show_active_date;
+            reloadDisplay();
+        });
+        rb_old_group.addActionListener(e -> {
+            sort_order = show_old_group;
+            reloadDisplay();
+        });
+        rb_old_date.addActionListener(e -> {
+            sort_order = show_old_date;
+            reloadDisplay();
+        });
+        rb_all_group.addActionListener(e -> {
+            sort_order = show_all_group;
+            reloadDisplay();
+        });
+        rb_all_date.addActionListener(e -> {
+            sort_order = show_all_date;
+            reloadDisplay();
+        });
 
-        if (!listUsedCommontags.isEmpty()) {
-
-            JPanel pnlTags = new JPanel();
-            pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.Y_AXIS));
-            pnlTags.setOpaque(false);
-
-            for (final Commontags commontag : listUsedCommontags) {
-                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag), true, true, false, tbClosed.isSelected(), true), true));
-                btnTag.setForeground(GUITools.getColor(commontag.getColor()));
-                pnlTags.add(btnTag);
-            }
-            list.add(pnlTags);
-        }
+// 31.12.25 - brauchen wir das wirklich ?
+//        if (!listUsedCommontags.isEmpty()) {
+//
+//            JPanel pnlTags = new JPanel();
+//            pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.Y_AXIS));
+//            pnlTags.setOpaque(false);
+//
+//            for (final Commontags commontag : listUsedCommontags) {
+//                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, e -> SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(PrescriptionTools.getPrescriptions4Tags(resident, commontag), true, true, false, tbClosed.isSelected(), true), true));
+//                btnTag.setForeground(GUITools.getColor(commontag.getColor()));
+//                pnlTags.add(btnTag);
+//            }
+//            list.add(pnlTags);
+//        }
 
         return list;
     }
@@ -801,7 +858,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         // checked for acls
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
-            JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, actionEvent -> SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected(), true), true));
+            JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, actionEvent -> SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, true, true), true));
             list.add(printPrescription);
         }
 
@@ -1291,7 +1348,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              * Gehört zu dem Aspekt, dass verhindert werden soll, dass Depot-Spritzen vergessen werden.
              */
             if (PrescriptionTools.is_remindable(prescription)) {
-                String icon = prescription.isNever_remind() ? "artwork/22x22/no_bell.png": "artwork/22x22/bell.png";
+                String icon = prescription.isNever_remind() ? "artwork/22x22/no_bell.png" : "artwork/22x22/bell.png";
                 String message = prescription.isNever_remind() ? "nursingrecords.prescription.btnRemindIsOff" : "nursingrecords.prescription.btnRemindIsOn";
                 final JButton btn_never_remind = GUITools.createHyperlinkButton(message,
                         new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(icon)), e -> {

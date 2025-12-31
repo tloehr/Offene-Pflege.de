@@ -859,6 +859,19 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static ArrayList<Prescription> getAllStopped(Resident resident) {
+        EntityManager em = OPDE.createEM();
+
+        ArrayList<Prescription> result = null;
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.to < :now");
+        query.setParameter("resident", resident);
+        query.setParameter("now", new Date());
+        result = new ArrayList<Prescription>(query.getResultList());
+
+        em.close();
+        return result;
+    }
+
 //    public static ArrayList<Prescription> getAllActiveWithWeightControll() {
 //        EntityManager em = OPDE.createEM();
 //

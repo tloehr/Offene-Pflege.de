@@ -49,7 +49,7 @@ public class DlgReport extends MyJDialog {
     }
 
     private void initDialog() {
-        cb_close_bhps = new JCheckBox("Ergebnis der BHPs bestätigen.");
+        cb_close_bhps = new JCheckBox("Wirksamkeit des Bedarfs bestätigen");
         if (nReport.getPbid() == null) { // new, empty report
             int num_of_bhps = BHPTools.get_on_demand_bhps_with_pending_outcome_last_two_days(nReport.getResident()).size();
             if (num_of_bhps > 0) {
@@ -74,15 +74,7 @@ public class DlgReport extends MyJDialog {
     @Override
     public void dispose() {
         super.dispose();
-        if (nReport != null)
-            actionBlock.execute(new Pair<>(nReport,
-                            cb_close_bhps.isSelected() ?
-                                    BHPTools.get_on_demand_bhps_with_pending_outcome_last_two_days(nReport.getResident()) :
-                                    new ArrayList<>()
-                    )
-            );
-        else
-            actionBlock.execute(null);
+            actionBlock.execute(nReport);
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -101,6 +93,10 @@ public class DlgReport extends MyJDialog {
 
         nReport.setPit(pnlPIT.getPIT());
         nReport.setNewBy(OPDE.getMe());
+
+        if (cb_close_bhps.isSelected())
+            nReport.getOutcomes().addAll(BHPTools.get_on_demand_bhps_with_pending_outcome_last_two_days(nReport.getResident()));
+
         dispose();
     }
 
