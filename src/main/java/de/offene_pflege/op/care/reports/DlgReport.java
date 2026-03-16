@@ -49,7 +49,7 @@ public class DlgReport extends MyJDialog {
     }
 
     private void initDialog() {
-        cb_close_bhps = new JCheckBox("Wirksamkeit des Bedarfs bestätigen");
+        cb_close_bhps = new JCheckBox("Ergebnis der Bedarfsgabe beschreiben");
         if (nReport.getPbid() == null) { // new, empty report
             int num_of_bhps = BHPTools.get_on_demand_bhps_with_pending_outcome_last_two_days(nReport.getResident()).size();
             if (num_of_bhps > 0) {

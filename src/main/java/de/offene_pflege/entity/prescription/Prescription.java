@@ -22,6 +22,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.ToString;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.persistence.annotations.OptimisticLocking;
@@ -92,6 +93,7 @@ import java.util.List;
 @Entity
 @Table(name = "prescription")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
+@ToString
 public class Prescription extends Ownable implements Serializable, QProcessElement, Cloneable, Comparable<Prescription>, Attachable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -131,13 +133,17 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     // ==
     // 1:N Relationen
     // ==
+    @ToString.Exclude
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2FILE> attachedFilesConnections;
+    @ToString.Exclude
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2PROCESS> attachedProcessConnections;
+    @ToString.Exclude
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
     // these are the annotations for a prescription. currently only used for the MRE studies
+    @ToString.Exclude
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "prescription")
     private Collection<ResInfo> annotations;
 
@@ -146,35 +152,45 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     // ==
     // N:1 Relationen
     // ==
+    @ToString.Exclude
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private OPUsers userON;
     @JoinColumn(name = "AbUKennung", referencedColumnName = "UKennung")
     @ManyToOne
+    @ToString.Exclude
     private OPUsers userOFF;
     @JoinColumn(name = "BWKennung", referencedColumnName = "id")
     @ManyToOne
+    @ToString.Exclude
     private Resident resident;
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
+    @ToString.Exclude
     private Intervention intervention;
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
+    @ToString.Exclude
     private TradeForm tradeform;
     @JoinColumn(name = "SitID", referencedColumnName = "SitID")
     @ManyToOne
+    @ToString.Exclude
     private Situations situation;
     @JoinColumn(name = "AnKHID", referencedColumnName = "KHID")
     @ManyToOne
+    @ToString.Exclude
     private Hospital hospitalON;
     @JoinColumn(name = "AbKHID", referencedColumnName = "KHID")
     @ManyToOne
+    @ToString.Exclude
     private Hospital hospitalOFF;
     @JoinColumn(name = "AnArztID", referencedColumnName = "ArztID")
     @ManyToOne
+    @ToString.Exclude
     private GP docON;
     @JoinColumn(name = "AbArztID", referencedColumnName = "ArztID")
     @ManyToOne
+    @ToString.Exclude
     private GP docOFF;
 
 
@@ -182,6 +198,7 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     @JoinTable(name = "prescription2tags", joinColumns =
     @JoinColumn(name = "prescid"), inverseJoinColumns =
     @JoinColumn(name = "ctagid"))
+    @ToString.Exclude
     private Collection<Commontags> commontags;
 
 
@@ -600,9 +617,9 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
 
     @Override
     public int compareTo(Prescription them) {
-        int result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;
+        int result = Boolean.compare(isOnDemand(), them.isOnDemand()) * -1;
         if (result == 0) {
-            result = ((Boolean) hasMed()).compareTo(them.hasMed());
+            result = Boolean.compare(hasMed(), them.hasMed());
         }
         if (result == 0) {
             String mytitle = hasMed() ? getTradeForm().getMedProduct().getText() : getIntervention().getBezeichnung();
@@ -615,11 +632,6 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
         return result;
     }
 
-    @Override
-    public String toString() {
-        return "Prescription{" +
-                "verid=" + id;
-    }
 
     @Override
     public boolean isActive() {

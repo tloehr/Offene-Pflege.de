@@ -856,18 +856,17 @@ public class ResInfoTools {
                     Hospital hospital = EntityTools.find(Hospital.class, hid);
                     strHospital = SYSConst.html_bold(HospitalTools.getFullName(hospital));
                 }
-
-                log.debug(resInfo.getID());
-
-                if (!strHospital.isEmpty()) {
-                    html = "<br/>" + SYSConst.html_bold(SYSConst.html_ul("misc.msg.hospital")) +
-                            SYSConst.html_ul(SYSConst.html_li(strHospital));
-                } else if (content.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_HOLLIDAY)) {
-                    html = SYSConst.html_italic("misc.msg.holliday") + SYSConst.html_paragraph(resInfo.getText());
-                } else if (content.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_OTHER)) {
-                    html = SYSConst.html_italic("misc.msg.otherreasons") + SYSConst.html_paragraph(resInfo.getText());
-                }
             }
+
+            if (!strHospital.isEmpty()) {
+                html = "<br/>" + SYSConst.html_bold(SYSConst.html_ul("misc.msg.hospital")) +
+                        SYSConst.html_ul(SYSConst.html_li(strHospital));
+            } else if (content.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_HOLLIDAY)) {
+                html = SYSConst.html_italic("misc.msg.holliday") + SYSConst.html_paragraph(resInfo.getText());
+            } else if (content.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_OTHER)) {
+                html = SYSConst.html_italic("misc.msg.otherreasons") + SYSConst.html_paragraph(resInfo.getText());
+            }
+
         } else if (resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY) {
             Properties content = getContent(resInfo);
             boolean kzp = content.getProperty(ResInfoTypeTools.KZP_KEY, "false").equalsIgnoreCase("true");

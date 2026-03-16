@@ -273,8 +273,10 @@ public class MedOrderTools {
                             .forEach(prescription -> {
                                 if (type == PnlMed.TYPE_REGULAR && prescription.isOnDemand()) return;
                                 if (type == PnlMed.TYPE_ON_DEMAND && !prescription.isOnDemand()) return;
+                                MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, prescription.getTradeForm());
+                                if (inventory == null) return; // prevent exception when no inventory
                                 BigDecimal consumption_per_day = PrescriptionTools.get_consumption_per_day(prescription);
-                                BigDecimal sum_for_inventory = MedInventoryTools.getSum(TradeFormTools.getInventory4TradeForm(resident, prescription.getTradeForm()));
+                                BigDecimal sum_for_inventory = MedInventoryTools.getSum(inventory);
                                 BigDecimal range = sum_for_inventory.divide(consumption_per_day, RoundingMode.HALF_UP);
                                 if (range.compareTo(BigDecimal.valueOf(cover_days)) <= 0) {
                                     map.put(resident, prescription.getTradeForm(), new Quintet<>(consumption_per_day, sum_for_inventory, range, prescription.getDocON(), prescription.getHospitalON()));

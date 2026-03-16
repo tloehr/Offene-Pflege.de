@@ -7,6 +7,7 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.Pair;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -22,6 +23,7 @@ import java.util.Set;
  * Created by IntelliJ IDEA. User: tloehr Date: 18.11.11 Time: 16:29 To change this template use File | Settings | File
  * Templates.
  */
+@Log4j2
 public class TradeFormTools {
     public static final int SHORT = 0;
     public static final int MEDIUM = 1;
@@ -168,6 +170,7 @@ public class TradeFormTools {
     public static MedInventory getInventory4TradeForm(Resident bewohner, TradeForm tradeform) {
         MedInventory result = null;
         EntityManager em = OPDE.createEM();
+
         try {
             result = getInventory4TradeForm(em, bewohner, tradeform);
         } catch (NoResultException nre) {

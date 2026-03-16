@@ -75,10 +75,11 @@ import java.util.*;
 public class PnlPrescription extends NursingRecordsPanel {
     private final int show_active_group = 0;
     private final int show_active_date = 1;
-    private final int show_old_group = 2;
-    private final int show_old_date = 3;
-    private final int show_all_group = 4;
-    private final int show_all_date = 5;
+    private final int show_active_abc = 2;
+    private final int show_old_group = 3;
+    private final int show_old_date = 4;
+    private final int show_old_abc = 5;
+
 
     private Resident resident;
 
@@ -160,18 +161,22 @@ public class PnlPrescription extends NursingRecordsPanel {
                 int progress = -1;
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstPrescriptions.size()));
 
-                if (sort_order == show_active_date || sort_order == show_active_group) {
+                if (sort_order == show_active_date || sort_order == show_active_group || sort_order == show_active_abc) {
                     lstPrescriptions = PrescriptionTools.getAllActive(resident);
-                } else if (sort_order == show_old_date || sort_order == show_old_group) {
+                } else if (sort_order == show_old_date || sort_order == show_old_group || sort_order == show_old_abc) {
                     lstPrescriptions = PrescriptionTools.getAllStopped(resident);
                 } else {
                     lstPrescriptions = PrescriptionTools.getAll(resident);
                 }
 
-                if (sort_order == show_active_date || sort_order == show_all_date)
+                if (sort_order == show_active_date)
                     Collections.sort(lstPrescriptions, Comparator.comparing(Prescription::getFrom).reversed());
                 else if (sort_order == show_old_date)
                     Collections.sort(lstPrescriptions, Comparator.comparing(Prescription::getTo).reversed());
+                else if (sort_order == show_old_abc || sort_order == show_active_abc )
+                    Collections.sort(lstPrescriptions, Comparator.comparing(PrescriptionTools::getShortDescriptionAsCompactText, String.CASE_INSENSITIVE_ORDER)
+                            .thenComparing(Prescription::getFrom)
+                    );
                 else Collections.sort(lstPrescriptions);
 
                 for (Prescription prescription : lstPrescriptions) {
@@ -646,69 +651,34 @@ public class PnlPrescription extends NursingRecordsPanel {
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
 
-//        tbClosed = GUITools.getNiceToggleButton("nursingrecords.prescription.showclosed");
-//        tbClosed.addItemListener(e -> {
-//            log.debug("from addFilters");
-//            reloadDisplay();
-//        });
-//        tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
-//        list.add(tbClosed);
+        list.add(new JSeparator());
+        list.add(new JLabel(SYSTools.xx("Filter & Sortierung")));
 
-        JRadioButton rb_active_group = new JRadioButton("aktive");
-        JRadioButton rb_active_date = new JRadioButton("aktive nach Start-Datum");
-        JRadioButton rb_old_group = new JRadioButton("abgesetzte");
-        JRadioButton rb_old_date = new JRadioButton("abgesetzte nach End-Datum");
-        JRadioButton rb_all_group = new JRadioButton("alle");
-        JRadioButton rb_all_date = new JRadioButton("alle nach Start-Datum");
-
-        rb_active_group.setOpaque(false);
-        rb_active_date.setOpaque(false);
-        rb_old_group.setOpaque(false);
-        rb_old_date.setOpaque(false);
-        rb_all_group.setOpaque(false);
-        rb_all_date.setOpaque(false);
+        CollapsiblePane p = new CollapsiblePane("Filter & Sortierung");
 
         ButtonGroup bg = new ButtonGroup();
-        bg.add(rb_active_group);
-        bg.add(rb_active_date);
-        bg.add(rb_old_group);
-        bg.add(rb_old_date);
-        bg.add(rb_all_group);
-        bg.add(rb_all_date);
 
-        rb_active_group.setSelected(true);
+        Object[][] filterConfig = new Object[][]{
+                {"aktive", show_active_group},
+                {"aktive, Start-Datum", show_active_date},
+                {"aktive, abc", show_active_abc},
+                {"abgesetzte", show_old_group},
+                {"abgesetzte, End-Datum", show_old_date},
+                {"abgesetzte, abc", show_old_abc}
+        };
 
-        list.add(rb_active_group);
-        list.add(rb_active_date);
-        list.add(rb_old_group);
-        list.add(rb_old_date);
-        list.add(rb_all_group);
-        list.add(rb_all_date);
-
-        rb_active_group.addActionListener(e -> {
-            sort_order = show_active_group;
-            reloadDisplay();
-        });
-        rb_active_date.addActionListener(e -> {
-            sort_order = show_active_date;
-            reloadDisplay();
-        });
-        rb_old_group.addActionListener(e -> {
-            sort_order = show_old_group;
-            reloadDisplay();
-        });
-        rb_old_date.addActionListener(e -> {
-            sort_order = show_old_date;
-            reloadDisplay();
-        });
-        rb_all_group.addActionListener(e -> {
-            sort_order = show_all_group;
-            reloadDisplay();
-        });
-        rb_all_date.addActionListener(e -> {
-            sort_order = show_all_date;
-            reloadDisplay();
-        });
+        for (Object[] config : filterConfig) {
+            JRadioButton rb = new JRadioButton(config[0].toString());
+            rb.setOpaque(false);
+            bg.add(rb);
+            list.add(rb);
+            final int order = (Integer) config[1];
+            if (order == show_active_group) rb.setSelected(true);
+            rb.addActionListener(e -> {
+                sort_order = order;
+                reloadDisplay();
+            });
+        }
 
 // 31.12.25 - brauchen wir das wirklich ?
 //        if (!listUsedCommontags.isEmpty()) {

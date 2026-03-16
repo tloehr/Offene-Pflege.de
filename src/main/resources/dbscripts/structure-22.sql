@@ -58,8 +58,7 @@ CREATE TABLE `bhp` (
   `VerID` bigint(20) unsigned NOT NULL,
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
   `nanotime` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `needsText` tinyint(1) NOT NULL DEFAULT '0',
-  `outcome4` bigint(20) unsigned DEFAULT NULL,
+  `outcome_nreport` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`BHPID`),
   KEY `BHPPID_IDX` (`BHPPID`),
   KEY `idx1` (`Soll`),
@@ -67,7 +66,7 @@ CREATE TABLE `bhp` (
   KEY `idx3` (`DafID`),
   KEY `idx4` (`VerID`),
   KEY `idx5` (`SZeit`),
-  KEY `idx6` (`outcome4`)
+  KEY `idx6` (`outcome_nreport`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -117,7 +116,7 @@ CREATE TABLE `dosageform` (
   `AnwEinheit` tinyint(3) unsigned NOT NULL,
   `PackEinheit` tinyint(3) unsigned NOT NULL,
   `MassID` bigint(20) unsigned NOT NULL,
-  `Stellplan` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `Stellplan` tinyint(3) NOT NULL DEFAULT '0',
   `Status` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `Equiv` int(10) unsigned NOT NULL DEFAULT '0',
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
