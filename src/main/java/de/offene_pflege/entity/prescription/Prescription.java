@@ -93,7 +93,6 @@ import java.util.List;
 @Entity
 @Table(name = "prescription")
 @OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
-@ToString
 public class Prescription extends Ownable implements Serializable, QProcessElement, Cloneable, Comparable<Prescription>, Attachable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -631,6 +630,14 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Prescription{" +
+                "verid=" + id + "}";
+    }
+
+
 
 
     @Override
