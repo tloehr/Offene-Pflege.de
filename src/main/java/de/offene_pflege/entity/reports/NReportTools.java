@@ -214,7 +214,7 @@ public class NReportTools {
      */
     public static String getNReportAsHTML(NReport nReport, boolean withResident) {
         String html = "";
-        String text = SYSTools.replace(nReport.getText(), "\n", "<br/>", false);
+        String text = SYSTools.replace(getText(nReport), "\n", "<br/>", false);
 
         if (withResident) {
             html += "<b>Pflegebericht für " + ResidentTools.getLabelText(nReport.getResident()) + "</b>";
@@ -387,7 +387,7 @@ public class NReportTools {
 //            result += "<font color=\"red\">&#9679;</font>";
 //        }
 
-        String tmp = SYSTools.replace(nReport.getText(), "\n", "<br/>", false);
+        String tmp = SYSTools.replace(getText(nReport), "\n", "<br/>", false);
         if (!SYSTools.catchNull(highlight).isEmpty()) {
             tmp = SYSTools.replace(tmp, highlight, "<font style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</font>", true);
         }
@@ -458,7 +458,7 @@ public class NReportTools {
                 for (NReport nReport : listReports) {
                     html.append(SYSConst.html_table_tr(
                             SYSConst.html_table_td(df.format(nReport.getPit()), null) +
-                                    SYSConst.html_table_td(SYSConst.html_paragraph(nReport.getText()), null) +
+                                    SYSConst.html_table_td(SYSConst.html_paragraph(getText(nReport)), null) +
                                     SYSConst.html_table_td(nReport.getNewBy().getFullname(), null)
                     ));
                 }
@@ -467,6 +467,12 @@ public class NReportTools {
         }
         return html.toString();
     }
+
+    public static String getText(NReport nReport) {
+        return SYSTools.anonymizeText(ResidentTools.getName(nReport.getResident()), nReport.getText());
+    }
+
+
 
 
     public static String getComplaints(LocalDate from, Closure progress) {
@@ -519,7 +525,7 @@ public class NReportTools {
                     table += SYSConst.html_table_tr(
                             SYSConst.html_table_td(df.format(nReport.getPit()), null) +
                                     SYSConst.html_table_td(ResidentTools.getTextCompact(nReport.getResident()), null) +
-                                    SYSConst.html_table_td(SYSConst.html_paragraph(nReport.getText()), null) +
+                                    SYSConst.html_table_td(SYSConst.html_paragraph(getText(nReport)), null) +
                                     SYSConst.html_table_td(nReport.getNewBy().getFullname(), null)
                     );
                 }
@@ -795,7 +801,7 @@ public class NReportTools {
         report.setDeletedBy(deletedBy);
         report.setDelPIT(new Date());
         report.getAttachedFilesConnections().clear();
-        report.getAttachedQProcessConnections().clear();
+        report.getAttachedProcessConnections().clear();
         report.getOutcomes().forEach(bhp -> {
             em.merge(bhp);
             bhp.setOutcome_report(null);

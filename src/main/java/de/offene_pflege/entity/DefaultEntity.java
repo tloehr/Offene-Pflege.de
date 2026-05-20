@@ -13,6 +13,7 @@ import java.util.Objects;
 @MappedSuperclass
 @Getter
 @Setter
+@Entity
 @NoArgsConstructor
 public class DefaultEntity implements Serializable {
     private static final long serialVersionUID = 1L;

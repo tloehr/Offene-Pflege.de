@@ -11,6 +11,7 @@ import de.offene_pflege.entity.info.ResInfoTools;
 import de.offene_pflege.entity.info.ResInfoTypeTools;
 import de.offene_pflege.entity.prescription.BHPTools;
 import de.offene_pflege.entity.reports.NReport;
+import de.offene_pflege.entity.reports.NReportTools;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
@@ -65,7 +66,7 @@ public class DlgReport extends MyJDialog {
         pnlCommonTags = new PnlCommonTags(nReport.getCommontags(), true, 5);
         add(new JScrollPane(pnlCommonTags), CC.xyw(2, 5, 3));
 
-        txtBericht.setText(nReport.getText());
+        txtBericht.setText(NReportTools.getText(nReport));
 
         SwingUtilities.invokeLater(() -> txtBericht.requestFocus());
     }
@@ -87,7 +88,7 @@ public class DlgReport extends MyJDialog {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptyentry")));
             return;
         }
-        nReport.setText(txtBericht.getText());
+        nReport.setText(SYSTools.tidy(txtBericht.getText()));
         nReport.getCommontags().clear();
         nReport.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
 

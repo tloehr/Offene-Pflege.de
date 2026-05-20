@@ -911,7 +911,7 @@ public class PnlReport extends NursingRecordsPanel {
                                                     (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple_internal)) + "</p></b></td>"
                                     ) +
                                             SYSConst.html_table_tr(
-                                                    "<td width=\"800\" align=\"left\">" + SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
+                                                    "<td width=\"800\" align=\"left\">" + SYSTools.replace(NReportTools.getText(nreport), "\n", "<br/>", false) +
                                                             "</td>"
                                             ) +
                                             outcome // usually empty
@@ -977,7 +977,7 @@ public class PnlReport extends NursingRecordsPanel {
                     }
 
 
-                    if (!nreport.getAttachedQProcessConnections().isEmpty()) {
+                    if (!nreport.getAttachedProcessConnections().isEmpty()) {
                         /***
                          *      _     _         ____
                          *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
@@ -986,7 +986,7 @@ public class PnlReport extends NursingRecordsPanel {
                          *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
                          *
                          */
-                        final JButton btnProcess = new JButton(Integer.toString(nreport.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
+                        final JButton btnProcess = new JButton(Integer.toString(nreport.getAttachedProcessConnections().size()), SYSConst.icon22redStar);
                         btnProcess.setToolTipText(SYSTools.xx("misc.btnprocess.tooltip"));
                         btnProcess.setForeground(Color.YELLOW);
                         btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
@@ -1017,11 +1017,11 @@ public class PnlReport extends NursingRecordsPanel {
                                     NReport myReport = em.merge(nreport);
                                     em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                    ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
+                                    ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedProcessConnections());
                                     for (SYSNR2PROCESS linkObject : attached) {
                                         if (unassigned.contains(linkObject.getQProcess())) {
                                             linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                            linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
+                                            linkObject.getNReport().getAttachedProcessConnections().remove(linkObject);
                                             em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
 
                                             em.remove(linkObject);
@@ -1036,7 +1036,7 @@ public class PnlReport extends NursingRecordsPanel {
                                             SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
                                             em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                             qProcess.getAttachedNReportConnections().add(myLinkObject);
-                                            myReport.getAttachedQProcessConnections().add(myLinkObject);
+                                            myReport.getAttachedProcessConnections().add(myLinkObject);
                                         }
                                     }
 
@@ -1241,7 +1241,7 @@ public class PnlReport extends NursingRecordsPanel {
                             newReport.setReplacementFor(oldReport);
 
                             oldReport.getAttachedFilesConnections().clear();
-                            oldReport.getAttachedQProcessConnections().clear();
+                            oldReport.getAttachedProcessConnections().clear();
 
                             oldReport.getOutcomes().forEach(bhp -> {
                                 em.merge(bhp);
@@ -1585,11 +1585,11 @@ public class PnlReport extends NursingRecordsPanel {
                         NReport myReport = em.merge(nreport);
                         em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                        ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
+                        ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedProcessConnections());
                         for (SYSNR2PROCESS linkObject : attached) {
                             if (unassigned.contains(linkObject.getQProcess())) {
                                 linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
+                                linkObject.getNReport().getAttachedProcessConnections().remove(linkObject);
                                 em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                 em.remove(linkObject);
                             }
@@ -1603,7 +1603,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
                                 em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                 qProcess.getAttachedNReportConnections().add(myLinkObject);
-                                myReport.getAttachedQProcessConnections().add(myLinkObject);
+                                myReport.getAttachedProcessConnections().add(myLinkObject);
                             }
                         }
 
