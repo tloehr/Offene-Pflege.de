@@ -6,7 +6,6 @@ import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
-import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -51,7 +50,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     @Basic(optional = false)
     @Column(name = "nanotime")
     private Long nanotime;
-    @JoinColumn(name = "outcome_nreport", referencedColumnName = "PBID")
+    @JoinColumn(name = "outcome_nreport", referencedColumnName = "id")
     @ManyToOne
     private NReport outcome_report;
 

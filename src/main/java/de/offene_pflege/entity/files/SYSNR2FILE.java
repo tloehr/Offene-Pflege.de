@@ -53,7 +53,7 @@ public class SYSNR2FILE implements Serializable {
     @JoinColumn(name = "FID", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
-    @JoinColumn(name = "PBID", referencedColumnName = "PBID")
+    @JoinColumn(name = "PBID", referencedColumnName = "id")
     @ManyToOne
     private NReport nReport;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")

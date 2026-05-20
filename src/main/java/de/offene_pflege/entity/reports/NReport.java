@@ -1,5 +1,6 @@
 package de.offene_pflege.entity.reports;
 
+import de.offene_pflege.entity.DefaultEntity;
 import de.offene_pflege.entity.files.SYSNR2FILE;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
@@ -12,6 +13,8 @@ import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.interfaces.Attachable;
 import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
@@ -51,17 +54,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "nreports")
-public class NReport implements Serializable, QProcessElement, Comparable<NReport>, Cloneable, Attachable {
-
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PBID")
-    private Long pbid;
-
-    @Version
-    @Column(name = "version")
-    private Long version;
+@Getter
+@Setter
+public class NReport extends DefaultEntity implements Serializable, QProcessElement, Comparable<NReport>, Cloneable, Attachable {
 
     /**
      * Hier steht der Zeitpunkt, an dem das beschriebene Ereignis stattgefunden hat.
@@ -135,14 +130,14 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     /**
      * Falls der Bericht ersetzt wurde, dann steht der Bericht, der ihn ersetzt hat. `null` wenn nicht.
      */
-    @JoinColumn(name = "ReplacedBy", referencedColumnName = "PBID")
+    @JoinColumn(name = "ReplacedBy", referencedColumnName = "id")
     @OneToOne
     private NReport replacedBy;
 
     /**
      * Falls dieser Bericht einen anderen ersetzt hat, dann steht hier der ersetzte Bericht drin. `null` wenn nicht.
      */
-    @JoinColumn(name = "ReplacementFor", referencedColumnName = "PBID")
+    @JoinColumn(name = "ReplacementFor", referencedColumnName = "id")
     @OneToOne
     private NReport replacementFor;
 
@@ -198,7 +193,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.attachedProcessConnections = new ArrayList<>();
         this.usersAcknowledged = new ArrayList<>();
         this.outcomes = new ArrayList<>();
-        this.version = 0L;
     }
 
     /**
@@ -229,15 +223,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.attachedProcessConnections = new ArrayList<>();
         this.usersAcknowledged = new ArrayList<>();
         this.outcomes = new ArrayList<>();
-        this.version = 0L;
-    }
-
-    public Long getPbid() {
-        return pbid;
-    }
-
-    public void setPbid(Long pbid) {
-        this.pbid = pbid;
     }
 
     public List<NR2User> getUsersAcknowledged() {
@@ -395,46 +380,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.newBy = user;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        NReport nReport = (NReport) o;
-
-//        if (editedBy != null ? !editedBy.equals(nReport.editedBy) : nReport.editedBy != null) return false;
-        if (editedPIT != null ? !editedPIT.equals(nReport.editedPIT) : nReport.editedPIT != null) return false;
-        if (newPIT != null ? !newPIT.equals(nReport.newPIT) : nReport.newPIT != null) return false;
-        if (delPIT != null ? !delPIT.equals(nReport.delPIT) : nReport.delPIT != null) return false;
-        if (pbid != null ? !pbid.equals(nReport.pbid) : nReport.pbid != null) return false;
-        if (pit != null ? !pit.equals(nReport.pit) : nReport.pit != null) return false;
-//        if (replacedBy != null ? !replacedBy.equals(nReport.replacedBy) : nReport.replacedBy != null) return false;
-//        if (replacementFor != null ? !replacementFor.equals(nReport.replacementFor) : nReport.replacementFor != null)
-//            return false;
-        if (resident != null ? !resident.equals(nReport.resident) : nReport.resident != null) return false;
-        if (commontags != null ? !commontags.equals(nReport.commontags) : nReport.commontags != null) return false;
-        if (text != null ? !text.equals(nReport.text) : nReport.text != null) return false;
-        if (newBy != null ? !newBy.equals(nReport.newBy) : nReport.newBy != null) return false;
-        if (version != null ? !version.equals(nReport.version) : nReport.version != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = pbid != null ? pbid.hashCode() : 0;
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (pit != null ? pit.hashCode() : 0);
-        result = 31 * result + (editedPIT != null ? editedPIT.hashCode() : 0);
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (newBy != null ? newBy.hashCode() : 0);
-        result = 31 * result + (resident != null ? resident.hashCode() : 0);
-//        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
-//        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
-//        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
-        result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
-        return result;
-    }
 
     @Override
     public String getContentAsHTML() {
@@ -448,13 +393,13 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     @Override
     public long getID() {
-        return pbid;
+        return id;
     }
 
 
     @Override
     public String toString() {
-        return "entity.reports.NReport[pbid=" + pbid + "]";
+        return "entity.reports.NReport[pbid=" + id + "]";
     }
 
     @Override

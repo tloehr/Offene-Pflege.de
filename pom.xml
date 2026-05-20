@@ -31,7 +31,7 @@
         <commons.exec.version>1.3</commons.exec.version>
         <commons.io.version>2.14.0</commons.io.version>
         <commons.lang3.version>3.18.0</commons.lang3.version>
-        <commons.log4j.version>2.25.3</commons.log4j.version>
+        <commons.log4j.version>2.26.0</commons.log4j.version>
         <commons.net.version>3.9.0</commons.net.version>
         <commons.text.version>1.10.0</commons.text.version>
         <eclipselink.version>2.7.16</eclipselink.version>
@@ -73,7 +73,7 @@
         <opde.minor>16</opde.minor>
         <opde.release>7</opde.release>
 <!--        this is the only place where the software looks for the proper dbversion -->
-        <opde.dbversion>22</opde.dbversion>
+        <opde.dbversion>23</opde.dbversion>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
     </properties>
 

@@ -30,7 +30,7 @@ public class NR2User implements Serializable, Comparable<NR2User> {
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date pit;
-    @JoinColumn(name = "PBID", referencedColumnName = "PBID")
+    @JoinColumn(name = "PBID", referencedColumnName = "id")
     @ManyToOne
     private NReport bericht;
     @JoinColumn(name = "UID", referencedColumnName = "UKennung")

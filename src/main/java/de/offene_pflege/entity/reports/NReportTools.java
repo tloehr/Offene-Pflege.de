@@ -229,7 +229,7 @@ public class NReportTools {
         DateFormat df = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String html = "";
         html += df.format(nReport.getPit()) + "; " + nReport.getNewBy().getFullname();
-        html += OPDE.isExperimental() ? "; " + nReport.getID() : "";
+        html += OPDE.isExperimental() ? "; " + nReport.getId() : "";
         return html;
     }
 
@@ -351,7 +351,7 @@ public class NReportTools {
         result = sdf.format(nReport.getPit()) + "; " + nReport.getNewBy().getFullname();
 //        result += SYSTools.catchNull(getTagsAsHTML(nReport), "<br/>[", "]") + " ";
         if (showIDs) {
-            result += "<br/><i>[" + nReport.getPbid() + "]</i>";
+            result += "<br/><i>[" + nReport.getId() + "]</i>";
         }
         return result;
     }
@@ -363,7 +363,7 @@ public class NReportTools {
      */
     public static String getAsHTML(NReport nReport, String highlight) {
         String result = "<div id=\"fonttext\">";
-        log.debug(nReport.getPbid());
+
 //        result += getDateAndUser(nReport, false, true);
 
 //        result += SYSTools.catchNull(getTagsAsHTML(nReport), " [", "]") + " ";
@@ -378,7 +378,7 @@ public class NReportTools {
 //        }
         if (nReport.isReplaced()) {
             result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
-            result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getId() + "<br/>";
         }
 //        if (!nReport.getAttachedFilesConnections().isEmpty()) {
 //            result += "<font color=\"green\">&#9679;</font>";
@@ -401,16 +401,16 @@ public class NReportTools {
     public static String getInfoAsHTML(NReport nReport) {
         String result = "<div id=\"fonttext\">";
 
-        result += "[" + nReport.getPbid() + "]<br/>";
+        result += "[" + nReport.getId() + "]<br/>";
 
         DateFormat df = DateFormat.getDateTimeInstance();
         if (nReport.isDeleted()) {
             result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getDelPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getDeletedBy().getFullname() + "<br/>";
         } else if (nReport.isReplacement() && !nReport.isReplaced()) {
-            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getNewPIT()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getNewPIT()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getId() + "<br/>";
         } else if (nReport.isReplaced()) {
             result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditedPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
-            result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getId() + "<br/>";
         } else {
             result += "<br/>" + SYSTools.xx("misc.msg.created") + " " + SYSTools.xx("misc.msg.atchrono") + ": " + df.format(nReport.getNewPIT()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + ": " + nReport.getNewBy().getFullname();
         }
@@ -819,7 +819,7 @@ public class NReportTools {
 
             // native sql. the generated one is awfully slow
             String nativeSQL = "SELECT nr.* FROM nreports nr " +
-                    " INNER JOIN nreports2tags tg ON nr.`PBID` = tg.`PBID` " +
+                    " INNER JOIN nreports2tags tg ON nr.id = tg.`PBID` " +
                     " WHERE nr.`PIT` >= ? AND nr.`PIT` <= ? " +
                     " AND tg.ctagid = ?;";
 
@@ -850,7 +850,7 @@ public class NReportTools {
 
             // native sql. the generated one is awfully slow
             String nativeSQL = "SELECT DISTINCT nr.* FROM nreports nr " +
-                    " INNER JOIN nreports2tags tg ON nr.`PBID` = tg.`PBID` " +
+                    " INNER JOIN nreports2tags tg ON nr.id = tg.`PBID` " +
                     " INNER JOIN opde.commontags ct ON ct.`id` = tg.`ctagid` " +
                     " WHERE nr.`PIT` >= ? AND nr.`PIT` <= ? " +
                     " AND ct.type = ?;";

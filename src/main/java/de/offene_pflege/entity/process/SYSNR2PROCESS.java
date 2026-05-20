@@ -26,7 +26,7 @@ public class SYSNR2PROCESS {
     private QProcess qProcess;
 
     @ManyToOne
-    @JoinColumn(name = "PBID", referencedColumnName = "PBID")
+    @JoinColumn(name = "PBID", referencedColumnName = "id")
     private NReport nreport;
 
     protected SYSNR2PROCESS() {
