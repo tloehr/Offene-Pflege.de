@@ -1,6 +1,5 @@
 package de.offene_pflege.entity.reports;
 
-import de.offene_pflege.entity.Ownable;
 import de.offene_pflege.entity.files.SYSNR2FILE;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
@@ -52,7 +51,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "nreports")
-public class NReport extends Ownable implements Serializable, QProcessElement, Comparable<NReport>, Cloneable, Attachable {
+public class NReport implements Serializable, QProcessElement, Comparable<NReport>, Cloneable, Attachable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -397,11 +396,6 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
     }
 
     @Override
-    public OPUsers getOwner() {
-        return newBy;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -508,6 +502,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         return clonedReport;
     }
 
+    @Transient
     @Override
     public long getPITInMillis() {
         return pit.getTime();
@@ -518,6 +513,7 @@ public class NReport extends Ownable implements Serializable, QProcessElement, C
         return pit.compareTo(other.getPit()) * -1;
     }
 
+    @Transient
     @Override
     public boolean isActive() {
         return ResidentTools.isActive(resident) && !isObsolete();

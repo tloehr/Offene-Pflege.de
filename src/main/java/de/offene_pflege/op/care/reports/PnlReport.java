@@ -1243,6 +1243,14 @@ public class PnlReport extends NursingRecordsPanel {
                             oldReport.getAttachedFilesConnections().clear();
                             oldReport.getAttachedQProcessConnections().clear();
 
+                            oldReport.getOutcomes().forEach(bhp -> {
+                                em.merge(bhp);
+                                newReport.getOutcomes().add(bhp);
+                                bhp.setOutcome_report(newReport);
+                            });
+
+                            oldReport.getOutcomes().clear();
+
                             oldReport.setEditedBy(em.merge(OPDE.getMe()));
                             oldReport.setEditedPIT(new Date());
                             oldReport.setReplacedBy(newReport);

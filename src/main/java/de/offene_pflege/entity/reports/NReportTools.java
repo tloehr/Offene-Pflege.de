@@ -42,7 +42,14 @@ public class NReportTools {
 
     //https://github.com/tloehr/Offene-Pflege.de/issues/66
     public static boolean isChangeable(NReport nReport) {
-        return (nReport.isMine() && !nReport.isObsolete() && ResidentTools.isActive(nReport.getResident()) && nReport.getUsersAcknowledged().isEmpty());
+        return (isMine(nReport) && !nReport.isObsolete() && ResidentTools.isActive(nReport.getResident()) && nReport.getUsersAcknowledged().isEmpty());
+    }
+
+
+
+
+    public static boolean isMine(NReport nReport){
+        return nReport.getNewBy().equals(OPDE.getMe());
     }
 
     /**
@@ -794,21 +801,6 @@ public class NReportTools {
             bhp.setOutcome_report(null);
         });
         report.getOutcomes().clear();
-        return report;
-    }
-
-    /**
-     * sets all necessary changes to <i>DELETE</i> a report. Which is in fact never really deleted.
-     *
-     * @param report
-     * @param deletedBy
-     * @return
-     */
-    public static NReport replace(NReport report, OPUsers deletedBy) {
-        report.setDeletedBy(deletedBy);
-        report.setDelPIT(new Date());
-        report.getAttachedFilesConnections().clear();
-        report.getAttachedQProcessConnections().clear();
         return report;
     }
 

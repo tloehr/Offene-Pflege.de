@@ -145,7 +145,7 @@ public class TMMedOrders extends AbstractTableModel {
         if (column == COL_CONFIRMED) return true;
         if (column == COL_DELETE) return true;
         if (MedOrderTools.is_closed(medOrderList.get(row))) return false;
-        return column == COL_WHERE_TO_ORDER;
+        return OPDE.isAdmin() && column == COL_WHERE_TO_ORDER;
     }
 
     public MedOrder get(int row) {
