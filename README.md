@@ -1,3 +1,15 @@
+>>>>>>>>>>>>>
+**Neuauflage des Projekts: https://github.com/nileneb/opcare**
+>>>>>>>>>>>>>
+ - Contributions welcome
+ - Stammdaten-Domänenmodell dient als Vorlage, die Pflegeplanung nach dem Strukturmodell / SIS® neu modelliert
+ - Spracherfassung und LLM-Vorschläge lokal und auf eigener Hardware
+ - Laravel 13
+    - PHP 8.4
+    - Livewire
+    - Tailwind CSS
+
+
 # DEPRECATED / INAKTIVES PROJEKT
 Dieses Projekt ist inaktiv. Es werden keine weiteren Update oder Releases mehr vorgenommen. Benutzung auf eigene Gefahr.
 
@@ -7,12 +19,4 @@ Dies ist ein freies Pflegedokumentationssystem für stationäre Einrichtungen. I
 
 Aufgrund der gesetzlichen Anforderungen (EU Cyber Resilience Act, EU-Produkthaftungsrichtlinie), habe ich mich entschieden OPDE nicht mehr anzubieten. Die Source-Codes lasse ich noch eine zeitlang online, aber die Webseite wird bald abgeschaltet.
 
->>>>>>>>>>>>>
-Neuauflage des Projekts: https://github.com/nileneb/opcare
->>>>>>>>>>>>>
- - Contributions welcome
- - Laravel 13
-    - PHP 8.4
-    - Livewire
-    - Tailwind CSS
 
