@@ -7,3 +7,12 @@ Dies ist ein freies Pflegedokumentationssystem für stationäre Einrichtungen. I
 
 Aufgrund der gesetzlichen Anforderungen (EU Cyber Resilience Act, EU-Produkthaftungsrichtlinie), habe ich mich entschieden OPDE nicht mehr anzubieten. Die Source-Codes lasse ich noch eine zeitlang online, aber die Webseite wird bald abgeschaltet.
 
+>>>>>>>>>>>>>
+Neuauflage des Projekts: https://github.com/nileneb/opcare
+>>>>>>>>>>>>>
+ - Contributions welcome
+ - Laravel 13
+    - PHP 8.4
+    - Livewire
+    - Tailwind CSS
+
