@@ -95,7 +95,7 @@ public class BHPTools {
         Date date;
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.resident = :resident ORDER BY b.bhpid");
+        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.resident = :resident ORDER BY b.id");
         query.setParameter("resident", bewohner);
         query.setMaxResults(1);
         try {

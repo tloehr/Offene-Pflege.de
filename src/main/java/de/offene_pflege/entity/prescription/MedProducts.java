@@ -85,7 +85,7 @@ public class MedProducts implements Serializable {
         return !SYSTools.catchNull(sideeffects).isEmpty();
     }
 
-    @JoinColumn(name = "acmeid", referencedColumnName = "MPHID")
+    @JoinColumn(name = "acmeid", referencedColumnName = "id")
     @ManyToOne(cascade = CascadeType.PERSIST)
     private ACME acme;
 

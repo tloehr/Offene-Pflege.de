@@ -1,16 +1,17 @@
 package de.offene_pflege.entity.prescription;
 
+import de.offene_pflege.entity.DefaultEntity;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "acme")
-public class ACME implements Serializable {
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MPHID")
-    private Long mphid;
+@NoArgsConstructor
+@ToString
+public class ACME extends DefaultEntity implements Serializable {
     @Basic(optional = false)
     @Column(name = "Firma")
     private String name;
@@ -27,9 +28,6 @@ public class ACME implements Serializable {
     @Column(name = "WWW")
     private String www;
 
-    public ACME() {
-    }
-
     public ACME(String name, String street, String zipcode, String city, String tel, String fax, String www) {
         this.name = name;
         this.street = street;
@@ -39,15 +37,6 @@ public class ACME implements Serializable {
         this.fax = fax;
         this.www = www;
     }
-
-    public Long getMphid() {
-        return mphid;
-    }
-
-    public void setMphid(Long mphid) {
-        this.mphid = mphid;
-    }
-
     public String getName() {
         return name;
     }
@@ -104,49 +93,4 @@ public class ACME implements Serializable {
         this.www = www;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ACME acme = (ACME) o;
-
-        if (city != null ? !city.equals(acme.city) : acme.city != null) return false;
-        if (fax != null ? !fax.equals(acme.fax) : acme.fax != null) return false;
-        if (mphid != null ? !mphid.equals(acme.mphid) : acme.mphid != null) return false;
-        if (name != null ? !name.equals(acme.name) : acme.name != null) return false;
-        if (street != null ? !street.equals(acme.street) : acme.street != null) return false;
-        if (tel != null ? !tel.equals(acme.tel) : acme.tel != null) return false;
-        if (www != null ? !www.equals(acme.www) : acme.www != null) return false;
-        if (zipcode != null ? !zipcode.equals(acme.zipcode) : acme.zipcode != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = mphid != null ? mphid.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (street != null ? street.hashCode() : 0);
-        result = 31 * result + (zipcode != null ? zipcode.hashCode() : 0);
-        result = 31 * result + (city != null ? city.hashCode() : 0);
-        result = 31 * result + (tel != null ? tel.hashCode() : 0);
-        result = 31 * result + (fax != null ? fax.hashCode() : 0);
-        result = 31 * result + (www != null ? www.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "ACME{" +
-                "mphid=" + mphid +
-                ", firma='" + name + '\'' +
-                ", strasse='" + street + '\'' +
-                ", plz='" + zipcode + '\'' +
-                ", ort='" + city + '\'' +
-                ", tel='" + tel + '\'' +
-                ", fax='" + fax + '\'' +
-                ", www='" + www + '\'' +
-                '}';
-    }
 }

@@ -637,7 +637,8 @@ public class PnlBHP extends NursingRecordsPanel {
                             // we FORCED INCREMENTED LOCKS on the Schedule and the Prescription.
                             ArrayList<BHP> changeList = new ArrayList<BHP>();
                             for (BHP bhp1 : mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND)) {
-                                if (bhp1.getPrescription().getID() == myBHP.getPrescription().getID() && bhp1.getBHPid() != myBHP.getBHPid()) {
+                                if (bhp1.getPrescription().getID() == myBHP.getPrescription().getID()
+                                        && !bhp1.getId().equals(myBHP.getId())) {
                                     bhp1.setPrescription(myBHP.getPrescription());
                                     bhp1.setPrescriptionSchedule(myBHP.getPrescriptionSchedule());
                                     changeList.add(bhp1);
@@ -722,7 +723,7 @@ public class PnlBHP extends NursingRecordsPanel {
         JLabel icon1 = new JLabel(BHPTools.getIcon(bhp));
         icon1.setOpaque(false);
         if (!bhp.isOpen()) {
-            icon1.setToolTipText("[" + bhp.getBHPid() + "] " + DateFormat.getDateTimeInstance().format(bhp.getIst()));
+            icon1.setToolTipText("[" + bhp.getId() + "] " + DateFormat.getDateTimeInstance().format(bhp.getIst()));
         }
 
         JLabel icon2 = new JLabel(BHPTools.getWarningIcon(bhp, stock));

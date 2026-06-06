@@ -85,7 +85,7 @@ public class PrescriptionTools {
         EntityManager em = OPDE.createEM();
         try {
             Query query = em.createNativeQuery("" +
-                    " SELECT v.VerID, bhp.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Text, Ms.Bezeichnung " +
+                    " SELECT v.VerID, bhp.id, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Text, Ms.Bezeichnung " +
                     " FROM prescription v " +
                     " INNER JOIN resident bw ON v.BWKennung = bw.id  " +
                     " INNER JOIN intervention Ms ON Ms.MassID = v.MassID " +

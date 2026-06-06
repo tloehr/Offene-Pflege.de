@@ -4,7 +4,9 @@
  */
 package de.offene_pflege.entity.system;
 
+import de.offene_pflege.entity.DefaultEntity;
 import de.offene_pflege.op.OPDE;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,14 +17,8 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "acl")
-
-public class Acl implements Serializable, Comparable<Acl> {
-
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ACLID")
-    private Long aclid;
+@NoArgsConstructor
+public class Acl extends DefaultEntity implements Serializable, Comparable<Acl> {
     @Basic(optional = false)
     @Column(name = "acl")
     private short acl;
@@ -30,16 +26,9 @@ public class Acl implements Serializable, Comparable<Acl> {
     @ManyToOne
     private SYSGROUPS2ACL intclass;
 
-    public Acl() {
-    }
-
     public Acl(short acl, SYSGROUPS2ACL intclass) {
         this.acl = acl;
         this.intclass = intclass;
-    }
-
-    public Long getAclid() {
-        return aclid;
     }
 
     public SYSGROUPS2ACL getIntclass() {
@@ -56,26 +45,6 @@ public class Acl implements Serializable, Comparable<Acl> {
 
     public void setAcl(short acl) {
         this.acl = acl;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (aclid != null ? aclid.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof Acl)) {
-            return false;
-        }
-        Acl other = (Acl) object;
-        if ((this.aclid == null && other.aclid != null) || (this.aclid != null && !this.aclid.equals(other.aclid))) {
-            return false;
-        }
-        return true;
     }
 
     @Override

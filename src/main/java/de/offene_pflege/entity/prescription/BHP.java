@@ -1,11 +1,14 @@
 package de.offene_pflege.entity.prescription;
 
 
+import de.offene_pflege.entity.DefaultEntity;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.reports.NReport;
 import de.offene_pflege.entity.system.OPUsers;
 import de.offene_pflege.op.tools.SYSCalendar;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,15 +19,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "bhp")
-public class BHP implements Serializable, Comparable<BHP> {
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "BHPID")
-    private Long bhpid;
-    @Version
-    @Column(name = "version")
-    private Long version;
+@ToString
+public class BHP extends DefaultEntity implements Serializable, Comparable<BHP> {
     @Basic(optional = false)
     @Column(name = "Soll")
     @Temporal(TemporalType.TIMESTAMP)
@@ -72,7 +68,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.resident = this.prescriptionSchedule.getPrescription().getResident();
         this.tradeform = this.prescriptionSchedule.getPrescription().getTradeForm();
         stockTransaction = new ArrayList<>();
-        this.version = 0l;
         this.nanotime = System.nanoTime();
         this.mdate = new Date();
         this.outcome_report = null;
@@ -85,7 +80,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.resident = this.prescriptionSchedule.getPrescription().getResident();
         this.tradeform = this.prescriptionSchedule.getPrescription().getTradeForm();
         this.soll = soll;
-        this.version = 0l;
         this.nanotime = System.nanoTime();
         this.sZeit = sZeit;
         this.dosis = dosis;
@@ -134,20 +128,8 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.user = user;
     }
 
-    public Long getBHPid() {
-        return bhpid;
-    }
-
-    public void setBHPid(Long bhpid) {
-        this.bhpid = bhpid;
-    }
-
     public Date getSoll() {
         return soll;
-    }
-
-    public long getVersion() {
-        return version;
     }
 
     public void setSoll(Date soll) {
@@ -306,89 +288,9 @@ public class BHP implements Serializable, Comparable<BHP> {
         }
 
         if (result == 0) {
-            bhpid.compareTo(that.bhpid);
+            id.compareTo(that.id);
         }
         return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        BHP bhp = (BHP) o;
-
-        if (text != null ? !text.equals(bhp.text) : bhp.text != null) return false;
-        if (bhpid != null ? !bhpid.equals(bhp.bhpid) : bhp.bhpid != null) return false;
-        if (dosis != null ? !dosis.equals(bhp.dosis) : bhp.dosis != null) return false;
-        if (iZeit != null ? !iZeit.equals(bhp.iZeit) : bhp.iZeit != null) return false;
-        if (ist != null ? !ist.equals(bhp.ist) : bhp.ist != null) return false;
-        if (mdate != null ? !mdate.equals(bhp.mdate) : bhp.mdate != null) return false;
-        if (nanotime != null ? !nanotime.equals(bhp.nanotime) : bhp.nanotime != null) return false;
-        if (prescription != null ? !prescription.equals(bhp.prescription) : bhp.prescription != null) return false;
-        if (prescriptionSchedule != null ? !prescriptionSchedule.equals(bhp.prescriptionSchedule) : bhp.prescriptionSchedule != null)
-            return false;
-        if (resident != null ? !resident.equals(bhp.resident) : bhp.resident != null) return false;
-        if (sZeit != null ? !sZeit.equals(bhp.sZeit) : bhp.sZeit != null) return false;
-        if (soll != null ? !soll.equals(bhp.soll) : bhp.soll != null) return false;
-        if (state != null ? !state.equals(bhp.state) : bhp.state != null) return false;
-//        if (stockTransaction != null ? !stockTransaction.equals(bhp.stockTransaction) : bhp.stockTransaction != null)
-//            return false;
-        if (tradeform != null ? !tradeform.equals(bhp.tradeform) : bhp.tradeform != null) return false;
-        if (user != null ? !user.equals(bhp.user) : bhp.user != null) return false;
-        if (version != null ? !version.equals(bhp.version) : bhp.version != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = bhpid != null ? bhpid.hashCode() : 0;
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (soll != null ? soll.hashCode() : 0);
-        result = 31 * result + (ist != null ? ist.hashCode() : 0);
-        result = 31 * result + (sZeit != null ? sZeit.hashCode() : 0);
-        result = 31 * result + (iZeit != null ? iZeit.hashCode() : 0);
-        result = 31 * result + (dosis != null ? dosis.hashCode() : 0);
-        result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (mdate != null ? mdate.hashCode() : 0);
-        result = 31 * result + (nanotime != null ? nanotime.hashCode() : 0);
-//        result = 31 * result + (stockTransaction != null ? stockTransaction.hashCode() : 0);
-        result = 31 * result + (prescriptionSchedule != null ? prescriptionSchedule.hashCode() : 0);
-        result = 31 * result + (prescription != null ? prescription.hashCode() : 0);
-        result = 31 * result + (resident != null ? resident.hashCode() : 0);
-        result = 31 * result + (tradeform != null ? tradeform.hashCode() : 0);
-        result = 31 * result + (user != null ? user.hashCode() : 0);
-        return result;
-    }
-
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (!(o instanceof BHP)){
-//            log.info("not instance of BHP " + o.toString());
-//            log.info("i am a bhp with id: " + bhpid);
-//            return false;
-//        }
-//        BHP other = (BHP) o;
-//        return new Integer(hashCode()).equals(other.hashCode());
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        int result = bhpid != null ? bhpid.hashCode() : 0;
-//        result = 31 * result + (nanotime != null ? nanotime.hashCode() : 0);
-//        return result;
-//    }
-
-    @Override
-    public String toString() {
-        return "BHP{" +
-                "bhpid=" + bhpid +
-                '}';
     }
 
 }

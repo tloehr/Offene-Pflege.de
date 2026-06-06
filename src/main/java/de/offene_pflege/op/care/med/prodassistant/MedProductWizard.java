@@ -394,7 +394,7 @@ public class MedProductWizard {
             result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 
             ACME displayFactory = acme == null ? product.getACME() : acme;
-            result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page5.title") + ": <b>" + displayFactory.getName() + ", " + displayFactory.getCity() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + SYSTools.xx("misc.msg.willBeCreated") + "</i>" : " <i>" + SYSTools.xx("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page5.title") + ": <b>" + displayFactory.getName() + ", " + displayFactory.getCity() + "</b>" + (displayFactory.getId() == null ? " <i>" + SYSTools.xx("misc.msg.willBeCreated") + "</i>" : " <i>" + SYSTools.xx("misc.msg.alreadyExits") + "</i>") + "</li>";
 
             result += "</ul>";
 

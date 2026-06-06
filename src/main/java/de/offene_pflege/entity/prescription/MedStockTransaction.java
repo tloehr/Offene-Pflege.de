@@ -140,7 +140,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     //OWNER
     private MedStock stock;
 
-    @JoinColumn(name = "BHPID", referencedColumnName = "BHPID")
+    @JoinColumn(name = "BHPID", referencedColumnName = "id")
     @ManyToOne
     //OWNER
     private BHP bhp;
