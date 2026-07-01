@@ -182,7 +182,7 @@ public class Resident extends DefaultStringIDEntity implements Serializable, Com
         this.pn2 = pn2;
     }
 
-    @JoinColumn(name = "ArztID", referencedColumnName = "ArztID")
+    @JoinColumn(name = "ArztID", referencedColumnName = "id")
     @ManyToOne
     public GP getGp() {
         return gp;

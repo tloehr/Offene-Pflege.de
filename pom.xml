@@ -21,7 +21,6 @@
         <!-- Damit die Tests nicht jedes mal vor dem Package ablaufen -->
         <maven.test.skip>true</maven.test.skip>
         <!-- Library Versions -->
-        <!-- Versions checked June 2021 -->
         <com.itextpdf.version>5.5.13.3</com.itextpdf.version>
         <commons.beanutils.version>1.11.0</commons.beanutils.version>
         <commons.cli.version>1.5.0</commons.cli.version>

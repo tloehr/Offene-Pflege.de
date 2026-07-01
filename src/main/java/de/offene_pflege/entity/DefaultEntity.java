@@ -5,6 +5,8 @@ import de.offene_pflege.op.tools.Tools;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.eclipse.persistence.annotations.OptimisticLocking;
+import org.eclipse.persistence.annotations.OptimisticLockingType;
 
 import javax.persistence.*;
 import java.io.Serializable;

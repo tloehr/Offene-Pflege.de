@@ -1,7 +1,9 @@
 package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.entity.DefaultEntity;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -9,8 +11,10 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "acme")
-@NoArgsConstructor
 @ToString
+@Getter
+@Setter
+@NoArgsConstructor
 public class ACME extends DefaultEntity implements Serializable {
     @Basic(optional = false)
     @Column(name = "Firma")
@@ -35,61 +39,6 @@ public class ACME extends DefaultEntity implements Serializable {
         this.city = city;
         this.tel = tel;
         this.fax = fax;
-        this.www = www;
-    }
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String firma) {
-        this.name = firma;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String strasse) {
-        this.street = strasse;
-    }
-
-    public String getPlz() {
-        return zipcode;
-    }
-
-    public void setPlz(String plz) {
-        this.zipcode = plz;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String ort) {
-        this.city = ort;
-    }
-
-    public String getTel() {
-        return tel;
-    }
-
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
-    public String getFax() {
-        return fax;
-    }
-
-    public void setFax(String fax) {
-        this.fax = fax;
-    }
-
-    public String getWww() {
-        return www;
-    }
-
-    public void setWww(String www) {
         this.www = www;
     }
 

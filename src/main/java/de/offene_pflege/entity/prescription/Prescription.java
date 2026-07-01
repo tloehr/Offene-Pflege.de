@@ -183,11 +183,11 @@ public class Prescription extends Ownable implements Serializable, QProcessEleme
     @ManyToOne
     @ToString.Exclude
     private Hospital hospitalOFF;
-    @JoinColumn(name = "AnArztID", referencedColumnName = "ArztID")
+    @JoinColumn(name = "AnArztID", referencedColumnName = "id")
     @ManyToOne
     @ToString.Exclude
     private GP docON;
-    @JoinColumn(name = "AbArztID", referencedColumnName = "ArztID")
+    @JoinColumn(name = "AbArztID", referencedColumnName = "id")
     @ManyToOne
     @ToString.Exclude
     private GP docOFF;

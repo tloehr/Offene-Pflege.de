@@ -13,5 +13,9 @@ alter table `acme`
     add version bigint(20) not null;
 alter table `bhp`
     change BHPID id bigint unsigned auto_increment;
+alter table gp
+    change ArztID id bigint unsigned auto_increment,
+    add medorder_period tinyint default 0
+        not null comment 'the number of days for med order range. 0 means restore user default.';
 #alter table `dfn`
 #    change DFNID id bigint unsigned auto_increment;

@@ -473,7 +473,7 @@ public class DlgDiag extends MyJDialog {
         props.put("text", icd.getText());
         props.put("koerperseite", cmbKoerper.getSelectedItem());
         props.put("diagnosesicherheit", cmbSicherheit.getSelectedItem());
-        props.put("arztid", doc == null ? "null" : doc.getArztID().toString());
+        props.put("arztid", doc == null ? "null" : doc.getId().toString());
         props.put("khid", kh == null ? "null" : kh.getKhid().toString());
 
         // Erweiterung für die QDVS V01.1

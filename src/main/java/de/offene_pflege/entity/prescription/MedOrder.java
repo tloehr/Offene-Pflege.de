@@ -28,7 +28,7 @@ public class MedOrder extends DefaultEntity {
     @Column(name = "note")
     private String note;
 
-    @JoinColumn(name = "arztid", referencedColumnName = "ArztID")
+    @JoinColumn(name = "arztid", referencedColumnName = "id")
     @ManyToOne
     private GP gp;
 

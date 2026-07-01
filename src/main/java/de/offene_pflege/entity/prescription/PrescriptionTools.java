@@ -85,11 +85,11 @@ public class PrescriptionTools {
         EntityManager em = OPDE.createEM();
         try {
             Query query = em.createNativeQuery("" +
-                    " SELECT v.VerID, bhp.id, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Text, Ms.Bezeichnung " +
+                    " SELECT v.VerID, psch.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Text, Ms.Bezeichnung " +
                     " FROM prescription v " +
                     " INNER JOIN resident bw ON v.BWKennung = bw.id  " +
                     " INNER JOIN intervention Ms ON Ms.MassID = v.MassID " +
-                    " INNER JOIN pschedule bhp ON bhp.VerID = v.VerID " +
+                    " INNER JOIN pschedule psch ON psch.VerID = v.VerID " +
                     " LEFT OUTER JOIN tradeform D ON v.DafID = D.DafID " +
                     " LEFT OUTER JOIN medproducts M ON M.MedPID = D.MedPID " +
                     " LEFT OUTER JOIN dosageform F ON D.FormID = F.FormID " +
@@ -104,9 +104,9 @@ public class PrescriptionTools {
                     "      WHERE stock.Aus = '9999-12-31 23:59:59' AND stock.Anbruch < '9999-12-31 23:59:59' " +
                     ") best ON best.VorID = vor.VorID " +
                     " WHERE bw.adminonly <> 2 " +
-                    " AND v.AnDatum < now() AND v.AbDatum > now() AND Date(bhp.LDatum) <= Date(now()) AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
+                    " AND v.AnDatum < now() AND v.AbDatum > now() AND Date(psch.LDatum) <= Date(now()) AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND bw.StatID = ? " +
-                    " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.id, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Text, Ms.Bezeichnung)");
+                    " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.id, v.DafID IS NOT NULL, psch.Uhrzeit, F.Stellplan, CONCAT( M.Text, Ms.Bezeichnung)");
             query.setParameter(1, station.getId());
 
             printDailyPlanAsPDF(station, query.getResultList());

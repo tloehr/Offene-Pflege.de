@@ -1312,7 +1312,7 @@ public class PnlEditResInfo {
                         gpid = -1;
                         gpText = "--";
                     } else {
-                        gpid = ((GP) o).getArztID();
+                        gpid = ((GP) o).getId();
                         gpText = GPTools.getCompleteAddress((GP) o);
                     }
                     content.put(thisGroupName + ".id", Long.toString(gpid));

@@ -34,14 +34,14 @@ public class GPTools {
             if (OPDE.isAnonym()) {
                 return "[" + SYSTools.xx("misc.msg.anon") + "]";
             }
-            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + " " + doc.getFirstname() + ", " + doc.getCity();
+            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getName() + " " + doc.getVorname() + ", " + doc.getOrt();
         } else {
             return SYSTools.xx("misc.msg.noentryyet");
         }
     }
 
     public static String get_for_order_list(GP doc) {
-        return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + SYSTools.anonymizeName(doc.getName(), SYSTools.INDEX_LASTNAME) + "<br/>" + SYSTools.anonymizeString(doc.getFax());
+        return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + SYSTools.anonymizeName(doc.getName(), SYSTools.INDEX_LASTNAME) + "<br/>" + SYSTools.anonymizeString(doc.getFax());
     }
 
     public static String getCompleteAddress(GP doc) {
@@ -49,7 +49,7 @@ public class GPTools {
             if (OPDE.isAnonym()) {
                 return "[" + SYSTools.xx("misc.msg.anon") + "]";
             }
-            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getFirstname() + " " + doc.getName() + ", " + doc.getStreet() + ", " + doc.getZIP() + " " + doc.getCity() + ", Tel: " + doc.getTel();
+            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getVorname() + " " + doc.getName() + ", " + doc.getStrasse() + ", " + doc.getPlz() + " " + doc.getOrt() + ", Tel: " + doc.getTel();
         } else {
             return SYSTools.xx("misc.msg.noentryyet");
         }

@@ -1177,8 +1177,8 @@ public class ResInfoTools {
             if (OPDE.isAnonym()) {
                 result += SYSTools.xx("misc.msg.anon");
             } else {
-                result += GPTools.getFullName(resident.getGp()) + ", " + resident.getGp().getStreet();
-                result += ", " + resident.getGp().getZIP() + " " + resident.getGp().getCity();
+                result += GPTools.getFullName(resident.getGp()) + ", " + resident.getGp().getStrasse();
+                result += ", " + resident.getGp().getPlz() + " " + resident.getGp().getOrt();
                 result += ", " + SYSTools.xx("misc.msg.phone") + ": " + resident.getGp().getTel() + ", " + SYSTools.xx("misc.msg.fax") + ": " + resident.getGp().getFax();
             }
             result += "</div>";

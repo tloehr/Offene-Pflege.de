@@ -48,7 +48,7 @@ public class DlgNewOrder extends JDialog {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 return super.getListCellRendererComponent(list,
-                        SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getFirstname(), SYSTools.INDEX_FIRSTNAME_MALE),
+                        SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME) + ", " + SYSTools.anonymizeName(((GP) value).getVorname(), SYSTools.INDEX_FIRSTNAME_MALE),
                         index, isSelected, cellHasFocus);
             }
         });
@@ -91,7 +91,7 @@ public class DlgNewOrder extends JDialog {
     private void cmbWhereToOrderItemStateChanged(ItemEvent e) {
         if (e.getStateChange() != ItemEvent.SELECTED) return;
         if (e.getItem() instanceof GP) {
-            SYSPropsTools.storeProp(this.getClass().getName() + ":cmbwhere", "GP:" + ((GP) e.getItem()).getArztID(), OPDE.getLogin().getUser());
+            SYSPropsTools.storeProp(this.getClass().getName() + ":cmbwhere", "GP:" + ((GP) e.getItem()).getId(), OPDE.getLogin().getUser());
         } else {
             SYSPropsTools.storeProp(this.getClass().getName() + ":cmbwhere", "Hospital:" + ((Hospital) e.getItem()).getKhid(), OPDE.getLogin().getUser());
         }
