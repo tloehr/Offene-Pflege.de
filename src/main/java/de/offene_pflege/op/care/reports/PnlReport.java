@@ -298,7 +298,7 @@ public class PnlReport extends NursingRecordsPanel {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                     return;
                 }
-                currentEditor = new DlgReport(new NReport(resident), obj -> {
+                currentEditor = new DlgReport(NReportTools.create(resident), obj -> {
                     if (obj != null) {
                         NReport report = (NReport) obj;
                         EntityManager em = OPDE.createEM();
@@ -1227,7 +1227,7 @@ public class PnlReport extends NursingRecordsPanel {
             final JButton btnEdit = GUITools.createHyperlinkButton("nursingrecords.reports.btnEdit.tooltip", SYSConst.icon22edit3, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEdit.addActionListener(actionEvent -> {
-                currentEditor = new DlgReport(nreport.clone(), o -> {
+                currentEditor = new DlgReport(NReportTools.create(nreport), o -> {
                     if (o != null) {
 
                         EntityManager em = OPDE.createEM();

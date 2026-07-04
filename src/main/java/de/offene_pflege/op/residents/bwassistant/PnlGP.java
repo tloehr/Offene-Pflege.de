@@ -40,7 +40,7 @@ public class PnlGP extends JPanel {
     }
 
     private void btnAddActionPerformed(ActionEvent e) {
-        final JidePopup popupGP = GUITools.createPanelPopup(new PnlEditGP(new GP()), o -> {
+        final JidePopup popupGP = GUITools.createPanelPopup(new PnlEditGP(GPTools.create()), o -> {
             if (o != null) {
                 cmbArzt.setModel(new DefaultComboBoxModel(new GP[]{(GP) o}));
                 validate.execute(cmbArzt.getSelectedItem());

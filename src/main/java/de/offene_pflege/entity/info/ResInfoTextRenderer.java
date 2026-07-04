@@ -2,9 +2,11 @@ package de.offene_pflege.entity.info;
 
 import de.offene_pflege.op.tools.InfoTreeNodeBean;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 
+@Log4j2
 public class ResInfoTextRenderer implements ResInfoRenderInterface {
     public ResInfoTextRenderer() {
     }
@@ -45,12 +47,17 @@ public class ResInfoTextRenderer implements ResInfoRenderInterface {
     @Override
     public String renderBoolean(String label, String sBool, boolean showFalseEntries) {
         Boolean bool = Boolean.parseBoolean(sBool);
+
+        String result = "";
+
         // Items mit nicht angeklickten Checkboxen weglassen.
         if (showFalseEntries)
-            return "[" + (bool ? "\u2713" : "\u274d") + " " + label + "] ";
+            result = "[" + (bool ? "\u2713" : "\u274d") + " " + label + "] ";
         else
-            return bool ? "[\u2713 " + label + "] " : "";
+            result = bool ? "[\u2713 " + label + "] " : "";
 
+        log.debug( "showFalseEntries {}, label {}, sBool {},  bool {}, result {}", showFalseEntries, label, sBool, bool, result);
+        return result;
         //        return label + " " + (bool ? "(\u2713)" : "( )");
     }
 

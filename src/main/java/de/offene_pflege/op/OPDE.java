@@ -397,7 +397,7 @@ public class OPDE {
         opts.addOption("h", "help", false, SYSTools.xx("cmdline.help.description"));
         opts.addOption("v", "version", false, SYSTools.xx("cmdline.version.description"));
         opts.addOption("x", "experimental", false, SYSTools.xx("cmdline.experimental.description"));
-//        opts.addOption("l", "debug", false, SYSTools.xx("cmdline.debug.description"));
+        opts.addOption("l", "debug", false, SYSTools.xx("cmdline.debug.description"));
         opts.addOption("a", "anonymous", false, SYSTools.xx("cmdline.anonymous.description"));
         opts.addOption("t", "setup-database", false, SYSTools.xx("cmdline.setup-database.description"));
         opts.addOption("c", "enable-cache", false, SYSTools.xx("cmdline.enable-cache.description"));
@@ -416,7 +416,7 @@ public class OPDE {
 
         DefaultParser parser = new DefaultParser();
         CommandLine cl = null;
-        String footer = "https://www.wiedenhof.info" + " " + OPDE.getAppInfo().getBuildInformation();
+        String footer = "https://www.offene-pflege.de" + " " + OPDE.getAppInfo().getBuildInformation();
 
         /***
          *      _          _

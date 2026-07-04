@@ -186,7 +186,7 @@ public class ResInfoContentParser extends DefaultHandler  {
         } else {
             if (infonode.getValue().isPresent()) {
                 if (infonode.isCheckbox()) {
-                    text = renderer.renderBoolean(infonode.getLabel(), infonode.getValue().get().toString(), true) + renderer.renderNewLine();
+                    text = renderer.renderBoolean(infonode.getLabel(), infonode.getValue().get().toString(), false) + renderer.renderNewLine();
                 } else {
                     text = renderer.renderKeyValue(infonode.getLabel(), infonode.getValue().get().toString()) + renderer.renderNewLine();
                 }

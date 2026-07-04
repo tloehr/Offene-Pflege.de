@@ -17,5 +17,5 @@ alter table gp
     change ArztID id bigint unsigned auto_increment,
     add medorder_period tinyint default 0
         not null comment 'the number of days for med order range. 0 means restore user default.';
-#alter table `dfn`
-#    change DFNID id bigint unsigned auto_increment;
+#UPDATE opde.gp t SET t.medorder_period = 28 WHERE t.id = 67;
+#UPDATE opde.gp t SET t.medorder_period = 14 WHERE t.id = 68;

@@ -33,7 +33,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class NReport extends DefaultEntity implements Serializable, QProcessElement, Comparable<NReport>, Cloneable, Attachable {
+public class NReport extends DefaultEntity implements Serializable, QProcessElement, Comparable<NReport>, Attachable {
     private Date pit;
     private Date newPIT;
     private Date editedPIT;
@@ -82,42 +82,6 @@ public class NReport extends DefaultEntity implements Serializable, QProcessElem
     @JoinColumn(name = "pbid"), inverseJoinColumns =
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
-
-    /**
-     * Der Standard Konstuktor. Hier drüber werden fast alle Berichte erstellt.
-     *
-     * @param resident das ist die Kennung des BWs für den der neue Bericht erstellt wird.
-     */
-    public NReport(Resident resident) {
-        this.pit = new Date();
-        this.newPIT = new Date();
-        this.text = "";
-        this.resident = resident;
-        this.newBy = OPDE.getLogin().getUser();
-        this.attachedFilesConnections = new ArrayList<>();
-        this.commontags = new ArrayList<>();
-        this.attachedProcessConnections = new ArrayList<>();
-        this.usersAcknowledged = new ArrayList<>();
-        this.outcomes = new ArrayList<>();
-    }
-
-    private NReport(Date pit, Date newPIT, Date editedPIT, String text, OPUsers newBy, Resident resident, OPUsers editedBy, NReport replacedBy, NReport replacementFor) {
-        this.pit = pit;
-        this.newPIT = newPIT;
-        this.editedPIT = editedPIT;
-        this.text = SYSTools.tidy(text);
-        this.newBy = newBy;
-        this.resident = resident;
-        this.editedBy = editedBy;
-        this.replacedBy = replacedBy;
-        this.replacementFor = replacementFor;
-        this.attachedFilesConnections = new ArrayList<>();
-        this.commontags = new ArrayList<>();
-        this.attachedProcessConnections = new ArrayList<>();
-        this.usersAcknowledged = new ArrayList<>();
-        this.outcomes = new ArrayList<>();
-
-    }
 
     @Transient
     public boolean isReplaced() {
@@ -184,33 +148,6 @@ public class NReport extends DefaultEntity implements Serializable, QProcessElem
         return SYSTools.xx("misc.msg.report") + ": " + text;
     }
 
-    @Override
-    public NReport clone() {
-
-        final NReport clonedReport = new NReport(pit, newPIT, editedPIT, text, newBy, resident, editedBy, null, null);
-
-        CollectionUtils.forAllDo(commontags, new Closure() {
-            public void execute(Object o) {
-                clonedReport.commontags.add((Commontags) o);
-            }
-        });
-
-        CollectionUtils.forAllDo(attachedProcessConnections, new Closure() {
-            public void execute(Object o) {
-                SYSNR2PROCESS oldAssignment = (SYSNR2PROCESS) o;
-                clonedReport.attachedProcessConnections.add(new SYSNR2PROCESS(oldAssignment.getQProcess(), clonedReport));
-            }
-        });
-
-        CollectionUtils.forAllDo(attachedFilesConnections, new Closure() {
-            public void execute(Object o) {
-                SYSNR2FILE oldAssignment = (SYSNR2FILE) o;
-                clonedReport.attachedFilesConnections.add(new SYSNR2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getNewBy(), clonedReport.getPit()));
-            }
-        });
-        return clonedReport;
-    }
-
     @Transient
     @Override
     public long getPITInMillis() {
@@ -227,4 +164,10 @@ public class NReport extends DefaultEntity implements Serializable, QProcessElem
     public boolean isActive() {
         return ResidentTools.isActive(resident) && !isObsolete();
     }
+
+    @Transient
+    public boolean isMine() {
+        return newBy.equals(OPDE.getMe());
+    }
 }
+

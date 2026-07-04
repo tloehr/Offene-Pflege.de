@@ -14,6 +14,25 @@ import java.util.ArrayList;
  */
 public class GPTools {
 
+    public static GP create(){
+        GP gp = new GP();
+        gp.setAnrede("");
+        gp.setName("");
+        gp.setVorname("");
+        gp.setStrasse("");
+        gp.setPlz("");
+        gp.setOrt("");
+        gp.setTel("");
+        gp.setFax("");
+        gp.setEMail("");
+        gp.setMobil("");
+        gp.setNeurologist(false);
+        gp.setDermatology(false);
+        gp.setStatus(0);
+        gp.setMedorder_period(0);
+        return gp;
+    }
+
     public static ListCellRenderer getRenderer() {
         return (jList, o, i, isSelected, cellHasFocus) -> {
             String text;

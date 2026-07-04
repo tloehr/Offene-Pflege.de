@@ -162,7 +162,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
     }
 
     private void btnAddGPActionPerformed(ActionEvent e) {
-        final PnlEditGP pnlGP = new PnlEditGP(new GP());
+        final PnlEditGP pnlGP = new PnlEditGP(GPTools.create());
         final JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
             if (o != null) {
                 EntityManager em = OPDE.createEM();

@@ -226,7 +226,7 @@ public class DlgRegular extends MyJDialog {
     }
 
     private void btnAddGPActionPerformed(ActionEvent e) {
-        final PnlEditGP pnlGP = new PnlEditGP(new GP());
+        final PnlEditGP pnlGP = new PnlEditGP(GPTools.create());
         JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
             if (o != null) {
                 cmbDocON.setModel(new DefaultComboBoxModel(new GP[]{(GP) o}));

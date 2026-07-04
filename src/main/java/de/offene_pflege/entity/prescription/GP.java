@@ -1,10 +1,7 @@
 package de.offene_pflege.entity.prescription;
 
 import de.offene_pflege.entity.DefaultEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
 
@@ -13,8 +10,8 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "gp")
-@NoArgsConstructor
 @ToString
+@NoArgsConstructor
 @Getter
 @Setter
 public class GP extends DefaultEntity implements Serializable, HasName {
@@ -60,5 +57,7 @@ public class GP extends DefaultEntity implements Serializable, HasName {
     @Basic(optional = false)
     @Column(name = "medorder_period")
     private Integer medorder_period;
+
+
 
 }

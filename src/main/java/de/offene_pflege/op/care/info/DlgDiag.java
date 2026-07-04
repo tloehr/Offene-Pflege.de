@@ -113,7 +113,7 @@ public class DlgDiag extends MyJDialog {
     }
 
     private void btnAddGPActionPerformed(ActionEvent e) {
-        final PnlEditGP pnlGP = new PnlEditGP(new GP());
+        final PnlEditGP pnlGP = new PnlEditGP(GPTools.create());
         JidePopup popup = GUITools.createPanelPopup(pnlGP, o -> {
             if (o != null) {
                 GP gp = EntityTools.merge((GP) o);

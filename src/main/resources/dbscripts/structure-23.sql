@@ -1,16 +1,17 @@
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `acl` (
-  `ACLID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `ICID` bigint(20) unsigned NOT NULL,
   `acl` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`ACLID`)
+  `version` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `acme` (
-  `MPHID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Firma` varchar(100) NOT NULL,
   `Strasse` varchar(100) DEFAULT NULL,
   `PLZ` char(10) DEFAULT NULL,
@@ -18,7 +19,8 @@ CREATE TABLE `acme` (
   `Tel` varchar(100) DEFAULT NULL,
   `Fax` varchar(100) DEFAULT NULL,
   `WWW` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`MPHID`)
+  `version` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -42,7 +44,7 @@ CREATE TABLE `allowance` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bhp` (
-  `BHPID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BHPPID` bigint(20) unsigned NOT NULL,
   `UKennung` char(10) CHARACTER SET utf8 DEFAULT NULL,
   `Soll` datetime NOT NULL,
@@ -59,7 +61,7 @@ CREATE TABLE `bhp` (
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
   `nanotime` bigint(20) unsigned NOT NULL DEFAULT '0',
   `outcome_nreport` bigint(20) unsigned DEFAULT NULL,
-  PRIMARY KEY (`BHPID`),
+  PRIMARY KEY (`id`),
   KEY `BHPPID_IDX` (`BHPPID`),
   KEY `idx1` (`Soll`),
   KEY `idx2` (`BWKennung`),
@@ -138,7 +140,7 @@ CREATE TABLE `floors` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `gp` (
-  `ArztID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `Anrede` varchar(20) NOT NULL,
   `Titel` varchar(20) NOT NULL,
   `Name` varchar(100) NOT NULL,
@@ -154,7 +156,8 @@ CREATE TABLE `gp` (
   `version` bigint(20) unsigned NOT NULL DEFAULT '0',
   `neurologist` bit(1) NOT NULL DEFAULT b'0',
   `skin` bit(1) NOT NULL DEFAULT b'0',
-  PRIMARY KEY (`ArztID`)
+  `medorder_period` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'the number of days for med order range. 0 means restore user default.',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -454,7 +457,7 @@ CREATE TABLE `nr2user` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `nreports` (
-  `PBID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `PIT` datetime NOT NULL,
   `NewPIT` datetime NOT NULL,
   `Text` mediumtext,
@@ -467,7 +470,7 @@ CREATE TABLE `nreports` (
   `DelPIT` datetime DEFAULT NULL,
   `EditedPIT` datetime DEFAULT NULL,
   `DeletedBy` char(10) DEFAULT NULL,
-  PRIMARY KEY (`PBID`),
+  PRIMARY KEY (`id`),
   KEY `Resident` (`BWKennung`),
   KEY `PIT` (`PIT`),
   FULLTEXT KEY `Text` (`Text`)

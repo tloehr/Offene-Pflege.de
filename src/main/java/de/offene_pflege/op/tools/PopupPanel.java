@@ -9,7 +9,7 @@ import com.jidesoft.popup.JidePopup;
  * Time: 15:09
  * To change this template use File | Settings | File Templates.
  */
-public  abstract class PopupPanel extends JidePopup {
+public abstract class PopupPanel extends JidePopup {
     public abstract Object getResult();
     public abstract void setStartFocus();
     public abstract boolean isSaveOK();

@@ -33,6 +33,38 @@ public class PnlEditGP extends PopupPanel {
         txtAnrede.requestFocus();
     }
 
+    @Override
+    public Object getResult() {
+
+        if (txtNachname.getText().isEmpty()) {
+            return null;
+        }
+
+        doc.setAnrede(SYSTools.left(txtAnrede.getText().trim(), 20));
+        doc.setTitel(SYSTools.left(txtTitel.getText().trim(), 20));
+        doc.setName(txtNachname.getText().trim());
+        doc.setVorname(txtVorname.getText().trim());
+        doc.setStrasse(txtStrasse.getText().trim());
+        doc.setPlz(txtPLZ.getText().trim());
+        doc.setOrt(txtOrt.getText().trim());
+        doc.setTel(txtTel.getText().trim());
+        doc.setFax(txtFax.getText().trim());
+        doc.setMobil(txtMobil.getText().trim());
+        doc.setEMail(txtEMAIL.getText().trim());
+
+        return doc;
+    }
+
+    @Override
+    public boolean isSaveOK() {
+        return !txtNachname.getText().isEmpty();
+    }
+
+    @Override
+    public void setStartFocus() {
+        txtAnrede.requestFocus();
+    }
+
     private void initPanel() {
         lblAnrede.setText(SYSTools.xx("misc.msg.termofaddress"));
         lblTitel.setText(SYSTools.xx("misc.msg.title"));
@@ -153,8 +185,8 @@ public class PnlEditGP extends PopupPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "13dlu, $lcgap, default, $lcgap, 143dlu, $lcgap, 13dlu",
-                "13dlu, 11*($lgap, default), $lgap, 13dlu"));
+            "13dlu, $lcgap, default, $lcgap, 143dlu, $lcgap, 13dlu",
+            "13dlu, 11*($lgap, default), $lgap, 13dlu"));
 
         //---- lblAnrede ----
         lblAnrede.setText("Anrede");
@@ -291,37 +323,5 @@ public class PnlEditGP extends PopupPanel {
     private JTextField txtMobil;
     private JLabel lblEMAIL;
     private JTextField txtEMAIL;
-
-    @Override
-    public Object getResult() {
-
-        if (txtNachname.getText().isEmpty()) {
-            return null;
-        }
-
-        doc.setAnrede(SYSTools.left(txtAnrede.getText().trim(), 20));
-        doc.setTitel(SYSTools.left(txtTitel.getText().trim(), 20));
-        doc.setName(txtNachname.getText().trim());
-        doc.setVorname(txtVorname.getText().trim());
-        doc.setStrasse(txtStrasse.getText().trim());
-        doc.setPlz(txtPLZ.getText().trim());
-        doc.setOrt(txtOrt.getText().trim());
-        doc.setTel(txtTel.getText().trim());
-        doc.setFax(txtFax.getText().trim());
-        doc.setMobil(txtMobil.getText().trim());
-        doc.setEMail(txtEMAIL.getText().trim());
-
-        return doc;
-    }
-
-    @Override
-    public boolean isSaveOK() {
-        return !txtNachname.getText().isEmpty();
-    }
-
-    @Override
-    public void setStartFocus() {
-        txtAnrede.requestFocus();
-    }
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

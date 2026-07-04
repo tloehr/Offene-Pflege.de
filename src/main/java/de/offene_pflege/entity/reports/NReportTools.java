@@ -6,9 +6,11 @@ package de.offene_pflege.entity.reports;
 
 import de.offene_pflege.entity.EntityTools;
 import de.offene_pflege.entity.building.Homes;
+import de.offene_pflege.entity.files.SYSNR2FILE;
 import de.offene_pflege.entity.info.Resident;
 import de.offene_pflege.entity.info.ResidentTools;
 import de.offene_pflege.entity.process.QProcessElement;
+import de.offene_pflege.entity.process.SYSNR2PROCESS;
 import de.offene_pflege.entity.system.Commontags;
 import de.offene_pflege.entity.system.CommontagsTools;
 import de.offene_pflege.entity.system.OPUsers;
@@ -17,6 +19,7 @@ import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.checkerframework.checker.units.qual.A;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -42,15 +45,60 @@ public class NReportTools {
 
     //https://github.com/tloehr/Offene-Pflege.de/issues/66
     public static boolean isChangeable(NReport nReport) {
-        return (isMine(nReport) && !nReport.isObsolete() && ResidentTools.isActive(nReport.getResident()) && nReport.getUsersAcknowledged().isEmpty());
+        return (nReport.isMine() && !nReport.isObsolete() && ResidentTools.isActive(nReport.getResident()) && nReport.getUsersAcknowledged().isEmpty());
     }
 
-
-
-
-    public static boolean isMine(NReport nReport){
-        return nReport.getNewBy().equals(OPDE.getMe());
+    /**
+     * Der Standard Creator. Hier drüber werden fast alle Berichte erstellt.
+     *
+     * @param resident das ist die Kennung des BWs für den der neue Bericht erstellt wird.
+     */
+    public static NReport create(Resident resident) {
+        NReport nReport = new NReport();
+        nReport.setPit(new Date());
+        nReport.setNewPIT(new Date());
+        nReport.setText("");
+        nReport.setResident(resident);
+        nReport.setNewBy(OPDE.getLogin().getUser());
+        nReport.setAttachedFilesConnections(new ArrayList<>());
+        nReport.setCommontags(new ArrayList<>());
+        nReport.setAttachedProcessConnections(new ArrayList<>());
+        nReport.setUsersAcknowledged(new ArrayList<>());
+        nReport.setOutcomes(new ArrayList<>());
+        return nReport;
     }
+
+    public static NReport create(NReport template) {
+        final NReport clonedReport = new NReport();
+        clonedReport.setPit(template.getPit());
+        clonedReport.setNewPIT(template.getNewPIT());
+        clonedReport.setEditedPIT(template.getEditedPIT());
+        clonedReport.setEditedBy(template.getEditedBy());
+        clonedReport.setNewBy(template.getNewBy());
+        clonedReport.setText(SYSTools.tidy(template.getText()));
+        clonedReport.setResident(template.getResident());
+        clonedReport.setUsersAcknowledged(new ArrayList<>());
+        clonedReport.setOutcomes(new ArrayList<>());
+        clonedReport.setAttachedFilesConnections(new ArrayList<>());
+        clonedReport.setCommontags(new ArrayList<>());
+        clonedReport.setAttachedProcessConnections(new ArrayList<>());
+        clonedReport.setReplacedBy(template.getReplacedBy());
+        clonedReport.setReplacementFor(template.getReplacementFor());
+
+        CollectionUtils.forAllDo(template.getCommontags(), o -> clonedReport.getCommontags().add((Commontags) o));
+
+        CollectionUtils.forAllDo(template.getAttachedProcessConnections(), o -> {
+            SYSNR2PROCESS oldAssignment = (SYSNR2PROCESS) o;
+            clonedReport.getAttachedProcessConnections().add(new SYSNR2PROCESS(oldAssignment.getQProcess(), clonedReport));
+        });
+
+        CollectionUtils.forAllDo(template.getAttachedFilesConnections(), o -> {
+            SYSNR2FILE oldAssignment = (SYSNR2FILE) o;
+            clonedReport.getAttachedFilesConnections().add(new SYSNR2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getNewBy(), clonedReport.getPit()));
+        });
+        return clonedReport;
+    }
+
 
     /**
      * retrieves the PITs of the first and the last entries in the NReports and Handovers table. The values are
@@ -254,32 +302,30 @@ public class NReportTools {
             for (NReport nreport : nReports) {
 
 
+                LocalDate currentDate = new LocalDate(nreport.getPit());
 
-                    LocalDate currentDate = new LocalDate(nreport.getPit());
-
-                    if (prevDate == null || !prevDate.equals(currentDate)) {
-                        prevDate = currentDate;
-                        html += SYSTools.catchNull(subtitle).isEmpty() ? "<h2 id=\"fonth2\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h2>\n" : "<h3 id=\"fonth3\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h3>\n";
-                    }
+                if (prevDate == null || !prevDate.equals(currentDate)) {
+                    prevDate = currentDate;
+                    html += SYSTools.catchNull(subtitle).isEmpty() ? "<h2 id=\"fonth2\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h2>\n" : "<h3 id=\"fonth3\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h3>\n";
+                }
 
 
-                    html += SYSConst.html_bold(
+                html += SYSConst.html_bold(
 
-                            (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
-                                    (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
-                                    DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                                    " " + SYSTools.xx("misc.msg.Time.short") +
-                                    ", " + nreport.getNewBy().getFullname() +
-                                    (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
+                        (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
+                                (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
+                                DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                                " " + SYSTools.xx("misc.msg.Time.short") +
+                                ", " + nreport.getNewBy().getFullname() +
+                                (nreport.getCommontags().isEmpty() ? "" : " " + CommontagsTools.getAsHTML(nreport.getCommontags(), SYSConst.html_16x16_tagPurple))
 
-                    );
+                );
 
-                    html += "<br/>";
-                    html += getAsHTML(nreport, highlight);
+                html += "<br/>";
+                html += getAsHTML(nreport, highlight);
 
 
 //                    result = SYSConst.html_paragraph(html);
-
 
 
             }
@@ -293,7 +339,6 @@ public class NReportTools {
 
         return result;
     }
-
 
 
     public static String getReportsAndHandoversAsHTML(List<QProcessElement> reports, String highlight, int year) {
@@ -471,8 +516,6 @@ public class NReportTools {
     public static String getText(NReport nReport) {
         return SYSTools.anonymizeText(ResidentTools.getName(nReport.getResident()), nReport.getText());
     }
-
-
 
 
     public static String getComplaints(LocalDate from, Closure progress) {
@@ -770,7 +813,7 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " JOIN nr.commontags t " +
                     " WHERE nr.resident = :resident " +
-                    (with_edited_or_obsolete ? "" : " AND nr.editedBy IS NULL ")  +
+                    (with_edited_or_obsolete ? "" : " AND nr.editedBy IS NULL ") +
                     " AND t = :tag " +
 //                    " AND nr.pit >= :from AND nr.pit <= :to  " +
                     " ORDER BY nr.pit DESC ";

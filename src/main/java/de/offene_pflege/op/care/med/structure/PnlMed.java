@@ -220,7 +220,6 @@ public class PnlMed extends CleanablePanel {
         }
     }
 
-
     @SneakyThrows
     private void prepareSearchArea() {
         searchPanes = new CollapsiblePanes();
@@ -397,7 +396,23 @@ public class PnlMed extends CleanablePanel {
                 return super.getListCellRendererComponent(list, value == null ? "für alle" : SYSTools.anonymizeName(((GP) value).getName(), SYSTools.INDEX_LASTNAME), index, isSelected, cellHasFocus);
             }
         });
+
+        // setze Arzt spezifischen Bestellzeitraum
+        if (cmb_filter_for_generate.getActionListeners().length == 0) {
+            cmb_filter_for_generate.addActionListener(e -> {
+                int range = 0;
+                if (cmb_filter_for_generate.getSelectedItem() != null) {
+                    range = ((GP) cmb_filter_for_generate.getSelectedItem()).getMedorder_period();
+                }
+                if (range > 0)
+                    days_range.setText(String.valueOf(range));
+                else
+                    days_range.setText(OPDE.getProps().getProperty("opde.medorder:auto_order_day_range", "7"));
+            });
+        }
+
         list.add(cmb_filter_for_generate);
+
 
         JButton btn_regular = GUITools.createHyperlinkButton("automatisch Bestellen", SYSConst.icon22shopping, null);
         btn_regular.addActionListener(e -> {
