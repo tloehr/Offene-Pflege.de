@@ -635,10 +635,11 @@ public class PnlBHP extends NursingRecordsPanel {
                             // This whole thing here is only to handle the BPHs on Demand
                             // Fix the other BHPs on demand. If not, you will get locking exceptions,
                             // we FORCED INCREMENTED LOCKS on the Schedule and the Prescription.
-                            ArrayList<BHP> changeList = new ArrayList<BHP>();
+                            ArrayList<BHP> changeList = new ArrayList<>();
                             for (BHP bhp1 : mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND)) {
+                                log.debug("BHP1: " + bhp1.getId() + ", BHP: " + myBHP.getId());
                                 if (bhp1.getPrescription().getID() == myBHP.getPrescription().getID()
-                                        && !bhp1.getId().equals(myBHP.getId())) {
+                                        && !bhp1.equals(myBHP)) {
                                     bhp1.setPrescription(myBHP.getPrescription());
                                     bhp1.setPrescriptionSchedule(myBHP.getPrescriptionSchedule());
                                     changeList.add(bhp1);
