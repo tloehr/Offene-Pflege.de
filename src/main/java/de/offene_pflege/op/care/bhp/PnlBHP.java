@@ -637,7 +637,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             // we FORCED INCREMENTED LOCKS on the Schedule and the Prescription.
                             ArrayList<BHP> changeList = new ArrayList<>();
                             for (BHP bhp1 : mapShift2BHP.get(SYSCalendar.SHIFT_ON_DEMAND)) {
-                                log.debug("BHP1: " + bhp1.getId() + ", BHP: " + myBHP.getId());
+                                // log.debug("BHP1: " + bhp1.getId() + ", BHP: " + myBHP.getId());
                                 if (bhp1.getPrescription().getID() == myBHP.getPrescription().getID()
                                         && !bhp1.equals(myBHP)) {
                                     bhp1.setPrescription(myBHP.getPrescription());

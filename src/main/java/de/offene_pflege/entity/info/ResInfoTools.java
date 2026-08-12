@@ -1138,6 +1138,13 @@ public class ResInfoTools {
             result += "</td></tr>";
         }
 
+        ResInfo pers = getLastResinfo(resident, ResInfoTypeTools.TYPE_PERSONALS);
+        if (pers != null && !pers.isClosed()) {
+            result += "<tr><td valign=\"top\">" + SYSTools.xx("Bestattung") + "</td><td valign=\"top\">";
+            result += ResInfoTools.getContent(pers).getProperty("bestattung").isEmpty() ? "--" : ResInfoTools.getContent(pers).getProperty("bestattung");
+            result += "</td></tr>";
+        }
+
         if (resident.getPn1() != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + SYSTools.xx("misc.msg.bv") + "</td><td valign=\"top\">";
             result += resident.getPn1().getFullname();
