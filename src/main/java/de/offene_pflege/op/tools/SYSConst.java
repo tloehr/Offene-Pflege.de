@@ -837,6 +837,7 @@ public class SYSConst {
             "#fonttextgray18 { font-size:18px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
             "#fonttextgray20 { font-size:20px; background-color:#CCCCCC; font-family:Arial,sans-serif; -webkit-print-color-adjust:exact;}\n" +
             ".boxed {border: 1px solid black; background-color:#CCCCCC;}" +
+            "div.ex1 {font-size: 30px;}"+
             "</style>";
 
 }

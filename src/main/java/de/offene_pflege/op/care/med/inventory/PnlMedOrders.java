@@ -15,8 +15,6 @@ import de.offene_pflege.op.tools.SYSTools;
 import de.offene_pflege.services.HomesService;
 import de.offene_pflege.tablerenderer.RNDHTML;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.jdesktop.swingx.HorizontalLayout;
 
 import javax.swing.*;
@@ -116,7 +114,7 @@ public class PnlMedOrders extends JPanel {
             tbl.getColumnModel().getColumn(TMMedOrders.COL_TradeForm).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_Resident).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellRenderer(new RNDHTML());
-            tbl.getColumnModel().getColumn(TMMedOrders.COL_ORDER_INFO).setCellRenderer(new RNDHTML());
+            tbl.getColumnModel().getColumn(TMMedOrders.COL_ORDER_NOTES).setCellRenderer(new RNDHTML());
             tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).setCellEditor(new DefaultCellEditor(cmb));
             ((DefaultCellEditor) tbl.getColumnModel().getColumn(TMMedOrders.COL_WHERE_TO_ORDER).getCellEditor()).setClickCountToStart(2);
 

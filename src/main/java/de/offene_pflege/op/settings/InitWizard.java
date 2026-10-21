@@ -446,10 +446,6 @@ public class InitWizard extends WizardDialog {
                 myLogger.addInfo(pingResult);
                 db_server_pingable = true;
 
-                // Credentials
-                //autoReconnect=true&useSSL=false&serverTimezone=Europe/Berlin
-//                Class.forName("com.mysql.cj.jdbc.Driver");
-//                Connection jdbcConnection = DriverManager.getConnection("jdbc:mysql://srv10:3320/opde?user=opdeuser&password=9rs1q01:a1Q&autoReconnect=true&useSSL=false&serverTimezone=Europe/Berlin");
                 Connection jdbcConnection = DriverManager.getConnection(EntityTools.getJDBCUrl(txtServer.getText().trim(), Integer.toString(port), null), txtUser.getText(), new String(txtPassword.getPassword()).trim());
                 log.debug("jdbc.connection.ok");
                 db_dbms_reachable = true;

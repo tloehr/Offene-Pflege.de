@@ -41,8 +41,11 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -53,9 +56,9 @@ import java.util.Optional;
  */
 @Log4j2
 public class TMMedOrders extends AbstractTableModel {
-    public static final int COL_TradeForm = 1;
     public static final int COL_Resident = 0;
-    public static final int COL_ORDER_INFO = 2;
+    public static final int COL_TradeForm = 1;
+    public static final int COL_ORDER_NOTES = 2;
     public static final int COL_WHERE_TO_ORDER = 3;
     public static final int COL_CONFIRMED = 4;
     public static final int COL_DELETE = 5;
@@ -97,7 +100,7 @@ public class TMMedOrders extends AbstractTableModel {
     public Class getColumnClass(int col) {
         switch (col) {
             case COL_TradeForm:
-            case COL_ORDER_INFO:
+            case COL_ORDER_NOTES:
             case COL_CONFIRMED:
             case COL_complete:
             case COL_DELETE:
@@ -197,7 +200,10 @@ public class TMMedOrders extends AbstractTableModel {
                         result = TradeFormTools.toPrettyHTML(medOrder.getTradeForm());
                     }
 
+
                     result += get_presciption_dose_for_inventory(medInventory);
+
+
                 }
                 if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
@@ -218,7 +224,7 @@ public class TMMedOrders extends AbstractTableModel {
                 if (medOrder.getClosed_by() != null) result = HTMLTools.strike(result.toString());
                 break;
             }
-            case COL_ORDER_INFO: {
+            case COL_ORDER_NOTES: {
                 result = MedOrderTools.toPrettyHTMLOrderInfos(medOrder, show_notes);
                 break;
             }
@@ -308,6 +314,6 @@ public class TMMedOrders extends AbstractTableModel {
         }
         medOrderList.set(row, EntityTools.merge(medOrder));
         fireTableCellUpdated(row, COL_CONFIRMED);
-        fireTableCellUpdated(row, COL_ORDER_INFO);
+        fireTableCellUpdated(row, COL_ORDER_NOTES);
     }
 }

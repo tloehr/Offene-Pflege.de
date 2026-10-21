@@ -12,11 +12,14 @@ import de.offene_pflege.op.tools.HTMLTools;
 import de.offene_pflege.op.tools.JavaTimeConverter;
 import de.offene_pflege.op.tools.SYSConst;
 import de.offene_pflege.op.tools.SYSTools;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.javatuples.Quintet;
+import org.javatuples.Sextet;
 
+import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
@@ -27,9 +30,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -247,7 +248,8 @@ public class MedOrderTools {
 
     public static List<MedOrder> generate_orders(final int cover_days, final int type, Optional<HasName> order_source, List<MedOrder> open_orders) {
         List<MedOrder> result = new ArrayList<>();
-        final MultiKeyMap<Object, Quintet<BigDecimal, BigDecimal, BigDecimal, GP, Hospital>> map = new MultiKeyMap();
+        //final MultiKeyMap<Object, Sextet<BigDecimal, BigDecimal, BigDecimal, GP, Hospital, Optional<MedStock>>> map = new MultiKeyMap();
+        final Map<StockKey, Supply> map = new HashMap<>();
 
         //>> since 1.16.4_b331
         // alle aktiven BW, aber ohne die abwesenden
@@ -256,6 +258,9 @@ public class MedOrderTools {
                 .filter(resident -> !ResInfoTools.isAway(resident))
                 .collect(Collectors.toList());
         //<< since 1.16.4_b331
+
+
+        // todo: aufaddieren des Bedarfs bei mehrfacher Verordnung derselben daf bei unterschiedlicher Prescription
 
         MutableInt running_integer = new MutableInt(0);
         residents.forEach(resident -> {
@@ -277,20 +282,25 @@ public class MedOrderTools {
                                 if (inventory == null) return; // prevent exception when no inventory
                                 BigDecimal consumption_per_day = PrescriptionTools.get_consumption_per_day(prescription);
                                 BigDecimal sum_for_inventory = MedInventoryTools.getSum(inventory);
-                                BigDecimal range = sum_for_inventory.divide(consumption_per_day, RoundingMode.HALF_UP);
-                                if (range.compareTo(BigDecimal.valueOf(cover_days)) <= 0) {
-                                    map.put(resident, prescription.getTradeForm(), new Quintet<>(consumption_per_day, sum_for_inventory, range, prescription.getDocON(), prescription.getHospitalON()));
-                                    log.debug("{}, {} per day {} remaining {} range of days {}", resident.getName(), TradeFormTools.toPrettyString(prescription.getTradeForm()), consumption_per_day, sum_for_inventory, range);
+                                BigDecimal range_of_days = sum_for_inventory.divide(consumption_per_day, RoundingMode.HALF_UP);
+                                // Packungsgröße
+                                Optional<MedStock> optMedStock = inventory.getMedStocks().stream().filter(medStock -> medStock.isOpened() || medStock.isNew()).max(Comparator.comparing(MedStock::getIN));
+
+                                // wenn der Bedarf im Bestell Zeitraum nicht ausreichen würde, dann bestellen wir nach
+                                if (range_of_days.compareTo(BigDecimal.valueOf(cover_days)) <= 0) {
+                                    new Supply(consumption_per_day, sum_for_inventory, range_of_days, prescription, optMedStock);
+                                    //map.put(resident, prescription.getTradeForm(), new Sextet<>(consumption_per_day, sum_for_inventory, range_of_days, prescription.getDocON(), prescription.getHospitalON(), optMedStock));
+                                    map.put(new StockKey(resident, prescription.getTradeForm()), new Supply(consumption_per_day, sum_for_inventory, range_of_days, prescription, optMedStock));
+                                    log.debug("{}, {} per day {} remaining {} range of days {}", resident.getName(), TradeFormTools.toPrettyString(prescription.getTradeForm()), consumption_per_day, sum_for_inventory, range_of_days);
                                 }
                             });
                     // wie weit kommen wir mit unserm vorrat bei dieser Verordnung ?
                 }
         );
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 0, 0));
-        map.entrySet().forEach(multiKeyTupleEntry -> {
-            final Resident resident = (Resident) multiKeyTupleEntry.getKey().getKey(0);
-            final TradeForm tradeForm = (TradeForm) multiKeyTupleEntry.getKey().getKey(1);
-
+        map.entrySet().forEach(entry -> {
+            final Resident resident = entry.getKey().getResident();
+            final TradeForm tradeForm = entry.getKey().getTradeForm();
 
             // wir haben so eine bestellung schon
             // 23-02-18: wir interessieren uns aber nur für die mit einer Tradeform. Keine freien texte !!
@@ -302,21 +312,46 @@ public class MedOrderTools {
 
             DecimalFormat df = new DecimalFormat("#0.##");
 
+            // es gibt mindestens eine Packung in dem Vorrat. Mal sehen wie groß die ist, und wie wieviele wir davon bräuchten
+            Supply supply = entry.getValue();
+
+
             MedOrder medOrder = new MedOrder();
             medOrder.setTradeForm(tradeForm);
             medOrder.setResident(resident);
             medOrder.setCreated_on(LocalDateTime.now());
             medOrder.setCreated_by(OPDE.getLogin().getUser());
             medOrder.setAuto_created(true);
-            medOrder.setGp(multiKeyTupleEntry.getValue().getValue3());
-            medOrder.setHospital(multiKeyTupleEntry.getValue().getValue4());
+            medOrder.setGp(supply.getPrescription().getDocON());
+            medOrder.setHospital(supply.getPrescription().getHospitalON());
             medOrder.setClosing_med_stock(null);
-            medOrder.setNote(String.format("Wir brauchen %s pro Tag, es sind noch %s da, reicht noch für %s Tage",
-                            df.format(multiKeyTupleEntry.getValue().getValue0()),
-                            df.format(multiKeyTupleEntry.getValue().getValue1()),
-                            df.format(multiKeyTupleEntry.getValue().getValue2())
-                    )
-            );
+
+            supply.getOptMedStock().ifPresent(medStock -> {
+                final StringBuilder note = new StringBuilder(String.format("<p>Wir brauchen %s %s pro Tag, es sind noch %s %s da, reicht noch für %s Tage. Gerechnet für %s Tage.</p>",
+                        df.format(supply.getConsumptionPerDay()),
+                        SYSConst.UNITS[medStock.getTradeForm().getDosageForm().getPackUnit()],
+                        df.format(supply.getSumForInventory()),
+                        SYSConst.UNITS[medStock.getTradeForm().getDosageForm().getPackUnit()],
+                        df.format(supply.getRangeOfDays()),
+                        cover_days
+                ));
+
+                // wie groß ist die Packung ?
+                BigDecimal amount_per_package = medStock.getPackage().getContent();
+                // wieviel wollen wir haben
+                /*BigDecimal consumption_per_day = PrescriptionTools.get_consumption_per_day(prescription);
+                BigDecimal sum_for_inventory = MedInventoryTools.getSum(inventory);
+                BigDecimal range_of_days = sum_for_inventory.divide(consumption_per_day, RoundingMode.HALF_UP);
+                BigDecimal amount_needed = supply.getConsumptionPerDay().multiply(BigDecimal.valueOf(cover_days));*/
+                //BigDecimal packages_needed = amount_needed.divide(amount_per_package, 0, RoundingMode.HALF_UP);
+                BigDecimal amount_needed = supply.getConsumptionPerDay().multiply(BigDecimal.valueOf(cover_days));
+                BigDecimal packages_needed = amount_needed.divide(amount_per_package, 0, RoundingMode.HALF_UP);
+                log.debug("we need a max of {}, with {} per package this would mean {}x packages with the PZN {}", amount_needed, amount_per_package, packages_needed, medStock.getPackage().getPzn());
+                String large_css = packages_needed.compareTo(BigDecimal.ONE) > 0 ? "<div class=\"ex1\">" : "<div>";
+                note.append(String.format("<p>Vorschlag: <b>%s%sx</div> %s %s</b>", large_css, packages_needed, medStock.getTradeForm().getMedProduct().getText(), MedPackageTools.toPrettyString(medStock.getPackage())));
+                medOrder.setNote(note.toString());
+            });
+
             result.add(medOrder);
         });
         return result;
@@ -328,5 +363,20 @@ public class MedOrderTools {
 
     public static Optional<OPUsers> get_confirmed_by(MedOrder medOrder) {
         return Optional.ofNullable(medOrder.getConfirmed_by());
+    }
+
+    @Value
+    private static class StockKey {
+        Resident resident;
+        TradeForm tradeForm;
+    }
+
+    @Value
+    private static class Supply {
+        BigDecimal consumptionPerDay;
+        BigDecimal sumForInventory;
+        BigDecimal rangeOfDays;
+        Prescription prescription;
+        Optional<MedStock> optMedStock;
     }
 }

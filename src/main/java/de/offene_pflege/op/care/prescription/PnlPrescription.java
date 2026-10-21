@@ -47,12 +47,15 @@ import de.offene_pflege.op.OPDE;
 import de.offene_pflege.op.care.med.inventory.*;
 import de.offene_pflege.op.care.sysfiles.DlgFiles;
 import de.offene_pflege.op.process.DlgProcessAssign;
+import de.offene_pflege.op.system.AppInfo;
 import de.offene_pflege.op.system.InternalClassACL;
 import de.offene_pflege.op.threads.DisplayManager;
 import de.offene_pflege.op.threads.DisplayMessage;
 import de.offene_pflege.op.tools.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.poi.sl.draw.geom.GuideIf;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
@@ -64,7 +67,12 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.*;
 
@@ -173,7 +181,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     Collections.sort(lstPrescriptions, Comparator.comparing(Prescription::getFrom).reversed());
                 else if (sort_order == show_old_date)
                     Collections.sort(lstPrescriptions, Comparator.comparing(Prescription::getTo).reversed());
-                else if (sort_order == show_old_abc || sort_order == show_active_abc )
+                else if (sort_order == show_old_abc || sort_order == show_active_abc)
                     Collections.sort(lstPrescriptions, Comparator.comparing(PrescriptionTools::getShortDescriptionAsCompactText, String.CASE_INSENSITIVE_ORDER)
                             .thenComparing(Prescription::getFrom)
                     );
@@ -830,6 +838,30 @@ public class PnlPrescription extends NursingRecordsPanel {
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, actionEvent -> SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, true, true), true));
             list.add(printPrescription);
+        }
+
+        // checked for acls
+        if (OPDE.isAdmin()) {
+            JideButton exportAsCSV = GUITools.createHyperlinkButton("Verordnungen exportieren", SYSConst.icon22exec,
+                    actionEvent -> {
+                        try (FileWriter out = new FileWriter(AppInfo.getOPCache() + File.separator + resident.getId() + "_verordnungen.csv");
+                             CSVPrinter printer = new CSVPrinter(out,
+                                     CSVFormat.DEFAULT.withHeader("Medikament", "Dosierung", "von", "bis"))) {
+
+                            for (Prescription prescription : lstPrescriptions) {
+                                if (prescription.hasMed()) {
+                                    printer.printRecord(PrescriptionTools.getShortDescriptionAsCompactText(prescription),
+                                            PrescriptionTools.getDoseAsCompactText(prescription),
+                                            JavaTimeConverter.toJavaLocalDateTime(prescription.getFrom()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)),
+                                            !prescription.isClosed() ? "--" : JavaTimeConverter.toJavaLocalDateTime(prescription.getTo()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
+                                    log.debug(PrescriptionTools.getShortDescriptionAsCompactText(prescription));
+                                }
+                            }
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+            list.add(exportAsCSV);
         }
 
         return list;
