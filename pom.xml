@@ -64,7 +64,7 @@
         <xerces.version>2.12.2</xerces.version>
         <xml.bind.impl.version>3.0.2</xml.bind.impl.version>
         <xml.bind.version>3.0.1</xml.bind.version>
-        <json.version>20231013</json.version>
+        <json.version>20260719</json.version>
         <!-- not changed anymore -->
         <install4j.runtime.version>10.0.9</install4j.runtime.version>
         <exec.mainClass>de.offene_pflege.op.OPDE</exec.mainClass>
